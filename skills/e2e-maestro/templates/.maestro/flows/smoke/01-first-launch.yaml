@@ -1,0 +1,17 @@
+# .maestro/flows/smoke/01-first-launch.yaml — a fresh install starts on the home screen and draws
+# its content. Every step selects by testID, so the flow runs unchanged in every locale and on both
+# platforms (testID is the accessibility identifier on iOS and the resource-id on Android).
+appId: ${APP_ID}
+name: A fresh install opens the home screen with its content
+tags: [smoke]
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+- extendedWaitUntil:
+    visible:
+      id: '__HOME_SCREEN_ID__'
+    timeout: 20000
+- assertVisible:
+    id: '__SUMMARY_ID__'
+- takeScreenshot: first-launch-home

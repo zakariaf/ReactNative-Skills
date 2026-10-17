@@ -1,0 +1,699 @@
+{
+  "bad-abandoned-loss-overwritten": {
+    "expect": ["FAIL src/services/game-host/host-runs.ts:1 [abandoned-run-recorded]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/game-host/host-runs.ts",
+          "find": "    settlePrevious: isNew ? () => settleAbandoned(game, deps) : SETTLED,",
+          "with": "    settlePrevious: SETTLED,"
+        }
+      }
+    ]
+  },
+  "bad-back-guard-condition": {
+    "expect": [
+      "FAIL src/features/game [game-screen-wiring] the Game screen guards Back on `view?.status === 'playing'`, not on backCommandOf"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/game/use-game-model.ts",
+          "find": "  usePreventRemove(back !== null, ({ data }) => {",
+          "with": "  usePreventRemove(view?.status === 'playing', ({ data }) => {"
+        }
+      }
+    ]
+  },
+  "bad-back-leaves-pending-loss": {
+    "expect": ["FAIL src/services/game-host/run-end-policy.ts:1 [back-guard]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/game-host/run-end-policy.ts",
+          "find": "      return view.continueState === 'offered' ? FINISH : null;",
+          "with": "      return null;"
+        }
+      }
+    ]
+  },
+  "bad-back-playing-only": {
+    "expect": ["FAIL src/features/game [game-screen-wiring] the Game screen guards Back without backCommandOf"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/game/use-game-model.ts",
+          "find": "  const back = backCommandOf(view);",
+          "with": "  const back = view?.status === 'playing' ? ({ type: 'pause' } as const) : null;"
+        }
+      }
+    ]
+  },
+  "bad-binding-with-logic": {
+    "expect": ["FAIL src/games/lights-out/lights-out-hosted.ts:1 [hosted-binding]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/lights-out-hosted.ts",
+          "find": "  Surface: LightsOutBoard,\n",
+          "with": "  Surface: LightsOutBoard,\n  isFeatured: true,\n"
+        }
+      }
+    ]
+  },
+  "bad-cast-in-registry": {
+    "expect": ["FAIL src/games/game-registry.ts:", "[unsafe-cast]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/game-registry.ts",
+          "find": "createGameHost(LIGHTS_OUT_HOSTED, {",
+          "with": "createGameHost(LIGHTS_OUT_HOSTED as unknown as typeof LIGHTS_OUT_HOSTED, {"
+        }
+      }
+    ]
+  },
+  "bad-config-continue": {
+    "expect": [
+      "FAIL src/config/game-host-config.ts:1 [config-rules] lights-out: isContinueAllowed is true but the rules offer no rescue"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/lights-out-game.ts",
+          "find": "    continueRun: {\n      kind: 'once',\n      descriptionId: 'lights-out.continue.more-moves',\n      apply: (lost) => ({ state: { ...lost, maxMoves: lost.maxMoves + 2 }, events: [] }),\n    },",
+          "with": "    continueRun: { kind: 'none' },"
+        }
+      }
+    ]
+  },
+  "bad-config-hints": {
+    "expect": [
+      "FAIL src/config/game-host-config.ts:1 [config-rules] lights-out: freeHintsPerDay is 2 but the rules have no hints"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/lights-out-game.ts",
+          "find": "hints: { kind: 'solver', suggest: () => ({ kind: 'toggle', col: 0, row: 0 }) },",
+          "with": "hints: { kind: 'none' },"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/config/game-host-config.ts",
+          "find": "    freeHintsPerDay: 0,",
+          "with": "    freeHintsPerDay: 2,"
+        }
+      }
+    ]
+  },
+  "bad-config-missing-game": {
+    "expect": ["FAIL src/config/game-host-config.ts:1 [config-rules] GAME_HOST_CONFIG has no entry for lights-out"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/game-host-config.ts",
+          "find": "  'lights-out': {",
+          "with": "  'sliding-puzzle': {"
+        }
+      }
+    ]
+  },
+  "bad-continue-hardcoded": {
+    "expect": ["FAIL src/games/game-registry.ts:", "[continue-from-config]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/game-registry.ts",
+          "find": "options: GAME_HOST_CONFIG['lights-out']",
+          "with": "options: { isContinueAllowed: true, freeHintsPerDay: 2 }"
+        }
+      }
+    ]
+  },
+  "bad-counters-last-move": {
+    "expect": ["FAIL src/services/game-host/measure-counters.ts:1 [counters-from-log]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/game-host/run-summary.ts",
+          "find": "counters: measureCounters(context.rules, session, context.counters),",
+          "with": "counters: measureCounters(context.rules, { ...session, log: session.log.slice(-1) }, context.counters),"
+        }
+      }
+    ]
+  },
+  "bad-daily-replay-counted": {
+    "expect": ["FAIL src/services/game-host/session-persist.ts:1 [daily-practice]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/game-host/session-persist.ts",
+          "find": "  return session.ref.kind === 'daily' ? deps.runs.hasRunEnd(deps.gameId, session.ref) : ok(false);",
+          "with": "  return ok(false);"
+        }
+      }
+    ]
+  },
+  "bad-debug-end-skipped": {
+    "expect": ["FAIL src/services/game-host/game-host.ts:1 [debug-run-end]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/game-host/game-host.ts",
+          "find": "endActiveRun: (example) => active?.endWith(example) ?? false",
+          "with": "endActiveRun: () => active !== null"
+        }
+      }
+    ]
+  },
+  "bad-export-renamed": {
+    "expect": ["FAIL src/services/game-host/session-view-of.ts:1 [host-export-missing] does not export continueStateOf"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/game-host/session-view-of.ts",
+          "find": "export function continueStateOf<",
+          "with": "function continueStateOf<"
+        }
+      }
+    ]
+  },
+  "bad-feedback-before-write": {
+    "expect": ["FAIL src/services/game-host/session-persist.ts:1 [result-feedback]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/game-host/session-persist.ts",
+          "find": "    const isFinal = isDecided(session) && !isRescuePending(parts.deps.rules, session);",
+          "with": "    if (isDecided(session)) parts.deps.feedback(session.status === 'won' ? 'win' : 'lose');\n    const isFinal = isDecided(session) && !isRescuePending(parts.deps.rules, session);"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/game-host/session-persist.ts",
+          "find": "    if (DECIDING.has(action.type) && isDecided(session)) {\n      parts.deps.feedback(session.status === 'won' ? 'win' : 'lose');\n    }\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-feedback-on-decline": {
+    "expect": ["FAIL src/services/game-host/session-persist.ts:1 [result-feedback]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/game-host/session-persist.ts",
+          "find": "  'sync-state',\n]);",
+          "with": "  'sync-state',\n  'decline-continue',\n]);"
+        }
+      }
+    ]
+  },
+  "bad-game-facing-unrecorded": {
+    "expect": ["FAIL contracts/architecture.json:1 [game-facing-recorded]"],
+    "ops": [{ "json": { "file": "contracts/architecture.json", "path": ["gameFacing"], "value": [] } }]
+  },
+  "bad-game-not-registered": {
+    "expect": ["FAIL src/games/game-registry.ts [game-registered] the registry does not host sliding-puzzle"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/sliding-puzzle/sliding-puzzle-hosted.ts",
+          "lines": [
+            "// src/games/sliding-puzzle/sliding-puzzle-hosted.ts",
+            "import { SlidingPuzzleSurface } from '@/games/sliding-puzzle/board/sliding-puzzle-surface';",
+            "import { SLIDING_PUZZLE_GAME } from '@/games/sliding-puzzle/sliding-puzzle-game';",
+            "",
+            "import type { HostedGame } from '@/services/game-host/hosted-game';",
+            "",
+            "export const SLIDING_PUZZLE_HOSTED: HostedGame<never, never, never, never> = {",
+            "  ...SLIDING_PUZZLE_GAME,",
+            "  Surface: SlidingPuzzleSurface,",
+            "};"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-host-at-import": {
+    "expect": ["FAIL src/features/home/home-hosts.ts:4 [host-at-import]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/home/home-hosts.ts",
+          "lines": [
+            "// src/features/home/home-hosts.ts",
+            "import { createGameHosts } from '@/games/game-registry';",
+            "",
+            "export const HOSTS = createGameHosts(EARLY_DEPS);"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-host-file-missing": {
+    "expect": ["FAIL src/services/game-host/run-end-policy.ts [host-file-missing]"],
+    "ops": [{ "delete": ["src/services/game-host/run-end-policy.ts", "src/services/game-host/run-end-policy.test.ts"] }]
+  },
+  "bad-host-in-render": {
+    "expect": ["FAIL src/features/root-navigator/games-root.tsx:26 [host-in-render]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/games-root.tsx",
+          "find": "  const [hosts] = useState(() =>",
+          "with": "  const [hosts] = [0].map(() =>"
+        }
+      }
+    ]
+  },
+  "bad-host-load-enum": {
+    "expect": ["FAIL src/services/game-host/play-clock.ts:1 [host-load]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/game-host/play-clock.ts",
+          "find": "export const MAX_PLAY_DELTA_MS",
+          "with": "export enum ClockMode {\n  Playing,\n}\n\nexport const MAX_PLAY_DELTA_MS"
+        }
+      }
+    ]
+  },
+  "bad-host-not-created": { "expect": ["[host-not-created]"], "ops": [{ "delete": "src/games/game-registry.ts" }] },
+  "bad-host-test-missing": {
+    "expect": ["FAIL src/services/game-host/session-controller.test.ts [host-test-missing]"],
+    "ops": [{ "delete": "src/services/game-host/session-controller.test.ts" }]
+  },
+  "bad-loss-recorded-at-once": {
+    "expect": ["FAIL src/services/game-host/session-persist.ts:1 [rescue-pending]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/game-host/session-persist.ts",
+          "find": "const isFinal = isDecided(session) && !isRescuePending(parts.deps.rules, session);",
+          "with": "const isFinal = isDecided(session);"
+        }
+      }
+    ]
+  },
+  "bad-loss-stranded-when-loading": {
+    "expect": ["FAIL src/services/game-host/run-end-policy.ts:1 [loss-not-stranded]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/game-host/run-end-policy.ts",
+          "find": "offer === 'hidden'",
+          "with": "offer !== 'free'"
+        }
+      }
+    ]
+  },
+  "bad-move-while-paused": {
+    "expect": ["FAIL src/stores/game-session/game-session-transitions.ts:1 [moves-only-while-playing]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/game-session/game-session-transitions.ts",
+          "find": "  if (session.status !== 'playing') return session;\n  const result",
+          "with": "  const result"
+        }
+      }
+    ]
+  },
+  "bad-move-without-intent": {
+    "expect": [
+      "FAIL src/services/game-host/session-controller.ts:1 [intent-legality] the controller turns intents",
+      "FAIL src/services/game-host/session-controller.ts:1 [intent-legality] a tap the game does not turn into a move"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/game-host/session-controller.ts",
+          "find": "const move = deps.intentToMove(session.state, intent);",
+          "with": "const move: TMove | null = Object.assign(intent, {}) as never;"
+        }
+      }
+    ]
+  },
+  "bad-no-back-guard": {
+    "expect": ["FAIL src/features/game [game-screen-wiring] the Game screen lets Back"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/game/use-game-model.ts",
+          "find": "  usePreventRemove(back !== null, ({ data }) => {\n    if (leaving.current) {\n      navigation.dispatch(data.action);\n      return;\n    }\n    if (back !== null) send(back);\n  });\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-no-board": {
+    "expect": ["[game-screen-wiring] the Game screen does not render the host's BoardHost"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/game/game-screen.tsx",
+          "find": "      <BoardHost testID=\"game.board\" />\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-no-boot-validation": {
+    "expect": [
+      "FAIL src/services/game-host/game-host.ts:1 [saved-run-validated] createGameHost drops an unreadable saved run at boot"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/game-host/game-host.ts",
+          "find": "  // At boot: validate the saved run with the game's own parsers; drop only an unreadable run.\n  savedSession(game, deps);\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-no-pause-on-background": {
+    "expect": ["FAIL src/features/game [game-screen-wiring] the Game screen does not pause the run"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/game/use-game-model.ts",
+          "find": "  usePauseOnBackground(view?.status ?? null, pause);\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-no-provider": {
+    "expect": ["[host-not-provided]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/games-root.tsx",
+          "find": "<GameHostsProvider hosts={hosts}>{children}</GameHostsProvider>",
+          "with": "<>{children}</>"
+        }
+      }
+    ]
+  },
+  "bad-play-time-unclamped": {
+    "expect": ["FAIL src/services/game-host/play-clock.ts:1 [play-time]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/game-host/play-clock.ts",
+          "find": "Math.min(Math.max(elapsed, 0), MAX_PLAY_DELTA_MS)",
+          "with": "elapsed"
+        }
+      }
+    ]
+  },
+  "bad-publish-before-persist": {
+    "expect": ["FAIL src/stores/game-session/game-session-store.ts:1 [save-before-publish]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/game-session/game-session-store.ts",
+          "find": "      const saved = persist(next, action);\n      if (!saved.ok) return saved;\n      set({ session: next });",
+          "with": "      set({ session: next });\n      const saved = persist(next, action);\n      if (!saved.ok) return saved;"
+        }
+      }
+    ]
+  },
+  "bad-resume-playing": {
+    "expect": ["FAIL src/stores/game-session/saved-run.ts:1 [saved-run-validated]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/game-session/saved-run.ts",
+          "find": "status: outcome.kind === 'playing' ? 'paused' : outcome.kind,",
+          "with": "status: outcome.kind,"
+        }
+      }
+    ]
+  },
+  "bad-run-end-not-published": {
+    "expect": ["FAIL src/services/game-host/session-persist.ts:1 [run-end-once]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/game-host/session-persist.ts",
+          "find": "  parts.extras.patch({ summary: recorded.value, hint: null });\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-run-end-split": {
+    "expect": ["FAIL src/services/game-host/session-persist.ts:1 [run-end-once]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/game-host/session-persist.ts",
+          "find": "    const written = isFinal\n      ? recordEnd(parts, session)\n      : writeRunIfDue(parts.deps, session, action);",
+          "with": "    const written = isFinal\n      ? (writeRunIfDue(parts.deps, session, action), recordEnd(parts, session))\n      : writeRunIfDue(parts.deps, session, action);"
+        }
+      }
+    ]
+  },
+  "bad-save-failure-hidden": {
+    "expect": ["FAIL src/services/game-host/session-controller.ts:1 [save-failure-shown]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/game-host/session-controller.ts",
+          "find": "  if (!result.ok) showSaveFailure(parts.extras, result.error);\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-save-point-not-written": {
+    "expect": ["FAIL src/services/game-host/session-persist.ts:1 [save-point-write]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/game-host/session-persist.ts",
+          "find": "const isSavePoint = action.type === 'pause' || action.type === 'sync-state';",
+          "with": "const isSavePoint = action.type === 'pause';"
+        }
+      }
+    ]
+  },
+  "bad-save-policy-realtime": {
+    "expect": ["FAIL src/games/lights-out/lights-out-game.ts:1 [save-policy] a game with a real-time loop"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/lights-out/sim/fixed-step.ts",
+          "lines": ["// src/games/lights-out/sim/fixed-step.ts", "export const STEP_MS = 16;"]
+        }
+      }
+    ]
+  },
+  "bad-screen-applies-move": {
+    "expect": ["FAIL src/features/game/use-game-model.ts:", "[intent-legality] makes a move itself"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/game/use-game-model.ts",
+          "find": "  const hint = useRescueOffer(gameId, 'hint');",
+          "with": "  const hint = useRescueOffer(gameId, 'hint');\n  const replay = (game: { engine: { applyMove: (state: null) => void } }): void => {\n    game.engine.applyMove(null);\n  };"
+        }
+      }
+    ]
+  },
+  "bad-screen-imports-game": {
+    "expect": [
+      "FAIL src/features/levels/use-levels-model.ts:2 [screens-type-erased] imports @/games/lights-out/lights-out-game"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/levels/use-levels-model.ts",
+          "lines": [
+            "// src/features/levels/use-levels-model.ts",
+            "import { LIGHTS_OUT_GAME } from '@/games/lights-out/lights-out-game';",
+            "",
+            "export function useLevelsModel(): number {",
+            "  return LIGHTS_OUT_GAME.levels?.packs.length ?? 0;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-screen-strands-loss": {
+    "expect": ["[game-screen-wiring] the Game screen never finishes a loss nobody can rescue"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/game/use-game-model.ts",
+          "find": "    if (view !== null && isLossStranded(view, offer)) send({ type: 'finish' });",
+          "with": "    if (view?.status === 'lost') send({ type: 'pause' });"
+        }
+      }
+    ]
+  },
+  "bad-second-rescue": {
+    "expect": ["FAIL src/stores/game-session/game-session-transitions.ts:1 [continue-once]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/game-session/game-session-transitions.ts",
+          "find": "    session.continuesUsed === 0 &&\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-stars-not-rated": {
+    "expect": ["FAIL src/services/game-host/run-summary.ts:1 [stars-from-table]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/game-host/run-summary.ts",
+          "find": "starsFor(rule, run) : 0",
+          "with": "3 : 0"
+        }
+      }
+    ]
+  },
+  "bad-store-names-module": {
+    "expect": ["FAIL src/stores/lights-out-progress.ts:", "[screens-type-erased] names GameModule"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/stores/lights-out-progress.ts",
+          "lines": [
+            "// src/stores/lights-out-progress.ts",
+            "import type { GameIntent } from '@/core/game/game-input';",
+            "",
+            "export type ProgressInput = { readonly module: GameModule<unknown, unknown, unknown, GameIntent> };"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-tutorial-illegal-move": {
+    "expect": [
+      "FAIL src/games/lights-out/tutorial/lights-out-tutorial.ts:1 [tutorial-legal] the tutorial cannot be played: step 2 expects"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/tutorial/lights-out-tutorial.ts",
+          "find": "expect: { kind: 'move', move: { kind: 'toggle', col: 2, row: 2 } },",
+          "with": "expect: { kind: 'move', move: { kind: 'toggle', col: 7, row: 2 } },"
+        }
+      }
+    ]
+  },
+  "bad-tutorial-missing": {
+    "expect": ["FAIL src/games/lights-out/lights-out-hosted.ts:1 [tutorial-legal]"],
+    "ops": [{ "delete": "src/games/lights-out/tutorial/lights-out-tutorial.ts" }]
+  },
+  "bad-tutorial-records": {
+    "expect": ["FAIL src/services/game-host/host-runs.ts:1 [tutorial-beside-run]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/game-host/host-runs.ts",
+          "find": "const runDeps = { ...base, rules, runs: NO_WRITES, tutorial: tutorial.steps };",
+          "with": "const runDeps = { ...base, rules, tutorial: tutorial.steps };"
+        }
+      }
+    ]
+  },
+  "bad-tutorial-step-gate": {
+    "expect": [
+      "FAIL src/services/game-host/session-controller.ts:1 [tutorial-beside-run] a tutorial step plays only the move it expects"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/game-host/session-controller.ts",
+          "find": "if (move === null || !isAccepted(deps.tutorial, move, session.moveCount)) return;",
+          "with": "if (move === null) return;"
+        }
+      }
+    ]
+  },
+  "bad-undo-out-of-loss": {
+    "expect": ["FAIL src/stores/game-session/game-session-transitions.ts:1 [undo-not-after-loss]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/game-session/game-session-transitions.ts",
+          "find": "if (session.status !== 'playing' || session.log.at(-1)?.kind !== 'move') return false;",
+          "with": "if (session.log.at(-1)?.kind !== 'move') return false;"
+        }
+      }
+    ]
+  },
+  "error-games-dir-outside": {
+    "expect": ["ERROR [bad-input] --games-dir must be a repo-relative folder"],
+    "args": "{dir} --games-dir ../games",
+    "ops": []
+  },
+  "error-missing-root": { "expect": ["ERROR [bad-input]"], "args": "{dir}/no-such-app", "ops": [] },
+  "pass-before-architecture-contract": {
+    "expect": [
+      "SKIP contracts/architecture.json [game-facing-recorded] not yet created (architecture-and-boundaries creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "contracts/architecture.json" }]
+  },
+  "pass-before-game-screen": {
+    "expect": [
+      "SKIP src/features/game [game-screen-wiring] not yet created (the Game screen step of game-session-host creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "src/features/game" }]
+  },
+  "pass-installed-skills-silent": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/demo/SKILL.md",
+          "lines": ["---", "name: demo", "description: Planted fixture.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": ".agents/skills/demo/src/features/x/bad.ts",
+          "lines": [
+            "// src/features/x/bad.ts",
+            "export const bad = (game: { engine: { applyMove: () => void } }): void => game.engine.applyMove();"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/vendored/SKILL.md",
+          "lines": ["---", "name: vendored", "description: Planted fixture.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/vendored/bad.ts",
+          "lines": [
+            "// src/features/vendored/bad.ts",
+            "import { LIGHTS_OUT_GAME } from '@/games/lights-out/lights-out-game';",
+            "export const cast = LIGHTS_OUT_GAME as unknown as GameModule<never, never, never, never>;",
+            "export const tap = { type: 'apply-move' };"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-no-games": {
+    "expect": ["NOT APPLICABLE: the app has no game and no game host"],
+    "ops": [{ "delete": ["src/games", "src/services/game-host"] }]
+  },
+  "pass-source-only": { "expect": ["RESULT: PASS"], "args": "{dir} --no-run", "ops": [] }
+}

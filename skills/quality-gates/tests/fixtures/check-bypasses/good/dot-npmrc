@@ -1,0 +1,8 @@
+min-release-age=7
+engine-strict=true
+save-exact=true
+strict-allow-scripts=true
+
+# exclude-block expires=2026-10-03 reason=expo 57.0.26 pins module patches younger than 7 days (expires today: still valid)
+min-release-age-exclude[]=expo
+min-release-age-exclude[]=expo-*

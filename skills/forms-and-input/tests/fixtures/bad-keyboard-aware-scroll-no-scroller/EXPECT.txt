@@ -1,0 +1,2 @@
+src/features/rename/rename-screen.tsx:13 [keyboard-aware-scroll] 3 text fields with no KeyboardAwareScrollView
+RESULT: FAIL (1 problems)

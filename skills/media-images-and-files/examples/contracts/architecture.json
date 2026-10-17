@@ -1,0 +1,9 @@
+{
+  "$comment": "Merge into the app's contracts/architecture.json (architecture-and-boundaries) and add the same packages to VENDOR_SDK_PATHS in eslint.config.mjs, in one commit with a Gate-Change trailer. expo-image stays portless (it renders); expo-file-system is a default vendor SDK already.",
+  "vendorSdks": {
+    "expo-image-picker": "MediaPickerPort (src/services/media-picker)",
+    "expo-image-manipulator": "ImageResizerPort (src/services/image-resizer)",
+    "expo-media-library": "PhotoSaverPort (src/services/photo-saver)",
+    "expo-camera": "CameraPort (an in-app viewfinder, only when the system camera UI is not enough)"
+  }
+}

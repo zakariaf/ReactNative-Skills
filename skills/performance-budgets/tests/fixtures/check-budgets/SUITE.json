@@ -1,0 +1,8 @@
+{
+  "base": [
+    {
+      "from": "@skill/assets/perf-budgets.json",
+      "to": "quality-gates.json"
+    }
+  ]
+}

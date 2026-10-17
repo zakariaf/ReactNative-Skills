@@ -1,0 +1,9 @@
+{
+  "base": [
+    {
+      "templates": true,
+      "firstLinePath": true
+    }
+  ],
+  "extends": "good"
+}

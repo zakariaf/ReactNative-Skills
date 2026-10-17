@@ -1,0 +1,335 @@
+{
+  "bad-component-placement": {
+    "expect": [
+      "FAIL src/features/notes/notes-row.tsx:1 [component-placement] notes-row.tsx sits in the feature root beside the screen"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/notes/notes-row.tsx",
+          "content": "// src/features/notes/notes-row.tsx\nexport function NotesRow(): null {\n  return null;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-feature-files": {
+    "expect": ["FAIL src/features/notes/use-notes-model.test.tsx [feature-files] notes: the model hook has no test"],
+    "ops": [{ "delete": "src/features/notes/use-notes-model.test.tsx" }]
+  },
+  "bad-feature-names": {
+    "expect": [
+      "FAIL src/features/notes/use-notes-model.ts:1 [feature-names] the model hook does not export the type NotesModel"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/notes/use-notes-model.ts",
+          "find": "export type NotesModel = {",
+          "with": "type NotesModel = {"
+        }
+      }
+    ]
+  },
+  "bad-message-key-missing": {
+    "expect": [
+      "[message-key-missing] 'note-detail.invalid-link.go-home' is missing from src/i18n/catalogs/ar.json",
+      "FAIL src/features/note-detail/use-note-detail-model.ts:"
+    ],
+    "ops": [
+      { "json": { "file": "src/i18n/catalogs/ar.json", "path": ["note-detail.invalid-link.go-home"], "delete": true } }
+    ]
+  },
+  "bad-message-key-orphan": {
+    "expect": ["FAIL src/i18n/catalogs/en.json:8 [message-key-orphan] \"notes.old-title\" is used by no code"],
+    "args": ". --orphans",
+    "ops": [
+      { "json": { "file": "src/i18n/catalogs/en.json", "path": ["notes.old-title"], "value": "Old notes" } },
+      {
+        "write": {
+          "file": ".agents/skills/demo/src/uses-key.ts",
+          "content": "// .agents/skills/demo/src/uses-key.ts: a decoy use that must not count\nexport const KEY = 'notes.old-title';\n"
+        }
+      }
+    ]
+  },
+  "bad-nav-contract": {
+    "expect": ["FAIL contracts/navigation.json:1 [nav-contract] \"(app)/notes\" is not in routes"],
+    "ops": [{ "json": { "file": "contracts/navigation.json", "path": ["routes"], "value": ["(app)/notes/[noteId]"] } }]
+  },
+  "bad-nav-param-parser": {
+    "expect": [
+      "FAIL contracts/navigation.json:1 [nav-contract] paramParsers[\"(app)/notes/[noteId]\"] is null, not \"src/features/note-detail/note-detail-params.ts\""
+    ],
+    "ops": [{ "json": { "file": "contracts/navigation.json", "path": ["paramParsers"], "value": {} } }]
+  },
+  "bad-params-global": {
+    "expect": [
+      "FAIL src/features/note-detail/use-note-detail-model.ts:35 [params-in-model] the model hook reads the params of (app)/notes/[noteId] with useGlobalSearchParams"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/note-detail/use-note-detail-model.ts",
+          "find": "useLocalSearchParams",
+          "with": "useGlobalSearchParams",
+          "all": true
+        }
+      }
+    ]
+  },
+  "bad-params-in-model": {
+    "expect": ["FAIL src/app/(app)/notes/[noteId].tsx:13 [params-in-model] the route reads the URL params itself"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/(app)/notes/[noteId].tsx",
+          "find": "import { Stack } from 'expo-router';",
+          "with": "import { Stack, useLocalSearchParams } from 'expo-router';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/(app)/notes/[noteId].tsx",
+          "find": "  const model = useNoteDetailModel();\n",
+          "with": "  const model = useNoteDetailModel();\n  const raw = useLocalSearchParams();\n  console.log(raw);\n"
+        }
+      }
+    ]
+  },
+  "bad-params-parser": {
+    "expect": [
+      "FAIL src/features/note-detail/note-detail-params.ts:1 [params-parser] the parser does not name the route param \"noteId\""
+    ],
+    "ops": [
+      {
+        "$comment": "The schema key is renamed while the type and the return value keep noteId: every link opens the invalid-link state.",
+        "replace": {
+          "file": "src/features/note-detail/note-detail-params.ts",
+          "find": "  noteId: v.pipe(",
+          "with": "  id: v.pipe("
+        }
+      }
+    ]
+  },
+  "bad-params-parser-missing": {
+    "expect": [
+      "FAIL src/features/note-detail/note-detail-params.ts [params-parser] the dynamic route (app)/notes/[noteId] has no params parser"
+    ],
+    "ops": [
+      {
+        "delete": [
+          "src/features/note-detail/note-detail-params.ts",
+          "src/features/note-detail/note-detail-params.test.ts"
+        ]
+      }
+    ]
+  },
+  "bad-placeholder-left": {
+    "expect": [
+      "FAIL src/features/notes/use-notes-model.ts:19 [placeholder-left] unfilled template placeholder __FEATURE__"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/notes/use-notes-model.ts",
+          "find": "t('notes.body')",
+          "with": "t('__FEATURE__.body')"
+        }
+      }
+    ]
+  },
+  "bad-placeholder-path": {
+    "expect": ["FAIL src/features/__FEATURE__ [placeholder-left] a path still holds a template placeholder"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/__FEATURE__/__FEATURE__-screen.tsx",
+          "content": "// src/features/__FEATURE__/__FEATURE__-screen.tsx\nexport const X = 1;\n"
+        }
+      }
+    ]
+  },
+  "bad-route-missing": {
+    "expect": ["FAIL src/features/notes/notes-screen.tsx:1 [route-wiring] no route renders NotesScreen"],
+    "ops": [{ "delete": ["src/app/(app)/notes.tsx", "src/features/notes/notes-navigation.test.tsx"] }]
+  },
+  "bad-route-test": {
+    "expect": ["FAIL src/app/(app)/notes.tsx:1 [route-test] no route test renders this route (notes)"],
+    "ops": [{ "delete": "src/features/notes/notes-navigation.test.tsx" }]
+  },
+  "bad-route-test-render-router": {
+    "expect": ["FAIL src/app/(app)/notes.tsx:1 [route-test] no route test renders this route (notes)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/notes/notes-navigation.test.tsx",
+          "find": "await renderRouterWithProviders(",
+          "with": "await renderRouter("
+        }
+      }
+    ]
+  },
+  "bad-route-wiring": {
+    "expect": [
+      "FAIL src/app/(app)/notes.tsx:1 [route-wiring] the route imports the notes feature but does not render <NotesScreen>"
+    ],
+    "ops": [
+      { "replace": { "file": "src/app/(app)/notes.tsx", "find": "<NotesScreen model={model} />", "with": "null" } }
+    ]
+  },
+  "bad-screen-contract": {
+    "expect": [
+      "FAIL contracts/screens.json:1 [screen-contract] screen \"notes\" names the model \"src/features/notes/use-notes.ts\", not \"src/features/notes/use-notes-model.ts\""
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 0, "model"],
+          "value": "src/features/notes/use-notes.ts"
+        }
+      }
+    ]
+  },
+  "bad-screen-unlisted": {
+    "expect": [
+      "FAIL contracts/screens.json:1 [screen-contract] no screen entry has \"view\": \"src/features/note-detail/note-detail-screen.tsx\""
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 1, "view"],
+          "value": "src/features/note-detail/detail-screen.tsx"
+        }
+      }
+    ]
+  },
+  "bad-starter-screen": {
+    "expect": [
+      "FAIL src/features/home/home-screen.tsx:1 [starter-screen] home is the starter screen of a new app (expo-project-bootstrap), not a feature",
+      "Fix: Delete src/app/index.tsx and src/features/home/, then generate the first feature at its route: scaffold-feature.mjs . --feature <name> --route \"index\"",
+      "check-feature: 3 features checked, 1 problems"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/index.tsx",
+          "content": "// src/app/index.tsx: the first route of a new app. Route files stay thin: they render a screen from\n// src/features/. The first real feature (scaffold-feature-screen) replaces this route and its screen.\nimport { HomeScreen } from '@/features/home/home-screen';\n\nexport default function HomeRoute(): React.JSX.Element {\n  return <HomeScreen />;\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/home/home-screen.tsx",
+          "content": "// src/features/home/home-screen.tsx: the starter screen of a new app, a pure view. It shows no text\n// yet: words reach the screen through the message catalogs (i18n-strings-and-catalogs), never as\n// literal strings, and colours through the theme (design-system-structure). The first real feature\n// (scaffold-feature-screen) replaces it.\nimport { StyleSheet, View } from 'react-native';\n\nexport function HomeScreen(): React.JSX.Element {\n  return <View style={styles.screen} testID=\"home.screen\" />;\n}\n\nconst styles = StyleSheet.create({\n  screen: { flex: 1 },\n});\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/home/home-screen.test.tsx",
+          "content": "// src/features/home/home-screen.test.tsx\n// no-providers: the starter screen reads nothing from context (no copy, theme or store yet)\nimport { render, screen } from '@testing-library/react-native';\n\nimport { HomeScreen } from './home-screen';\n\ndescribe('HomeScreen', () => {\n  it('renders the starter screen under its testID', async () => {\n    await render(<HomeScreen />);\n\n    expect(screen.getByTestId('home.screen')).toBeOnTheScreen();\n  });\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-unknown-feature": {
+    "expect": [
+      "FAIL src/features/settings/settings-screen.tsx [feature-files] settings: settings-screen.tsx is missing",
+      "check-feature: 1 features checked"
+    ],
+    "args": ". --feature settings",
+    "ops": []
+  },
+  "bad-view-pure": {
+    "expect": [
+      "FAIL src/features/notes/notes-screen.tsx:9 [view-pure] the view imports @/i18n/t-context",
+      "[view-pure] the view calls useT()"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/notes/notes-screen.tsx",
+          "find": "import { makeStyles } from '@/theme/make-styles';",
+          "with": "import { useT } from '@/i18n/t-context';\nimport { makeStyles } from '@/theme/make-styles';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/notes/notes-screen.tsx",
+          "find": "  const styles = useStyles();\n",
+          "with": "  const styles = useStyles();\n  const t = useT();\n  console.log(t('notes.title'));\n"
+        }
+      }
+    ]
+  },
+  "bad-view-pure-component": {
+    "expect": [
+      "FAIL src/features/note-detail/components/note-detail-invalid-link.tsx:4 [view-pure] the view imports expo-router"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/note-detail/components/note-detail-invalid-link.tsx",
+          "find": "import { StyleSheet, View } from 'react-native';",
+          "with": "import { useRouter } from 'expo-router';\nimport { StyleSheet, View } from 'react-native';"
+        }
+      }
+    ]
+  },
+  "error-bad-feature-name": {
+    "expect": ["ERROR [bad-input] --feature \"Notes\" is not a kebab-case feature folder name"],
+    "args": ". --feature Notes",
+    "ops": []
+  },
+  "error-no-features": {
+    "expect": ["ERROR [bad-input] nothing to check: 0 screen features found"],
+    "ops": [{ "delete": ["src/features/notes", "src/features/note-detail", "src/app"] }]
+  },
+  "error-no-package": {
+    "expect": ["ERROR [bad-input] nothing to check: no package.json in ."],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "pass-no-contracts": {
+    "expect": [
+      "SKIP contracts/navigation.json [nav-contract] not yet created (navigation-and-routing creates it)",
+      "SKIP contracts/screens.json [screen-contract] not yet created (screen-contracts creates it)",
+      "SKIP src/i18n/catalogs [message-key-missing] holds no catalog (i18n-strings-and-catalogs creates them)",
+      "0 problems, 3 skipped"
+    ],
+    "ops": [
+      {
+        "delete": [
+          "contracts/navigation.json",
+          "contracts/screens.json",
+          "src/i18n/catalogs/en.json",
+          "src/i18n/catalogs/ar.json"
+        ]
+      }
+    ]
+  },
+  "pass-no-router": {
+    "expect": ["NOT APPLICABLE: expo-router is not in package.json"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo-router"], "delete": true } }]
+  },
+  "pass-orphans": { "expect": ["check-feature: 2 features checked, 0 problems"], "args": ". --orphans", "ops": [] },
+  "pass-route-device-only": {
+    "expect": ["check-feature: 2 features checked, 0 problems"],
+    "ops": [
+      { "delete": "src/features/notes/notes-navigation.test.tsx" },
+      {
+        "replace": {
+          "file": "src/app/(app)/notes.tsx",
+          "find": "// src/app/(app)/notes.tsx\n",
+          "with": "// src/app/(app)/notes.tsx\n// device-only: covered by the notes flow on a device\n"
+        }
+      }
+    ]
+  },
+  "pass-unrouted-screen": {
+    "expect": ["check-feature: 2 features checked, 0 problems"],
+    "ops": [
+      { "delete": ["src/app/(app)/notes.tsx", "src/features/notes/notes-navigation.test.tsx"] },
+      { "json": { "file": "contracts/screens.json", "path": ["screens", 0, "presentation"], "value": "sheet" } }
+    ]
+  }
+}

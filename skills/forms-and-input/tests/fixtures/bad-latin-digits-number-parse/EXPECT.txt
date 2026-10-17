@@ -1,0 +1,2 @@
+src/features/copies/use-copies-form.ts:7 [latin-digits] the schema reads digits without toLatinDigits
+RESULT: FAIL (1 problems)

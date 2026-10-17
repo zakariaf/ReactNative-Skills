@@ -1,0 +1,572 @@
+{
+  "bad-banned": {
+    "expect": [
+      "[banned] node-ipc is banned: protestware",
+      "Never install it. Instead: remove the dependency that pulls it in (npm explain <pkg>)."
+    ],
+    "args": "node-ipc .",
+    "ops": []
+  },
+  "bad-companion-rntl": {
+    "expect": [
+      "[too-young]",
+      "companion test-renderer 1.2.0 (install)",
+      "npm install -D test-renderer@1.2.0 @testing-library/react-native@14.0.1"
+    ],
+    "args": "@testing-library/react-native . --npm-view rntl-view.json --now 2026-09-28T00:00:00Z",
+    "ops": [
+      {
+        "write": {
+          "file": "rntl-view.json",
+          "lines": [
+            "{",
+            "  \"version\": \"14.0.1\",",
+            "  \"time\": {",
+            "    \"created\": \"2019-01-01T00:00:00.000Z\",",
+            "    \"14.0.1\": \"2026-09-26T09:00:00.000Z\"",
+            "  },",
+            "  \"license\": \"MIT\",",
+            "  \"scripts\": {}",
+            "}"
+          ]
+        }
+      },
+      {
+        "json": { "file": "package.json", "path": ["devDependencies", "@testing-library/react-native"], "delete": true }
+      },
+      { "json": { "file": "package.json", "path": ["devDependencies", "test-renderer"], "delete": true } }
+    ]
+  },
+  "bad-companion-typescript-eslint": {
+    "expect": [
+      "[too-young] typescript-eslint@8.70.1 is 2 days old",
+      "companion @typescript-eslint/eslint-plugin 8.70.1 (overrides)",
+      "add \"@typescript-eslint/visitor-keys\": \"8.70.1\" to the root package.json overrides"
+    ],
+    "args": "typescript-eslint . --npm-view tse-view.json --now 2026-09-24T00:00:00Z",
+    "ops": [
+      {
+        "write": {
+          "file": "tse-view.json",
+          "lines": [
+            "{",
+            "  \"version\": \"8.70.1\",",
+            "  \"time\": {",
+            "    \"created\": \"2019-01-01T00:00:00.000Z\",",
+            "    \"8.70.1\": \"2026-09-21T17:07:55.524Z\"",
+            "  },",
+            "  \"license\": \"MIT\",",
+            "  \"scripts\": {}",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-deprecated": {
+    "expect": [
+      "deprecated Planted: use the next release",
+      "[deprecated] lefthook@2.1.14 is deprecated on npm",
+      "scripts  postinstall: node postinstall.js (allowScripts approves it: \"lefthook@2.1.14\": true)"
+    ],
+    "args": "lefthook . --npm-view lefthook-view.json --now 2026-10-03T00:00:00Z",
+    "ops": [
+      {
+        "write": {
+          "file": "lefthook-view.json",
+          "lines": [
+            "{",
+            "  \"version\": \"2.1.14\",",
+            "  \"time\": {",
+            "    \"2.1.14\": \"2026-09-23T08:00:00.000Z\"",
+            "  },",
+            "  \"license\": \"MIT\",",
+            "  \"deprecated\": \"Planted: use the next release\",",
+            "  \"scripts\": {",
+            "    \"postinstall\": \"node postinstall.js\"",
+            "  }",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-do-not-add": {
+    "expect": ["[do-not-add] babel-preset-expo: comes with expo; a direct copy drifts from the SDK's own"],
+    "args": "babel-preset-expo .",
+    "ops": []
+  },
+  "bad-held-back": {
+    "expect": ["[held-back] eslint@10.0.0 crosses a held-back major"],
+    "args": "eslint@10.0.0 .",
+    "ops": []
+  },
+  "bad-licence": {
+    "expect": ["[licence] valibot is licensed GPL-3.0-only, which the policy does not allow for shipped code"],
+    "args": "valibot . --npm-view valibot-view.json --now 2026-10-03T00:00:00Z",
+    "ops": [
+      {
+        "write": {
+          "file": "valibot-view.json",
+          "lines": [
+            "{",
+            "  \"time\": {",
+            "    \"1.5.0\": \"2026-09-09T08:00:00.000Z\"",
+            "  },",
+            "  \"license\": \"GPL-3.0-only\",",
+            "  \"scripts\": {}",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-licence-expression": {
+    "expect": [
+      "[licence] valibot is licensed (MIT OR GPL-3.0-only) AND LGPL-3.0-only, which the policy does not allow for shipped code"
+    ],
+    "args": "valibot . --npm-view valibot-view.json --now 2026-10-03T00:00:00Z",
+    "ops": [
+      {
+        "write": {
+          "file": "valibot-view.json",
+          "lines": [
+            "{",
+            "  \"time\": {",
+            "    \"1.5.0\": \"2026-09-09T08:00:00.000Z\"",
+            "  },",
+            "  \"license\": \"(MIT OR GPL-3.0-only) AND LGPL-3.0-only\",",
+            "  \"scripts\": {}",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-not-in-table": {
+    "expect": ["[not-in-table] left-pad is not in the dependency policy", "Stop and ask the developer"],
+    "args": "left-pad .",
+    "ops": []
+  },
+  "bad-too-young": {
+    "expect": [
+      "[too-young] react-native-google-mobile-ads@17.2.0 is 2 days old",
+      "Wait until 2026-10-02T14:07Z",
+      "add \"# exclude-block expires=2026-10-02 reason=<link>\" (the publish date + 7 days)"
+    ],
+    "args": "react-native-google-mobile-ads . --npm-view gma-view.json --now 2026-09-28T00:00:00Z",
+    "ops": [
+      {
+        "write": {
+          "file": "gma-view.json",
+          "lines": [
+            "{",
+            "  \"version\": \"17.2.0\",",
+            "  \"time\": {",
+            "    \"created\": \"2019-01-01T00:00:00.000Z\",",
+            "    \"17.1.0\": \"2026-09-01T10:00:00.000Z\",",
+            "    \"17.2.0\": \"2026-09-25T14:06:55.000Z\"",
+            "  },",
+            "  \"license\": \"Apache-2.0\",",
+            "  \"scripts\": {",
+            "    \"prepare\": \"yarn build && yarn build:plugin\"",
+            "  }",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-too-young-by-the-hour": {
+    "expect": [
+      "age      react-native-google-mobile-ads@17.2.0 was published 2026-09-25 (6 days before 2026-10-02T14:00Z; the .npmrc asks for 7)",
+      "[too-young] react-native-google-mobile-ads@17.2.0 is 6 days old; min-release-age=7 will refuse it",
+      "Wait until 2026-10-02T14:07Z"
+    ],
+    "args": "react-native-google-mobile-ads . --npm-view gma-view.json --now 2026-10-02T14:00:00Z",
+    "ops": [
+      {
+        "write": {
+          "file": "gma-view.json",
+          "lines": [
+            "{",
+            "  \"version\": \"17.2.0\",",
+            "  \"time\": {",
+            "    \"created\": \"2019-01-01T00:00:00.000Z\",",
+            "    \"17.1.0\": \"2026-09-01T10:00:00.000Z\",",
+            "    \"17.2.0\": \"2026-09-25T14:06:55.000Z\"",
+            "  },",
+            "  \"license\": \"Apache-2.0\",",
+            "  \"scripts\": {",
+            "    \"prepare\": \"yarn build && yarn build:plugin\"",
+            "  }",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-too-young-outliving-block": {
+    "expect": ["[too-young] react-native-google-mobile-ads@17.2.0 is 2 days old"],
+    "args": "react-native-google-mobile-ads . --npm-view gma-view.json --now 2026-09-28T00:00:00Z",
+    "ops": [
+      {
+        "write": {
+          "file": "gma-view.json",
+          "lines": [
+            "{",
+            "  \"version\": \"17.2.0\",",
+            "  \"time\": {",
+            "    \"created\": \"2019-01-01T00:00:00.000Z\",",
+            "    \"17.1.0\": \"2026-09-01T10:00:00.000Z\",",
+            "    \"17.2.0\": \"2026-09-25T14:06:55.000Z\"",
+            "  },",
+            "  \"license\": \"Apache-2.0\",",
+            "  \"scripts\": {",
+            "    \"prepare\": \"yarn build && yarn build:plugin\"",
+            "  }",
+            "}"
+          ]
+        }
+      },
+      {
+        "op": "replace",
+        "file": ".npmrc",
+        "find": "min-release-age-exclude[]=@expo/*\n",
+        "with": "min-release-age-exclude[]=@expo/*\nmin-release-age-exclude[]=react-native-google-mobile-ads\n",
+        "$comment": "The exclude sits in the base block, which expires 2026-10-10: after 2026-09-28 + 7 days, so it was extended or invented and the plan does not count on it (check-deps-policy fails it as npmrc-exclude)."
+      }
+    ]
+  },
+  "bad-too-young-stricter": {
+    "expect": [
+      "age      react-native-google-mobile-ads@17.2.0 was published 2026-09-25 (7 days before 2026-10-03T00:00Z; the .npmrc asks for 14)",
+      "[too-young] react-native-google-mobile-ads@17.2.0 is 7 days old; min-release-age=14 will refuse it",
+      "Wait until 2026-10-09T14:07Z",
+      "expires=2026-10-09 reason=<link>\" (the publish date + 14 days)"
+    ],
+    "args": "react-native-google-mobile-ads . --npm-view gma-view.json --now 2026-10-03T00:00:00Z",
+    "ops": [
+      {
+        "write": {
+          "file": "gma-view.json",
+          "lines": [
+            "{",
+            "  \"version\": \"17.2.0\",",
+            "  \"time\": {",
+            "    \"created\": \"2019-01-01T00:00:00.000Z\",",
+            "    \"17.1.0\": \"2026-09-01T10:00:00.000Z\",",
+            "    \"17.2.0\": \"2026-09-25T14:06:55.000Z\"",
+            "  },",
+            "  \"license\": \"Apache-2.0\",",
+            "  \"scripts\": {",
+            "    \"prepare\": \"yarn build && yarn build:plugin\"",
+            "  }",
+            "}"
+          ]
+        }
+      },
+      { "replace": { "file": ".npmrc", "find": "min-release-age=7\n", "with": "min-release-age=14\n" } }
+    ]
+  },
+  "bad-version-differs": {
+    "expect": ["[version-differs] the dependency policy pins zustand 5.0.15, not 5.0.14"],
+    "args": "zustand@5.0.14 .",
+    "ops": []
+  },
+  "bad-version-differs-online": {
+    "expect": ["[version-differs] the dependency policy pins zustand 5.0.15, not 5.99.0"],
+    "args": "zustand@5.99.0 . --online --today 2026-10-03",
+    "ops": []
+  },
+  "error-no-policy": {
+    "expect": ["ERROR [bad-input] no dependency policy at contracts/dependency-policy.json"],
+    "args": "expo-haptics .",
+    "ops": [{ "delete": "contracts/dependency-policy.json" }]
+  },
+  "error-peer-of-single": {
+    "expect": ["ERROR [bad-input] --peer-of packages/ui needs npm workspaces, and this repo has none"],
+    "args": "expo-haptics . --peer-of packages/ui",
+    "ops": []
+  },
+  "pass-age-by-the-hour": {
+    "expect": [
+      "age      react-native-google-mobile-ads@17.2.0 was published 2026-09-25 (7 days before 2026-10-02T14:10Z; the .npmrc asks for 7)",
+      "plan-dependency: 1 requests checked, 0 problems"
+    ],
+    "args": "react-native-google-mobile-ads . --npm-view gma-view.json --now 2026-10-02T14:10:00Z",
+    "ops": [
+      {
+        "write": {
+          "file": "gma-view.json",
+          "lines": [
+            "{",
+            "  \"version\": \"17.2.0\",",
+            "  \"time\": {",
+            "    \"created\": \"2019-01-01T00:00:00.000Z\",",
+            "    \"17.1.0\": \"2026-09-01T10:00:00.000Z\",",
+            "    \"17.2.0\": \"2026-09-25T14:06:55.000Z\"",
+            "  },",
+            "  \"license\": \"Apache-2.0\",",
+            "  \"scripts\": {",
+            "    \"prepare\": \"yarn build && yarn build:plugin\"",
+            "  }",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-approved-script": {
+    "expect": [
+      "decided  allowScripts already approves the install script of lefthook@2.1.14 with the pinned key \"lefthook@2.1.14\" (a new version needs a new review)",
+      "step 1   npm install -D lefthook@2.1.14",
+      "scripts  postinstall: node postinstall.js (allowScripts approves it: \"lefthook@2.1.14\": true)"
+    ],
+    "args": "lefthook . --npm-view lefthook-view.json --now 2026-10-03T00:00:00Z",
+    "ops": [
+      {
+        "write": {
+          "file": "lefthook-view.json",
+          "lines": [
+            "{",
+            "  \"version\": \"2.1.14\",",
+            "  \"time\": {",
+            "    \"2.1.14\": \"2026-08-30T12:00:00.000Z\"",
+            "  },",
+            "  \"license\": \"MIT\",",
+            "  \"scripts\": {",
+            "    \"postinstall\": \"node postinstall.js\"",
+            "  }",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-denied-every-version": {
+    "expect": [
+      "decided  allowScripts denies the install script of lefthook for every version (\"lefthook\": false; npm installs the package without running it)",
+      "step 1   npm install -D lefthook@2.1.14",
+      "scripts  postinstall: node postinstall.js (allowScripts denies it for every version: \"lefthook\": false)"
+    ],
+    "args": "lefthook . --npm-view lefthook-view.json --now 2026-10-03T00:00:00Z",
+    "ops": [
+      {
+        "write": {
+          "file": "lefthook-view.json",
+          "lines": [
+            "{",
+            "  \"version\": \"2.1.14\",",
+            "  \"time\": {",
+            "    \"2.1.14\": \"2026-08-30T12:00:00.000Z\"",
+            "  },",
+            "  \"license\": \"MIT\",",
+            "  \"scripts\": {",
+            "    \"postinstall\": \"node postinstall.js\"",
+            "  }",
+            "}"
+          ]
+        }
+      },
+      {
+        "json": { "file": "package.json", "path": ["allowScripts"], "value": { "lefthook": false } },
+        "$comment": "A name-only false denies the script of every lefthook version: a reviewed decision, so no review step."
+      }
+    ]
+  },
+  "pass-deprecated-accepted": {
+    "expect": ["deprecated This version is no longer supported.", "accepted ESLint 9 is end of life"],
+    "args": "eslint . --npm-view eslint-view.json --now 2026-10-03T00:00:00Z",
+    "ops": [
+      {
+        "write": {
+          "file": "eslint-view.json",
+          "lines": [
+            "{",
+            "  \"version\": \"9.39.5\",",
+            "  \"time\": {",
+            "    \"9.39.5\": \"2026-07-10T12:00:00.000Z\"",
+            "  },",
+            "  \"license\": \"MIT\",",
+            "  \"deprecated\": \"This version is no longer supported. Please see https://eslint.org/version-support for other options.\",",
+            "  \"scripts\": {}",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-exclude-covered": {
+    "expect": ["covered  by the dated exclude react-native-google-mobile-ads (block expires 2026-10-02)"],
+    "args": "react-native-google-mobile-ads . --npm-view gma-view.json --now 2026-09-28T00:00:00Z",
+    "ops": [
+      {
+        "write": {
+          "file": "gma-view.json",
+          "lines": [
+            "{",
+            "  \"version\": \"17.2.0\",",
+            "  \"time\": {",
+            "    \"created\": \"2019-01-01T00:00:00.000Z\",",
+            "    \"17.1.0\": \"2026-09-01T10:00:00.000Z\",",
+            "    \"17.2.0\": \"2026-09-25T14:06:55.000Z\"",
+            "  },",
+            "  \"license\": \"Apache-2.0\",",
+            "  \"scripts\": {",
+            "    \"prepare\": \"yarn build && yarn build:plugin\"",
+            "  }",
+            "}"
+          ]
+        }
+      },
+      {
+        "op": "replace",
+        "file": ".npmrc",
+        "find": "min-release-age-exclude[]=@expo/*\n",
+        "with": "min-release-age-exclude[]=@expo/*\n\n# exclude-block expires=2026-10-02 reason=17.2.0 fixes the consent form crash (planted)\nmin-release-age-exclude[]=react-native-google-mobile-ads\n",
+        "$comment": "A block of its own, dated as the policy requires: the publish date (2026-09-25) + the 7-day release age."
+      }
+    ]
+  },
+  "pass-expo-companions": {
+    "expect": [
+      "companion react-native-screens 4.26.2 (install)",
+      "step 2   npx expo install expo-constants@~57.0.21 expo-linking@~57.0.12 react-native-safe-area-context@~5.7.0 react-native-screens@~4.26.0 expo-router@~57.0.25"
+    ],
+    "args": "expo-router .",
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-router"], "delete": true } },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-linking"], "delete": true } },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-constants"], "delete": true } },
+      { "json": { "file": "package.json", "path": ["dependencies", "react-native-screens"], "delete": true } },
+      { "json": { "file": "package.json", "path": ["dependencies", "react-native-safe-area-context"], "delete": true } }
+    ]
+  },
+  "pass-expo-managed-plan": {
+    "expect": [
+      "package  expo-haptics ~57.0.3 (Expo-managed; belongs in dependencies)",
+      "present  nowhere yet",
+      "step 1   review first: npm view expo-haptics@57.0.3 scripts (or plan with --online)",
+      "step 2   npx expo install expo-haptics@~57.0.3",
+      "step 3   npm approve-scripts --allow-scripts-pending   (must print \"No packages with unreviewed install scripts.\"",
+      "step 4   npx expo install --check && npx expo-doctor",
+      "native change: rebuild the binaries"
+    ],
+    "args": "expo-haptics .",
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo-haptics"], "delete": true } }]
+  },
+  "pass-expo-table-spec": {
+    "expect": [
+      "package  expo-constants ~57.0.21 (Expo-managed; belongs in dependencies)",
+      "step 2   npx expo install expo-constants@~57.0.21",
+      "note     keep the @<spec> in each npx expo install: it writes the policy's specifier",
+      "which can be a patch published that day; that patch stays a WARN with its due date in scripts/deps/check-deps.ts"
+    ],
+    "args": "expo-constants .",
+    "ops": []
+  },
+  "pass-plan-jest-image-snapshot": {
+    "expect": [
+      "companion @types/jest-image-snapshot 6.4.2 (install)",
+      "npm install -D @types/jest-image-snapshot@6.4.2 jest-image-snapshot@6.5.2"
+    ],
+    "args": "jest-image-snapshot .",
+    "ops": []
+  },
+  "pass-remove": {
+    "expect": ["step 1   npm uninstall zustand", "delete its row from the dependency policy"],
+    "args": "zustand . --remove",
+    "ops": []
+  },
+  "pass-review-before-install": {
+    "expect": [
+      "step 1   review first: @shopify/react-native-skia@2.6.2 runs postinstall: node scripts/install-libs.js; read it (npm pack @shopify/react-native-skia@2.6.2, then the file it runs), then add \"@shopify/react-native-skia@2.6.2\": true to allowScripts in the root package.json before installing",
+      "step 2   npx expo install @shopify/react-native-skia@2.6.2",
+      "scripts  postinstall: node scripts/install-libs.js (review it before the install: the review step of the plan)"
+    ],
+    "args": "@shopify/react-native-skia . --npm-view skia-view.json --now 2026-10-03T00:00:00Z",
+    "ops": [
+      {
+        "write": {
+          "file": "skia-view.json",
+          "lines": [
+            "{",
+            "  \"version\": \"2.6.2\",",
+            "  \"time\": {",
+            "    \"2.6.1\": \"2026-03-20T09:12:00.000Z\",",
+            "    \"2.6.2\": \"2026-04-04T06:40:19.893Z\"",
+            "  },",
+            "  \"license\": \"MIT\",",
+            "  \"scripts\": {",
+            "    \"build\": \"bob build && merge-dirs lib/typescript/src lib/commonjs && merge-dirs lib/typescript/src lib/module\",",
+            "    \"postinstall\": \"node scripts/install-libs.js\",",
+            "    \"install-skia\": \"node scripts/install-libs.js\",",
+            "    \"test\": \"jest\"",
+            "  }",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-today-names-the-day": {
+    "expect": [
+      "react-native-google-mobile-ads@17.2.0 was published 2026-09-25",
+      "plan-dependency: 1 requests checked, 0 problems"
+    ],
+    "args": "react-native-google-mobile-ads . --npm-view gma-view.json --today 2026-09-28",
+    "ops": [
+      {
+        "write": {
+          "file": "gma-view.json",
+          "lines": [
+            "{",
+            "  \"version\": \"17.2.0\",",
+            "  \"time\": {",
+            "    \"created\": \"2019-01-01T00:00:00.000Z\",",
+            "    \"17.1.0\": \"2026-09-01T10:00:00.000Z\",",
+            "    \"17.2.0\": \"2026-09-25T14:06:55.000Z\"",
+            "  },",
+            "  \"license\": \"Apache-2.0\",",
+            "  \"scripts\": {",
+            "    \"prepare\": \"yarn build && yarn build:plugin\"",
+            "  }",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-unpinned-approval-review": {
+    "expect": [
+      "step 1   review first: lefthook@2.1.14 runs postinstall: node postinstall.js; read it (npm pack lefthook@2.1.14, then the file it runs), then add \"lefthook@2.1.14\": true to allowScripts in the root package.json in place of \"lefthook\" (a name-only true approves every future version unreviewed; check-deps-policy.mjs fails it as unpinned-approval) before installing",
+      "step 2   npm install -D lefthook@2.1.14",
+      "scripts  postinstall: node postinstall.js (\"lefthook\" approves every version unreviewed: review it and pin the key, the review step of the plan)"
+    ],
+    "args": "lefthook . --npm-view lefthook-view.json --now 2026-10-03T00:00:00Z",
+    "ops": [
+      {
+        "write": {
+          "file": "lefthook-view.json",
+          "lines": [
+            "{",
+            "  \"version\": \"2.1.14\",",
+            "  \"time\": {",
+            "    \"2.1.14\": \"2026-08-30T12:00:00.000Z\"",
+            "  },",
+            "  \"license\": \"MIT\",",
+            "  \"scripts\": {",
+            "    \"postinstall\": \"node postinstall.js\"",
+            "  }",
+            "}"
+          ]
+        }
+      },
+      {
+        "json": { "file": "package.json", "path": ["allowScripts"], "value": { "lefthook": true } },
+        "$comment": "A name-only true lets npm run the script of any lefthook version: the plan does not count it as a review."
+      }
+    ]
+  }
+}

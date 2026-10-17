@@ -1,0 +1,97 @@
+{
+  "bad-app-in-subfolder": {
+    "expect": [
+      "[code-without-test]",
+      ":src/features/tasks/next-due.ts",
+      "check-test-edits: 2 commits checked, 1 problems"
+    ],
+    "args": "{dir}/fullstack/mobile --range HEAD~2..HEAD"
+  },
+  "bad-deep-table-row": {
+    "expect": [
+      "[assertion-changed]",
+      "src/features/tasks/task-urgency.test.ts:17",
+      "expectation table row \"[29, 'later'],\"",
+      "check-test-edits: 2 commits checked, 1 problems"
+    ],
+    "args": "{dir} --range main..table"
+  },
+  "bad-generic-table-row": {
+    "expect": [
+      "[assertion-changed]",
+      "src/features/tasks/task-urgency.test.ts:17",
+      "expectation table row \"[29, 'later'],\"",
+      "check-test-edits: 2 commits checked, 1 problems"
+    ],
+    "args": "{dir} --range main..typed"
+  },
+  "bad-multiline-expectation": {
+    "expect": [
+      "[assertion-changed]",
+      "src/features/tasks/tasks-digest.test.ts:9",
+      "changes the existing assertion \"overdue: ['task-1'],\"",
+      "src/features/tasks/tasks-digest.test.ts:10",
+      "check-test-edits: 2 commits checked, 2 problems"
+    ],
+    "args": "{dir} --range main..wrapped"
+  },
+  "bad-refactor-changes-literal": {
+    "expect": [
+      "[assertion-changed]",
+      "changes the existing assertion \"overdue: ['task-1'],\"",
+      "check-test-edits: 1 commits checked, 2 problems"
+    ],
+    "args": "{dir} --range wrapped~1..renamelit"
+  },
+  "bad-refactor-keeps-old-name": {
+    "expect": [
+      "[assertion-changed]",
+      "src/features/tasks/task-tally.test.ts:6",
+      "changes the existing assertion \"expect(tallyTasks([false, false, true]).openCount).toBe(2);\"",
+      "check-test-edits: 1 commits checked, 1 problems"
+    ],
+    "args": "{dir} --range tally..swapkeep"
+  },
+  "bad-refactor-swaps-to-existing-name": {
+    "expect": [
+      "[assertion-changed]",
+      "src/features/tasks/task-tally.test.ts:6",
+      "changes the existing assertion \"expect(tallyTasks([false, false, true]).openCount).toBe(2);\"",
+      "check-test-edits: 1 commits checked, 1 problems"
+    ],
+    "args": "{dir} --range tally..swapold"
+  },
+  "bad-staged-code-without-test": {
+    "expect": ["[code-without-test]", "staged:src/features/tasks/task-urgency.ts"],
+    "args": "{dir} --staged --message {dir}/COMMIT_MSG.txt",
+    "ops": [
+      {
+        "write": {
+          "file": "COMMIT_MSG.txt",
+          "content": "feat(tasks): never call a task more than a month away urgent\n"
+        }
+      }
+    ]
+  },
+  "error-message-without-staged": {
+    "expect": ["ERROR [bad-input] --message works only with --staged"],
+    "args": "{dir} --range HEAD~1..HEAD --message {dir}/EXPECT.txt"
+  },
+  "error-unknown-revision": {
+    "expect": ["ERROR [bad-input] git log", "no-such-tag"],
+    "args": "{dir} --range no-such-tag..HEAD"
+  },
+  "pass-rename-refactor": {
+    "expect": ["check-test-edits: 1 commits checked, 0 problems", "RESULT: PASS"],
+    "args": "{dir} --range wrapped~1..rename"
+  },
+  "pass-rewrapped-expectation": {
+    "expect": ["check-test-edits: 1 commits checked, 0 problems", "RESULT: PASS"],
+    "args": "{dir} --range wrapped~1..rewrap"
+  },
+  "pass-staged-refactor": {
+    "expect": ["check-test-edits: 1 commits checked, 0 problems", "RESULT: PASS"],
+    "args": "{dir} --staged --message {dir}/COMMIT_MSG.txt",
+    "ops": [{ "write": { "file": "COMMIT_MSG.txt", "content": "refactor(tasks): name the far-future limit\n" } }]
+  }
+}

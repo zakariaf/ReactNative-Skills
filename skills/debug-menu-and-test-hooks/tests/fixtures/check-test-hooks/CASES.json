@@ -1,0 +1,342 @@
+{
+  "bad-api-hand-written": {
+    "expect": ["src/test-only.ts:16 [api-derived] TestOnlyApi is written by hand"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/test-only.ts",
+          "find": "import type * as TestOnlyEntry from './test-only-entry';",
+          "with": "import type { ClockPort } from '@/services/clock/clock-port';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/test-only.ts",
+          "find": "export type TestOnlyApi = typeof TestOnlyEntry;",
+          "with": "export type TestOnlyApi = {\n  readonly createSimulatedClock: (real: ClockPort) => ClockPort;\n};"
+        }
+      }
+    ]
+  },
+  "bad-clock-countdown": {
+    "expect": [
+      "src/services/test-hooks/simulated-clock.ts:1 [simulated-clock] msUntilNextLocalDay() is 86400000 instead of the real 42"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/test-hooks/simulated-clock.ts",
+          "find": "msUntilNextLocalDay: () => real.msUntilNextLocalDay(),",
+          "with": "msUntilNextLocalDay: () => 86_400_000,"
+        }
+      }
+    ]
+  },
+  "bad-clock-missing": {
+    "expect": [
+      "src/services/test-hooks/simulated-clock.ts [simulated-clock] the test hooks have no createSimulatedClock"
+    ],
+    "ops": [{ "delete": "src/services/test-hooks/simulated-clock.ts" }]
+  },
+  "bad-connectivity-leak": {
+    "expect": [
+      "src/services/test-hooks/simulated-connectivity.ts:1 [simulated-connectivity] a real network change leaks through while offline is simulated"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/test-hooks/simulated-connectivity.ts",
+          "find": "if (!isOffline) hub.report(next);",
+          "with": "hub.report(next);"
+        }
+      }
+    ]
+  },
+  "bad-contract-drift": {
+    "expect": [
+      "contracts/debug-links.json:1 [debug-registry] theme values differ; missing dark",
+      "contracts/debug-links.json:1 [debug-registry] lists seed, which the registry refuses"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/debug-links.json",
+          "path": ["params", "theme", "values"],
+          "value": ["system", "light"]
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/debug-links.json",
+          "path": ["params", "seed"],
+          "value": { "values": ["1"], "effect": "a seed" }
+        }
+      }
+    ]
+  },
+  "bad-contract-missing": {
+    "expect": ["contracts/debug-links.json [debug-registry] the debug-link contract is missing"],
+    "ops": [{ "delete": "contracts/debug-links.json" }]
+  },
+  "bad-dev-gate": {
+    "expect": ["src/test-only.ts:20 [gate-form]", "__DEV__ is false in preview builds too"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/test-only.ts",
+          "find": "process.env.EXPO_PUBLIC_APP_VARIANT === 'production'\n    ? null\n    : (require('./test-only-entry') as TestOnlyApi);",
+          "with": "__DEV__ ? (require('./test-only-entry') as TestOnlyApi) : null;"
+        }
+      }
+    ]
+  },
+  "bad-entry-logic": {
+    "expect": [
+      "src/test-only-entry.ts:14 [entry-manifest] holds code besides re-exports and the sentinel: export function isDebugBuild"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/test-only-entry.ts",
+          "find": "export { createTestHooks }",
+          "with": "export function isDebugBuild(): boolean {\n  return true;\n}\n\nexport { createTestHooks }"
+        }
+      }
+    ]
+  },
+  "bad-entry-unread": {
+    "expect": ["src/test-only-entry.ts:15 [entry-reachable] nothing reads TEST_ONLY?.createDebugKit"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/create-root-kits.ts",
+          "find": "  const createDebugKit = TEST_ONLY?.createDebugKit;",
+          "with": "  const createDebugKit = undefined as ((hooks: TestHooks) => RootKit) | undefined;"
+        }
+      }
+    ]
+  },
+  "bad-folders-undeclared": {
+    "expect": ["contracts/architecture.json:1 [test-only-folders] testOnlyFolders lacks src/services/test-hooks/"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/architecture.json",
+          "path": ["testOnlyFolders"],
+          "value": ["src/features/debug/", "src/services/debug-storage/", "src/stores/debug-overrides/"]
+        }
+      }
+    ]
+  },
+  "bad-gate-extra-code": {
+    "expect": ["src/test-only.ts:21 [gate-form] the gate runs code besides TEST_ONLY"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/test-only.ts",
+          "find": "    : (require('./test-only-entry') as TestOnlyApi);\n",
+          "with": "    : (require('./test-only-entry') as TestOnlyApi);\n\nexport const isTestBuild = TEST_ONLY !== null;\n"
+        }
+      }
+    ]
+  },
+  "bad-gate-missing": {
+    "expect": ["src/test-only.ts [gate-file] the app has test-only code"],
+    "ops": [{ "delete": "src/test-only.ts" }]
+  },
+  "bad-hooks-services-unused": {
+    "expect": [
+      "src/services/create-root-kits.ts:30 [hooks-wired] calls TEST_ONLY?.createTestHooks but never uses the result's services"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/create-root-kits.ts",
+          "find": "services: testHooks?.services ?? device,",
+          "with": "services: device,"
+        }
+      }
+    ]
+  },
+  "bad-hooks-ternary-unused": {
+    "expect": [
+      "src/services/create-root-kits.ts:32 [hooks-wired] calls TEST_ONLY?.createTestHooks but never uses the result's services"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/create-root-kits.ts",
+          "find": "    TEST_ONLY?.createTestHooks({",
+          "with": "    TEST_ONLY === null\n      ? null\n      : TEST_ONLY.createTestHooks({"
+        }
+      },
+      { "replace": { "file": "src/services/create-root-kits.ts", "find": "    }) ?? null;", "with": "        });" } },
+      {
+        "replace": {
+          "file": "src/services/create-root-kits.ts",
+          "find": "services: testHooks?.services ?? device,",
+          "with": "services: device,"
+        }
+      }
+    ]
+  },
+  "bad-imported-gate": {
+    "expect": [
+      "src/test-only.ts:22 [gate-form]",
+      "an imported constant or a helper call keeps the module in production bundles"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/test-only.ts",
+          "find": "import type * as TestOnlyEntry from './test-only-entry';",
+          "with": "import { IS_TEST_BUILD } from '@/config/is-test-build';\n\nimport type * as TestOnlyEntry from './test-only-entry';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/test-only.ts",
+          "find": "process.env.EXPO_PUBLIC_APP_VARIANT === 'production'\n    ? null\n    : (require('./test-only-entry') as TestOnlyApi);",
+          "with": "IS_TEST_BUILD ? (require('./test-only-entry') as TestOnlyApi) : null;"
+        }
+      }
+    ]
+  },
+  "bad-inverted-gate": {
+    "expect": ["src/test-only.ts:22 [gate-form]", "compare with 'production' only"],
+    "ops": [{ "replace": { "file": "src/test-only.ts", "find": "=== 'production'", "with": "=== 'development'" } }]
+  },
+  "bad-link-route-direct": {
+    "expect": ["src/app/(debug)/debug/setup.tsx:1 [link-route] the link route does not hand useLocalSearchParams()"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/(debug)/debug/setup.tsx",
+          "content": "// src/app/(debug)/debug/setup.tsx\nimport { DebugSetupRoot } from '@/features/debug/debug-setup-root';\n\nexport default function DebugSetupRoute(): React.JSX.Element {\n  return <DebugSetupRoot params={{}} />;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-link-route-missing": {
+    "expect": ["src/app/(debug)/debug/setup.tsx [link-route] no route answers the debug link path 'debug/setup'"],
+    "ops": [{ "delete": "src/app/(debug)/debug/setup.tsx" }]
+  },
+  "bad-registry-boolean-alias": {
+    "expect": [
+      "src/features/debug/debug-links.ts:1 [registry-strict] offline=true is not refused with debug-link-bad-value",
+      "probe=false is not refused with debug-link-bad-value"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/debug/debug-links.ts",
+          "find": "  return spec.values.includes(value);",
+          "with": "  return spec.values.includes(value === 'true' ? '1' : value === 'false' ? '0' : value);"
+        }
+      }
+    ]
+  },
+  "bad-registry-lenient": {
+    "expect": [
+      "src/features/debug/debug-links.ts:1 [registry-strict] an unknown parameter is not refused with debug-link-unknown-param"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/debug/debug-links.ts",
+          "find": "if (!isParam(param)) return err({ kind: 'debug-link-unknown-param', param });",
+          "with": "if (!isParam(param)) continue;"
+        }
+      }
+    ]
+  },
+  "bad-registry-repeated": {
+    "expect": [
+      "src/features/debug/debug-links.ts:1 [registry-strict] offline given twice is not refused with debug-link-repeated-param"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/debug/debug-links.ts",
+          "find": "if (typeof raw !== 'string') return err({ kind: 'debug-link-repeated-param', param });",
+          "with": "if (typeof raw !== 'string') continue;"
+        }
+      }
+    ]
+  },
+  "bad-second-gate": {
+    "expect": ["src/features/debug/test-only.ts:1 [gate-file] a second test-only gate"],
+    "ops": [{ "write": { "file": "src/features/debug/test-only.ts", "content": "export const TEST_ONLY = null;\n" } }]
+  },
+  "bad-sentinel-copied": {
+    "expect": ["src/features/tasks/about.ts:2 [sentinel] also contains the sentinel text 'TASKS_TEST_BUILD_ONLY'"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/about.ts",
+          "content": "// src/features/tasks/about.ts\nexport const BUILD_LABEL = 'TASKS_TEST_BUILD_ONLY';\n"
+        }
+      }
+    ]
+  },
+  "bad-sentinel-format": {
+    "expect": ["src/test-only-entry.ts:12 [sentinel] the sentinel 'test-build' is not <APP>_TEST_BUILD_ONLY"],
+    "ops": [
+      { "replace": { "file": "src/test-only-entry.ts", "find": "'TASKS_TEST_BUILD_ONLY'", "with": "'test-build'" } }
+    ]
+  },
+  "bad-sentinel-missing": {
+    "expect": ["src/test-only-entry.ts:1 [sentinel] the entry exports no TEST_BUILD_SENTINEL"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/test-only-entry.ts",
+          "find": "export const TEST_BUILD_SENTINEL = 'TASKS_TEST_BUILD_ONLY';\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "error-missing-root": { "expect": ["ERROR [bad-input]"], "args": "{dir}/no-such-folder", "ops": [] },
+  "error-nothing-to-check": { "expect": ["nothing to check"], "args": "{dir}/src/app", "ops": [] },
+  "pass-installed-skills": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/vendored/src/test-only.ts",
+          "content": "export const TEST_ONLY = __DEV__ ? require('./x') : null;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "skills/vendored/src/test-only.ts",
+          "content": "export const TEST_ONLY = __DEV__ ? require('./x') : null;\n"
+        }
+      },
+      { "write": { "file": "src/vendor/skillpack/SKILL.md", "content": "---\nname: vendored\n---\n" } },
+      {
+        "write": {
+          "file": "src/vendor/skillpack/test-only.ts",
+          "content": "export const TEST_ONLY = __DEV__ ? require('./x') : null;\n"
+        }
+      }
+    ]
+  },
+  "pass-no-architecture-contract": {
+    "expect": [
+      "SKIP contracts/architecture.json [test-only-folders] not yet created (architecture-and-boundaries creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "contracts/architecture.json" }]
+  },
+  "pass-not-applicable": {
+    "expect": ["NOT APPLICABLE: the app has no test-only code"],
+    "base": ["@tests/bases/app"],
+    "ops": []
+  },
+  "pass-react-navigation": {
+    "expect": ["note: link-route: expo-router is not in package.json", "RESULT: PASS"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo-router"], "delete": true } }]
+  }
+}

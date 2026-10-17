@@ -1,0 +1,10 @@
+{
+  "$comment": "Values verify-templates and the self-test use to fill the templates: the reference Tasks app's production id, an API host, the debug link's open value for the home screen, the testIDs of that screen (its list, summary and one task row) and the summary text after that row is ticked. An app puts its own values here when it adopts the templates.",
+  "__PRODUCTION_APP_ID__": "com.example.harness",
+  "__API_HOST__": "api.example.com",
+  "__HOME_OPEN__": "tasks",
+  "__HOME_SCREEN_ID__": "tasks.list",
+  "__SUMMARY_ID__": "tasks.summary",
+  "__ITEM_ROW_ID__": "tasks.task-row.task-2",
+  "__SUMMARY_AFTER_TAP__": ".*1 open task.*"
+}

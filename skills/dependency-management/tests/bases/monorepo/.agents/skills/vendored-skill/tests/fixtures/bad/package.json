@@ -1,0 +1,8 @@
+{
+  "name": "decoy",
+  "dependencies": {
+    "node-ipc": "^10.1.1",
+    "axios": "^1.0.0",
+    "left-pad": "^1.0.0"
+  }
+}

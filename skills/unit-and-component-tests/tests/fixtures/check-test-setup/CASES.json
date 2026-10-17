@@ -1,0 +1,804 @@
+{
+  "bad-android-preset": {
+    "expect": [
+      "jest.config.js:118 [jest-android-project] android preset is \"jest-expo/ios\", not \"jest-expo/android\""
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "preset: 'jest-expo/android',",
+          "with": "preset: 'jest-expo/ios',"
+        }
+      }
+    ]
+  },
+  "bad-babel-no-stryker-branch": {
+    "expect": [
+      "babel.config.js:3 [babel-config] lacks the STRYKER_MUTATOR_WORKER branch",
+      "babel.config.js:3 [babel-config] lacks worklets: false"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "babel.config.js",
+          "content": "module.exports = function (api) {\n  api.cache(true);\n  return { presets: ['babel-preset-expo'] };\n};\n"
+        }
+      }
+    ]
+  },
+  "bad-coverage-exclusion-unmarked": {
+    "expect": [
+      "src/core/task-filter.ts:1 [coverage-device-only]",
+      "carries no \"// device-only: covered by <check>\" marker"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "coveragePathIgnorePatterns: ['/node_modules/', ...deviceOnlyCoveragePatterns(__dirname)],",
+          "with": "coveragePathIgnorePatterns: [\n    '/node_modules/',\n    '<rootDir>/src/core/task-filter\\\\.ts$',\n    ...deviceOnlyCoveragePatterns(__dirname),\n  ],"
+        }
+      }
+    ]
+  },
+  "bad-coverage-helper-missing": {
+    "expect": [
+      "scripts/quality/device-only.ts [coverage-device-only]",
+      "jest.config.js requires this helper but it does not exist"
+    ],
+    "ops": [{ "delete": ["scripts/quality/device-only.ts", "scripts/quality/device-only.test.ts"] }]
+  },
+  "bad-coverage-keys-gone": {
+    "expect": ["jest.config.js:147 [coverage-threshold-keys] the logic threshold key ./src/data/ is gone"],
+    "ops": [{ "replace": { "file": "jest.config.js", "find": "  './src/data/': 'src/data/**/*.ts',\n", "with": "" } }]
+  },
+  "bad-coverage-report": {
+    "expect": [
+      "jest.config.js:178 [coverage-report] coverage is not written to <rootDir>/reports/coverage with the json-summary reporter"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "coverageReporters: ['text-summary', 'json-summary', 'lcov'],",
+          "with": "coverageReporters: ['text-summary', 'lcov'],"
+        }
+      }
+    ]
+  },
+  "bad-coverage-scope-extra": {
+    "expect": ["jest.config.js:177 [coverage-scope] collectCoverageFrom leaves out !<rootDir>/src/features/**"],
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "    '!**/testing/**',\n",
+          "with": "    '!**/testing/**',\n    '!<rootDir>/src/features/**',\n"
+        }
+      }
+    ]
+  },
+  "bad-device-only-counted": {
+    "expect": ["src/app/_layout.tsx:1 [coverage-device-only] is marked device-only but jest.config.js still counts it"],
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "coveragePathIgnorePatterns: ['/node_modules/', ...deviceOnlyCoveragePatterns(__dirname)],",
+          "with": "coveragePathIgnorePatterns: ['/node_modules/', ...deviceOnlyCoveragePatterns(__dirname).slice(1)],"
+        }
+      }
+    ]
+  },
+  "bad-golden-env": {
+    "expect": ["jest.config.js:140 [jest-golden-project] golden testEnvironment is undefined"],
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "  testEnvironment: '@shopify/react-native-skia/jestEnv.js',\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-golden-loads-unit-setup": {
+    "expect": [
+      "jest.config.js:133 [jest-golden-project] golden loads <rootDir>/jest.setup.ts, whose inert Skia mock replaces CanvasKit"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "setupFilesAfterEnv: ['@shopify/react-native-skia/jestSetup.js'],",
+          "with": "setupFilesAfterEnv: ['@shopify/react-native-skia/jestSetup.js', '<rootDir>/jest.setup.ts'],"
+        }
+      }
+    ]
+  },
+  "bad-golden-no-setup-without-skia": {
+    "expect": [
+      "jest.config.js:138 [jest-golden-project] golden does not load <rootDir>/jest.setup.ts (without Skia, goldens run with the unit set-up)"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "@shopify/react-native-skia"], "delete": true } },
+      { "delete": "test/skia-mock.test.tsx" },
+      { "json": { "file": "package.json", "path": ["scripts", "test:golden"], "delete": true } },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],\n  ...(HAS_SKIA ? CANVASKIT : {}),\n",
+          "with": "  ...(HAS_SKIA ? CANVASKIT : {}),\n"
+        }
+      }
+    ]
+  },
+  "bad-golden-without-skia": {
+    "expect": [
+      "jest.config.js:141 [jest-golden-project] golden uses Skia's CanvasKit environment, but the app does not depend on @shopify/react-native-skia"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "@shopify/react-native-skia"], "delete": true } },
+      { "json": { "file": "package.json", "path": ["scripts", "test:golden"], "delete": true } },
+      { "delete": "test/skia-mock.test.tsx" },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "  ...(HAS_SKIA ? CANVASKIT : {}),\n",
+          "with": "  ...CANVASKIT,\n"
+        }
+      }
+    ]
+  },
+  "bad-jest-config-load": {
+    "expect": ["jest.config.js:1 [jest-config-load] throws when loaded: Cannot find module './jest.shared-preset.js'"],
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "process.env.TZ = 'UTC';\n",
+          "with": "process.env.TZ = 'UTC';\nrequire('./jest.shared-preset.js');\n"
+        }
+      }
+    ]
+  },
+  "bad-jest-config-missing": {
+    "expect": ["jest.config.js [jest-config-missing] no jest.config.js at the repo root"],
+    "ops": [{ "delete": "jest.config.js" }]
+  },
+  "bad-jest-config-second-file": {
+    "expect": ["jest.config.ts:1 [jest-config-duplicate] sits next to jest.config.js"],
+    "ops": [{ "write": { "file": "jest.config.ts", "content": "export default { preset: 'jest-expo' };\n" } }]
+  },
+  "bad-jest-expo-sdk": {
+    "expect": [
+      "package.json:38 [test-dep-version] jest-expo 56.0.4 does not match the app's Expo SDK 57.0.26",
+      "package.json:29 [test-dep-version] @react-native/jest-preset 0.85.2 differs from react-native 0.86.3"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["devDependencies", "jest-expo"], "value": "56.0.4" } },
+      {
+        "json": { "file": "package.json", "path": ["devDependencies", "@react-native/jest-preset"], "value": "0.85.2" }
+      }
+    ]
+  },
+  "bad-jest-key-in-package": {
+    "expect": [
+      "package.json:41 [jest-config-duplicate] has a \"jest\" key next to jest.config.js, so every Jest run stops with \"Multiple configurations found\""
+    ],
+    "ops": [{ "json": { "file": "package.json", "path": ["jest"], "value": { "preset": "jest-expo" } } }]
+  },
+  "bad-missing-sdk-mock": {
+    "expect": [
+      "__mocks__/expo-iap.ts [root-mock-missing] package.json depends on expo-iap but the root mock is missing",
+      "__mocks__/expo-tracking-transparency.ts [root-mock-missing] package.json depends on expo-tracking-transparency"
+    ],
+    "ops": [{ "delete": ["__mocks__/expo-iap.ts", "__mocks__/expo-tracking-transparency.ts"] }]
+  },
+  "bad-mock-reset": {
+    "expect": ["jest.config.js:81 [jest-mock-reset] project \"unit\" does not set clearMocks and restoreMocks to true"],
+    "ops": [
+      { "replace": { "file": "jest.config.js", "find": "  restoreMocks: true,\n", "with": "  restoreMocks: false,\n" } }
+    ]
+  },
+  "bad-nested-sdk-mock": {
+    "expect": [
+      "src/services/purchase/__mocks__/expo-iap.ts:1 [nested-sdk-mock] the expo-iap mock outside the root __mocks__ folder"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/purchase/__mocks__/expo-iap.ts",
+          "content": "export const initConnection = jest.fn();\n"
+        }
+      }
+    ]
+  },
+  "bad-no-alias-mapper": {
+    "expect": [
+      "jest.config.js:76 [jest-alias-mapper] project \"unit\" does not map @/* to its source under <rootDir>",
+      "jest.config.js:76 [jest-alias-mapper] project \"android\" does not map @/*",
+      "jest.config.js:76 [jest-alias-mapper] project \"golden\" does not map @/*"
+    ],
+    "ops": [{ "replace": { "file": "jest.config.js", "find": "  '^@/(.*)$': '<rootDir>/src/$1',\n", "with": "" } }]
+  },
+  "bad-no-android-project": {
+    "expect": ["jest.config.js:170 [jest-projects] projects are [unit, golden]: the android project is missing"],
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "projects: [unitProject, androidProject, goldenProject],",
+          "with": "projects: [unitProject, goldenProject],"
+        }
+      }
+    ]
+  },
+  "bad-no-react-native-override": {
+    "expect": ["package.json:27 [one-react] overrides lack \"react-native\""],
+    "base": ["@tests/bases/app", { "templates": true, "firstLinePath": true }, "@tests/bases/monorepo"],
+    "ops": [
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      { "json": { "file": "package.json", "path": ["overrides", "react-native"], "delete": true } }
+    ]
+  },
+  "bad-no-tz": {
+    "expect": ["jest.config.js:1 [jest-tz] does not set process.env.TZ = 'UTC'"],
+    "ops": [{ "replace": { "file": "jest.config.js", "find": "process.env.TZ = 'UTC';\n", "with": "" } }]
+  },
+  "bad-one-project": {
+    "expect": [
+      "jest.config.js:170 [jest-projects] projects are [unit, android]: the app depends on @shopify/react-native-skia but the golden project is missing"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "projects: [unitProject, androidProject, goldenProject],",
+          "with": "projects: [unitProject, androidProject],"
+        }
+      }
+    ]
+  },
+  "bad-orphan-data-golden": {
+    "expect": [
+      "src/core/task-filter.golden.test.ts:1 [jest-orphan-tests] neither a Jest project (unit, android) nor jest.sim.config.js runs this test, so it never runs",
+      "jest.config.js:170 [jest-projects] projects are [unit, android]: src/core/task-filter.golden.test.ts is a golden test but the golden project is missing",
+      "package.json:6 [test-script] script \"test:golden\" is missing"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "@shopify/react-native-skia"], "delete": true } },
+      { "delete": "test/skia-mock.test.tsx" },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "projects: [unitProject, androidProject, goldenProject],",
+          "with": "projects: [unitProject, androidProject, ...(HAS_SKIA ? [goldenProject] : [])],"
+        }
+      },
+      { "json": { "file": "package.json", "path": ["scripts", "test:golden"], "delete": true } },
+      {
+        "write": {
+          "file": "src/core/task-filter.golden.test.ts",
+          "content": "import { openTaskCount } from './task-filter';\n\ndescribe('openTaskCount', () => {\n  it('counts the open tasks of each list', () => {\n    const lines = [[], [false, true], [true, true]].map((flags) => `${flags.length}: ${openTaskCount(flags)}`);\n\n    expect(lines.join('\\n')).toMatchSnapshot();\n  });\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-orphan-expo-guide-test": {
+    "expect": [
+      "__tests__/home-screen-test.tsx:1 [jest-orphan-tests] neither a Jest project (unit, android, golden) nor jest.sim.config.js runs this test, so it never runs",
+      "Expo's unit-testing guide puts tests in __tests__/<name>-test.tsx, which jest.config.js does not run"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "__tests__/home-screen-test.tsx",
+          "content": "import { render } from '@testing-library/react-native';\n\nimport { TasksScreen } from '@/features/tasks/tasks-screen';\n\ndescribe('<TasksScreen />', () => {\n  test('renders on the home screen', async () => {\n    const view = await render(<TasksScreen />);\n\n    expect(view.toJSON()).toBeNull();\n  });\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-orphan-golden-tsx": {
+    "expect": [
+      "src/features/tasks/components/task-row.golden.test.tsx:1 [jest-orphan-tests] neither a Jest project (unit, android, golden) nor jest.sim.config.js runs this test",
+      "Rename it to *.golden.test.ts"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-row.golden.test.tsx",
+          "content": "import { openTaskCount } from '@/core/task-filter';\n\ndescribe('openTaskCount', () => {\n  it('counts the open tasks of each list', () => {\n    const lines = [[], [false, true], [true, true]].map((flags) => `${flags.length}: ${openTaskCount(flags)}`);\n\n    expect(lines.join('\\n')).toMatchSnapshot();\n  });\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-orphan-outside-roots": {
+    "expect": [
+      "lib/sum.test.ts:1 [jest-orphan-tests] neither a Jest project (unit, android, golden) nor jest.sim.config.js runs this test, so it never runs",
+      "Move it next to its unit as <unit>.test.ts(x) (a test that needs Node APIs goes under test/)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "lib/sum.test.ts",
+          "content": "import { sum } from './sum';\n\ndescribe('sum', () => {\n  it('adds two numbers', () => {\n    expect(sum(1, 2)).toBe(3);\n  });\n});\n"
+        }
+      },
+      {
+        "write": {
+          "file": "lib/sum.ts",
+          "content": "export function sum(a: number, b: number): number {\n  return a + b;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-orphan-playwright-without-testdir": {
+    "expect": [
+      "e2e-web/home.spec.ts:1 [jest-orphan-tests]",
+      "otherRunnerGlobs",
+      "check-test-setup: 1 repo checked, 1 problems"
+    ],
+    "ops": [
+      {
+        "$comment": "Playwright's testDir defaults to the config's folder, here the whole repo: the checker cannot tell which folder it owns, so the spec stays a problem until the contract names it.",
+        "write": {
+          "file": "playwright.config.ts",
+          "content": "import { defineConfig } from '@playwright/test';\n\nexport default defineConfig({\n  use: { baseURL: 'http://localhost:8081' },\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-orphan-spec-file": {
+    "expect": [
+      "src/features/tasks/task-filter.spec.ts:1 [jest-orphan-tests] neither a Jest project (unit, android, golden) nor jest.sim.config.js runs this test, so it never runs",
+      "Rename it to <unit>.test.ts(x) next to its unit"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/task-filter.spec.ts",
+          "content": "import { openTaskCount } from '@/core/task-filter';\n\ndescribe('openTaskCount', () => {\n  it('counts the tasks that are not done', () => {\n    expect(openTaskCount([false, true, false])).toBe(2);\n  });\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-range-pin": {
+    "expect": ["package.json:37 [test-dep-range] jest is \"^29.7.0\", not an exact version"],
+    "ops": [{ "json": { "file": "package.json", "path": ["devDependencies", "jest"], "value": "^29.7.0" } }]
+  },
+  "bad-react-range": {
+    "expect": ["package.json:20 [one-react] react is \"^19.2.3\", not an exact version"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "react"], "value": "^19.2.3" } }]
+  },
+  "bad-react-test-renderer": {
+    "expect": [
+      "package.json:40 [test-dep-deprecated] declares react-test-renderer, which React 19 deprecates and RNTL 14 does not use"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["devDependencies", "react-test-renderer"], "value": "19.2.3" } }
+    ]
+  },
+  "bad-render-helper-missing": {
+    "expect": [
+      "test/render-with-providers.tsx [render-helper-missing] 1 component test file(s) exist (src/features/tasks/tasks-screen.test.tsx)"
+    ],
+    "ops": [
+      { "delete": ["test/render-with-providers.tsx", "test/render-with-providers.test.tsx", "test/skia-mock.test.tsx"] }
+    ]
+  },
+  "bad-rntl-without-renderer": {
+    "expect": [
+      "package.json:28 [test-dep-missing] devDependencies lack test-renderer",
+      "It comes with @testing-library/react-native 14.0.1"
+    ],
+    "ops": [{ "json": { "file": "package.json", "path": ["devDependencies", "test-renderer"], "delete": true } }]
+  },
+  "bad-script-updates-snapshots": {
+    "expect": ["package.json:7 [test-script] script \"test\" is \"jest --ci -u\""],
+    "ops": [{ "json": { "file": "package.json", "path": ["scripts", "test"], "value": "jest --ci -u" } }]
+  },
+  "bad-setup-file-missing": {
+    "expect": [
+      "jest.config.js:110 [jest-setup-file-missing] project \"unit\" loads test/setup-extra.ts, which does not exist"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],\n",
+          "with": "  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts', '<rootDir>/test/setup-extra.ts'],\n",
+          "occurrence": 1
+        }
+      }
+    ]
+  },
+  "bad-setup-missing": {
+    "expect": ["jest.setup.ts [jest-setup-missing] no jest.setup.ts at the repo root"],
+    "ops": [{ "delete": "jest.setup.ts" }]
+  },
+  "bad-setup-no-reanimated": {
+    "expect": ["jest.setup.ts:1 [jest-setup-content] lacks require('react-native-reanimated').setUpTests()"],
+    "ops": [
+      {
+        "replace": { "file": "jest.setup.ts", "find": "require('react-native-reanimated').setUpTests();\n", "with": "" }
+      }
+    ]
+  },
+  "bad-setup-no-skia-mock": {
+    "expect": ["jest.setup.ts:1 [skia-unit-mock] does not mock @shopify/react-native-skia"],
+    "ops": [
+      {
+        "write": {
+          "file": "jest.setup.ts",
+          "lines": [
+            "// jest.setup.ts",
+            "import 'react-native-gesture-handler/jestSetup';",
+            "",
+            "jest.mock('react-native-worklets', () => require('react-native-worklets/src/mock'));",
+            "require('react-native-reanimated').setUpTests();"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-setup-retries": {
+    "expect": ["jest.setup.ts:13 [jest-retries] calls jest.retryTimes"],
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.setup.ts",
+          "find": "require('react-native-reanimated').setUpTests();\n",
+          "with": "require('react-native-reanimated').setUpTests();\njest.retryTimes(2);\n"
+        }
+      }
+    ]
+  },
+  "bad-sim-environment": {
+    "expect": ["jest.sim.config.js:1 [sim-config] testEnvironment is undefined, not \"node\""],
+    "ops": [{ "replace": { "file": "jest.sim.config.js", "find": "  testEnvironment: 'node',\n", "with": "" } }]
+  },
+  "bad-skills-not-ignored": {
+    "expect": [
+      "jest.config.js:77 [jest-ignored-paths] project \"unit\" does not ignore skills, .agents, .claude in modulePathIgnorePatterns",
+      "jest.config.js:77 [jest-ignored-paths] project \"android\" does not ignore skills, .agents, .claude",
+      "jest.config.js:77 [jest-ignored-paths] project \"golden\" does not ignore skills, .agents, .claude",
+      "jest.sim.config.js:18 [jest-ignored-paths] the sim config does not ignore skills, .agents, .claude"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "  '<rootDir>/(coverage|reports|skills|\\\\.stryker-tmp|\\\\.skill-tooling)/',\n  '<rootDir>/\\\\.(agents|claude|codex|cursor|windsurf|roo|cline|continue|kiro)/',\n",
+          "with": "  '<rootDir>/(coverage|reports|\\\\.stryker-tmp|\\\\.skill-tooling)/',\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.sim.config.js",
+          "find": "    '<rootDir>/(skills|\\\\.stryker-tmp|\\\\.skill-tooling)/',\n    '<rootDir>/\\\\.(agents|claude|codex|cursor|windsurf|roo|cline|continue|kiro)/',\n",
+          "with": "    '<rootDir>/(\\\\.stryker-tmp|\\\\.skill-tooling)/',\n"
+        }
+      }
+    ]
+  },
+  "bad-spec-in-routes": {
+    "expect": [
+      "src/app/(app)/index.spec.tsx:1 [test-in-routes] a test file inside the routes folder src/app/: Expo Router bundles every file there as a route, so the production export fails to resolve it Fix: Move it out of src/app/.",
+      "src/app/(app)/index.spec.tsx:1 [jest-orphan-tests] neither a Jest project (unit, android, golden) nor jest.sim.config.js runs this test, so it never runs",
+      "check-test-setup: 1 repo checked, 2 problems"
+    ],
+    "ops": [
+      {
+        "$comment": "A .spec.tsx in the routes folder: Expo Router bundles it and no Jest project runs it, so test-in-routes must not claim that the unit project still runs it (jest-orphan-tests says it runs nowhere).",
+        "write": {
+          "file": "src/app/(app)/index.spec.tsx",
+          "content": "// src/app/(app)/index.spec.tsx\nimport { screen } from '@testing-library/react-native';\n\nimport { renderWithProviders } from '@test/render-with-providers';\n\nimport { TasksScreen } from '@/features/tasks/tasks-screen';\n\ndescribe('TasksScreen', () => {\n  it('shows the task list', async () => {\n    await renderWithProviders(<TasksScreen />);\n\n    expect(screen.getByRole('header', { name: 'Tasks' })).toBeOnTheScreen();\n  });\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-stryker-break": {
+    "expect": ["stryker.config.json:46 [stryker-config] thresholds.break is 60 (must be at least 75)"],
+    "ops": [{ "json": { "file": "stryker.config.json", "path": ["thresholds", "break"], "value": 60 } }]
+  },
+  "bad-stryker-scans-skills": {
+    "expect": [
+      "stryker.config.json:27 [stryker-config] ignorePatterns do not keep skills, .agents, .claude out of the sandbox"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "stryker.config.json",
+          "path": ["ignorePatterns"],
+          "value": ["ios", "android", "build", "dist", "reports", "coverage", ".skill-tooling"]
+        }
+      }
+    ]
+  },
+  "bad-stryker-tsconfig-extends": {
+    "expect": [
+      "tsconfig.stryker.json:2 [stryker-tsconfig] extends ./tsconfig.base.json, which does not exist",
+      "typescript-and-lint-rules",
+      "check-test-setup: 1 repo checked, 1 problems"
+    ],
+    "ops": [
+      {
+        "$comment": "An app on create-expo-app's default tsconfig has no tsconfig.base.json (typescript-and-lint-rules creates it).",
+        "delete": "tsconfig.base.json"
+      },
+      { "json": { "file": "tsconfig.json", "path": ["extends"], "value": "expo/tsconfig.base" } }
+    ]
+  },
+  "bad-stryker-tsconfig-node-types": {
+    "expect": [
+      "tsconfig.stryker.json:4 [stryker-tsconfig] compilerOptions.types is [\"jest\",\"node\"], not [\"jest\"]"
+    ],
+    "ops": [
+      { "json": { "file": "tsconfig.stryker.json", "path": ["compilerOptions", "types"], "value": ["jest", "node"] } }
+    ]
+  },
+  "bad-test-in-routes": {
+    "expect": [
+      "src/app/(app)/_layout.test.tsx:1 [test-in-routes] a test file inside the routes folder src/app/",
+      "src/app/__tests__/route-fixtures.ts:1 [test-in-routes]",
+      "src/app/index.test.tsx:1 [test-in-routes] a test file inside the routes folder src/app/: Expo Router bundles every file there as a route, so the production export fails to resolve it (the unit project still runs it, so Jest passes) Fix:",
+      "src/features/<feature>/<feature>-navigation.test.tsx",
+      "check-test-setup: 1 repo checked, 3 problems"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/index.test.tsx",
+          "content": "// src/app/index.test.tsx\nimport { screen } from '@testing-library/react-native';\n\nimport { renderWithProviders } from '@test/render-with-providers';\n\nimport TasksRoute from './index';\n\ndescribe('TasksRoute', () => {\n  it('shows the task list', async () => {\n    await renderWithProviders(<TasksRoute />);\n\n    expect(screen.getByRole('header', { name: 'Tasks' })).toBeOnTheScreen();\n  });\n});\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/(app)/_layout.test.tsx",
+          "content": "// src/app/(app)/_layout.test.tsx\nimport { screen } from '@testing-library/react-native';\n\nimport { renderRouterWithProviders } from '@test/render-router-with-providers';\n\nimport AppLayout from './_layout';\n\ndescribe('AppLayout', () => {\n  it('opens the task list first', async () => {\n    const view = await renderRouterWithProviders({ '(app)/_layout': AppLayout, '(app)/index': () => null });\n\n    expect(view.getPathname()).toBe('/');\n    expect(screen.toJSON()).not.toBeNull();\n  });\n});\n"
+        }
+      },
+      {
+        "$comment": "A helper beside route tests holds no test call, but Expo Router bundles it as a route all the same.",
+        "write": {
+          "file": "src/app/__tests__/route-fixtures.ts",
+          "content": "// src/app/__tests__/route-fixtures.ts\nexport const ROUTE_TASKS = [{ id: 'task-1', title: 'Buy milk', isDone: false }];\n"
+        }
+      }
+    ]
+  },
+  "bad-test-in-routes-workspace": {
+    "expect": [
+      "apps/mobile/src/app/index.test.tsx:1 [test-in-routes] a test file inside the routes folder apps/mobile/src/app/",
+      "apps/mobile/src/features/<feature>/<feature>-navigation.test.tsx",
+      "check-test-setup: 1 repo checked, 1 problems"
+    ],
+    "base": ["@tests/bases/app", { "templates": true, "firstLinePath": true }, "@tests/bases/monorepo"],
+    "ops": [
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      { "json": { "file": "apps/mobile/package.json", "path": ["dependencies", "expo-router"], "value": "~57.0.24" } },
+      {
+        "$comment": "The app workspace uses Expo Router, so Jest transpiles its navigation packages too.",
+        "replace": {
+          "file": "jest.config.js",
+          "find": "const TRANSPILE_PACKAGES = ['react-native', '@react-native', 'expo', '@expo'];",
+          "with": "const TRANSPILE_PACKAGES = ['react-native', '@react-native', 'expo', '@expo', 'standard-navigation', '@react-navigation'];"
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/src/app/index.test.tsx",
+          "content": "// apps/mobile/src/app/index.test.tsx\nimport { screen } from '@testing-library/react-native';\n\nimport { renderWithProviders } from '@test/render-with-providers';\n\nimport TasksRoute from './index';\n\ndescribe('TasksRoute', () => {\n  it('shows the task list', async () => {\n    await renderWithProviders(<TasksRoute />);\n\n    expect(screen.getByRole('header', { name: 'Tasks' })).toBeOnTheScreen();\n  });\n});\n"
+        }
+      },
+      {
+        "$comment": "packages/core has no routes: a src/app/ folder there is not bundled by Expo Router.",
+        "write": {
+          "file": "packages/core/src/app/sum-app.test.ts",
+          "content": "import { sum } from '../sum';\n\ndescribe('sum', () => {\n  it('adds nothing to zero', () => {\n    expect(sum([])).toBe(0);\n  });\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-test-renderer-line": {
+    "expect": ["package.json:39 [test-renderer-line] test-renderer 1.3.0 does not match React 19.2.3"],
+    "ops": [{ "json": { "file": "package.json", "path": ["devDependencies", "test-renderer"], "value": "1.3.0" } }]
+  },
+  "bad-threshold-lowered": {
+    "expect": [
+      "jest.config.js:160 [coverage-threshold] global coverage threshold is weaker than 90/90/90/85 (lines 80 < 90)",
+      "jest.config.js:146 [coverage-threshold] logic threshold ./src/core/ is weaker than 95/95/95/90 (branches 80 < 90)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "global: { statements: 90, lines: 90, functions: 90, branches: 85 },",
+          "with": "global: { statements: 90, lines: 80, functions: 90, branches: 85 },"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "const LOGIC = { statements: 95, lines: 95, functions: 95, branches: 90 };",
+          "with": "const LOGIC = { statements: 95, lines: 95, functions: 95, branches: 80 };"
+        }
+      }
+    ]
+  },
+  "bad-transform-missing-router": {
+    "expect": ["jest.config.js:40 [jest-transform] project \"unit\" does not transpile standard-navigation"],
+    "ops": [{ "replace": { "file": "jest.config.js", "find": "  'standard-navigation',\n", "with": "" } }]
+  },
+  "bad-unit-testmatch": {
+    "expect": [
+      "jest.config.js:101 [jest-unit-project] unit testMatch does not cover test",
+      "test/render-with-providers.test.tsx:1 [jest-orphan-tests]"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "  '<rootDir>/plugins/**/',\n  '<rootDir>/test/**/',\n];",
+          "with": "  '<rootDir>/plugins/**/',\n];"
+        }
+      }
+    ]
+  },
+  "bad-workspace-mapper": {
+    "expect": [
+      "jest.config.js:28 [jest-alias-mapper] project \"unit\" does not map @acme/core/* to its source under <rootDir>"
+    ],
+    "base": ["@tests/bases/app", { "templates": true, "firstLinePath": true }, "@tests/bases/monorepo"],
+    "ops": [
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "  '^@acme/core/(.*)$': '<rootDir>/packages/core/src/$1',\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "error-bad-contract": {
+    "expect": ["ERROR [bad-input] contracts/test-setup.json has an unknown key \"renderHelpers\""],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/test-setup.json",
+          "path": ["renderHelpers"],
+          "value": { "file": "test/render.tsx" }
+        }
+      }
+    ]
+  },
+  "pass-babel-instrumented-override": {
+    "expect": ["check-test-setup: 1 repo checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "The instrumented-only override from references/jest-config.md (the fix for the Reanimated 'useAnimatedStyle was used without a dependency array' failure in Stryker's initial run) passes babel-config.",
+        "write": {
+          "file": "babel.config.js",
+          "content": "// babel.config.js\n// Stryker workers compile only the files Stryker instrumented without the Worklets and Reanimated\n// plugins; every other file keeps them, so useAnimatedStyle without a dependency array still works.\nconst { readFileSync } = require('node:fs');\n\nconst STRYKER_NAMESPACE = 'stryNS_9fa48'; // written into every file Stryker mutates\nconst isInstrumented = (filename) => {\n  try {\n    return readFileSync(filename, 'utf8').includes(STRYKER_NAMESPACE);\n  } catch {\n    return false;\n  }\n};\n\nmodule.exports = function (api) {\n  const isMutationRun = process.env.STRYKER_MUTATOR_WORKER !== undefined;\n  api.cache.using(() => isMutationRun);\n  return {\n    presets: ['babel-preset-expo'],\n    overrides: isMutationRun\n      ? [{ test: isInstrumented, presets: [['babel-preset-expo', { worklets: false, reanimated: false }]] }]\n      : [],\n  };\n};\n"
+        }
+      }
+    ]
+  },
+  "pass-config-plugin-test": {
+    "expect": ["check-test-setup: 1 repo checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "A local Expo config plugin with its colocated test: the canonical TEST_ROOTS reach plugins/, so the test is no orphan.",
+        "write": {
+          "file": "plugins/with-demo-flag.ts",
+          "content": "// plugins/with-demo-flag.ts\nexport function withDemoFlag<T extends { extra?: Record<string, unknown> }>(config: T): T {\n  return { ...config, extra: { ...config.extra, demoFlag: true } };\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "plugins/with-demo-flag.test.ts",
+          "content": "// plugins/with-demo-flag.test.ts\nimport { withDemoFlag } from './with-demo-flag';\n\ndescribe('withDemoFlag', () => {\n  it('sets the demo flag in extra', () => {\n    expect(withDemoFlag({ extra: {} }).extra).toEqual({ demoFlag: true });\n  });\n});\n"
+        }
+      }
+    ]
+  },
+  "pass-data-golden-no-skia": {
+    "expect": ["check-test-setup: 1 repo checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "@shopify/react-native-skia"], "delete": true } },
+      { "delete": "test/skia-mock.test.tsx" },
+      {
+        "write": {
+          "file": "src/core/task-filter.golden.test.ts",
+          "content": "import { openTaskCount } from './task-filter';\n\ndescribe('openTaskCount', () => {\n  it('counts the open tasks of each list', () => {\n    const lines = [[], [false, true], [true, true]].map((flags) => `${flags.length}: ${openTaskCount(flags)}`);\n\n    expect(lines.join('\\n')).toMatchSnapshot();\n  });\n});\n"
+        }
+      }
+    ]
+  },
+  "pass-ios-only": {
+    "expect": ["check-test-setup: 1 repo checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "app.config.ts",
+          "content": "// app.config.ts\nexport default { name: 'Tasks', slug: 'tasks', platforms: ['ios'] };\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "projects: [unitProject, androidProject, goldenProject],",
+          "with": "projects: [unitProject, goldenProject],"
+        }
+      }
+    ]
+  },
+  "pass-monorepo": {
+    "expect": ["check-test-setup: 1 repo checked, 0 problems", "RESULT: PASS"],
+    "base": ["@tests/bases/app", { "templates": true, "firstLinePath": true }, "@tests/bases/monorepo"],
+    "ops": [{ "rename": { "from": "src", "to": "apps/mobile/src" } }]
+  },
+  "pass-no-providers-marked": {
+    "expect": ["check-test-setup: 1 repo checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      { "delete": ["test/render-with-providers.tsx", "test/render-with-providers.test.tsx", "test/skia-mock.test.tsx"] },
+      {
+        "$comment": "The one component test renders a props-only view with plain render() and says why; without the helper nothing else needs it.",
+        "write": {
+          "file": "src/features/tasks/tasks-screen.test.tsx",
+          "content": "// src/features/tasks/tasks-screen.test.tsx\n// no-providers: TasksScreen renders a static empty state from its props alone.\nimport { render, screen } from '@testing-library/react-native';\n\nimport { TasksScreen } from './tasks-screen';\n\ndescribe('TasksScreen', () => {\n  it('renders nothing before tasks load', async () => {\n    await render(<TasksScreen />);\n\n    expect(screen.queryByRole('list')).not.toBeOnTheScreen();\n  });\n});\n"
+        }
+      }
+    ]
+  },
+  "pass-no-skia": {
+    "expect": ["check-test-setup: 1 repo checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "@shopify/react-native-skia"], "delete": true } },
+      { "json": { "file": "package.json", "path": ["scripts", "test:golden"], "delete": true } },
+      { "delete": "test/skia-mock.test.tsx" }
+    ]
+  },
+  "pass-not-expo": {
+    "expect": ["NOT APPLICABLE: expo is not a dependency in package.json or any workspace", "RESULT: PASS"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo"], "delete": true } }]
+  },
+  "pass-other-runner-globs": {
+    "expect": ["check-test-setup: 1 repo checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "A web test runner the checker cannot see (its config builds testDir with path.join): the contract names its folder.",
+        "write": {
+          "file": "tools/web-tests/run-web-tests.mjs",
+          "content": "import { join } from 'node:path';\n\nexport const testDir = join(import.meta.dirname, 'specs');\n"
+        }
+      },
+      {
+        "write": {
+          "file": "tools/web-tests/specs/home.spec.ts",
+          "content": "import { expect, test } from '@playwright/test';\n\ntest('shows the task list', async ({ page }) => {\n  await page.goto('/');\n  await expect(page.getByRole('heading', { name: 'Tasks' })).toBeVisible();\n});\n"
+        }
+      },
+      { "json": { "file": "contracts/test-setup.json", "path": ["otherRunnerGlobs"], "value": ["tools/web-tests/**"] } }
+    ]
+  },
+  "pass-routes-folder-without-router": {
+    "expect": ["check-test-setup: 1 repo checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "Without expo-router, src/app/ is not a routes folder: nothing bundles its files as routes.",
+        "json": { "file": "package.json", "path": ["dependencies", "expo-router"], "delete": true }
+      },
+      {
+        "write": {
+          "file": "src/app/app-shell.test.ts",
+          "content": "import { APP_NAME } from './app-shell';\n\ndescribe('APP_NAME', () => {\n  it('names the app', () => {\n    expect(APP_NAME).toBe('Tasks');\n  });\n});\n"
+        }
+      },
+      { "write": { "file": "src/app/app-shell.ts", "content": "export const APP_NAME = 'Tasks';\n" } }
+    ]
+  }
+}

@@ -1,0 +1,928 @@
+{
+  "bad-acronym-case": {
+    "expect": [
+      "src/features/tasks/task-sync.ts:2 [acronym-case] SQLRow spells an acronym in capitals",
+      "src/features/tasks/task-sync.ts:3 [acronym-case] isRTL",
+      "src/features/tasks/task-sync.ts:4 [acronym-case] loadHTTPUrl",
+      "RESULT: FAIL (3 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/task-sync.ts",
+          "lines": [
+            "// src/features/tasks/task-sync.ts",
+            "export type SQLRow = { readonly id: string };",
+            "export const isRTL = (direction: string): boolean => direction === \"rtl\";",
+            "export function loadHTTPUrl(): string {",
+            "  return '';",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-boolean-name": {
+    "expect": [
+      "src/features/tasks/task-flags.ts:2 [boolean-name] boolean done has no",
+      "src/features/tasks/task-flags.ts:5 [boolean-name] boolean loading has no",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/task-flags.ts",
+          "lines": [
+            "// src/features/tasks/task-flags.ts",
+            "export function visibleCount(total: number, done: boolean): number {",
+            "  return done ? total : 0;",
+            "}",
+            "export let loading = false;"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-constant-name": {
+    "expect": [
+      "src/features/tasks/task-limits.ts:2 [constant-name] module constant maxUndoDepth",
+      "src/features/tasks/task-limits.ts:3 [constant-name] module constant sortModes",
+      "src/features/tasks/task-limits.ts:4 [constant-name] module constant titlePattern",
+      "RESULT: FAIL (3 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/task-limits.ts",
+          "lines": [
+            "// src/features/tasks/task-limits.ts",
+            "export const maxUndoDepth = 200;",
+            "export const sortModes = ['title', 'due'] as const;",
+            "export const titlePattern = /^\\S/u;"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-env-destructure": {
+    "expect": [
+      "src/features/tasks/api-url.ts:2 [env-var] app code reads process.env without dot access: it destructures it ({ EXPO_PUBLIC_API_URL })",
+      "Fix: Expo inlines only process.env.EXPO_PUBLIC_NAME read by name: write process.env.EXPO_PUBLIC_API_URL at each use",
+      "src/features/tasks/api-url.ts:3 [env-var] app code reads process.env without dot access: it uses it as a value (a copy or an argument)",
+      "src/features/tasks/api-url.ts:4 [env-var] app code reads process.env without dot access: it spreads it",
+      "src/features/tasks/api-url.ts:11 [env-var] app code reads process.env without dot access: it uses a computed key",
+      "RESULT: FAIL (4 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/api-url.ts",
+          "lines": [
+            "// src/features/tasks/api-url.ts",
+            "const { EXPO_PUBLIC_API_URL } = process.env;",
+            "const env = process.env;",
+            "const merged = { ...process.env };",
+            "",
+            "export function apiUrl(path: string): string {",
+            "  return `${EXPO_PUBLIC_API_URL ?? env.EXPO_PUBLIC_FALLBACK_URL ?? merged.EXPO_PUBLIC_MIRROR_URL ?? ''}/${path}`;",
+            "}",
+            "",
+            "export function readPublic(name: string): string | undefined {",
+            "  return process.env[`EXPO_PUBLIC_${name}`];",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-env-server-public": {
+    "expect": [
+      "src/server/payments.ts:3 [env-var] server code reads EXPO_PUBLIC_PAYMENTS_SECRET: its name says it holds a secret",
+      "Fix: Server code (API routes, +middleware, src/server/) reads secrets under plain names (DATABASE_URL, PAYMENTS_SECRET)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/server/payments.ts",
+          "lines": [
+            "// src/server/payments.ts: shared by the API routes only.",
+            "export function paymentsKey(): string {",
+            "  return process.env.EXPO_PUBLIC_PAYMENTS_SECRET ?? '';",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-env-var": {
+    "expect": [
+      "src/config/app-variant.ts:6 [env-var] app code reads EXPO_PUBLIC_APP_VARIANT with bracket access",
+      "src/features/tasks/read-flag.ts:3 [env-var] app code reads FEATURE_FLAG, which Expo does not inline",
+      "scripts/quality/check-env.ts:3 [env-var] env variable githubActions is not UPPER_SNAKE_CASE",
+      "RESULT: FAIL (3 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/app-variant.ts",
+          "find": "process.env.EXPO_PUBLIC_APP_VARIANT",
+          "with": "process.env['EXPO_PUBLIC_APP_VARIANT']"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/read-flag.ts",
+          "lines": [
+            "// src/features/tasks/read-flag.ts",
+            "export function isFlagOn(): boolean {",
+            "  return process.env.FEATURE_FLAG === 'on';",
+            "}"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "scripts/quality/check-env.ts",
+          "find": "process.env['GITHUB_ACTIONS']",
+          "with": "process.env['githubActions']"
+        }
+      }
+    ]
+  },
+  "bad-handler-name": {
+    "expect": [
+      "src/features/tasks/components/task-chip.tsx:7 [handler-name] local handler named onPress",
+      "src/features/tasks/components/task-chip.tsx:12 [handler-name] on* prop receives \"press\"",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-chip.tsx",
+          "lines": [
+            "// src/features/tasks/components/task-chip.tsx",
+            "import { Pressable } from 'react-native';",
+            "",
+            "export type TaskChipProps = { readonly onSelect: () => void };",
+            "",
+            "export function TaskChip({ onSelect }: TaskChipProps): React.JSX.Element {",
+            "  const onPress = (): void => onSelect();",
+            "  const press = (): void => onSelect();",
+            "  return (",
+            "    <Pressable",
+            "      role=\"button\" testID=\"tasks.chip-button\" onPress={onPress}",
+            "      onLongPress={press}",
+            "    />",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-i18n-key": {
+    "expect": [
+      "src/i18n/catalogs/en.json:14 [i18n-key] key 'Tasks.Title' breaks the grammar",
+      "src/i18n/catalogs/en.json:15 [i18n-key] key 'tasks.addTask' breaks the grammar",
+      "src/features/tasks/tasks-screen.tsx:22 [i18n-key] key 'TasksTitle' breaks the grammar",
+      "src/features/tasks/task-messages.ts:5 [i18n-key] key 'Tasks.Heading' breaks the grammar",
+      "RESULT: FAIL (4 problems)"
+    ],
+    "ops": [
+      { "json": { "file": "src/i18n/catalogs/en.json", "path": ["Tasks.Title"], "value": "Tasks" } },
+      { "json": { "file": "src/i18n/catalogs/en.json", "path": ["tasks.addTask"], "value": "Add task" } },
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "t('tasks.title')",
+          "with": "t('TasksTitle')"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/task-messages.ts",
+          "lines": [
+            "// src/features/tasks/task-messages.ts: react-intl descriptors for the Tasks screen.",
+            "import { defineMessages } from 'react-intl';",
+            "",
+            "export const taskMessages = defineMessages({",
+            "  heading: { id: 'Tasks.Heading', defaultMessage: 'Tasks' },",
+            "  empty: { id: 'tasks.empty-state.title', defaultMessage: 'No tasks yet' },",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-i18n-key-built": {
+    "expect": [
+      "src/features/tasks/priority-label.ts:7 [i18n-key-built] key built from a template",
+      "src/features/tasks/priority-label.ts:11 [i18n-key-built] key built from a template",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/priority-label.ts",
+          "lines": [
+            "// src/features/tasks/priority-label.ts",
+            "import { defineMessage } from 'react-intl';",
+            "",
+            "import type { TaskPriority } from './task-list';",
+            "",
+            "export function priorityLabel(t: (key: string) => string, priority: TaskPriority): string {",
+            "  return t(`tasks.priority.${priority}`);",
+            "}",
+            "",
+            "export function priorityMessage(priority: TaskPriority): { readonly id: string } {",
+            "  return defineMessage({ id: `tasks.priority.${priority}.title` });",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-i18n-key-namespace": {
+    "expect": [
+      "src/i18n/catalogs/en.json:14 [i18n-key-namespace] key 'home.title' starts with 'home', which is not a feature folder or a declared key area",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [{ "json": { "file": "src/i18n/catalogs/en.json", "path": ["home.title"], "value": "Home" } }]
+  },
+  "bad-i18n-key-package": {
+    "expect": [
+      "packages/billing/src/i18n/catalogs/en.json:1 [i18n-key-namespace] package key 'paywall.title' does not start with 'billing.'",
+      "src/i18n/catalogs/en.json:14 [i18n-key-namespace] app key 'billing.price' starts with the package id 'billing'",
+      "packages/billing/src/checkout-title.ts:3 [i18n-key-namespace] package key 'checkout.title' does not start with 'billing.'",
+      "src/features/tasks/task-upsell.ts:3 [i18n-key-namespace] app code names the billing package's key 'billing.paywall.title'",
+      "RESULT: FAIL (4 problems)"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["packages/*"] } },
+      {
+        "write": {
+          "file": "packages/billing/package.json",
+          "lines": ["{ \"name\": \"@acme/billing\", \"private\": true }"]
+        }
+      },
+      {
+        "write": {
+          "file": "packages/billing/src/i18n/catalogs/en.json",
+          "lines": ["{ \"billing.paywall.title\": \"Go Premium\", \"paywall.title\": \"Go Premium\" }"]
+        }
+      },
+      {
+        "write": {
+          "file": "packages/billing/src/checkout-title.ts",
+          "lines": [
+            "// packages/billing/src/checkout-title.ts",
+            "export function checkoutTitle(t: (key: string) => string): string {",
+            "  return t('checkout.title');",
+            "}"
+          ]
+        }
+      },
+      { "json": { "file": "src/i18n/catalogs/en.json", "path": ["billing.price"], "value": "Price" } },
+      {
+        "write": {
+          "file": "src/features/tasks/task-upsell.ts",
+          "lines": [
+            "// src/features/tasks/task-upsell.ts",
+            "export function taskUpsellTitle(t: (key: string) => string): string {",
+            "  return t('billing.paywall.title');",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-i18n-placeholder": {
+    "expect": [
+      "src/i18n/catalogs/en.json:8 [i18n-placeholder] 'tasks.due-label' has a plain {due}",
+      "[i18n-placeholder] 'tasks.best' has placeholder {best-score}",
+      "[i18n-placeholder] 'tasks.first' has placeholder {0}",
+      "RESULT: FAIL (3 problems)"
+    ],
+    "ops": [
+      { "json": { "file": "src/i18n/catalogs/en.json", "path": ["tasks.due-label"], "value": "Due {due}" } },
+      { "json": { "file": "src/i18n/catalogs/en.json", "path": ["tasks.best"], "value": "Best {best-score}" } },
+      { "json": { "file": "src/i18n/catalogs/en.json", "path": ["tasks.first"], "value": "First {0}" } }
+    ]
+  },
+  "bad-kind-value": {
+    "expect": [
+      "src/features/tasks/task-events.ts:8 [kind-value] kind value 'taskCompleted' is not kebab-case",
+      "src/features/tasks/task-events.ts:11 [kind-value] kind value 'STALE_REVISION'",
+      "src/stores/settings-reducer.ts:11 [kind-value] type value 'setTheme'",
+      "RESULT: FAIL (3 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/task-events.ts",
+          "find": "kind: 'task-completed'",
+          "with": "kind: 'taskCompleted'"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/task-events.ts",
+          "find": "'stale-revision'",
+          "with": "'STALE_REVISION'"
+        }
+      },
+      {
+        "replace": { "file": "src/stores/settings-reducer.ts", "find": "type: 'set-theme'", "with": "type: 'setTheme'" }
+      }
+    ]
+  },
+  "bad-maestro-selector": {
+    "expect": [
+      ".maestro/flows/smoke/01-add-task.yaml:9 [maestro-selector] tapOn selects by text \"Add task\"",
+      ".maestro/flows/smoke/01-add-task.yaml:10 [maestro-selector] assertVisible selects by text \"Buy milk\"",
+      ".maestro/flows/smoke/01-add-task.yaml:12 [maestro-selector] selector by text without an id",
+      ".maestro/flows/smoke/01-add-task.yaml:14 [maestro-selector] id \"TasksList\" is not a valid testID",
+      ".maestro/subflows/open-settings.yaml:6 [maestro-selector] visible selects by text \"Settings\"",
+      ".maestro/subflows/open-settings.yaml:8 [maestro-selector] tapOn selects by text \"Continue\"",
+      ".maestro/subflows/open-settings.yaml:10 [maestro-selector] visible selects by text \"Sound\"",
+      ".maestro/subflows/open-settings.yaml:14 [maestro-selector] selector by text without an id",
+      "RESULT: FAIL (8 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/flows/smoke/01-add-task.yaml",
+          "find": "- tapOn:\n    id: 'tasks.add-button'\n",
+          "with": "- tapOn: 'Add task'\n- assertVisible: \"Buy milk\"\n- tapOn:\n    text: 'Tasks'\n- assertVisible:\n    id: 'TasksList'\n"
+        }
+      },
+      {
+        "write": {
+          "file": ".maestro/subflows/open-settings.yaml",
+          "lines": [
+            "# .maestro/subflows/open-settings.yaml",
+            "appId: ${APP_ID}",
+            "---",
+            "- runFlow:",
+            "    when:",
+            "      visible: 'Settings'",
+            "    commands:",
+            "      - tapOn: 'Continue'",
+            "- extendedWaitUntil:",
+            "    visible: 'Sound'",
+            "    timeout: 5000",
+            "# Tap the alert first (a plain comment is no system-ui reason).",
+            "- tapOn:",
+            "    text: 'Allow'"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-test-title": {
+    "expect": [
+      "src/stores/settings-reducer.test.ts:6 [test-title] title \"should store the new theme\"",
+      "src/features/tasks/task-list.test.ts:18 [test-title] test() instead of it()",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/settings-reducer.test.ts",
+          "find": "it('stores the new theme'",
+          "with": "it('should store the new theme'"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/task-list.test.ts",
+          "find": "it('can include done tasks'",
+          "with": "test('can include done tasks'"
+        }
+      }
+    ]
+  },
+  "bad-testid-format": {
+    "expect": [
+      "src/features/tasks/tasks-screen.tsx:22 [testid-format] testID \"tasks_title\"",
+      "src/features/tasks/tasks-screen.tsx:25 [testid-format] testID \"TasksList\"",
+      "src/features/tasks/components/task-row.tsx:19 [testid-format] testID template \"Tasks.TaskRow.${}\"",
+      "src/features/tasks/components/task-chip.tsx:10 [testid-format] testID template \"tasks.list-chip-${}\" glues a value into a segment",
+      "RESULT: FAIL (4 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "testID=\"tasks.title\"",
+          "with": "testID=\"tasks_title\""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "testID=\"tasks.list\"",
+          "with": "testID=\"TasksList\""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "find": "`tasks.task-row.${task.id}`",
+          "with": "`Tasks.TaskRow.${task.id}`"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-chip.tsx",
+          "lines": [
+            "// src/features/tasks/components/task-chip.tsx: the list a task belongs to, as a chip.",
+            "import { Pressable } from 'react-native';",
+            "",
+            "export type TaskChipProps = {",
+            "  readonly listId: string;",
+            "  readonly onPress: () => void;",
+            "};",
+            "",
+            "export function TaskChip({ listId, onPress }: TaskChipProps): React.JSX.Element {",
+            "  return <Pressable testID={`tasks.list-chip-${listId}`} onPress={onPress} />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-testid-index": {
+    "expect": [
+      "src/features/tasks/components/task-row.tsx:19 [testid-index] testID \"tasks.task-row.${}\" uses a list index",
+      "src/features/tasks/components/task-grid.tsx:20 [testid-index] testID \"tasks.task-tile.${}\" uses a list index",
+      "src/features/tasks/components/task-grid.tsx:21 [testid-index] testID \"tasks.grid-row.${}\" uses a list index",
+      "RESULT: FAIL (3 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "find": "`tasks.task-row.${task.id}`",
+          "with": "`tasks.task-row.${String(index)}`"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-grid.tsx",
+          "lines": [
+            "// src/features/tasks/components/task-grid.tsx: the tasks as a numbered grid.",
+            "import { FlatList, Pressable } from 'react-native';",
+            "",
+            "import { AppText } from '@/ui/app-text';",
+            "",
+            "import type { Task } from '@/features/tasks/task-list';",
+            "",
+            "export type TaskGridProps = {",
+            "  readonly tasks: readonly Task[];",
+            "  readonly onOpenTask: (taskId: string) => void;",
+            "};",
+            "",
+            "export function TaskGrid({ tasks, onOpenTask }: TaskGridProps): React.JSX.Element {",
+            "  return (",
+            "    <FlatList",
+            "      data={tasks}",
+            "      renderItem={({ item, index }) => {",
+            "        const rowIndex = Math.floor(index / 2);",
+            "        return (",
+            "          <Pressable testID={`tasks.task-tile.${String(index + 1)}`} onPress={() => { onOpenTask(item.id); }}>",
+            "            <AppText testID={`tasks.grid-row.${rowIndex}`}>{item.title}</AppText>",
+            "          </Pressable>",
+            "        );",
+            "      }}",
+            "    />",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-testid-index-variable": {
+    "expect": [
+      "src/features/tasks/components/task-list-rows.tsx:17 [testid-index] testID \"tasks.list-row.${}\" (built in a variable) uses a list index",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-list-rows.tsx",
+          "lines": [
+            "// src/features/tasks/components/task-list-rows.tsx: the lists, one row each.",
+            "import { FlatList } from 'react-native';",
+            "",
+            "import { AppText } from '@/ui/app-text';",
+            "",
+            "import type { Task } from '@/features/tasks/task-list';",
+            "",
+            "export type TaskListRowsProps = {",
+            "  readonly tasks: readonly Task[];",
+            "};",
+            "",
+            "export function TaskListRows({ tasks }: TaskListRowsProps): React.JSX.Element {",
+            "  return (",
+            "    <FlatList",
+            "      data={tasks}",
+            "      renderItem={({ item, index }) => {",
+            "        const rowID = `tasks.list-row.${String(index)}`;",
+            "        const titleTestId = `tasks.list-title.${item.id}`;",
+            "        return <AppText testID={rowID}>{titleTestId}</AppText>;",
+            "      }}",
+            "    />",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-testid-role": {
+    "expect": [
+      "src/features/tasks/tasks-screen.tsx:23 [testid-role] AppButton testID \"tasks.add\" does not name its role",
+      "src/features/settings/settings-screen.tsx:11 [testid-role] Switch testID \"settings.sound\"",
+      "src/features/settings/settings-screen.tsx:12 [testid-role] TextInput testID \"settings.display-name\"",
+      "src/features/tasks/components/task-row.tsx:19 [testid-role] ListRow testID \"tasks.task.${task.id}\"",
+      "RESULT: FAIL (4 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "testID=\"tasks.add-button\"",
+          "with": "testID=\"tasks.add\""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/settings/settings-screen.tsx",
+          "find": "testID=\"settings.sound-switch\"",
+          "with": "testID=\"settings.sound\""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/settings/settings-screen.tsx",
+          "find": "testID=\"settings.display-name-input\"",
+          "with": "testID=\"settings.display-name\""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "find": "`tasks.task-row.${task.id}`",
+          "with": "`tasks.task.${task.id}`"
+        }
+      }
+    ]
+  },
+  "bad-type-name": {
+    "expect": [
+      "src/features/tasks/task-types.ts:2 [type-name] type ITaskFilter has an I prefix",
+      "src/features/tasks/task-types.ts:3 [type-name] type named plain Props",
+      "src/features/tasks/task-types.ts:4 [type-name] type taskSort is not PascalCase",
+      "RESULT: FAIL (3 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/task-types.ts",
+          "lines": [
+            "// src/features/tasks/task-types.ts",
+            "export type ITaskFilter = { readonly isDone: boolean };",
+            "export type Props = { readonly title: string };",
+            "export type taskSort = 'title' | 'due';"
+          ]
+        }
+      }
+    ]
+  },
+  "error-bad-contract": {
+    "expect": ["ERROR [bad-input] contracts/naming.json \"keyAreas\" must be a list of non-empty strings"],
+    "ops": [{ "json": { "file": "contracts/naming.json", "path": ["keyAreas"], "value": "common" } }]
+  },
+  "error-missing-contract": {
+    "expect": ["ERROR [bad-input] --contract names nope.json, which does not exist"],
+    "args": "{dir} --contract nope.json",
+    "ops": []
+  },
+  "error-no-source": {
+    "expect": ["ERROR [bad-input] nothing to check: no .ts/.tsx files"],
+    "args": "{dir}/contracts",
+    "ops": []
+  },
+  "pass-expo-inlined-env": {
+    "expect": ["check-code-names:", "0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/platform-flags.ts",
+          "lines": [
+            "// src/features/tasks/platform-flags.ts: Expo inlines its own EXPO_OS and EXPO_BASE_URL at build time.",
+            "export const IS_IOS = process.env.EXPO_OS === 'ios';",
+            "export const BASE_URL = process.env.EXPO_BASE_URL ?? '';",
+            "export const IS_PRODUCTION = process.env.NODE_ENV === 'production';",
+            "// Optional chaining is inlined too (babel-preset-expo 57.0.13), and typeof reads no variable.",
+            "export const API_URL = process.env?.EXPO_PUBLIC_API_URL ?? '';",
+            "export const HAS_PROCESS_ENV = typeof process.env === 'object';"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-library-type-values": {
+    "expect": ["check-code-names:", "0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-form.ts",
+          "lines": [
+            "// src/features/tasks/use-task-form.ts: the add-task form; react-hook-form owns its error types.",
+            "import { useForm } from 'react-hook-form';",
+            "",
+            "export type TaskFormValues = { readonly title: string };",
+            "",
+            "const MAX_TITLE_LENGTH = 80;",
+            "",
+            "export function useTaskForm(): { readonly checkTitle: (title: string) => void } {",
+            "  const { setError } = useForm<TaskFormValues>({ defaultValues: { title: '' } });",
+            "  return {",
+            "    checkTitle: (title) => {",
+            "      if (title.length > MAX_TITLE_LENGTH) {",
+            "        setError('title', { type: 'maxLength', message: 'tasks.title-input.too-long' });",
+            "      }",
+            "    },",
+            "  };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/task-title-schema.test.ts",
+          "lines": [
+            "// src/features/tasks/task-title-schema.test.ts: valibot reports its own issue types.",
+            "import * as v from 'valibot';",
+            "",
+            "const taskTitleSchema = v.pipe(v.string(), v.minLength(1));",
+            "",
+            "describe('taskTitleSchema', () => {",
+            "  it('rejects an empty title', () => {",
+            "    expect(v.safeParse(taskTitleSchema, '').issues?.[0]).toMatchObject({ type: 'min_length' });",
+            "  });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-multi-package": {
+    "expect": ["check-code-names:", "0 problems"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["packages/*"] } },
+      {
+        "write": {
+          "file": "packages/billing/package.json",
+          "lines": ["{ \"name\": \"@acme/billing\", \"private\": true }"]
+        }
+      },
+      {
+        "write": {
+          "file": "packages/billing/src/i18n/catalogs/en.json",
+          "lines": ["{ \"billing.paywall.title\": \"Go Premium\" }"]
+        }
+      },
+      {
+        "write": {
+          "file": "packages/billing/src/paywall-title.ts",
+          "lines": [
+            "// packages/billing/src/paywall-title.ts",
+            "export function paywallTitle(t: (key: string) => string): string {",
+            "  return t('billing.paywall.title');",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-multi-package-skips": {
+    "expect": [
+      "SKIP apps/mobile/src/i18n/catalogs [i18n-key] not yet created (i18n-strings-and-catalogs creates it)",
+      "0 problems, 1 skipped"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["apps/*", "packages/*"] } },
+      { "delete": ["app.config.ts", ".maestro", "src/i18n/catalogs"] },
+      {
+        "write": { "file": "apps/mobile/package.json", "lines": ["{ \"name\": \"@acme/mobile\", \"private\": true }"] }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/app.config.ts",
+          "lines": [
+            "// apps/mobile/app.config.ts",
+            "export default function appConfig(): object {",
+            "  return { name: 'Tasks', slug: 'acme-tasks' };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/src/features/tasks/tasks-title.ts",
+          "lines": [
+            "// apps/mobile/src/features/tasks/tasks-title.ts",
+            "export function tasksTitle(t: (key: string) => string): string {",
+            "  return t('tasks.title');",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/.maestro/flows/smoke/01-open-tasks.yaml",
+          "lines": ["appId: ${APP_ID}", "---", "- launchApp", "- assertVisible:", "    id: 'tasks.title'"]
+        }
+      },
+      {
+        "write": {
+          "file": "packages/billing/package.json",
+          "lines": ["{ \"name\": \"@acme/billing\", \"private\": true }"]
+        }
+      }
+    ]
+  },
+  "pass-node-code": {
+    "expect": ["check-code-names:", "0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/config/build-flags.ts",
+          "lines": [
+            "// src/config/build-flags.ts: imported by app.config.ts only (Node).",
+            "export function readBuildVariant(): string {",
+            "  return process.env['APP_VARIANT'] ?? 'development';",
+            "}"
+          ]
+        }
+      },
+      { "json": { "file": "contracts/naming.json", "path": ["nodeCode"], "value": ["src/config/build-flags.ts"] } }
+    ]
+  },
+  "pass-not-yet-created": {
+    "expect": [
+      "SKIP src/i18n/catalogs [i18n-key] not yet created (i18n-strings-and-catalogs creates it)",
+      "SKIP .maestro [maestro-selector] not yet created (e2e-maestro creates it)"
+    ],
+    "ops": [{ "delete": ["src/i18n/catalogs", ".maestro"] }]
+  },
+  "pass-sdk-type-values": {
+    "expect": ["check-code-names:", "0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/backup/export-backup.ts",
+          "lines": [
+            "// src/features/backup/export-backup.ts: the backup file the share sheet sends.",
+            "export function backupBlob(json: string): Blob {",
+            "  return new Blob([json], { type: 'application/json' });",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/files/expo-document-picker-files-adapter.ts",
+          "lines": [
+            "// src/services/files/expo-document-picker-files-adapter.ts: picks a backup file with expo-document-picker.",
+            "import * as DocumentPicker from 'expo-document-picker';",
+            "",
+            "export function createExpoDocumentPickerFilesAdapter(): { readonly pickBackup: () => Promise<string | null>; readonly pickAny: () => Promise<string | null> } {",
+            "  return {",
+            "    pickBackup: async () => {",
+            "      const result = await DocumentPicker.getDocumentAsync({ type: 'application/json', copyToCacheDirectory: true });",
+            "      return result.canceled ? null : (result.assets[0]?.uri ?? null);",
+            "    },",
+            "    pickAny: async () => {",
+            "      const result = await DocumentPicker.getDocumentAsync({ type: '*/*' });",
+            "      return result.canceled ? null : (result.assets[0]?.uri ?? null);",
+            "    },",
+            "  };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/backup/export-csv.ts",
+          "lines": [
+            "// src/features/backup/export-csv.ts: the task list as a CSV file for the share sheet.",
+            "export function csvBlob(csv: string): Blob {",
+            "  return new Blob([csv], { type: 'text/csv;charset=utf-8' });",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/attachments/pick-image-options.ts",
+          "lines": [
+            "// src/features/attachments/pick-image-options.ts: what the attachments model asks its file port for.",
+            "export const PICK_IMAGE_OPTIONS = { type: 'image/*', isMultiple: false } as const;"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-server-env": {
+    "expect": ["check-code-names:", "0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/api/tasks+api.ts",
+          "lines": [
+            "// src/app/api/tasks+api.ts: a server API route; it never ships in the app bundle.",
+            "import { openDatabase } from '@/server/database';",
+            "",
+            "export async function GET(request: Request): Promise<Response> {",
+            "  const database = openDatabase(process.env.DATABASE_URL ?? '');",
+            "  return Response.json(await database.listTasks(new URL(request.url).searchParams.get('list') ?? 'inbox'));",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/+middleware.ts",
+          "lines": [
+            "// src/app/+middleware.ts: server middleware; it reads the signing secret.",
+            "export default function middleware(request: Request): Response | undefined {",
+            "  const isSigned = request.headers.get('x-signature') === process.env['WEBHOOK_SECRET'];",
+            "  return isSigned ? undefined : new Response('Forbidden', { status: 403 });",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/server/database.ts",
+          "lines": [
+            "// src/server/database.ts: shared by the API routes only.",
+            "export type TaskDatabase = { listTasks: (listId: string) => Promise<readonly string[]> };",
+            "",
+            "export function openDatabase(url: string): TaskDatabase {",
+            "  const poolSize = Number(process.env.DATABASE_POOL_SIZE ?? '4');",
+            "  return { listTasks: async (listId) => [url, listId, String(poolSize)] };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/auth/callback+api.ts",
+          "lines": [
+            "// src/app/auth/callback+api.ts: sends the browser back to the public site after sign-in.",
+            "export function GET(): Response {",
+            "  return Response.redirect(`${process.env.EXPO_PUBLIC_SITE_URL ?? ''}/signed-in`, 302);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-testid-container": {
+    "expect": ["check-code-names:", "0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-summary.tsx",
+          "lines": [
+            "// src/features/tasks/components/task-summary.tsx: the open count above the list (not tappable).",
+            "import { SummaryCard } from '@/ui/summary-card';",
+            "",
+            "export type TaskSummaryProps = {",
+            "  readonly openCount: number;",
+            "  readonly testID: string;",
+            "};",
+            "",
+            "export function TaskSummary({ openCount, testID }: TaskSummaryProps): React.JSX.Element {",
+            "  return <SummaryCard testID={`${testID}.card`} value={openCount} />;",
+            "}"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "      <AppText testID=\"tasks.title\">",
+          "with": "      <SummaryCard testID=\"tasks.summary\" value={tasks.length} />\n      <AppText testID=\"tasks.title\">"
+        }
+      }
+    ]
+  }
+}

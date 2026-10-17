@@ -1,0 +1,239 @@
+{
+  "$comment": "The demo component tier the templates were built from: merge it into design/tokens.json as \"components\", then replace the values with the design's (references/measurements-and-specs.md).",
+  "components": {
+    "button": {
+      "minHeight": 48,
+      "minHeightLarge": 56,
+      "paddingBlock": "{spacing.sm}",
+      "paddingInline": "{spacing.lg}",
+      "gap": "{spacing.sm}",
+      "radius": "{radius.md}",
+      "border": "{stroke.regular}",
+      "icon": 20,
+      "rowMinBasis": 120
+    },
+    "textButton": {
+      "paddingBlock": "{spacing.sm}",
+      "paddingInline": "{spacing.sm}",
+      "underlineThickness": 2,
+      "underlineOffset": 2
+    },
+    "iconButton": {
+      "size": 48,
+      "sizeSmall": "{size.minTouch}",
+      "radius": "{radius.md}",
+      "icon": 24
+    },
+    "checkbox": {
+      "box": 24,
+      "radius": "{radius.sm}",
+      "border": "{stroke.regular}"
+    },
+    "checkMark": {
+      "width": 6,
+      "height": 11,
+      "stroke": 2
+    },
+    "chevron": {
+      "size": 8,
+      "stroke": 2
+    },
+    "toggle": {
+      "width": 52,
+      "height": 32,
+      "radius": "{radius.lg}",
+      "border": "{stroke.regular}",
+      "knob": 22,
+      "knobInset": 3
+    },
+    "segmentedControl": {
+      "minHeight": "{size.minTouch}",
+      "gap": "{spacing.xs}",
+      "radius": "{radius.md}",
+      "border": "{stroke.regular}",
+      "paddingBlock": "{spacing.xs}",
+      "paddingInline": "{spacing.xs}",
+      "labelGap": "{spacing.xs}"
+    },
+    "slider": {
+      "height": "{size.minTouch}",
+      "minWidth": 120,
+      "trackHeight": 6,
+      "trackRadius": 3,
+      "thumb": 28,
+      "thumbBorder": "{stroke.regular}"
+    },
+    "progressBar": {
+      "height": 8,
+      "minWidth": 60,
+      "radius": 4
+    },
+    "radio": {
+      "size": 24,
+      "border": "{stroke.regular}",
+      "dot": 12
+    },
+    "optionCard": {
+      "minHeight": 56,
+      "paddingBlock": "{spacing.md}",
+      "paddingInline": "{spacing.lg}",
+      "gap": "{spacing.md}",
+      "radius": "{radius.md}"
+    },
+    "list": {
+      "radius": "{radius.lg}",
+      "border": "{stroke.hair}"
+    },
+    "sectionHeader": {
+      "paddingTop": "{spacing.lg}",
+      "paddingBottom": "{spacing.xs}",
+      "paddingInline": "{spacing.lg}",
+      "gap": "{spacing.sm}",
+      "icon": 16
+    },
+    "row": {
+      "minHeight": 52,
+      "paddingBlock": "{spacing.md}",
+      "paddingInline": "{spacing.lg}",
+      "gap": "{spacing.md}",
+      "separator": "{stroke.hair}",
+      "labelGap": "{spacing.xxs}",
+      "subRowIndent": 60
+    },
+    "iconTile": {
+      "size": 32,
+      "radius": "{radius.sm}",
+      "icon": 20,
+      "sizeLarge": 64,
+      "radiusLarge": "{radius.lg}",
+      "iconLarge": 36
+    },
+    "card": {
+      "radius": "{radius.lg}",
+      "border": "{stroke.hair}",
+      "padding": "{spacing.lg}",
+      "paddingCompact": "{spacing.md}",
+      "gap": "{spacing.md}"
+    },
+    "cardHeader": {
+      "gap": "{spacing.md}"
+    },
+    "callout": {
+      "gap": "{spacing.md}",
+      "icon": 20,
+      "iconNudge": 2
+    },
+    "badge": {
+      "paddingBlock": "{spacing.xxs}",
+      "paddingInline": "{spacing.sm}",
+      "gap": "{spacing.xs}",
+      "radius": "{radius.sm}",
+      "icon": 14,
+      "maxTilt": 8
+    },
+    "chip": {
+      "paddingBlock": "{spacing.xs}",
+      "paddingInline": "{spacing.md}",
+      "gap": "{spacing.xs}",
+      "radius": "{radius.sm}",
+      "border": "{stroke.hair}",
+      "icon": 14
+    },
+    "appBar": {
+      "minHeight": 56,
+      "paddingInline": "{spacing.xs}",
+      "gap": "{spacing.xs}"
+    },
+    "scrim": {
+      "paddingBlock": "{spacing.xl}",
+      "paddingInline": "{spacing.lg}"
+    },
+    "dialog": {
+      "radius": "{radius.lg}",
+      "paddingTop": "{spacing.xl}",
+      "paddingInline": "{spacing.xl}",
+      "paddingBottom": "{spacing.lg}",
+      "gap": "{spacing.md}",
+      "elevation": "{elevation.overlay}",
+      "buttonRowGap": "{spacing.md}",
+      "buttonRowMarginTop": "{spacing.sm}"
+    },
+    "toast": {
+      "paddingBlock": "{spacing.md}",
+      "paddingInline": "{spacing.lg}",
+      "radius": "{radius.md}",
+      "gap": "{spacing.md}",
+      "icon": 20,
+      "stackGap": "{spacing.sm}",
+      "drop": 16,
+      "border": "{stroke.hair}"
+    },
+    "emptyState": {
+      "gap": "{spacing.md}",
+      "paddingBlock": "{spacing.xxl}"
+    },
+    "pagerDots": {
+      "dot": 8,
+      "activeWidth": 20,
+      "gap": "{spacing.sm}"
+    },
+    "statGrid": {
+      "gap": "{spacing.md}",
+      "cellPadding": "{spacing.md}",
+      "radius": "{radius.md}",
+      "cellGap": "{spacing.xxs}"
+    },
+    "barChart": {
+      "height": 120,
+      "bar": 16,
+      "gap": "{spacing.sm}",
+      "radius": "{radius.sm}",
+      "minBar": 2,
+      "labelGap": "{spacing.xs}"
+    },
+    "busy": {
+      "block": 8,
+      "radius": 2,
+      "gap": 4,
+      "hop": 6
+    },
+    "tileButton": {
+      "minHeight": 88,
+      "paddingBlock": "{spacing.md}",
+      "paddingInline": "{spacing.sm}",
+      "gap": "{spacing.sm}",
+      "radius": "{radius.md}",
+      "icon": 28
+    },
+    "toggleTile": {
+      "minHeight": 88,
+      "paddingBlock": "{spacing.sm}",
+      "paddingInline": "{spacing.xs}",
+      "gap": "{spacing.xs}",
+      "radius": "{radius.md}",
+      "icon": 24,
+      "stateGap": "{spacing.xxs}"
+    },
+    "navCard": {
+      "minHeight": 64,
+      "paddingBlock": "{spacing.md}",
+      "paddingInline": "{spacing.lg}",
+      "gap": "{spacing.md}",
+      "labelGap": "{spacing.xxs}",
+      "radius": "{radius.md}"
+    },
+    "actionCard": {
+      "minHeight": 56,
+      "paddingBlock": "{spacing.sm}",
+      "paddingInline": "{spacing.lg}",
+      "gap": "{spacing.md}",
+      "radius": "{radius.md}"
+    },
+    "confetti": {
+      "band": 64,
+      "piece": 10,
+      "radius": 2,
+      "fall": 32
+    }
+  }
+}

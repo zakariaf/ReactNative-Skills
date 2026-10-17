@@ -1,0 +1,17 @@
+{
+  "$schema": "./android-release.schema.json",
+  "lane": "local",
+  "applicationId": "com.acme.tasks",
+  "uploadCertificateSha256": "86:76:E3:D2:E7:A7:97:DB:29:8F:99:32:25:28:1D:C3:2D:D5:26:D4:D6:92:8E:EA:35:5F:6D:B1:F0:EF:3A:7C",
+  "minTargetSdk": 36,
+  "uploadTrack": "internal",
+  "rollout": [0.05, 0.2, 0.5, 1],
+  "permissions": {
+    "android.permission.INTERNET": { "reason": "Requests through the ApiClient port, ads and purchases" },
+    "android.permission.ACCESS_NETWORK_STATE": { "reason": "The Google Mobile Ads SDK checks connectivity before loading an ad" },
+    "com.google.android.gms.permission.AD_ID": {
+      "reason": "The Google Mobile Ads SDK reads the advertising ID for ads",
+      "playDeclaration": "Advertising ID: yes, used for advertising or marketing"
+    }
+  }
+}

@@ -1,0 +1,540 @@
+{
+  "area": "services",
+  "entries": [
+    {
+      "id": "services-ads-error-codes",
+      "topic": "Ads",
+      "symptom": "Ad error handling breaks after an AdMob library update",
+      "cause": "Legacy error code strings are deprecated (removed in v18)",
+      "fix": "Branch on error.phase, then error.reason",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "admob-ads-and-consent",
+      "appliesTo": {
+        "react-native-google-mobile-ads": "17.x"
+      }
+    },
+    {
+      "id": "services-banner-never-shows",
+      "topic": "Ads",
+      "symptom": "The banner never appears",
+      "cause": "Offline, Premium, consent not given (canRequestAds false), ads switched off for the variant, no fill, or a container that renders nothing until the ad loads",
+      "fix": "Check the ad policy inputs in the debug menu and open the Ad Inspector in a preview build; always mount the banner slot (it keeps zero height until an ad loads) and never wrap it in a container that renders nothing until the ad is visible",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "admob-ads-and-consent"
+    },
+    {
+      "id": "services-can-request-ads-false",
+      "topic": "Ads",
+      "symptom": "canRequestAds stays false",
+      "cause": "The user refused consent where that blocks ads",
+      "fix": "Expected; the privacy-choices row lets them change it",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "admob-ads-and-consent"
+    },
+    {
+      "id": "services-ad-already-used",
+      "topic": "Ads",
+      "symptom": "Ad error reason ad-already-used",
+      "cause": "A full-screen ad object was shown twice",
+      "fix": "Use each ad object once and destroy it after CLOSED",
+      "match": [
+        "ad-already-used"
+      ],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "admob-ads-and-consent"
+    },
+    {
+      "id": "services-ad-preload-before-init",
+      "topic": "Ads",
+      "symptom": "The first interstitial or rewarded ad after launch never loads",
+      "cause": "The ad was preloaded before initialize() had resolved",
+      "fix": "Await initialize (after consent) before any preload",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "admob-ads-and-consent"
+    },
+    {
+      "id": "services-interstitial-over-result",
+      "topic": "Ads",
+      "symptom": "An interstitial covers a result or summary screen",
+      "cause": "The call sits in the screen effect instead of the button handler that leaves the screen",
+      "fix": "Only the handlers that navigate away (Next, Continue) show an interstitial, through the ad policy",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "admob-ads-and-consent"
+    },
+    {
+      "id": "services-banner-size-mock",
+      "topic": "Ads",
+      "symptom": "A banner test passes undefined as the size",
+      "cause": "The mock lacked BannerAdSize.LARGE_ANCHORED_ADAPTIVE_BANNER (ANCHORED_ADAPTIVE_BANNER is deprecated)",
+      "fix": "The root mock lists both sizes",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "admob-ads-and-consent"
+    },
+    {
+      "id": "services-ads-off-contacts-google",
+      "topic": "Consent",
+      "symptom": "An ads-off build contacts Google's consent service at launch",
+      "cause": "The consent port was built for the ads SDK directly, ignoring the ads mode",
+      "fix": "Build it through the consent factory with the ads mode; ads are enabled only when the mode is not off",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "admob-ads-and-consent"
+    },
+    {
+      "id": "services-no-consent-form",
+      "topic": "Consent",
+      "symptom": "No consent form appears in the EEA on a real device",
+      "cause": "No published GDPR message in the AdMob console, or a cached answer",
+      "fix": "Human step: the developer publishes the message; in preview builds use the debug geography EEA plus AdsConsent.reset()",
+      "match": [],
+      "status": "documented",
+      "needsHuman": true,
+      "skill": "admob-ads-and-consent"
+    },
+    {
+      "id": "services-debug-geography-ships",
+      "topic": "Consent",
+      "symptom": "Consent debug settings are reachable in a production build",
+      "cause": "debugGeography and AdsConsent.reset() were not behind the test-only gate",
+      "fix": "Reach them only through test-only code; unit-test the gate",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "admob-ads-and-consent"
+    },
+    {
+      "id": "services-consent-offline",
+      "topic": "Consent",
+      "symptom": "The consent update fails offline, and no ads show later although consent was given",
+      "cause": "The UMP request needs the network",
+      "fix": "Use canRequestAds from the earlier session when the update fails; the ad policy suppresses ads while offline",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "admob-ads-and-consent"
+    },
+    {
+      "id": "services-att-prompt-missing",
+      "topic": "Consent",
+      "symptom": "The App Tracking Transparency prompt is missing before the first ad request, or the app has no NSUserTrackingUsageDescription",
+      "cause": "The expo-tracking-transparency plugin entry is missing, or the consent flow never asks, or code outside the consent adapter asks in the wrong order",
+      "fix": "On iOS ask in this order before any ad request: Google's form when required, then the ATT prompt while the status is not determined and the app is active. Add ['expo-tracking-transparency', { userTrackingPermission }] to the plugins and import the package only in src/services/consent/expo-tracking-consent-adapter.ts. A child-directed app has neither",
+      "match": [
+        "ATT prompt (is )?missing",
+        "no NSUserTrackingUsageDescription"
+      ],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "admob-ads-and-consent",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "services-att-crash-no-usage-string",
+      "topic": "Consent",
+      "symptom": "The app crashes when it asks for tracking: \"This app has crashed because it attempted to access privacy-sensitive data without a usage description ... NSUserTrackingUsageDescription\"",
+      "cause": "requestTrackingPermissionsAsync ran in a build whose Info.plist has no usage string (plugin entry missing, or the native project predates it)",
+      "fix": "Add the expo-tracking-transparency plugin entry with a translated userTrackingPermission, prebuild with --clean and rebuild",
+      "match": [
+        "must contain an NSUserTrackingUsageDescription key",
+        "privacy-sensitive data without a usage description"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "admob-ads-and-consent",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "services-att-prompt-never-shows",
+      "topic": "Consent",
+      "symptom": "The ATT prompt never appears (requestTracking returns at once), or the tracking question shows twice with a Google explainer before it",
+      "cause": "iOS shows the prompt only while the app is active; a device that restricts tracking answers at once; the user already answered (once per install); Maestro's launchApp granted it; or an IDFA explainer message is published in the AdMob console, so UMP runs its own ATT flow first",
+      "fix": "Ask after the consent form closes and AppState is active; publish no IDFA explainer in AdMob; to see the prompt again delete the app from your own simulator and reinstall. Declined, restricted and unavailable are normal answers: ads still serve without the IDFA",
+      "match": [
+        "ATT prompt never (appears|shows)",
+        "prompt shown twice"
+      ],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "admob-ads-and-consent",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "services-att-alert-over-form",
+      "topic": "Consent",
+      "symptom": "Apple's tracking alert appears while Google's consent form is still drawn behind it",
+      "cause": "The consent flow asks right after the form reports closed; the form's dismissal is still on screen when iOS presents the alert",
+      "fix": "Nothing to fix: the order is right. Only an ATT alert before the form is answered is a bug",
+      "match": [
+        "alert appears while .*form is still"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "admob-ads-and-consent",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "services-sample-idfa-explainer",
+      "topic": "Consent",
+      "symptom": "Google's \"Our app wants to stay free for you\" page appears before Apple's tracking prompt in a preview build outside the EEA",
+      "cause": "Preview builds use Google's sample AdMob app id, and that sample app publishes an IDFA explainer message",
+      "fix": "Expected in builds with the sample id only; never publish an explainer in the real AdMob app if the app shows its own flow",
+      "match": [
+        "Our app wants to stay free for you"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "admob-ads-and-consent",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "services-gma-tracking-label",
+      "topic": "Privacy",
+      "symptom": "App Review rejection risk under guideline 5.1.2(i): the ads SDK declares tracking (Device ID) in its privacy manifest",
+      "cause": "Google Mobile Ads' own manifest declares Device ID used for tracking",
+      "fix": "Ask for ATT before any ad request on iOS, answer App Privacy with Device ID collected and used for tracking by the third-party SDK, and keep the app's own manifest honest (NSPrivacyTracking false when the app's code tracks nothing)",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "privacy-and-store-declarations",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "services-static-pod-manifests",
+      "topic": "Privacy",
+      "symptom": "Apple emails about missing required-reason APIs",
+      "cause": "Apple does not reliably parse the privacy manifests of static CocoaPods",
+      "fix": "Aggregate every pod manifest into ios.privacyManifests; the privacy audit fails on a gap",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "privacy-and-store-declarations",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "services-app-privacy-web-only",
+      "topic": "Privacy",
+      "symptom": "The App Privacy questionnaire or the Play Data safety form cannot be filled by the agent",
+      "cause": "Both are console forms",
+      "fix": "Human step: the developer fills them from the privacy contract and the audit output",
+      "match": [],
+      "status": "open",
+      "needsHuman": true,
+      "skill": "privacy-and-store-declarations"
+    },
+    {
+      "id": "services-webview-sockets",
+      "topic": "Privacy",
+      "symptom": "The runtime socket audit sees WebKit or system-daemon traffic",
+      "cause": "Ads render in a web view whose traffic comes from a system networking process; store traffic goes through a system daemon",
+      "fix": "Run the runtime audit with ads off; store traffic is expected",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "privacy-and-store-declarations"
+    },
+    {
+      "id": "services-netinfo-probe",
+      "topic": "Privacy",
+      "symptom": "@react-native-community/netinfo makes HTTP requests to clients3.google.com",
+      "cause": "Its default reachability check fetches generate_204 whenever the native layer gives no answer",
+      "fix": "Detect connectivity with expo-network behind the ConnectivityPort, or configure NetInfo without the reachability probe; an offline-only app declares neither",
+      "match": [
+        "clients3\\.google\\.com"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "networking-and-server-state"
+    },
+    {
+      "id": "services-aliased-network-global",
+      "topic": "Privacy",
+      "symptom": "const send = globalThis.fetch passes lint and the bundle audit",
+      "cause": "The rules matched only direct calls of the network globals",
+      "fix": "Never alias network globals; network goes through the ApiClient port",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "privacy-and-store-declarations"
+    },
+    {
+      "id": "services-dev-client-local-network",
+      "topic": "Privacy",
+      "symptom": "NSLocalNetworkUsageDescription and NSBonjourServices appear in the generated Info.plist of every variant",
+      "cause": "expo-dev-client's plugin adds them to the generated plist",
+      "fix": "Expected on SDK 57: its build phase strips them from every non-Debug product, and the dev-launcher pods are Debug-only; check the Release .app, not the generated plist",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "ios-simulator-build",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "services-aps-environment",
+      "topic": "Privacy",
+      "symptom": "aps-environment is development in a production build",
+      "cause": "expo-notifications writes aps-environment: development unless its mode says otherwise",
+      "fix": "Set the plugin's mode to production for production builds (per variant)",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "push-notifications",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "services-storekit-xcuitest",
+      "topic": "Purchases",
+      "symptom": "SKTestSession in a UI-test runner does not control the app; products stay []",
+      "cause": "The UI-test runner is a separate process; xcodebuild test ignores the scheme StoreKit configuration",
+      "fix": "A hosted XCTest bundle (TEST_HOST = the app) arms StoreKit testing for the bundle id; then launch the app normally",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "in-app-purchases",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "services-storekit-get-task-allow",
+      "topic": "Purchases",
+      "symptom": "StoreKit testing fails silently",
+      "cause": "The app was built without the get-task-allow entitlement",
+      "fix": "Debug-only get-task-allow for the StoreKit test build; the release gate proves it absent",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "in-app-purchases",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "services-revoke-on-absence",
+      "topic": "Purchases",
+      "symptom": "Premium disappears right after a purchase",
+      "cause": "A just-bought purchase is briefly missing from the current entitlements, and a foreground re-check fires after the sheet closes",
+      "fix": "Revoke only on a verified transaction with a revocation date; absence keeps the cached state",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "in-app-purchases"
+    },
+    {
+      "id": "services-restore-sync-error",
+      "topic": "Purchases",
+      "symptom": "restorePurchases throws sync-error",
+      "cause": "AppStore.sync failed or the account prompt was cancelled",
+      "fix": "Map it to a 'could not restore' state, never 'nothing to restore'",
+      "match": [
+        "sync-error",
+        "SyncError"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "in-app-purchases"
+    },
+    {
+      "id": "services-empty-products",
+      "topic": "Purchases",
+      "symptom": "The price never loads, with no error",
+      "cause": "fetchProducts returns [] silently when the store cannot resolve the product id",
+      "fix": "Map an empty result to 'store unavailable'; check the product id and its state in the store console",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "in-app-purchases"
+    },
+    {
+      "id": "services-store-price-offline",
+      "topic": "Purchases",
+      "symptom": "The purchase screen shows a price while the phone is offline",
+      "cause": "Nothing linked connectivity to the store flow",
+      "fix": "Wrap the purchase port with connectivity and reload the store on reconnect",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "in-app-purchases"
+    },
+    {
+      "id": "services-refund-after-offline-launch",
+      "topic": "Purchases",
+      "symptom": "A refund is not applied after a launch that started offline: Premium stays on when the phone comes back online",
+      "cause": "The launch re-check ran offline, where a missing entitlement is not evidence, and nothing re-checked on reconnect",
+      "fix": "Re-check entitlements when connectivity returns and on every foreground while online",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "in-app-purchases"
+    },
+    {
+      "id": "services-entitlements-offline",
+      "topic": "Purchases",
+      "symptom": "Premium might be revoked or missing when entitlements are read offline",
+      "cause": "Not verified whether the current entitlements are complete offline",
+      "fix": "An error keeps the cached state; only a verified revocation removes it",
+      "match": [],
+      "status": "open",
+      "needsHuman": false,
+      "skill": "in-app-purchases"
+    },
+    {
+      "id": "services-refund-not-pushed",
+      "topic": "Purchases",
+      "symptom": "A refund in the test store does not reach the running app",
+      "cause": "The test store did not push an update; only the launch re-check saw the revocation",
+      "fix": "Handle both paths (the transaction listener and the launch check)",
+      "match": [],
+      "status": "open",
+      "needsHuman": false,
+      "skill": "in-app-purchases"
+    },
+    {
+      "id": "services-family-sharing-irreversible",
+      "topic": "Purchases",
+      "symptom": "Family Sharing for a non-consumable: should it be on?",
+      "cause": "Turning Family Sharing on in App Store Connect cannot be undone",
+      "fix": "A product decision for the developer; keep the StoreKit configuration and the console in agreement, and never turn it on without that decision",
+      "match": [],
+      "status": "documented",
+      "needsHuman": true,
+      "skill": "in-app-purchases",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "services-audio-other-playing",
+      "topic": "Audio",
+      "symptom": "The app's music starts over the user's own music",
+      "cause": "The audio library has no API for \"other audio is playing\"",
+      "fix": "Keep background music off by default (or read the session's secondaryAudioShouldBeSilencedHint in a small native module); use the ambient category",
+      "match": [],
+      "status": "open",
+      "needsHuman": false,
+      "skill": "audio-and-haptics-feedback"
+    },
+    {
+      "id": "services-audio-voices-dropped",
+      "topic": "Audio",
+      "symptom": "The next sounds are dropped after a fast sequence of events",
+      "cause": "Cancelled cues kept their voice slots, and cues scheduled out of order got a negative time gap",
+      "fix": "Model voices as intervals on the audio clock and release them on cancel",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "audio-and-haptics-feedback"
+    },
+    {
+      "id": "services-audio-layer-click",
+      "topic": "Audio",
+      "symptom": "A click in the middle of a synthesised sound",
+      "cause": "A layer that starts after 0 has no fade-in",
+      "fix": "Give every late-starting layer a fade-in of at least 1 ms",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "audio-and-haptics-feedback"
+    },
+    {
+      "id": "services-audio-plugin-unwired",
+      "topic": "Audio",
+      "symptom": "No sound on a device build although the audio plugin options are defined",
+      "cause": "The plugin constant is never added to the plugins list of app.config.ts",
+      "fix": "Add the audio library's plugin entry, prebuild with --clean",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "audio-and-haptics-feedback"
+    },
+    {
+      "id": "services-ios-allow-haptics",
+      "topic": "Haptics",
+      "symptom": "Haptics do not change with an audio session option such as iosAllowHaptics",
+      "cause": "The option only affects recording sessions",
+      "fix": "Leave it at its default with the ambient category",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "audio-and-haptics-feedback",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "services-haptics-simulator",
+      "topic": "Haptics",
+      "symptom": "Haptics cannot be felt in the simulator or emulator",
+      "cause": "Simulators have no haptic engine",
+      "fix": "Check haptics on a device; the adapter test only proves the calls",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "audio-and-haptics-feedback"
+    },
+    {
+      "id": "services-haptics-catch",
+      "topic": "Haptics",
+      "symptom": "Haptics calls end in .catch(() => undefined), which looks like a swallowed error",
+      "cause": "Expo documents haptics as a no-op that can reject in Low Power Mode and similar states",
+      "fix": "Keep it as the one allowed fallback inside the haptics adapter; everywhere else errors are recorded",
+      "match": [],
+      "status": "open",
+      "needsHuman": false,
+      "skill": "audio-and-haptics-feedback"
+    },
+    {
+      "id": "services-slider-percent-scale",
+      "topic": "Audio",
+      "symptom": "A volume slider sits at full and the setting holds fractions like 0.8",
+      "cause": "The slider works in 0 to 1 while the settings row passed 0 to 100",
+      "fix": "Convert percent and fraction in one place (the row) and save only when the whole percent changes",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "settings-and-preferences"
+    },
+    {
+      "id": "services-null-extra",
+      "topic": "Config",
+      "symptom": "null in expo.extra arrives as {} on the device",
+      "cause": "Expo serialises extra through the manifest",
+      "fix": "Omit keys instead of writing null",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "app-variants-and-environment"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "$comment": "A slim screen contract for the self-test: the Tasks screen, its rows (a component with parts) and a decorative badge.",
+  "version": 1,
+  "components": { "TaskRow": { "parts": ["label", "due-date"] } },
+  "screens": [
+    {
+      "id": "tasks",
+      "presentation": "route",
+      "view": "src/features/tasks/tasks-screen.tsx",
+      "states": [{ "id": "default" }],
+      "elements": [
+        { "testID": "tasks.list", "role": "list", "component": "FlatList" },
+        { "testID": "tasks.summary", "role": "text", "component": "AppText" },
+        { "testID": "tasks.task-row.{taskId}", "role": "checkbox", "component": "TaskRow" },
+        { "testID": "tasks.empty-badge", "role": "image", "component": "Icon", "a11yHidden": true, "coveredBy": "tasks.summary" }
+      ]
+    },
+    {
+      "id": "debug",
+      "presentation": "route",
+      "view": "src/features/debug/debug-menu-screen.tsx",
+      "states": [{ "id": "default" }],
+      "elements": [{ "testID": "debug.menu.day", "role": "text", "component": "AppText" }]
+    }
+  ]
+}

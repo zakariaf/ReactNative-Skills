@@ -1,0 +1,543 @@
+{
+  "bad-builder-duration": {
+    "expect": [
+      "src/features/tasks/components/task-row-enter.ts:4 [no-raw-duration] raw animation .duration(300) on FadeIn",
+      "src/features/tasks/components/task-row-enter.ts:5 [no-raw-duration] raw animation .delay(80) on LinearTransition"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-row-enter.ts",
+          "content": "// src/features/tasks/components/task-row-enter.ts\nimport { FadeIn, LinearTransition } from 'react-native-reanimated';\n\nexport const ENTERING = FadeIn.duration(300);\nexport const LAYOUT = LinearTransition.springify().delay(80);\n"
+        }
+      }
+    ]
+  },
+  "bad-builder-duration-const": {
+    "expect": [
+      "src/features/tasks/components/row-enter.ts:4 [no-raw-duration] raw animation .duration(SLIDE) on FadeIn: SLIDE is 300",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/row-enter.ts",
+          "content": "// src/features/tasks/components/row-enter.ts\nimport { FadeIn } from 'react-native-reanimated';\n\nconst SLIDE = 300;\n\nexport const rowEnter = FadeIn.duration(SLIDE);\n"
+        }
+      }
+    ]
+  },
+  "bad-color-literal": {
+    "expect": ["src/features/tasks/components/overdue-badge.tsx:5 [no-color-literal] colour literal #FFE4E1"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/overdue-badge.tsx",
+          "content": "// src/features/tasks/components/overdue-badge.tsx\nimport { StyleSheet } from 'react-native';\n\nexport const styles = StyleSheet.create({\n  badge: { backgroundColor: '#FFE4E1', borderColor: 'rgba(0,0,0,0.2)' },\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-duration-number-const": {
+    "expect": [
+      "src/features/tasks/components/fade-in-row.ts:4 [no-raw-duration] raw animation duration 250 in FADE_MS, passed to withTiming",
+      "src/features/tasks/components/fade-in-row.ts:5 [no-raw-duration] raw animation duration 180 in duration, passed to withTiming",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/fade-in-row.ts",
+          "content": "// src/features/tasks/components/fade-in-row.ts\nimport { withTiming } from 'react-native-reanimated';\n\nconst FADE_MS = 250;\nconst duration = 180;\n\nexport const fadeIn = () => withTiming(1, { duration: FADE_MS });\nexport const fadeOut = () => withTiming(0, { duration });\n"
+        }
+      }
+    ]
+  },
+  "bad-duration-ternary": {
+    "expect": [
+      "src/features/tasks/components/slow-fade.ts:8 [no-raw-duration] raw animation duration 600 or 200 in withTiming (isSlow() ? 600 : 200)",
+      "src/features/tasks/components/slow-fade.ts:9 [no-raw-duration] raw animation delay 50 in withDelay (index * 50)",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/slow-fade.ts",
+          "content": "// src/features/tasks/components/slow-fade.ts\nimport { withDelay, withTiming } from 'react-native-reanimated';\n\nimport { MOTION_MS } from '@/theme/motion';\n\nconst isSlow = (): boolean => false;\n\nexport const fade = () => withTiming(0, { duration: isSlow() ? 600 : 200 });\nexport const stagger = (index: number) => withDelay(index * 50, withTiming(1, { duration: MOTION_MS.fast }));\n"
+        }
+      }
+    ]
+  },
+  "bad-elevation-key": {
+    "expect": [
+      "src/features/tasks/components/list-card.tsx:5 [no-legacy-shadow] the elevation style key draws Android's own shadow, which iOS never draws",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/list-card.tsx",
+          "content": "// src/features/tasks/components/list-card.tsx: Android's own shadow, which iOS never draws.\nimport { StyleSheet } from 'react-native';\n\nexport const styles = StyleSheet.create({\n  card: { elevation: 4 },\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-font-size-ternary": {
+    "expect": [
+      "src/features/tasks/components/due-label.tsx:7 [no-raw-font-size] raw font size 13 and 17 in a conditional (isNarrow() ? 13 : 17)",
+      "src/features/tasks/components/due-label.tsx:8 [no-letter-spacing] raw letter spacing 0.5 in a conditional",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/due-label.tsx",
+          "content": "// src/features/tasks/components/due-label.tsx\nimport { StyleSheet } from 'react-native';\n\nconst isNarrow = (): boolean => false;\n\nexport const styles = StyleSheet.create({\n  label: { fontSize: isNarrow() ? 13 : 17 },\n  tight: { letterSpacing: isNarrow() ? -0.5 : 0 },\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-font-weight": {
+    "expect": [
+      "src/features/tasks/components/list-title.tsx:5 [no-font-weight] fontWeight with a bundled family: each weight is its own family, so there is no face to choose"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/design-system.json",
+          "path": ["fonts"],
+          "value": {
+            "dir": "assets/fonts",
+            "files": [
+              {
+                "file": "Inter-Regular.ttf",
+                "family": "Inter",
+                "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              {
+                "file": "Inter-Bold.ttf",
+                "family": "Inter",
+                "sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+              }
+            ],
+            "licences": { "Inter": "Inter-OFL.txt" }
+          }
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/components/list-title.tsx",
+          "content": "// src/features/tasks/components/list-title.tsx\nimport { StyleSheet } from 'react-native';\n\nexport const styles = StyleSheet.create({\n  title: { fontWeight: '600' },\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-gradient": {
+    "expect": ["src/features/tasks/components/hero-banner.tsx:2 [no-gradient] expo-linear-gradient paints a gradient"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/design-system.json",
+          "path": ["rawValues", "policy", "noGradients"],
+          "value": true
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/components/hero-banner.tsx",
+          "content": "// src/features/tasks/components/hero-banner.tsx\nimport { LinearGradient } from 'expo-linear-gradient';\n\nexport const Banner = LinearGradient;\n"
+        }
+      }
+    ]
+  },
+  "bad-layout-animation": {
+    "expect": [
+      "src/features/tasks/components/expand-row.ts:5 [no-raw-duration] raw animation duration 300 in LayoutAnimation.configureNext",
+      "src/features/tasks/components/expand-row.ts:8 [no-raw-duration] raw animation duration 250 in LayoutAnimation.create",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/expand-row.ts",
+          "content": "// src/features/tasks/components/expand-row.ts\nimport { LayoutAnimation } from 'react-native';\n\nexport function expand(): void {\n  LayoutAnimation.configureNext({ duration: 300, update: { type: 'easeInEaseOut' } });\n}\n\nexport const collapse = LayoutAnimation.create(250, 'easeInEaseOut', 'opacity');\nexport const preset = () => {\n  LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);\n};\n"
+        }
+      }
+    ]
+  },
+  "bad-legacy-shadow": {
+    "expect": [
+      "src/features/tasks/components/list-card.tsx:6 [no-legacy-shadow] shadowColor tints only Android's elevation shadow (API 28+) and iOS's legacy shadow",
+      "src/features/tasks/components/list-card.tsx:7 [no-legacy-shadow] shadowRadius is an iOS-only shadow prop",
+      "src/features/tasks/components/list-card.tsx:8 [no-legacy-shadow] the elevation style key draws Android's own shadow, which iOS never draws"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/list-card.tsx",
+          "content": "// src/features/tasks/components/list-card.tsx\nimport { StyleSheet } from 'react-native';\n\nexport const styles = StyleSheet.create({\n  card: {\n    shadowColor: undefined,\n    shadowRadius: 8,\n    elevation: 4,\n  },\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-letter-spacing": {
+    "expect": ["src/features/tasks/components/section-label.tsx:5 [no-letter-spacing] raw letter spacing"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/section-label.tsx",
+          "content": "// src/features/tasks/components/section-label.tsx\nimport { StyleSheet } from 'react-native';\n\nexport const styles = StyleSheet.create({\n  label: { letterSpacing: 0.5 },\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-make-styles-factory": {
+    "expect": [
+      "src/features/tasks/components/empty-state.tsx:4 [make-styles-factory] the makeStyles factory returns styles that StyleSheet.create never saw"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/empty-state.tsx",
+          "content": "// src/features/tasks/components/empty-state.tsx\nimport { makeStyles } from '@/theme/make-styles';\n\nexport const useStyles = makeStyles((theme) => ({\n  box: { backgroundColor: theme.colors.sunken },\n}));\n"
+        }
+      }
+    ]
+  },
+  "bad-named-color-prop": {
+    "expect": [
+      "src/features/tasks/components/task-form.tsx:7 [no-color-literal] named colour 'white'",
+      "src/features/tasks/components/task-form.tsx:8 [no-color-literal] named colour 'gray'",
+      "src/features/tasks/components/task-form.tsx:9 [no-color-literal] named colour 'black'",
+      "src/features/tasks/components/task-form.tsx:9 [no-color-literal] named colour 'Green'",
+      "src/features/tasks/components/due-style.ts:2 [no-color-literal] named colour 'red'",
+      "RESULT: FAIL (5 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-form.tsx",
+          "content": "// src/features/tasks/components/task-form.tsx\nimport { ActivityIndicator, Switch, TextInput, View } from 'react-native';\n\nexport function TaskForm({ busy }: { readonly busy: boolean }) {\n  return (\n    <View>\n      <ActivityIndicator color=\"white\" animating={busy} />\n      <TextInput placeholderTextColor=\"gray\" />\n      <Switch thumbColor={'black'} trackColor={{ false: 'transparent', true: 'Green' }} />\n    </View>\n  );\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/components/due-style.ts",
+          "content": "// src/features/tasks/components/due-style.ts\nexport const dueStyle = { color: 'red' };\n"
+        }
+      }
+    ]
+  },
+  "bad-palette-import": {
+    "expect": [
+      "src/features/tasks/components/overdue-banner.tsx:4 [no-palette-import] imports a palette (@/theme/palette)",
+      "src/features/tasks/components/brand-badge.tsx:2 [no-palette-import] imports the token file (../../../../design/tokens.json)",
+      "src/ui/theme-preview.tsx:2 [no-palette-import] imports APP_THEMES (@/theme/theme-context)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/overdue-banner.tsx",
+          "content": "// src/features/tasks/components/overdue-banner.tsx: the colour is frozen to light mode.\nimport { StyleSheet } from 'react-native';\n\nimport { PALETTE } from '@/theme/palette';\n\nexport const styles = StyleSheet.create({\n  banner: { backgroundColor: PALETTE.light.dangerSurface },\n});\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/components/brand-badge.tsx",
+          "content": "// src/features/tasks/components/brand-badge.tsx\nimport tokens from '../../../../design/tokens.json';\n\nexport const BRAND = tokens.color.primitive.blue['49'];\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/ui/theme-preview.tsx",
+          "content": "// src/ui/theme-preview.tsx\nimport { APP_THEMES } from '@/theme/theme-context';\n\nexport const DARK = APP_THEMES.get('standard.dark');\n"
+        }
+      }
+    ]
+  },
+  "bad-pill": {
+    "expect": [
+      "src/features/tasks/components/count-dot.tsx:6 [no-pill] radius SIZE / 2 makes a pill or a circle (the policy allows at most 16)"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/design-system.json", "path": ["rawValues", "policy", "maxRadius"], "value": 16 } },
+      {
+        "write": {
+          "file": "src/features/tasks/components/count-dot.tsx",
+          "content": "// src/features/tasks/components/count-dot.tsx\nimport { StyleSheet } from 'react-native';\n\nconst SIZE = 24;\nexport const styles = StyleSheet.create({\n  dot: { width: SIZE, height: SIZE, borderRadius: SIZE / 2 },\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-radius-ternary": {
+    "expect": [
+      "src/features/tasks/components/tag-chip.tsx:10 [no-raw-radius] raw radius 4 and 12 in a conditional (isNarrow() ? 4 : 12)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/tag-chip.tsx",
+          "content": "// src/features/tasks/components/tag-chip.tsx\nimport { StyleSheet } from 'react-native';\n\nimport { RADII } from '@/theme/tokens';\n\nconst isNarrow = (): boolean => false;\nconst AVATAR = 32;\n\nexport const styles = StyleSheet.create({\n  chip: { borderRadius: isNarrow() ? 4 : 12 },\n  card: { borderTopStartRadius: isNarrow() ? RADII.sm : RADII.md },\n  avatar: { width: AVATAR, height: AVATAR, borderRadius: AVATAR / 2 },\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-raw-duration": {
+    "expect": [
+      "src/features/tasks/components/done-check.tsx:5 [no-raw-duration] raw animation duration 300 in withTiming",
+      "src/features/tasks/components/task-chip.tsx:5 [no-raw-duration] raw transitionDuration 250"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/done-check.tsx",
+          "content": "// src/features/tasks/components/done-check.tsx\nimport { withTiming } from 'react-native-reanimated';\n\nexport const pop = () =>\n  withTiming(1, { duration: 300 });\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-chip.tsx",
+          "content": "// src/features/tasks/components/task-chip.tsx: a Reanimated 4 CSS transition.\nimport { StyleSheet } from 'react-native';\n\nexport const styles = StyleSheet.create({\n  chip: { transitionProperty: 'opacity', transitionDuration: 250 },\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-raw-font-size": {
+    "expect": ["src/features/tasks/components/due-label.tsx:5 [no-raw-font-size] raw font size"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/due-label.tsx",
+          "content": "// src/features/tasks/components/due-label.tsx\nimport { StyleSheet } from 'react-native';\n\nexport const styles = StyleSheet.create({\n  label: { fontSize: 13 },\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-raw-radius": {
+    "expect": ["src/features/tasks/components/tag-chip.tsx:5 [no-raw-radius] raw radius 12"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/tag-chip.tsx",
+          "content": "// src/features/tasks/components/tag-chip.tsx\nimport { StyleSheet } from 'react-native';\n\nexport const styles = StyleSheet.create({\n  chip: { borderRadius: 12 },\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-raw-spring": {
+    "expect": [
+      "src/features/tasks/components/done-check.tsx:4 [no-raw-spring] raw spring damping 14 in withSpring",
+      "src/features/tasks/components/done-check.tsx:4 [no-raw-spring] raw spring stiffness 420 in withSpring",
+      "src/features/tasks/components/done-check.tsx:5 [no-raw-spring] raw spring .damping(12) on ZoomIn"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/done-check.tsx",
+          "content": "// src/features/tasks/components/done-check.tsx\nimport { ZoomIn, withSpring } from 'react-native-reanimated';\n\nexport const settle = () => withSpring(1, { damping: 14, stiffness: 420 });\nexport const ENTERING = ZoomIn.springify().damping(12);\n"
+        }
+      }
+    ]
+  },
+  "bad-root-route-color": {
+    "expect": ["app/index.tsx:4 [no-color-literal] colour literal #FAFAFA"],
+    "ops": [
+      {
+        "write": {
+          "file": "app/_layout.tsx",
+          "content": "// app/_layout.tsx: Expo Router also reads routes from app/ at the repo root, next to src/.\nimport { Stack } from 'expo-router';\n\nexport default function RootLayout(): React.JSX.Element {\n  return <Stack />;\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "app/index.tsx",
+          "content": "// app/index.tsx: a route file paints a raw colour.\nimport { StyleSheet, View } from 'react-native';\n\nconst styles = StyleSheet.create({ screen: { flex: 1, backgroundColor: '#FAFAFA' } });\n\nexport default function Home(): React.JSX.Element {\n  return <View style={styles.screen} />;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-rounded-line-height": {
+    "expect": ["src/features/tasks/components/note-text.tsx:5 [no-rounded-line-height] lineHeight uses Math.round"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/note-text.tsx",
+          "content": "// src/features/tasks/components/note-text.tsx\nimport { StyleSheet } from 'react-native';\n\nexport const styles = StyleSheet.create({\n  note: { lineHeight: Math.round(17 * 1.32) },\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-spring-config-const": {
+    "expect": [
+      "src/features/tasks/components/status-pill.tsx:6 [no-raw-spring] raw spring damping 10 in BOUNCE, passed to withSpring",
+      "src/features/tasks/components/status-pill.tsx:6 [no-raw-spring] raw spring stiffness 100 in BOUNCE, passed to withSpring",
+      "src/features/tasks/components/status-pill.tsx:7 [no-raw-spring] raw spring mass 2 in SOFT, passed to withSpring"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/status-pill.tsx",
+          "content": "// src/features/tasks/components/status-pill.tsx: Reanimated's docs shape, a config bound to a const.\nimport { withSpring } from 'react-native-reanimated';\n\nimport type { WithSpringConfig } from 'react-native-reanimated';\n\nconst BOUNCE = { damping: 10, stiffness: 100 } as const;\nconst SOFT = { mass: 2 } satisfies WithSpringConfig;\n\nexport const settle = () => withSpring(1, BOUNCE);\nexport const release = (velocity: number) => withSpring(0, { ...SOFT, velocity });\n"
+        }
+      }
+    ]
+  },
+  "bad-timing-config-const": {
+    "expect": [
+      "src/features/tasks/components/fade-row.tsx:4 [no-raw-duration] raw animation duration 250 in FADE, passed to withTiming",
+      "src/features/tasks/components/fade-row.tsx:5 [no-raw-duration] raw animation delay 120 in STAGGER_MS, passed to withDelay",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/fade-row.tsx",
+          "content": "// src/features/tasks/components/fade-row.tsx: timing configs bound to consts, as Reanimated's docs write them.\nimport { withDelay, withTiming } from 'react-native-reanimated';\n\nconst FADE = { duration: 250 };\nconst STAGGER_MS = 120;\nconst SESSION = { duration: 25 };\n\nexport const fadeIn = () => withTiming(1, FADE);\nexport const later = () => withDelay(STAGGER_MS, withTiming(1, FADE));\nexport const minutes = () => SESSION.duration;\n"
+        }
+      }
+    ]
+  },
+  "error-no-src": { "expect": ["ERROR [bad-input] nothing to check: src does not exist"], "ops": [{ "delete": "src" }] },
+  "pass-domain-duration": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/core/tasks/estimate.ts",
+          "content": "// src/core/tasks/estimate.ts: a pure domain value (never scanned: src/core draws nothing).\nexport const DEFAULT_ESTIMATE = { duration: 25, unit: 'min' } as const;\nexport const withTiming = (minutes: number) => ({ duration: minutes * 60 });\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/use-focus-session-model.ts",
+          "content": "// src/features/tasks/use-focus-session-model.ts: a duration that is data, not an animation.\nimport { withSpring } from 'react-native-reanimated';\n\nimport { SPRINGS } from '@/theme/motion';\n\nexport const SESSION = { duration: 25, breakMinutes: 5 };\nexport const settle = (velocity: number) => withSpring(0, { ...SPRINGS.release, velocity });\nexport const later = (dayjs: { duration: (n: number, unit: string) => unknown }) => dayjs.duration(25, 'minutes');\n"
+        }
+      }
+    ]
+  },
+  "pass-gradient-allowed": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/hero-banner.tsx",
+          "content": "// src/features/tasks/components/hero-banner.tsx: gradients are allowed unless the policy bans them.\nimport { LinearGradient } from 'expo-linear-gradient';\n\nexport const Banner = LinearGradient;\n"
+        }
+      }
+    ]
+  },
+  "pass-html-root": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/+html.tsx",
+          "content": "// src/app/+html.tsx: the static web root paints both schemes' ground at export time.\nimport { PALETTE } from '@/theme/palette';\n\nexport const GROUND_CSS = `body { background: ${PALETTE.light.background}; } @media (prefers-color-scheme: dark) { body { background: ${PALETTE.dark.background}; } }`;\n"
+        }
+      }
+    ]
+  },
+  "pass-semantic-props": {
+    "expect": ["check-raw-values: 23 files checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-badge.tsx",
+          "content": "// src/features/tasks/components/task-badge.tsx\nimport { Switch, View } from 'react-native';\n\nimport { useTheme } from '@/theme/use-theme';\nimport { AppText } from '@/ui/app-text';\n\ntype Swatch = { readonly color: 'red' | 'blue' };\n\nexport function TaskBadge({ swatch }: { readonly swatch: Swatch }) {\n  const theme = useTheme();\n  return (\n    <View accessibilityHint=\"red\">\n      <AppText variant=\"label\" tone=\"danger\">\n        {swatch.color}\n      </AppText>\n      <Switch\n        thumbColor={theme.colors.surface}\n        trackColor={{ false: 'transparent', true: theme.colors.primary }}\n        accessibilityLabel=\"green\"\n      />\n    </View>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-src-dot": {
+    "expect": [
+      "scanned the repo root minus core, data, api, stores, services, i18n, config, test, __mocks__, scripts, .maestro, contracts (nothing is drawn there) and root *.config.ts / *.setup.ts files",
+      "check-raw-values: 23 files checked, 0 problems",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      { "write": { "file": "rn-skills.config.json", "json": { "srcDir": "." } } },
+      { "rename": { "from": "src/theme", "to": "theme" } },
+      { "rename": { "from": "src/ui", "to": "ui" } },
+      { "rename": { "from": "src/features", "to": "features" } },
+      { "rename": { "from": "src/vendor", "to": "vendor" } },
+      { "replace": { "file": "contracts/design-system.json", "find": "src/theme/", "with": "theme/", "all": true } },
+      {
+        "write": {
+          "file": "app.config.ts",
+          "content": "// app.config.ts: build-time colours are config, not app code (never scanned).\nexport default () => ({ name: 'Tasks', backgroundColor: '#F5F6F8', userInterfaceStyle: 'automatic' });\n"
+        }
+      },
+      {
+        "write": {
+          "file": "scripts/make-icons.ts",
+          "content": "// scripts/make-icons.ts: Node tooling (never scanned).\nexport const ICON_GROUND = '#2156C8';\n"
+        }
+      },
+      {
+        "write": {
+          "file": "test/render-with-providers.tsx",
+          "content": "// test/render-with-providers.tsx: a test helper (never scanned).\nexport const PROBE = { borderRadius: 12, color: '#FF0000' };\n"
+        }
+      },
+      {
+        "write": {
+          "file": "app/index.tsx",
+          "content": "// app/index.tsx: a thin route at the root.\nimport { TaskCard } from '@/features/tasks/components/task-card';\n\nexport default function Home(): React.JSX.Element {\n  return <TaskCard title={\"\"} />;\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-system-font": {
+    "expect": [
+      "no-font-weight: not checked (the contract says \"fonts\": \"system\" (or has no contract yet), so fontWeight picks the system weight)",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/design-system.json", "path": ["fonts"], "value": "system" } },
+      {
+        "write": {
+          "file": "src/features/tasks/components/list-title.tsx",
+          "content": "// src/features/tasks/components/list-title.tsx\nimport { StyleSheet } from 'react-native';\n\nexport const styles = StyleSheet.create({\n  title: { fontWeight: '600' },\n});\n"
+        }
+      }
+    ]
+  },
+  "pass-weight-by-fontweight": {
+    "expect": [
+      "no-font-weight: not checked (fonts.weightBy is \"fontWeight\": one family name, weight by fontWeight)",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/design-system.json",
+          "path": ["fonts"],
+          "value": {
+            "dir": "assets/fonts",
+            "files": [
+              {
+                "file": "Inter-Regular.ttf",
+                "family": "Inter",
+                "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              {
+                "file": "Inter-Bold.ttf",
+                "family": "Inter",
+                "sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+              }
+            ],
+            "licences": { "Inter": "Inter-OFL.txt" },
+            "weightBy": "fontWeight"
+          }
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/components/list-title.tsx",
+          "content": "// src/features/tasks/components/list-title.tsx\nimport { StyleSheet } from 'react-native';\n\nexport const styles = StyleSheet.create({\n  title: { fontWeight: '600' },\n});\n"
+        }
+      }
+    ]
+  }
+}

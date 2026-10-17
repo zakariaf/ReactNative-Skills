@@ -1,0 +1,620 @@
+{
+  "bad-allow-marker-without-reason": {
+    "expect": ["src/features/orders/price-axis.ts:4 [float-money]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/orders/price-axis.ts",
+          "lines": [
+            "// src/features/orders/price-axis.ts",
+            "export type PriceAxis = {",
+            "  // value-objects-allow float-money",
+            "  readonly maxPrice: number;",
+            "};"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-core-formats": {
+    "expect": ["src/core/units/units.ts:123 [core-formats]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/units/units.ts",
+          "find": "  return (canonical * denominator) / numerator;",
+          "with": "  return Number(((canonical * denominator) / numerator).toFixed(3));"
+        }
+      }
+    ]
+  },
+  "bad-core-tests": {
+    "expect": ["src/core/money/allocate.ts:1 [core-tests]"],
+    "ops": [{ "delete": "src/core/money/allocate.test.ts" }]
+  },
+  "bad-currency-format-edge": {
+    "expect": ["src/features/orders/price-text.ts:9 [currency-format-edge]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/orders/price-text.ts",
+          "lines": [
+            "// src/features/orders/price-text.ts",
+            "import { exponentOf } from '@/core/money/currency';",
+            "",
+            "import type { Money } from '@/core/money/money';",
+            "",
+            "export function priceText(amount: Money, localeTag: string): string {",
+            "  const digits = exponentOf(amount.currency);",
+            "  return new Intl.NumberFormat(localeTag, {",
+            "    style: 'currency',",
+            "    currency: amount.currency,",
+            "    minimumFractionDigits: digits,",
+            "    maximumFractionDigits: digits,",
+            "  }).format(amount.minor);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-currency-fraction-digits": {
+    "expect": ["src/i18n/format-money.ts:41 [currency-fraction-digits]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/i18n/format-money.ts",
+          "find": "    minimumFractionDigits: digits,\n    maximumFractionDigits: digits,\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-currency-fraction-digits-literal": {
+    "expect": ["src/i18n/format-money.ts:41 [currency-fraction-digits]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/i18n/format-money.ts",
+          "find": "    maximumFractionDigits: digits,",
+          "with": "    maximumFractionDigits: 2,"
+        }
+      }
+    ]
+  },
+  "bad-currency-symbol-concat": {
+    "expect": ["src/features/orders/euro-badge.ts:2 [currency-symbol-literal]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/orders/euro-badge.ts",
+          "lines": [
+            "// src/features/orders/euro-badge.ts",
+            "export const euroBadge = (shown: string): string => '€' + shown;"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-currency-symbol-literal": {
+    "expect": ["src/features/orders/price-badge.ts:2 [currency-symbol-literal]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/orders/price-badge.ts",
+          "lines": [
+            "// src/features/orders/price-badge.ts",
+            "export const priceBadge = (shown: string): string => `$${shown}`;"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-exponent-default": {
+    "expect": ["src/features/orders/decimals.ts:4 [exponent-default]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/orders/decimals.ts",
+          "lines": [
+            "// src/features/orders/decimals.ts",
+            "const EXPONENTS: Readonly<Record<string, number>> = { USD: 2, JPY: 0 };",
+            "",
+            "export const decimalsOf = (code: string): number => EXPONENTS[code] ?? 2;"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-float-money": {
+    "expect": ["src/features/orders/order-split.ts:17 [float-money]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/orders/order-split.ts",
+          "find": "  readonly unitPrice: Money;",
+          "with": "  readonly unitPrice: number;"
+        }
+      }
+    ]
+  },
+  "bad-float-money-literal": {
+    "expect": [
+      "src/features/orders/delivery-fee.ts:2 [float-money] deliveryFee = 2.99 holds money as a binary float",
+      "src/features/orders/delivery-fee.ts:3 [float-money] SHIPPING_FEE = 4.99",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/orders/delivery-fee.ts",
+          "lines": [
+            "// src/features/orders/delivery-fee.ts",
+            "export const deliveryFee = 2.99;",
+            "const SHIPPING_FEE = 4.99;",
+            "",
+            "export function shippingLabel(): string {",
+            "  return String(SHIPPING_FEE);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-float-money-literal-object": {
+    "expect": [
+      "src/features/orders/fees.ts:3 [float-money] serviceFee = 1.5 holds money as a binary float",
+      "src/features/orders/fees.ts:4 [float-money] priceMinor = 19.99 holds a fraction in a minor-unit name",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/orders/fees.ts",
+          "lines": [
+            "// src/features/orders/fees.ts",
+            "export const FEES = {",
+            "  serviceFee: 1.5,",
+            "  priceMinor: 19.99,",
+            "};"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-float-money-parse": {
+    "expect": ["src/features/orders/tip-input.ts:3 [float-money]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/orders/tip-input.ts",
+          "lines": [
+            "// src/features/orders/tip-input.ts",
+            "export function tipFromText(text: string): string {",
+            "  const tipAmount = Number.parseFloat(text);",
+            "  return String(tipAmount);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-float-money-schema": {
+    "expect": ["src/api/orders/order-response.ts:19 [float-money]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/api/orders/order-response.ts",
+          "find": "  tip_minor: v.pipe(v.number(), v.safeInteger()),",
+          "with": "  tip: v.number(),"
+        }
+      }
+    ]
+  },
+  "bad-float-money-schema-optional-minor": {
+    "expect": ["src/api/orders/order-response.ts:19 [float-money]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/api/orders/order-response.ts",
+          "find": "  tip_minor: v.pipe(v.number(), v.safeInteger()),",
+          "with": "  tip_minor: v.optional(v.number()),"
+        }
+      }
+    ]
+  },
+  "bad-float-money-schema-pipe": {
+    "expect": ["src/api/orders/order-response.ts:19 [float-money]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/api/orders/order-response.ts",
+          "find": "  tip_minor: v.pipe(v.number(), v.safeInteger()),",
+          "with": "  tip: v.pipe(v.number(), v.minValue(0)),"
+        }
+      }
+    ]
+  },
+  "bad-hard-coded-scale": {
+    "expect": ["src/features/orders/price-label.ts:3 [hard-coded-scale]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/orders/price-label.ts",
+          "lines": [
+            "// src/features/orders/price-label.ts",
+            "export function priceLabel(priceMinor: number): string {",
+            "  return String(priceMinor / 100);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-hard-coded-scale-parsed": {
+    "expect": ["src/features/orders/typed-price.ts:3 [hard-coded-scale]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/orders/typed-price.ts",
+          "lines": [
+            "// src/features/orders/typed-price.ts",
+            "export function typedPrice(text: string): { readonly priceMinor: number } {",
+            "  const priceMinor = Math.round(Number(text) * 100);",
+            "  return { priceMinor };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-hard-coded-scale-to-fixed": {
+    "expect": ["src/features/orders/fee-text.ts:5 [hard-coded-scale]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/orders/fee-text.ts",
+          "lines": [
+            "// src/features/orders/fee-text.ts",
+            "import type { Money } from '@/core/money/money';",
+            "",
+            "export function feeText(fee: Money, shown: number): string {",
+            "  return fee.currency + shown.toFixed(2);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-hard-coded-scale-total-minor": {
+    "expect": ["src/features/orders/total-text.ts:2 [hard-coded-scale]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/orders/total-text.ts",
+          "lines": [
+            "// src/features/orders/total-text.ts",
+            "export const totalText = (orderTotalMinor: number): string => (orderTotalMinor / 100).toFixed(2);"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-instant-column": {
+    "expect": ["src/data/migrations/v0002-create-orders.ts:20 [instant-column]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/migrations/v0002-create-orders.ts",
+          "find": "  created_at_ms INTEGER NOT NULL",
+          "with": "  created_at    TEXT    NOT NULL"
+        }
+      }
+    ]
+  },
+  "bad-instant-type": {
+    "expect": ["src/data/orders/order-row.ts:28 [instant-type]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/orders/order-row.ts",
+          "find": "  readonly createdAtMs: number;",
+          "with": "  readonly createdAt: string;"
+        }
+      }
+    ]
+  },
+  "bad-instant-type-date": {
+    "expect": ["src/data/orders/order-row.ts:28 [instant-type]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/orders/order-row.ts",
+          "find": "  readonly createdAtMs: number;",
+          "with": "  readonly createdAtMs: Date;"
+        }
+      }
+    ]
+  },
+  "bad-instant-type-seconds": {
+    "expect": ["src/data/orders/order-row.ts:28 [instant-type]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/orders/order-row.ts",
+          "find": "  readonly createdAtMs: number;",
+          "with": "  readonly createdAt: number;"
+        }
+      }
+    ]
+  },
+  "bad-money-column": {
+    "expect": ["src/data/migrations/v0002-create-orders.ts:26 [money-column]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/migrations/v0002-create-orders.ts",
+          "find": "  unit_price_minor INTEGER NOT NULL CHECK (unit_price_minor >= 0),",
+          "with": "  unit_price       REAL    NOT NULL,"
+        }
+      }
+    ]
+  },
+  "bad-money-column-name": {
+    "expect": ["src/data/migrations/v0002-create-orders.ts:18 [money-column]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/migrations/v0002-create-orders.ts",
+          "find": "  tip_minor     INTEGER NOT NULL DEFAULT 0,",
+          "with": "  tip           INTEGER NOT NULL DEFAULT 0,"
+        }
+      }
+    ]
+  },
+  "bad-money-column-real-minor": {
+    "expect": ["src/data/migrations/v0002-create-orders.ts:19 [money-column]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/migrations/v0002-create-orders.ts",
+          "find": "  tip_minor     INTEGER NOT NULL DEFAULT 0,\n",
+          "with": "  tip_minor     INTEGER NOT NULL DEFAULT 0,\n  total_minor   REAL    NOT NULL,\n"
+        }
+      }
+    ]
+  },
+  "bad-money-core": {
+    "expect": ["src/api/orders/order-response.ts:25 [money-core]"],
+    "ops": [{ "delete": "src/core/money/money.ts" }]
+  },
+  "bad-money-division": {
+    "expect": ["src/features/orders/even-share.ts:3 [money-division]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/orders/even-share.ts",
+          "lines": [
+            "// src/features/orders/even-share.ts",
+            "export function evenShareMinor(priceMinor: number, people: number): number {",
+            "  return Math.round(priceMinor / people);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-money-division-total-minor": {
+    "expect": ["src/features/orders/split-total.ts:3 [money-division]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/orders/split-total.ts",
+          "lines": [
+            "// src/features/orders/split-total.ts",
+            "export function sharePerPerson(totalMinor: number, people: number): number {",
+            "  return Math.round(totalMinor / people);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-money-float-rate": {
+    "expect": ["src/features/orders/sales-tax.ts:2 [money-float-rate]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/orders/sales-tax.ts",
+          "lines": [
+            "// src/features/orders/sales-tax.ts",
+            "export const salesTaxMinor = (subtotalMinor: number): number => Math.round(subtotalMinor * 0.0825);"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-money-float-rate-charged-minor": {
+    "expect": ["src/features/orders/service-fee.ts:2 [money-float-rate]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/orders/service-fee.ts",
+          "lines": [
+            "// src/features/orders/service-fee.ts",
+            "export const serviceFeeOf = (chargedMinor: number): number => Math.round(chargedMinor * 0.1);"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-raw-minor-arithmetic": {
+    "expect": ["src/features/orders/sum-two.ts:4 [raw-minor-arithmetic]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/orders/sum-two.ts",
+          "lines": [
+            "// src/features/orders/sum-two.ts",
+            "import type { Money } from '@/core/money/money';",
+            "",
+            "export const sumMinor = (a: Money, b: Money): number => a.minor + b.minor;"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-unit-suffix": {
+    "expect": ["src/data/orders/order-row.ts:29 [unit-suffix]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/orders/order-row.ts",
+          "find": "  readonly createdAtMs: number;",
+          "with": "  readonly createdAtMs: number;\n  readonly prepDuration: number;"
+        }
+      }
+    ]
+  },
+  "error-no-src": { "expect": ["ERROR [bad-input]"], "ops": [{ "delete": "src" }] },
+  "pass-allow-marker": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/orders/price-axis.ts",
+          "lines": [
+            "// src/features/orders/price-axis.ts",
+            "export type PriceAxis = {",
+            "  // value-objects-allow float-money: a chart axis bound in major units, display only",
+            "  readonly maxPrice: number;",
+            "};"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-games-points": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/lights-out/rules/shop.ts",
+          "lines": [
+            "// src/games/lights-out/rules/shop.ts",
+            "export type ShopItem = { readonly cost: number; readonly price: number };",
+            "export const half = (item: ShopItem): number => item.cost / 2;"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-installed-skills": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/pricing/src/features/item.ts",
+          "lines": ["export type Item = {", "  readonly price: number;", "  readonly createdAt: Date;", "};"]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/pricing/src/features/item.ts",
+          "lines": ["export type Item = {", "  readonly price: number;", "  readonly createdAt: Date;", "};"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/pricing-kit/SKILL.md",
+          "lines": ["---", "name: pricing-kit", "description: Planted skill folder.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/pricing-kit/templates/src/features/item.ts",
+          "lines": ["export type Item = {", "  readonly price: number;", "  readonly createdAt: Date;", "};"]
+        }
+      }
+    ]
+  },
+  "pass-rates-and-ratios": {
+    "expect": ["check-value-code:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/orders/ratios.ts",
+          "lines": [
+            "// src/features/orders/ratios.ts: decimal literals that are not money stay silent.",
+            "export const taxRate = 0.0825;",
+            "const opacity = 0.5;",
+            "export const STYLE = { opacity, scale: 1.25, discountRatio: 0.1 };",
+            "export const deliveryFeeMinor = 299;"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-ui-amount-and-units": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/orders/sheet-motion.ts",
+          "lines": [
+            "// src/features/orders/sheet-motion.ts",
+            "export type SheetMotion = {",
+            "  readonly blurAmount: number;",
+            "  readonly scrollAmount: number;",
+            "  readonly shakeAmount: number;",
+            "};"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/accounts/account-profile.ts",
+          "lines": [
+            "// src/stores/accounts/account-profile.ts",
+            "export type AccountProfile = {",
+            "  readonly ageYears: number;",
+            "  readonly tenureMonths: number;",
+            "  readonly headingDeg: number;",
+            "};"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/orders/reminder-delay.ts",
+          "lines": [
+            "// src/features/orders/reminder-delay.ts",
+            "export const reminderDelayMs = (text: string): number => Math.round(Number(text) * 1000);"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-vendor-field-without-core": {
+    "$comment": "An app that adopts a purchase adapter before any money code: the allow-marked vendor double alone does not demand the money core.",
+    "expect": ["RESULT: PASS"],
+    "base": ["@tests/bases/app"],
+    "extends": null,
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/purchase/store-product.ts",
+          "lines": [
+            "// src/services/purchase/store-product.ts",
+            "export type StoreProduct = {",
+            "  readonly id: string;",
+            "  readonly displayPrice: string;",
+            "  // value-objects-allow float-money: StoreKit/Play double from expo-iap, shown only as displayPrice",
+            "  readonly price: number | null;",
+            "};"
+          ]
+        }
+      }
+    ]
+  }
+}

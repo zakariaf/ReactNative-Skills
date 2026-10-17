@@ -1,0 +1,13 @@
+# .maestro/subflows/shoot-screen.yaml — a sub-flow of the screenshot matrix: opens one screen through
+# the debug link (open=${SCREEN}, which also names the PNG), waits for ROOT (the testID that proves
+# the screen is shown), lets every animation end and takes the screenshot.
+appId: ${APP_ID}
+---
+- runFlow:
+    file: debug-setup.yaml
+    env:
+      QUERY: 'open=${SCREEN}'
+      WAIT_FOR: '${ROOT}'
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: ${SCREEN}

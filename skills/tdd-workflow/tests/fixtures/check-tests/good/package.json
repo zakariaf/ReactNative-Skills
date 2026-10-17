@@ -1,0 +1,5 @@
+{
+  "name": "tasks-app",
+  "private": true,
+  "dependencies": { "expo": "~57.0.26" }
+}

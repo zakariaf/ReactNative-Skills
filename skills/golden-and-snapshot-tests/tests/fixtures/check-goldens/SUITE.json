@@ -1,0 +1,11 @@
+{
+  "base": ["@tests/bases/app", { "templates": true, "firstLinePath": true, "fill": { "__FEATURE__": "tasks" } }],
+  "ops": [
+    { "png": { "files": ["test/goldens/canvas/__image_snapshots__/weekly-chart-small-0.png"], "width": 32, "height": 40, "fill": "#14161cff" } },
+    { "$comment": "Installed skills hold planted findings on purpose: never scanned.", "write": { "file": ".agents/skills/demo-goldens/tests/fixtures/bad/src/orphan.golden.test.ts.snap.ios", "content": "exports[`orphan 1`] = `\n<View />\n`;\n" } },
+    { "write": { "file": "skills/demo-goldens/tests/fixtures/bad/src/task-row.test.tsx.snap", "content": "exports[`TaskRow renders 1`] = `\n<View />\n`;\n" } },
+    { "write": { "file": "vendor/review-kit/SKILL.md", "content": "---\nname: review-kit\n---\n" } },
+    { "write": { "file": "vendor/review-kit/fixtures/old.golden.test.ts.snap.ios", "content": "exports[`[contract] old 1`] = `{}`;\n" } },
+    { "write": { "file": "vendor/review-kit/fixtures/pixel.golden.test.ts", "content": "expect(png).toMatchImageSnapshot({ failureThreshold: 0.5 });\nexpect(Date.now()).toMatchInlineSnapshot();\n" } }
+  ]
+}

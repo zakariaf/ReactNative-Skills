@@ -1,0 +1,1 @@
+FAIL src/features/tasks/task-list.ts:1 [source-changed] modified since --start: only goldens change once a rebaseline starts

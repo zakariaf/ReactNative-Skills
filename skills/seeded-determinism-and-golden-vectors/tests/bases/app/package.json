@@ -1,0 +1,10 @@
+{
+  "name": "fixture-tasks-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "jest --ci",
+    "verify": "npm run -s typecheck && npm run -s test",
+    "typecheck": "tsc --noEmit"
+  }
+}

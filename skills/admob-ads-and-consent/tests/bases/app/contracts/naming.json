@@ -1,0 +1,6 @@
+{
+  "$comment": "The part of naming-conventions' contract the ads skill needs: the by-hand smoke flows folder.",
+  "extraE2eFolders": [
+    { "folder": "ads-smoke", "why": "by-hand ads smoke on ADS_MODE=test builds; CI never runs it" }
+  ]
+}

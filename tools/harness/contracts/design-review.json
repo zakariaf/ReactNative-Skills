@@ -1,0 +1,100 @@
+{
+  "$schema": "./design-review.schema.json",
+  "$comment": "The end-of-build design review plan (design-review-workflow): what the sweep captures and which on-device steps run, on which build. check-review-plan.mjs proves it covers the app (every screen and state of contracts/screens.json, the themes userInterfaceStyle allows, an ltr and an rtl locale, the default and the largest text size, the smallest phone and a large screen per platform, the large screens in landscape because iPads and Android tablets ignore a portrait lock, every motion moment). Change it in its own reviewed commit: the review record stores its hash, and a sign-off stops counting when it changes.",
+  "version": 1,
+  "reviewsDir": "design-review",
+  "capturesDir": "reports/design-review",
+  "screens": {
+    "contract": "contracts/screens.json",
+    "exclude": [],
+    "open": {
+      "tasks.default": "open=tasks",
+      "not-found.default": "/no-such-page"
+    },
+    "invariant": []
+  },
+  "themes": ["light", "dark"],
+  "locales": [
+    { "tag": "en", "direction": "ltr" },
+    { "tag": "ar", "direction": "rtl" }
+  ],
+  "textSizes": [
+    { "id": "default", "ios": "large", "android": 1 },
+    {
+      "id": "largest",
+      "ios": "accessibility-extra-extra-extra-large",
+      "android": 2,
+      "devices": ["ios-phone-small", "android-phone-small"]
+    }
+  ],
+  "devices": [
+    {
+      "id": "ios-phone-small",
+      "platform": "ios",
+      "role": "smallest-phone",
+      "model": "iPhone SE (3rd generation)",
+      "name": "tasks-review-iphone-small"
+    },
+    {
+      "id": "ios-tablet",
+      "platform": "ios",
+      "role": "tablet",
+      "model": "iPad mini (A17 Pro)",
+      "name": "tasks-review-ipad",
+      "orientation": "landscape"
+    },
+    {
+      "id": "android-phone-small",
+      "platform": "android",
+      "role": "smallest-phone",
+      "model": "small_phone (AVD profile, 720 x 1280 px, 360 x 640 dp)",
+      "name": "tasks-review-android-small"
+    },
+    {
+      "id": "android-tablet",
+      "platform": "android",
+      "role": "tablet",
+      "model": "medium_tablet (AVD profile, 2560 x 1600 px)",
+      "name": "tasks-review-android-tablet",
+      "orientation": "landscape"
+    }
+  ],
+  "motion": {
+    "catalog": "src/ui/motion/motion-moments.ts",
+    "record": ["press", "screenPush"],
+    "notRecorded": [
+      {
+        "id": "pressRelease",
+        "why": "The press videos show the release: every recorded tap ends with it."
+      }
+    ]
+  },
+  "build": { "variant": "preview" },
+  "devicePass": {
+    "hardware": [
+      {
+        "id": "iphone",
+        "platform": "ios",
+        "model": "the oldest, smallest iPhone the app supports"
+      },
+      {
+        "id": "android-budget",
+        "platform": "android",
+        "model": "a budget Android phone of the target market"
+      }
+    ],
+    "steps": [
+      { "id": "real-state", "destructive": false },
+      { "id": "screen-reader", "destructive": false },
+      { "id": "switch-access", "destructive": false },
+      { "id": "largest-text", "destructive": false },
+      { "id": "reduce-motion", "destructive": false },
+      { "id": "audio-haptics", "destructive": false },
+      { "id": "interruptions", "destructive": false },
+      { "id": "upgrade-in-place", "destructive": true },
+      { "id": "backup-restore", "destructive": true },
+      { "id": "crash-log", "destructive": true },
+      { "id": "fresh-install", "destructive": true }
+    ]
+  }
+}

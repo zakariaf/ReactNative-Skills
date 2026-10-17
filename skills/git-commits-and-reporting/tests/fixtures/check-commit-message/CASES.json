@@ -1,0 +1,65 @@
+{
+  "bad-android-golden-without-trailer": {
+    "expect": ["[gate-change-missing]", "task-row.golden.test.ts.snap.android"],
+    "ops": [
+      { "write": { "file": "files.txt", "content": "src/features/tasks/task-row.golden.test.ts.snap.android\n" } },
+      {
+        "write": {
+          "file": "message.txt",
+          "content": "test(tasks): record the android task row golden\n\nThe row wraps the title on narrow phones.\n"
+        }
+      }
+    ]
+  },
+  "bad-data-fixture-without-trailer": {
+    "expect": ["[gate-change-missing]", "src/data/migrations/fixtures/db-v1.sql"],
+    "ops": [
+      { "write": { "file": "files.txt", "content": "src/data/migrations/fixtures/db-v1.sql\n" } },
+      {
+        "write": {
+          "file": "message.txt",
+          "content": "test(data): freeze the version 1 database fixture\n\nThe migration test opens it.\n"
+        }
+      }
+    ]
+  },
+  "bad-maestro-baseline-without-trailer": {
+    "expect": ["[gate-change-missing]", ".maestro/baselines/tasks-light-en.png"],
+    "ops": [
+      { "write": { "file": "files.txt", "content": ".maestro/baselines/tasks-light-en.png\n" } },
+      {
+        "write": {
+          "file": "message.txt",
+          "content": "test(e2e): accept the new tasks screen baseline\n\nThe list now shows the due chip.\n"
+        }
+      }
+    ]
+  },
+  "bad-subject-period": {
+    "expect": ["[subject-period]", "the subject ends with a period"],
+    "ops": [
+      {
+        "write": {
+          "file": "message.txt",
+          "content": "test(tasks): record the task row golden.\n\nThe row shows the due date under the title.\n\nGate-Change: new golden for the task row with a due date\n"
+        }
+      }
+    ]
+  },
+  "bad-template-unfilled": {
+    "expect": ["[placeholder-left] placeholder __TYPE__ is left", "[header-format]", "[spec-change-format]"],
+    "base": ["good", { "from": "@skill/templates/reports/commit-message.txt", "to": "message.txt" }]
+  },
+  "pass-editor-comments": {
+    "expect": ["check-commits: 1 commit messages checked, 0 problems"],
+    "ops": [
+      { "write": { "file": "files.txt", "content": "src/ui/button.tsx\n" } },
+      {
+        "write": {
+          "file": "message.txt",
+          "content": "chore(ui): tidy the button styles\n# Please enter the commit message for your changes.\n\nOnly styles moved.\n# ------------------------ >8 ------------------------\n# Do not modify or remove the line above.\ndiff --git a/src/ui/button.tsx b/src/ui/button.tsx\n"
+        }
+      }
+    ]
+  }
+}

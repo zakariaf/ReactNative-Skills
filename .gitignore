@@ -1,0 +1,30 @@
+# macOS
+.DS_Store
+._*
+
+# Editors
+.idea/
+.vscode/
+*.iml
+*.swp
+
+# Logs (fixture logs under skills/ are test content and stay tracked; check-repo-hygiene enforces it)
+*.log
+npm-debug.log*
+!/skills/**/*.log
+
+# Node
+node_modules/
+
+# Packages installed for skills that pin them (node <skill>/scripts/x.mjs --tooling .skill-tooling/<skill>)
+.skill-tooling/
+
+# Coverage output
+/coverage/
+
+# Local holding folder for private, unpublished material
+.attic/
+
+# Maintainer automation for this checkout (agent workflow scripts); never published
+/.claude/workflows/
+/.claude/settings.local.json

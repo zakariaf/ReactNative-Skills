@@ -1,0 +1,1 @@
+{ "name": "react-native-safe-area-context", "version": "5.7.0", "codegenConfig": { "name": "safeareacontext", "type": "all", "jsSrcsDir": "src/specs" } }

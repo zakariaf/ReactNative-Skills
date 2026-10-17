@@ -1,0 +1,317 @@
+{
+  "bad-active-days-from-buckets": {
+    "expect": [
+      "src/core/streaks/streak-summary.ts:74 [view-streak] streakCountsOf: active days from the counter, the current streak alive from yesterday (expected {\"activeDays\":70"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/streaks/streak-summary.ts",
+          "find": "    activeDays: log.activeDays,\n    current:",
+          "with": "    activeDays: Object.keys(log.byDay).length,\n    current:"
+        }
+      }
+    ]
+  },
+  "bad-best-day-from-window": {
+    "expect": ["[stats-best] recordActivity: the best day survives pruning"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/stats/activity-stats.ts",
+          "find": "    bestDay: bestDayAfter(stats, day, perDay[day]?.count ?? 0),",
+          "with": "    bestDay: { date: day, count: perDay[day]?.count ?? 0 },"
+        }
+      }
+    ]
+  },
+  "bad-best-streak-frozen": {
+    "expect": ["[streak-rule] recordDay: the best streak follows a growing streak (expected 3, got 0)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/streaks/day-streak.ts",
+          "find": "    bestStreak: Math.max(log.bestStreak, streak.length),",
+          "with": "    bestStreak: log.bestStreak,"
+        }
+      }
+    ]
+  },
+  "bad-clock-back": {
+    "expect": ["[streak-clock-back] recordDay: the streak is unchanged by an earlier day"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/streaks/day-streak.ts",
+          "find": "  if (gap > 1) return { lastDate: date, length: 1 };",
+          "with": "  if (gap !== 1) return { lastDate: date, length: 1 };"
+        }
+      }
+    ]
+  },
+  "bad-clock-back-hides-streak": {
+    "expect": [
+      "src/core/streaks/day-streak.ts:79 [streak-clock-back] currentStreak: two days before the last active day the streak still shows"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/streaks/day-streak.ts",
+          "find": "  return daysBetween(lastDate, today) <= 1 ? length : 0;",
+          "with": "  return Math.abs(daysBetween(lastDate, today)) <= 1 ? length : 0;"
+        }
+      }
+    ]
+  },
+  "bad-counter-max-sums": {
+    "expect": ["[stats-counters] recordActivity: folded counters"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/stats/activity-stats.ts",
+          "find": "aggregate === 'sum' ? previous + value : Math.max(previous, value);",
+          "with": "previous + value;"
+        }
+      }
+    ]
+  },
+  "bad-date-key-missing": {
+    "expect": [
+      "src/core/streaks/day-streak.ts:1 [module-load] cannot be imported: it imports @/core/dates/date-key (src/core/dates/date-key), which does not exist (seeded-determinism-and-golden-vectors creates it)",
+      "Fix: Create the missing file"
+    ],
+    "ops": [{ "delete": "src/core/dates/date-key.ts" }]
+  },
+  "bad-days-window": {
+    "expect": ["[stats-days] recordActivity: buckets of the last 14 days only"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/stats/activity-stats.ts",
+          "find": "daysBetween(date, newest) < STATS_KEEP_DAYS;",
+          "with": "daysBetween(date, newest) <= STATS_KEEP_DAYS;"
+        }
+      }
+    ]
+  },
+  "bad-derive-unsorted": {
+    "expect": ["[streak-derive] streakOfDays: streakOfDays([2026-09-26, 2026-09-24"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/streaks/day-streak.ts",
+          "find": "const distinct = [...new Set(days)].sort();",
+          "with": "const distinct = [...new Set(days)];"
+        }
+      }
+    ]
+  },
+  "bad-duration-rounded": {
+    "expect": ["[view-stats] buildStatsSummary: overview"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/stats/stats-summary.ts",
+          "find": "minutes: Math.floor((ms - hours * HOUR_MS) / MINUTE_MS)",
+          "with": "minutes: Math.round((ms - hours * HOUR_MS) / MINUTE_MS)"
+        }
+      }
+    ]
+  },
+  "bad-failures-not-counted": {
+    "expect": ["[stats-counts] recordActivity: expected [3,2,1,180000], got [3,2,0,180000]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/stats/activity-stats.ts",
+          "find": "failures: stats.failures + (event.isSuccess ? 0 : 1),",
+          "with": "failures: stats.failures,"
+        }
+      }
+    ]
+  },
+  "bad-missing-module": {
+    "expect": ["src/core/stats/stats-summary.ts [missing-module] the statsSummary module is missing"],
+    "ops": [{ "delete": "src/core/stats/stats-summary.ts" }]
+  },
+  "bad-module-load": {
+    "expect": [
+      "src/core/stats/stats-summary.ts:1 [module-load] cannot be imported: it imports react-native, which plain Node cannot load"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/stats/stats-summary.ts",
+          "find": "import { addDays, isoWeekday } from '@/core/dates/date-key';",
+          "with": "import { addDays, isoWeekday } from '@/core/dates/date-key';\nimport { Platform } from 'react-native';\n\nexport const PLATFORM = Platform.OS;"
+        }
+      }
+    ]
+  },
+  "bad-mutates-input": {
+    "expect": ["[fold-immutable] recordActivity:", "src/core/stats/activity-stats.ts:"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/stats/activity-stats.ts",
+          "find": "const next: Record<string, number> = { ...current };",
+          "with": "const next = current as Record<string, number>;"
+        }
+      }
+    ]
+  },
+  "bad-practice-counted": {
+    "expect": ["[completion-record] recordCompletion: practice records nothing"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/stats/record-completion.ts",
+          "find": "  if (completion.isPractice) return progress;\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-prune-counts-window": {
+    "expect": ["[streak-prune] recordDay: activeDays survives pruning"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/streaks/day-streak.ts",
+          "find": "    activeDays: log.activeDays + 1,",
+          "with": "    activeDays: Object.keys(log.byDay).length + 1,"
+        }
+      }
+    ]
+  },
+  "bad-repeat-day-dropped": {
+    "expect": ["[completion-record] recordCompletion: a repeat on an active day still counts in the statistics"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/stats/record-completion.ts",
+          "find": "  if (completion.isPractice) return progress;",
+          "with": "  if (completion.isPractice || Object.hasOwn(progress.streak.byDay, completion.day)) return progress;"
+        }
+      }
+    ]
+  },
+  "bad-replay-counts": {
+    "expect": [
+      "[streak-first-of-day] recordDay: a repeat on the same day returns the same object",
+      "src/core/streaks/day-streak.ts:"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/streaks/day-streak.ts",
+          "find": "  if (Object.hasOwn(log.byDay, date)) return log;\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-run-not-reset": {
+    "expect": ["[stats-run] recordActivity: the run restarts after a failure (expected 1, got 4)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/stats/activity-stats.ts",
+          "find": "event.isSuccess ? stats.currentRun + 1 : 0;",
+          "with": "event.isSuccess ? stats.currentRun + 1 : stats.currentRun;"
+        }
+      }
+    ]
+  },
+  "bad-streak-today-only": {
+    "expect": ["[streak-rule] currentStreak: yesterday still counts (expected 3, got 0)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/streaks/day-streak.ts",
+          "find": "<= 1 ? length : 0;",
+          "with": "<= 0 ? length : 0;"
+        }
+      }
+    ]
+  },
+  "bad-week-newest-first": {
+    "expect": ["[streak-week] recentDays: expected [\"2026-09-20:false\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/streaks/day-streak.ts",
+          "find": "const date = addDays(today, index - count + 1);",
+          "with": "const date = addDays(today, -index);"
+        }
+      }
+    ]
+  },
+  "bad-week-weekday": {
+    "expect": ["[view-streak] buildStreakSummary: ISO weekdays for the letter and name keys"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/streaks/streak-summary.ts",
+          "find": "weekday: isoWeekday(date), mark",
+          "with": "weekday: isoWeekday(date) % 7, mark"
+        }
+      }
+    ]
+  },
+  "error-contract-dependency": {
+    "expect": [
+      "ERROR [bad-input] contracts/day-logic.json: \"modules.recordCompletion\" is set but \"modules.dayStreak\" is null (record-completion.ts folds the streak with recordDay)"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/day-logic.json", "path": ["modules", "dayStreak"], "literalNull": true } },
+      { "json": { "file": "contracts/day-logic.json", "path": ["modules", "streakSummary"], "literalNull": true } }
+    ]
+  },
+  "error-contract-json": {
+    "expect": ["ERROR [bad-input] contracts/day-logic.json is not valid JSON"],
+    "ops": [{ "write": { "file": "contracts/day-logic.json", "content": "{ \"modules\": { \n" } }]
+  },
+  "error-contract-module": {
+    "expect": ["ERROR [bad-input] contracts/day-logic.json: unknown module keys: streaks"],
+    "ops": [
+      { "json": { "file": "contracts/day-logic.json", "path": ["modules", "streaks"], "value": "src/core/streaks.ts" } }
+    ]
+  },
+  "error-no-app": {
+    "expect": ["ERROR [bad-input] nothing to check"],
+    "ops": [{ "delete": ["src", "contracts", "package.json", "tsconfig.json"] }]
+  },
+  "pass-no-contract": {
+    "expect": ["check-streaks-and-stats: 20 checks checked, 0 problems", "RESULT: PASS"],
+    "ops": [{ "delete": "contracts/day-logic.json" }]
+  },
+  "pass-not-applicable": {
+    "expect": ["NOT APPLICABLE: no streak or statistics module: contracts/day-logic.json is absent", "RESULT: PASS"],
+    "ops": [{ "delete": ["src/core/streaks", "src/core/stats", "contracts/day-logic.json"] }]
+  },
+  "pass-stats-only": {
+    "expect": ["check-streaks-and-stats: 7 checks checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "delete": [
+          "src/core/streaks",
+          "src/core/stats/record-completion.ts",
+          "src/core/stats/record-completion.test.ts"
+        ]
+      },
+      { "json": { "file": "contracts/day-logic.json", "path": ["modules", "dayStreak"], "literalNull": true } },
+      { "json": { "file": "contracts/day-logic.json", "path": ["modules", "streakSummary"], "literalNull": true } },
+      { "json": { "file": "contracts/day-logic.json", "path": ["modules", "recordCompletion"], "literalNull": true } }
+    ]
+  },
+  "pass-streaks-only": {
+    "expect": ["check-streaks-and-stats: 11 checks checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      { "delete": "src/core/stats" },
+      { "json": { "file": "contracts/day-logic.json", "path": ["modules", "activityStats"], "literalNull": true } },
+      { "json": { "file": "contracts/day-logic.json", "path": ["modules", "statsSummary"], "literalNull": true } },
+      { "json": { "file": "contracts/day-logic.json", "path": ["modules", "recordCompletion"], "literalNull": true } }
+    ]
+  }
+}

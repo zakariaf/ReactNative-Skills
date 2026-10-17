@@ -1,0 +1,175 @@
+{
+  "base": [
+    {
+      "templates": true,
+      "firstLinePath": true
+    },
+    "@tests/bases/app"
+  ],
+  "ops": [
+    {
+      "png": {
+        "files": [
+          "assets/icons/production/icon.png"
+        ],
+        "width": 1024,
+        "height": 1024,
+        "fill": "#2457C5",
+        "rects": [
+          {
+            "x": 400,
+            "y": 400,
+            "width": 224,
+            "height": 224,
+            "fill": "#FFFFFF"
+          }
+        ]
+      }
+    },
+    {
+      "png": {
+        "files": [
+          "assets/icons/production/icon-dark.png"
+        ],
+        "width": 1024,
+        "height": 1024,
+        "fill": "#00000000",
+        "rects": [
+          {
+            "x": 400,
+            "y": 400,
+            "width": 224,
+            "height": 224,
+            "fill": "#FFFFFF"
+          }
+        ]
+      }
+    },
+    {
+      "png": {
+        "files": [
+          "assets/icons/production/icon-tinted.png"
+        ],
+        "width": 1024,
+        "height": 1024,
+        "fill": "#202020",
+        "rects": [
+          {
+            "x": 400,
+            "y": 400,
+            "width": 224,
+            "height": 224,
+            "fill": "#C0C0C0"
+          }
+        ]
+      }
+    },
+    {
+      "png": {
+        "files": [
+          "assets/icons/production/android-foreground.png"
+        ],
+        "width": 1024,
+        "height": 1024,
+        "fill": "#00000000",
+        "rects": [
+          {
+            "x": 432,
+            "y": 432,
+            "width": 160,
+            "height": 160,
+            "fill": "#FFFFFF"
+          }
+        ]
+      }
+    },
+    {
+      "png": {
+        "files": [
+          "assets/icons/production/android-background.png"
+        ],
+        "width": 1024,
+        "height": 1024,
+        "fill": "#2457C5",
+        "rects": []
+      }
+    },
+    {
+      "png": {
+        "files": [
+          "assets/icons/production/android-monochrome.png"
+        ],
+        "width": 1024,
+        "height": 1024,
+        "fill": "#00000000",
+        "rects": [
+          {
+            "x": 432,
+            "y": 432,
+            "width": 160,
+            "height": 160,
+            "fill": "#FFFFFF"
+          }
+        ]
+      }
+    },
+    {
+      "png": {
+        "files": [
+          "assets/images/splash-icon.png"
+        ],
+        "width": 1024,
+        "height": 1024,
+        "fill": "#00000000",
+        "rects": [
+          {
+            "x": 400,
+            "y": 400,
+            "width": 224,
+            "height": 224,
+            "fill": "#FFFFFF"
+          }
+        ]
+      }
+    },
+    {
+      "png": {
+        "files": [
+          "assets/images/splash-icon-dark.png"
+        ],
+        "width": 1024,
+        "height": 1024,
+        "fill": "#00000000",
+        "rects": [
+          {
+            "x": 400,
+            "y": 400,
+            "width": 224,
+            "height": 224,
+            "fill": "#FFFFFF"
+          }
+        ]
+      }
+    },
+    {
+      "png": {
+        "files": [
+          "assets/store/play-icon.png"
+        ],
+        "width": 512,
+        "height": 512,
+        "fill": "#2457C5",
+        "rects": [
+          {
+            "x": 200,
+            "y": 200,
+            "width": 112,
+            "height": 112,
+            "fill": "#FFFFFF"
+          }
+        ]
+      }
+    }
+  ],
+  "extends": "good"
+}

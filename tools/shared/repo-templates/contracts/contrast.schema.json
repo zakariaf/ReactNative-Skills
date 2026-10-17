@@ -1,0 +1,211 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "contrast.schema.json",
+  "title": "Contrast contract",
+  "description": "The app's one contrast pair table: which colour sits on which in the theme palette and in every other colour table (chart series, tag colours), and the colour-blind lists. Read by the accessibility-as-code skill's check-contrast.mjs and test/a11y/app-contrast.test.ts, and (the theme palette entry) by design-system-structure's write-palette.mjs and check-design-system.mjs. Thresholds come from WCAG 2.2 AA and quality-gates.json, never from this file. Unknown keys are refused.",
+  "type": "object",
+  "required": ["palettes"],
+  "additionalProperties": false,
+  "$defs": {
+    "token": {
+      "type": "string",
+      "minLength": 1
+    },
+    "pair": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "$ref": "#/$defs/token"
+        },
+        {
+          "$ref": "#/$defs/token"
+        }
+      ],
+      "items": false,
+      "minItems": 2
+    },
+    "shape": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "$ref": "#/$defs/token",
+          "description": "the fill"
+        },
+        {
+          "$ref": "#/$defs/token",
+          "description": "the ground it sits on"
+        },
+        {
+          "$ref": "#/$defs/token",
+          "description": "its edge colour (default: the palette edge)"
+        }
+      ],
+      "items": false,
+      "minItems": 2
+    },
+    "setPath": {
+      "type": "string",
+      "minLength": 1,
+      "description": "A dotted path to a colour set inside the export, e.g. light or colorBlind.dark"
+    }
+  },
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "$comment": {
+      "type": "string"
+    },
+    "palettes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "file", "sets"],
+        "additionalProperties": false,
+        "properties": {
+          "$comment": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "file": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Repo-relative data module: .ts with type imports only, or .json"
+          },
+          "export": {
+            "type": "string",
+            "description": "The exported constant (or JSON path) holding the sets"
+          },
+          "sets": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/$defs/setPath"
+            }
+          },
+          "optionalSets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/setPath"
+            },
+            "description": "Checked when present, e.g. a colour-blind variant"
+          },
+          "base": {
+            "$ref": "#/$defs/token",
+            "description": "Opaque token translucent grounds are composited over (default background)"
+          },
+          "edge": {
+            "$ref": "#/$defs/token",
+            "description": "Default edge colour of every shape"
+          },
+          "text": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/pair"
+            },
+            "description": "[fg, bg] text and its ground: 4.5:1"
+          },
+          "graphics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/pair"
+            },
+            "description": "[fg, bg] icons, control edges, focus rings, chart lines: 3:1"
+          },
+          "shapes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/shape"
+            },
+            "description": "Filled shapes: 3:1 off their edge or their ground"
+          },
+          "distinct": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/token"
+              }
+            },
+            "description": "Colours that carry categories (chart series, tags): 0.07 OKLab apart under colour blindness"
+          },
+          "distinctSets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/setPath"
+            },
+            "description": "The sets the distinct lists are checked in (default: every checked set)"
+          }
+        },
+        "anyOf": [
+          {
+            "required": ["text"],
+            "properties": {
+              "text": {
+                "minItems": 1
+              }
+            }
+          },
+          {
+            "required": ["graphics"],
+            "properties": {
+              "graphics": {
+                "minItems": 1
+              }
+            }
+          },
+          {
+            "required": ["shapes"],
+            "properties": {
+              "shapes": {
+                "minItems": 1
+              }
+            }
+          }
+        ],
+        "description": "A colour table; it declares at least one text, graphics or shapes pair."
+      },
+      "description": "One entry per colour table, the theme palette first."
+    },
+    "exceptions": {
+      "type": "array",
+      "description": "Accepted failures, each printed on every run. Added only with the developer's go-ahead.",
+      "items": {
+        "type": "object",
+        "required": ["palette", "set", "fg", "bg", "reason", "approvedBy"],
+        "additionalProperties": false,
+        "properties": {
+          "$comment": {
+            "type": "string"
+          },
+          "palette": {
+            "type": "string",
+            "minLength": 1
+          },
+          "set": {
+            "$ref": "#/$defs/setPath"
+          },
+          "fg": {
+            "$ref": "#/$defs/token"
+          },
+          "bg": {
+            "$ref": "#/$defs/token"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "approvedBy": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

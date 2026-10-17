@@ -1,0 +1,13 @@
+{
+  "app.name": "المهام",
+  "debug.title": "Debug menu",
+  "permissions.camera.usage-description": "يتيح لك هذا إضافة صورة إلى مهمة. تبقى الصور على هذا الجهاز ما لم تشاركها.",
+  "reminders.next": "التذكير التالي – {dateText}",
+  "tasks.delete.title": "حذف هذه المهمة؟",
+  "tasks.list.rank": "القائمة رقم {place, selectordinal, other {#}}",
+  "tasks.list.title": "المهام",
+  "tasks.moved": "تم النقل إلى {listName}",
+  "tasks.page": "الصفحة {page, number}",
+  "tasks.progress": "تم إنجاز {doneRate, number, ::percent}",
+  "tasks.summary.open": "{openCount, plural, =0 {لا توجد مهام مفتوحة} one {مهمة مفتوحة واحدة} two {مهمتان مفتوحتان} few {# مهام مفتوحة} many {# مهمة مفتوحة} other {# مهمة مفتوحة}}"
+}

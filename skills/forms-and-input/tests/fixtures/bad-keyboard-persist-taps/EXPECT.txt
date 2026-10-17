@@ -1,0 +1,2 @@
+src/features/task-editor/task-editor-screen.tsx:45 [keyboard-persist-taps] <KeyboardAwareScrollView> holds text fields without keyboardShouldPersistTaps
+RESULT: FAIL (1 problems)

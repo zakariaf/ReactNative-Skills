@@ -1,0 +1,45 @@
+{
+  "base": [{ "templates": true, "firstLinePath": true }, "@tests/bases/app"],
+  "ops": [
+    {
+      "write": {
+        "file": "src/vendor/layout-kit/SKILL.md",
+        "content": "---\nname: layout-kit\ndescription: A vendored skill folder inside the app; its planted findings stay silent.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/vendor/layout-kit/kit-screen.tsx",
+        "lines": [
+          "import { Platform, View } from 'react-native';",
+          "export const IS_WIDE = (width: number): boolean => width >= 768 || Platform.isPad;",
+          "export const styles = { panel: { width: 375, maxWidth: 720 } };"
+        ]
+      }
+    },
+    {
+      "write": {
+        "file": ".agents/skills/layout-decoy/SKILL.md",
+        "content": "---\nname: layout-decoy\ndescription: An installed skill; its fixtures plant layout bugs on purpose.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": ".agents/skills/layout-decoy/tests/src/features/x/x-screen.tsx",
+        "lines": ["import * as ScreenOrientation from 'expo-screen-orientation';", "export const lock = () => ScreenOrientation.lockAsync(2);"]
+      }
+    },
+    {
+      "write": {
+        "file": "skills/layout-decoy/SKILL.md",
+        "content": "---\nname: layout-decoy\ndescription: A skill folder in the app repo; never scanned.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/layout-decoy/src/hooks/use-is-tablet.ts",
+        "lines": ["export function useIsTablet(): boolean {", "  return true;", "}"]
+      }
+    }
+  ]
+}

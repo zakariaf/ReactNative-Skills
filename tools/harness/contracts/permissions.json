@@ -1,0 +1,25 @@
+{
+  "$schema": "./permissions.schema.json",
+  "$comment": "The permissions this app asks for (permissions-and-system-prompts). The harness asks one: notifications, through push-notifications' opt-in flow (askedFrom; one OS permission covers push and local reminders). App Tracking Transparency is not listed: admob-ads-and-consent asks it through the ConsentPort.",
+  "permissions": [
+    {
+      "kind": "notifications",
+      "feature": "Get told when someone assigns you a task and when a reminder is due",
+      "askedFrom": "src/services/push/push-opt-in.ts",
+      "platforms": ["ios", "android"],
+      "shouldExplainFirst": false,
+      "explain": {
+        "title": "permissions.notifications.explain.title",
+        "body": "permissions.notifications.explain.body",
+        "continue": "permissions.continue",
+        "dismiss": "permissions.not-now"
+      },
+      "settings": {
+        "title": "permissions.notifications.settings.title",
+        "body": "permissions.notifications.settings.body",
+        "open": "permissions.open-settings",
+        "dismiss": "permissions.close"
+      }
+    }
+  ]
+}

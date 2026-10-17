@@ -1,0 +1,20 @@
+{
+  "$comment": "contracts/naming.json: this app's naming facts, read by the naming-conventions checkers. Edit the values; keep the keys. Every key is optional. The published* lists hold ids that are already live (a store listing, an EAS project) and so never change: each entry says why.",
+  "pathHeader": true,
+  "slugMatchesAppFolder": false,
+  "locales": ["en", "ar"],
+  "keyAreas": ["app", "common", "crash", "date", "errors", "permissions", "reminders"],
+  "allowedIndexFiles": [],
+  "nodeCode": [],
+  "extraTestIdRoles": [],
+  "extraE2eFolders": [],
+  "canonical": {
+    "types": [],
+    "npmScripts": ["lint", "typecheck", "test"],
+    "envVars": ["APP_VARIANT"]
+  },
+  "storeProductIds": [],
+  "publishedAppIds": [],
+  "publishedSlugs": [],
+  "publishedProductIds": []
+}

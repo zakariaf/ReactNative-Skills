@@ -1,0 +1,7 @@
+{
+  "$comment": "Optional, at the repo root as rn-skills.config.json. Every key is optional; these are the ones typescript-and-lint-rules reads. layoutEntries: top-level files or folders that are app code (linted, formatted, type-checked), so check-configs does not ask to ignore them as pre-existing.",
+  "srcDir": "src",
+  "layoutEntries": ["tailwind.config.js", "storybook"],
+  "importExtensions": "node",
+  "tsdocGlobs": ["src/core/**/*.ts", "src/services/*/*-port.ts"]
+}

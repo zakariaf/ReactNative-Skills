@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "stores contract",
+  "description": "The app's client-state facts, read by the state-management-zustand checker (check-stores.mjs).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["crossStoreWrites", "osMirrorStores"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "crossStoreWrites": {
+      "description": "Names of the functions or repository methods whose one transaction changes rows that more than one store holds (removeList deletes a list and its tasks; resetAllData; an import). A call of one of them is allowed only inside the write argument of updateAndPublish(stores, write), in the data folder, or in tests.",
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[A-Za-z_$][A-Za-z0-9_$]*$" },
+      "uniqueItems": true
+    },
+    "osMirrorStores": {
+      "description": "Repo-relative files that may create a store at module level: a mirror of operating-system state that is never persisted (accessibility-as-code's src/ui/a11y/system-a11y-store.ts). Every other store comes from a factory.",
+      "type": "array",
+      "items": { "type": "string", "pattern": "^(?!/)(?!.*\\.\\.)[^\\s]+\\.tsx?$" },
+      "uniqueItems": true
+    }
+  }
+}

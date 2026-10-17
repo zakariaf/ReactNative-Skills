@@ -1,0 +1,55 @@
+# .maestro/flows/a11y/01-large-text-core-screens.yaml
+# Core screens at the largest text size, with screenshots to read for clipping, overlap and rows
+# that should have stacked. e2e-maestro's runner runs flows/a11y/ at the largest size once per
+# contracts/e2e.json largeText locale, passing -e LANG=<locale>, and sets and resets the size itself;
+# the flow sets that language first through e2e-maestro's set-language sub-flow, then opens the home
+# screen through the debug link (debug-menu-and-test-hooks). By hand, with the size set on your own
+# device: tools/maestro/bin/maestro --device <udid or serial> --driver-host-port <port> test
+# -e APP_ID=<id> -e APP_SCHEME=<scheme> -e LANG=<locale> <this file>. Replace the testIDs with the
+# app's own (contracts/screens.json when the app keeps one).
+appId: ${APP_ID}
+name: Core screens stay usable at the largest text size
+tags:
+  - a11y
+---
+- launchApp:
+    clearState: true
+# This pass's language (LANG), alone: a right-to-left one restarts the app once.
+- runFlow:
+    file: ../../subflows/set-language.yaml
+- runFlow:
+    file: ../../subflows/debug-setup.yaml
+    env:
+      QUERY: 'motion=still&open=tasks'
+      WAIT_FOR: 'tasks.list'
+- takeScreenshot: 'a11y/large-text-tasks'
+- tapOn:
+    id: 'tasks.add-button'
+- assertVisible:
+    id: 'task-editor.title-input'
+- takeScreenshot: 'a11y/large-text-task-editor'
+- tapOn:
+    id: 'task-editor.title-input'
+- inputText: 'Buy milk'
+- tapOn:
+    id: 'task-editor.save-button'
+# Maestro taps the centre of the element on the real screen, where the card's text layer sits: the
+# task opens only when that layer passes touches through to the opener (pointerEvents 'none').
+# RNTL's press cannot prove this, because it presses the element it is given. A repeated row's
+# testID ends in its data key (tasks.task-row.<task id>), unknown before the run: this regex matches
+# the one row the flow just created, and not its tasks.task-row.<task id>.complete-checkbox.
+- tapOn:
+    id: 'tasks\.task-row\.[^.]+'
+- assertVisible:
+    id: 'task-detail.screen'
+- takeScreenshot: 'a11y/large-text-task-detail'
+- tapOn:
+    id: 'task-detail.back-button'
+- tapOn:
+    id: 'tasks.settings-button'
+- assertVisible:
+    id: 'settings.list'
+- scrollUntilVisible:
+    element:
+      id: 'settings.reduce-motion-row'
+- takeScreenshot: 'a11y/large-text-settings'

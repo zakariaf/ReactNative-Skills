@@ -1,0 +1,14 @@
+{
+  "$schema": "./schema-ledger.schema.json",
+  "$comment": "Every database schema version that ever reached a device (store, TestFlight, Play testing, a preview build, an EAS Update), in order, with the sha256 of its step file and frozen fixture. Append only: record-shipped adds an entry when a build or update with a new version first leaves the machine.",
+  "shipped": [
+    {
+      "version": 1,
+      "name": "create-lists-and-tasks",
+      "stepSha256": "448a853935900bcff7c0258edc03b5e1f0d6dd5b95894a64d85698dac7837338",
+      "fixtureSha256": "08cc5e6b8ee8ff48de9cd3595301dc573c9d594eaa7cba8f07a935385b18e6fd",
+      "firstShippedIn": "1.0.0 (1)",
+      "shippedOn": "2026-09-14"
+    }
+  ]
+}

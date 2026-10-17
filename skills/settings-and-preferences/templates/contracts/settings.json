@@ -1,0 +1,94 @@
+{
+  "$schema": "./settings.schema.json",
+  "$comment": "The app's settings model, read by settings-and-preferences' check-settings.mjs. Paths are repo-relative; regexes are JavaScript source strings. A new setting starts here (field, validator, first-launch value, action, effect), then the code follows: references/settings-model.md, 'Adding or changing a setting'. Only device preferences are fields; preferences the server owns (email opt-ins, notification categories of an account) are listed in accountPreferences and live in server state.",
+  "schema": {
+    "file": "src/stores/settings/settings-schema.ts",
+    "export": "SETTINGS_SCHEMA"
+  },
+  "defaults": {
+    "file": "src/stores/settings/settings-schema.ts",
+    "export": "DEFAULT_SETTINGS"
+  },
+  "reducer": "src/stores/settings/settings-reducer.ts",
+  "store": {
+    "file": "src/stores/settings/settings-store.ts",
+    "persist": "\\bstorage\\.write\\s*\\(",
+    "publish": "\\bset\\s*\\(\\s*\\{\\s*settings\\s*:"
+  },
+  "storage": {
+    "adapters": ["src/services/settings-storage/kv-settings-storage-adapter.ts"],
+    "key": "settings"
+  },
+  "screenDirs": ["src/features/settings"],
+  "effectExclude": [
+    "src/stores/settings/**",
+    "src/services/settings-storage/**",
+    "src/features/settings/**"
+  ],
+  "fields": {
+    "language": {
+      "schema": "v.nullable(v.picklist(LANGUAGES))",
+      "default": "null",
+      "action": "set-language",
+      "effect": "\\bselectLanguage\\b"
+    },
+    "digits": {
+      "schema": "v.picklist(['automatic', 'latin', 'local'])",
+      "default": "'automatic'",
+      "action": "set-digits",
+      "effect": "\\bselectDigits\\b"
+    },
+    "theme": {
+      "schema": "v.picklist(['system', 'light', 'dark'])",
+      "default": "'system'",
+      "action": "set-theme",
+      "effect": "\\bselectThemePreference\\b"
+    },
+    "reduceMotion": {
+      "schema": "v.picklist(['system', 'on', 'off'])",
+      "default": "'system'",
+      "action": "set-reduce-motion",
+      "effect": "\\bselectReduceMotionPreference\\b"
+    },
+    "hapticsEnabled": {
+      "schema": "v.boolean()",
+      "default": "true",
+      "action": "set-haptics",
+      "effect": "\\bselectIsHapticsOn\\b"
+    },
+    "soundEnabled": {
+      "schema": "v.boolean()",
+      "default": "false",
+      "action": "set-sound",
+      "effect": "\\bsoundEnabled\\b"
+    },
+    "soundVolume": {
+      "schema": "PERCENT",
+      "default": "80",
+      "action": "set-sound",
+      "effect": "\\bsoundVolume\\b",
+      "unit": "percent",
+      "clamp": "clampPercent"
+    }
+  },
+  "actions": [
+    "set-language",
+    "set-digits",
+    "set-theme",
+    "set-reduce-motion",
+    "set-haptics",
+    "set-sound",
+    "reset-settings"
+  ],
+  "rowExempt": [],
+  "accountPreferences": [],
+  "resets": [
+    {
+      "file": "src/data/reset-data.ts",
+      "function": "resetAllData",
+      "owner": "persistence-and-migrations",
+      "keeps": ["settings", "settingsStorage", "SETTINGS_STORAGE_KEY", "clearSync", "clearAsync"]
+    }
+  ],
+  "toggleFeedback": "\\bplayUiFeedback\\s*\\([^)]*['\"]toggle['\"]"
+}

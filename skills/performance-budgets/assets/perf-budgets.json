@@ -1,0 +1,14 @@
+{
+  "perf": {
+    "coldStartHomeMsMax": 1000,
+    "coldStartSimRegressionFactor": 1.2,
+    "hitchMsPerSecondMax": 10,
+    "frameP95MsMax": 17,
+    "saveWriteP95MsMax": 5,
+    "drawCallsPerFrameMax": 1000,
+    "bundleJsBytesMax": 6000000,
+    "bundleGrowthMaxRatio": 1.1,
+    "memoryFootprintMbMax": 150,
+    "skiaCanvasesPerScreenMax": 8
+  }
+}

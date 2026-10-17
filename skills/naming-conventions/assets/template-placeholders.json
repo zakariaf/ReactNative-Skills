@@ -1,0 +1,7 @@
+{
+  "__FEATURE__": "tasks",
+  "__UNION_FILE__": "task-priority",
+  "__UNION_PASCAL__": "TaskPriority",
+  "__VALUES_CONST__": "TASK_PRIORITIES",
+  "__VALUES__": "'low', 'normal', 'high'"
+}

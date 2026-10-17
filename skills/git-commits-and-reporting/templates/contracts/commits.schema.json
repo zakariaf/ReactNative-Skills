@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "contracts/commits.schema.json",
+  "title": "Commit rules contract",
+  "description": "Scopes and the requirement-reference rule for the commit-msg hook (scripts/git/commit-config.ts) and check-commits.mjs. Every key is optional; a missing key takes the default.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "scopeFolders": {
+      "description": "Folders that give scopes: '<folder>/*' (each visible sub-folder name) or '<folder>' (its own name). Default: the workspace globs when multi-package, then src/features/* and src/*.",
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[^/][^*]*(/\\*)?$" }
+    },
+    "extraScopes": {
+      "description": "Scopes added to the folder scopes and the fixed scopes (repo, deps, docs, ci, tooling, e2e, release, skills).",
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" }
+    },
+    "requirementRef": {
+      "description": "null: off (a Spec-Change trailer still names a requirement: #123, TASK-12, spec 4.2, issue 31). An object: the pattern a requirement reference matches, and whether feat and fix bodies must name one.",
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["pattern"],
+          "properties": {
+            "pattern": {
+              "type": "string",
+              "description": "A JavaScript regular expression source (u flag), for example \\bTASK-\\d+\\b."
+            },
+            "required": { "type": "boolean", "default": true },
+            "exemptScopes": {
+              "description": "Scopes whose feat and fix bodies need no reference. Default: the fixed scopes.",
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

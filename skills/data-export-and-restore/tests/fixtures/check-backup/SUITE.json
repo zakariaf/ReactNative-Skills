@@ -1,0 +1,16 @@
+{
+  "base": [
+    "@tests/bases/app",
+    {
+      "templates": true,
+      "firstLinePath": true,
+      "fill": {
+        "__APP_SLUG__": "tasks"
+      }
+    },
+    {
+      "from": "@skill/examples/src",
+      "firstLinePath": true
+    }
+  ]
+}

@@ -1,0 +1,574 @@
+{
+  "bad-ambient-random": {
+    "expect": ["src/core/rng/seeded-draws.ts:22 [ambient-random] Math.random on a seeded path"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/rng/seeded-draws.ts",
+          "find": "const draw = nextInt(state, items.length);",
+          "with": "const draw = { value: Math.floor(Math.random() * items.length), state };"
+        }
+      }
+    ]
+  },
+  "bad-ambient-random-destructured": {
+    "$comment": "A 'harmless' tie-break one hop from the generator, through a barrel, with Math.random destructured at module level: no Math.random text, and the runtime trap (installed per call) never sees the captured function.",
+    "expect": [
+      "src/lib/jitter.ts:2 [ambient-random] Math.random (destructured from Math) on a seeded path (reached from src/features/daily-focus/daily-focus-generator.ts via src/lib/index.ts -> src/lib/jitter.ts)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/lib/jitter.ts",
+          "lines": [
+            "// src/lib/jitter.ts",
+            "const { random } = Math;",
+            "",
+            "export function jitter(rank: number): number {",
+            "  return rank + (random() < 2 ? 0 : 1);",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": { "file": "src/lib/index.ts", "lines": ["// src/lib/index.ts", "export { jitter } from './jitter';"] }
+      },
+      {
+        "replace": {
+          "file": "src/features/daily-focus/daily-focus-generator.ts",
+          "find": "import { seedRng } from '@/core/rng/sfc32';",
+          "with": "import { seedRng } from '@/core/rng/sfc32';\nimport { jitter } from '@/lib';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/daily-focus/daily-focus-generator.ts",
+          "find": "  const state = seedRng(dailySeed(key, DAILY_FOCUS_SALT));",
+          "with": "  const state = seedRng(jitter(dailySeed(key, DAILY_FOCUS_SALT)));"
+        }
+      }
+    ]
+  },
+  "bad-ambient-random-dynamic": {
+    "$comment": "Platform randomness loaded with import(), a package subpath, and an object that is not literally named crypto.",
+    "expect": [
+      "src/core/rng/extra.ts:3 [ambient-random] imports (with import()) react-native-quick-crypto on a seeded path",
+      "src/core/rng/extra.ts:4 [ambient-random] QuickCrypto.randomBytes on a seeded path",
+      "src/core/rng/extra.ts:5 [ambient-random] imports (with import()) nanoid/non-secure on a seeded path"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/core/rng/extra.ts",
+          "lines": [
+            "// src/core/rng/extra.ts",
+            "export async function tieBreak(): Promise<number> {",
+            "  const QuickCrypto = await import('react-native-quick-crypto');",
+            "  const bytes = QuickCrypto.randomBytes(1);",
+            "  const { nanoid } = await import('nanoid/non-secure');",
+            "  return (bytes[0] ?? 0) + nanoid().length;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-ambient-random-extra-path": {
+    "expect": ["src/lib/jitter.ts:2 [ambient-random] Math.random on a seeded path"],
+    "args": "{dir} --path src/lib/**",
+    "ops": [
+      {
+        "write": {
+          "file": "src/lib/jitter.ts",
+          "content": "// src/lib/jitter.ts\nexport const jitter = (): number => Math.random();\n"
+        }
+      }
+    ]
+  },
+  "bad-contract-paths": {
+    "$comment": "A contract module and a paths glob that match nothing under the root scan nothing: a silent gap (a typo, a renamed folder, or the checker run from the repo root with an app's contract).",
+    "expect": [
+      "contracts/seeded-generators.json:3 [contract-paths] the \"paths\" glob src/features/daily-focus/catalogs/** matches no file under the root, so it scans nothing",
+      "contracts/seeded-generators.json:8 [contract-paths] the generator module src/features/daily-focus/daily-focus-gen.ts does not exist under the root, so nothing scans it"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "contracts/seeded-generators.json",
+          "find": "\"paths\": [],",
+          "with": "\"paths\": [\"src/features/daily-focus/catalogs/**\"],"
+        }
+      },
+      {
+        "replace": {
+          "file": "contracts/seeded-generators.json",
+          "find": "\"module\": \"src/features/daily-focus/daily-focus-generator.ts\",",
+          "with": "\"module\": \"src/features/daily-focus/daily-focus-gen.ts\","
+        }
+      }
+    ]
+  },
+  "bad-daily-seed-golden": {
+    "expect": ["[daily-seed-golden] dailySeed('2026-09-26', 17) is"],
+    "ops": [{ "replace": { "file": "src/core/dates/daily-seed.ts", "find": "0x01000193", "with": "0x01000197" } }]
+  },
+  "bad-date-key-golden": {
+    "expect": ["[date-key-golden] dayNumber('1970-01-01') is -1, not 0"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/dates/date-key.ts",
+          "find": "return era * 146097 + dayOfEra - 719468;",
+          "with": "return era * 146097 + dayOfEra - 719469;"
+        }
+      }
+    ]
+  },
+  "bad-draws-golden": {
+    "$comment": "One extra nextInt(1) draw: same permutation, different state for every later draw.",
+    "expect": ["[draws-golden] shuffle of 1 item consumes or orders draws differently"],
+    "ops": [
+      { "replace": { "file": "src/core/rng/seeded-draws.ts", "find": "i >= 1; i -= 1", "with": "i >= 0; i -= 1" } }
+    ]
+  },
+  "bad-fingerprint-golden": {
+    "expect": ["[fingerprint-golden] canonicalJson does not sort object keys"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/rng/fingerprint.ts",
+          "find": "const keys = Object.keys(value).sort(compareCodeUnits);",
+          "with": "const keys = Object.keys(value);"
+        }
+      }
+    ]
+  },
+  "bad-foreign-prng": {
+    "expect": ["src/features/daily-focus/daily-focus-generator.ts:5 [foreign-prng] imports the PRNG package seedrandom"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/daily-focus/daily-focus-generator.ts",
+          "find": "import { dailySeed } from '@/core/dates/daily-seed';",
+          "with": "import seedrandom from 'seedrandom';\nimport { dailySeed } from '@/core/dates/daily-seed';"
+        }
+      }
+    ]
+  },
+  "bad-foreign-prng-dynamic": {
+    "$comment": "A second PRNG loaded with require() is still a second PRNG.",
+    "expect": ["src/core/rng/legacy.ts:3 [foreign-prng] requires the PRNG package seedrandom"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/core/rng/legacy.ts",
+          "lines": [
+            "// src/core/rng/legacy.ts",
+            "// eslint-disable-next-line @typescript-eslint/no-require-imports",
+            "const seedrandom = require('seedrandom');",
+            "",
+            "export const legacyDraw = (seed: string): number => seedrandom(seed)();"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-golden-pins": {
+    "$comment": "The expected value computed by the module under test: the test can no longer fail.",
+    "expect": ["src/core/rng/sfc32.test.ts:1 [golden-pins] the test does not pin the golden values 2847463752"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/rng/sfc32.test.ts",
+          "find": "const GOLDEN_TEXT_HASH = 2847463752; // hashSeed('tasks:2026-09-26')",
+          "with": "const GOLDEN_TEXT_HASH = hashSeed('tasks:2026-09-26');"
+        }
+      }
+    ]
+  },
+  "bad-golden-pins-comment": {
+    "$comment": "The expected values are computed by the module under test, and the old literals survive only in comments: nothing pins them any more.",
+    "expect": [
+      "src/core/rng/sfc32.test.ts:1 [golden-pins] the test does not pin the golden values 1828152527, 3394835397, 2967886022, 2251045104, 4148684523, 2847463752 as literals in code"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/rng/sfc32.test.ts",
+          "find": "const GOLDEN_SEED_1 = [1828152527, 3394835397, 2967886022, 2251045104, 4148684523];",
+          "with": "// was [1828152527, 3394835397, 2967886022, 2251045104, 4148684523]\nconst GOLDEN_SEED_1 = drawMany(seedRng(1), 5);"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/core/rng/sfc32.test.ts",
+          "find": "const GOLDEN_TEXT_HASH = 2847463752; // hashSeed('tasks:2026-09-26')",
+          "with": "const GOLDEN_TEXT_HASH = hashSeed('tasks:2026-09-26'); // 2847463752"
+        }
+      }
+    ]
+  },
+  "bad-golden-pins-no-test": {
+    "expect": ["src/core/dates/date-key.test.ts:1 [golden-pins] src/core/dates/date-key.ts has no test"],
+    "ops": [{ "delete": "src/core/dates/date-key.test.ts" }]
+  },
+  "bad-inexact-math": {
+    "expect": [
+      "src/games/lights-out/levels/scatter.ts:4 [inexact-math] Math.sin is implementation-approximated",
+      "src/games/lights-out/levels/scatter.ts:5 [inexact-math] ** (Number::exponentiate) is implementation-approximated"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/lights-out/levels/scatter.ts",
+          "content": "// src/games/lights-out/levels/scatter.ts\nexport function scatter(index: number): number {\n  const angle = index * 0.5;\n  const x = Math.sin(angle);\n  return x * 2 ** 3;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-inexact-math-exact": {
+    "$comment": "Exactly specified members outside the shared allow-list get their own message (and a rewrite); a destructured approximated member is still approximated.",
+    "expect": [
+      "src/games/lights-out/levels/grid.ts:2 [inexact-math] Math.trunc is exactly specified but outside the shared allow-list (the ESLint DETERMINISTIC block uses the same list): use x < 0 ? -Math.floor(-x) : Math.floor(x), or add it to both lists",
+      "src/games/lights-out/levels/grid.ts:2 [inexact-math] Math.hypot is implementation-approximated",
+      "src/games/lights-out/levels/grid.ts:5 [inexact-math] Math.ceil is exactly specified but outside the shared allow-list (the ESLint DETERMINISTIC block uses the same list): use -Math.floor(-x), or add it to both lists"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/lights-out/levels/grid.ts",
+          "lines": [
+            "// src/games/lights-out/levels/grid.ts",
+            "const { trunc, hypot } = Math;",
+            "",
+            "export function half(size: number): number {",
+            "  return Math.ceil(size / 2) + trunc(hypot(size, 1));",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-inexact-math-helper": {
+    "$comment": "The generator imports a helper outside the seeded paths, and the helper imports another one through the @/ alias: both use inexact maths while every row is drawn. The scan follows the generator's imports and names the chain.",
+    "expect": [
+      "src/features/daily-focus/daily-focus-weights.ts:5 [inexact-math] Math.exp is implementation-approximated (it differs between engines and C maths libraries) (reached from src/features/daily-focus/daily-focus-generator.ts via src/features/daily-focus/daily-focus-weights.ts)",
+      "src/features/daily-focus/daily-focus-weights.ts:5 [inexact-math] ** (Number::exponentiate) is implementation-approximated (reached from src/features/daily-focus/daily-focus-generator.ts via src/features/daily-focus/daily-focus-weights.ts)",
+      "src/lib/easing.ts:3 [inexact-math] Math.log1p is implementation-approximated (it differs between engines and C maths libraries) (reached from src/features/daily-focus/daily-focus-generator.ts via src/features/daily-focus/daily-focus-weights.ts -> src/lib/easing.ts)",
+      "check-determinism: 15 seeded files checked, 3 problems"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/daily-focus/daily-focus-weights.ts",
+          "lines": [
+            "// src/features/daily-focus/daily-focus-weights.ts",
+            "import { easeOut } from '@/lib/easing';",
+            "",
+            "export function itemWeight(index: number): number {",
+            "  return Math.round(1000 * Math.exp(-index / 4) + 2 ** (index % 3)) + easeOut(index);",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/lib/easing.ts",
+          "lines": [
+            "// src/lib/easing.ts",
+            "export function easeOut(index: number): number {",
+            "  return Math.round(Math.log1p(index) * 10);",
+            "}"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/daily-focus/daily-focus-generator.ts",
+          "find": "import { seedRng } from '@/core/rng/sfc32';",
+          "with": "import { seedRng } from '@/core/rng/sfc32';\n\nimport { itemWeight } from './daily-focus-weights';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/daily-focus/daily-focus-generator.ts",
+          "find": "  const state = seedRng(dailySeed(key, DAILY_FOCUS_SALT));",
+          "with": "  const state = seedRng(dailySeed(key, DAILY_FOCUS_SALT) + itemWeight(key.length));"
+        }
+      }
+    ]
+  },
+  "bad-locale-dependent": {
+    "expect": [
+      "src/features/daily-focus/daily-focus-generator.ts:76 [locale-dependent] localeCompare() depends on the device locale"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/daily-focus/daily-focus-generator.ts",
+          "find": "return output.itemIds.join(' ');",
+          "with": "return [...output.itemIds].sort((a, b) => a.localeCompare(b)).join(' ');"
+        }
+      }
+    ]
+  },
+  "bad-rng-golden": {
+    "$comment": "One warm-up draw fewer: every seeded output changes.",
+    "expect": ["[rng-golden] seedRng(1) draws", "src/core/rng/sfc32.ts:"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/rng/sfc32.ts",
+          "find": "const WARM_UP_DRAWS = 12;",
+          "with": "const WARM_UP_DRAWS = 11;"
+        }
+      }
+    ]
+  },
+  "bad-rng-worklet": {
+    "expect": ["[rng-golden] sfc32.ts lost its file-level 'worklet' directive"],
+    "ops": [{ "replace": { "file": "src/core/rng/sfc32.ts", "find": "'worklet';\n", "with": "" } }]
+  },
+  "bad-unmixed-seed": {
+    "expect": [
+      "src/features/daily-focus/daily-focus-generator.ts:53 [unmixed-seed] the raw dailySeed() value is used with %",
+      "src/features/daily-focus/daily-focus-generator.ts:55 [unmixed-seed] seed holds a raw dailySeed() value and is used with %"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/daily-focus/daily-focus-generator.ts",
+          "find": "  const state = seedRng(dailySeed(key, DAILY_FOCUS_SALT));",
+          "with": "  const lead = CATALOG_V1[dailySeed(key, DAILY_FOCUS_SALT) % CATALOG_V1.length];\n  const seed = dailySeed(key, DAILY_FOCUS_SALT);\n  const pick = seed % PICKS_V1;\n  const state = seedRng(seed + pick + (lead === undefined ? 0 : 1));"
+        }
+      }
+    ]
+  },
+  "bad-wall-clock": {
+    "expect": ["src/features/daily-focus/daily-focus-generator.ts:63 [wall-clock] new Date on a seeded path"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/daily-focus/daily-focus-generator.ts",
+          "find": "export function generateDailyFocus(\n  key: DateKey,",
+          "with": "export function generateDailyFocus(\n  key: DateKey = new Date().toISOString().slice(0, 10),"
+        }
+      }
+    ]
+  },
+  "bad-wall-clock-test": {
+    "$comment": "A test on a seeded path reads the real clock: it passes today and fails at the next year end.",
+    "expect": [
+      "src/core/dates/date-key.test.ts:13 [wall-clock] new Date without arguments reads the clock",
+      "src/core/dates/date-key.test.ts:14 [wall-clock] Date.now on a seeded path"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/dates/date-key.test.ts",
+          "find": "describe('date-key', () => {",
+          "with": "describe('date-key', () => {\n  it('knows today', () => {\n    const today = new Date();\n    expect(isDateKey(today.toISOString().slice(0, 10))).toBe(Date.now() > 0);\n  });\n"
+        }
+      }
+    ]
+  },
+  "bad-workspace-package": {
+    "$comment": "A workspaces repo (apps/mobile, packages/shared), checked once per app with the app folder as the root. The generator imports @acme/shared, whose helper uses Math.exp and **: the scan follows the import out of the app folder into the workspace package.",
+    "expect": [
+      "../../packages/shared/src/easing.ts:3 [inexact-math] Math.exp is implementation-approximated (it differs between engines and C maths libraries) (reached from src/features/daily-focus/daily-focus-generator.ts via ../../packages/shared/src/index.ts -> ../../packages/shared/src/easing.ts)",
+      "../../packages/shared/src/easing.ts:3 [inexact-math] ** (Number::exponentiate) is implementation-approximated"
+    ],
+    "args": "{dir}/apps/mobile",
+    "ops": [
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      { "rename": { "from": "contracts", "to": "apps/mobile/contracts" } },
+      { "rename": { "from": "scripts", "to": "apps/mobile/scripts" } },
+      { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+      { "rename": { "from": "tsconfig.json", "to": "apps/mobile/tsconfig.json" } },
+      { "json": { "file": "apps/mobile/package.json", "path": ["name"], "value": "@acme/mobile" } },
+      {
+        "write": {
+          "file": "package.json",
+          "json": { "name": "acme", "private": true, "workspaces": ["apps/*", "packages/*"] }
+        }
+      },
+      {
+        "write": {
+          "file": "packages/shared/package.json",
+          "json": { "name": "@acme/shared", "version": "1.0.0", "private": true, "main": "src/index.ts" }
+        }
+      },
+      {
+        "write": {
+          "file": "packages/shared/src/index.ts",
+          "lines": ["// packages/shared/src/index.ts", "export { rankWeight } from './easing';"]
+        }
+      },
+      {
+        "write": {
+          "file": "packages/shared/src/easing.ts",
+          "lines": [
+            "// packages/shared/src/easing.ts",
+            "export function rankWeight(rank: number): number {",
+            "  return Math.round(1000 * Math.exp(-rank / 4)) + 2 ** (rank % 3);",
+            "}"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "apps/mobile/src/features/daily-focus/daily-focus-generator.ts",
+          "find": "import { seedRng } from '@/core/rng/sfc32';",
+          "with": "import { seedRng } from '@/core/rng/sfc32';\nimport { rankWeight } from '@acme/shared';"
+        }
+      },
+      {
+        "replace": {
+          "file": "apps/mobile/src/features/daily-focus/daily-focus-generator.ts",
+          "find": "  const state = seedRng(dailySeed(key, DAILY_FOCUS_SALT));",
+          "with": "  const state = seedRng(dailySeed(key, DAILY_FOCUS_SALT) + rankWeight(key.length));"
+        }
+      }
+    ]
+  },
+  "error-contract-json": {
+    "expect": ["ERROR [bad-input] contracts/seeded-generators.json is not valid JSON"],
+    "ops": [{ "write": { "file": "contracts/seeded-generators.json", "content": "{ \"generators\": [ \n" } }]
+  },
+  "error-nothing-seeded": {
+    "expect": ["ERROR [bad-input] nothing to check: no seeded code"],
+    "base": ["@tests/bases/app"],
+    "ops": []
+  },
+  "pass-dates-only": {
+    "expect": ["check-determinism: 6 seeded files checked, 0 problems", "RESULT: PASS"],
+    "ops": [{ "delete": ["src/core/rng", "src/features", "scripts/oracles", "contracts"] }]
+  },
+  "pass-installed-skills": {
+    "$comment": "Planted findings inside installed skill folders and a vendored folder holding a SKILL.md stay silent.",
+    "expect": ["RESULT: PASS"],
+    "args": "{dir} --path **/planted.ts",
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/other-skill/src/core/rng/planted.ts",
+          "content": "export const r = Math.random();\n"
+        }
+      },
+      { "write": { "file": "skills/other-skill/src/core/rng/planted.ts", "content": "export const t = Date.now();\n" } },
+      {
+        "write": {
+          "file": "src/core/rng/vendor/SKILL.md",
+          "content": "---\nname: vendored\ndescription: A vendored skill folder.\n---\n"
+        }
+      },
+      { "write": { "file": "src/core/rng/vendor/planted.ts", "content": "export const s = Math.sin(1) ** 2;\n" } }
+    ]
+  },
+  "pass-test-fixed-instants": {
+    "$comment": "A test on a seeded path compares the integer arithmetic with fixed instants (Date.UTC, new Date(<arguments>), getUTC*): no clock is read, so the wall-clock rule stays silent.",
+    "expect": ["check-determinism: 13 seeded files checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/dates/date-key.test.ts",
+          "find": "describe('date-key', () => {",
+          "with": "describe('date-key', () => {\n  it('agrees with fixed UTC instants', () => {\n    expect(dayNumber('2026-09-26')).toBe(Date.UTC(2026, 8, 26) / 86_400_000);\n    const instant = new Date(Date.UTC(2028, 1, 29));\n    expect(addDays('2028-02-28', 1)).toBe(instant.toISOString().slice(0, 10));\n    expect(instant.getUTCDate()).toBe(29);\n    expect(new Date('2026-09-26T00:00:00Z').getUTCDay()).toBe(isoWeekday('2026-09-26') % 7);\n  });\n"
+        }
+      }
+    ]
+  },
+  "pass-type-import-not-followed": {
+    "$comment": "A type-only import loads nothing at runtime, so the store it names (which reads the clock) is not seeded; a clean helper the generator imports by value is reached and scanned (14 files instead of 13).",
+    "expect": ["check-determinism: 14 seeded files checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/stores/tasks-store.ts",
+          "lines": [
+            "// src/stores/tasks-store.ts",
+            "export type TaskSummary = { readonly id: string; readonly createdAt: number };",
+            "",
+            "export function newTaskSummary(id: string): TaskSummary {",
+            "  return { id, createdAt: Date.now() };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/daily-focus/daily-focus-labels.ts",
+          "lines": [
+            "// src/features/daily-focus/daily-focus-labels.ts",
+            "export function focusLabel(count: number): string {",
+            "  return count > 2 ? 'busy' : 'light';",
+            "}"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/daily-focus/daily-focus-generator.ts",
+          "find": "import type { DateKey } from '@/core/dates/date-key';",
+          "with": "import type { DateKey } from '@/core/dates/date-key';\nimport type { TaskSummary } from '@/stores/tasks-store';\n\nimport { focusLabel } from './daily-focus-labels';\n\nexport type FocusStore = typeof import('@/stores/tasks-store');\nexport type FocusTask = TaskSummary;\nexport const focusLabelFor = (count: number): string => focusLabel(count);"
+        }
+      }
+    ]
+  },
+  "pass-workspace-app": {
+    "$comment": "The same workspaces repo with an exact helper in packages/shared: the package file is followed and scanned (one more seeded file than the single app) and nothing is reported.",
+    "expect": ["check-determinism: 15 seeded files checked, 0 problems", "RESULT: PASS"],
+    "args": "{dir}/apps/mobile",
+    "ops": [
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      { "rename": { "from": "contracts", "to": "apps/mobile/contracts" } },
+      { "rename": { "from": "scripts", "to": "apps/mobile/scripts" } },
+      { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+      { "rename": { "from": "tsconfig.json", "to": "apps/mobile/tsconfig.json" } },
+      { "json": { "file": "apps/mobile/package.json", "path": ["name"], "value": "@acme/mobile" } },
+      {
+        "write": {
+          "file": "package.json",
+          "json": { "name": "acme", "private": true, "workspaces": ["apps/*", "packages/*"] }
+        }
+      },
+      {
+        "write": {
+          "file": "packages/shared/package.json",
+          "json": { "name": "@acme/shared", "version": "1.0.0", "private": true, "main": "src/index.ts" }
+        }
+      },
+      {
+        "write": {
+          "file": "packages/shared/src/index.ts",
+          "lines": ["// packages/shared/src/index.ts", "export { rankWeight } from './easing';"]
+        }
+      },
+      {
+        "write": {
+          "file": "packages/shared/src/easing.ts",
+          "lines": [
+            "// packages/shared/src/easing.ts",
+            "export function rankWeight(rank: number): number {",
+            "  return 1000 - rank * rank;",
+            "}"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "apps/mobile/src/features/daily-focus/daily-focus-generator.ts",
+          "find": "import { seedRng } from '@/core/rng/sfc32';",
+          "with": "import { seedRng } from '@/core/rng/sfc32';\nimport { rankWeight } from '@acme/shared';"
+        }
+      },
+      {
+        "replace": {
+          "file": "apps/mobile/src/features/daily-focus/daily-focus-generator.ts",
+          "find": "  const state = seedRng(dailySeed(key, DAILY_FOCUS_SALT));",
+          "with": "  const state = seedRng(dailySeed(key, DAILY_FOCUS_SALT) + rankWeight(key.length));"
+        }
+      }
+    ]
+  }
+}

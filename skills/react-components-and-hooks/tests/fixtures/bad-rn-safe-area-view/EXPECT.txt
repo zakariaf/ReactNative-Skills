@@ -1,0 +1,3 @@
+[banned-import] imports SafeAreaView from 'react-native'
+src/features/settings/settings-screen.tsx:2
+RESULT: FAIL (1 problems)

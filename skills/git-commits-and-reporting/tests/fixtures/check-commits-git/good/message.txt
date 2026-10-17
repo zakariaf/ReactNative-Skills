@@ -1,0 +1,6 @@
+test(tasks): add the arabic task list baseline
+
+The list now has an Arabic baseline, so a right-to-left layout
+regression shows up in the e2e run.
+
+Gate-Change: new baseline of the arabic task list

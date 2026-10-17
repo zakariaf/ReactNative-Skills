@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "persistence contract",
+  "description": "The app's persistence facts, read by the persistence-and-migrations checker (check-persistence.mjs).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["mode", "databaseFile", "protectedTables", "resetModules"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "mode": {
+      "description": "tables: SQLite tables and repositories (the default). document: one validated JSON document in current/backup slots. both: tables plus a document for small app state.",
+      "enum": ["tables", "document", "both"]
+    },
+    "databaseFile": {
+      "description": "The database file name in expo-sqlite's default directory.",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._-]+\\.db$"
+    },
+    "protectedTables": {
+      "description": "Tables no reset may delete, update or drop: entitlements (purchase state) and diagnostics such as error_log.",
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+      "uniqueItems": true
+    },
+    "resetModules": {
+      "description": "Repo-relative files that implement user-facing resets (Delete all my data). Every reset is listed here (not in sqlAllowed): the checker proves each one keeps the protected tables and runs in one transaction.",
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "sqlAllowed": {
+      "description": "Files that may own SQL besides the repositories: an adapter outside the data folder that holds SQL text and the driver, or an infrastructure module in the data folder that runs statements (a debug read of PRAGMA page_count). A reset never goes here: list it in resetModules, where its protected tables and its transaction are checked. src/services/error-log/sqlite-error-log-adapter.ts is always allowed.",
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "legacyImports": {
+      "description": "Files that may import an older storage engine (AsyncStorage, another SQLite binding) to copy its data into the app database once, guarded by a done flag. Remove the file and the entry once the import has shipped long enough.",
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "rootComponent": {
+      "description": "The file that renders the app root and calls useCheckpointOnBackground once (Expo Router: src/app/_layout.tsx).",
+      "type": "string"
+    },
+    "keyValueStore": {
+      "description": "The one key-value library for small preferences.",
+      "enum": ["expo-sqlite/kv-store", "react-native-mmkv"]
+    },
+    "fixturesTest": {
+      "description": "The test that lists every frozen database fixture (default test/sqlite/migration-fixtures.test.ts).",
+      "type": "string"
+    },
+    "document": {
+      "description": "Only for mode document or both.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "appId": {
+          "description": "The identity every stored document carries; a document with another appId decodes as damaged.",
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+        },
+        "protectedSections": {
+          "description": "Document sections no reset may write and only a dated revocation may downgrade.",
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "resetModules": {
+          "description": "Files that implement document resets.",
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+[
+  { "from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs" },
+  { "from": "scripts/lib/source-scan.mjs", "to": "scripts/lib/source-scan.mjs" },
+  { "from": "scripts/lib/ts-literal.mjs", "to": "scripts/lib/ts-literal.mjs" },
+  { "from": "repo-templates/src/i18n/languages.ts", "to": "templates/src/i18n/languages.ts" },
+  { "from": "repo-templates/src/i18n/digits.ts", "to": "templates/src/i18n/digits.ts" },
+  { "from": "repo-templates/src/i18n/bidi.ts", "to": "templates/src/i18n/bidi.ts" },
+  { "from": "repo-templates/src/services/direction-guard/", "to": "templates/src/services/direction-guard/" },
+  { "from": "repo-templates/test/direction-guard/", "to": "templates/test/direction-guard/" },
+  { "from": "repo-templates/src/i18n/direction-context.tsx", "to": "templates/src/i18n/direction-context.tsx" },
+  { "from": "repo-templates/src/i18n/direction-context.test.tsx", "to": "templates/src/i18n/direction-context.test.tsx" }
+]

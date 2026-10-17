@@ -1,0 +1,4 @@
+{
+  "base": ["@tests/bases/libs", { "from": "@skill/templates/contracts", "to": "contracts" }],
+  "renames": { "fixture-node-modules": "node_modules" }
+}

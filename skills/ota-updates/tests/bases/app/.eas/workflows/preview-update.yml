@@ -1,0 +1,30 @@
+# .eas/workflows/preview-update.yml
+name: Preview update
+on:
+  workflow_dispatch: {}
+jobs:
+  fingerprint:
+    type: fingerprint
+    environment: preview
+  get_ios_build:
+    needs: [fingerprint]
+    type: get-build
+    params:
+      fingerprint_hash: ${{ needs.fingerprint.outputs.ios_fingerprint_hash }}
+      profile: preview
+      platform: ios
+  get_android_build:
+    needs: [fingerprint]
+    type: get-build
+    params:
+      fingerprint_hash: ${{ needs.fingerprint.outputs.android_fingerprint_hash }}
+      profile: preview
+      platform: android
+  publish_preview:
+    needs: [get_ios_build, get_android_build]
+    if: ${{ needs.get_ios_build.outputs.build_id && needs.get_android_build.outputs.build_id }}
+    type: update
+    environment: preview
+    params:
+      channel: preview
+      message: Preview of main

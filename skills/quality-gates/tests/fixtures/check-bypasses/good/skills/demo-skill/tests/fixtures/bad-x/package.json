@@ -1,0 +1,1 @@
+{ "scripts": { "commit": "git commit --no-verify", "update": "jest -u", "lint": "eslint . --max-warnings 5" } }

@@ -1,0 +1,386 @@
+{
+  "bad-continue-mismatch": {
+    "expect": [
+      "FAIL contracts/games.json:6 [declaration-mismatch] lights-out: the module's rules.continueRun.kind is \"once\", the declaration says \"none\"",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [{ "json": { "file": "contracts/games.json", "path": ["games", 0, "continue"], "value": "none" } }]
+  },
+  "bad-contract-test-missing": {
+    "expect": ["FAIL src/games/lights-out/lights-out-game.test.ts [part-missing] game module contract test is missing"],
+    "ops": [{ "delete": "src/games/lights-out/lights-out-game.test.ts" }]
+  },
+  "bad-daily-mismatch": {
+    "expect": [
+      "FAIL contracts/games.json:6 [declaration-mismatch] lights-out: the module's levels.daily is \"daily\", the declaration says daily: false",
+      "FAIL contracts/levels.json:6 [declaration-mismatch] lights-out: the levels contract says daily: true, the declaration says daily: false",
+      "check-game-scaffold: 1 games checked, 2 problems"
+    ],
+    "ops": [{ "json": { "file": "contracts/games.json", "path": ["games", 0, "daily"], "value": false } }]
+  },
+  "bad-endless-mismatch": {
+    "expect": [
+      "FAIL contracts/games.json:6 [declaration-mismatch] lights-out: the module's levels.endless is \"none\", the declaration says endless: true",
+      "FAIL contracts/levels.json:6 [declaration-mismatch] lights-out: the levels contract says endless: false, the declaration says endless: true",
+      "check-game-scaffold: 1 games checked, 2 problems"
+    ],
+    "ops": [{ "json": { "file": "contracts/games.json", "path": ["games", 0, "endless"], "value": true } }]
+  },
+  "bad-hints-mismatch": {
+    "expect": [
+      "FAIL contracts/games.json:6 [declaration-mismatch] lights-out: the module's rules.hints.kind is \"none\", the declaration says \"solver\"",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [{ "json": { "file": "contracts/games.json", "path": ["games", 0, "hints"], "value": "solver" } }]
+  },
+  "bad-hosted-missing": {
+    "expect": [
+      "FAIL src/games/lights-out/lights-out-hosted.ts [part-missing] hosted binding (the module plus its Surface) is missing",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [{ "delete": "src/games/lights-out/lights-out-hosted.ts" }]
+  },
+  "bad-key-missing": {
+    "expect": [
+      "FAIL src/games/lights-out/canvas/intent-to-move.ts:3 [catalog-missing-key] lights-out.hud.moves is missing in ar.json, en.json"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/lights-out/canvas/intent-to-move.ts",
+          "content": "// src/games/lights-out/canvas/intent-to-move.ts\nexport function intentToMove(): null {\n  return 'lights-out.hud.moves' === '' ? null : null;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-levels-contract-mismatch": {
+    "expect": [
+      "FAIL contracts/levels.json:6 [declaration-mismatch] lights-out: the levels contract says packCount: 4, the declaration says levels.packs: 3",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [{ "json": { "file": "contracts/levels.json", "path": ["games", 0, "packCount"], "value": 4 } }]
+  },
+  "bad-levels-contract-missing": {
+    "expect": [
+      "FAIL contracts/levels.json:1 [declaration-mismatch] lights-out: the declaration has 3 packs of 30 levels, but the levels contract does not exist",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [{ "delete": "contracts/levels.json" }]
+  },
+  "bad-levels-null-mismatch": {
+    "expect": [
+      "FAIL contracts/games.json:6 [declaration-mismatch] lights-out: the module has 3 level packs, the declaration says levels: null",
+      "FAIL contracts/levels.json:6 [declaration-mismatch] lights-out: the levels contract says packCount: 3 and levelsPerPack: 30, the declaration says levels: null (no packs: a pack-less entry has packCount 0 and levelsPerPack 0)",
+      "check-game-scaffold: 1 games checked, 2 problems"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/games.json", "path": ["games", 0, "levels"], "value": null, "literalNull": true } }
+    ]
+  },
+  "bad-module-load": {
+    "expect": [
+      "FAIL src/games/lights-out/lights-out-game.ts:1 [module-load] cannot be loaded headless (src/games/lights-out/lights-out-game.ts imports react-native)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/lights-out-game.ts",
+          "find": "import { intentToMove }",
+          "with": "import { Platform } from 'react-native';\nimport { intentToMove }"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/games/lights-out/lights-out-game.ts",
+          "find": "panMode: 'none'",
+          "with": "panMode: Platform.OS === 'ios' ? 'none' : 'none'"
+        }
+      }
+    ]
+  },
+  "bad-module-load-deep": {
+    "expect": [
+      "FAIL src/games/lights-out/lights-out-game.ts:1 [module-load] cannot be loaded headless (src/games/lights-out/lights-out-game.ts -> src/games/lights-out/rules/lights-out-engine.ts -> src/games/lights-out/rules/outcome.ts imports expo-haptics)"
+    ],
+    "ops": [
+      {
+        "$comment": "A UI import two files deep in the module's graph (rules/outcome.ts): the problem names the chain that reaches it.",
+        "replace": {
+          "file": "src/games/lights-out/rules/outcome.ts",
+          "find": "export function outcome(state: LightsOutState) {",
+          "with": "import * as Haptics from 'expo-haptics';\n\nexport const OUTCOME_FEEDBACK = Haptics;\n\nexport function outcome(state: LightsOutState) {"
+        }
+      }
+    ]
+  },
+  "bad-no-flow": {
+    "expect": [
+      "FAIL .maestro/flows/games/01-lights-out.yaml [evidence-missing] missing for lights-out: an E2E flow that plays the game",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [{ "delete": ".maestro" }]
+  },
+  "bad-no-golden": {
+    "expect": [
+      "FAIL test/goldens/canvas/lights-out.golden.test.ts [evidence-missing] missing for lights-out: a pixel golden of the board",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [{ "delete": "test/goldens" }]
+  },
+  "bad-no-registry": {
+    "expect": [
+      "FAIL src/games/game-registry.ts:1 [host-registration] does not exist, so the app hosts no game",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [{ "delete": "src/games/game-registry.ts" }]
+  },
+  "bad-no-sims": {
+    "expect": ["FAIL test/sims/lights-out/*.sim.test.ts [evidence-missing] missing for lights-out: bot simulations"],
+    "ops": [{ "delete": "test/sims" }]
+  },
+  "bad-not-registered": {
+    "expect": [
+      "FAIL src/games/game-registry.ts:1 [host-registration] does not host lights-out (import LIGHTS_OUT_HOSTED from '@/games/lights-out/lights-out-hosted' and call createGameHost(LIGHTS_OUT_HOSTED, ...))",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/game-registry.ts",
+          "content": "// src/games/game-registry.ts\nexport const GAMES = [] as const;\n"
+        }
+      }
+    ]
+  },
+  "bad-pack-size-mismatch": {
+    "expect": [
+      "FAIL contracts/games.json:6 [declaration-mismatch] lights-out: a pack does not hold 20 levels (levelsPerPack)",
+      "FAIL contracts/levels.json:6 [declaration-mismatch] lights-out: the levels contract says levelsPerPack: 30, the declaration says levels.levelsPerPack: 20",
+      "check-game-scaffold: 1 games checked, 2 problems"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/games.json", "path": ["games", 0, "levels", "levelsPerPack"], "value": 20 } }
+    ]
+  },
+  "bad-packless-entry-missing": {
+    "expect": [
+      "FAIL contracts/levels.json:1 [declaration-mismatch] lights-out: the declaration has no packs but a daily level, but the levels contract has no entry for the game"
+    ],
+    "extends": "pass-daily-only",
+    "ops": [
+      {
+        "$comment": "The daily-only game without its pack-less levels contract entry: nothing holds its daily mode to one place.",
+        "json": { "file": "contracts/levels.json", "path": ["games"], "value": [] }
+      }
+    ]
+  },
+  "bad-packs-mismatch": {
+    "expect": [
+      "FAIL contracts/games.json:6 [declaration-mismatch] lights-out: the module has 3 level packs, the declaration says 4",
+      "FAIL contracts/levels.json:6 [declaration-mismatch] lights-out: the levels contract says packCount: 3, the declaration says levels.packs: 4",
+      "check-game-scaffold: 1 games checked, 2 problems"
+    ],
+    "ops": [{ "json": { "file": "contracts/games.json", "path": ["games", 0, "levels", "packs"], "value": 4 } }]
+  },
+  "bad-pan-mismatch": {
+    "expect": [
+      "FAIL contracts/games.json:6 [declaration-mismatch] lights-out: the module's input.panMode is \"none\", the declaration says \"swipe\"",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [{ "json": { "file": "contracts/games.json", "path": ["games", 0, "panMode"], "value": "swipe" } }]
+  },
+  "bad-placeholder": {
+    "expect": [
+      "FAIL src/games/lights-out/testing/lights-out-testing.ts:3 [placeholder-left] template placeholder __GAME_CONST__ was not replaced"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/testing/lights-out-testing.ts",
+          "find": "export const LIGHTS_OUT_TESTING",
+          "with": "// __GAME_CONST___TESTING\nexport const LIGHTS_OUT_TESTING"
+        }
+      }
+    ]
+  },
+  "bad-placeholder-in-sim": {
+    "expect": [
+      "FAIL test/sims/lights-out/balance.sim.test.ts:2 [placeholder-left] template placeholder __GAME_PASCAL__ was not replaced",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "test/sims/lights-out/balance.sim.test.ts",
+          "content": "// test/sims/lights-out/balance.sim.test.ts\nconst NAME = '__GAME_PASCAL__';\nit(`keeps ${NAME} inside its bands (stand-in)`, () => undefined);\n"
+        }
+      }
+    ]
+  },
+  "bad-realtime-undeclared": {
+    "expect": [
+      "FAIL contracts/games.json:6 [declaration-mismatch] lights-out: the module has a realtime spec, the declaration says class \"turn-based\"",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/lights-out-game.ts",
+          "find": "  levels: LIGHTS_OUT_LEVELS,\n",
+          "with": "  levels: LIGHTS_OUT_LEVELS,\n  realtime: { stepMs: 16 },\n"
+        }
+      }
+    ]
+  },
+  "bad-realtime-without-sim": {
+    "expect": [
+      "FAIL src/games/lights-out/sim/<sim>.ts [part-missing] real-time sim (sim/) is missing",
+      "FAIL src/games/lights-out/lights-out-realtime.ts [part-missing] real-time spec (the RealtimeSpec the module joins as realtime) is missing",
+      "FAIL contracts/games.json:6 [declaration-mismatch] lights-out: the declaration says class \"realtime\", but the module has no realtime spec"
+    ],
+    "ops": [{ "json": { "file": "contracts/games.json", "path": ["games", 0, "class"], "value": "realtime" } }]
+  },
+  "bad-registry-old-shape": {
+    "expect": [
+      "FAIL src/games/game-registry.ts:1 [host-registration] does not host lights-out (import LIGHTS_OUT_HOSTED from '@/games/lights-out/lights-out-hosted' and call createGameHost(LIGHTS_OUT_HOSTED, ...))",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/game-registry.ts",
+          "content": "// src/games/game-registry.ts\n// The pre-session-host shape: a list of bare modules, no Surface and no host factory.\nimport { LIGHTS_OUT_GAME } from '@/games/lights-out/lights-out-game';\n\nexport const GAMES = [LIGHTS_OUT_GAME] as const;\n"
+        }
+      }
+    ]
+  },
+  "bad-surface-missing": {
+    "expect": [
+      "FAIL src/games/lights-out/canvas/lights-out-surface.ts [part-missing] canvas surface (canvas/lights-out-surface.ts) is missing",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [{ "delete": "src/games/lights-out/canvas/lights-out-surface.ts" }]
+  },
+  "bad-types-missing": {
+    "expect": [
+      "FAIL src/games/lights-out/rules/lights-out-types.ts [part-missing] rules types is missing",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [{ "delete": "src/games/lights-out/rules/lights-out-types.ts" }]
+  },
+  "bad-undeclared-lose": {
+    "expect": [
+      "FAIL src/games/lights-out/rules/outcome.ts:7 [lose-reasons] the rules can end a run with lights-out.lose.board-full, which the declaration does not list"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/rules/outcome.ts",
+          "find": "reasonKey: 'lights-out.lose.out-of-moves'",
+          "with": "reasonKey: state.lit.length > 3 ? 'lights-out.lose.board-full' : 'lights-out.lose.out-of-moves'"
+        }
+      },
+      {
+        "json": {
+          "file": "src/i18n/catalogs/en.json",
+          "path": ["lights-out.lose.board-full"],
+          "value": "The board is full"
+        }
+      },
+      {
+        "json": {
+          "file": "src/i18n/catalogs/ar.json",
+          "path": ["lights-out.lose.board-full"],
+          "value": "اللوحة ممتلئة"
+        }
+      }
+    ]
+  },
+  "bad-unproduced-lose": {
+    "expect": [
+      "FAIL contracts/games.json:6 [lose-reasons] lights-out: declares the way of losing \"time-up\", but no rules file returns lights-out.lose.time-up",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/games.json",
+          "path": ["games", 0, "loseReasons"],
+          "value": ["out-of-moves", "time-up"]
+        }
+      },
+      { "json": { "file": "src/i18n/catalogs/en.json", "path": ["lights-out.lose.time-up"], "value": "Time is up" } },
+      { "json": { "file": "src/i18n/catalogs/ar.json", "path": ["lights-out.lose.time-up"], "value": "انتهى الوقت" } }
+    ]
+  },
+  "error-no-game": {
+    "expect": ["ERROR [bad-input] nothing to check: contracts/games.json declares no game"],
+    "args": "{dir} --stage complete",
+    "ops": [{ "delete": "src/games" }, { "json": { "file": "contracts/games.json", "path": ["games"], "value": [] } }]
+  },
+  "pass-daily-only": {
+    "expect": ["check-game-scaffold: 1 games checked, 0 problems"],
+    "ops": [
+      { "json": { "file": "contracts/games.json", "path": ["games", 0, "levels"], "value": null, "literalNull": true } },
+      {
+        "$comment": "A daily-only game keeps its levels contract entry, pack-less: packCount 0, levelsPerPack 0, no starRule (level-generation-and-solvers).",
+        "json": {
+          "file": "contracts/levels.json",
+          "path": ["games", 0],
+          "value": { "id": "lights-out", "packCount": 0, "levelsPerPack": 0, "daily": true, "endless": false }
+        }
+      },
+      {
+        "replace": {
+          "file": "src/games/lights-out/levels/lights-out-levels.ts",
+          "find": "const packs = [1, 2, 3].map((pack) => ({ id: `pack-${pack}`, nameId: 'lights-out.name', firstLevel: (pack - 1) * 30 + 1, levelCount: 30, starsToUnlock: 0 }));",
+          "with": "// Daily only: no packs, so the declaration says levels: null and contracts/levels.json has packCount 0.\nconst packs: readonly { readonly levelCount: number }[] = [];"
+        }
+      }
+    ]
+  },
+  "pass-installed-skills": {
+    "expect": ["check-game-scaffold: 1 games checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/board-kit/SKILL.md",
+          "lines": ["---", "name: board-kit", "description: An installed skill.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": ".agents/skills/board-kit/templates/src/games/__GAME_ID__/rules/create.ts",
+          "lines": [
+            "// src/games/__GAME_ID__/rules/create.ts",
+            "export type __GAME_PASCAL__State = { readonly key: 'tile-match.lose.unknown' };"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/puzzle-kit/SKILL.md",
+          "lines": ["---", "name: puzzle-kit", "description: A vendored skill.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/puzzle-kit/src/games/tile-match/rules/outcome.ts",
+          "lines": ["export const KEY = 'tile-match.lose.unknown'; // __GAME_ID__"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/vendored-kit/SKILL.md",
+          "lines": ["---", "name: vendored-kit", "description: A skill vendored into the games folder.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/vendored-kit/templates/__GAME_ID__-game.ts",
+          "lines": ["// __GAME_CONST___GAME", "export {};"]
+        }
+      }
+    ]
+  }
+}

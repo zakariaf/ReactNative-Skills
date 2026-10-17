@@ -1,0 +1,93 @@
+{
+  "format": "__APP_SLUG__.backup",
+  "formatVersion": 1,
+  "schemaVersion": 2,
+  "appVersion": "1.1.0",
+  "exportedAt": "2026-11-02T09:30:00.000Z",
+  "payloadSha256": "21ed7f399cd7c6b443eb41f17104f59605a3666fed8e53afe15cae98ac9c8e22",
+  "payload": {
+    "lists": [
+      {
+        "id": 1,
+        "name": "Home",
+        "created_at_ms": 1790000000000
+      },
+      {
+        "id": 2,
+        "name": "Work, \"Q4\"",
+        "created_at_ms": 1790000060000
+      },
+      {
+        "id": 3,
+        "name": "\u200Fالبيت\u200F",
+        "created_at_ms": 0
+      }
+    ],
+    "tasks": [
+      {
+        "id": 1,
+        "list_id": 1,
+        "title": "Call the plumber about the kitchen's tap",
+        "is_done": 1,
+        "created_at_ms": 1790000120000,
+        "due_on": null
+      },
+      {
+        "id": 2,
+        "list_id": 1,
+        "title": "=1+2",
+        "is_done": 0,
+        "created_at_ms": 1790000180000,
+        "due_on": null
+      },
+      {
+        "id": 3,
+        "list_id": 2,
+        "title": "@SUM(A1:A2)",
+        "is_done": 0,
+        "created_at_ms": 1790000240000,
+        "due_on": null
+      },
+      {
+        "id": 4,
+        "list_id": 2,
+        "title": "line one\r\nline two, \"quoted\"",
+        "is_done": 0,
+        "created_at_ms": 1790000300000,
+        "due_on": "2026-10-31"
+      },
+      {
+        "id": 5,
+        "list_id": 2,
+        "title": "Send the report 📊",
+        "is_done": 1,
+        "created_at_ms": 4102444800000,
+        "due_on": null
+      },
+      {
+        "id": 6,
+        "list_id": 3,
+        "title": "\u200Fشراء الحليب\u200F",
+        "is_done": 0,
+        "created_at_ms": 1790000360000,
+        "due_on": null
+      },
+      {
+        "id": 7,
+        "list_id": 3,
+        "title": "   ",
+        "is_done": 0,
+        "created_at_ms": 1790000420000,
+        "due_on": null
+      },
+      {
+        "id": 9,
+        "list_id": 1,
+        "title": "📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊📊",
+        "is_done": 0,
+        "created_at_ms": 1790000480000,
+        "due_on": null
+      }
+    ]
+  }
+}

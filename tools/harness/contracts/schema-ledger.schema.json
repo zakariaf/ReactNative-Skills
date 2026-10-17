@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Schema ledger",
+  "description": "The database schema versions that reached a device. run-migration's check-migration reads it; record-shipped appends to it.",
+  "type": "object",
+  "required": ["shipped"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "openPath": {
+      "description": "Repo path of the module that exports openAppDatabase (default src/data/app-database.ts).",
+      "type": "string"
+    },
+    "shipped": {
+      "description": "One entry per shipped version, versions 1..N in order. Never edit or remove an entry.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "version",
+          "name",
+          "stepSha256",
+          "fixtureSha256",
+          "firstShippedIn",
+          "shippedOn"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "version": { "type": "integer", "minimum": 1 },
+          "name": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+          "stepSha256": {
+            "description": "sha256 of src/data/migrations/vNNNN-<name>.ts with CRLF read as LF.",
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "fixtureSha256": {
+            "description": "sha256 of src/data/migrations/fixtures/db-vN.sql with CRLF read as LF.",
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "firstShippedIn": {
+            "description": "The first build or update that carried this version, for example '1.4.0 (37)' or 'update 3f2c... on production'.",
+            "type": "string",
+            "minLength": 1
+          },
+          "shippedOn": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+          "contentTest": {
+            "description": "Only for a version shipped before this ledger was adopted: why it has no vNNNN-<name>.test.ts.",
+            "type": "string",
+            "minLength": 10
+          }
+        }
+      }
+    }
+  }
+}

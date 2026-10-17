@@ -1,0 +1,9 @@
+{
+  "base": "good",
+  "ops": [
+    { "mkdir": "src/features/tasks" },
+    { "mkdir": "src/features/lists" },
+    { "mkdir": "src/ui" },
+    { "mkdir": "src/core" }
+  ]
+}

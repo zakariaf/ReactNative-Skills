@@ -1,0 +1,31 @@
+// modules/task-checksum/android/build.gradle
+// A React Native library module: the com.facebook.react plugin runs codegen for this library
+// (generateCodegenArtifactsFromSchema) from package.json codegenConfig; externalNativeBuild compiles
+// the shared C++ and its JNI bridge (CMakeLists.txt) into libtaskchecksum.so for every ABI.
+plugins {
+  id 'com.android.library'
+  id 'org.jetbrains.kotlin.android'
+  id 'com.facebook.react'
+}
+
+android {
+  namespace 'com.example.taskchecksum'
+  compileSdk 36
+  defaultConfig {
+    minSdk 24
+    externalNativeBuild {
+      cmake {
+        arguments '-DANDROID_STL=c++_static'
+      }
+    }
+  }
+  externalNativeBuild {
+    cmake {
+      path 'CMakeLists.txt'
+    }
+  }
+}
+
+dependencies {
+  implementation 'com.facebook.react:react-android'
+}

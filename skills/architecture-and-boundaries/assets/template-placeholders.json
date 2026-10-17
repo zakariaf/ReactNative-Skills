@@ -1,0 +1,15 @@
+{
+  "$comment": "Values verify-templates uses to fill the port templates (a clipboard port over expo-clipboard). Any real SDK call with no arguments that returns a value works the same way.",
+  "__CONCERN__": "clipboard",
+  "__PORT_NAME__": "Clipboard",
+  "__PORT_SUMMARY__": "The system clipboard: reads the text the user copied (paste a task title).",
+  "__QUERY__": "readText",
+  "__QUERY_SUMMARY__": "The clipboard's text, '' when it holds none.",
+  "__VALUE_TYPE__": "string",
+  "__VENDOR__": "expo",
+  "__ADAPTER_PASCAL__": "ExpoClipboard",
+  "__VENDOR_SDK__": "expo-clipboard",
+  "__VENDOR_CALL__": "getStringAsync",
+  "__MAPPING_EXPRESSION__": "answer",
+  "__SAMPLE_VALUE__": "'Buy milk'"
+}

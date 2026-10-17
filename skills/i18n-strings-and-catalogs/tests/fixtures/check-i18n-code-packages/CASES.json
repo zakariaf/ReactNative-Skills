@@ -1,0 +1,30 @@
+{
+  "bad-unknown-package-id": {
+    "expect": [
+      "[unknown-key]",
+      "packages/billing/src/plan-text.ts:3",
+      "package message id uses \"billing.plan.monthy\", which is not in packages/billing/src/i18n"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "packages/billing/src/plan-text.ts",
+          "find": "{ id: 'billing.plan.monthly' }",
+          "with": "{ id: 'billing.plan.monthy' }"
+        }
+      }
+    ]
+  },
+  "bad-unknown-package-table": {
+    "expect": ["[unknown-key]", "packages/billing/src/i18n/keys.ts:2", "\"billing.plan.yeraly\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "packages/billing/src/i18n/keys.ts",
+          "find": "'billing.plan.yearly'] as const",
+          "with": "'billing.plan.yeraly'] as const"
+        }
+      }
+    ]
+  }
+}

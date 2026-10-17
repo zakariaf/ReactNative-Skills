@@ -1,0 +1,42 @@
+{
+  "generator": "starter-pack",
+  "fingerprint": "fnv1a32/canonical-json-v1",
+  "oracle": "scripts/oracles/starter-pack-oracle.py",
+  "rows": [
+    {
+      "key": "7KQ2",
+      "version": 1,
+      "fingerprint": "a3f57ce3",
+      "summary": "task-05 task-02 task-03",
+      "note": "the code in the share-sheet docs, at version 1"
+    },
+    {
+      "key": "M3XD",
+      "version": 1,
+      "fingerprint": "d64d269d",
+      "summary": "task-02 task-01 task-08",
+      "note": "a second version 1 code"
+    },
+    {
+      "key": "0000",
+      "version": 1,
+      "fingerprint": "0652f4dd",
+      "summary": "task-04 task-07 task-08",
+      "note": "the smallest code body"
+    },
+    {
+      "key": "7KQ2",
+      "version": 2,
+      "fingerprint": "faefb603",
+      "summary": "task-01 task-07 task-11 task-04 task-03",
+      "note": "same body at version 2: a different pack"
+    },
+    {
+      "key": "ZZZZZZZZZZZZ",
+      "version": 2,
+      "fingerprint": "b9f42d74",
+      "summary": "task-05 task-06 task-04 task-07 task-01",
+      "note": "the longest code body"
+    }
+  ]
+}

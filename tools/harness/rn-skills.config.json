@@ -1,0 +1,4 @@
+{
+  "$comment": "Layout facts for the skills' checkers. adopted.json is the harness's manifest of adopted skill templates, a tool config read by tools/verify-templates.mjs, so it stays formatted like app files.",
+  "layoutEntries": ["adopted.json"]
+}

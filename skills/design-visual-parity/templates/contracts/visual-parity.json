@@ -1,0 +1,49 @@
+{
+  "$schema": "./visual-parity.schema.json",
+  "$comment": "The app's visual-parity contract, read by design-visual-parity's scripts. The design frames themselves are the screen-contract states with a \"reference\" (contracts/screens.json, screen-contracts); this file adds the done set (themes x languages x devices), where the references, waivers, sign-off ledger, runs and summary live, the mockup adapter, the layout facts the gates need, the measured type-role floors, the app's facts, the harness folder and per-frame settings. Filled for the demo Tasks app: frames tasks-default, lists-default and delete-list-dialog-default, the default states of screen-contracts' tasks, lists and delete-list-dialog entries once each has its \"reference\" (the skill's examples/screens.json); replace the frames with the app's own. A change here is a reviewed change: it decides what a screen is compared with.",
+  "version": 1,
+  "referencesDir": "design/parity",
+  "runsDir": ".parity",
+  "summary": "reports/parity/summary.json",
+  "mockup": {
+    "file": "design/parity/mockup/index.html",
+    "htmlAttributes": { "data-theme": "{theme}", "lang": "{lang}", "dir": "{dir}" }
+  },
+  "themes": ["light", "dark"],
+  "languages": ["en", "ar"],
+  "rtlLanguages": ["ar"],
+  "devices": ["iphone-16-pro", "android-parity"],
+  "launch": {
+    "scheme": "tasks-preview",
+    "ios": "com.example.tasks.preview",
+    "android": "com.example.tasks.preview"
+  },
+  "harness": { "dir": "src/features/parity", "fixture": "src/features/parity/parity-fixture.json" },
+  "layout": {
+    "fixedHeaderPt": 56
+  },
+  "textRoleFloors": {},
+  "frames": {
+    "tasks-default": { "root": "tasks.list", "keys": { "taskId": ["milk", "bread", "mail"] } },
+    "lists-default": {
+      "kind": "phone-tall",
+      "keys": {
+        "listId": [
+          "home",
+          "work",
+          "garden",
+          "travel",
+          "books",
+          "gifts",
+          "music",
+          "films",
+          "health",
+          "ideas",
+          "shop",
+          "later"
+        ]
+      }
+    },
+    "delete-list-dialog-default": {}
+  }
+}

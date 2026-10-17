@@ -1,0 +1,13 @@
+{
+  "app.name": "Aufgaben",
+  "debug.title": "Debug menu",
+  "permissions.camera.usage-description": "Damit kannst du einer Aufgabe ein Foto hinzufügen. Fotos bleiben auf diesem Gerät, solange du sie nicht teilst.",
+  "reminders.next": "Nächste Erinnerung – {dateText}",
+  "tasks.delete.title": "Diese Aufgabe löschen?",
+  "tasks.list.rank": "Deine {place, selectordinal, other {#.}} Liste",
+  "tasks.list.title": "Aufgaben",
+  "tasks.moved": "Verschoben nach {listName}",
+  "tasks.page": "Seite {page, number}",
+  "tasks.progress": "{doneRate, number, ::percent} erledigt",
+  "tasks.summary.open": "{openCount, plural, =0 {Keine offenen Aufgaben} one {# offene Aufgabe} other {# offene Aufgaben}}"
+}

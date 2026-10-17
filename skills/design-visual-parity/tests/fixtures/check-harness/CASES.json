@@ -1,0 +1,523 @@
+{
+  "bad-capture-branch": {
+    "expect": [
+      "src/features/lists/use-lists-model.ts:16 [harness-capture-branch] production code reads useFrameRequest() itself"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/lists/use-lists-model.ts",
+          "find": "import { useFrameStateOpener } from '@/hooks/use-frame-state-opener';",
+          "with": "import { useFrameRequest } from '@/hooks/use-frame-request';\nimport { useFrameStateOpener } from '@/hooks/use-frame-state-opener';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/lists/use-lists-model.ts",
+          "find": "  return { pendingDelete, onAskDelete };",
+          "with": "  if (useFrameRequest() !== null) return { pendingDelete: 'home', onAskDelete };\n  return { pendingDelete, onAskDelete };"
+        }
+      }
+    ]
+  },
+  "bad-component-border": {
+    "expect": ["contracts/component-library.json [component-border] the references are browser renders"],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/component-library.json",
+          "json": { "version": 1, "specs": { "tokens": "design/tokens.json" } }
+        }
+      }
+    ]
+  },
+  "bad-consent": {
+    "expect": [
+      "src/features/debug/parity-launch-screen.tsx:9 [harness-consent] the consent applier does not consult the ads mode"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["dependencies"],
+          "value": { "react-native-google-mobile-ads": "17.2.0" }
+        }
+      }
+    ]
+  },
+  "bad-contract-invalid": {
+    "expect": ["[contract-invalid] contracts/visual-parity.json: unknown key \"harnessDir\""],
+    "ops": [{ "json": { "file": "contracts/visual-parity.json", "path": ["harnessDir"], "value": "src/parity" } }]
+  },
+  "bad-debug-flags": {
+    "expect": [
+      "src/features/parity/parity-launch.ts [harness-debug-flags] the launch does not set isOffline: false in its overrides"
+    ],
+    "ops": [
+      {
+        "replace": { "file": "src/features/parity/parity-launch.ts", "find": "        isOffline: false,\n", "with": "" }
+      }
+    ]
+  },
+  "bad-draws-nothing": {
+    "expect": ["src/features/parity/parity-frame-root.tsx:37 [harness-draws-nothing] the harness renders <AppText>"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/parity/parity-frame-root.tsx",
+          "find": "      <ParityLaunchMarker />\n",
+          "with": "      <ParityLaunchMarker />\n      <AppText>parity</AppText>\n"
+        }
+      }
+    ]
+  },
+  "bad-fixture": {
+    "expect": [
+      "src/features/parity/parity-fixture.json [harness-fixture] the app's fixture differs from the design's (design/parity/fixture.json)"
+    ],
+    "ops": [
+      { "json": { "file": "src/features/parity/parity-fixture.json", "path": ["tasks", 0, "done"], "value": true } }
+    ]
+  },
+  "bad-frame-missing": {
+    "expect": ["src/features/parity/parity-plans.ts [harness-frame-missing] no plan for the design frame lists-empty"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 1, "states", 1, "reference"],
+          "value": "lists-empty.png"
+        }
+      }
+    ]
+  },
+  "bad-frame-state": {
+    "expect": [
+      "src/features/parity/parity-plans.ts [harness-frame-state] delete-list-dialog-default shows delete-list-dialog default (a dialog)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/parity/parity-plans.ts",
+          "find": "state: 'delete-list-dialog-open',",
+          "with": "state: null,"
+        }
+      }
+    ]
+  },
+  "bad-frame-unknown": {
+    "expect": ["src/features/parity/parity-plans.ts [harness-frame-unknown] PARITY_PLANS plans tasks-home"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/parity/parity-plans.ts",
+          "find": "'tasks-default': {",
+          "with": "'tasks-home': {"
+        }
+      }
+    ]
+  },
+  "bad-gated": {
+    "expect": [
+      "quality-gates.json [gated-paths] gatedPaths does not cover design/parity/waivers.json",
+      "gatedPaths does not cover design/parity/manifest.json",
+      "gatedPaths does not cover design/parity/mockup/index.html",
+      "gatedPaths does not cover design/parity/devices/android-parity.json"
+    ],
+    "ops": [{ "json": { "file": "quality-gates.json", "path": ["gatedPaths"], "value": ["quality-gates.json"] } }]
+  },
+  "bad-gated-ledger": {
+    "expect": ["quality-gates.json [gated-paths] gatedPaths covers the sign-off ledger design/parity/signoff.json"],
+    "ops": [
+      {
+        "json": {
+          "file": "quality-gates.json",
+          "path": ["gatedPaths"],
+          "value": ["quality-gates.json", "design/parity/**"]
+        }
+      }
+    ]
+  },
+  "bad-gitignore": {
+    "expect": [".gitignore [harness-gitignore] .parity/ is not ignored"],
+    "ops": [{ "replace": { "file": ".gitignore", "find": ".parity/\n", "with": "" } }]
+  },
+  "bad-launch-marker-composed": {
+    "expect": [
+      "src/features/lists/delete-list-dialog/delete-list-dialog.tsx:10 [harness-launch-marker] a modal root renders no <ParityLaunchMarker />"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/lists/delete-list-dialog/delete-list-dialog.tsx",
+          "find": "      <View testID=\"delete-list-dialog.scrim\" accessibilityViewIsModal>\n        <ParityLaunchMarker />\n      </View>\n",
+          "with": "      <Scrim testID=\"delete-list-dialog.scrim\" />\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/lists/delete-list-dialog/delete-list-dialog.tsx",
+          "find": "import { ParityLaunchMarker } from '@/ui/parity-launch-marker';\n",
+          "with": "import { Scrim } from '@/ui/scrim';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/lists/delete-list-dialog/delete-list-dialog.tsx",
+          "find": "import { Modal, View } from 'react-native';",
+          "with": "import { Modal } from 'react-native';"
+        }
+      },
+      {
+        "write": {
+          "file": "src/ui/scrim.tsx",
+          "content": "// src/ui/scrim.tsx\nimport { View } from 'react-native';\n\nimport { ParityLaunchMarker } from './parity-launch-marker';\n\nimport type { ReactNode } from 'react';\n\nexport function Scrim({ testID }: { readonly testID: string }): ReactNode {\n  return (\n    <View testID={testID} accessibilityViewIsModal>\n    </View>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-launch-marker-modal": {
+    "expect": [
+      "src/features/lists/delete-list-dialog/delete-list-dialog.tsx:10 [harness-launch-marker] a modal root renders no <ParityLaunchMarker />"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/lists/delete-list-dialog/delete-list-dialog.tsx",
+          "find": "        <ParityLaunchMarker />\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-launch-marker-outside-modal-view": {
+    "expect": [
+      "src/features/lists/delete-list-dialog/delete-list-dialog.tsx:11 [harness-launch-marker] the launch marker is rendered outside the view that carries accessibilityViewIsModal"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/lists/delete-list-dialog/delete-list-dialog.tsx",
+          "find": "      <View testID=\"delete-list-dialog.scrim\" accessibilityViewIsModal>\n        <ParityLaunchMarker />\n      </View>\n",
+          "with": "      <ParityLaunchMarker />\n      <View testID=\"delete-list-dialog.scrim\" accessibilityViewIsModal />\n"
+        }
+      }
+    ]
+  },
+  "bad-launch-marker-root": {
+    "expect": [
+      "src/features/parity/parity-frame-root.tsx [harness-launch-marker] the parity root draws no <ParityLaunchMarker />"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/parity/parity-frame-root.tsx",
+          "find": "      <ParityLaunchMarker />\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-leak": {
+    "expect": [
+      "src/features/tasks/use-tasks-model.ts:2 [harness-leak] a runtime file imports the parity harness (@/features/parity/parity-session) by value"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "content": "// src/features/tasks/use-tasks-model.ts\nimport { currentParityRequest } from '@/features/parity/parity-session';\n\nexport const isParityRun = (): boolean => currentParityRequest() !== null;\n"
+        }
+      }
+    ]
+  },
+  "bad-ledger-invalid": {
+    "expect": ["design/parity/signoff.json [ledger-invalid] expected { \"version\": 1, \"entries\": [...] }"],
+    "ops": [{ "json": { "file": "design/parity/signoff.json", "path": ["entries"], "value": {} } }]
+  },
+  "bad-missing": {
+    "expect": ["src/features/parity/parity-session.test.ts [harness-missing] a harness file does not exist"],
+    "ops": [{ "delete": "src/features/parity/parity-session.test.ts" }]
+  },
+  "bad-not-exported": {
+    "expect": ["src/test-only-entry.ts [harness-not-exported] the test-only entry does not export createParityKit"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/test-only-entry.ts",
+          "find": "export { createParityKit } from '@/features/parity/parity-root-kit';\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-not-wired": {
+    "expect": ["src/test-only-entry.ts [harness-not-wired] nothing reads TEST_ONLY?.createParityKit"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/create-root-kits.ts",
+          "find": "  const createParityKit = TEST_ONLY?.createParityKit;",
+          "with": "  const createParityKit = undefined as (() => RootKit) | undefined;"
+        }
+      }
+    ]
+  },
+  "bad-not-wired-launch": {
+    "expect": ["src/test-only-entry.ts [harness-not-wired] no screen renders <ParityLaunchRoot>"],
+    "ops": [{ "delete": "src/features/debug/parity-launch-screen.tsx" }]
+  },
+  "bad-not-wired-rendered": {
+    "expect": [
+      "src/features/parity/parity-root-kit.tsx [harness-not-wired] the parity kit never renders <ParityLaunchBridge>"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/parity/parity-root-kit.tsx",
+          "find": "    effects: <ParityLaunchBridge navigate={navigate} />,",
+          "with": "    effects: null,"
+        }
+      }
+    ]
+  },
+  "bad-opener": {
+    "expect": [
+      "src/features/parity/parity-plans.ts [harness-opener] delete-list-dialog-default: no model opens the state \"delete-list-dialog-open\""
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/lists/use-lists-model.ts",
+          "find": "useFrameStateOpener('delete-list-dialog-open', () => {",
+          "with": "useFrameStateOpener('delete-list-open', () => {"
+        }
+      }
+    ]
+  },
+  "bad-parser": {
+    "expect": ["src/features/parity/parity-request.ts [harness-parser] the launch parser accepts an unknown parameter"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/parity/parity-request.ts",
+          "find": "if (!isParam(param)) return err({ kind: 'parity-unknown-param', param });",
+          "with": "if (!isParam(param)) continue;"
+        }
+      }
+    ]
+  },
+  "bad-parser-refuses": {
+    "expect": ["src/features/parity/parity-request.ts [harness-parser] a valid launch of tasks-default is refused"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/parity/parity-request.ts",
+          "find": "nonce: (value) => /^[a-z0-9]{6,32}$/.test(value),",
+          "with": "nonce: (value) => /^[0-9]{6,32}$/.test(value),"
+        }
+      }
+    ]
+  },
+  "bad-probe": {
+    "expect": [
+      "src/features/parity/parity-plans.ts [harness-probe] tasks-default: the plan's probe is map, the contract's region is none"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/parity/parity-plans.ts",
+          "find": "probe: null",
+          "with": "probe: 'map'",
+          "occurrence": 1
+        }
+      }
+    ]
+  },
+  "bad-root": {
+    "expect": [
+      "src/features/parity/parity-plans.ts [harness-root] tasks-default: the plan's root is tasks.screen, the contract's is tasks.list"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/parity/parity-plans.ts",
+          "find": "root: 'tasks.list'",
+          "with": "root: 'tasks.screen'"
+        }
+      }
+    ]
+  },
+  "bad-route": {
+    "expect": ["[harness-route] no route answers the parity launch link (/debug/parity)"],
+    "ops": [{ "delete": "src/app/(debug)/debug/parity.tsx" }]
+  },
+  "bad-tall": {
+    "expect": [
+      "src/features/parity/parity-plans.ts [harness-tall] lists-default: the plan says tall false, the contract's kind is phone-tall"
+    ],
+    "ops": [
+      { "replace": { "file": "src/features/parity/parity-plans.ts", "find": "tall: true", "with": "tall: false" } }
+    ]
+  },
+  "bad-test-only-folder": {
+    "expect": [
+      "contracts/architecture.json [harness-test-only-folder] testOnlyFolders does not list src/features/parity/"
+    ],
+    "ops": [
+      {
+        "json": { "file": "contracts/architecture.json", "path": ["testOnlyFolders"], "value": ["src/features/debug/"] }
+      }
+    ]
+  },
+  "bad-waiver-invalid": {
+    "expect": [
+      "design/parity/waivers.json [waiver-invalid] waiver 1 (tasks-default tasks.summary bounds): needs \"reportedOn\": \"YYYY-MM-DD\""
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "design/parity/waivers.json",
+          "path": ["waivers"],
+          "value": [
+            {
+              "frame": "tasks-default",
+              "testID": "tasks.summary",
+              "rule": "bounds",
+              "reason": "The platform cannot lay this line out like the design does."
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "pass-capture-branch-test-file": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/lists/use-lists-model.test.ts",
+          "content": "// src/features/lists/use-lists-model.test.ts\nimport { useFrameRequest } from '@/hooks/use-frame-request';\n\ntest('a test may read the request', () => {\n  expect(typeof useFrameRequest).toBe('function');\n});\n"
+        }
+      }
+    ]
+  },
+  "pass-component-border-floored": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/component-library.json",
+          "json": { "version": 1, "specs": { "asRenderedBorders": true } }
+        }
+      }
+    ]
+  },
+  "pass-consent-ads-mode": {
+    "expect": ["check-harness: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["dependencies"],
+          "value": { "react-native-google-mobile-ads": "17.2.0" }
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/debug/parity-launch-screen.tsx",
+          "find": "  consent: () => Promise.resolve(),\n",
+          "with": "  consent: () =>\n    readAdsMode() === 'off'\n      ? Promise.resolve()\n      : Promise.reject(new Error('capture an ADS_MODE=off build')),\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/debug/parity-launch-screen.tsx",
+          "find": "const APPLIERS",
+          "with": "const readAdsMode = (): string => 'off';\n\nconst APPLIERS"
+        }
+      }
+    ]
+  },
+  "pass-launch-marker-composed": {
+    "expect": ["check-harness: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/lists/delete-list-dialog/delete-list-dialog.tsx",
+          "find": "      <View testID=\"delete-list-dialog.scrim\" accessibilityViewIsModal>\n        <ParityLaunchMarker />\n      </View>\n",
+          "with": "      <Scrim testID=\"delete-list-dialog.scrim\" />\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/lists/delete-list-dialog/delete-list-dialog.tsx",
+          "find": "import { ParityLaunchMarker } from '@/ui/parity-launch-marker';\n",
+          "with": "import { Scrim } from '@/ui/scrim';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/lists/delete-list-dialog/delete-list-dialog.tsx",
+          "find": "import { Modal, View } from 'react-native';",
+          "with": "import { Modal } from 'react-native';"
+        }
+      },
+      {
+        "write": {
+          "file": "src/ui/scrim.tsx",
+          "content": "// src/ui/scrim.tsx\nimport { View } from 'react-native';\n\nimport { ParityLaunchMarker } from './parity-launch-marker';\n\nimport type { ReactNode } from 'react';\n\nexport function Scrim({ testID }: { readonly testID: string }): ReactNode {\n  return (\n    <View testID={testID} accessibilityViewIsModal>\n      <ParityLaunchMarker />\n    </View>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-no-contract": {
+    "expect": ["NOT APPLICABLE: contracts/visual-parity.json does not exist"],
+    "ops": [{ "delete": "contracts/visual-parity.json" }]
+  },
+  "pass-not-wired-yet": {
+    "expect": [
+      "SKIP src/test-only-entry.ts [harness-not-exported] not yet created (debug-menu-and-test-hooks creates it)",
+      "SKIP contracts/architecture.json [harness-test-only-folder] not yet created (architecture-and-boundaries creates it)",
+      "SKIP quality-gates.json [gated-paths] not yet created (quality-gates creates it)"
+    ],
+    "ops": [{ "delete": ["src/test-only-entry.ts", "contracts/architecture.json", "quality-gates.json"] }]
+  },
+  "pass-skills-pruned": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "write": { "file": ".agents/skills/screens/SKILL.md", "content": "---\nname: screens\n---\n" } },
+      {
+        "write": {
+          "file": ".agents/skills/screens/src/leak.tsx",
+          "content": "import { startParitySession } from '@/features/parity/parity-session';\nimport { Modal } from 'react-native';\n\nexport const Planted = (): unknown => [startParitySession, <Modal visible />];\n"
+        }
+      },
+      { "write": { "file": "skills/other/SKILL.md", "content": "---\nname: other\n---\n" } },
+      {
+        "write": {
+          "file": "skills/other/src/leak.tsx",
+          "content": "import { startParitySession } from '@/features/parity/parity-session';\nimport { Modal } from 'react-native';\n\nexport const Planted = (): unknown => [startParitySession, <Modal visible />];\n"
+        }
+      },
+      { "write": { "file": "src/vendor/kit/SKILL.md", "content": "---\nname: kit\n---\n" } },
+      {
+        "write": {
+          "file": "src/vendor/kit/leak.tsx",
+          "content": "import { startParitySession } from '@/features/parity/parity-session';\nimport { Modal } from 'react-native';\n\nexport const Planted = (): unknown => [startParitySession, <Modal visible />];\n"
+        }
+      }
+    ]
+  },
+  "pass-type-import": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/tasks-types.ts",
+          "content": "// src/features/tasks/tasks-types.ts\nimport type { ParityRequest } from '@/features/parity/parity-request';\n\nexport type MaybeRequest = ParityRequest | null;\n"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "bad-exists": {
+    "expect": ["[name-exists]", "that skill folder already exists"],
+    "args": "file-naming --skills-root {dir}/skills"
+  },
+  "bad-format": { "expect": ["[name-format]", "Store_Listing"], "args": "Store_Listing --skills-root {dir}/skills" },
+  "bad-reserved": {
+    "expect": ["[name-reserved]", "\"verify\" shadows a bundled command"],
+    "args": "verify --skills-root {dir}/skills"
+  },
+  "bad-reserved-eas-hosting": {
+    "expect": ["[name-reserved]", "\"eas-hosting\" shadows"],
+    "args": "eas-hosting --skills-root {dir}/skills"
+  },
+  "bad-reserved-expo": {
+    "expect": ["[name-reserved]", "\"expo-router\" shadows"],
+    "args": "expo-router --skills-root {dir}/skills"
+  },
+  "bad-reserved-expo-animation": {
+    "expect": ["[name-reserved]", "\"expo-animation\" shadows"],
+    "args": "expo-animation --skills-root {dir}/skills"
+  },
+  "bad-runbook-name": {
+    "expect": ["[runbook-name]", "starts with run-"],
+    "args": "list-export --runbook --skills-root {dir}/skills"
+  },
+  "error-no-root": { "expect": ["ERROR [bad-input] pass --skills-root"], "args": "store-listing-texts" },
+  "error-root-missing": {
+    "expect": ["ERROR [bad-input] skills root", "does not exist, and its parent folder is not a repo root"],
+    "args": "store-listing-texts --skills-root {dir}/nowhere/skills"
+  },
+  "pass-creates-root": {
+    "expect": [
+      "created the skills root app/skills (the repo had no skills folder yet)",
+      "created app/skills/store-listing-texts",
+      "RESULT: PASS"
+    ],
+    "args": "store-listing-texts --skills-root {dir}/app/skills",
+    "ops": [{ "write": { "file": "app/package.json", "content": "{ \"name\": \"tasks-app\", \"private\": true }\n" } }]
+  },
+  "pass-dry-run": {
+    "expect": ["would write store-listing-texts/SKILL.md", "would write store-listing-texts/scripts/check-lib.mjs"],
+    "args": "store-listing-texts --dry-run --skills-root {dir}/skills"
+  },
+  "pass-runbook": {
+    "expect": ["created", "run-list-export (12 files, a run-only runbook)"],
+    "args": "run-list-export --runbook --skills-root {dir}/skills"
+  }
+}

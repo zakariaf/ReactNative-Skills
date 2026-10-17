@@ -1,0 +1,115 @@
+{
+ "numFailedTestSuites": 0,
+ "numFailedTests": 0,
+ "numPassedTests": 9,
+ "numTotalTestSuites": 3,
+ "numTotalTests": 9,
+ "numRuntimeErrorTestSuites": 0,
+ "snapshot": {
+  "added": 0,
+  "didUpdate": false,
+  "failure": false,
+  "filesAdded": 0,
+  "filesRemoved": 0,
+  "filesRemovedList": [],
+  "filesUnmatched": 0,
+  "filesUpdated": 0,
+  "matched": 9,
+  "total": 9,
+  "unchecked": 0,
+  "uncheckedKeysByFile": [],
+  "unmatched": 0,
+  "updated": 0
+ },
+ "startTime": 1791900060000,
+ "success": true,
+ "testResults": [
+  {
+   "name": "src/features/tasks/tasks-digest.golden.test.ts",
+   "status": "passed",
+   "startTime": 1791900060100,
+   "endTime": 1791900060500,
+   "assertionResults": [
+    {
+     "ancestorTitles": [
+      "planDigest goldens"
+     ],
+     "title": "groups the sample list on 2026-10-03",
+     "status": "passed"
+    },
+    {
+     "ancestorTitles": [
+      "planDigest goldens"
+     ],
+     "title": "groups the sample list on 2026-12-31",
+     "status": "passed"
+    },
+    {
+     "ancestorTitles": [
+      "[contract] digestNotificationId goldens"
+     ],
+     "title": "names the digest of the inbox list on 2026-10-03",
+     "status": "passed"
+    },
+    {
+     "ancestorTitles": [
+      "[contract] digestNotificationId goldens"
+     ],
+     "title": "names the digest of the inbox list on 2026-12-31",
+     "status": "passed"
+    },
+    {
+     "ancestorTitles": [
+      "[contract] digestNotificationId goldens"
+     ],
+     "title": "names the digest of the inbox list on 2027-01-01",
+     "status": "passed"
+    }
+   ]
+  },
+  {
+   "name": "src/features/tasks/tasks-summary.golden.test.ts",
+   "status": "passed",
+   "startTime": 1791900060200,
+   "endTime": 1791900060600,
+   "assertionResults": [
+    {
+     "ancestorTitles": [
+      "summarizeTasks goldens"
+     ],
+     "title": "summarizes the sample list",
+     "status": "passed"
+    }
+   ]
+  },
+  {
+   "name": "test/goldens/progress-ring.golden.test.ts",
+   "status": "passed",
+   "startTime": 1791900060300,
+   "endTime": 1791900060700,
+   "assertionResults": [
+    {
+     "ancestorTitles": [
+      "progress ring golden"
+     ],
+     "title": "draws the ring at narrow",
+     "status": "passed"
+    },
+    {
+     "ancestorTitles": [
+      "progress ring golden"
+     ],
+     "title": "draws the ring at phone",
+     "status": "passed"
+    },
+    {
+     "ancestorTitles": [
+      "progress ring golden"
+     ],
+     "title": "draws the ring at tablet",
+     "status": "passed"
+    }
+   ]
+  }
+ ]
+}

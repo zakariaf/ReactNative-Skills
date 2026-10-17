@@ -1,0 +1,369 @@
+{
+  "bad-build-number-line": {
+    "expect": ["app.config.ts [version-source] has 0 \"const IOS_BUILD_NUMBER = <int>;\" lines, expected exactly 1"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "const IOS_BUILD_NUMBER = 14;",
+          "with": "let IOS_BUILD_NUMBER = 14;"
+        }
+      }
+    ]
+  },
+  "bad-claude-deny-missing": {
+    "expect": [".claude/settings.json [claude-deny] permissions.deny lacks Read(**/AuthKey_*)"],
+    "ops": [{ "json": { "file": ".claude/settings.json", "path": ["permissions", "deny", 2], "delete": true } }]
+  },
+  "bad-clock-without-now": {
+    "expect": ["scripts/clock/system-clock.ts [wall-clock] nowEpochSeconds() is not exported"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/clock/system-clock.ts",
+          "find": "export function nowEpochSeconds()",
+          "with": "function nowEpochSecondsLocal()"
+        }
+      }
+    ]
+  },
+  "bad-contract-missing": {
+    "expect": ["contracts/ios-release.json [release-contract] is missing"],
+    "ops": [{ "delete": "contracts/ios-release.json" }]
+  },
+  "bad-contract-no-verify": {
+    "expect": ["contracts/ios-release.json:6 [release-contract] \"preflight\" does not run verify"],
+    "ops": [
+      { "json": { "file": "contracts/ios-release.json", "path": ["preflight"], "value": ["lint"] } },
+      { "json": { "file": "package.json", "path": ["scripts", "lint"], "value": "eslint ." } }
+    ]
+  },
+  "bad-contract-placeholder": {
+    "expect": [
+      "contracts/ios-release.json [release-contract] appId com.example.tasks is the template bundle id (com.example.*)"
+    ],
+    "ops": [{ "json": { "file": "contracts/ios-release.json", "path": ["appId"], "value": "com.example.tasks" } }]
+  },
+  "bad-eas-remote-version": {
+    "expect": ["eas.json [version-source] cli.appVersionSource is \"remote\""],
+    "ops": [
+      {
+        "write": {
+          "file": "eas.json",
+          "json": {
+            "cli": { "version": ">= 16.0.0", "appVersionSource": "remote" },
+            "build": { "production": { "autoIncrement": true } }
+          }
+        }
+      }
+    ]
+  },
+  "bad-gitignore-secrets": {
+    "expect": [".gitignore [gitignore-secrets] does not ignore *.p8"],
+    "ops": [{ "replace": { "file": ".gitignore", "find": "*.p8\n", "with": "" } }]
+  },
+  "bad-key-file-in-repo": {
+    "expect": ["AuthKey_ABC123XYZ9.p8 [key-material] a key or signing file is inside the repo"],
+    "ops": [{ "plant": { "AuthKey_ABC123XYZ9.p8": true } }]
+  },
+  "bad-key-read-elsewhere": {
+    "expect": ["scripts/release/peek-key.ts:4 [key-read] reads the App Store Connect key file"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/release/peek-key.ts",
+          "content": "// scripts/release/peek-key.ts\nimport { readFileSync } from 'node:fs';\nimport { ascKeyPath } from '../asc/asc-credentials.ts';\nconst pem = readFileSync(ascKeyPath('ABC123'), 'utf8');\nexport { pem };\n"
+        }
+      }
+    ]
+  },
+  "bad-key-read-env-path": {
+    "expect": ["scripts/release/key-from-env.ts:3 [key-read] reads the App Store Connect key file"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/release/key-from-env.ts",
+          "content": "// scripts/release/key-from-env.ts\nimport { readFileSync } from 'node:fs';\nexport const pem = readFileSync(process.env['ASC_KEY_PATH'] ?? '', 'utf8');\n"
+        }
+      }
+    ]
+  },
+  "bad-key-read-exec-args": {
+    "expect": ["scripts/release/key-info.ts:3 [key-read] reads the App Store Connect key file"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/release/key-info.ts",
+          "content": "// scripts/release/key-info.ts\nimport { execFileSync } from 'node:child_process';\nexecFileSync('openssl', ['pkey', '-in', keyFile, '-noout']);\n"
+        }
+      }
+    ]
+  },
+  "bad-key-read-exec-env": {
+    "expect": [
+      "FAIL scripts/tools/peek.ts:4 [key-read] reads the App Store Connect key file",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/tools/peek.ts",
+          "content": "// scripts/tools/peek.ts\nimport { execFileSync } from 'node:child_process';\n\nexecFileSync('cat', [`${process.env['HOME']}/.appstoreconnect/private_keys/AuthKey_X.p8`]);\n"
+        }
+      }
+    ]
+  },
+  "bad-key-read-homedir": {
+    "expect": [
+      "FAIL scripts/tools/peek.ts:7 [key-read] reads the App Store Connect key file",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/tools/peek.ts",
+          "content": "// scripts/tools/peek.ts\nimport { readFileSync } from 'node:fs';\nimport { homedir } from 'node:os';\nimport { join } from 'node:path';\n\nexport function peek(id: string): string {\n  return readFileSync(join(homedir(), '.appstoreconnect', 'private_keys', `AuthKey_${id}.p8`), 'utf8');\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-key-read-shell": {
+    "expect": ["scripts/release/check-key.sh:2 [key-read] reads the App Store Connect key file"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/release/check-key.sh",
+          "content": "#!/bin/sh\nhead -c 40 ~/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8\n"
+        }
+      }
+    ]
+  },
+  "bad-no-api-key-signing": {
+    "expect": [
+      "scripts/release/release-options.ts [api-key-signing] the archive/export arguments lack -authenticationKeyID"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/release/release-options.ts",
+          "find": "...['-authenticationKeyID', ids.keyId],\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-npm-script": {
+    "expect": ["package.json [npm-script] scripts[\"release:ios\"] is \"eas build --platform ios\""],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["scripts", "release:ios"], "value": "eas build --platform ios" } }
+    ]
+  },
+  "bad-p12-import": {
+    "expect": ["scripts/release/import-certificate.ts:3 [api-key-signing] handles a .p12 or imports a certificate"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/release/import-certificate.ts",
+          "content": "// scripts/release/import-certificate.ts\nimport { execFileSync } from 'node:child_process';\nexecFileSync('security', ['import', 'dist.p12', '-k', 'login.keychain-db']);\n"
+        }
+      }
+    ]
+  },
+  "bad-placeholder-values": {
+    "expect": [
+      "app.config.ts:27 [ship-placeholder]",
+      "a placeholder email address (@example.com): support@example.com",
+      "src/config/admob-ids.ts:3 [ship-placeholder]",
+      "the template AdMob app id (all-zero publisher)"
+    ],
+    "ops": [
+      { "replace": { "file": "app.config.ts", "find": "'help@acme-tasks.app'", "with": "'support@example.com'" } },
+      {
+        "write": {
+          "file": "src/config/admob-ids.ts",
+          "content": "// src/config/admob-ids.ts\nexport const ADMOB_IDS = {\n  ios: { appId: 'ca-app-pub-0000000000000000~0000000001' },\n};\n"
+        }
+      }
+    ]
+  },
+  "bad-private-key-text": {
+    "expect": ["notes/handover.md:4 [key-material] contains private key text"],
+    "ops": [{ "plant": { "notes/handover.md": true } }]
+  },
+  "bad-processing-not-read": {
+    "expect": ["scripts/release/processing.ts [upload-wait] nothing reads the build processingState"],
+    "ops": [
+      {
+        "replace": { "file": "scripts/release/processing.ts", "find": "processingState", "with": "state", "all": true }
+      }
+    ]
+  },
+  "bad-release-files-missing": {
+    "expect": ["scripts/release/processing-wait.ts [release-files] is missing"],
+    "ops": [{ "delete": ["scripts/release/processing-wait.ts", "scripts/release/processing-wait.test.ts"] }]
+  },
+  "bad-release-prereqs-missing": {
+    "expect": ["package.json [release-prereqs] scripts[\"audit:network\"] is missing"],
+    "ops": [{ "json": { "file": "package.json", "path": ["scripts", "audit:network"], "delete": true } }]
+  },
+  "bad-store-export-internal-only": {
+    "expect": [
+      "scripts/release/export-options-production.plist [export-options] testFlightInternalTestingOnly is true, expected false"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/release/export-options-production.plist",
+          "find": "<key>testFlightInternalTestingOnly</key>\n\t<false/>",
+          "with": "<key>testFlightInternalTestingOnly</key>\n\t<true/>"
+        }
+      }
+    ]
+  },
+  "bad-sudo": {
+    "expect": ["scripts/release/accept-license.ts:3 [no-xcode-select] runs sudo"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/release/accept-license.ts",
+          "content": "// scripts/release/accept-license.ts\nimport { execSync } from 'node:child_process';\nexecSync('sudo xcodebuild -license accept');\n"
+        }
+      }
+    ]
+  },
+  "bad-team-id-missing": {
+    "expect": ["app.config.ts [team-id] sets no ios.appleTeamId"],
+    "ops": [
+      {
+        "replace": { "file": "app.config.ts", "find": "      appleTeamId: process.env['APPLE_TEAM_ID'],\n", "with": "" }
+      }
+    ]
+  },
+  "bad-token-printed": {
+    "expect": [
+      "scripts/release/debug-token.ts:4 [token-printed] prints a token, JWT, private key, Bearer value or request headers"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/release/debug-token.ts",
+          "content": "// scripts/release/debug-token.ts\nimport { createAscJwt } from '../asc/asc-jwt.ts';\nconst jwt = createAscJwt({ keyId: 'K', issuerId: 'I', privateKeyPem: '' }, 0);\nconsole.log('signed', jwt);\n"
+        }
+      }
+    ]
+  },
+  "bad-token-printed-bearer": {
+    "expect": [
+      "scripts/asc/debug-auth.ts:3 [token-printed] prints a token, JWT, private key, Bearer value or request headers"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/asc/debug-auth.ts",
+          "content": "// scripts/asc/debug-auth.ts\nexport function logAuth(value: string): void {\n  console.info(`Bearer ${value}`);\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-token-printed-headers": {
+    "expect": [
+      "scripts/release/debug-request.ts:3 [token-printed] prints a token, JWT, private key, Bearer value or request headers"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/release/debug-request.ts",
+          "content": "// scripts/release/debug-request.ts\nexport function logRequest(url: string, headers: Record<string, string>): void {\n  console.log('request', url,\n    headers);\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-two-build-numbers": {
+    "expect": [
+      "app.config.ts:23 [version-source] ios.buildNumber is a literal: a second build number next to IOS_BUILD_NUMBER"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "      buildNumber: String(IOS_BUILD_NUMBER),",
+          "with": "      buildNumber: '15',"
+        }
+      }
+    ]
+  },
+  "bad-unfinished-marker": {
+    "expect": ["docs/unfinished-screens.md [unfinished-marker] marks unfinished work"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/ios-release.json",
+          "path": ["unfinishedMarkers"],
+          "value": ["docs/unfinished-screens.md"]
+        }
+      },
+      { "write": { "file": "docs/unfinished-screens.md", "content": "- settings screen\n" } }
+    ]
+  },
+  "bad-upload-without-wait": {
+    "expect": ["scripts/release/release-options.ts [upload-wait] the altool upload does not pass --wait"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/release/release-options.ts",
+          "find": "...['--wait', '--output-format', 'json'],",
+          "with": "...['--output-format', 'json'],"
+        }
+      }
+    ]
+  },
+  "bad-xcode-manages-numbers": {
+    "expect": [
+      "scripts/release/export-options-preview.plist [export-options] manageAppVersionAndBuildNumber is true, expected false"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/release/export-options-preview.plist",
+          "find": "<key>manageAppVersionAndBuildNumber</key>\n\t<false/>",
+          "with": "<key>manageAppVersionAndBuildNumber</key>\n\t<true/>"
+        }
+      }
+    ]
+  },
+  "bad-xcode-select": {
+    "expect": ["scripts/release/switch-xcode.ts:3 [no-xcode-select] switches the global Xcode with xcode-select"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/release/switch-xcode.ts",
+          "content": "// scripts/release/switch-xcode.ts\nimport { execSync } from 'node:child_process';\nexecSync('xcode-select -s /Applications/Xcode.app');\n"
+        }
+      }
+    ]
+  },
+  "error-no-package-json": {
+    "expect": ["nothing to check: no package.json in the repo root"],
+    "args": "{dir}",
+    "ops": [{ "delete": "package.json" }]
+  },
+  "pass-no-local-lane": {
+    "expect": ["NOT APPLICABLE: the repo has no local iOS release lane"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["scripts", "release:ios"], "delete": true } },
+      { "delete": "scripts/release" }
+    ]
+  },
+  "pass-sample-ids-in-config": {
+    "expect": ["check-release-setup: 1 repo checked, 0 problems"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    extra: { supportEmail: 'help@acme-tasks.app' },",
+          "with": "    extra: { supportEmail: 'help@acme-tasks.app', sampleAdApp: 'ca-app-pub-3940256099942544~1458002511' },"
+        }
+      }
+    ]
+  }
+}

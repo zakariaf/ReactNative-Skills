@@ -1,0 +1,219 @@
+{
+  "$comment": "The known-failures catalogue: this index plus one <area>.json per area. Edit the area files, then run scripts/check-catalogue.mjs --write. Never edit the rendered references.",
+  "version": 2,
+  "reviewedOn": "2026-10-17",
+  "stack": "Expo SDK 57 (expo 57.0.27), React Native 0.86.3, React 19.2.3, Xcode 26.6, Android compileSdk and targetSdk 36, Jest 29.7, Maestro 2.10",
+  "areas": {
+    "build": {
+      "title": "Expo config, variants, Metro and native modules",
+      "file": "references/build-and-expo-config.md",
+      "intro": "Failures while loading app.config.ts, resolving the variant, running config plugins and prebuild, bundling with Metro, and starting native modules, on both platforms.",
+      "reverify": "npx expo config --type public && npx expo export --platform ios --platform android"
+    },
+    "ios": {
+      "title": "Xcode, xcodebuild and the iOS simulator",
+      "file": "references/ios-xcode-and-simulator.md",
+      "intro": "Failures while selecting Xcode, prebuilding the iOS project, building for the simulator, and running or screenshotting the app there.",
+      "reverify": "xcodebuild -version && xcrun simctl list runtimes"
+    },
+    "android": {
+      "title": "Gradle, the Android emulator and adb",
+      "file": "references/android-gradle-and-emulator.md",
+      "intro": "Failures of the JDK and SDK toolchain, Gradle, the emulator, adb installs, APK checks and Android 16 behaviour.",
+      "reverify": "java -version && sdkmanager --list_installed && emulator -list-avds"
+    },
+    "release": {
+      "title": "Signing, store uploads and EAS submit",
+      "file": "references/release-and-signing.md",
+      "intro": "Failures of the signed archive, export, store gate, upload, processing and the store consoles, on the EAS lane and the local lane. Rows marked \"needs a human\" are stops: send one message and never retry.",
+      "reverify": "npx eas-cli --version && xcrun altool --version"
+    },
+    "deps": {
+      "title": "Dependencies, pinning and knip",
+      "file": "references/dependencies-and-supply-chain.md",
+      "intro": "Failures while installing, pinning or upgrading packages, held-back majors, install scripts, and knip findings.",
+      "reverify": "npm ls expo react-native typescript eslint jest && npx expo install --check"
+    },
+    "lint": {
+      "title": "TypeScript and ESLint",
+      "file": "references/typescript-and-lint.md",
+      "intro": "Compiler and lint errors seen with the strict TypeScript 6 setup and the ESLint 9 flat config, and the config bugs found while verifying them.",
+      "reverify": "npm run -s typecheck && npx eslint . --max-warnings 0"
+    },
+    "testing": {
+      "title": "Jest, RNTL, goldens, coverage and Stryker",
+      "file": "references/testing-jest-and-goldens.md",
+      "intro": "Failures of unit, component, golden, coverage and mutation tests.",
+      "reverify": "npx jest --ci --maxWorkers=2"
+    },
+    "e2e": {
+      "title": "Maestro flows and devices",
+      "file": "references/e2e-maestro.md",
+      "intro": "Failures of Maestro end-to-end flows on the iOS simulator and the Android emulator, and of the devices they run on.",
+      "reverify": "maestro --version"
+    },
+    "animation": {
+      "title": "Reanimated, Worklets, Skia and gestures",
+      "file": "references/animation-skia-and-gestures.md",
+      "intro": "Failures in frame callbacks, worklets, springs, Skia canvases, frame rates and gestures.",
+      "reverify": "npm ls react-native-reanimated react-native-worklets @shopify/react-native-skia react-native-gesture-handler"
+    },
+    "i18n": {
+      "title": "Intl, catalogs, RTL and fonts",
+      "file": "references/i18n-and-rtl.md",
+      "intro": "Failures with Intl on Hermes, message catalogs, right-to-left layout and direction switches, and fonts.",
+      "reverify": "npm ls react-intl expo-localization"
+    },
+    "services": {
+      "title": "Ads, consent, purchases, audio, haptics and privacy",
+      "file": "references/ads-purchases-audio-privacy.md",
+      "intro": "Failures with AdMob and consent (UMP, App Tracking Transparency), store purchases, audio and haptics, and privacy declarations.",
+      "reverify": "npm ls react-native-google-mobile-ads expo-iap expo-tracking-transparency"
+    },
+    "state": {
+      "title": "State, persistence, navigation, async and dates",
+      "file": "references/state-persistence-navigation.md",
+      "intro": "Failures with stores, validation, SQLite persistence, navigation, cancellation and day maths.",
+      "reverify": "npm ls zustand expo-sqlite expo-router valibot"
+    },
+    "gates": {
+      "title": "Quality gates, hooks, commits and agent hooks",
+      "file": "references/quality-gates-and-git.md",
+      "intro": "Failures of the gates themselves, git hooks, commit rules, reports and Claude Code hooks and settings.",
+      "reverify": "npm run verify"
+    },
+    "perf": {
+      "title": "Performance and accessibility",
+      "file": "references/performance-and-accessibility.md",
+      "intro": "Measurement traps, budgets, and accessibility findings on VoiceOver and TalkBack.",
+      "reverify": "npm run -s check:fast"
+    },
+    "parity": {
+      "title": "Visual parity and screenshot comparison",
+      "file": "references/visual-parity-and-screenshots.md",
+      "intro": "Failures while capturing the app and the design and comparing them element by element: unsettled captures, the wrong device, status bars, modal roots, scroll offsets and comparison traps. design-visual-parity owns the full procedure and its failure-message table.",
+      "reverify": "maestro --version && xcrun simctl list devicetypes && emulator -version"
+    },
+    "skills": {
+      "title": "Agent skills that do not load, trigger or run",
+      "file": "references/agent-skills.md",
+      "intro": "Symptoms of skills that never load, never trigger or whose scripts misbehave; skill-maintenance owns the full procedure.",
+      "reverify": "claude --version"
+    },
+    "games": {
+      "title": "Games (optional plugin)",
+      "file": "references/games-optional.md",
+      "intro": "Failures specific to the optional games plugin: deterministic rules, levels, real-time loops, balance simulations and session hosts.",
+      "reverify": "npm run test:sim"
+    },
+    "runtime": {
+      "title": "Red boxes, the dev server and the default stack at run time",
+      "file": "references/runtime-and-dev-server.md",
+      "intro": "Failures while the app runs in development and in production: Metro and the dev server, React red boxes and warnings, Expo Router navigation, network requests, TanStack Query, over-the-air updates, crash reports, secure storage and deep links, on both platforms.",
+      "reverify": "npx expo start --help && npm ls react react-native expo-router @tanstack/react-query"
+    }
+  },
+  "skills": [
+    "accessibility-as-code",
+    "adaptive-layout",
+    "admob-ads-and-consent",
+    "analytics-and-consent",
+    "android-emulator-build",
+    "android-release-play",
+    "app-startup-and-bootstrap",
+    "app-variants-and-environment",
+    "architecture-and-boundaries",
+    "async-safety",
+    "audio-and-haptics-feedback",
+    "auth-and-secure-storage",
+    "background-tasks",
+    "canvas-gestures-and-hit-testing",
+    "ci-pipeline-and-gates",
+    "crash-reporting-and-observability",
+    "data-export-and-restore",
+    "dates-streaks-and-statistics",
+    "debug-menu-and-test-hooks",
+    "deep-links-and-universal-links",
+    "dependency-management",
+    "design-review-workflow",
+    "design-system-structure",
+    "design-visual-parity",
+    "e2e-maestro",
+    "eas-build-and-submit",
+    "error-handling-typed-results",
+    "expo-prebuild-and-config-plugins",
+    "expo-project-bootstrap",
+    "expo-sdk-upgrade",
+    "forms-and-input",
+    "game-balance-and-bots",
+    "game-rules-engine",
+    "game-session-host",
+    "git-commits-and-reporting",
+    "golden-and-snapshot-tests",
+    "i18n-strings-and-catalogs",
+    "icons-app-icon-and-splash",
+    "in-app-purchases",
+    "ios-release-testflight",
+    "ios-simulator-build",
+    "level-generation-and-solvers",
+    "local-notifications",
+    "media-images-and-files",
+    "motion-and-animation",
+    "naming-conventions",
+    "native-modules-and-new-architecture",
+    "navigation-and-routing",
+    "networking-and-server-state",
+    "new-game-scaffold",
+    "ota-updates",
+    "performance-budgets",
+    "permissions-and-system-prompts",
+    "persistence-and-migrations",
+    "privacy-and-store-declarations",
+    "push-notifications",
+    "quality-gates",
+    "react-components-and-hooks",
+    "react-native-conventions-index",
+    "realtime-game-loop",
+    "rtl-and-direction",
+    "run-goldens-rebaseline",
+    "run-migration",
+    "scaffold-feature-screen",
+    "screen-contracts",
+    "seeded-determinism-and-golden-vectors",
+    "settings-and-preferences",
+    "skia-canvas-rendering",
+    "skill-maintenance",
+    "spec-traceability",
+    "state-management-zustand",
+    "tdd-workflow",
+    "troubleshooting-playbook",
+    "typescript-and-lint-rules",
+    "ui-component-library",
+    "ui-states-and-feedback",
+    "unit-and-component-tests",
+    "value-objects-money-and-units",
+    "web-support"
+  ],
+  "bannedTerms": [
+    {
+      "pattern": "\\bthe owner\\b",
+      "why": "house vocabulary: the developer or the reviewer"
+    },
+    {
+      "pattern": "\\bpackages/[a-z][a-z0-9-]*/",
+      "why": "one app's monorepo workspace path: name the layout key (srcDir, scriptsDir) or src/ instead"
+    },
+    {
+      "pattern": "\\b(?:com|io|dev)\\.(?!example\\.|android\\.|google\\.|apple\\.|facebook\\.)[a-z0-9]+\\.[a-z0-9]+",
+      "why": "an app-specific bundle id or package name: use com.example.tasks"
+    },
+    {
+      "pattern": "\\bround [0-9]\\b|\\blead decision\\b|OWNER[ ]STEPS PENDING",
+      "why": "private project history"
+    },
+    {
+      "pattern": "/Users/|/home/[a-z]",
+      "why": "an absolute machine path"
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+[effect-cleanup] the useEffect subscribes or starts a timer but returns no cleanup
+src/features/tasks/use-sync-on-foreground.ts:8
+RESULT: FAIL (1 problems)

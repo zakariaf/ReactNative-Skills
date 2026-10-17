@@ -1,0 +1,117 @@
+{
+  "$comment": "stack-pin-ignore-file: an example of the optional repo-owned contracts/expo-sdk-lines.json (shape: assets/sdk-lines.schema.json). Each entry replaces this skill's entry for that SDK; delete the file once this skill describes the SDK. The values are the SDK 58 pre-release read on 2026-10-04, shown for shape only.",
+  "sdks": {
+    "58": {
+      "status": "example: the entry an app writes in contracts/expo-sdk-lines.json when it moves before this skill describes the stable SDK; copy every value from the stable release (bundledNativeModules.json, the Expo versions API, react-native gradle/libs.versions.toml, the release notes) and note where each came from",
+      "expo": "58.0.3",
+      "reactNative": "0.88",
+      "react": "19.3",
+      "typesReact": "19.3",
+      "testRenderer": "1.3",
+      "typescript": "6.0",
+      "jest": "30",
+      "typesJest": "30.0.0",
+      "gestureHandlerMajor": 3,
+      "skiaPostinstallUntil": "2.6.5",
+      "configPluginsImport": "expo/config-plugins",
+      "jestConfigMustInclude": [
+        {
+          "text": "resolver: 'react-native-reanimated/jest/resolver'",
+          "pattern": "['\"]?\\bresolver['\"]?\\s*:\\s*['\"]react-native-reanimated/jest/resolver['\"]",
+          "why": "Reanimated 4.7 and Worklets 0.13 load their native initializers under Jest without it ('[Reanimated] setCSSEventHandler is not available in JSReanimated'); the resolver picks the web implementations (Reanimated's testing guide)",
+          "fix": "Add resolver: 'react-native-reanimated/jest/resolver' to the options every Jest project shares (SHARED in the canonical jest.config.js)."
+        },
+        {
+          "text": "'^react-native/asset-registry$': '<rootDir>/node_modules/react-native/src/asset-registry.js'",
+          "pattern": "['\"]\\^react-native/asset-registry\\$['\"]\\s*:\\s*['\"]<rootDir>/node_modules/react-native/src/asset-registry\\.js['\"]",
+          "why": "jest-expo 58 maps react-native/asset-registry to react-native/src/asset-registry, which React Native 0.88's exports map hides from that resolver ('Could not locate module react-native/asset-registry mapped as react-native/src/asset-registry')",
+          "fix": "Add '^react-native/asset-registry$': '<rootDir>/node_modules/react-native/src/asset-registry.js' as the first entry of the moduleNameMapper every project shares (PATH_ALIASES in the canonical jest.config.js)."
+        }
+      ],
+      "xcodeMin": "26.4",
+      "xcodeMaxWithoutSceneSupport": null,
+      "sceneSupportMinExpo": null,
+      "ios": {
+        "deploymentTarget": "16.4"
+      },
+      "android": {
+        "compileSdk": 37,
+        "targetSdk": 36,
+        "minSdk": 24,
+        "buildTools": "37.0.0",
+        "agp": "9.2.1",
+        "kotlin": "2.2.0",
+        "ndk": "27.1.12297006",
+        "jdk": 17
+      },
+      "eas": {
+        "iosImage": "macos-tahoe-26.6-xcode-27.0",
+        "androidImage": "ubuntu-26.04-jdk-17-ndk-r27b-sdk-58"
+      },
+      "removedApis": [
+        {
+          "id": "InteractionManager",
+          "rule": "removed-rn-api",
+          "scope": "app",
+          "from": "React Native 0.88",
+          "pattern": "\\bInteractionManager\\b",
+          "fix": "Split the long task into smaller ones and schedule them with requestIdleCallback (React Native 0.88 throws 'InteractionManager has been removed from react-native core' in development)."
+        },
+        {
+          "id": "Modal animated prop",
+          "rule": "removed-rn-api",
+          "scope": "app",
+          "from": "React Native 0.88",
+          "pattern": "<Modal\\b[^>]*\\banimated\\b",
+          "fix": "Use animationType (\"none\" | \"slide\" | \"fade\"); React Native 0.88's Modal has no animated prop."
+        },
+        {
+          "id": "StatusBar backgroundColor",
+          "rule": "removed-rn-api",
+          "scope": "app",
+          "from": "React Native 0.88",
+          "pattern": "<StatusBar\\b[^>]*\\bbackgroundColor\\s*=|StatusBar\\.setBackgroundColor\\s*\\(",
+          "fix": "Remove it; React Native 0.88's StatusBar has no backgroundColor (edge to edge on Android: colour the view behind the bar)."
+        },
+        {
+          "id": "StatusBar translucent",
+          "rule": "removed-rn-api",
+          "scope": "app",
+          "from": "React Native 0.88",
+          "pattern": "<StatusBar\\b[^>]*\\btranslucent\\b|StatusBar\\.setTranslucent\\s*\\(",
+          "fix": "Remove it; React Native 0.88's StatusBar has no translucent (edge to edge is the only mode; safe-area insets place content)."
+        },
+        {
+          "id": "Jest alias matcher",
+          "rule": "removed-test-api",
+          "scope": "test",
+          "from": "Jest 30",
+          "pattern": "\\.(?:toBeCalled|toBeCalledTimes|toBeCalledWith|lastCalledWith|nthCalledWith|toReturn|toReturnTimes|toReturnWith|lastReturnedWith|nthReturnedWith|toThrowError)\\s*\\(",
+          "fix": "Use the full matcher name (toHaveBeenCalled, toHaveBeenCalledTimes, toHaveBeenCalledWith, toHaveBeenLastCalledWith, toHaveBeenNthCalledWith, toHaveReturned, toHaveReturnedTimes, toHaveReturnedWith, toHaveLastReturnedWith, toHaveNthReturnedWith, toThrow); Jest 29 has them too, so fix it before the move."
+        },
+        {
+          "id": "jest.genMockFromModule",
+          "rule": "removed-test-api",
+          "scope": "test",
+          "from": "Jest 30",
+          "pattern": "\\bjest\\.genMockFromModule\\s*\\(",
+          "fix": "Use jest.createMockFromModule (Jest 29 has it too)."
+        }
+      ],
+      "removedAppConfigKeys": [
+        {
+          "key": "newArchEnabled",
+          "pattern": "\\bnewArchEnabled\\b['\"]?\\s*:",
+          "since": 55,
+          "fix": "Delete newArchEnabled: since SDK 55 the New Architecture is the only architecture and the key is gone from the app config schema."
+        },
+        {
+          "key": "android.edgeToEdgeEnabled",
+          "pattern": "\\bedgeToEdgeEnabled\\b['\"]?\\s*:",
+          "since": 55,
+          "fix": "Delete android.edgeToEdgeEnabled: Android 16 (targetSdk 36) enforces edge to edge, the key left the app config schema in SDK 55; lay content out with safe-area insets."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,16 @@
+[
+  { "from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs" },
+  { "from": "scripts/lib/source-scan.mjs", "to": "scripts/lib/source-scan.mjs" },
+  { "from": "repo-templates/src/services/services-context.tsx", "to": "templates/src/services/services-context.tsx" },
+  { "from": "repo-templates/src/services/services-context.test.tsx", "to": "templates/src/services/services-context.test.tsx" },
+  { "from": "repo-templates/src/services/create-device-services.ts", "to": "templates/src/services/create-device-services.ts" },
+  { "from": "repo-templates/src/services/create-device-services.test.ts", "to": "templates/src/services/create-device-services.test.ts" },
+  { "from": "repo-templates/src/services/create-test-services.ts", "to": "templates/src/services/create-test-services.ts" },
+  { "from": "repo-templates/src/services/create-test-services.test.ts", "to": "templates/src/services/create-test-services.test.ts" },
+  { "from": "repo-templates/src/services/clock/", "to": "templates/src/services/clock/" },
+  { "from": "repo-templates/src/services/error-log/", "to": "templates/src/services/error-log/" },
+  { "from": "repo-templates/src/core/result.ts", "to": "templates/src/core/result.ts" },
+  { "from": "repo-templates/src/core/dates/date-key.ts", "to": "templates/src/core/dates/date-key.ts" },
+  { "from": "repo-templates/src/services/direction-guard/", "to": "templates/src/services/direction-guard/" },
+  { "from": "repo-templates/src/i18n/languages.ts", "to": "templates/src/i18n/languages.ts" }
+]

@@ -1,0 +1,113 @@
+# .github/workflows/devices.yml
+# The device lanes: a Release build of the preview variant and the Maestro flows, on Android (an
+# emulator on Linux with KVM; macOS arm64 runners cannot nest virtualization) and on iOS (a simulator
+# on macOS). Nightly and on demand, because a device lane takes 20 to 60 minutes and macOS minutes
+# cost about ten times Linux minutes. Every device is created and named by the repo's own scripts
+# (build:android:emu, build:ios:sim, e2e:android, e2e:ios); this file never talks to a device.
+name: devices
+
+on:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  LEFTHOOK: '0'
+  EXPO_NO_TELEMETRY: '1'
+
+jobs:
+  android:
+    name: android emulator
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node from .nvmrc
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Use the image's JDK 17 (React Native's Gradle plugin and Maestro need 17)
+        run: echo "JAVA_HOME=$JAVA_HOME_17_X64" >> "$GITHUB_ENV"
+      - name: Let the emulator use KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Install the pinned Android packages (licences come accepted with the image)
+        run: >-
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install
+          'emulator' 'platforms;android-36' 'build-tools;36.0.0' 'ndk;27.1.12297006'
+          'system-images;android-36;google_apis;x86_64'
+      - name: Restore the Gradle caches
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - name: Restore the Maestro download
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/maestro-cli
+          key: maestro-${{ runner.os }}-${{ hashFiles('scripts/e2e/install-maestro.sh') }}
+      - name: Install the locked dependencies
+        run: npm ci
+      - name: Build the preview APK and start it on a named emulator
+        run: npm run build:android:emu -- --variant preview
+      - name: Run the Maestro flows
+        run: npm run e2e:android
+      - name: Keep the reports
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: android-reports
+          path: reports/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  ios:
+    name: ios simulator
+    runs-on: macos-26
+    timeout-minutes: 90
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node from .nvmrc
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Use the image's JDK 17 (Maestro needs 17; the image default is newer)
+        run: echo "JAVA_HOME=$JAVA_HOME_17_arm64" >> "$GITHUB_ENV"
+      - name: Restore the Maestro download
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/Library/Caches/maestro-cli
+          key: maestro-${{ runner.os }}-${{ hashFiles('scripts/e2e/install-maestro.sh') }}
+      - name: Install the locked dependencies
+        run: npm ci
+      - name: Build the preview app with the pinned Xcode and start it on a named simulator
+        run: npm run build:ios:sim -- --variant preview
+      - name: Run the Maestro flows
+        run: npm run e2e:ios
+      - name: Keep the reports
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ios-reports
+          path: reports/
+          if-no-files-found: ignore
+          retention-days: 14

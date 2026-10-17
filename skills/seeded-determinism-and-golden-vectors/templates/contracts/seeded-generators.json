@@ -1,0 +1,24 @@
+{
+  "$comment": "The register of every seeded generator: shipped salts and cutover tables are frozen facts here, so a change in code shows up as a checker failure. Read by check-determinism.mjs (paths) and check-golden-vectors.mjs. An app with no seeded generator keeps \"generators\": [].",
+  "paths": [],
+  "generators": [
+    {
+      "$comment": "Template values: salt 795560989 is the template's 0x2f6b4c1d; before the first release set it to the generator's new salt (in decimal) and refill the template rows (Workflow step 6). outcome.file is the persistence layout's repository port; point it at whichever file declares the stored row once the table exists.",
+      "id": "__FEATURE__",
+      "module": "src/features/__FEATURE__/__FEATURE__-generator.ts",
+      "generate": "generate__FEATURE_PASCAL__",
+      "summarize": "summarize__FEATURE_PASCAL__",
+      "keyKind": "date",
+      "salt": 795560989,
+      "saltExport": "__FEATURE_CONST___SALT",
+      "versionsExport": "__FEATURE_CONST___VERSIONS",
+      "versions": [{ "version": 1, "from": null }],
+      "vectors": "src/features/__FEATURE__/__FEATURE__.vectors.json",
+      "outcome": {
+        "file": "src/data/__FEATURE__/__FEATURE__-outcome-repository.ts",
+        "versionField": "generatorVersion"
+      },
+      "regenerate": "node scripts/oracles/update-__FEATURE__-vectors.ts"
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "bad-ad-app-id-malformed": {
+    "expect": [
+      "artifacts/Tasks.app/Info.plist [ad-app-id] GADApplicationIdentifier \"ca-app-pub-123~456\" is not an AdMob app id"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["dependencies", "react-native-google-mobile-ads"],
+          "value": "17.2.0"
+        }
+      },
+      {
+        "replace": {
+          "file": "artifacts/Tasks.app/Info.plist",
+          "find": "  <key>MinimumOSVersion</key>",
+          "with": "  <key>GADApplicationIdentifier</key>\n  <string>ca-app-pub-123~456</string>\n  <key>MinimumOSVersion</key>"
+        }
+      }
+    ]
+  },
+  "bad-bundle-id-testing-id": {
+    "expect": [
+      "artifacts/Tasks.app/Info.plist [bundle-id] CFBundleIdentifier is \"com.acme.tasks.dev\", expected \"com.acme.tasks\" for a production build"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "artifacts/Tasks.app/Info.plist",
+          "find": "<string>com.acme.tasks</string>",
+          "with": "<string>com.acme.tasks.dev</string>"
+        }
+      },
+      {
+        "replace": {
+          "file": "artifacts/Tasks.app/EXConstants.bundle/app.config",
+          "find": "\"bundleIdentifier\": \"com.acme.tasks\"",
+          "with": "\"bundleIdentifier\": \"com.acme.tasks.dev\""
+        }
+      }
+    ]
+  },
+  "bad-encryption-flag": {
+    "expect": ["artifacts/Tasks.app/Info.plist [encryption-flag] ITSAppUsesNonExemptEncryption is not set"],
+    "ops": [
+      {
+        "replace": {
+          "file": "artifacts/Tasks.app/Info.plist",
+          "find": "  <key>ITSAppUsesNonExemptEncryption</key>\n  <false/>\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-placeholder-link": {
+    "expect": [
+      "artifacts/Tasks.app/EXConstants.bundle/app.config [ship-placeholder] EXConstants extra.supportUrl is a placeholder domain (example.com): https://example.com/support"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "artifacts/Tasks.app/EXConstants.bundle/app.config",
+          "find": "https://tasks.acme.app/support",
+          "with": "https://example.com/support"
+        }
+      }
+    ]
+  },
+  "bad-sample-ad-id": {
+    "expect": [
+      "artifacts/Tasks.app/Info.plist [ship-placeholder] Info.plist GADApplicationIdentifier is Google's sample AdMob app id"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["dependencies", "react-native-google-mobile-ads"],
+          "value": "17.2.0"
+        }
+      },
+      {
+        "replace": {
+          "file": "artifacts/Tasks.app/Info.plist",
+          "find": "  <key>MinimumOSVersion</key>",
+          "with": "  <key>GADApplicationIdentifier</key>\n  <string>ca-app-pub-3940256099942544~1458002511</string>\n  <key>MinimumOSVersion</key>"
+        }
+      }
+    ]
+  },
+  "bad-sentinel-shipped": {
+    "expect": [
+      "artifacts/Tasks.app/main.jsbundle [test-code] the production build contains the test-only sentinel \"TASKS_TEST_BUILD_ONLY\" 1 time(s)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "artifacts/Tasks.app/main.jsbundle",
+          "content": "HBC stand-in: __d(function(g,r,i,a,m,e,d){e.TEST_BUILD_SENTINEL=\"TASKS_TEST_BUILD_ONLY\"},2,[]);\n"
+        }
+      }
+    ]
+  },
+  "bad-store-test-artefacts": {
+    "expect": ["artifacts/Tasks.app/Products.storekit [store-test-artefacts]"],
+    "ops": [
+      {
+        "write": {
+          "file": "artifacts/Tasks.app/Products.storekit",
+          "content": "{ \"identifier\": \"StoreKitTest\", \"products\": [] }\n"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Screen states contract",
+  "description": "The non-happy states each data screen shows (ui-states-and-feedback).",
+  "type": "object",
+  "required": ["screens"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "$comment": {
+      "type": "string"
+    },
+    "actionProp": {
+      "type": "string",
+      "description": "The prop that carries a state's next step on its message element. Default: action."
+    },
+    "screens": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "view", "test", "states"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+            "description": "The screen's testID prefix."
+          },
+          "view": {
+            "type": "string",
+            "description": "The file that renders the states (literal testIDs '<id>.state.<state>')."
+          },
+          "test": {
+            "type": "string",
+            "description": "The test that renders every declared state."
+          },
+          "model": {
+            "type": "string",
+            "description": "Optional: the model hook; importing @tanstack/react-query there counts as readsServer."
+          },
+          "stateType": {
+            "type": "object",
+            "required": ["file", "name"],
+            "additionalProperties": false,
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "description": "The union type whose kinds must equal the declared states plus 'ready'."
+          },
+          "states": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "enum": ["loading", "offline", "failed", "empty", "filtered-empty"]
+            }
+          },
+          "isList": {
+            "type": "boolean",
+            "description": "The content is a collection: 'empty' is required."
+          },
+          "hasFilter": {
+            "type": "boolean",
+            "description": "A filter or search narrows it: 'filtered-empty' is required."
+          },
+          "readsServer": {
+            "type": "boolean",
+            "description": "It reads server state: 'offline' is required."
+          }
+        }
+      }
+    },
+    "confirmations": {
+      "type": "array",
+      "description": "Every confirm() the app asks: its literal testID and why Undo cannot replace it.",
+      "items": {
+        "type": "object",
+        "required": ["testID", "whyNotUndo"],
+        "additionalProperties": false,
+        "properties": {
+          "testID": {
+            "type": "string"
+          },
+          "whyNotUndo": {
+            "type": "string",
+            "minLength": 1,
+            "description": "What cannot be undone, in one sentence."
+          }
+        }
+      }
+    }
+  }
+}

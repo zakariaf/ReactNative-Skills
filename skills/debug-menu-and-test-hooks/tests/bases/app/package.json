@@ -1,0 +1,10 @@
+{
+  "name": "fixture-tasks-app",
+  "version": "1.0.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "dependencies": {
+    "expo": "~57.0.26",
+    "expo-router": "~57.0.24"
+  }
+}

@@ -1,0 +1,2 @@
+# Paths the rebaseline deleted (read by scripts/selftest.mjs when it builds the base; never copied).
+test/goldens/__image_snapshots__/old-badge-golden-test-ts-draws-the-badge-1-snap.png

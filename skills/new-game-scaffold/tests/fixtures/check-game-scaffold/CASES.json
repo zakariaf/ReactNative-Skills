@@ -1,0 +1,262 @@
+{
+  "bad-catalog-json": {
+    "expect": ["FAIL src/i18n/catalogs/ar.json:1 [catalogs] is not valid JSON"],
+    "ops": [{ "write": { "file": "src/i18n/catalogs/ar.json", "content": "{ \"app.name\": \n" } }]
+  },
+  "bad-catalog-keys": {
+    "expect": [
+      "FAIL src/i18n/catalogs/en.json:1 [catalog-keys] lacks lights-out.* keys other catalogs have: lights-out.hud.moves (in ar.json)",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "src/i18n/catalogs/ar.json",
+          "path": ["lights-out.hud.moves"],
+          "value": "الحركات {moves, number}"
+        }
+      }
+    ]
+  },
+  "bad-catalog-keys-source": {
+    "expect": [
+      "FAIL src/i18n/catalogs/ar.json:1 [catalog-keys] lacks lights-out.* keys other catalogs have: lights-out.hud.moves (in en.json)",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "src/i18n/catalogs/en.json",
+          "path": ["lights-out.hud.moves"],
+          "value": "Moves {moves, number}"
+        }
+      }
+    ]
+  },
+  "bad-contract-json": {
+    "expect": ["FAIL contracts/games.json:1 [declaration] is not valid JSON"],
+    "ops": [
+      { "write": { "file": "contracts/games.json", "content": "{ \"games\": [\n" } },
+      { "write": { "file": "src/games/lights-out/rules/create.ts", "content": "export {};\n" } }
+    ]
+  },
+  "bad-contract-stale-key": {
+    "expect": [
+      "[declaration] has the key \"registry\", which the schema does not allow (allowed: $schema, $comment, games, apps)",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [{ "json": { "file": "contracts/games.json", "path": ["registry"], "value": "src/games/game-registry.ts" } }]
+  },
+  "bad-copy-source-text": {
+    "expect": [
+      "FAIL src/i18n/catalogs/en.json:5 [copy-source-text] lights-out.name is \"Lights Out\", but the approved copy (contracts/copy-source.json) says \"Lights Out!\""
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/copy-source.json",
+          "content": "{\n  \"strings\": {\n    \"lights-out.name\": {\n      \"en\": \"Lights Out!\",\n      \"ar\": \"Lights Out\"\n    }\n  }\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-declaration-entry-key": {
+    "expect": [
+      "FAIL contracts/games.json:6 [declaration] lights-out: has \"registry\", which the schema does not allow",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/games.json",
+          "path": ["games", 0, "registry"],
+          "value": "src/games/game-registry.ts"
+        }
+      }
+    ]
+  },
+  "bad-declaration-field": {
+    "expect": ["FAIL contracts/games.json:6 [declaration] lights-out: hints is \"maybe\", not none or solver"],
+    "ops": [{ "json": { "file": "contracts/games.json", "path": ["games", 0, "hints"], "value": "maybe" } }]
+  },
+  "bad-declaration-levels": {
+    "expect": [
+      "FAIL contracts/games.json:6 [declaration] lights-out: levels must be null (no level packs, also for a daily- or endless-only game) or { \"packs\": n >= 1, \"levelsPerPack\": n >= 1 }",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [{ "json": { "file": "contracts/games.json", "path": ["games", 0, "levels", "packs"], "value": 0 } }]
+  },
+  "bad-empty-text": {
+    "expect": ["FAIL src/i18n/catalogs/en.json:5 [catalogs] lights-out.name is empty"],
+    "ops": [{ "json": { "file": "src/i18n/catalogs/en.json", "path": ["lights-out.name"], "value": "" } }]
+  },
+  "bad-frame-key-missing": {
+    "expect": [
+      "FAIL contracts/games.json:6 [catalog-missing-key] lights-out.lose.out-of-moves is missing in ar.json, en.json"
+    ],
+    "ops": [
+      { "json": { "file": "src/i18n/catalogs/ar.json", "path": ["lights-out.lose.out-of-moves"], "delete": true } },
+      { "json": { "file": "src/i18n/catalogs/en.json", "path": ["lights-out.lose.out-of-moves"], "delete": true } }
+    ]
+  },
+  "bad-key-missing": {
+    "expect": [
+      "FAIL src/games/lights-out/rules/outcome.ts:2 [catalog-missing-key] lights-out.lose.board-full is missing in ar.json, en.json"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/lights-out/rules/outcome.ts",
+          "content": "// src/games/lights-out/rules/outcome.ts\nexport const BOARD_FULL = 'lights-out.lose.board-full';\n"
+        }
+      }
+    ]
+  },
+  "bad-new-game-script": {
+    "expect": [
+      "FAIL package.json:1 [new-game-script] the \"new-game\" script runs scripts/games/new-game.ts, which does not exist"
+    ],
+    "ops": [{ "delete": "scripts/games/new-game.ts" }]
+  },
+  "bad-no-contract": {
+    "expect": ["FAIL contracts/games.json [declaration] does not exist, so lights-out has no declaration"],
+    "ops": [
+      { "delete": "contracts/games.json" },
+      { "write": { "file": "src/games/lights-out/rules/create.ts", "content": "export {};\n" } }
+    ]
+  },
+  "bad-placeholder": {
+    "expect": [
+      "FAIL src/games/lights-out/rules/lights-out-types.ts:2 [placeholder-left] template placeholder __GAME_PASCAL__ was not replaced"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/lights-out/rules/lights-out-types.ts",
+          "content": "// src/games/lights-out/rules/lights-out-types.ts\nexport type __GAME_PASCAL__State = { readonly lit: readonly number[] };\n"
+        }
+      }
+    ]
+  },
+  "bad-placeholder-in-sim": {
+    "expect": [
+      "FAIL test/sims/lights-out/balance.sim.test.ts:2 [placeholder-left] template placeholder __GAME_PASCAL__ was not replaced",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "test/sims/lights-out/balance.sim.test.ts",
+          "content": "// test/sims/lights-out/balance.sim.test.ts\nconst NAME = '__GAME_PASCAL__';\nit(`keeps ${NAME} inside its bands`, () => undefined);\n"
+        }
+      }
+    ]
+  },
+  "bad-retired-key": {
+    "expect": ["[retired-key] lights-out.result.lost is retired (replaced by lights-out.lose.out-of-moves)"],
+    "ops": [
+      { "json": { "file": "src/i18n/catalogs/en.json", "path": ["lights-out.result.lost"], "value": "You lost" } },
+      { "json": { "file": "src/i18n/catalogs/ar.json", "path": ["lights-out.result.lost"], "value": "خسرت" } },
+      {
+        "write": {
+          "file": "contracts/copy-source.json",
+          "content": "{\n  \"strings\": {},\n  \"retired\": {\n    \"lights-out.result.lost\": \"replaced by lights-out.lose.out-of-moves\"\n  }\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-undeclared-folder": {
+    "expect": [
+      "FAIL contracts/games.json:1 [declaration] does not declare tile-match (the folder src/games/tile-match exists)"
+    ],
+    "ops": [{ "write": { "file": "src/games/tile-match/rules/create.ts", "content": "export {};\n" } }]
+  },
+  "error-bad-game": {
+    "expect": ["ERROR [bad-input] --game \"Lights_Out\" is not a kebab-case game id"],
+    "args": "{dir} --game Lights_Out",
+    "ops": []
+  },
+  "error-bad-stage": {
+    "expect": ["ERROR [bad-input] --stage done is not scaffold or complete"],
+    "args": "{dir} --stage done",
+    "ops": []
+  },
+  "error-missing-root": { "expect": ["ERROR [bad-input]"], "args": "{dir}/no-such-folder", "ops": [] },
+  "pass-before-catalogs": {
+    "expect": ["SKIP src/i18n/catalogs [catalog-missing-key] not yet created (i18n-strings-and-catalogs creates it)"],
+    "ops": [{ "delete": "src/i18n" }]
+  },
+  "pass-dev-global": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/lights-out/rules/create.ts",
+          "content": "// src/games/lights-out/rules/create.ts\nexport const IS_DEBUG = typeof __DEV__ === 'boolean' && __DEV__;\nexport const NAME_ID = 'lights-out.name';\n"
+        }
+      }
+    ]
+  },
+  "pass-games-dir": {
+    "expect": ["check-game-scaffold: 1 games checked, 0 problems"],
+    "ops": [
+      { "write": { "file": "rn-skills.config.json", "content": "{ \"gamesDir\": \"src/play\" }\n" } },
+      {
+        "write": {
+          "file": "src/play/lights-out/rules/outcome.ts",
+          "content": "export const LOST = 'lights-out.lose.out-of-moves';\n"
+        }
+      }
+    ]
+  },
+  "pass-installed-skills": {
+    "expect": ["check-game-scaffold: 1 games checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/board-kit/SKILL.md",
+          "lines": ["---", "name: board-kit", "description: An installed skill.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": ".agents/skills/board-kit/templates/src/games/__GAME_ID__/rules/create.ts",
+          "lines": [
+            "// src/games/__GAME_ID__/rules/create.ts",
+            "export type __GAME_PASCAL__State = { readonly key: 'tile-match.lose.unknown' };"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/puzzle-kit/SKILL.md",
+          "lines": ["---", "name: puzzle-kit", "description: A vendored skill.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/puzzle-kit/src/games/tile-match/rules/outcome.ts",
+          "lines": ["export const KEY = 'tile-match.lose.unknown'; // __GAME_ID__"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/vendored-kit/SKILL.md",
+          "lines": ["---", "name: vendored-kit", "description: A skill vendored into the games folder.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/vendored-kit/templates/__GAME_ID__-game.ts",
+          "lines": ["// __GAME_CONST___GAME", "export {};"]
+        }
+      }
+    ]
+  },
+  "pass-no-game": {
+    "expect": [
+      "NOT APPLICABLE: the app has no game (contracts/games.json declares none and src/games has no game folder)"
+    ],
+    "ops": [{ "json": { "file": "contracts/games.json", "path": ["games"], "value": [] } }]
+  }
+}

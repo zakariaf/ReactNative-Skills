@@ -1,0 +1,312 @@
+{
+  "$comment": "The app icon set on the 24-unit grid: the source of src/ui/icons/icon-paths.ts. Edit the layers here, then run node scripts/art/build-icon-paths.ts; never edit icon-paths.ts by hand.",
+  "viewBox": "0 0 24 24",
+  "directional": ["back", "forward", "chevron", "undo"],
+  "glyphs": {
+    "back": {
+      "layers": [
+        {
+          "op": "stroke",
+          "width": 2,
+          "cap": "round",
+          "join": "round",
+          "d": "M11 5l-7 7 7 7M4.5 12H20"
+        }
+      ]
+    },
+    "forward": {
+      "layers": [
+        {
+          "op": "stroke",
+          "width": 2,
+          "cap": "round",
+          "join": "round",
+          "d": "M13 5l7 7-7 7M19.5 12H4"
+        }
+      ]
+    },
+    "chevron": {
+      "layers": [
+        {
+          "op": "stroke",
+          "width": 2.4,
+          "cap": "round",
+          "join": "round",
+          "d": "M9 5l7 7-7 7"
+        }
+      ]
+    },
+    "undo": {
+      "layers": [
+        {
+          "op": "stroke",
+          "width": 2,
+          "cap": "round",
+          "join": "round",
+          "d": "M9 14 4 9l5-5"
+        },
+        {
+          "op": "stroke",
+          "width": 2,
+          "cap": "round",
+          "join": "round",
+          "d": "M4.5 9H15a5 5 0 0 1 0 10h-4"
+        }
+      ]
+    },
+    "check": {
+      "layers": [
+        {
+          "op": "stroke",
+          "width": 2.4,
+          "cap": "round",
+          "join": "round",
+          "d": "M4.5 12.5l5 5L19.5 7"
+        }
+      ]
+    },
+    "close": {
+      "layers": [
+        {
+          "op": "stroke",
+          "width": 2.4,
+          "cap": "round",
+          "join": "round",
+          "d": "M6 6l12 12M18 6 6 18"
+        }
+      ]
+    },
+    "plus": {
+      "layers": [
+        {
+          "op": "stroke",
+          "width": 2.4,
+          "cap": "round",
+          "join": "round",
+          "d": "M12 5v14M5 12h14"
+        }
+      ]
+    },
+    "search": {
+      "layers": [
+        {
+          "op": "stroke",
+          "width": 2,
+          "cap": "round",
+          "join": "round",
+          "d": "M4 10.5a6.5 6.5 0 1 0 13 0a6.5 6.5 0 1 0 -13 0Z"
+        },
+        {
+          "op": "stroke",
+          "width": 2,
+          "cap": "round",
+          "join": "round",
+          "d": "M15.5 15.5 20 20"
+        }
+      ]
+    },
+    "list": {
+      "layers": [
+        {
+          "op": "stroke",
+          "width": 2,
+          "cap": "round",
+          "join": "round",
+          "d": "M10 6h10M10 12h10M10 18h10"
+        },
+        {
+          "op": "fill",
+          "fillRule": "nonzero",
+          "d": "M3.5 6a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0 -3 0Z"
+        },
+        {
+          "op": "fill",
+          "fillRule": "nonzero",
+          "d": "M3.5 12a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0 -3 0Z"
+        },
+        {
+          "op": "fill",
+          "fillRule": "nonzero",
+          "d": "M3.5 18a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0 -3 0Z"
+        }
+      ]
+    },
+    "bell": {
+      "layers": [
+        {
+          "op": "stroke",
+          "width": 2,
+          "cap": "round",
+          "join": "round",
+          "d": "M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15z"
+        },
+        {
+          "op": "stroke",
+          "width": 2,
+          "cap": "round",
+          "join": "round",
+          "d": "M10 21h4"
+        }
+      ]
+    },
+    "calendar": {
+      "layers": [
+        {
+          "op": "stroke",
+          "width": 2,
+          "cap": "round",
+          "join": "round",
+          "d": "M6 5.5h12A2.5 2.5 0 0 1 20.5 8v10a2.5 2.5 0 0 1-2.5 2.5H6A2.5 2.5 0 0 1 3.5 18V8A2.5 2.5 0 0 1 6 5.5z"
+        },
+        {
+          "op": "stroke",
+          "width": 2,
+          "cap": "round",
+          "join": "round",
+          "d": "M3.5 10.5h17M8 3.5v4M16 3.5v4"
+        }
+      ]
+    },
+    "settings": {
+      "layers": [
+        {
+          "op": "stroke",
+          "width": 2,
+          "cap": "round",
+          "join": "round",
+          "d": "M4 7h16M4 17h16"
+        },
+        {
+          "op": "fill",
+          "fillRule": "nonzero",
+          "d": "M6.4 7a2.6 2.6 0 1 0 5.2 0a2.6 2.6 0 1 0 -5.2 0Z"
+        },
+        {
+          "op": "stroke",
+          "width": 1.4,
+          "cap": "butt",
+          "join": "round",
+          "d": "M6.4 7a2.6 2.6 0 1 0 5.2 0a2.6 2.6 0 1 0 -5.2 0Z"
+        },
+        {
+          "op": "fill",
+          "fillRule": "nonzero",
+          "d": "M12.4 17a2.6 2.6 0 1 0 5.2 0a2.6 2.6 0 1 0 -5.2 0Z"
+        },
+        {
+          "op": "stroke",
+          "width": 1.4,
+          "cap": "butt",
+          "join": "round",
+          "d": "M12.4 17a2.6 2.6 0 1 0 5.2 0a2.6 2.6 0 1 0 -5.2 0Z"
+        }
+      ]
+    },
+    "trash": {
+      "layers": [
+        {
+          "op": "stroke",
+          "width": 2,
+          "cap": "round",
+          "join": "round",
+          "d": "M4 7h16M9.5 7V4.5h5V7M6.5 7l1 12.5A1.5 1.5 0 0 0 9 21h6a1.5 1.5 0 0 0 1.5-1.5l1-12.5M10 11v6M14 11v6"
+        }
+      ]
+    },
+    "edit": {
+      "layers": [
+        {
+          "op": "stroke",
+          "width": 2,
+          "cap": "round",
+          "join": "round",
+          "d": "M4.5 19.5l1-4.5L15.5 5a2.1 2.1 0 0 1 3 3l-10 10z"
+        },
+        {
+          "op": "stroke",
+          "width": 2,
+          "cap": "round",
+          "join": "round",
+          "d": "M13.5 7l3 3"
+        }
+      ]
+    },
+    "info": {
+      "layers": [
+        {
+          "op": "stroke",
+          "width": 2,
+          "cap": "round",
+          "join": "round",
+          "d": "M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0Z"
+        },
+        {
+          "op": "stroke",
+          "width": 2,
+          "cap": "round",
+          "join": "round",
+          "d": "M12 11v6"
+        },
+        {
+          "op": "fill",
+          "fillRule": "nonzero",
+          "d": "M10.7 7.6a1.3 1.3 0 1 0 2.6 0a1.3 1.3 0 1 0 -2.6 0Z"
+        }
+      ]
+    },
+    "lock": {
+      "layers": [
+        {
+          "op": "stroke",
+          "width": 2,
+          "cap": "round",
+          "join": "round",
+          "d": "M8 10.5V8a4 4 0 0 1 8 0v2.5"
+        },
+        {
+          "op": "fill",
+          "fillRule": "evenodd",
+          "d": "M7.5 10.5h9A2.5 2.5 0 0 1 19 13v5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 5 18v-5a2.5 2.5 0 0 1 2.5-2.5zM12 13.5a1.5 1.5 0 0 0-.85 2.74V18h1.7v-1.76A1.5 1.5 0 0 0 12 13.5z"
+        }
+      ]
+    },
+    "star": {
+      "layers": [
+        {
+          "op": "stroke",
+          "width": 2,
+          "cap": "round",
+          "join": "round",
+          "d": "M12 3l2.7 5.5 6 .9-4.35 4.25 1 6L12 16.8l-5.35 2.85 1-6L3.3 9.4l6-.9z"
+        }
+      ]
+    },
+    "star-fill": {
+      "layers": [
+        {
+          "op": "fill",
+          "fillRule": "nonzero",
+          "d": "M12 3l2.7 5.5 6 .9-4.35 4.25 1 6L12 16.8l-5.35 2.85 1-6L3.3 9.4l6-.9z"
+        },
+        {
+          "op": "stroke",
+          "width": 1.4,
+          "cap": "butt",
+          "join": "round",
+          "d": "M12 3l2.7 5.5 6 .9-4.35 4.25 1 6L12 16.8l-5.35 2.85 1-6L3.3 9.4l6-.9z"
+        }
+      ]
+    },
+    "star-edge": {
+      "layers": [
+        {
+          "op": "stroke",
+          "width": 1.6,
+          "cap": "round",
+          "join": "round",
+          "d": "M12 3l2.7 5.5 6 .9-4.35 4.25 1 6L12 16.8l-5.35 2.85 1-6L3.3 9.4l6-.9z"
+        }
+      ]
+    }
+  }
+}

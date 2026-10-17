@@ -1,0 +1,14 @@
+{
+  "base": "@tests/bases/export",
+  "ops": [
+    { "write": { "file": "dist/assets/wa-sqlite.7ca566fb.wasm", "content": "(stand-in for the wa-sqlite WebAssembly module)\n" } },
+    { "json": { "file": "contracts/web.json", "path": ["smokeLanguage"], "value": { "lang": "ar", "dir": "rtl" } } },
+    {
+      "write": {
+        "file": "dist/_expo/static/js/web/index-3f2a.js",
+        "content": "// A stand-in web bundle: renders the route's testID and lays the page out in the browser's language.\n(function render() {\n  var isArabic = (navigator.language || '').toLowerCase().indexOf('ar') === 0;\n  document.documentElement.lang = isArabic ? 'ar' : 'en';\n  document.documentElement.dir = isArabic ? 'rtl' : 'ltr';\n  var screen = document.createElement('div');\n  screen.setAttribute('data-testid', location.pathname.indexOf('settings') === -1 ? 'tasks.list' : 'settings.list');\n  document.getElementById('root').appendChild(screen);\n})();\n"
+      }
+    }
+  ],
+  "extends": "good"
+}

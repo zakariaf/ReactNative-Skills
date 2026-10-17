@@ -1,0 +1,14 @@
+{
+  "name": "tasks",
+  "private": true,
+  "main": "index.ts",
+  "scripts": {
+    "build:android:emu": "node scripts/build/build-android-emu.ts",
+    "audit:android": "node scripts/audit/audit-android.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p src/tsconfig.json"
+  },
+  "dependencies": {
+    "expo": "~57.0.26",
+    "expo-router": "~57.0.24"
+  }
+}

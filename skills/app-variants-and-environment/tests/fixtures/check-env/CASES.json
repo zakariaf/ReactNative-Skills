@@ -1,0 +1,841 @@
+{
+  "bad-env-reader-api-name-outside-routes": {
+    "expect": [
+      "FAIL src/features/tasks/summarize+api.ts:2 [env-reader] process.env.SUMMARY_API_TOKEN is not an EXPO_PUBLIC_ variable"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/summarize+api.ts",
+          "content": "// src/features/tasks/summarize+api.ts (not under src/app/: app code, bundled into the app)\nexport const SUMMARY_TOKEN = process.env.SUMMARY_API_TOKEN ?? '';\n"
+        }
+      }
+    ]
+  },
+  "bad-env-reader-bracket": {
+    "expect": ["FAIL src/config/environment.ts:5 [env-reader] process.env[...] is not a supported form"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/environment.ts",
+          "find": "process.env.EXPO_PUBLIC_TASKS_API_URL ?? ''",
+          "with": "process.env['EXPO_PUBLIC_TASKS_API_URL'] ?? ''"
+        }
+      }
+    ]
+  },
+  "bad-env-reader-destructured": {
+    "expect": ["FAIL src/config/environment.ts:5 [env-reader] process.env used as an object"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/environment.ts",
+          "find": "  return { apiUrl: process.env.EXPO_PUBLIC_TASKS_API_URL ?? '' };",
+          "with": "  const { EXPO_PUBLIC_TASKS_API_URL } = process.env;\n  return { apiUrl: EXPO_PUBLIC_TASKS_API_URL ?? '' };"
+        }
+      }
+    ]
+  },
+  "bad-env-reader-flag-const": {
+    "expect": [
+      "FAIL src/app/storybook.tsx:2 [env-reader] process.env.EXPO_PUBLIC_STORYBOOK_ENABLED decides whether a require() is in the bundle"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/storybook.tsx",
+          "content": "// src/app/storybook.tsx\nconst ENABLED = process.env.EXPO_PUBLIC_STORYBOOK_ENABLED === 'true';\n\nexport default ENABLED\n  ? (require('../../.rnstorybook') as { default: () => null }).default\n  : (): null => null;\n"
+        }
+      }
+    ]
+  },
+  "bad-env-reader-flag-if": {
+    "expect": [
+      "FAIL src/app/storybook.tsx:3 [env-reader] process.env.EXPO_PUBLIC_STORYBOOK_ENABLED decides whether a require() is in the bundle, but not as a literal comparison in the same ternary",
+      "Fix: Keep the literal comparison at the require site: process.env.EXPO_PUBLIC_STORYBOOK_ENABLED === '<value>' ? require(<entry>) : null"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/storybook.tsx",
+          "content": "// src/app/storybook.tsx\nlet Screen: () => null = () => null;\nif (process.env.EXPO_PUBLIC_STORYBOOK_ENABLED === 'true') {\n  Screen = (require('../../.rnstorybook') as { default: () => null }).default;\n}\nexport default Screen;\n"
+        }
+      }
+    ]
+  },
+  "bad-env-reader-non-public": {
+    "expect": [
+      "FAIL src/config/environment.ts:5 [env-reader] process.env.TASKS_API_URL is not an EXPO_PUBLIC_ variable"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/environment.ts",
+          "find": "process.env.EXPO_PUBLIC_TASKS_API_URL ?? ''",
+          "with": "process.env.TASKS_API_URL ?? ''"
+        }
+      }
+    ]
+  },
+  "bad-env-reader-outside-config": {
+    "expect": [
+      "FAIL src/features/tasks/use-tasks-model.ts:9 [env-reader] process.env.EXPO_PUBLIC_TASKS_API_URL read outside src/config/"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "apiUrl: readPublicEnvironment().apiUrl",
+          "with": "apiUrl: process.env.EXPO_PUBLIC_TASKS_API_URL ?? readPublicEnvironment().apiUrl"
+        }
+      }
+    ]
+  },
+  "bad-env-reader-root-app-routes": {
+    "expect": ["FAIL app/settings/index.tsx:4 [env-reader] process.env.APP_VARIANT is not an EXPO_PUBLIC_ variable"],
+    "ops": [
+      { "rename": { "from": "src/app", "to": "app" } },
+      {
+        "write": {
+          "file": "app/settings/index.tsx",
+          "content": "// app/settings/index.tsx\nimport { Text } from 'react-native';\n\nconst IS_DEV_BUILD = process.env.APP_VARIANT === 'development';\n\nexport default function SettingsRoute(): React.JSX.Element {\n  return <Text>{IS_DEV_BUILD ? 'dev' : ''}</Text>;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-env-reader-server-undeclared": {
+    "expect": [
+      "FAIL src/server/llm-client.ts:5 [env-reader] process.env.OPENAI_API_KEY is not an EXPO_PUBLIC_ variable",
+      "If src/server/llm-client.ts is server-only code that only API routes import, list its folder in rn-skills.config.json \"serverDirs\"."
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/server/llm-client.ts",
+          "content": "// src/server/llm-client.ts (server-only, but rn-skills.config.json does not say so)\nexport async function summarize(text: string): Promise<string> {\n  const response = await fetch('https://api.openai.com/v1/responses', {\n    method: 'POST',\n    headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY ?? ''}` },\n    body: JSON.stringify({ input: text }),\n  });\n  return response.text();\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-inclusion-gate-constant": {
+    "expect": [
+      "FAIL src/test-only.ts:7 [inclusion-gate] the require() of ./test-only-entry is not decided by the literal variant comparison in one expression"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/test-only.ts",
+          "content": "// src/test-only.ts\nimport { IS_TEST_BUILD } from './config/is-test-build';\n\nimport type { TestOnlyApi } from './test-only-entry';\n\nexport const TEST_ONLY: TestOnlyApi | null = IS_TEST_BUILD\n  ? (require('./test-only-entry') as TestOnlyApi)\n  : null;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/config/is-test-build.ts",
+          "content": "// src/config/is-test-build.ts\nexport const IS_TEST_BUILD = process.env.EXPO_PUBLIC_APP_VARIANT !== 'production';\n"
+        }
+      }
+    ]
+  },
+  "bad-inclusion-gate-dev-flag": {
+    "expect": [
+      "FAIL src/features/tasks/debug-panel-slot.ts:2 [inclusion-gate] the require() of ./debug-panel is not decided by the literal variant comparison"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/debug-panel-slot.ts",
+          "content": "// src/features/tasks/debug-panel-slot.ts\nexport const DEBUG_PANEL: unknown = __DEV__ ? require('./debug-panel') : null;\n"
+        }
+      }
+    ]
+  },
+  "bad-inclusion-gate-if": {
+    "expect": [
+      "FAIL src/test-only.ts:6 [inclusion-gate] the require() of ./test-only-entry sits in an if block: use the ternary gate form"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/test-only.ts",
+          "content": "// src/test-only.ts\nimport type { TestOnlyApi } from './test-only-entry';\n\nexport let TEST_ONLY: TestOnlyApi | null = null;\nif (process.env.EXPO_PUBLIC_APP_VARIANT !== 'production') {\n  TEST_ONLY = require('./test-only-entry') as TestOnlyApi;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-inclusion-gate-imported-flag": {
+    "expect": [
+      "FAIL src/app/storybook.tsx:5 [inclusion-gate] the require() of ../../.rnstorybook is decided by STORYBOOK_ENABLED, imported from src/config/storybook.ts, which reads process.env.EXPO_PUBLIC_STORYBOOK_ENABLED",
+      "Fix: Compare the variable with its literal at the require site: process.env.EXPO_PUBLIC_STORYBOOK_ENABLED === '<value>' ? require(../../.rnstorybook) : null."
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/config/storybook.ts",
+          "content": "// src/config/storybook.ts\nexport const STORYBOOK_ENABLED = process.env.EXPO_PUBLIC_STORYBOOK_ENABLED === 'true';\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/storybook.tsx",
+          "content": "// src/app/storybook.tsx\nimport { STORYBOOK_ENABLED } from '@/config/storybook';\n\nexport default STORYBOOK_ENABLED\n  ? (require('../../.rnstorybook') as { default: () => null }).default\n  : (): null => null;\n"
+        }
+      }
+    ]
+  },
+  "bad-inclusion-gate-imported-helper": {
+    "expect": [
+      "FAIL src/app/storybook.tsx:5 [inclusion-gate] the require() of ../../.rnstorybook is decided by flags, imported from src/config/flags.ts, which reads process.env.EXPO_PUBLIC_STORYBOOK_ENABLED"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/config/flags.ts",
+          "content": "// src/config/flags.ts\nexport function isStorybookEnabled(): boolean {\n  return process.env.EXPO_PUBLIC_STORYBOOK_ENABLED === 'true';\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/storybook.tsx",
+          "content": "// src/app/storybook.tsx\nimport * as flags from '@/config/flags';\n\nexport default flags.isStorybookEnabled()\n  ? (require('../../.rnstorybook') as { default: () => null }).default\n  : (): null => null;\n"
+        }
+      }
+    ]
+  },
+  "bad-inclusion-gate-node-env": {
+    "expect": [
+      "FAIL src/features/tasks/debug-menu-slot.ts:2 [inclusion-gate] the require() of ./debug-menu is not decided by the literal variant comparison"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/debug-menu-slot.ts",
+          "content": "// src/features/tasks/debug-menu-slot.ts\nexport const DEBUG_MENU: unknown = process.env.NODE_ENV === 'production' ? null : require('./debug-menu');\n"
+        }
+      }
+    ]
+  },
+  "bad-inclusion-gate-package": {
+    "expect": [
+      "FAIL src/app/mocks.ts:4 [inclusion-gate] the require() of msw/native is not decided by the literal variant comparison in one expression"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/mocks.ts",
+          "content": "// src/app/mocks.ts\nimport { IS_TEST_BUILD } from '@/config/is-test-build';\n\nexport const MOCKS: unknown = IS_TEST_BUILD ? require('msw/native') : null;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/config/is-test-build.ts",
+          "content": "// src/config/is-test-build.ts\nexport const IS_TEST_BUILD = process.env.EXPO_PUBLIC_APP_VARIANT !== 'production';\n"
+        }
+      }
+    ]
+  },
+  "bad-inclusion-gate-root-layout": {
+    "expect": [
+      "FAIL components/debug.ts:2 [inclusion-gate] the require() of ./debug-menu is not decided by the literal variant comparison"
+    ],
+    "ops": [
+      { "rename": { "from": "src/app", "to": "app" } },
+      {
+        "write": {
+          "file": "components/debug.ts",
+          "content": "// components/debug.ts\nexport const DEBUG_MENU: unknown = __DEV__ ? require('./debug-menu') : null;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "components/debug-menu.ts",
+          "content": "// components/debug-menu.ts\nexport const DEBUG_MENU_ITEMS = ['reset'] as const;\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app/_layout.tsx",
+          "find": "import { Stack } from 'expo-router';\n",
+          "with": "import { Stack } from 'expo-router';\n\nimport { DEBUG_MENU } from '../components/debug';\n\nvoid DEBUG_MENU;\n"
+        }
+      }
+    ]
+  },
+  "bad-inclusion-gate-store-build": {
+    "expect": [
+      "FAIL src/features/tasks/debug-menu-slot.ts:4 [inclusion-gate] the require() of ./debug-menu is not decided by the literal variant comparison"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/debug-menu-slot.ts",
+          "content": "// src/features/tasks/debug-menu-slot.ts\nimport { IS_STORE_BUILD } from '@/config/build-flags';\n\nexport const DEBUG_MENU: unknown = IS_STORE_BUILD ? null : require('./debug-menu');\n"
+        }
+      }
+    ]
+  },
+  "bad-multi-package-env-reader": {
+    "expect": [
+      "FAIL apps/mobile/src/features/tasks/use-tasks-model.ts:9 [env-reader] process.env.EXPO_PUBLIC_TASKS_API_URL read outside apps/mobile/src/config/"
+    ],
+    "ops": [
+      { "rename": { "from": "app.config.ts", "to": "apps/mobile/app.config.ts" } },
+      { "rename": { "from": "eas.json", "to": "apps/mobile/eas.json" } },
+      { "rename": { "from": ".env.example", "to": "apps/mobile/.env.example" } },
+      { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      {
+        "write": {
+          "file": "package.json",
+          "content": "{ \"name\": \"tasks-repo\", \"private\": true, \"workspaces\": [\"apps/*\"] }\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "apps/mobile/src/features/tasks/use-tasks-model.ts",
+          "find": "apiUrl: readPublicEnvironment().apiUrl",
+          "with": "apiUrl: process.env.EXPO_PUBLIC_TASKS_API_URL ?? readPublicEnvironment().apiUrl"
+        }
+      }
+    ]
+  },
+  "bad-no-gitignore": {
+    "expect": ["FAIL .gitignore [secret-ignored] no .gitignore"],
+    "ops": [{ "delete": ".gitignore" }]
+  },
+  "bad-public-env-secret-api-route": {
+    "expect": [
+      "FAIL src/app/api/chat+api.ts:3 [public-env-secret] EXPO_PUBLIC_ANTHROPIC_API_KEY is named like a secret",
+      "Drop the EXPO_PUBLIC_ prefix"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/api/chat+api.ts",
+          "content": "// src/app/api/chat+api.ts\nexport async function POST(request: Request): Promise<Response> {\n  const key = process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY ?? '';\n  return Response.json({ ok: key !== '', body: await request.text() });\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-public-env-secret-app-config": {
+    "expect": [
+      "FAIL app.config.ts:",
+      "[public-env-secret] EXPO_PUBLIC_SENTRY_AUTH_TOKEN is named like a secret, but an EXPO_PUBLIC_ variable is public"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    // (expo-prebuild-and-config-plugins), and every package named here is a dependency.\n",
+          "with": "    // (expo-prebuild-and-config-plugins), and every package named here is a dependency.\n    ['@sentry/react-native/expo', { organization: 'tasks', uploadToken: process.env.EXPO_PUBLIC_SENTRY_AUTH_TOKEN }],\n"
+        }
+      }
+    ]
+  },
+  "bad-public-env-secret-claude": {
+    "expect": ["FAIL .env.local:1 [public-env-secret] EXPO_PUBLIC_CLAUDE_API_KEY is named like a secret"],
+    "ops": [{ "write": { "file": ".env.local", "content": "EXPO_PUBLIC_CLAUDE_API_KEY=placeholder-value\n" } }]
+  },
+  "bad-public-env-secret-connection-string": {
+    "expect": [
+      "FAIL .env.local:1 [public-env-secret] EXPO_PUBLIC_DATABASE_URL holds a connection string with a password"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": ".env.local",
+          "content": "EXPO_PUBLIC_DATABASE_URL=postgres://tasks_app:Zq8-vR2mX4tL9wKe_AT_tasks-db.c9xk2.eu-west-1.rds.amazonaws.com:5432/tasks\n"
+        }
+      },
+      { "replace": { "file": ".env.local", "find": "_AT_", "with": "@" } }
+    ]
+  },
+  "bad-public-env-secret-declared": {
+    "expect": [
+      "FAIL src/env.d.ts:10 [public-env-secret] EXPO_PUBLIC_API_TOKEN is declared as a public variable but is named like a secret"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/env.d.ts",
+          "find": "    readonly EXPO_PUBLIC_APP_VARIANT?: string;\n",
+          "with": "    readonly EXPO_PUBLIC_APP_VARIANT?: string;\n    readonly EXPO_PUBLIC_API_TOKEN?: string;\n"
+        }
+      }
+    ]
+  },
+  "bad-public-env-secret-eas": {
+    "expect": ["[public-env-secret] build.production.env.EXPO_PUBLIC_ADMIN_KEY is named like a secret"],
+    "ops": [
+      {
+        "json": { "file": "eas.json", "path": ["build", "production", "env", "EXPO_PUBLIC_ADMIN_KEY"], "value": "abc" }
+      }
+    ]
+  },
+  "bad-public-env-secret-encryption-key": {
+    "expect": [
+      "FAIL src/config/local-cache-key.ts:3 [public-env-secret] EXPO_PUBLIC_ENCRYPTION_KEY is named like a secret"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/config/local-cache-key.ts",
+          "content": "// src/config/local-cache-key.ts\nexport function localCacheKey(): string {\n  return process.env.EXPO_PUBLIC_ENCRYPTION_KEY ?? '';\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-public-env-secret-llm-code": {
+    "expect": ["FAIL src/config/ai.ts:3 [public-env-secret] EXPO_PUBLIC_OPENAI_API_KEY is named like a secret"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/config/ai.ts",
+          "content": "// src/config/ai.ts\nexport function openAiKey(): string {\n  return process.env.EXPO_PUBLIC_OPENAI_API_KEY ?? '';\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-public-env-secret-llm-eas": {
+    "expect": ["[public-env-secret] build.production.env.EXPO_PUBLIC_OPENAI_API_KEY holds an OpenAI API key"],
+    "ops": [
+      {
+        "json": {
+          "file": "eas.json",
+          "path": ["build", "production", "env", "EXPO_PUBLIC_OPENAI_API_KEY"],
+          "value": "sk-pXroj-0000aaaa1111bbbb2222cccc3333dddd"
+        }
+      },
+      { "replace": { "file": "eas.json", "find": "sk-pXroj-", "with": "sk-proj-" } }
+    ]
+  },
+  "bad-public-env-secret-llm-env-file": {
+    "expect": ["FAIL .env:1 [public-env-secret] EXPO_PUBLIC_OPENAI_API_KEY holds an OpenAI API key"],
+    "ops": [
+      {
+        "write": { "file": ".env", "content": "EXPO_PUBLIC_OPENAI_API_KEY=sk-pXroj-0000aaaa1111bbbb2222cccc3333dddd\n" }
+      },
+      { "replace": { "file": ".env", "find": "sk-pXroj-", "with": "sk-proj-" } }
+    ]
+  },
+  "bad-public-env-secret-name": {
+    "expect": [
+      "FAIL src/config/environment.ts:5 [public-env-secret] EXPO_PUBLIC_STRIPE_SECRET_KEY is named like a secret"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/environment.ts",
+          "find": "process.env.EXPO_PUBLIC_TASKS_API_URL ?? ''",
+          "with": "process.env.EXPO_PUBLIC_STRIPE_SECRET_KEY ?? ''"
+        }
+      }
+    ]
+  },
+  "bad-public-env-secret-open-ai": {
+    "expect": ["FAIL src/config/ai.ts:2 [public-env-secret] EXPO_PUBLIC_OPEN_AI_API_KEY is named like a secret"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/config/ai.ts",
+          "content": "// src/config/ai.ts\nexport const aiKey = (): string => process.env.EXPO_PUBLIC_OPEN_AI_API_KEY ?? '';\nexport const aiKeyCamel = { openAiApiKey: '' };\n"
+        }
+      }
+    ]
+  },
+  "bad-public-env-secret-value": {
+    "expect": ["FAIL .env.local:1 [public-env-secret] EXPO_PUBLIC_PAYMENTS_KEY holds a Stripe secret or restricted key"],
+    "ops": [
+      { "write": { "file": ".env.local", "content": "EXPO_PUBLIC_PAYMENTS_KEY=sk_XLIVE_00000000aaaaaaaa11111111\n" } },
+      { "replace": { "file": ".env.local", "find": "sk_XLIVE_", "with": "sk_live_" } }
+    ]
+  },
+  "bad-secret-eas-env": {
+    "expect": [
+      "[secret-eas-env] build.production.env.SENTRY_AUTH_TOKEN puts a secret into eas.json, which is committed plain text"
+    ],
+    "ops": [
+      { "json": { "file": "eas.json", "path": ["build", "production", "env", "SENTRY_AUTH_TOKEN"], "value": "abc123" } }
+    ]
+  },
+  "bad-secret-eas-env-llm": {
+    "expect": [
+      "[secret-eas-env] build.preview.env.ANTHROPIC_API_KEY puts a secret into eas.json, which is committed plain text"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "eas.json",
+          "path": ["build", "preview", "env", "ANTHROPIC_API_KEY"],
+          "value": "sk-aXnt-api03-0000aaaa1111bbbb2222cccc3333"
+        }
+      },
+      { "replace": { "file": "eas.json", "find": "sk-aXnt-", "with": "sk-ant-" } }
+    ]
+  },
+  "bad-secret-env-file": {
+    "expect": ["[secret-env-file] SENTRY_AUTH_TOKEN has a value in .env.example, which git would commit"],
+    "ops": [
+      {
+        "replace": { "file": ".env.example", "find": "# SENTRY_AUTH_TOKEN=", "with": "SENTRY_AUTH_TOKEN=abc123456789" }
+      }
+    ]
+  },
+  "bad-secret-env-file-connection-string": {
+    "expect": [
+      "[secret-env-file] MONGODB_URI has a value in .env.example, which git would commit (a connection string with a password)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".env.example",
+          "find": "# SENTRY_AUTH_TOKEN=\n",
+          "with": "# SENTRY_AUTH_TOKEN=\nMONGODB_URI=mongodb+srv://tasks:Zq8vR2mX4tL9wKe_AT_cluster0.ab1cd.mongodb.net/tasks\n"
+        }
+      },
+      { "replace": { "file": ".env.example", "find": "_AT_", "with": "@" } }
+    ]
+  },
+  "bad-secret-env-file-stripe-test": {
+    "expect": [
+      "[secret-env-file] PAYMENTS_KEY has a value in .env.example, which git would commit (a Stripe secret or restricted key (live or test))"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".env.example",
+          "find": "# SENTRY_AUTH_TOKEN=\n",
+          "with": "# SENTRY_AUTH_TOKEN=\nPAYMENTS_KEY=sk_tXest_00000000aaaaaaaa11111111\n"
+        }
+      },
+      { "replace": { "file": ".env.example", "find": "sk_tXest_", "with": "sk_test_" } }
+    ]
+  },
+  "bad-secret-ignored": {
+    "expect": ["FAIL .gitignore [secret-ignored] release.keystore is not git-ignored"],
+    "ops": [{ "replace": { "file": ".gitignore", "find": "*.keystore\n", "with": "" } }]
+  },
+  "bad-secret-ignored-eas-key": {
+    "expect": [
+      "FAIL .gitignore [secret-ignored] play-service-account.json is not git-ignored (eas.json submit.production.android.serviceAccountKeyPath points at it)"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "eas.json",
+          "path": ["submit", "production", "android", "serviceAccountKeyPath"],
+          "value": "./play-service-account.json"
+        }
+      }
+    ]
+  },
+  "bad-secret-ignored-local-credentials": {
+    "expect": ["FAIL .gitignore [secret-ignored] credentials.json is not git-ignored"],
+    "ops": [{ "json": { "file": "eas.json", "path": ["build", "production", "credentialsSource"], "value": "local" } }]
+  },
+  "bad-server-import": {
+    "expect": [
+      "FAIL src/features/tasks/summary.ts:2 [server-import] imports @/server/llm-client (src/server/llm-client.ts), which sits in a serverDirs folder"
+    ],
+    "ops": [
+      { "write": { "file": "rn-skills.config.json", "content": "{ \"serverDirs\": [\"src/server\"] }\n" } },
+      {
+        "write": {
+          "file": "src/server/llm-client.ts",
+          "content": "// src/server/llm-client.ts\nexport function apiKey(): string {\n  return process.env.OPENAI_API_KEY ?? '';\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/summary.ts",
+          "content": "// src/features/tasks/summary.ts\nimport { apiKey } from '@/server/llm-client';\n\nexport const hasKey = (): boolean => apiKey() !== '';\n"
+        }
+      }
+    ]
+  },
+  "bad-src-dot-unimported-file": {
+    "expect": [
+      "FAIL components/debug.ts:2 [inclusion-gate] the require() of ./debug-menu is not decided by the literal variant comparison",
+      "FAIL components/debug.ts:3 [env-reader] process.env.EXPO_PUBLIC_TASKS_API_URL read outside config/"
+    ],
+    "ops": [
+      { "write": { "file": "rn-skills.config.json", "content": "{ \"srcDir\": \".\" }\n" } },
+      { "rename": { "from": "src/app", "to": "app" } },
+      { "rename": { "from": "src/config", "to": "config" } },
+      { "rename": { "from": "src/features", "to": "features" } },
+      { "rename": { "from": "src/test-only.ts", "to": "test-only.ts" } },
+      { "rename": { "from": "src/test-only-entry.ts", "to": "test-only-entry.ts" } },
+      { "rename": { "from": "src/env.d.ts", "to": "env.d.ts" } },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "./src/config/app-variant.ts",
+          "with": "./config/app-variant.ts",
+          "all": true
+        }
+      },
+      {
+        "write": {
+          "file": "components/debug.ts",
+          "content": "// components/debug.ts\nexport const DEBUG_MENU: unknown = __DEV__ ? require('./debug-menu') : null;\nexport const API_URL = process.env.EXPO_PUBLIC_TASKS_API_URL;\n"
+        }
+      }
+    ]
+  },
+  "bad-variant-env-file": {
+    "expect": [
+      "FAIL .env.example:11 [variant-env-file] .env.example sets APP_VARIANT=production, and git would commit it"
+    ],
+    "ops": [
+      { "replace": { "file": ".env.example", "find": "# APP_VARIANT=development", "with": "APP_VARIANT=production" } }
+    ]
+  },
+  "bad-variant-env-file-committed-env": {
+    "expect": [
+      "FAIL .env:1 [variant-env-file] .env sets APP_VARIANT=production",
+      "FAIL .env:2 [variant-env-file] .env sets EXPO_PUBLIC_APP_VARIANT=production"
+    ],
+    "ops": [
+      { "replace": { "file": ".gitignore", "find": ".env*\n", "with": ".env*.local\n" } },
+      { "write": { "file": ".env", "content": "APP_VARIANT=production\nEXPO_PUBLIC_APP_VARIANT=production\n" } }
+    ]
+  },
+  "bad-variant-reader": {
+    "expect": ["FAIL src/features/tasks/use-tasks-model.ts:7 [variant-reader]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "  const variant = currentAppVariant();",
+          "with": "  const variant = String(Constants.expoConfig?.extra?.appVariant ?? currentAppVariant());"
+        }
+      }
+    ]
+  },
+  "error-no-app-code": {
+    "expect": ["ERROR [bad-input] nothing to check: no app code in src/"],
+    "ops": [{ "delete": "src" }]
+  },
+  "error-no-package-json": {
+    "expect": ["ERROR [bad-input] nothing to check: no package.json"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "error-server-dirs-malformed": {
+    "expect": [
+      "ERROR [bad-input] rn-skills.config.json \"serverDirs\" entry \"../server\" is not a repo-relative folder"
+    ],
+    "ops": [{ "write": { "file": "rn-skills.config.json", "content": "{ \"serverDirs\": [\"../server\"] }\n" } }]
+  },
+  "pass-api-route": {
+    "expect": ["check-env: 14 files checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/api/summarize+api.ts",
+          "content": "// src/app/api/summarize+api.ts\n// An Expo Router API route: it runs on the server (EAS Hosting), never in the app bundle, so it\n// reads its secrets from process.env at request time.\nexport async function POST(request: Request): Promise<Response> {\n  const token = process.env.SUMMARY_API_TOKEN ?? '';\n  const { OPENAI_API_KEY } = process.env;\n  const model = process.env['SUMMARY_MODEL'] ?? 'small';\n  return Response.json({ ok: token !== '' && OPENAI_API_KEY !== undefined, model, body: await request.text() });\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-dev-only-requires": {
+    "expect": ["0 problems"],
+    "ops": [
+      { "write": { "file": "rn-skills.config.json", "content": "{ \"devOnlyRequires\": [\"./dev-tools/*\"] }\n" } },
+      {
+        "write": {
+          "file": "src/dev/inspector.ts",
+          "content": "// src/dev/inspector.ts\nexport const INSPECTOR: unknown = __DEV__ ? require('./dev-tools/layout-inspector') : null;\n"
+        }
+      }
+    ]
+  },
+  "pass-dev-package-tooling": {
+    "expect": ["check-env: 14 files checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/devtools.tsx",
+          "content": "// src/app/devtools.tsx\n// Debug-bundle tooling from a package: __DEV__ is its right gate.\nexport const Devtools: unknown = __DEV__ ? require('@tanstack/react-query-devtools') : null;\n"
+        }
+      }
+    ]
+  },
+  "pass-env-file-local-connection-string": {
+    "expect": ["check-env: 13 files checked, 0 problems"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".env.example",
+          "find": "# SENTRY_AUTH_TOKEN=\n",
+          "with": "# SENTRY_AUTH_TOKEN=\n# The docker-compose database for local API-route work (not a secret).\nDATABASE_URL=postgres://postgres:postgres@localhost:5432/tasks\n"
+        }
+      }
+    ]
+  },
+  "pass-flag-gate": {
+    "expect": ["check-env: 14 files checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/storybook.tsx",
+          "content": "// src/app/storybook.tsx\n// Storybook is in the bundle only when the build sets EXPO_PUBLIC_STORYBOOK_ENABLED=true: the literal\n// comparison sits at the require() call, so Metro folds it and drops the module otherwise.\nexport default process.env.EXPO_PUBLIC_STORYBOOK_ENABLED === 'true'\n  ? (require('../../.rnstorybook') as { default: () => null }).default\n  : (): null => null;\n"
+        }
+      }
+    ]
+  },
+  "pass-gate-lookalikes": {
+    "expect": ["0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/optional-flows.ts",
+          "content": "// src/features/tasks/optional-flows.ts\n// Conditions that are not the variant: inclusion-gate leaves them alone.\nimport { Platform } from 'react-native';\n\nimport { latest, releaseNotes, shouldRestore, showPreview } from './flags';\n\nexport const RESTORE: unknown = shouldRestore ? require('./restore-flow') : null;\nexport const PREVIEW_CARD: unknown = showPreview ? require('./preview-card') : null;\nexport const NOTES: unknown = releaseNotes && require('./release-notes');\nexport const LATEST: unknown = latest() ? require('./latest-tasks') : null;\nexport const HAPTICS: unknown = Platform.OS === 'ios' ? require('./haptics-ios') : require('./haptics-android');\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/dev/reactotron.ts",
+          "content": "// src/dev/reactotron.ts\n// Reactotron's documented setup: debug-bundle tooling, not test-only code.\nif (__DEV__) {\n  require('./reactotron-config');\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-multi-package": {
+    "expect": ["check-env: 13 files checked, 0 problems"],
+    "ops": [
+      { "rename": { "from": "app.config.ts", "to": "apps/mobile/app.config.ts" } },
+      { "rename": { "from": "eas.json", "to": "apps/mobile/eas.json" } },
+      { "rename": { "from": ".env.example", "to": "apps/mobile/.env.example" } },
+      { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      {
+        "write": {
+          "file": "package.json",
+          "content": "{ \"name\": \"tasks-repo\", \"private\": true, \"workspaces\": [\"apps/*\"] }\n"
+        }
+      }
+    ]
+  },
+  "pass-not-expo": {
+    "expect": ["NOT APPLICABLE: expo is not in package.json dependencies (not an Expo app)"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo"], "delete": true } }]
+  },
+  "pass-platform-require": {
+    "expect": ["0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/haptics-slot.ts",
+          "content": "// src/features/tasks/haptics-slot.ts\nimport { Platform } from 'react-native';\n\nexport const HAPTICS: unknown = Platform.OS === 'ios' ? require('./haptics-ios') : require('./haptics-android');\n"
+        }
+      }
+    ]
+  },
+  "pass-public-by-design": {
+    "expect": ["0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "rn-skills.config.json",
+          "content": "{ \"publicEnvAllow\": [\"EXPO_PUBLIC_MAPBOX_TOKEN\"] }\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/config/environment.ts",
+          "find": "process.env.EXPO_PUBLIC_TASKS_API_URL ?? ''",
+          "with": "process.env.EXPO_PUBLIC_TASKS_API_URL ?? process.env.EXPO_PUBLIC_MAPBOX_TOKEN ?? ''"
+        }
+      }
+    ]
+  },
+  "pass-public-setting-names": {
+    "expect": ["check-env: 14 files checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/config/auth.ts",
+          "content": "// src/config/auth.ts\nexport const authSettings = (): { readonly tokenEndpoint: string; readonly privateBeta: boolean; readonly refreshTtl: string } => ({\n  tokenEndpoint: process.env.EXPO_PUBLIC_AUTH_TOKEN_ENDPOINT ?? '',\n  privateBeta: process.env.EXPO_PUBLIC_PRIVATE_BETA_ENABLED === 'true',\n  refreshTtl: process.env.EXPO_PUBLIC_REFRESH_TOKEN_TTL ?? '',\n});\n"
+        }
+      }
+    ]
+  },
+  "pass-root-app-layout": {
+    "expect": ["check-env: 14 files checked, 0 problems"],
+    "ops": [
+      { "rename": { "from": "src/app", "to": "app" } },
+      {
+        "write": {
+          "file": "components/variant-badge.tsx",
+          "content": "// components/variant-badge.tsx\nimport { Text } from 'react-native';\n\nimport { currentAppVariant } from '@/config/current-app-variant';\n\nexport function VariantBadge(): React.JSX.Element | null {\n  const variant = currentAppVariant();\n  return variant === 'production' ? null : <Text>{variant}</Text>;\n}\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app/_layout.tsx",
+          "find": "import { Stack } from 'expo-router';\n",
+          "with": "import { Stack } from 'expo-router';\n\nimport { VariantBadge } from '../components/variant-badge';\n\nvoid VariantBadge;\n"
+        }
+      }
+    ]
+  },
+  "pass-secret-in-ignored-env-file": {
+    "expect": ["0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": ".env.local",
+          "content": "SENTRY_AUTH_TOKEN=abc123456789\nEXPO_PUBLIC_TASKS_API_URL=http://localhost:3000\n"
+        }
+      }
+    ]
+  },
+  "pass-server-dirs": {
+    "expect": ["check-env: 15 files checked, 0 problems"],
+    "ops": [
+      { "write": { "file": "rn-skills.config.json", "content": "{ \"serverDirs\": [\"src/server\"] }\n" } },
+      {
+        "write": {
+          "file": "src/server/llm-client.ts",
+          "content": "// src/server/llm-client.ts (server-only: imported by API routes)\nexport async function summarize(text: string): Promise<string> {\n  const response = await fetch('https://api.openai.com/v1/responses', {\n    method: 'POST',\n    headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY ?? ''}` },\n    body: JSON.stringify({ input: text }),\n  });\n  return response.text();\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/api/summarize+api.ts",
+          "content": "// src/app/api/summarize+api.ts\nimport { summarize } from '@/server/llm-client';\n\nexport async function POST(request: Request): Promise<Response> {\n  return Response.json({ summary: await summarize(await request.text()) });\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-src-dot-layout": {
+    "expect": ["check-env: 13 files checked, 0 problems"],
+    "ops": [
+      { "write": { "file": "rn-skills.config.json", "content": "{ \"srcDir\": \".\" }\n" } },
+      { "rename": { "from": "src/app", "to": "app" } },
+      { "rename": { "from": "src/config", "to": "config" } },
+      { "rename": { "from": "src/features", "to": "features" } },
+      { "rename": { "from": "src/test-only.ts", "to": "test-only.ts" } },
+      { "rename": { "from": "src/test-only-entry.ts", "to": "test-only-entry.ts" } },
+      { "rename": { "from": "src/env.d.ts", "to": "env.d.ts" } },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "./src/config/app-variant.ts",
+          "with": "./config/app-variant.ts",
+          "all": true
+        }
+      }
+    ]
+  },
+  "pass-variant-env-file-ignored": {
+    "expect": ["check-env: 14 files checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": ".env.local",
+          "content": "# my machine only (git-ignored)\nAPP_VARIANT=preview\nEXPO_PUBLIC_APP_VARIANT=preview\n"
+        }
+      }
+    ]
+  }
+}

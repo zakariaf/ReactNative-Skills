@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Audio feedback",
+  "description": "The app's facts for the audio-and-haptics-feedback checkers. Optional: without it, react-native-audio-api must be pinned to the version the checker was verified on (0.13.6) and no recorded audio file may ship.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "$comment": {
+      "type": "string"
+    },
+    "audioApiVersion": {
+      "description": "The exact react-native-audio-api version this app verified with the before-any-bump checklist (release notes, plugin defaults, the Jest mock, adapter tests, a smoke test on a named iOS simulator and Android emulator, a listening check). package.json must pin exactly this version.",
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "bundledSounds": {
+      "description": "Recorded feedback sounds the audio adapter decodes (opt-in; synthesized recipes are the default). Each file is a local asset with its licence and source; feedback sounds never stream from the network.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["file", "license", "source"],
+        "properties": {
+          "file": {
+            "description": "Repo-relative path, for example assets/sounds/complete.wav. WAV (PCM), MP3 or FLAC only: with disableFFmpeg and disableStaticExternalLibs, react-native-audio-api decodes nothing else (CAF, M4A/AAC and OGG/Opus stay silent).",
+            "type": "string",
+            "pattern": "^(?!/)(?!.*\\.\\.)[^\\s]+\\.(wav|mp3|flac)$"
+          },
+          "license": {
+            "description": "SPDX id or licence name, for example CC0-1.0.",
+            "type": "string",
+            "minLength": 2
+          },
+          "source": {
+            "description": "Where it came from: a URL, a vendor or 'recorded by the team'.",
+            "type": "string",
+            "minLength": 2
+          }
+        }
+      }
+    },
+    "otherAudio": {
+      "description": "Recorded audio the app ships that is not feedback: a notification sound (expo-notifications plays it, not the feedback engine) or a media file a feature plays with expo-audio or expo-video. Listed so every shipped audio file has a licence and a source; the feedback adapter never decodes these.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["file", "purpose", "license", "source"],
+        "properties": {
+          "file": {
+            "description": "Repo-relative path, for example assets/sounds/reminder.wav.",
+            "type": "string",
+            "pattern": "^(?!/)(?!.*\\.\\.)[^\\s]+\\.(wav|mp3|m4a|aac|caf|ogg|oga|flac|aif|aiff|opus)$"
+          },
+          "purpose": {
+            "description": "notification: a notification or channel sound; media: content a feature plays (a podcast intro, a video soundtrack).",
+            "enum": ["notification", "media"]
+          },
+          "license": {
+            "description": "SPDX id or licence name, for example CC0-1.0.",
+            "type": "string",
+            "minLength": 2
+          },
+          "source": {
+            "description": "Where it came from: a URL, a vendor or 'recorded by the team'.",
+            "type": "string",
+            "minLength": 2
+          }
+        }
+      }
+    }
+  }
+}

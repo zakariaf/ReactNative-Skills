@@ -1,0 +1,12 @@
+{
+  "$schema": "./web.schema.json",
+  "version": 1,
+  "output": "static",
+  "host": "eas-hosting",
+  "smokeRoutes": [
+    { "path": "/", "testID": "tasks.list" },
+    { "path": "/settings", "testID": "settings.list" }
+  ],
+  "clientRoutes": [],
+  "publishSourceMaps": false
+}

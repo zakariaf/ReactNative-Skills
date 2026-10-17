@@ -1,0 +1,14 @@
+{
+  "base": [
+    { "templates": true, "firstLinePath": true, "fill": { "__ROOT_STACK_FILE__": "src/app/_layout.tsx" } },
+    "@tests/bases/app"
+  ],
+  "ops": [
+    {
+      "write": {
+        "file": "src/vendor/kit/SKILL.md",
+        "content": "---\nname: kit\ndescription: A vendored skill folder inside the app; its planted findings stay silent.\n---\n"
+      }
+    }
+  ]
+}

@@ -1,0 +1,377 @@
+{
+  "bad-contract-route-missing": {
+    "expect": ["[route-table]", "contract route Stats is missing from the static config"],
+    "ops": [{ "json": { "file": "contracts/navigation.json", "path": ["routes", 6], "value": "Stats" } }]
+  },
+  "bad-debug-in-main": {
+    "expect": ["[debug-gated]", "debug route Debug is not inside a group with an if hook"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/root-stack.tsx",
+          "find": "    Debug: {\n      if: useIsTestBuild,\n      screens: { Debug: DebugRoute },\n    },\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/root-navigator/root-stack.tsx",
+          "find": "  groups: {\n",
+          "with": "  screens: { Debug: DebugRoute },\n  groups: {\n"
+        }
+      },
+      { "json": { "file": "contracts/navigation.json", "path": ["groups", 2], "delete": true } }
+    ]
+  },
+  "bad-debug-ungated": {
+    "expect": [
+      "[debug-gated]",
+      "src/features/root-navigator/debug-route.tsx:1",
+      "debug route Debug does not render through TEST_ONLY"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/root-navigator/debug-route.tsx",
+          "lines": [
+            "// src/features/root-navigator/debug-route.tsx",
+            "export { DebugScreen as DebugRoute } from '@/features/debug/debug-screen';"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-editor-no-prevent-remove": {
+    "expect": [
+      "[guarded-prevent-remove]",
+      "src/features/task-editor/use-task-editor-model.ts:1",
+      "guarded route TaskEditor never blocks removal"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/task-editor/use-task-editor-model.ts",
+          "find": "  usePreventRemove(title.length > 0, ({ data }) => {\n    if (isLeavingRef.current) navigation.dispatch(data.action);\n    else setBlocked(data.action);\n  });\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/task-editor/use-task-editor-model.ts",
+          "find": "import { usePreventRemove, useNavigation } from '@react-navigation/native';",
+          "with": "import { useNavigation } from '@react-navigation/native';"
+        }
+      }
+    ]
+  },
+  "bad-editor-swipe-on": {
+    "expect": ["[guarded-gesture-off]", "guarded route TaskEditor keeps the iOS back swipe"],
+    "ops": [{ "json": { "file": "contracts/navigation.json", "path": ["guarded", 0, "gesture"], "value": "off" } }]
+  },
+  "bad-expo-router-import": {
+    "expect": [
+      "[one-navigator]",
+      "src/features/home/use-home-model.ts:3",
+      "imports expo-router in a React Navigation app"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/home/use-home-model.ts",
+          "find": "import { useNavigation } from '@react-navigation/native';",
+          "with": "import { useNavigation } from '@react-navigation/native';\nimport { router } from 'expo-router';"
+        }
+      }
+    ]
+  },
+  "bad-group-if": {
+    "expect": ["[group-if]", "group Main needs if: useIsOnboarded (found useIsOnboarding)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/root-stack.tsx",
+          "find": "      if: useIsOnboarded,",
+          "with": "      if: useIsOnboarding,"
+        }
+      }
+    ]
+  },
+  "bad-groups-order": {
+    "expect": ["[group-if]", "groups are [Onboarding, Main, Debug], the contract says [Main, Onboarding, Debug]"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/navigation.json",
+          "path": ["groups"],
+          "value": [
+            { "name": "Main", "if": "useIsOnboarded", "screens": ["Home", "TaskDetail", "TaskEditor", "Compose"] },
+            { "name": "Onboarding", "if": "useIsOnboarding", "screens": ["Welcome"] },
+            { "name": "Debug", "if": "useIsTestBuild", "screens": ["Debug"] }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-home-not-first": {
+    "expect": ["[home-route]", "the first screen of group Main is TaskDetail"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/root-stack.tsx",
+          "find": "        Home: HomeScreen,\n        TaskDetail: TaskDetailScreen,\n",
+          "with": "        TaskDetail: TaskDetailScreen,\n        Home: HomeScreen,\n"
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/navigation.json",
+          "path": ["groups", 1, "screens"],
+          "value": ["TaskDetail", "Home", "TaskEditor", "Compose"]
+        }
+      }
+    ]
+  },
+  "bad-js-stack": {
+    "expect": ["[native-stack]", "src/features/settings/settings-stack.tsx:2", "imports @react-navigation/stack"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/settings/settings-stack.tsx",
+          "lines": [
+            "// src/features/settings/settings-stack.tsx",
+            "import { createStackNavigator } from '@react-navigation/stack';",
+            "",
+            "export const settingsStack = createStackNavigator({ screens: {} });"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-modal-pushed": {
+    "expect": ["[modal-presentation]", "screen Compose is a contract modal but opens as a pushed card"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/root-stack.tsx",
+          "find": "Compose: { screen: ComposeScreen, options: { presentation: 'modal' } },",
+          "with": "Compose: ComposeScreen,"
+        }
+      }
+    ]
+  },
+  "bad-navigate-home": {
+    "expect": [
+      "[go-back]",
+      "src/features/task-editor/use-task-editor-model.ts:35",
+      "navigate('Home') stacks a second Home"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/task-editor/use-task-editor-model.ts",
+          "find": "navigation.popTo('Home');",
+          "with": "navigation.navigate('Home');"
+        }
+      }
+    ]
+  },
+  "bad-navigation-container": {
+    "expect": [
+      "[static-container]",
+      "src/features/root-navigator/app-shell.tsx:5",
+      "<NavigationContainer> with the static API"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/root-navigator/app-shell.tsx",
+          "lines": [
+            "// src/features/root-navigator/app-shell.tsx",
+            "import { NavigationContainer } from '@react-navigation/native';",
+            "",
+            "export function AppShell(): React.JSX.Element {",
+            "  return <NavigationContainer>{null}</NavigationContainer>;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-no-fade": {
+    "expect": [
+      "[motion-transition]",
+      "src/features/root-navigator/navigation-root.tsx:1",
+      "pushes never switch to a cross-fade"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/root-navigator/navigation-root.tsx",
+          "lines": [
+            "// src/features/root-navigator/navigation-root.tsx",
+            "import { createStaticNavigation } from '@react-navigation/native';",
+            "",
+            "import { rootStack } from './root-stack';",
+            "",
+            "const Navigation = createStaticNavigation(rootStack);",
+            "",
+            "export function NavigationRoot(): React.JSX.Element {",
+            "  return <Navigation />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-params-function": {
+    "expect": ["[params-serialisable]", "src/features/root-navigator/route-params.ts:4"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/route-params.ts",
+          "find": "export type TaskDetailParams = { readonly taskId: string };",
+          "with": "export type TaskDetailParams = { readonly taskId: string; readonly onDone: () => void };"
+        }
+      }
+    ]
+  },
+  "bad-placeholder-release": {
+    "expect": ["[placeholder-release]", "route Compose still renders PlaceholderScreen"],
+    "args": "{dir} --release",
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/root-stack.tsx",
+          "find": "Compose: { screen: ComposeScreen, options: { presentation: 'modal' } },",
+          "with": "Compose: { screen: PlaceholderScreen, options: { presentation: 'modal' } },"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/root-navigator/root-stack.tsx",
+          "find": "import { ComposeScreen } from '@/features/compose/compose-screen';",
+          "with": "import { PlaceholderScreen } from '@/features/placeholder/placeholder-screen';"
+        }
+      },
+      { "json": { "file": "contracts/navigation.json", "path": ["placeholders"], "value": ["Compose"] } }
+    ]
+  },
+  "bad-placeholder-unlisted": {
+    "expect": ["[placeholder-route]", "route Compose renders PlaceholderScreen but is not in the contract placeholders"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/root-stack.tsx",
+          "find": "Compose: { screen: ComposeScreen, options: { presentation: 'modal' } },",
+          "with": "Compose: { screen: PlaceholderScreen, options: { presentation: 'modal' } },"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/root-navigator/root-stack.tsx",
+          "find": "import { ComposeScreen } from '@/features/compose/compose-screen';",
+          "with": "import { PlaceholderScreen } from '@/features/placeholder/placeholder-screen';"
+        }
+      }
+    ]
+  },
+  "bad-reset-flow": {
+    "expect": [
+      "[flow-by-guard]",
+      "src/features/welcome/use-welcome-model.ts:7",
+      "navigation.reset() rebuilds the stack by hand"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/welcome/use-welcome-model.ts",
+          "lines": [
+            "// src/features/welcome/use-welcome-model.ts",
+            "import { useNavigation } from '@react-navigation/native';",
+            "",
+            "export function useWelcomeModel(): { readonly onStart: () => void } {",
+            "  const navigation = useNavigation();",
+            "  return {",
+            "    onStart: () => navigation.reset({ index: 0, routes: [{ name: 'Home' }] }),",
+            "  };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-router-in-ui": {
+    "expect": ["[nav-in-screens]", "src/ui/task-row.tsx:3", "imports @react-navigation/native"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/task-row.tsx",
+          "find": "import { Pressable, Text } from 'react-native';",
+          "with": "import { Pressable, Text } from 'react-native';\nimport { useNavigation } from '@react-navigation/native';"
+        }
+      }
+    ]
+  },
+  "bad-screen-not-in-contract": {
+    "expect": ["[route-table]", "src/features/root-navigator/root-stack.tsx:", "screen Settings is not in the contract"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/root-stack.tsx",
+          "find": "        Home: HomeScreen,\n",
+          "with": "        Home: HomeScreen,\n        Settings: HomeScreen,\n"
+        }
+      }
+    ]
+  },
+  "bad-second-container": {
+    "expect": [
+      "[one-navigator]",
+      "src/features/onboarding/onboarding-navigation.tsx:6",
+      "a navigation container outside src/features/root-navigator/navigation-root.tsx"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/onboarding/onboarding-navigation.tsx",
+          "lines": [
+            "// src/features/onboarding/onboarding-navigation.tsx",
+            "import { createStaticNavigation } from '@react-navigation/native';",
+            "",
+            "import { onboardingStack } from './onboarding-stack';",
+            "",
+            "export const OnboardingNavigation = createStaticNavigation(onboardingStack);"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-untyped": {
+    "expect": [
+      "[typed-routes]",
+      "src/features/root-navigator/react-navigation.d.ts:1",
+      "the global RootParamList declaration is missing"
+    ],
+    "ops": [{ "delete": "src/features/root-navigator/react-navigation.d.ts" }]
+  },
+  "pass-placeholder-listed": {
+    "expect": ["check-navigation:", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/root-stack.tsx",
+          "find": "Compose: { screen: ComposeScreen, options: { presentation: 'modal' } },",
+          "with": "Compose: { screen: PlaceholderScreen, options: { presentation: 'modal' } },"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/root-navigator/root-stack.tsx",
+          "find": "import { ComposeScreen } from '@/features/compose/compose-screen';",
+          "with": "import { PlaceholderScreen } from '@/features/placeholder/placeholder-screen';"
+        }
+      },
+      { "json": { "file": "contracts/navigation.json", "path": ["placeholders"], "value": ["Compose"] } }
+    ]
+  }
+}

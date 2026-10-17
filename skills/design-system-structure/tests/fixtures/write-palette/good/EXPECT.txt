@@ -1,0 +1,3 @@
+  background: '#F5F6F8', // neutral.97
+export const PALETTE: Palette = { light: LIGHT, dark: DARK };
+RESULT: PASS

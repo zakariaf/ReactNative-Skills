@@ -1,0 +1,16 @@
+{
+  "$schema": "./tdd.schema.json",
+  "$comment": "The app's facts for tdd-workflow's check-tests and check-test-edits. Every key is optional; these values are the defaults for the canonical single-app layout. Set requirementIdPattern once the app has a spec with requirement IDs (the same pattern as contracts/commits.json requirementRef.pattern).",
+  "logicGlobs": [
+    "src/core/**",
+    "src/data/**",
+    "src/services/**",
+    "src/stores/**",
+    "src/api/**",
+    "src/features/**",
+    "src/hooks/**"
+  ],
+  "sourceGlobs": ["src/**", "scripts/**", "plugins/**"],
+  "ignore": [],
+  "requirementIdPattern": null
+}

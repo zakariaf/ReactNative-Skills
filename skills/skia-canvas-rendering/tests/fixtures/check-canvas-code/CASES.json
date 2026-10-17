@@ -1,0 +1,1768 @@
+{
+  "bad-canvas-a11y": {
+    "expect": ["[canvas-a11y]", "src/canvas/surface-canvas.tsx:85"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/surface-canvas.tsx",
+          "find": "      accessibilityRole=\"image\"\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-canvas-a11y-declarative": {
+    "expect": ["[canvas-a11y]", "src/features/tasks/canvas/legend.tsx:7"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/canvas/legend.tsx",
+          "lines": [
+            "// src/features/tasks/canvas/legend.tsx",
+            "// Planted bug: a declarative canvas (no Picture) without a label",
+            "import { Canvas, Rect } from '@shopify/react-native-skia';",
+            "",
+            "export function Legend(): React.JSX.Element {",
+            "  return (",
+            "    <Canvas style={{ width: 24, height: 24 }}>",
+            "      <Rect x={0} y={0} width={24} height={24} color=\"#2F5FD0\" />",
+            "    </Canvas>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-canvas-a11y-not-accessible": {
+    "expect": [
+      "src/canvas/surface-canvas.tsx:85 [canvas-a11y]",
+      "canvas has an image role and a label but is not accessible",
+      "Add accessible (or accessible={true})"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/surface-canvas.tsx",
+          "find": "      accessible\n      accessibilityRole=\"image\"\n",
+          "with": "      accessibilityRole=\"image\"\n"
+        }
+      }
+    ]
+  },
+  "bad-canvas-a11y-wrapper-closed": {
+    "expect": ["[canvas-a11y]", "src/features/tasks/canvas/legend-picture.tsx:15"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/canvas/legend-picture.tsx",
+          "lines": [
+            "// src/features/tasks/canvas/legend-picture.tsx",
+            "// Planted bug: the image View closes before the Canvas, so nothing labels the Skia picture.",
+            "import { Canvas, Picture } from '@shopify/react-native-skia';",
+            "import { View } from 'react-native';",
+            "",
+            "import type { SkPicture } from '@shopify/react-native-skia';",
+            "",
+            "export function LegendPicture(props: {",
+            "  readonly label: string;",
+            "  readonly picture: SkPicture;",
+            "}): React.JSX.Element {",
+            "  return (",
+            "    <View>",
+            "      <View accessible accessibilityRole=\"image\" accessibilityLabel={props.label} />",
+            "      <Canvas style={{ flex: 1 }}>",
+            "        <Picture picture={props.picture} />",
+            "      </Canvas>",
+            "    </View>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-canvas-a11y-wrapper-not-accessible": {
+    "expect": ["src/features/tasks/canvas/legend-picture.tsx:14 [canvas-a11y]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/canvas/legend-picture.tsx",
+          "lines": [
+            "// src/features/tasks/canvas/legend-picture.tsx",
+            "// Planted bug: the image View around the Canvas has a role and a label but is not accessible, so iOS",
+            "// VoiceOver never focuses it (React Native 0.86 defaults accessible to false).",
+            "import { Canvas, Picture } from '@shopify/react-native-skia';",
+            "import { View } from 'react-native';",
+            "",
+            "import type { SkPicture } from '@shopify/react-native-skia';",
+            "",
+            "export function LegendPicture(props: { readonly label: string; readonly picture: SkPicture }): React.JSX.Element {",
+            "  return (",
+            "    <View accessibilityRole=\"image\" accessibilityLabel={props.label}>",
+            "      <View>",
+            "        <View style={{ flex: 1 }} />",
+            "        <Canvas style={{ flex: 1 }}>",
+            "          <Picture picture={props.picture} />",
+            "        </Canvas>",
+            "      </View>",
+            "    </View>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-canvas-onlayout": {
+    "expect": ["[canvas-onlayout]", "src/canvas/surface-canvas.tsx:85"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/surface-canvas.tsx",
+          "find": "onSize={props.size}",
+          "with": "onLayout={() => undefined}"
+        }
+      }
+    ]
+  },
+  "bad-canvas-outside-surface": {
+    "expect": ["[canvas-outside-surface]", "src/features/tasks/components/sparkline.tsx:27", "reads per-frame values"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/sparkline.tsx",
+          "lines": [
+            "// src/features/tasks/components/sparkline.tsx",
+            "// Planted bug: a computed picture (re-recorded from a shared value) outside the kit and the surface",
+            "// folders, so its drawing escapes the worklet, opacity, budget and golden rules.",
+            "import { Canvas, Picture, Skia } from '@shopify/react-native-skia';",
+            "import { useState } from 'react';",
+            "import { useDerivedValue } from 'react-native-reanimated';",
+            "",
+            "import type { SkPaint } from '@shopify/react-native-skia';",
+            "import type { SharedValue } from 'react-native-reanimated';",
+            "",
+            "type SparklineProps = { readonly values: SharedValue<readonly number[]>; readonly paint: SkPaint; readonly label: string };",
+            "",
+            "export function Sparkline(props: SparklineProps): React.JSX.Element {",
+            "  const { values, paint } = props;",
+            "  const [recorder] = useState(() => Skia.PictureRecorder());",
+            "  const picture = useDerivedValue(() => {",
+            "    const canvas = recorder.beginRecording({ x: 0, y: 0, width: 120, height: 40 });",
+            "    const points = values.get();",
+            "    for (let i = 1; i < points.length; i += 1) {",
+            "      const x0 = ((i - 1) / (points.length - 1)) * 120;",
+            "      const x1 = (i / (points.length - 1)) * 120;",
+            "      canvas.drawLine(x0, 40 - (points[i - 1] ?? 0), x1, 40 - (points[i] ?? 0), paint);",
+            "    }",
+            "    return recorder.finishRecordingAsPicture();",
+            "  });",
+            "  return (",
+            "    <Canvas",
+            "      style={{ height: 40 }}",
+            "      accessible",
+            "      accessibilityRole=\"image\"",
+            "      accessibilityLabel={props.label}",
+            "    >",
+            "      <Picture picture={picture} />",
+            "    </Canvas>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-canvas-outside-surface-component": {
+    "expect": [
+      "src/features/tasks/components/pulse-legend.tsx:22 [canvas-outside-surface]",
+      "reads per-frame values (useSharedValue)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/pulse-legend.tsx",
+          "lines": [
+            "// src/features/tasks/components/pulse-legend.tsx",
+            "// Planted bug: the second canvas renders a same-file component whose circle reads a shared value, so",
+            "// its picture is computed outside every surface folder (the static swatch beside it is fine).",
+            "import { Canvas, Circle } from '@shopify/react-native-skia';",
+            "import { useEffect } from 'react';",
+            "import { useSharedValue, withTiming } from 'react-native-reanimated';",
+            "",
+            "function PulseDot(): React.JSX.Element {",
+            "  const radius = useSharedValue(4);",
+            "  useEffect(() => {",
+            "    radius.set(withTiming(8, { duration: 300 }));",
+            "  }, [radius]);",
+            "  return <Circle cx={12} cy={12} r={radius} color=\"#2F5FD0\" />;",
+            "}",
+            "",
+            "export function PulseLegend(props: { readonly label: string }): React.JSX.Element {",
+            "  return (",
+            "    <>",
+            "      <Canvas style={{ width: 12, height: 12 }} accessible={false}>",
+            "        <Circle cx={6} cy={6} r={6} color=\"#2F5FD0\" />",
+            "      </Canvas>",
+            "      <Canvas style={{ width: 24, height: 24 }} accessible accessibilityRole=\"image\" accessibilityLabel={props.label}>",
+            "        <PulseDot />",
+            "      </Canvas>",
+            "    </>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-clock-seq-guard": {
+    "expect": [
+      "src/canvas/use-scene-clock.ts:1 [clock-runnable] the clock hook does not route its decisions through scene-clock-state",
+      "src/canvas/use-scene-clock.ts:30 [clock-runnable] reads the scene shared value on the JS thread",
+      "src/canvas/use-scene-clock.ts:44 [clock-runnable] switches the frame callback with a literal setActive(true)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/canvas/use-scene-clock.ts",
+          "lines": [
+            "// src/canvas/use-scene-clock.ts",
+            "// device-only: covered by the canvas end-to-end flow (useFrameCallback needs the UI thread).",
+            "import { useEffect, useRef } from 'react';",
+            "import { useFrameCallback, useSharedValue } from 'react-native-reanimated';",
+            "",
+            "import { runSceneFrame } from './run-scene-frame';",
+            "",
+            "import type { Scene } from './scene';",
+            "import type { FrameCallback, SharedValue } from 'react-native-reanimated';",
+            "",
+            "export type SceneClock<TView> = {",
+            "  readonly scene: SharedValue<Scene<TView>>;",
+            "  readonly now: SharedValue<number>;",
+            "  readonly push: (next: Scene<TView>) => void;",
+            "  readonly stop: () => void;",
+            "  readonly resume: () => void;",
+            "};",
+            "",
+            "// Planted bug: the seq guard. A JS read of scene.get() returns the cached scene from before the",
+            "// last push, so the done of the old scene stops the new one (the frozen surface).",
+            "export function useSceneClock<TView>(",
+            "  initial: Scene<TView>,",
+            "  onError: (message: string) => void,",
+            "): SceneClock<TView> {",
+            "  const scene = useSharedValue(initial);",
+            "  const now = useSharedValue(0);",
+            "  const run = useSharedValue(0);",
+            "  const frameRef = useRef<FrameCallback | null>(null);",
+            "  const onDone = (_run: number, seq: number): void => {",
+            "    if (seq === scene.get().seq) frameRef.current?.setActive(false);",
+            "  };",
+            "  const wiring = { scene, now, run, onDone, onError, trace: null, onFrameTime: null };",
+            "  const frame = useFrameCallback((info) => {",
+            "    runSceneFrame(wiring, info.timestamp);",
+            "  }, false);",
+            "  useEffect(() => {",
+            "    frameRef.current = frame;",
+            "  }, [frame]);",
+            "  return {",
+            "    scene,",
+            "    now,",
+            "    push: (next) => {",
+            "      scene.set(next);",
+            "      frame.setActive(true);",
+            "    },",
+            "    stop: () => {",
+            "      frame.setActive(false);",
+            "    },",
+            "    resume: () => {",
+            "      frame.setActive(true);",
+            "    },",
+            "  };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-draw-alloc": {
+    "expect": [
+      "[draw-pure]",
+      "src/features/tasks/canvas/draw-progress-grid.ts:4",
+      "src/features/tasks/canvas/draw-progress-grid.ts:53",
+      "imports a value from @shopify/react-native-skia",
+      "creates or uses the Skia API inside draw"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/draw-progress-grid.ts",
+          "find": "import { cellRect } from '@/canvas/canvas-layout';",
+          "with": "import { Skia } from '@shopify/react-native-skia';\n\nimport { cellRect } from '@/canvas/canvas-layout';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/draw-progress-grid.ts",
+          "find": "  const mark = frame.kit.paths['mark'];",
+          "with": "  const mark = frame.kit.paths['mark'];\n  const paint = Skia.Paint();\n  paint.setColor(frame.colors.color.mark);"
+        }
+      }
+    ]
+  },
+  "bad-frame-alloc": {
+    "expect": ["[frame-alloc]", "src/features/tasks/components/sparkline-paint.ts:8", "Skia.Paint"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/sparkline-paint.ts",
+          "lines": [
+            "// src/features/tasks/components/sparkline-paint.ts",
+            "// Planted bug: a Skia paint created inside a derived value, so every frame allocates one.",
+            "import { Skia } from '@shopify/react-native-skia';",
+            "import { useDerivedValue } from 'react-native-reanimated';",
+            "",
+            "export function useInk(): ReturnType<typeof useDerivedValue> {",
+            "  return useDerivedValue(() => {",
+            "    const paint = Skia.Paint();",
+            "    return paint;",
+            "  });",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-frame-callback-body": {
+    "expect": ["[frame-callback-body]", "src/canvas/use-scene-clock.ts:142"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/use-scene-clock.ts",
+          "find": "    runSceneFrame(wiring, info.timestamp, info.timeSincePreviousFrame);\n",
+          "with": "    const current = scene.get();\n    if (current.startAt === -1) scene.set({ ...current, startAt: info.timestamp });\n    now.set(info.timestamp);\n"
+        }
+      }
+    ]
+  },
+  "bad-idle-clock": {
+    "expect": [
+      "src/features/tasks/canvas/pulse-badge.tsx:8 [idle-clock]",
+      "useClock() runs a frame callback on every frame"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/canvas/pulse-badge.tsx",
+          "lines": [
+            "// src/features/tasks/canvas/pulse-badge.tsx",
+            "// Planted bug: Skia's useClock drives the radius, so a frame loop runs while nothing changes.",
+            "import { Canvas, Circle, useClock } from '@shopify/react-native-skia';",
+            "import { useDerivedValue } from 'react-native-reanimated';",
+            "",
+            "export function PulseBadge(props: { readonly label: string }): React.JSX.Element {",
+            "  // The clock never stops: it runs in the background, under overlays and when nothing changes.",
+            "  const clock = useClock();",
+            "  const radius = useDerivedValue(() => 8 + 2 * Math.sin(clock.get() / 300));",
+            "  return (",
+            "    <Canvas style={{ width: 24, height: 24 }} accessible accessibilityRole=\"image\" accessibilityLabel={props.label}>",
+            "      <Circle cx={12} cy={12} r={radius} color=\"#2F5FD0\" />",
+            "    </Canvas>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-idle-clock-derived": {
+    "expect": [
+      "src/ui/shimmer-bar.tsx:8 [idle-clock]",
+      "useClock() runs a frame callback on every frame for as long as the component is mounted"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/shimmer-bar.tsx",
+          "lines": [
+            "// src/ui/shimmer-bar.tsx",
+            "// Planted bug: Skia's clock reaches the canvas through a derived value, so it re-records every frame.",
+            "import { Canvas, Rect, useClock } from '@shopify/react-native-skia';",
+            "import { useDerivedValue, useSharedValue } from 'react-native-reanimated';",
+            "",
+            "export function ShimmerBar(props: { readonly label: string }): React.JSX.Element {",
+            "  const pressed = useSharedValue(0);",
+            "  const clock = useClock();",
+            "  const offset = useDerivedValue(() => (clock.get() / 4) % 240);",
+            "  const shine = useDerivedValue(() => offset.get() - 60 + pressed.get());",
+            "  return (",
+            "    <Canvas style={{ width: 240, height: 8 }} accessible accessibilityRole=\"image\" accessibilityLabel={props.label}>",
+            "      <Rect x={shine} y={0} width={60} height={8} color=\"#2F5FD0\" />",
+            "    </Canvas>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-idle-clock-repeat": {
+    "expect": ["src/ui/pulse-dot.tsx:10 [idle-clock]", "withRepeat(..., -1) repeats forever"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/pulse-dot.tsx",
+          "lines": [
+            "// src/ui/pulse-dot.tsx",
+            "// Planted bug: an endless Reanimated repeat drives a Skia value outside any timeline.",
+            "import { Canvas, Circle } from '@shopify/react-native-skia';",
+            "import { useEffect } from 'react';",
+            "import { useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';",
+            "",
+            "export function PulseDot(): React.JSX.Element {",
+            "  const radius = useSharedValue(6);",
+            "  useEffect(() => {",
+            "    radius.set(withRepeat(withTiming(9, { duration: 600 }), -1, true));",
+            "  }, [radius]);",
+            "  return (",
+            "    <Canvas style={{ width: 24, height: 24 }} accessible={false}>",
+            "      <Circle cx={12} cy={12} r={radius} color=\"#2F5FD0\" />",
+            "    </Canvas>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-interpolate-color": {
+    "expect": ["[interpolate-color]", "src/features/tasks/canvas/flash-colour.ts:5"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/canvas/flash-colour.ts",
+          "lines": [
+            "// src/features/tasks/canvas/flash-colour.ts",
+            "import { interpolateColor } from 'react-native-reanimated';",
+            "",
+            "export function flashColour(progress: number): string {",
+            "  return interpolateColor(progress, [0, 1], ['#ffffff', '#2f5fd0']);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-measure-text": {
+    "expect": ["[measure-text]", "src/canvas/draw-text.ts:12"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/draw-text.ts",
+          "find": "  let width = 0;\n  for (const glyphWidth of font.getGlyphWidths(font.getGlyphIDs(text))) width += glyphWidth;\n  return width;",
+          "with": "  return font.measureText(text).width;"
+        }
+      }
+    ]
+  },
+  "bad-missing-worklet": {
+    "expect": ["[worklet-directive]", "src/features/tasks/canvas/draw-progress-grid.ts:1"],
+    "ops": [
+      { "replace": { "file": "src/features/tasks/canvas/draw-progress-grid.ts", "find": "'worklet';\n", "with": "" } }
+    ]
+  },
+  "bad-module-recorder": {
+    "expect": ["[recorder-per-canvas]", "src/canvas/surface-canvas.tsx:26"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/surface-canvas.tsx",
+          "find": "/** Touch input for an interactive surface",
+          "with": "export const SHARED_RECORDER = Skia.PictureRecorder();\n\n/** Touch input for an interactive surface"
+        }
+      }
+    ]
+  },
+  "bad-monorepo-missing-worklet": {
+    "expect": [
+      "apps/mobile/src/canvas/scene.ts:1 [worklet-directive]",
+      "apps/mobile/src/canvas/record-picture.ts:5 [worklet-import]",
+      "57 canvas source files checked"
+    ],
+    "ops": [
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      { "rename": { "from": "tsconfig.json", "to": "apps/mobile/tsconfig.json" } },
+      { "copy": { "from": "package.json", "to": "apps/mobile/package.json" } },
+      { "json": { "file": "apps/mobile/package.json", "path": ["name"], "value": "@acme/mobile" } },
+      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["apps/*"] } },
+      { "json": { "file": "package.json", "path": ["dependencies"], "delete": true } },
+      { "delete": ["contracts"] },
+      { "replace": { "file": "apps/mobile/src/canvas/scene.ts", "find": "'worklet';\n", "with": "" } }
+    ]
+  },
+  "bad-mutable-path": {
+    "expect": [
+      "[skia-path-api]",
+      "src/features/tasks/canvas/progress-grid-surface.ts:15",
+      "src/features/tasks/canvas/progress-grid-surface.ts:16"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/progress-grid-surface.ts",
+          "find": "const mark = skia\\.PathBuilder\\.Make\\(\\)[\\s\\S]*?\\.build\\(\\);",
+          "with": "const mark = skia.Path.Make();\n  mark.addCircle(0.5, 0.5, 0.4);",
+          "regex": true
+        }
+      }
+    ]
+  },
+  "bad-no-lifecycle": {
+    "expect": ["[lifecycle]", "src/canvas/use-surface-player.ts:155", "runs a scene clock without useCanvasLifecycle"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/use-surface-player.ts",
+          "find": "  useCanvasLifecycle({\n",
+          "with": "  useAppStateLifecycle({\n"
+        }
+      }
+    ]
+  },
+  "bad-opaque-background": {
+    "expect": [
+      "[opaque-background]",
+      "src/features/tasks/canvas/draw-progress-grid.ts:160",
+      "drawProgressGrid starts with drawCell(canvas, ...)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/draw-progress-grid.ts",
+          "find": "  canvas.drawColor(frame.colors.color.background);\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-opaque-background-clip-first": {
+    "expect": ["[opaque-background]", "drawProgressGrid starts with canvas.clipRect()"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/draw-progress-grid.ts",
+          "find": "  canvas.drawColor(frame.colors.color.background);\n",
+          "with": "  // Planted bug: the clip shrinks what drawColor fills, so the corners outside it stay unpainted.\n  canvas.save();\n  canvas.clipRect({ x: 0, y: 0, width: frame.layout.width / 2, height: frame.layout.height }, 1, true);\n  canvas.drawColor(frame.colors.color.background);\n  canvas.restore();\n"
+        }
+      }
+    ]
+  },
+  "bad-opaque-background-helper": {
+    "expect": [
+      "[opaque-background]",
+      "drawProgressGrid starts with drawBackground(canvas, ...), whose first canvas call is target.drawRect()"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/draw-progress-grid.ts",
+          "find": "  canvas.drawColor(frame.colors.color.background);\n",
+          "with": "  drawBackground(canvas, frame);\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/draw-progress-grid.ts",
+          "find": "/** Pure worklet: reads only its arguments, allocates no Skia objects, reads no clock. */\n",
+          "with": "/** Planted bug: a rect the size of the grid leaves the canvas corners unpainted. */\nfunction drawBackground(target: SkCanvas, frame: Frame): void {\n  frame.kit.fill.setColor(frame.colors.color.background);\n  target.drawRect({ x: 0, y: 0, width: frame.layout.width / 2, height: frame.layout.height }, frame.kit.fill);\n}\n\n/** Pure worklet: reads only its arguments, allocates no Skia objects, reads no clock. */\n"
+        }
+      }
+    ]
+  },
+  "bad-opaque-contract-missing": {
+    "expect": [
+      "src/features/tasks/components/progress-card.tsx:11 [opaque-contract]",
+      "without a literal isOpaque={false}"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/draw-progress-grid.ts",
+          "find": "  canvas.drawColor(frame.colors.color.background);\n",
+          "with": ""
+        }
+      },
+      { "json": { "file": "contracts/canvas-surfaces.json", "path": ["surfaces", 0, "opaque"], "value": false } },
+      {
+        "write": {
+          "file": "src/features/tasks/components/progress-card.tsx",
+          "lines": [
+            "// src/features/tasks/components/progress-card.tsx",
+            "// The progress grid on a rounded card: the canvas must show the card behind it.",
+            "import { SurfaceHost } from '@/canvas/surface-host';",
+            "import { progressGridSurface } from '@/features/tasks/canvas/progress-grid-surface';",
+            "",
+            "import type { ComponentProps } from 'react';",
+            "",
+            "type Props = Omit<ComponentProps<typeof SurfaceHost>, 'surface' | 'isOpaque'>;",
+            "",
+            "export function ProgressCard(props: Props): React.JSX.Element {",
+            "  return <SurfaceHost {...props} surface={progressGridSurface} />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-opaque-contract-undeclared": {
+    "expect": [
+      "src/features/tasks/components/progress-card.tsx:11 [opaque-contract]",
+      "does not declare it \"opaque\": false"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/progress-card.tsx",
+          "lines": [
+            "// src/features/tasks/components/progress-card.tsx",
+            "// The progress grid on a rounded card: the canvas must show the card behind it.",
+            "import { SurfaceHost } from '@/canvas/surface-host';",
+            "import { progressGridSurface } from '@/features/tasks/canvas/progress-grid-surface';",
+            "",
+            "import type { ComponentProps } from 'react';",
+            "",
+            "type Props = Omit<ComponentProps<typeof SurfaceHost>, 'surface' | 'isOpaque'>;",
+            "",
+            "export function ProgressCard(props: Props): React.JSX.Element {",
+            "  return <SurfaceHost {...props} surface={progressGridSurface} isOpaque={false} />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-opaque-contract-unrendered": {
+    "expect": [
+      "contracts/canvas-surfaces.json:1 [opaque-contract]",
+      "progress-grid is declared \"opaque\": false, but no SurfaceHost or SurfaceCanvas"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/draw-progress-grid.ts",
+          "find": "  canvas.drawColor(frame.colors.color.background);\n",
+          "with": ""
+        }
+      },
+      { "json": { "file": "contracts/canvas-surfaces.json", "path": ["surfaces", 0, "opaque"], "value": false } }
+    ]
+  },
+  "bad-outside-canvas-a11y": {
+    "expect": ["[canvas-a11y]", "src/features/tasks/components/sparkline.tsx:9"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/sparkline.tsx",
+          "lines": [
+            "// src/features/tasks/components/sparkline.tsx",
+            "// Planted bug: a declarative canvas outside the surface folders with no label",
+            "import { Canvas, Path } from '@shopify/react-native-skia';",
+            "",
+            "import type { SkPath } from '@shopify/react-native-skia';",
+            "",
+            "export function Sparkline(props: { readonly path: SkPath; readonly label: string }): React.JSX.Element {",
+            "  return (",
+            "    <Canvas style={{ height: 40 }}>",
+            "      <Path path={props.path} color=\"#2F5FD0\" />",
+            "    </Canvas>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-outside-canvas-onlayout": {
+    "expect": ["[canvas-onlayout]", "src/features/tasks/components/sparkline.tsx:9"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/sparkline.tsx",
+          "lines": [
+            "// src/features/tasks/components/sparkline.tsx",
+            "// Planted bug: onLayout on a canvas outside the surface folders",
+            "import { Canvas, Path } from '@shopify/react-native-skia';",
+            "",
+            "import type { SkPath } from '@shopify/react-native-skia';",
+            "",
+            "export function Sparkline(props: { readonly path: SkPath; readonly label: string }): React.JSX.Element {",
+            "  return (",
+            "    <Canvas style={{ height: 40 }} onLayout={() => undefined} accessible accessibilityRole=\"image\" accessibilityLabel={props.label}>",
+            "      <Path path={props.path} color=\"#2F5FD0\" />",
+            "    </Canvas>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-outside-child-component": {
+    "expect": [
+      "src/features/tasks/components/animated-bar.tsx:14 [canvas-outside-surface]",
+      "<Rect> (a Skia element) reads per-frame values (y: useDerivedValue) in a file that renders no <Canvas>"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/bar-chart.tsx",
+          "lines": [
+            "// src/features/tasks/components/bar-chart.tsx",
+            "// The canvas itself looks static here: the animated nodes live in a child component in another file.",
+            "import { Canvas } from '@shopify/react-native-skia';",
+            "",
+            "import { AnimatedBar } from './animated-bar';",
+            "",
+            "export function BarChart(props: { readonly values: readonly number[]; readonly label: string }): React.JSX.Element {",
+            "  return (",
+            "    <Canvas style={{ width: 320, height: 200 }} accessible accessibilityRole=\"image\" accessibilityLabel={props.label}>",
+            "      {props.values.map((value, index) => (",
+            "        <AnimatedBar key={index} x={index * 32} value={value} />",
+            "      ))}",
+            "    </Canvas>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/components/animated-bar.tsx",
+          "lines": [
+            "// src/features/tasks/components/animated-bar.tsx",
+            "// Planted bug: Skia nodes animated with Reanimated hooks in a file with no <Canvas>; they feed the",
+            "// computed canvas of bar-chart.tsx outside every surface folder.",
+            "import { Rect } from '@shopify/react-native-skia';",
+            "import { useEffect } from 'react';",
+            "import { useDerivedValue, useSharedValue, withTiming } from 'react-native-reanimated';",
+            "",
+            "export function AnimatedBar(props: { readonly x: number; readonly value: number }): React.JSX.Element {",
+            "  const height = useSharedValue(0);",
+            "  useEffect(() => {",
+            "    height.set(withTiming(props.value * 200, { duration: 400 }));",
+            "  }, [height, props.value]);",
+            "  const y = useDerivedValue(() => 200 - height.get());",
+            "  return <Rect x={props.x} y={y} width={24} height={height} color=\"#2F5FD0\" />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-outside-interpolate-color": {
+    "expect": ["[interpolate-color]", "src/features/tasks/components/sparkline-paint.ts:6"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/sparkline-paint.ts",
+          "lines": [
+            "// src/features/tasks/components/sparkline-paint.ts",
+            "// Planted bug: Reanimated interpolateColor for a Skia colour.",
+            "import { Skia } from '@shopify/react-native-skia';",
+            "import { interpolateColor } from 'react-native-reanimated';",
+            "",
+            "export const tint = (t: number) => Skia.Color(interpolateColor(t, [0, 1], ['#000000', '#ffffff']));"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-outside-measure-text": {
+    "expect": ["[measure-text]", "src/features/tasks/components/sparkline-paint.ts:6"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/sparkline-paint.ts",
+          "lines": [
+            "// src/features/tasks/components/sparkline-paint.ts",
+            "// Planted bug: measureText outside the kit",
+            "import { Skia } from '@shopify/react-native-skia';",
+            "",
+            "export function widthOf(font: ReturnType<typeof Skia.Font>, text: string): number {",
+            "  return font.measureText(text).width;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-outside-module-recorder": {
+    "expect": ["[recorder-per-canvas]", "src/features/tasks/components/sparkline-paint.ts:5"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/sparkline-paint.ts",
+          "lines": [
+            "// src/features/tasks/components/sparkline-paint.ts",
+            "// Planted bug: a module-scope recorder outside the kit",
+            "import { Skia } from '@shopify/react-native-skia';",
+            "",
+            "export const RECORDER = Skia.PictureRecorder();"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-outside-mutable-path": {
+    "expect": ["[skia-path-api]", "src/features/tasks/components/sparkline-paint.ts:5"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/sparkline-paint.ts",
+          "lines": [
+            "// src/features/tasks/components/sparkline-paint.ts",
+            "// Planted bug: the mutable path API outside the surface folders",
+            "import { Skia } from '@shopify/react-native-skia';",
+            "",
+            "export const LINE = Skia.Path.Make();"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-outside-onsize-animated": {
+    "expect": ["src/ui/card-backdrop.tsx:17 [canvas-outside-surface]", "reads per-frame values (end: useDerivedValue)"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/card-backdrop.tsx",
+          "lines": [
+            "// src/ui/card-backdrop.tsx",
+            "// Planted bug: the gradient end reads the canvas size and a progress that animates with withTiming, so",
+            "// the canvas is computed (motion), not static layout; onSize does not excuse the progress.",
+            "import { Canvas, LinearGradient, Rect, vec } from '@shopify/react-native-skia';",
+            "import { useEffect } from 'react';",
+            "import { StyleSheet } from 'react-native';",
+            "import { useDerivedValue, useSharedValue, withTiming } from 'react-native-reanimated';",
+            "",
+            "export function CardBackdrop(props: { readonly isActive: boolean }): React.JSX.Element {",
+            "  const size = useSharedValue({ width: 0, height: 0 });",
+            "  const progress = useSharedValue(0);",
+            "  useEffect(() => {",
+            "    progress.set(withTiming(props.isActive ? 1 : 0, { duration: 300 }));",
+            "  }, [progress, props.isActive]);",
+            "  const end = useDerivedValue(() => vec(size.get().width * progress.get(), size.get().height));",
+            "  return (",
+            "    <Canvas style={StyleSheet.absoluteFill} onSize={size} accessible={false}>",
+            "      <Rect x={0} y={0} width={390} height={120}>",
+            "        <LinearGradient start={vec(0, 0)} end={end} colors={['#1B2A4A', '#0E1526']} />",
+            "      </Rect>",
+            "    </Canvas>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-outside-pixel-flip": {
+    "expect": ["[pixel-flip]", "src/features/tasks/components/sparkline-paint.ts:5"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/sparkline-paint.ts",
+          "lines": [
+            "// src/features/tasks/components/sparkline-paint.ts",
+            "// Planted bug: a Skia file outside the surface folders pixel-flips",
+            "import { Skia } from '@shopify/react-native-skia';",
+            "",
+            "export const MIRROR = { transform: [{ scaleX: -1 }] };",
+            "export const INK = Skia.Color('#000000');"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-outside-reduced-motion": {
+    "expect": ["[reduced-motion-source]", "src/features/tasks/components/sparkline-paint.ts:8"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/sparkline-paint.ts",
+          "lines": [
+            "// src/features/tasks/components/sparkline-paint.ts",
+            "// Planted bug: Reanimated useReducedMotion in a Skia file (read once at app start).",
+            "import { useReducedMotion } from 'react-native-reanimated';",
+            "",
+            "import type { SkColor } from '@shopify/react-native-skia';",
+            "",
+            "export function useMotion(_ink: SkColor): boolean {",
+            "  return useReducedMotion();",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-outside-run-on-js": {
+    "expect": [
+      "[worklets-api]",
+      "src/features/tasks/components/sparkline-paint.ts:4",
+      "src/features/tasks/components/sparkline-paint.ts:6"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/sparkline-paint.ts",
+          "lines": [
+            "// src/features/tasks/components/sparkline-paint.ts",
+            "// Planted bug: the deprecated runOnJS in a Skia file.",
+            "import { Skia } from '@shopify/react-native-skia';",
+            "import { runOnJS } from 'react-native-worklets';",
+            "",
+            "export const report = (fn: () => void) => runOnJS(fn);",
+            "export const INK = Skia.Color('#000000');"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-outside-text-direction": {
+    "expect": ["[text-direction]", "src/features/tasks/components/sparkline-paint.ts:5"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/sparkline-paint.ts",
+          "lines": [
+            "// src/features/tasks/components/sparkline-paint.ts",
+            "// Planted bug: TextDirection.RTL is 0, so this picks LTR in RTL locales.",
+            "import { Skia, TextDirection } from '@shopify/react-native-skia';",
+            "",
+            "export const style = (isRtl: boolean) => ({ textDirection: isRtl && TextDirection.RTL, color: Skia.Color('#000') });"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-outside-value-accessor": {
+    "expect": ["[shared-value-accessor]", "src/features/tasks/components/sparkline-paint.ts:9"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/sparkline-paint.ts",
+          "lines": [
+            "// src/features/tasks/components/sparkline-paint.ts",
+            "// Planted bug: .value on a shared value in a Skia file.",
+            "import { useSharedValue } from 'react-native-reanimated';",
+            "",
+            "import type { SkSize } from '@shopify/react-native-skia';",
+            "",
+            "export function useWidth(): number {",
+            "  const size = useSharedValue<SkSize>({ width: 0, height: 0 });",
+            "  return size.value.width;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-pixel-flip": {
+    "expect": ["[pixel-flip]", "src/features/tasks/canvas/grid-frame.tsx:8"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/canvas/grid-frame.tsx",
+          "lines": [
+            "// src/features/tasks/canvas/grid-frame.tsx",
+            "import { StyleSheet, View } from 'react-native';",
+            "",
+            "export function GridFrame(props: { readonly children: React.ReactNode }): React.JSX.Element {",
+            "  return <View style={styles.mirrored}>{props.children}</View>;",
+            "}",
+            "",
+            "const styles = StyleSheet.create({ mirrored: { transform: [{ scaleX: -1 }] } });"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-reduced-motion-hook": {
+    "expect": ["[reduced-motion-source]", "src/canvas/surface-host.tsx:33"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/surface-host.tsx",
+          "find": "import { CanvasLayoutProbe } from './canvas-layout-probe';",
+          "with": "import { useReducedMotion } from 'react-native-reanimated';\n\nimport { CanvasLayoutProbe } from './canvas-layout-probe';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/canvas/surface-host.tsx",
+          "find": "  const { clock, size, layout } = useSurfacePlayer(props);",
+          "with": "  const motion = useReducedMotion() ? 'reduced' : 'full';\n  const { clock, size, layout } = useSurfacePlayer({ ...props, motion });"
+        }
+      }
+    ]
+  },
+  "bad-run-on-js": {
+    "expect": ["[worklets-api]", "src/canvas/surface-canvas.tsx:69"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/surface-canvas.tsx",
+          "find": "import { scheduleOnRN } from 'react-native-worklets';",
+          "with": "import { runOnJS } from 'react-native-worklets';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/canvas/surface-canvas.tsx",
+          "find": "    scheduleOnRN(onDrawError, message);",
+          "with": "    runOnJS(onDrawError)(message);"
+        }
+      }
+    ]
+  },
+  "bad-static-canvas-animates": {
+    "expect": [
+      "src/ui/brand-mark.tsx:19 [canvas-outside-surface]",
+      "reads per-frame values (turned: useDerivedValue)",
+      "declared static art in \"staticCanvases\""
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/canvas-surfaces.json",
+          "path": ["staticCanvases"],
+          "value": ["src/ui/brand-mark.tsx"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/ui/brand-mark.tsx",
+          "lines": [
+            "// src/ui/brand-mark.tsx",
+            "// Static art recorded once (createPicture), declared in contracts/canvas-surfaces.json staticCanvases.",
+            "import { Canvas, createPicture, Picture, Skia } from '@shopify/react-native-skia';",
+            "import { useState } from 'react';",
+            "import { useDerivedValue, useSharedValue } from 'react-native-reanimated';",
+            "",
+            "export function BrandMark(props: { readonly label: string }): React.JSX.Element {",
+            "  const [mark] = useState(() =>",
+            "    createPicture((canvas) => {",
+            "      const paint = Skia.Paint();",
+            "      paint.setColor(Skia.Color('#2F5FD0'));",
+            "      canvas.drawCircle(24, 24, 20, paint);",
+            "    }),",
+            "  );",
+            "  // Planted bug: the declared static art animates (a per-frame value).",
+            "  const angle = useSharedValue(0);",
+            "  const turned = useDerivedValue(() => [{ rotate: angle.get() }]);",
+            "  return (",
+            "    <Canvas style={{ width: 48, height: 48 }} accessible accessibilityRole=\"image\" accessibilityLabel={props.label}>",
+            "      <Picture picture={mark} transform={turned} />",
+            "    </Canvas>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-static-canvas-stale": {
+    "expect": [
+      "contracts/canvas-surfaces.json:1 [canvas-outside-surface]",
+      "\"staticCanvases\" lists src/ui/brand-mark.tsx, which does not exist"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/canvas-surfaces.json",
+          "path": ["staticCanvases"],
+          "value": ["src/ui/brand-mark.tsx"]
+        }
+      }
+    ]
+  },
+  "bad-static-canvas-undeclared": {
+    "expect": ["src/ui/brand-mark.tsx:15 [canvas-outside-surface]", "renders a <Picture>"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/gradient-backdrop.tsx",
+          "lines": [
+            "// src/ui/gradient-backdrop.tsx",
+            "// A static declarative canvas: no draw(), no Picture, no frame loop. It may live anywhere; the API",
+            "// rules and canvas-a11y still apply (decorative, so it opts out of the screen reader explicitly).",
+            "import { Canvas, LinearGradient, Rect, vec } from '@shopify/react-native-skia';",
+            "import { StyleSheet } from 'react-native';",
+            "",
+            "export function GradientBackdrop(props: { readonly width: number; readonly height: number }): React.JSX.Element {",
+            "  return (",
+            "    <Canvas style={StyleSheet.absoluteFill} accessible={false}>",
+            "      <Rect x={0} y={0} width={props.width} height={props.height}>",
+            "        <LinearGradient start={vec(0, 0)} end={vec(0, props.height)} colors={['#1B2A4A', '#0E1526']} />",
+            "      </Rect>",
+            "    </Canvas>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/ui/brand-mark.tsx",
+          "lines": [
+            "// src/ui/brand-mark.tsx",
+            "// Static art recorded once (createPicture), declared in contracts/canvas-surfaces.json staticCanvases.",
+            "import { Canvas, createPicture, Picture, Skia } from '@shopify/react-native-skia';",
+            "import { useState } from 'react';",
+            "",
+            "export function BrandMark(props: { readonly label: string }): React.JSX.Element {",
+            "  const [mark] = useState(() =>",
+            "    createPicture((canvas) => {",
+            "      const paint = Skia.Paint();",
+            "      paint.setColor(Skia.Color('#2F5FD0'));",
+            "      canvas.drawCircle(24, 24, 20, paint);",
+            "    }),",
+            "  );",
+            "  return (",
+            "    <Canvas style={{ width: 48, height: 48 }} accessible accessibilityRole=\"image\" accessibilityLabel={props.label}>",
+            "      <Picture picture={mark} />",
+            "    </Canvas>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-surface-glob-wildcard": {
+    "expect": ["[worklet-directive]", "src/features/tasks/canvas/layout-progress-grid.ts:1"],
+    "ops": [
+      { "delete": "contracts/canvas-surfaces.json" },
+      { "write": { "file": "rn-skills.config.json", "lines": ["{ \"canvasSurfaceDirs\": [\"**/canvas\"] }"] } },
+      { "replace": { "file": "src/features/tasks/canvas/layout-progress-grid.ts", "find": "'worklet';\n", "with": "" } }
+    ]
+  },
+  "bad-surface-outside-folder": {
+    "expect": [
+      "src/features/insights/chart/progress-grid-surface.ts:9 [surface-outside-folder]",
+      "src/features/insights/chart/draw-progress-grid.ts:12 [surface-outside-folder]"
+    ],
+    "ops": [
+      { "copy": { "from": "src/features/tasks/canvas", "to": "src/features/insights/chart" } },
+      {
+        "replace": { "file": "src/features/insights/chart/draw-progress-grid.ts", "find": "'worklet';\n\n", "with": "" }
+      },
+      {
+        "write": {
+          "file": "src/features/insights/insights-chart.tsx",
+          "lines": [
+            "// src/features/insights/insights-chart.tsx",
+            "import { SurfaceHost } from '@/canvas/surface-host';",
+            "",
+            "import { progressGridSurface } from './chart/progress-grid-surface';",
+            "",
+            "import type { ComponentProps } from 'react';",
+            "",
+            "type Props = Omit<ComponentProps<typeof SurfaceHost>, 'surface'>;",
+            "",
+            "export function InsightsChart(props: Props): React.JSX.Element {",
+            "  return <SurfaceHost {...props} surface={progressGridSurface} />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-surface-outside-folder-untyped": {
+    "expect": [
+      "src/features/insights/chart/chart-surface.ts:5 [surface-outside-folder]",
+      "is rendered as a surface (<SurfaceHost surface={chartSurface}> in src/features/insights/insights-chart.tsx:11)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/insights/chart/chart-surface.ts",
+          "lines": [
+            "// src/features/insights/chart/chart-surface.ts",
+            "// Planted bug: a surface object without the CanvasSurface annotation, outside every surface folder.",
+            "import { progressGridSurface } from '@/features/tasks/canvas/progress-grid-surface';",
+            "",
+            "export const chartSurface = { ...progressGridSurface, isMirroredInRtl: false };"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/insights/insights-chart.tsx",
+          "lines": [
+            "// src/features/insights/insights-chart.tsx",
+            "import { SurfaceHost } from '@/canvas/surface-host';",
+            "",
+            "import { chartSurface } from './chart/chart-surface';",
+            "",
+            "import type { ComponentProps } from 'react';",
+            "",
+            "type Props = Omit<ComponentProps<typeof SurfaceHost>, 'surface'>;",
+            "",
+            "export function InsightsChart(props: Props): React.JSX.Element {",
+            "  return <SurfaceHost {...props} surface={chartSurface} />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-text-direction": {
+    "expect": ["[text-direction]", "src/features/tasks/canvas/word-label.ts:5"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/canvas/word-label.ts",
+          "lines": [
+            "// src/features/tasks/canvas/word-label.ts",
+            "import { TextDirection } from '@shopify/react-native-skia';",
+            "",
+            "export function paragraphDirection(isRtl: boolean): TextDirection | false {",
+            "  return isRtl && TextDirection.RTL;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-time-since-first-frame": {
+    "expect": ["[frame-clock]", "src/canvas/use-scene-clock.ts:143"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/use-scene-clock.ts",
+          "find": "runSceneFrame(wiring, info.timestamp, info.timeSincePreviousFrame);",
+          "with": "runSceneFrame(wiring, info.timeSinceFirstFrame, info.timeSincePreviousFrame);"
+        }
+      }
+    ]
+  },
+  "bad-value-accessor": {
+    "expect": [
+      "[shared-value-accessor]",
+      "src/canvas/use-surface-player.ts:86",
+      "shared value size is accessed with .value"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/use-surface-player.ts",
+          "find": "const { width, height } = size.get();",
+          "with": "const { width, height } = size.value;"
+        }
+      }
+    ]
+  },
+  "bad-value-accessor-member": {
+    "expect": [
+      "[shared-value-accessor]",
+      "src/canvas/surface-canvas.tsx:74",
+      "shared value now is accessed with .value"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/surface-canvas.tsx",
+          "find": "now: clock.now.get(),",
+          "with": "now: clock.now.value,"
+        }
+      }
+    ]
+  },
+  "bad-worklet-import": {
+    "expect": [
+      "[worklet-import]",
+      "src/features/tasks/canvas/draw-progress-grid.ts:9",
+      "src/features/tasks/canvas/build-timeline.ts, which is not a 'worklet' module"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/draw-progress-grid.ts",
+          "find": "import { CHANGE_ENTITY, cellEntity } from './canvas-ids';",
+          "with": "import { CHANGE_ENTITY, cellEntity } from './build-timeline';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/build-timeline.ts",
+          "find": "import { CHANGE_ENTITY, cellEntity } from './canvas-ids';",
+          "with": "import { CHANGE_ENTITY, cellEntity } from './canvas-ids';\n\nexport { CHANGE_ENTITY, cellEntity };"
+        }
+      }
+    ]
+  },
+  "bad-worklet-import-alias": {
+    "expect": [
+      "[worklet-import]",
+      "src/features/tasks/canvas/draw-progress-grid.ts:6",
+      "src/canvas/present-change.ts, which is not a 'worklet' module"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/draw-progress-grid.ts",
+          "find": "import { drawFittedText } from '@/canvas/draw-text';",
+          "with": "import { drawFittedText } from '@/canvas/draw-text';\nimport { presentChange } from '@/canvas/present-change';"
+        }
+      }
+    ]
+  },
+  "error-no-canvas-code": {
+    "expect": ["ERROR [bad-input] nothing to check: no canvas code"],
+    "ops": [{ "delete": ["src/canvas", "src/features/tasks/canvas", "src/features/timer/canvas"] }]
+  },
+  "error-static-canvases-invalid": {
+    "expect": ["\"staticCanvases\" must list unique repo-relative source files"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/canvas-surfaces.json",
+          "path": ["staticCanvases"],
+          "value": "src/ui/brand-mark.tsx"
+        }
+      }
+    ]
+  },
+  "error-surface-glob-unmatched": {
+    "expect": ["ERROR [bad-input] the surface glob src/screens/*/canvas matches no surface folder on disk"],
+    "ops": [
+      {
+        "write": { "file": "rn-skills.config.json", "lines": ["{ \"canvasSurfaceDirs\": [\"src/screens/*/canvas\"] }"] }
+      }
+    ]
+  },
+  "pass-canvas-a11y-decorative": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/canvas/legend.tsx",
+          "lines": [
+            "// src/features/tasks/canvas/legend.tsx",
+            "// Decorative: hidden from screen readers on purpose (the explicit opt-out).",
+            "import { Canvas, Rect } from '@shopify/react-native-skia';",
+            "",
+            "export function Legend(): React.JSX.Element {",
+            "  return (",
+            "    <Canvas style={{ width: 24, height: 24 }} accessible={false}>",
+            "      <Rect x={0} y={0} width={24} height={24} color=\"#2F5FD0\" />",
+            "    </Canvas>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/canvas/swatch.tsx",
+          "lines": [
+            "// src/features/tasks/canvas/swatch.tsx",
+            "import { Canvas, Rect } from '@shopify/react-native-skia';",
+            "",
+            "export function Swatch(): React.JSX.Element {",
+            "  return (",
+            "    <Canvas style={{ width: 8, height: 8 }} importantForAccessibility=\"no-hide-descendants\">",
+            "      <Rect x={0} y={0} width={8} height={8} color=\"#2F5FD0\" />",
+            "    </Canvas>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/canvas/badge.tsx",
+          "lines": [
+            "// src/features/tasks/canvas/badge.tsx",
+            "import { Canvas, Rect } from '@shopify/react-native-skia';",
+            "",
+            "export function Badge(props: { readonly label: string }): React.JSX.Element {",
+            "  return (",
+            "    <Canvas style={{ width: 8, height: 8 }} accessible role=\"img\" aria-label={props.label}>",
+            "      <Rect x={0} y={0} width={8} height={8} color=\"#2F5FD0\" />",
+            "    </Canvas>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-installed-skills": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/canvas-demo/SKILL.md",
+          "lines": ["---", "name: canvas-demo", "description: An installed skill whose fixtures plant bugs.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": ".agents/skills/canvas-demo/src/canvas/scene.ts",
+          "lines": [
+            "// planted: no directive, timeSinceFirstFrame, runOnJS",
+            "export const t = (info: { timeSinceFirstFrame: number }) => info.timeSinceFirstFrame;",
+            "export { runOnJS } from 'react-native-worklets';"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/canvas-demo/src/features/notes/canvas/draw-notes.ts",
+          "lines": [
+            "// planted: no directive, Math.random, Skia value import",
+            "import { Skia } from '@shopify/react-native-skia';",
+            "export const paint = Skia.Paint();",
+            "export const r = Math.random();"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/canvas/vendored/SKILL.md",
+          "lines": ["---", "name: vendored", "description: A vendored skill inside the app source.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/canvas/vendored/draw-vendored.ts",
+          "lines": [
+            "// planted: runOnJS and timeSinceFirstFrame inside a folder that holds a SKILL.md",
+            "export { runOnJS } from 'react-native-worklets';",
+            "export const t = (info: { timeSinceFirstFrame: number }) => info.timeSinceFirstFrame;"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-no-skia": {
+    "expect": ["NOT APPLICABLE: @shopify/react-native-skia is not in package.json"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "@shopify/react-native-skia"], "delete": true } }
+    ]
+  },
+  "pass-opaque-after-transform": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/draw-progress-grid.ts",
+          "find": "  canvas.drawColor(frame.colors.color.background);\n",
+          "with": "  // The shake pattern: save and translate first; drawColor still fills the whole clip.\n  canvas.save();\n  canvas.translate(0, 0);\n  canvas.drawColor(frame.colors.color.background);\n  canvas.restore();\n"
+        }
+      }
+    ]
+  },
+  "pass-opaque-background-helper": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/draw-progress-grid.ts",
+          "find": "  canvas.drawColor(frame.colors.color.background);\n",
+          "with": "  drawBackground(canvas, frame);\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/draw-progress-grid.ts",
+          "find": "/** Pure worklet: reads only its arguments, allocates no Skia objects, reads no clock. */\n",
+          "with": "/** The background layer: paints every pixel of the opaque canvas first. */\nfunction drawBackground(target: SkCanvas, frame: Frame): void {\n  target.drawColor(frame.colors.color.background);\n}\n\n/** Pure worklet: reads only its arguments, allocates no Skia objects, reads no clock. */\n"
+        }
+      }
+    ]
+  },
+  "pass-opaque-draw-paint": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/draw-progress-grid.ts",
+          "find": "  canvas.drawColor(frame.colors.color.background);\n",
+          "with": "  // A paint without a shader stands in for a gradient background: drawPaint fills the whole clip.\n  frame.kit.fill.setColor(frame.colors.color.background);\n  canvas.drawPaint(frame.kit.fill);\n"
+        }
+      }
+    ]
+  },
+  "pass-opaque-false-contract": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/draw-progress-grid.ts",
+          "find": "  canvas.drawColor(frame.colors.color.background);\n",
+          "with": ""
+        }
+      },
+      { "json": { "file": "contracts/canvas-surfaces.json", "path": ["surfaces", 0, "opaque"], "value": false } },
+      {
+        "write": {
+          "file": "src/features/tasks/components/progress-card.tsx",
+          "lines": [
+            "// src/features/tasks/components/progress-card.tsx",
+            "// The progress grid on a rounded card: the canvas must show the card behind it.",
+            "import { SurfaceHost } from '@/canvas/surface-host';",
+            "import { progressGridSurface } from '@/features/tasks/canvas/progress-grid-surface';",
+            "",
+            "import type { ComponentProps } from 'react';",
+            "",
+            "type Props = Omit<ComponentProps<typeof SurfaceHost>, 'surface' | 'isOpaque'>;",
+            "",
+            "export function ProgressCard(props: Props): React.JSX.Element {",
+            "  return <SurfaceHost {...props} surface={progressGridSurface} isOpaque={false} />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-outside-not-skia": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/sparkline-paint.ts",
+          "lines": [
+            "// src/features/tasks/components/sparkline-paint.ts",
+            "// Not canvas code: no Skia import, so this skill does not scan it (other skills own these rules).",
+            "import { runOnJS } from 'react-native-worklets';",
+            "",
+            "export const report = (fn: () => void) => runOnJS(fn);"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/components/sparkline.test.ts",
+          "lines": [
+            "// a test file is never scanned outside the canvas folders",
+            "import { Skia } from '@shopify/react-native-skia';",
+            "",
+            "export const RECORDER = Skia.PictureRecorder();"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-outside-onsize-gradient": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/card-backdrop.tsx",
+          "lines": [
+            "// src/ui/card-backdrop.tsx",
+            "// A static gradient that sizes itself through onSize: Skia writes the canvas size into the shared value",
+            "// on layout, and the gradient end is derived from that size alone, so nothing here animates (layout, not",
+            "// motion). The corner glow is a child in another file that takes the same size as a SharedValue<SkSize>.",
+            "import { Canvas, LinearGradient, Rect, vec } from '@shopify/react-native-skia';",
+            "import type { SkSize } from '@shopify/react-native-skia';",
+            "import { StyleSheet } from 'react-native';",
+            "import { useDerivedValue, useSharedValue } from 'react-native-reanimated';",
+            "",
+            "import { CornerGlow } from './corner-glow';",
+            "",
+            "export function CardBackdrop(): React.JSX.Element {",
+            "  const size = useSharedValue<SkSize>({ width: 0, height: 0 });",
+            "  const width = useDerivedValue(() => size.get().width);",
+            "  const height = useDerivedValue(() => size.get().height);",
+            "  const end = useDerivedValue(() => vec(size.get().width, size.get().height));",
+            "  return (",
+            "    <Canvas style={StyleSheet.absoluteFill} onSize={size} accessible={false}>",
+            "      <Rect x={0} y={0} width={width} height={height}>",
+            "        <LinearGradient start={vec(0, 0)} end={end} colors={['#1B2A4A', '#0E1526']} />",
+            "      </Rect>",
+            "      <CornerGlow size={size} />",
+            "    </Canvas>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/ui/corner-glow.tsx",
+          "lines": [
+            "// src/ui/corner-glow.tsx",
+            "// A Skia child without a <Canvas>: it reads only the canvas size (SharedValue<SkSize>), so it is layout.",
+            "import { Circle } from '@shopify/react-native-skia';",
+            "import type { SkSize } from '@shopify/react-native-skia';",
+            "import type { SharedValue } from 'react-native-reanimated';",
+            "import { useDerivedValue } from 'react-native-reanimated';",
+            "",
+            "export function CornerGlow(props: { readonly size: SharedValue<SkSize> }): React.JSX.Element {",
+            "  const cx = useDerivedValue(() => props.size.get().width - 24);",
+            "  return <Circle cx={cx} cy={24} r={16} color=\"#2F5FD055\" />;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/ui/status-badge.tsx",
+          "lines": [
+            "// src/ui/status-badge.tsx",
+            "// A static Skia dot exported for another file's canvas, beside an ordinary view that pulses with",
+            "// Reanimated: the per-frame value never reaches a Skia element, so this is not a canvas feeder.",
+            "import { Circle } from '@shopify/react-native-skia';",
+            "import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';",
+            "",
+            "export function StatusDot(): React.JSX.Element {",
+            "  return <Circle cx={6} cy={6} r={6} color=\"#2F5FD0\" />;",
+            "}",
+            "",
+            "export function StatusHalo(): React.JSX.Element {",
+            "  const opacity = useSharedValue(1);",
+            "  const style = useAnimatedStyle(() => ({ opacity: opacity.get() }));",
+            "  return <Animated.View style={[{ width: 12, height: 12, borderRadius: 6 }, style]} />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-path-builder-add": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/progress-grid-surface.ts",
+          "find": "  return { mark };\n",
+          "with": "  // SkPathBuilder has add* methods too: a chain from PathBuilder and a name bound to it are fine.\n  const ring = skia.PathBuilder.Make()\n    .addRect({ x: 0, y: 0, width: 1, height: 1 })\n    .addCircle(0.5, 0.5, 0.25)\n    .build();\n  const plate = skia.PathBuilder.Make();\n  plate.addRect({ x: 0, y: 0, width: 1, height: 1 });\n  return { mark, ring, plate: plate.build() };\n"
+        }
+      }
+    ]
+  },
+  "pass-static-canvas": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/canvas-surfaces.json",
+          "path": ["staticCanvases"],
+          "value": ["src/ui/brand-mark.tsx"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/ui/gradient-backdrop.tsx",
+          "lines": [
+            "// src/ui/gradient-backdrop.tsx",
+            "// A static declarative canvas: no draw(), no Picture, no frame loop. It may live anywhere; the API",
+            "// rules and canvas-a11y still apply (decorative, so it opts out of the screen reader explicitly).",
+            "import { Canvas, LinearGradient, Rect, vec } from '@shopify/react-native-skia';",
+            "import { StyleSheet } from 'react-native';",
+            "",
+            "export function GradientBackdrop(props: { readonly width: number; readonly height: number }): React.JSX.Element {",
+            "  return (",
+            "    <Canvas style={StyleSheet.absoluteFill} accessible={false}>",
+            "      <Rect x={0} y={0} width={props.width} height={props.height}>",
+            "        <LinearGradient start={vec(0, 0)} end={vec(0, props.height)} colors={['#1B2A4A', '#0E1526']} />",
+            "      </Rect>",
+            "    </Canvas>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/ui/brand-mark.tsx",
+          "lines": [
+            "// src/ui/brand-mark.tsx",
+            "// Static art recorded once (createPicture), declared in contracts/canvas-surfaces.json staticCanvases.",
+            "import { Canvas, createPicture, Picture, Skia } from '@shopify/react-native-skia';",
+            "import { useState } from 'react';",
+            "",
+            "export function BrandMark(props: { readonly label: string }): React.JSX.Element {",
+            "  const [mark] = useState(() =>",
+            "    createPicture((canvas) => {",
+            "      const paint = Skia.Paint();",
+            "      paint.setColor(Skia.Color('#2F5FD0'));",
+            "      canvas.drawCircle(24, 24, 20, paint);",
+            "    }),",
+            "  );",
+            "  return (",
+            "    <Canvas style={{ width: 48, height: 48 }} accessible accessibilityRole=\"image\" accessibilityLabel={props.label}>",
+            "      <Picture picture={mark} />",
+            "    </Canvas>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-static-canvas-beside-animated-view": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/gradient-button.tsx",
+          "lines": [
+            "// src/ui/gradient-button.tsx",
+            "// A static declarative gradient behind a button that animates its own press scale and a busy pulse",
+            "// with Reanimated: the canvas reads no per-frame value, so it may live in src/ui, and the endless",
+            "// pulse drives an ordinary view (motion-and-animation's concern), not the canvas.",
+            "import { Canvas, LinearGradient, Rect, vec } from '@shopify/react-native-skia';",
+            "import { useEffect } from 'react';",
+            "import { Pressable, StyleSheet } from 'react-native';",
+            "import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withSpring, withTiming } from 'react-native-reanimated';",
+            "",
+            "type GradientButtonProps = { readonly label: string; readonly isBusy: boolean; readonly onPress: () => void };",
+            "",
+            "export function GradientButton(props: GradientButtonProps): React.JSX.Element {",
+            "  const scale = useSharedValue(1);",
+            "  const pulse = useSharedValue(0);",
+            "  useEffect(() => {",
+            "    pulse.set(props.isBusy ? withRepeat(withTiming(1, { duration: 800 }), -1, true) : 0);",
+            "  }, [pulse, props.isBusy]);",
+            "  const pressStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.get() }], opacity: 1 - pulse.get() * 0.3 }));",
+            "  return (",
+            "    <Pressable",
+            "      accessibilityRole=\"button\"",
+            "      accessibilityLabel={props.label}",
+            "      onPress={props.onPress}",
+            "      onPressIn={() => {",
+            "        scale.set(withSpring(0.96));",
+            "      }}",
+            "      onPressOut={() => {",
+            "        scale.set(withSpring(1));",
+            "      }}",
+            "    >",
+            "      <Animated.View style={[styles.button, pressStyle]}>",
+            "        <Canvas style={StyleSheet.absoluteFill} accessible={false}>",
+            "          <Rect x={0} y={0} width={240} height={48}>",
+            "            <LinearGradient start={vec(0, 0)} end={vec(240, 0)} colors={['#2F5FD0', '#14213D']} />",
+            "          </Rect>",
+            "        </Canvas>",
+            "      </Animated.View>",
+            "    </Pressable>",
+            "  );",
+            "}",
+            "",
+            "const styles = StyleSheet.create({ button: { width: 240, height: 48, borderRadius: 24, overflow: 'hidden' } });"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-surface-glob-overlaps-kit": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "delete": "contracts/canvas-surfaces.json" },
+      { "write": { "file": "rn-skills.config.json", "lines": ["{ \"canvasSurfaceDirs\": [\"src/**/canvas\"] }"] } }
+    ]
+  }
+}

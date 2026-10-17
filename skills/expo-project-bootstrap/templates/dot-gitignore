@@ -1,0 +1,50 @@
+# dependencies and generated projects (Continuous Native Generation rebuilds the root ios/ and android/;
+# anchored, so scripts/ios/ and a local module's modules/<name>/ios/ native source stay committed;
+# when multi-package, each app's own .gitignore from the Expo template covers apps/<app>/ios, or add
+# apps/*/ios and apps/*/android here)
+node_modules/
+.expo/
+expo-env.d.ts
+/ios
+/android
+.kotlin/
+build/
+dist/
+web-build/
+*.orig.*
+.metro-health-check*
+*.tsbuildinfo
+npm-debug.*
+# reports, coverage, mutation sandboxes, skill tooling installs, the pinned Maestro install (e2e-maestro)
+# and the parity captures, reports and sheets (design-visual-parity: several MB per run)
+coverage/
+reports/
+.parity/
+dist-audit/
+.stryker-tmp/
+.skill-tooling/
+/tools/maestro/
+**/__image_snapshots__/__diff_output__/
+.DS_Store
+# secrets and signing material
+*.p8
+*.p12
+*.pem
+*.key
+*.mobileprovision
+*.keystore
+*.jks
+AuthKey_*
+ApiKey_*
+*.xcarchive
+*.ipa
+*.aab
+*.apk
+credentials.json
+# local env files; .env.example (the documented keys, no values) is the one committed env file
+.env*
+!.env.example
+.claude/settings.local.json
+# per-developer Lefthook overrides (lefthook.yml is the shared, committed config)
+lefthook-local.yml
+.lefthook-local.yml

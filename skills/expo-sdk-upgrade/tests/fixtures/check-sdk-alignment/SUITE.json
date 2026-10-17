@@ -1,0 +1,30 @@
+{
+  "$comment": "One Expo app at the repo root on SDK 57 (tests/bases/app-57) with the shipped templates placed at their first-line paths; installed and vendored skills hold planted findings that stay invisible. The real pruning proof is src/vendor/third-party-skill (inside the scanned src folder, pruned only because it holds a SKILL.md); bad-vendor-folder-without-skill-md deletes that SKILL.md and expects the decoy's findings, so a pruning regression cannot hide. The .agents/skills and skills/ decoys sit outside every scanned folder and only guard against a wider scan.",
+  "base": [
+    "@tests/bases/app-57",
+    {
+      "templates": true,
+      "firstLinePath": true
+    }
+  ],
+  "ops": [
+    {
+      "write": {
+        "file": ".agents/skills/vendored-skill/SKILL.md",
+        "content": "---\nname: vendored-skill\ndescription: A planted skill folder; its files hold findings on purpose and must stay invisible.\n---\n\n# vendored-skill\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/demo-skill/SKILL.md",
+        "content": "---\nname: demo-skill\ndescription: A planted skill folder; its files hold findings on purpose and must stay invisible.\n---\n\n# demo-skill\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/vendor/third-party-skill/SKILL.md",
+        "content": "---\nname: third-party-skill\ndescription: A planted skill folder; its files hold findings on purpose and must stay invisible.\n---\n\n# third-party-skill\n"
+      }
+    }
+  ]
+}

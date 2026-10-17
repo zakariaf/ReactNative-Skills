@@ -1,0 +1,32 @@
+# .maestro/ads-smoke/03-break-interstitial.yaml
+# Step 3, after step 2 (same install). The first interstitial is due after three finished natural
+# breaks (the default pacing): the first two "Review done" presses show no ad, the third shows
+# Google's test interstitial, and the task list is back after it closes. No pacing override in the
+# debug link: a "show every ad" switch would prove nothing here.
+appId: ${APP_ID}
+name: Ads smoke 3 - the third finished break shows an interstitial, then the list again
+tags: [ads-smoke]
+---
+- tapOn:
+    id: 'tasks.review-done-button'
+# system-ui: Google's test ads carry a "Test mode" label; none may show yet.
+- assertNotVisible: 'Test mode'
+- tapOn:
+    id: 'tasks.review-done-button'
+# system-ui: still no test ad after the second break.
+- assertNotVisible: 'Test mode'
+- tapOn:
+    id: 'tasks.review-done-button'
+# system-ui: Google's test interstitial covers the app.
+- extendedWaitUntil:
+    visible: 'Test mode'
+    timeout: 30000
+- waitForAnimationToEnd
+# system-ui: the interstitial's close key, top end corner (Google's UI, no testID); on Android the
+# hardware back key closes it too.
+- tapOn:
+    point: '94%,9%'
+- extendedWaitUntil:
+    visible:
+      id: 'tasks.list'
+    timeout: 30000

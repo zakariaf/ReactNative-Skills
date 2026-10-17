@@ -1,0 +1,12 @@
+{
+  "base": [
+    "@tests/bases/app",
+    "@tests/bases/decoys",
+    {
+      "templates": true,
+      "firstLinePath": true,
+      "fill": { "__ASC_APP_ID__": "6740000000", "__APP_ID__": "com.example.tasks" }
+    }
+  ],
+  "renames": { "dot-gitignore": ".gitignore", "dot-nvmrc": ".nvmrc" }
+}

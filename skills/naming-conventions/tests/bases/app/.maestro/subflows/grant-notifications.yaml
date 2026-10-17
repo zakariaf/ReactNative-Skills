@@ -1,0 +1,10 @@
+# .maestro/subflows/grant-notifications.yaml
+# The OS permission dialog (iOS alert, Android 13+ POST_NOTIFICATIONS) is tapped only when it shows:
+# the guard's visible text equals the text it taps.
+appId: ${APP_ID}
+---
+- runFlow:
+    when:
+      visible: 'Allow'
+    commands:
+      - tapOn: 'Allow'

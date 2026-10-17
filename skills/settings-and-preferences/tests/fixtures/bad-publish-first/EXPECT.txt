@@ -1,0 +1,3 @@
+[persist-then-publish]
+publishes before it persists
+src/stores/settings/settings-store.ts:

@@ -1,0 +1,9 @@
+{
+  "gatedPaths": [
+    "eslint.config.mjs",
+    "jest.config.js",
+    "**/__snapshots__/*.golden.test.ts.snap",
+    "**/*.golden.test.ts.snap.ios",
+    "**/*.golden.test.ts.snap.android"
+  ]
+}

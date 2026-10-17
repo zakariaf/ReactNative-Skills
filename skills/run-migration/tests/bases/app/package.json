@@ -1,0 +1,9 @@
+{
+  "name": "tasks",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "expo": "~57.0.26",
+    "expo-sqlite": "~57.0.3"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "$comment": "Values verify-templates and the self-test fill into the templates: a bouncing-orbs arena. Replace them with your game's id in kebab case, PascalCase and UPPER_SNAKE.",
+  "__GAME_ID__": "bounce-arena",
+  "__GAME_PASCAL__": "BounceArena",
+  "__GAME_CONST__": "BOUNCE_ARENA"
+}

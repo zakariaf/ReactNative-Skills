@@ -1,0 +1,29 @@
+[
+  {
+    "$comment": "REQ-1 is built and traced by the test and the flow below.",
+    "replace": {
+      "file": "docs/spec/requirements.md",
+      "find": "### REQ-1 \u00b7 Add a task\n\n- Status: planned",
+      "with": "### REQ-1 \u00b7 Add a task\n\n- Status: built"
+    }
+  },
+  {
+    "$comment": "A numbered section turns section citations on (sections: auto).",
+    "write": {
+      "file": "docs/spec/glossary.md",
+      "lines": [
+        "# Glossary",
+        "",
+        "## 1 \u00b7 Words",
+        "",
+        "### 1.1 \u00b7 Task",
+        "",
+        "One thing to do, with a title and an optional due date.",
+        "",
+        "### 1.2 \u00b7 List",
+        "",
+        "A named group of tasks."
+      ]
+    }
+  }
+]

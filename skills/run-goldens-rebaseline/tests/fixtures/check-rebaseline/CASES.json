@@ -1,0 +1,379 @@
+{
+  "bad-assertions-late": [
+    { "json": { "file": "reports/rebaseline/assertions.json", "path": ["startTime"], "value": 1791900035000 } }
+  ],
+  "bad-assertions-partial": [
+    { "json": { "file": "reports/rebaseline/assertions.json", "path": ["testResults"], "value": [] } }
+  ],
+  "bad-assertions-red": [
+    { "json": { "file": "reports/rebaseline/assertions.json", "path": ["success"], "value": false } },
+    { "json": { "file": "reports/rebaseline/assertions.json", "path": ["numFailedTests"], "value": 1 } }
+  ],
+  "bad-contract-edited": [
+    {
+      "replace": {
+        "file": "src/features/tasks/tasks-digest.golden.test.ts.snap.ios",
+        "find": "\"digest:inbox:2027-01-01\"",
+        "with": "\"digest:inbox:2027-1-1\""
+      }
+    }
+  ],
+  "bad-contract-reaccepted": [
+    {
+      "json": {
+        "file": "reports/rebaseline/triage.json",
+        "path": ["testResults", 0, "assertionResults", 4, "status"],
+        "value": "failed"
+      }
+    }
+  ],
+  "bad-contract-renamed": [
+    {
+      "replace": {
+        "file": "src/features/tasks/tasks-digest.golden.test.ts.snap.ios",
+        "find": "names the digest of the inbox list on 2026-10-03 1",
+        "with": "names the inbox digest on 2026-10-03 1"
+      }
+    }
+  ],
+  "bad-dependencies-changed": [
+    { "json": { "file": "package.json", "path": ["devDependencies", "jest-image-snapshot"], "value": "6.5.3" } }
+  ],
+  "bad-frozen-golden-path": [
+    { "replace": { "file": "src/core/rng/daily-pick.vectors.json", "find": "\"pick\": 7", "with": "\"pick\": 8" } }
+  ],
+  "bad-golden-deleted-by-hand": [
+    { "delete": "src/features/tasks/tasks-summary.golden.test.ts.snap.ios" },
+    {
+      "json": {
+        "file": "reports/rebaseline/inspection.json",
+        "path": ["entries", 4],
+        "value": {
+          "path": "src/features/tasks/tasks-summary.golden.test.ts.snap.ios",
+          "verdict": "orphan",
+          "note": "thought to be unused, deleted it"
+        }
+      }
+    }
+  ],
+  "bad-golden-edited-after-proof": [
+    {
+      "replace": {
+        "file": "src/features/tasks/tasks-digest.golden.test.ts.snap.ios",
+        "find": "upcoming: -",
+        "with": "upcoming: none"
+      }
+    }
+  ],
+  "bad-golden-hand-edit": [
+    {
+      "replace": {
+        "file": "src/features/tasks/tasks-summary.golden.test.ts.snap.ios",
+        "find": "open 1 done 0",
+        "with": "open 1 done 0 overdue 0"
+      }
+    },
+    {
+      "json": {
+        "file": "reports/rebaseline/inspection.json",
+        "path": ["entries", 4],
+        "value": {
+          "path": "src/features/tasks/tasks-summary.golden.test.ts.snap.ios",
+          "verdict": "intended",
+          "note": "summary gains an overdue count, read it line by line"
+        }
+      }
+    }
+  ],
+  "bad-header-and-entry-changed": [
+    {
+      "replace": {
+        "file": "src/features/tasks/tasks-summary.golden.test.ts.snap.ios",
+        "find": "https://goo.gl/fbAQLP",
+        "with": "https://jestjs.io/docs/snapshot-testing"
+      }
+    },
+    {
+      "replace": {
+        "file": "src/features/tasks/tasks-summary.golden.test.ts.snap.ios",
+        "find": "open 1 done 0",
+        "with": "open 1 done 1"
+      }
+    },
+    {
+      "json": {
+        "file": "reports/rebaseline/inspection.json",
+        "path": ["entries", 4],
+        "value": {
+          "path": "src/features/tasks/tasks-summary.golden.test.ts.snap.ios",
+          "verdict": "intended",
+          "note": "header link rewritten for the Jest major release"
+        }
+      }
+    }
+  ],
+  "bad-inspection-missing-entry": [
+    { "json": { "file": "reports/rebaseline/inspection.json", "path": ["entries", 2], "delete": true } }
+  ],
+  "bad-inspection-no-record": [{ "delete": "reports/rebaseline/inspection.json" }],
+  "bad-inspection-not-yes": [
+    {
+      "json": { "file": "reports/rebaseline/inspection.json", "path": ["entries", 0, "verdict"], "value": "regression" }
+    }
+  ],
+  "bad-inspection-orphan-verdict-on-change": [
+    { "json": { "file": "reports/rebaseline/inspection.json", "path": ["entries", 1, "verdict"], "value": "orphan" } }
+  ],
+  "bad-inspection-short-note": [
+    { "json": { "file": "reports/rebaseline/inspection.json", "path": ["entries", 2, "note"], "value": "ok" } }
+  ],
+  "bad-inspection-todo": [
+    { "json": { "file": "reports/rebaseline/inspection.json", "path": ["entries", 1, "verdict"], "value": "todo" } }
+  ],
+  "bad-inspection-unchanged-path": [
+    {
+      "json": {
+        "file": "reports/rebaseline/inspection.json",
+        "path": ["entries", 4],
+        "value": {
+          "path": "src/features/tasks/tasks-summary.golden.test.ts.snap.ios",
+          "verdict": "intended",
+          "note": "looked at it to be sure, it is fine"
+        }
+      }
+    }
+  ],
+  "bad-install-missing": [{ "delete": "node_modules/jest-image-snapshot/node_modules/pixelmatch" }],
+  "bad-install-stale": [
+    { "json": { "file": "node_modules/jest/package.json", "path": ["version"], "value": "29.6.4" } }
+  ],
+  "bad-message-no-trailer": {
+    "args": "--message reports/rebaseline/commit-message.txt",
+    "ops": [
+      {
+        "write": {
+          "file": "reports/rebaseline/commit-message.txt",
+          "content": "test(goldens): re-accept the ring and digest goldens\n\nRe-accepted tasks-digest.golden.test.ts and progress-ring.golden.test.ts;\ndeleted old-badge-golden-test-ts-draws-the-badge-1-snap.png.\n"
+        }
+      }
+    ]
+  },
+  "bad-message-trailer-in-prose": {
+    "args": "--message reports/rebaseline/commit-message.txt",
+    "ops": [
+      {
+        "write": {
+          "file": "reports/rebaseline/commit-message.txt",
+          "content": "feat(tasks): thicker progress ring and open count in the digest\n\nRe-accepted: tasks-digest.golden.test.ts (header gains the open count),\nprogress-ring.golden.test.ts (stroke 6 -> 8 px at phone and tablet).\nDeleted orphan: old-badge-golden-test-ts-draws-the-badge-1-snap.png.\n\nEvery diff was read and every PNG and triage diff opened.\nGate-Change: 2 goldens re-accepted for the Tasks progress redesign\n"
+        }
+      }
+    ]
+  },
+  "bad-message-unnamed": {
+    "args": "--message reports/rebaseline/commit-message.txt",
+    "ops": [
+      {
+        "write": {
+          "file": "reports/rebaseline/commit-message.txt",
+          "content": "test(goldens): re-accept the digest golden\n\nRe-accepted tasks-digest.golden.test.ts.\n\nGate-Change: digest header re-accepted after the redesign; diff read line by line\n"
+        }
+      }
+    ]
+  },
+  "bad-orphan-image-kept": [
+    {
+      "png": {
+        "files": ["test/goldens/__image_snapshots__/old-badge-golden-test-ts-draws-the-badge-1-snap.png"],
+        "width": 24,
+        "height": 24,
+        "fill": "#208aef"
+      }
+    },
+    { "json": { "file": "reports/rebaseline/inspection.json", "path": ["entries", 3], "delete": true } }
+  ],
+  "bad-orphan-snapshot": [
+    {
+      "write": {
+        "file": "src/features/tasks/tasks-filter.golden.test.ts.snap.ios",
+        "content": "// Jest Snapshot v1, https://goo.gl/fbAQLP\n\nexports[`filterTasks goldens keeps open tasks 1`] = `\"open 2\"`;\n"
+      }
+    }
+  ],
+  "bad-proof-early": [
+    { "json": { "file": "reports/rebaseline/proof-01.json", "path": ["startTime"], "value": 1791900035000 } }
+  ],
+  "bad-proof-missing": [{ "delete": "reports/rebaseline/proof-02.json" }],
+  "bad-proof-no-golden-record": [{ "delete": "reports/rebaseline/proof-goldens.json" }],
+  "bad-proof-obsolete": [
+    { "json": { "file": "reports/rebaseline/proof-01.json", "path": ["snapshot", "unchecked"], "value": 1 } }
+  ],
+  "bad-proof-partial": [
+    { "json": { "file": "reports/rebaseline/proof-02.json", "path": ["testResults", 1], "delete": true } }
+  ],
+  "bad-proof-red": [
+    { "json": { "file": "reports/rebaseline/proof-02.json", "path": ["success"], "value": false } },
+    { "json": { "file": "reports/rebaseline/proof-02.json", "path": ["numFailedTests"], "value": 1 } },
+    { "json": { "file": "reports/rebaseline/proof-02.json", "path": ["snapshot", "unmatched"], "value": 1 } }
+  ],
+  "bad-proof-wrote": [
+    { "json": { "file": "reports/rebaseline/proof-01.json", "path": ["snapshot", "didUpdate"], "value": true } },
+    { "json": { "file": "reports/rebaseline/proof-01.json", "path": ["snapshot", "updated"], "value": 1 } }
+  ],
+  "bad-source-added": [
+    {
+      "write": {
+        "file": "src/features/tasks/task-filter.ts",
+        "content": "// src/features/tasks/task-filter.ts\nexport const FILTERS = [] as const;\n"
+      }
+    }
+  ],
+  "bad-source-edited": [
+    {
+      "replace": {
+        "file": "src/features/tasks/task-list.ts",
+        "find": "Open tasks first",
+        "with": "Open tasks first (stable)"
+      }
+    }
+  ],
+  "bad-tolerance-matcher": [
+    {
+      "replace": {
+        "file": "test/goldens/skia-golden.ts",
+        "find": "failureThreshold: 0.001",
+        "with": "failureThreshold: 0.002"
+      }
+    }
+  ],
+  "bad-tolerance-register": [
+    { "json": { "file": "contracts/goldens.json", "path": ["maxPixelTolerance"], "value": 0.002 } }
+  ],
+  "bad-triage-missing": [{ "delete": "reports/rebaseline/triage.json" }],
+  "bad-triage-partial": [
+    { "json": { "file": "reports/rebaseline/triage.json", "path": ["testResults", 1], "delete": true } }
+  ],
+  "bad-update-two-files": [
+    {
+      "json": {
+        "file": "reports/rebaseline/update-01.json",
+        "path": ["testResults", 1],
+        "value": {
+          "name": "src/features/tasks/tasks-summary.golden.test.ts",
+          "status": "passed",
+          "startTime": 0,
+          "endTime": 1,
+          "assertionResults": [
+            { "ancestorTitles": ["summarizeTasks goldens"], "title": "summarizes the sample list", "status": "passed" }
+          ]
+        }
+      }
+    }
+  ],
+  "bad-update-unplanned": [
+    { "json": { "file": "reports/rebaseline/triage.json", "path": ["testResults", 2, "status"], "value": "passed" } }
+  ],
+  "bad-update-without-flag": [
+    { "json": { "file": "reports/rebaseline/update-02.json", "path": ["snapshot", "didUpdate"], "value": false } }
+  ],
+  "error-edited-start-record": [
+    { "json": { "file": "reports/rebaseline/before.json", "path": ["version"], "value": 2 } }
+  ],
+  "error-evidence-moved": [
+    {
+      "json": {
+        "file": "reports/rebaseline/assertions.json",
+        "path": ["testResults", 0, "name"],
+        "value": "/elsewhere/old-clone/src/features/tasks/task-list.test.ts"
+      }
+    }
+  ],
+  "error-no-rebaseline": [{ "delete": "reports/rebaseline/before.json" }],
+  "error-not-a-jest-result": [
+    { "write": { "file": "reports/rebaseline/triage.json", "content": "{ \"tests\": [] }\n" } }
+  ],
+  "pass-evidence-dir-option": {
+    "args": "--evidence-dir qa/rebaseline",
+    "ops": [{ "rename": { "from": "reports/rebaseline", "to": "qa/rebaseline" } }]
+  },
+  "pass-header-only-rewrite": {
+    "$comment": "A Jest-major header rewrite in the documented order: --start, --assertions, --triage (the files failing on 'Outdated guide link' are the plan), one header run without -u in place of any --update (so no update-NN.json for this file), then --proof, which records the rewritten header's hash in proof-goldens.json.",
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-summary.golden.test.ts.snap.ios",
+          "find": "https://goo.gl/fbAQLP",
+          "with": "https://jestjs.io/docs/snapshot-testing"
+        }
+      },
+      {
+        "json": {
+          "file": "reports/rebaseline/inspection.json",
+          "path": ["entries", 4],
+          "value": {
+            "path": "src/features/tasks/tasks-summary.golden.test.ts.snap.ios",
+            "verdict": "intended",
+            "note": "header link rewritten for the Jest major; git diff -U0 shows line 1 only"
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "reports/rebaseline/proof-goldens.json",
+          "path": ["goldens", "src/features/tasks/tasks-summary.golden.test.ts.snap.ios"],
+          "value": "05e5c5a7c4bd3c4f5712ffe3b29a083f5a71cbec3c700b01aa7d248d25e21a07"
+        }
+      }
+    ]
+  },
+  "pass-installed-skills-silent": [
+    {
+      "write": {
+        "file": ".agents/skills/demo/tests/fixtures/bad/src/x.golden.test.ts.snap.ios",
+        "content": "exports[`[contract] x 1`] = `\"planted\"`;\n"
+      }
+    },
+    { "write": { "file": ".agents/skills/demo/SKILL.md", "content": "---\nname: demo\n---\n" } },
+    { "write": { "file": "skills/demo/src/planted.ts", "content": "export const planted = 1;\n" } },
+    { "write": { "file": "vendor/kit/SKILL.md", "content": "---\nname: kit\n---\n" } },
+    {
+      "write": {
+        "file": "vendor/kit/y.golden.test.ts.snap.ios",
+        "content": "exports[`y 1`] = `\"orphan in a vendored skill\"`;\n"
+      }
+    }
+  ],
+  "pass-message": {
+    "args": "--message reports/rebaseline/commit-message.txt",
+    "ops": [
+      {
+        "write": {
+          "file": "reports/rebaseline/commit-message.txt",
+          "content": "feat(tasks): thicker progress ring and open count in the digest\n\nRe-accepted: tasks-digest.golden.test.ts (header gains the open count),\nprogress-ring.golden.test.ts (stroke 6 -> 8 px at phone and tablet).\nDeleted orphan: old-badge-golden-test-ts-draws-the-badge-1-snap.png.\n\nGate-Change: 2 goldens re-accepted for the ring redesign; every diff read, every PNG and triage diff opened\n"
+        }
+      }
+    ]
+  },
+  "pass-no-jest": [{ "json": { "file": "package.json", "path": ["devDependencies", "jest"], "delete": true } }],
+  "pass-screenshot-baseline": [
+    {
+      "png": {
+        "files": [".maestro/baselines/ios/iphone-17/en-light/tasks.png"],
+        "width": 40,
+        "height": 80,
+        "fill": "#f4f4f4",
+        "rects": [{ "x": 4, "y": 8, "width": 32, "height": 8, "fill": "#111111" }]
+      }
+    },
+    {
+      "json": {
+        "file": "reports/rebaseline/inspection.json",
+        "path": ["entries", 4],
+        "value": {
+          "path": ".maestro/baselines/ios/iphone-17/en-light/tasks.png",
+          "verdict": "intended",
+          "note": "header bar 6 -> 8 px on the tasks screen, as designed"
+        }
+      }
+    }
+  ]
+}

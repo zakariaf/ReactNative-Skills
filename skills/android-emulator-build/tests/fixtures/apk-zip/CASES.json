@@ -1,0 +1,18 @@
+{
+  "bad-debuggable-binary": {
+    "expect": ["artifacts/app-debuggable.apk/AndroidManifest.xml [debuggable] android:debuggable is true"],
+    "args": "{dir} --apk artifacts/app-debuggable.apk --variant preview"
+  },
+  "bad-unsigned": {
+    "expect": ["artifacts/app-unsigned.apk [signature] the APK has no APK Signing Block"],
+    "args": "{dir} --apk artifacts/app-unsigned.apk --variant preview"
+  },
+  "bad-zip-misaligned": {
+    "expect": ["artifacts/app-misaligned.apk/lib/arm64-v8a/libhermes.so [page-alignment] stored uncompressed at byte"],
+    "args": "{dir} --apk artifacts/app-misaligned.apk --variant preview"
+  },
+  "error-truncated": {
+    "expect": ["ERROR [bad-input] nothing to check: artifacts/app-truncated.apk: not a ZIP file"],
+    "args": "{dir} --apk artifacts/app-truncated.apk --variant preview"
+  }
+}

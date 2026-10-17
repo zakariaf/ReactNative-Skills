@@ -1,0 +1,7 @@
+{
+  "$comment": "Values verify-templates and the self-test fill into the templates: the Tasks app's tasks feature. Replace them with the feature you add sounds to.",
+  "__FEATURE__": "tasks",
+  "__FEATURE_PASCAL__": "Tasks",
+  "__FEATURE_SOUNDS__": "TASKS_SOUNDS",
+  "__FEATURE_FEEDBACK__": "TASKS_FEEDBACK"
+}

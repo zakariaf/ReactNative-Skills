@@ -1,0 +1,12 @@
+{
+  "version": "17.2.0",
+  "time": {
+    "created": "2019-01-01T00:00:00.000Z",
+    "17.1.0": "2026-09-01T10:00:00.000Z",
+    "17.2.0": "2026-09-25T14:06:55.000Z"
+  },
+  "license": "Apache-2.0",
+  "scripts": {
+    "prepare": "yarn build && yarn build:plugin"
+  }
+}

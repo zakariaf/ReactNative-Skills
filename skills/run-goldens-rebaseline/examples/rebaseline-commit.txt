@@ -1,0 +1,30 @@
+A rebaseline commit message (write it to reports/rebaseline/commit-message.txt, run
+check-rebaseline.mjs . --message reports/rebaseline/commit-message.txt, then git commit -F that file).
+The subject follows the repository's commit format (the commit-msg hook limits the header to 72
+characters); the body names every re-accepted golden test and
+every deleted orphan; the last paragraph is the Gate-Change trailer.
+
+---------------------------------------------------------------------------------------------------
+chore(deps): bump Skia and re-accept the chart goldens
+
+The new CanvasKit anti-aliases curved edges differently. The old goldens passed on the old version
+(npm run test:golden before the bump); the unit suite is green on the new one.
+
+Re-accepted:
+- weekly-chart.golden.test.ts: bar edges at narrow, phone and tablet (0.2 to 0.6% of pixels)
+- progress-ring.golden.test.ts: ring edges at all three sizes and moments
+Deleted orphan: streak-badge-golden-test-ts-draws-the-badge-1-snap.png (its test went in abc1234).
+
+Gate-Change: 2 pixel goldens re-accepted after the Skia upgrade; every triage composite and new PNG opened, edges only
+---------------------------------------------------------------------------------------------------
+
+A header-only rebaseline after a Jest major:
+
+---------------------------------------------------------------------------------------------------
+chore(deps): move to Jest 30 with Expo SDK 58
+
+Re-accepted: the snapshot header of tasks-digest.golden.test.ts and tasks-summary.golden.test.ts
+(Jest 30 fails the old guide link under --ci).
+
+Gate-Change: snapshot headers rewritten for Jest 30; git diff -U0 shows line 1 only in every file
+---------------------------------------------------------------------------------------------------

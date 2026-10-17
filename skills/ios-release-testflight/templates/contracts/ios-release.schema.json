@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ios-release.schema.json",
+  "title": "iOS release contract",
+  "description": "The app's own facts for TestFlight and App Store releases. Read by scripts/release/release-config.ts (the local lane) and by the ios-release-testflight skill's check-release-setup.mjs (all keys) and check-store-artifact.mjs (appId, appDir, usageStrings, usesNonExemptEncryption, forbiddenBundleStrings, unfinishedMarkers, adIdsFile, productionAdsMode). The Xcode pin lives in scripts/ios/toolchain.ts and the build number in app.config.ts, never here. Unknown keys are refused.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["appId"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "appId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)+$",
+      "description": "The production bundle identifier, the one the App Store Connect app record carries. Preview builds carry <appId>.preview (app-variants-and-environment's variantIdentity) and need their own app record. Never com.example.*."
+    },
+    "appDir": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The app's folder relative to the repo root: '.' for a single app (default); when multi-package, apps/<app>. Tags and the release commit scope then start with the folder name."
+    },
+    "releaseBranch": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The only branch releases are built from. Default: main."
+    },
+    "preflight": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true,
+      "contains": { "const": "verify" },
+      "description": "npm scripts run before the build number is bumped; a failure stops the release with nothing used. Must include verify (quality-gates' full gate). Default: [\"verify\"]."
+    },
+    "postPrebuild": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true,
+      "description": "npm scripts run from the repo root right after the clean prebuild, before the archive: the privacy-manifest and network audits that read ios/Pods (privacy-and-store-declarations: audit:privacy, audit:network). Default: none."
+    },
+    "usageStrings": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^NS[A-Za-z]+UsageDescription$" },
+      "uniqueItems": true,
+      "description": "Usage-description keys every build must carry in Info.plist and in every language the app is localized into. Keys already present in the built Info.plist are checked in every language too, and NSUserTrackingUsageDescription is required whenever the app can ask for tracking."
+    },
+    "usesNonExemptEncryption": {
+      "type": "boolean",
+      "description": "The ITSAppUsesNonExemptEncryption answer a production build carries (app.config.ts ios.config.usesNonExemptEncryption; false for HTTPS-only apps). A legal statement: ask the developer when unsure."
+    },
+    "forbiddenBundleStrings": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 6 },
+      "uniqueItems": true,
+      "description": "Strings that mark unfinished work and must never be in main.jsbundle of any uploaded build: a placeholder screen's testID, a stub route name. Default: none."
+    },
+    "unfinishedMarkers": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true,
+      "description": "Repo files whose presence means the app is not finished (for example docs/unfinished-screens.md). The release preflight and both checkers refuse a repo that has one. Default: none."
+    },
+    "productionAdsMode": {
+      "enum": ["live", "off"],
+      "default": "live",
+      "description": "The ADS_MODE a production build ships with (admob-ads-and-consent): live (the default) or off for an app that ships without ads. release:ios and check-store-artifact use it when --ads is not given, and a keyless production/off rehearsal reads the ad ids file only when the store build runs live ads."
+    },
+    "adIdsFile": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Where the app's own AdMob ids live (admob-ads-and-consent: src/config/admob-ids.ts, the default). check-release-setup scans it for placeholder ids, and a keyless production rehearsal with ads off reads it in place of the live build it stands in for."
+    },
+    "whatToTest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "always": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Tester checks listed in every build's What to Test (for example: switch to an RTL language once)."
+        },
+        "whenChanged": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["paths", "line"],
+            "properties": {
+              "paths": {
+                "type": "array",
+                "items": { "type": "string", "minLength": 1 },
+                "minItems": 1
+              },
+              "line": { "type": "string", "minLength": 1 }
+            }
+          },
+          "description": "A tester check listed on the first build and whenever a file under one of its path prefixes changed since the previous upload tag (for example the purchase flow when src/services/purchases/ changed)."
+        }
+      },
+      "description": "The What to Test lines beyond the release's --notes."
+    }
+  }
+}

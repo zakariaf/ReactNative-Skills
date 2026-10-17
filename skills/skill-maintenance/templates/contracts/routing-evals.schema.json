@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "routing-evals.schema.json",
+  "title": "Routing evals contract",
+  "description": "Realistic task prompts and the skill each should load, read by skill-maintenance's check-routing.mjs (offline ranking, or --live with Claude Code). Every authored, model-invocable skill needs at least two evals (--min-per-skill). A plain list of evals is accepted too.",
+  "type": "object",
+  "required": ["evals"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "evals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["prompt", "expect"],
+        "additionalProperties": false,
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "minLength": 1,
+            "description": "A task as a developer would write it, without the skill's name."
+          },
+          "expect": {
+            "description": "The skill folder name that should load, or null when no project skill should.",
+            "oneOf": [
+              { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+              { "type": "null" }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

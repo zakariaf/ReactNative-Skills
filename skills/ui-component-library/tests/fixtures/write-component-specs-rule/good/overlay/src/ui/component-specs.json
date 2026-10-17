@@ -1,0 +1,16 @@
+{
+  "chip": {
+    "border": 2,
+    "radius": 8,
+    "gap": 12,
+    "ring": 3.5,
+    "padding": [4, 12, 5]
+  },
+  "row": {
+    "separatorBorder": 1,
+    "borderHair": 0.5,
+    "iconStroke": 2.5,
+    "fillEdge": 2,
+    "minHeight": 52
+  }
+}

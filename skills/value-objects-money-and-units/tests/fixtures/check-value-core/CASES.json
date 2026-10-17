@@ -1,0 +1,548 @@
+{
+  "bad-allocate-conservation": {
+    "expect": ["src/core/money/allocate.ts:54 [allocate-conservation]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/money/allocate.ts",
+          "find": "  const parts = weights.map((weight) => (amount * weight) / total);",
+          "with": "  const parts = weights.map((weight) => BigInt(Math.floor((Number(amount) * Number(weight)) / Number(total))));"
+        }
+      }
+    ]
+  },
+  "bad-allocate-refuses": {
+    "expect": ["src/core/money/allocate.ts:54 [allocate-refuses]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/money/allocate.ts",
+          "find": "    if (!Number.isSafeInteger(weight) || weight < 0) {",
+          "with": "    if (!Number.isSafeInteger(weight)) {"
+        }
+      }
+    ]
+  },
+  "bad-allocate-vectors": {
+    "expect": ["src/core/money/allocate.ts:54 [allocate-vectors]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/money/allocate.ts",
+          "find": "  if (a.rest === b.rest) return a.index - b.index;",
+          "with": "  if (a.rest === b.rest) return b.index - a.index;"
+        }
+      }
+    ]
+  },
+  "bad-apply-rate": {
+    "expect": ["src/core/money/rate.ts:62 [apply-rate]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/money/rate.ts",
+          "find": "    toSafeInteger(divideRounded(scaled, BigInt(value.denominator), rounding)),",
+          "with": "    Math.round((amount.minor * value.numerator) / value.denominator),"
+        }
+      }
+    ]
+  },
+  "bad-convert-money": {
+    "expect": ["src/core/money/rate.ts:91 [convert-money]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/money/rate.ts",
+          "find": "  const numerator = BigInt(amount.minor) * BigInt(perUnit.numerator) * pow10(exponentOf(to));",
+          "with": "  const numerator = BigInt(amount.minor) * BigInt(perUnit.numerator);"
+        }
+      }
+    ]
+  },
+  "bad-cross-currency": {
+    "expect": ["src/core/money/money.ts:39 [cross-currency]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/money/money.ts",
+          "find": "export function addMoney(a: Money, b: Money): Money {\n  assertSameCurrency(a, b);\n",
+          "with": "export function addMoney(a: Money, b: Money): Money {\n"
+        }
+      }
+    ]
+  },
+  "bad-exponent-table": {
+    "expect": ["src/core/money/currency-exponents.ts:7 [exponent-table]"],
+    "ops": [{ "replace": { "file": "src/core/money/currency-exponents.ts", "find": "  KWD: 3,", "with": "  KWD: 2," } }]
+  },
+  "bad-exponent-table-non-iso": {
+    "expect": ["src/core/money/currency-exponents.ts:7 [exponent-table]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/money/currency-exponents.ts",
+          "find": "  AED: 2,",
+          "with": "  AED: 2,\n  BTC: 8,"
+        }
+      }
+    ]
+  },
+  "bad-instant-parse": {
+    "expect": ["src/core/time/instant.ts:96 [instant-parse]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/time/instant.ts",
+          "find": "  const offset = match?.[8];\n  if (match !== null && offset === undefined) return err({ kind: 'missing-offset', text });\n",
+          "with": "  const offset = match === null ? undefined : (match[8] ?? 'Z');\n"
+        }
+      }
+    ]
+  },
+  "bad-iso-xml-newer-list": {
+    "expect": ["src/core/money/currency-exponents.ts:7 [exponent-table]"],
+    "args": "{dir} --iso-xml {dir}/iso/list-one.xml",
+    "ops": [
+      {
+        "write": {
+          "file": "iso/list-one.xml",
+          "lines": [
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<ISO_4217 Pblshd=\"2026-09-17\">",
+            "<CcyTbl>",
+            "<CcyNtry><Ccy>AED</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>AFN</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>ALL</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>AMD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>AOA</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>ARS</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>AUD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>AWG</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>AZN</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BAM</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BBD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BDT</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BHD</Ccy><CcyMnrUnts>3</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BIF</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BMD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BND</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BOB</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BOV</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BRL</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BSD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BTN</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BWP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BYN</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BZD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>CAD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>CDF</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>CHE</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>CHF</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>CHW</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>CLF</Ccy><CcyMnrUnts>4</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>CLP</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>CNY</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>COP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>COU</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>CRC</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>CUP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>CVE</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>CZK</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>DJF</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>DKK</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>DOP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>DZD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>EGP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>ERN</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>ETB</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>EUR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>FJD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>FKP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>GBP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>GEL</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>GHS</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>GIP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>GMD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>GNF</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>GTQ</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>GYD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>HKD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>HNL</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>HTG</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>HUF</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>IDR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>ILS</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>INR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>IQD</Ccy><CcyMnrUnts>3</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>IRR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>ISK</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>JMD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>JOD</Ccy><CcyMnrUnts>3</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>JPY</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>KES</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>KGS</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>KHR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>KMF</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>KPW</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>KRW</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>KWD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>KYD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>KZT</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>LAK</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>LBP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>LKR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>LRD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>LSL</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>LYD</Ccy><CcyMnrUnts>3</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MAD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MDL</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MGA</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MKD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MMK</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MNT</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MOP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MRU</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MUR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MVR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MWK</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MXN</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MXV</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MYR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MZN</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>NAD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>NGN</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>NIO</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>NOK</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>NPR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>NZD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>OMR</Ccy><CcyMnrUnts>3</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>PAB</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>PEN</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>PGK</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>PHP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>PKR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>PLN</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>PYG</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>QAR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>RON</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>RSD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>RUB</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>RWF</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>SAR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>SBD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>SCR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>SDG</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>SEK</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>SGD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>SHP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>SLE</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>SOS</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>SRD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>SSP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>STN</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>SVC</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>SYP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>SZL</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>THB</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>TJS</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>TMT</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>TND</Ccy><CcyMnrUnts>3</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>TOP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>TRY</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>TTD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>TWD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>TZS</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>UAH</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>UGX</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>USD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>USN</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>UYI</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>UYU</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>UYW</Ccy><CcyMnrUnts>4</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>UZS</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>VED</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>VES</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>VND</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>VUV</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>WST</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>XAD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>XAF</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>XCD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>XCG</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>XOF</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>XPF</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>YER</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>ZAR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>ZMW</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>ZWG</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "</CcyTbl>",
+            "</ISO_4217>"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-missing-module": {
+    "expect": ["src/core/money/rate.ts [missing-module]"],
+    "ops": [{ "delete": "src/core/money/rate.ts" }]
+  },
+  "bad-module-load": {
+    "expect": ["src/core/money/allocate.ts:1 [module-load]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/money/money.ts",
+          "find": "import type { CurrencyCode } from './currency';",
+          "with": "import { Platform } from 'react-native';\n\nimport type { CurrencyCode } from './currency';\n\nexport const OS = Platform.OS;"
+        }
+      }
+    ]
+  },
+  "bad-money-integer": {
+    "expect": ["src/core/money/money.ts:18 [money-integer]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/money/money.ts",
+          "find": "  if (!Number.isSafeInteger(minor)) {",
+          "with": "  if (Number.isNaN(minor)) {"
+        }
+      }
+    ]
+  },
+  "bad-parse-money": {
+    "expect": ["src/core/money/money-text.ts:26 [parse-money]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/money/money-text.ts",
+          "find": "  const minor = rescaleExact(value, exponent);",
+          "with": "  const minor = BigInt(Math.round(Number(text) * 10 ** exponent));"
+        }
+      }
+    ]
+  },
+  "bad-store-price": {
+    "expect": ["src/core/money/store-price.ts:44 [store-price]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/money/store-price.ts",
+          "find": "const DOUBLE_TOLERANCE = 1e-4;",
+          "with": "const DOUBLE_TOLERANCE = 0.5;"
+        }
+      }
+    ]
+  },
+  "bad-units-exact": {
+    "expect": ["src/core/units/units.ts:86 [units-exact]"],
+    "ops": [
+      { "replace": { "file": "src/core/units/units.ts", "find": "    inch: [254, 10],", "with": "    inch: [25, 1]," } }
+    ]
+  },
+  "bad-unknown-currency": {
+    "expect": ["src/core/money/currency.ts:29 [unknown-currency]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/money/currency.ts",
+          "find": "  return EXPONENTS.has(code);",
+          "with": "  return code in CURRENCY_EXPONENTS;"
+        }
+      }
+    ]
+  },
+  "error-iso-xml-missing": { "expect": ["ERROR [bad-input]"], "args": "{dir} --iso-xml {dir}/missing.xml", "ops": [] },
+  "error-no-src": { "expect": ["ERROR [bad-input]"], "ops": [{ "delete": "src" }] },
+  "pass-iso-xml": {
+    "expect": ["RESULT: PASS"],
+    "args": "{dir} --iso-xml {dir}/iso/list-one.xml",
+    "ops": [
+      {
+        "write": {
+          "file": "iso/list-one.xml",
+          "lines": [
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<ISO_4217 Pblshd=\"2026-09-17\">",
+            "<CcyTbl>",
+            "<CcyNtry><Ccy>AED</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>AFN</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>ALL</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>AMD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>AOA</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>ARS</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>AUD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>AWG</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>AZN</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BAM</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BBD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BDT</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BHD</Ccy><CcyMnrUnts>3</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BIF</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BMD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BND</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BOB</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BOV</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BRL</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BSD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BTN</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BWP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BYN</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>BZD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>CAD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>CDF</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>CHE</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>CHF</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>CHW</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>CLF</Ccy><CcyMnrUnts>4</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>CLP</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>CNY</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>COP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>COU</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>CRC</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>CUP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>CVE</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>CZK</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>DJF</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>DKK</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>DOP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>DZD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>EGP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>ERN</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>ETB</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>EUR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>FJD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>FKP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>GBP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>GEL</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>GHS</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>GIP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>GMD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>GNF</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>GTQ</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>GYD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>HKD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>HNL</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>HTG</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>HUF</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>IDR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>ILS</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>INR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>IQD</Ccy><CcyMnrUnts>3</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>IRR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>ISK</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>JMD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>JOD</Ccy><CcyMnrUnts>3</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>JPY</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>KES</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>KGS</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>KHR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>KMF</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>KPW</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>KRW</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>KWD</Ccy><CcyMnrUnts>3</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>KYD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>KZT</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>LAK</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>LBP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>LKR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>LRD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>LSL</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>LYD</Ccy><CcyMnrUnts>3</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MAD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MDL</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MGA</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MKD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MMK</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MNT</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MOP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MRU</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MUR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MVR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MWK</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MXN</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MXV</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MYR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>MZN</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>NAD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>NGN</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>NIO</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>NOK</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>NPR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>NZD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>OMR</Ccy><CcyMnrUnts>3</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>PAB</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>PEN</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>PGK</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>PHP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>PKR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>PLN</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>PYG</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>QAR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>RON</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>RSD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>RUB</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>RWF</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>SAR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>SBD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>SCR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>SDG</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>SEK</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>SGD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>SHP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>SLE</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>SOS</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>SRD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>SSP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>STN</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>SVC</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>SYP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>SZL</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>THB</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>TJS</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>TMT</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>TND</Ccy><CcyMnrUnts>3</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>TOP</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>TRY</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>TTD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>TWD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>TZS</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>UAH</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>UGX</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>USD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>USN</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>UYI</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>UYU</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>UYW</Ccy><CcyMnrUnts>4</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>UZS</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>VED</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>VES</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>VND</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>VUV</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>WST</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>XAD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>XAF</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>XCD</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>XCG</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>XOF</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>XPF</Ccy><CcyMnrUnts>0</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>YER</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>ZAR</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>ZMW</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "<CcyNtry><Ccy>ZWG</Ccy><CcyMnrUnts>2</CcyMnrUnts></CcyNtry>",
+            "</CcyTbl>",
+            "</ISO_4217>"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-money-only": {
+    "expect": ["check-value-core: 11 checks checked, 0 problems"],
+    "ops": [{ "delete": ["src/core/units", "src/core/time"] }]
+  },
+  "pass-not-applicable": {
+    "expect": ["NOT APPLICABLE: no value-object core"],
+    "ops": [{ "delete": ["src/core/money", "src/core/units", "src/core/time"] }]
+  }
+}

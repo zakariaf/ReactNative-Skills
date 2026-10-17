@@ -1,0 +1,88 @@
+{
+  "bad-catalog-drift": {
+    "expect": ["[catalog-drift] the catalogue lists delta-four, the index snapshot does not"],
+    "ops": [
+      {
+        "json": {
+          "file": "catalog.json",
+          "path": ["skills", 3],
+          "value": { "name": "delta-four", "category": "parts", "plugin": "core", "manual": false }
+        }
+      }
+    ]
+  },
+  "bad-index-data": {
+    "expect": ["[index-data]", "plugins must be a list"],
+    "ops": [{ "json": { "file": "skills/route-index/assets/index.json", "path": ["plugins"], "value": [] } }]
+  },
+  "bad-markers-missing": {
+    "expect": ["SKILL.md [generated-missing]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/route-index/SKILL.md",
+          "find": "<!-- generated:task-table:start (build-index.mjs; edit assets/index.json instead) -->\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-order-shape": {
+    "expect": ["[index-data]", "copies must be a list"],
+    "ops": [
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["buildOrders", 0, "steps", 0, "copies"],
+          "value": "src"
+        }
+      }
+    ]
+  },
+  "bad-stale-render": {
+    "expect": ["references/task-matrix.md [generated-stale] differs from a fresh render"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/route-index/references/task-matrix.md",
+          "find": "The beta feature sits on it.",
+          "with": "Edited by hand."
+        }
+      }
+    ]
+  },
+  "bad-unknown-skill": {
+    "expect": ["[skill-stale]", "names ghost-skill", "nothing was written"],
+    "ops": [
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["tasks", 1, "skills"],
+          "value": ["ghost-skill"]
+        }
+      }
+    ]
+  },
+  "error-write-and-check": {
+    "expect": ["ERROR [bad-input]", "--write and --check exclude each other"],
+    "args": "--skills-root {dir}/skills --index {dir}/skills/route-index --write --check"
+  },
+  "pass-app-skills": {
+    "expect": ["NOT APPLICABLE:", "holds installed skills; the index is generated in the library", "RESULT: PASS"],
+    "args": "{dir} --index {dir}/plugin/route-index --write",
+    "ops": [{ "rename": { "from": "skills/route-index", "to": "plugin/route-index" } }]
+  },
+  "pass-installed": {
+    "expect": [
+      "NOT APPLICABLE:",
+      "holds installed skills; the index is generated in the library (run check-index.mjs instead)",
+      "RESULT: PASS"
+    ],
+    "args": "{dir} --index {dir}/.agents/skills/route-index --write",
+    "ops": [{ "rename": { "from": "skills", "to": ".agents/skills" } }]
+  },
+  "pass-no-skills": {
+    "expect": ["NOT APPLICABLE: no skills folder in", "RESULT: PASS"],
+    "args": "{dir}/skills/alpha-one"
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "permissions.schema.json",
+  "title": "Permissions the app asks for",
+  "type": "object",
+  "required": ["permissions"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "permissions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/permission" }
+    }
+  },
+  "$defs": {
+    "copyKey": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*(\\.[a-z0-9]+(-[a-z0-9]+)*)+$"
+    },
+    "permission": {
+      "type": "object",
+      "required": [
+        "kind",
+        "feature",
+        "askedFrom",
+        "platforms",
+        "shouldExplainFirst",
+        "explain",
+        "settings"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "camera",
+            "microphone",
+            "photos",
+            "photos-add",
+            "location",
+            "location-background",
+            "contacts",
+            "calendar",
+            "reminders",
+            "motion",
+            "notifications",
+            "bluetooth"
+          ]
+        },
+        "feature": {
+          "type": "string",
+          "minLength": 10,
+          "description": "What the person gets: the feature that needs the permission."
+        },
+        "askedFrom": {
+          "type": "string",
+          "pattern": "^src/.+\\.tsx?$",
+          "description": "The model hook (or service flow) that asks, from a person's action."
+        },
+        "platforms": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "enum": ["ios", "android"] }
+        },
+        "purposeKey": {
+          "$ref": "#/$defs/copyKey",
+          "description": "The catalog key of the iOS purpose string (kinds with an iOS purpose key)."
+        },
+        "shouldExplainFirst": {
+          "type": "boolean",
+          "description": "True when the control alone does not explain the need: the app's explain sheet shows before the first dialog."
+        },
+        "explain": {
+          "type": "object",
+          "required": ["title", "body", "continue", "dismiss"],
+          "additionalProperties": false,
+          "description": "The explain sheet (one button: continue) and Android's rationale sheet (continue and dismiss).",
+          "properties": {
+            "title": { "$ref": "#/$defs/copyKey" },
+            "body": { "$ref": "#/$defs/copyKey" },
+            "continue": { "$ref": "#/$defs/copyKey" },
+            "dismiss": { "$ref": "#/$defs/copyKey" }
+          }
+        },
+        "settings": {
+          "type": "object",
+          "required": ["title", "body", "open", "dismiss"],
+          "additionalProperties": false,
+          "description": "The blocked sheet: why the feature is off and a button that opens the Settings app.",
+          "properties": {
+            "title": { "$ref": "#/$defs/copyKey" },
+            "body": { "$ref": "#/$defs/copyKey" },
+            "open": { "$ref": "#/$defs/copyKey" },
+            "dismiss": { "$ref": "#/$defs/copyKey" }
+          }
+        },
+        "unavailable": {
+          "type": "object",
+          "required": ["title", "body", "dismiss"],
+          "additionalProperties": false,
+          "description": "Optional: the sheet a press shows when the device has no such capability or the state could not be read (for example \"This device has no camera\"). Without it, the feature hides the control and the view shows no unavailable sheet.",
+          "properties": {
+            "title": { "$ref": "#/$defs/copyKey" },
+            "body": { "$ref": "#/$defs/copyKey" },
+            "dismiss": { "$ref": "#/$defs/copyKey" }
+          }
+        }
+      }
+    }
+  }
+}

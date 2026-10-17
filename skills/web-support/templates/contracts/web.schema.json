@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "contracts/web.json",
+  "description": "The app's web target for web-support's checkers. Present only when the app ships a web build (app.config.ts platforms includes web, or react-dom is installed and platforms is not set).",
+  "type": "object",
+  "required": ["version", "output", "host", "smokeRoutes"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "$comment": {
+      "type": "string"
+    },
+    "version": {
+      "const": 1
+    },
+    "output": {
+      "description": "Equal to app.config.ts web.output. static (the default on EAS Hosting): every route rendered to HTML at export time in Node, and _expo/.routes.json carries the expo-router plugin's headers. single: one index.html, no code runs in Node, no routes manifest (use it on a static host whose headers file sends the isolation headers). server: rendered per request by a deployed server.",
+      "enum": ["single", "static", "server"]
+    },
+    "host": {
+      "description": "Where the deployed site gets its response headers. eas-hosting: the expo-router config plugin's headers option. static-host: a headers file the host reads (headersFile, default public/_headers for Netlify and Cloudflare Pages). custom-server: the server's own configuration file (headersFile).",
+      "enum": ["eas-hosting", "static-host", "custom-server"]
+    },
+    "headersFile": {
+      "description": "Repo-relative file that sets the deployed response headers for static-host or custom-server.",
+      "type": "string",
+      "minLength": 1
+    },
+    "smokeRoutes": {
+      "description": "Pages check-web-export.mjs opens: each must exist in the export and, with --browser, render the testID with no console error and no uncaught exception.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["path", "testID"],
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string",
+            "pattern": "^/"
+          },
+          "testID": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "smokeLanguage": {
+      "description": "Optional: a right-to-left (or any second) language the browser smoke opens the first smoke route in, with Chrome started as --lang=<lang>. The page must show its testID with <html dir> equal to dir and <html lang> starting with lang. Leave it out when the app has only one language.",
+      "type": "object",
+      "required": ["lang", "dir"],
+      "additionalProperties": false,
+      "properties": {
+        "lang": {
+          "type": "string",
+          "pattern": "^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$"
+        },
+        "dir": {
+          "enum": ["ltr", "rtl"]
+        }
+      }
+    },
+    "clientRoutes": {
+      "description": "Dynamic route ids ('(app)/tasks/[id]') a static export serves through the host's rewrite instead of generateStaticParams.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "publishSourceMaps": {
+      "description": "true only when the deployed site is meant to serve .map files; source maps belong to the crash reporter, not the public site.",
+      "type": "boolean"
+    },
+    "nativeOnlyPackages": {
+      "description": "Packages the app knows fail in a browser and the support table does not list: check-web-support fails a web-bundled import of any of them.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

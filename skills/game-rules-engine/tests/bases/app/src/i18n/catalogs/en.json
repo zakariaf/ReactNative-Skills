@@ -1,0 +1,18 @@
+{
+  "app.name": "Tasks",
+  "lights-out.continue.more-moves": "Get more moves",
+  "lights-out.hud.moves": "Moves {moves, number} / {maxMoves, number}",
+  "lights-out.lose.out-of-moves": "No moves left",
+  "lights-out.name": "Lights Out",
+  "lights-out.stats.biggest-toggle": "Biggest toggle",
+  "lights-out.stats.boards-cleared": "Boards cleared",
+  "lights-out.stats.cells-toggled": "Lights toggled",
+  "pig.continue.extra-turns": "Clear the streak and get more turns",
+  "pig.hud.endless": "Turns left {turnsLeft, number}",
+  "pig.hud.target": "{banked, number} / {target, number} · Turns left {turnsLeft, number}",
+  "pig.lose.bust-streak": "Too many busts in a row",
+  "pig.lose.out-of-turns": "No turns left",
+  "pig.stats.best-turn": "Best turn",
+  "pig.stats.dice-rolled": "Dice rolled",
+  "pig.stats.points-banked": "Points banked"
+}

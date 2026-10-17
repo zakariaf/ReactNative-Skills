@@ -1,0 +1,25 @@
+# .maestro/ads-smoke/04-rewarded.yaml
+# Step 4, after step 3 (same install): the rewarded offer is ready (not busy), the user watches
+# Google's test rewarded ad to the end, closes it, and the reward is granted.
+appId: ${APP_ID}
+name: Ads smoke 4 - a watched rewarded ad grants its reward
+tags: [ads-smoke]
+---
+- extendedWaitUntil:
+    visible:
+      id: 'tasks.theme-offer-button'
+      enabled: true
+    timeout: 60000
+- tapOn:
+    id: 'tasks.theme-offer-button'
+# system-ui: Google's test rewarded ad; its "Reward granted" text appears once watched to the end.
+- extendedWaitUntil:
+    visible: 'Reward granted'
+    timeout: 60000
+# system-ui: the rewarded ad's close key (Google's UI, no testID).
+- tapOn:
+    point: '94%,9%'
+- extendedWaitUntil:
+    visible:
+      id: 'tasks.theme-unlocked'
+    timeout: 30000

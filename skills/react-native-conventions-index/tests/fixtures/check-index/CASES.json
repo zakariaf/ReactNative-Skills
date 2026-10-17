@@ -1,0 +1,581 @@
+{
+  "bad-agents-drift": {
+    "expect": ["AGENTS.md:", "[agents-drift] the intent for alpha-one differs from its description"],
+    "ops": [
+      {
+        "replace": {
+          "file": "AGENTS.md",
+          "find": "- `alpha-one`: use when the alpha part changes.",
+          "with": "- `alpha-one`: use when anything changes."
+        }
+      }
+    ]
+  },
+  "bad-agents-unrouted": {
+    "expect": ["[agents-drift] the intent map does not route beta-two"],
+    "ops": [
+      { "replace": { "file": "AGENTS.md", "find": "- `beta-two`: use when the beta feature changes.\n", "with": "" } }
+    ]
+  },
+  "bad-catalog-drift": {
+    "expect": ["[catalog-drift]", "beta-two: category is \"parts\" in the index, \"start\" in the catalogue"],
+    "ops": [{ "json": { "file": "catalog.json", "path": ["skills", 2, "category"], "value": "start" } }]
+  },
+  "bad-command-flag": {
+    "expect": [
+      "[command-unknown]",
+      "step 1 runs check-alpha.mjs --stirct, which alpha-one's check-alpha.mjs does not declare"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["buildOrders", 0, "steps", 0, "proof"],
+          "value": "`check-alpha.mjs . --stirct` (alpha-one) prints RESULT: PASS"
+        }
+      }
+    ]
+  },
+  "bad-command-unknown": {
+    "expect": [
+      "[command-unknown]",
+      "buildOrders[0] \"base\" step 1 runs check-beta.mjs, which alpha-one does not have in scripts/"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["buildOrders", 0, "steps", 0, "proof"],
+          "value": "`check-beta.mjs .` (alpha-one) prints RESULT: PASS"
+        }
+      }
+    ]
+  },
+  "bad-coverage-drop": {
+    "expect": [
+      "[step-import-closure]",
+      "src/feature/helper.ts (step 1, beta-two) has runtime code that only tests of step 2 reach"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["buildOrders", 0, "steps", 0, "skills"],
+          "value": ["alpha-one", "beta-two"]
+        }
+      },
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["buildOrders", 0, "steps", 0, "copies", 1],
+          "value": { "skill": "beta-two", "paths": ["src/feature/helper.ts"] }
+        }
+      }
+    ]
+  },
+  "bad-description-changed": {
+    "expect": ["references/skill-table.md [generated-stale]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/alpha-one/SKILL.md",
+          "find": "Builds the alpha part of the fixture app.",
+          "with": "Builds the alpha part, now renamed."
+        }
+      }
+    ]
+  },
+  "bad-duplicate": {
+    "expect": ["[skill-duplicate] beta-two is listed twice in catalog.skills"],
+    "ops": [
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["catalog", "skills", 3],
+          "value": { "name": "beta-two", "category": "parts", "plugin": "extra", "manual": false }
+        }
+      }
+    ]
+  },
+  "bad-example-copied": {
+    "expect": [
+      "[step-import-closure]",
+      "src/core/sample.ts (step 1, alpha-one) imports src/nowhere/missing, which no step copies or generates and no skill has a template for"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["buildOrders", 0, "steps", 0, "copies", 0, "examples"],
+          "value": true
+        }
+      }
+    ]
+  },
+  "bad-extra-order-command": {
+    "expect": ["[command-unknown]", "buildOrders[1] \"extra\" step 1 runs check-gamma.mjs"],
+    "ops": [
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["buildOrders", 1, "steps", 0, "proof"],
+          "value": "`check-gamma.mjs .` prints RESULT: PASS"
+        }
+      }
+    ]
+  },
+  "bad-generated-missing": {
+    "expect": ["references/intent-map.md [generated-missing] is missing"],
+    "ops": [{ "delete": "skills/route-index/references/intent-map.md" }]
+  },
+  "bad-index-data": {
+    "expect": ["[index-data]", "tasks must be a list"],
+    "ops": [{ "json": { "file": "skills/route-index/assets/index.json", "path": ["tasks"], "value": "not a list" } }]
+  },
+  "bad-install-companion": {
+    "expect": ["[step-manifest]", "step 1 installs zustand without its companion use-sync-external-store"],
+    "ops": [
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["buildOrders", 0, "steps", 0, "installs", 0, "companions"],
+          "value": []
+        }
+      }
+    ]
+  },
+  "bad-installed-drift": {
+    "expect": ["alpha-one/SKILL.md:3 [installed-drift]", "come from different releases"],
+    "args": "{dir} --index {dir}/.claude/skills/route-index",
+    "ops": [
+      { "rename": { "from": "skills", "to": ".claude/skills" } },
+      {
+        "replace": {
+          "file": ".claude/skills/alpha-one/SKILL.md",
+          "find": "Builds the alpha part of the fixture app.",
+          "with": "Builds the alpha part, a newer release."
+        }
+      }
+    ]
+  },
+  "bad-local-lane-command": {
+    "expect": [
+      "[command-unknown]",
+      "buildOrders[0] \"base\" step 1 runs check-beta.mjs, which alpha-one does not have in scripts/"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["buildOrders", 0, "steps", 0, "localLane"],
+          "value": "`check-beta.mjs .` (alpha-one) prints RESULT: PASS"
+        }
+      }
+    ]
+  },
+  "bad-manifest-required": {
+    "expect": ["[step-manifest]", "\"Base order\" declares no copies, but requireManifests names it"],
+    "ops": [
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["buildOrders", 0, "steps", 0, "copies"],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["buildOrders", 0, "steps", 1, "copies"],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["buildOrders", 0, "steps", 0, "installs"],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "bad-markers-missing": {
+    "expect": ["SKILL.md [generated-missing]", "no generated-block markers"],
+    "ops": [
+      {
+        "replace": { "file": "skills/route-index/SKILL.md", "find": "<!-- generated:task-table:end -->\n", "with": "" }
+      }
+    ]
+  },
+  "bad-merge-missing": {
+    "expect": [
+      "[step-manifest]",
+      "step 1 merges src/i18n/catalogs/en.json from beta-two, but no earlier step copies that file"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["buildOrders", 0, "steps", 0, "skills"],
+          "value": ["alpha-one", "beta-two"]
+        }
+      },
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["buildOrders", 0, "steps", 0, "copies"],
+          "value": [
+            { "skill": "beta-two", "paths": ["src/i18n/catalogs/*.json"], "merge": true },
+            { "skill": "alpha-one", "paths": ["src/core/**"] }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-order-shape": {
+    "expect": ["[index-data]", "buildOrders[1].base must be"],
+    "ops": [
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["buildOrders", 1, "base", "order"],
+          "value": "missing"
+        }
+      }
+    ]
+  },
+  "bad-package-not-installed": {
+    "expect": [
+      "[step-import-closure]",
+      "src/core/core.ts (step 1, alpha-one) imports the npm package zustand, which is not installed by then: step 2 installs it"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["buildOrders", 0, "steps", 0, "installs"],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["buildOrders", 0, "steps", 1, "installs"],
+          "value": [{ "package": "zustand", "companions": ["use-sync-external-store"] }]
+        }
+      }
+    ]
+  },
+  "bad-quick-table-edited": {
+    "expect": ["SKILL.md [generated-stale]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/route-index/SKILL.md",
+          "find": "| Find the right skill |",
+          "with": "| Find any skill |"
+        }
+      }
+    ]
+  },
+  "bad-readme-missing": {
+    "expect": ["[readme-missing] the README does not name beta-two"],
+    "ops": [
+      {
+        "replace": {
+          "file": "README.md",
+          "find": "| [`beta-two`](skills/beta-two/SKILL.md) | Builds the beta part. |\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-readme-stale": {
+    "expect": ["README.md:", "[readme-stale] the README names omega-nine, which is not a skill"],
+    "ops": [
+      {
+        "replace": {
+          "file": "README.md",
+          "find": "| [`beta-two`](skills/beta-two/SKILL.md) | Builds the beta part. |\n",
+          "with": "| [`beta-two`](skills/beta-two/SKILL.md) | Builds the beta part. |\n| [`omega-nine`](skills/omega-nine/SKILL.md) | Gone. |\n"
+        }
+      }
+    ]
+  },
+  "bad-related-unknown": {
+    "expect": ["SKILL.md:", "[related-unknown]", "names ghost-skill, which does not exist"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/route-index/SKILL.md",
+          "find": "- `beta-two` - the second part.\n",
+          "with": "- `beta-two` - the second part.\n- `ghost-skill` - nothing.\n"
+        }
+      }
+    ]
+  },
+  "bad-row-duplicate": {
+    "expect": ["[skill-duplicate]", "\"Build the alpha part\" lists alpha-one twice"],
+    "ops": [
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["tasks", 0, "skills"],
+          "value": ["alpha-one", "beta-two", "alpha-one"]
+        }
+      }
+    ]
+  },
+  "bad-row-rule": {
+    "expect": ["[row-rule]", "is led by alpha-one but does not load beta-two", "row rule \"pair\""],
+    "ops": [
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["tasks", 0, "skills"],
+          "value": ["alpha-one"]
+        }
+      }
+    ]
+  },
+  "bad-row-rule-anywhere": {
+    "expect": [
+      "[row-rule]",
+      "tasks[1] \"Find the right skill\" loads beta-two but does not load alpha-one",
+      "row rule \"feature-check\""
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["tasks", 1, "skills"],
+          "value": ["route-index", "beta-two"]
+        }
+      }
+    ]
+  },
+  "bad-skill-missing": {
+    "expect": [
+      "[skill-missing] gamma-three exists but is not in the index's catalogue",
+      "[skill-uncovered] no task row or build step routes to gamma-three"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "skills/gamma-three/SKILL.md",
+          "content": "---\nname: gamma-three\ndescription: Builds gamma. Use when gamma changes. Not for alpha (alpha-one).\n---\n\n# Gamma three\n"
+        }
+      }
+    ]
+  },
+  "bad-skill-name": {
+    "expect": ["[skill-name]", "frontmatter name \"beta-too\" does not match the folder"],
+    "ops": [{ "replace": { "file": "skills/beta-two/SKILL.md", "find": "name: beta-two", "with": "name: beta-too" } }]
+  },
+  "bad-skill-stale": {
+    "expect": ["[skill-stale]", "names delta-four, which does not exist"],
+    "ops": [
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["tasks", 1, "skills"],
+          "value": ["route-index", "delta-four"]
+        }
+      }
+    ]
+  },
+  "bad-step-duplicate": {
+    "expect": ["[skill-duplicate]", "buildOrders[1] \"extra\" step 1 lists alpha-one twice"],
+    "ops": [
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["buildOrders", 1, "steps", 0, "skills"],
+          "value": ["alpha-one", "alpha-one"]
+        }
+      }
+    ]
+  },
+  "bad-step-import-later": {
+    "expect": [
+      "[step-import-closure]",
+      "src/core/core.ts (step 1, alpha-one) imports src/core/util.ts, which step 2 copies (alpha-one)"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["buildOrders", 0, "steps", 0, "copies"],
+          "value": [{ "skill": "alpha-one", "paths": ["src/core/core.ts", "src/core/core.test.ts"] }]
+        }
+      },
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["buildOrders", 0, "steps", 1, "skills"],
+          "value": ["beta-two", "alpha-one"]
+        }
+      },
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["buildOrders", 0, "steps", 1, "copies", 1],
+          "value": { "skill": "alpha-one", "paths": ["src/core/util.ts", "src/core/util.test.ts"] }
+        }
+      }
+    ]
+  },
+  "bad-step-manifest": {
+    "expect": [
+      "[step-manifest]",
+      "step 2 copies from alpha-one, which the step does not load",
+      "step 2 copies src/nothing/** from alpha-one, which has no template with that repo path"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["buildOrders", 0, "steps", 1, "copies", 1],
+          "value": { "skill": "alpha-one", "paths": ["src/nothing/**"] }
+        }
+      }
+    ]
+  },
+  "bad-step-no-manifest": {
+    "expect": [
+      "[step-manifest]",
+      "\"Base order\", step 2 states no copies, installs or generates (requireManifests names the order)"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["buildOrders", 0, "steps", 1, "copies"],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "bad-task-count": {
+    "expect": ["[task-count]", "2 task rows, fewer than 5"],
+    "args": "--skills-root {dir}/skills --index {dir}/skills/route-index --min-tasks 5"
+  },
+  "bad-task-shape": {
+    "expect": ["[task-shape]", "\"Find the right skill\" names no skill"],
+    "ops": [{ "json": { "file": "skills/route-index/assets/index.json", "path": ["tasks", 1, "skills"], "value": [] } }]
+  },
+  "bad-test-later-step": {
+    "expect": [
+      "[step-import-closure]",
+      "src/feature/feature.ts (step 2, beta-two) arrives without its test: step 3 copies src/feature/feature.test.ts"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["buildOrders", 0, "steps", 1, "copies"],
+          "value": [{ "skill": "beta-two", "paths": ["src/feature/feature.ts", "src/feature/helper.ts"] }]
+        }
+      },
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["buildOrders", 0, "steps", 2],
+          "value": {
+            "step": "The feature test",
+            "skills": ["beta-two"],
+            "proof": "The feature test passes",
+            "copies": [{ "skill": "beta-two", "paths": ["src/feature/feature.test.ts"] }]
+          }
+        }
+      }
+    ]
+  },
+  "bad-uncovered": {
+    "expect": ["[skill-uncovered] no task row or build step routes to beta-two"],
+    "ops": [
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["tasks", 0, "skills"],
+          "value": ["alpha-one"]
+        }
+      },
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["buildOrders", 0, "steps", 1],
+          "delete": true
+        }
+      },
+      { "json": { "file": "skills/route-index/assets/index.json", "path": ["verifyGreen"], "delete": true } }
+    ]
+  },
+  "bad-verify-green": {
+    "expect": [
+      "[index-data]",
+      "verifyGreen.rows must be { gate, greenFrom: <a step number of \"base\">, before, meanwhile? }"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "skills/route-index/assets/index.json",
+          "path": ["verifyGreen", "rows", 0, "greenFrom"],
+          "value": 9
+        }
+      }
+    ]
+  },
+  "error-bad-min-tasks": {
+    "expect": ["ERROR [bad-input]", "--min-tasks zero is not a positive whole number"],
+    "args": "--skills-root {dir}/skills --index {dir}/skills/route-index --min-tasks zero"
+  },
+  "pass-app-skills": {
+    "expect": [
+      "installed mode: 2 of 3 listed skills installed, 1 other skill (the app's own, not checked)",
+      "RESULT: PASS"
+    ],
+    "args": "{dir} --index {dir}/plugin/route-index",
+    "ops": [
+      { "rename": { "from": "skills/route-index", "to": "plugin/route-index" } },
+      {
+        "write": {
+          "file": "skills/my-app-skill/SKILL.md",
+          "content": "---\nname: my-app-skill\ndescription: The app's own skill. Use when the app needs it.\n---\n\n# My app skill\n"
+        }
+      }
+    ]
+  },
+  "pass-installed": {
+    "expect": [
+      "installed mode: 2 of 3 listed skills installed, 1 other skill (the app's own, not checked)",
+      "RESULT: PASS"
+    ],
+    "args": "{dir} --index {dir}/.agents/skills/route-index",
+    "ops": [
+      { "rename": { "from": "skills", "to": ".agents/skills" } },
+      { "delete": ".agents/skills/beta-two" },
+      {
+        "write": {
+          "file": ".agents/skills/my-app-skill/SKILL.md",
+          "content": "---\nname: my-app-skill\ndescription: The app's own skill. Use when the app needs it.\n---\n\n# My app skill\n"
+        }
+      }
+    ]
+  },
+  "pass-no-skills": {
+    "expect": ["NOT APPLICABLE: no skills folder in", "RESULT: PASS"],
+    "args": "{dir}/skills/alpha-one"
+  },
+  "pass-readme-catalogue": {
+    "expect": ["library mode: 3 skills", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "README.md",
+          "content": "# Fixture library\n\n## The catalogue\n\n- `route-index`: routes tasks.\n- `alpha-one`: the alpha part.\n- `beta-two`: the beta part.\n\n## Commands\n\nRun build-index after a change.\n"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "base": [
+    "@tests/bases/app",
+    "@tests/bases/decoys",
+    {
+      "templates": true,
+      "firstLinePath": true,
+      "fill": {
+        "__APP_ID__": "com.example.tasks",
+        "__APP_NAME__": "Tasks",
+        "__APP_SLUG__": "tasks",
+        "__APP_SCHEME__": "tasks"
+      }
+    }
+  ],
+  "renames": {
+    "dot-env.example": ".env.example"
+  },
+  "ops": [
+    {
+      "write": {
+        "file": ".agents/skills/decoy/SKILL.md",
+        "content": "---\nname: decoy\ndescription: Planted findings that every scan must skip.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/decoy/SKILL.md",
+        "content": "---\nname: decoy\ndescription: Planted findings that every scan must skip.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/vendor/kit/SKILL.md",
+        "content": "---\nname: decoy\ndescription: Planted findings that every scan must skip.\n---\n"
+      }
+    }
+  ]
+}

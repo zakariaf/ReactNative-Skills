@@ -1,0 +1,2 @@
+src/features/rename/rename-screen.tsx:12 [keyboard-aware-scroll] <Animated.ScrollView> around text fields
+RESULT: FAIL (1 problems)

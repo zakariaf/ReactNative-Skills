@@ -1,0 +1,7 @@
+appId: com.acme.tasks
+---
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - setAirplaneMode: enabled

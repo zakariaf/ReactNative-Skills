@@ -1,0 +1,464 @@
+{
+  "bad-android-background": {
+    "expect": [
+      "FAIL assets/icons/production/android-background.png [art-android-background] the adaptive background layer has transparent pixels"
+    ],
+    "ops": [
+      {
+        "png": {
+          "files": ["assets/icons/production/android-background.png"],
+          "width": 1024,
+          "height": 1024,
+          "fill": "#00000000",
+          "rects": [{ "x": 400, "y": 400, "width": 224, "height": 224, "fill": "#FFFFFF" }]
+        }
+      }
+    ]
+  },
+  "bad-android-foreground": {
+    "expect": [
+      "FAIL assets/icons/production/android-foreground.png [art-android-foreground] the adaptive foreground has no transparent background"
+    ],
+    "ops": [
+      {
+        "png": {
+          "files": ["assets/icons/production/android-foreground.png"],
+          "width": 1024,
+          "height": 1024,
+          "fill": "#2457C5",
+          "rects": [{ "x": 400, "y": 400, "width": 224, "height": 224, "fill": "#FFFFFF" }]
+        }
+      }
+    ]
+  },
+  "bad-android-monochrome": {
+    "expect": [
+      "FAIL assets/icons/production/android-monochrome.png [art-android-monochrome] the themed icon layer has no transparent background"
+    ],
+    "ops": [
+      {
+        "png": {
+          "files": ["assets/icons/production/android-monochrome.png"],
+          "width": 1024,
+          "height": 1024,
+          "fill": "#000000",
+          "rects": [{ "x": 432, "y": 432, "width": 160, "height": 160, "fill": "#FFFFFF" }]
+        }
+      }
+    ]
+  },
+  "bad-android-safe-zone": {
+    "expect": [
+      "FAIL assets/icons/production/android-foreground.png [art-safe-area]",
+      "the 66 dp safe circle of a 108 dp layer keeps 30.6 %"
+    ],
+    "ops": [
+      {
+        "png": {
+          "files": ["assets/icons/production/android-foreground.png"],
+          "width": 1024,
+          "height": 1024,
+          "fill": "#00000000",
+          "rects": [{ "x": 250, "y": 250, "width": 524, "height": 524, "fill": "#FFFFFF" }]
+        }
+      }
+    ]
+  },
+  "bad-brand-mark-grid": {
+    "expect": [
+      "FAIL src/ui/icons/brand-mark.ts:1 [brand-mark-shape] layer 2 reaches 12.5,30.5 to 46.5,39.5 with its stroke; the mark stays inside 2..46"
+    ],
+    "ops": [
+      {
+        "$comment": "Inside the old -1..49 tolerance, but the 3-unit stroke reaches 46.5: past the 2-unit margin.",
+        "replace": { "file": "src/ui/icons/brand-mark.ts", "find": "M14 32h20M14 38h12", "with": "M14 32h31M14 38h12" }
+      }
+    ]
+  },
+  "bad-brand-mark-layers": {
+    "expect": [
+      "FAIL src/ui/icons/brand-mark.ts:1 [brand-mark-shape] BRAND_MARK has 9 layers; a mark read at 60 px on a home screen holds at most 8"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/icons/brand-mark.ts",
+          "find": "    { d: 'M14 32h20M14 38h12', stroke: 'textMuted', width: 3 },\n",
+          "with": "    { d: 'M14 32h20M14 38h12', stroke: 'textMuted', width: 3 },\n    { d: 'M10 8h2', stroke: 'text' },\n    { d: 'M11 8h2', stroke: 'text' },\n    { d: 'M12 8h2', stroke: 'text' },\n    { d: 'M13 8h2', stroke: 'text' },\n    { d: 'M14 8h2', stroke: 'text' },\n    { d: 'M15 8h2', stroke: 'text' },\n"
+        }
+      }
+    ]
+  },
+  "bad-brand-mark-missing": {
+    "expect": ["FAIL src/ui/icons/brand-mark.ts [brand-mark-missing]"],
+    "ops": [{ "delete": "src/ui/icons/brand-mark.ts" }]
+  },
+  "bad-brand-mark-shape": {
+    "expect": ["FAIL src/ui/icons/brand-mark.ts:1 [brand-mark-shape] layer 0 fill \"paper\" is not a theme colour role"],
+    "ops": [{ "replace": { "file": "src/ui/icons/brand-mark.ts", "find": "fill: 'surface'", "with": "fill: 'paper'" } }]
+  },
+  "bad-dark-opaque": {
+    "expect": [
+      "FAIL assets/icons/production/icon-dark.png [art-dark-clear] the dark icon has no transparent background"
+    ],
+    "ops": [
+      {
+        "png": {
+          "files": ["assets/icons/production/icon-dark.png"],
+          "width": 1024,
+          "height": 1024,
+          "fill": "#101010",
+          "rects": [{ "x": 400, "y": 400, "width": 224, "height": 224, "fill": "#FFFFFF" }]
+        }
+      }
+    ]
+  },
+  "bad-feature-graphic": {
+    "expect": ["FAIL assets/store/feature-graphic.png [art-store-opaque] the feature graphic has transparent pixels"],
+    "ops": [
+      {
+        "png": {
+          "files": ["assets/store/feature-graphic.png"],
+          "width": 1024,
+          "height": 500,
+          "fill": "#2457C5",
+          "rects": [{ "x": 0, "y": 0, "width": 1024, "height": 20, "fill": "#00000000" }]
+        }
+      }
+    ]
+  },
+  "bad-light-alpha": {
+    "expect": ["FAIL assets/icons/production/icon.png [art-light-opaque] the light icon has transparent pixels"],
+    "ops": [
+      {
+        "png": {
+          "files": ["assets/icons/production/icon.png"],
+          "width": 1024,
+          "height": 1024,
+          "fill": "#2457C5",
+          "rects": [
+            { "x": 400, "y": 400, "width": 224, "height": 224, "fill": "#FFFFFF" },
+            { "x": 0, "y": 0, "width": 40, "height": 40, "fill": "#00000000" }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-missing": {
+    "expect": ["FAIL assets/icons/production/icon-tinted.png [art-missing] the tinted image is missing"],
+    "ops": [{ "delete": "assets/icons/production/icon-tinted.png" }]
+  },
+  "bad-play-icon": {
+    "expect": ["FAIL assets/store/play-icon.png [art-store-opaque] the Play icon has transparent pixels"],
+    "ops": [
+      {
+        "png": {
+          "files": ["assets/store/play-icon.png"],
+          "width": 512,
+          "height": 512,
+          "fill": "#2457C5",
+          "rects": [
+            { "x": 200, "y": 200, "width": 112, "height": 112, "fill": "#FFFFFF" },
+            { "x": 0, "y": 0, "width": 30, "height": 30, "fill": "#00000000" }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-play-size": {
+    "expect": ["FAIL assets/store/play-icon.png [art-format] 1024 x 1024, must be 512 x 512"],
+    "ops": [
+      {
+        "png": {
+          "files": ["assets/store/play-icon.png"],
+          "width": 1024,
+          "height": 1024,
+          "fill": "#2457C5",
+          "rects": [{ "x": 400, "y": 400, "width": 224, "height": 224, "fill": "#FFFFFF" }]
+        }
+      }
+    ]
+  },
+  "bad-safe-area": {
+    "expect": [
+      "FAIL assets/icons/production/icon.png [art-safe-area] the mark spans 100,100 to 923,923; the safe area is 184..839"
+    ],
+    "ops": [
+      {
+        "png": {
+          "files": ["assets/icons/production/icon.png"],
+          "width": 1024,
+          "height": 1024,
+          "fill": "#2457C5",
+          "rects": [{ "x": 100, "y": 100, "width": 824, "height": 824, "fill": "#FFFFFF" }]
+        }
+      }
+    ]
+  },
+  "bad-size": {
+    "expect": ["FAIL assets/icons/production/icon.png [art-format] 512 x 512, must be 1024 x 1024"],
+    "ops": [
+      {
+        "png": {
+          "files": ["assets/icons/production/icon.png"],
+          "width": 512,
+          "height": 512,
+          "fill": "#2457C5",
+          "rects": []
+        }
+      }
+    ]
+  },
+  "bad-splash-edge": {
+    "expect": [
+      "FAIL assets/images/splash-icon-dark.png [art-safe-area]",
+      "the Android 12+ splash icon circle (192 of 288 dp: 96 / imageWidth 200) keeps 48.0 %"
+    ],
+    "ops": [
+      {
+        "png": {
+          "files": ["assets/images/splash-icon-dark.png"],
+          "width": 1024,
+          "height": 1024,
+          "fill": "#00000000",
+          "rects": [{ "x": 112, "y": 112, "width": 800, "height": 800, "fill": "#FFFFFF" }]
+        }
+      }
+    ]
+  },
+  "bad-splash-edge-wide-image": {
+    "expect": ["FAIL assets/images/splash-icon-dark.png [art-safe-area]", "96 / imageWidth 288) keeps 33.3 %"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/art/app-art-config.ts",
+          "find": "export const SPLASH_IMAGE_WIDTH = 200;",
+          "with": "export const SPLASH_IMAGE_WIDTH = 288;"
+        }
+      },
+      {
+        "png": {
+          "files": ["assets/images/splash-icon-dark.png"],
+          "width": 1024,
+          "height": 1024,
+          "fill": "#00000000",
+          "rects": [{ "x": 200, "y": 200, "width": 624, "height": 624, "fill": "#FFFFFF" }]
+        }
+      }
+    ]
+  },
+  "bad-splash-opaque": {
+    "expect": ["FAIL assets/images/splash-icon.png [art-splash-clear] the splash image has no transparent background"],
+    "ops": [
+      {
+        "png": {
+          "files": ["assets/images/splash-icon.png"],
+          "width": 1024,
+          "height": 1024,
+          "fill": "#F5F6F8",
+          "rects": [{ "x": 400, "y": 400, "width": 224, "height": 224, "fill": "#FFFFFF" }]
+        }
+      }
+    ]
+  },
+  "bad-splash-width": {
+    "expect": [
+      "[art-splash-width] the splash imageWidth is 320; Android 12+ draws the splash image on a 288 dp icon",
+      "FAIL scripts/art/app-art-config.ts:"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/art/app-art-config.ts",
+          "find": "export const SPLASH_IMAGE_WIDTH = 200;",
+          "with": "export const SPLASH_IMAGE_WIDTH = 320;"
+        }
+      }
+    ]
+  },
+  "bad-tinted-colour": {
+    "expect": [
+      "FAIL assets/icons/production/icon-tinted.png [art-tinted-gray] the tinted icon must be opaque grayscale"
+    ],
+    "ops": [
+      {
+        "png": {
+          "files": ["assets/icons/production/icon-tinted.png"],
+          "width": 1024,
+          "height": 1024,
+          "fill": "#202020",
+          "rects": [{ "x": 400, "y": 400, "width": 224, "height": 224, "fill": "#C04020" }]
+        }
+      }
+    ]
+  },
+  "bad-unreadable": {
+    "expect": ["FAIL assets/icons/production/icon-dark.png [art-format] not a readable PNG"],
+    "ops": [{ "write": { "file": "assets/icons/production/icon-dark.png", "content": "not a png\n" } }]
+  },
+  "bad-unwired-appearance": {
+    "expect": [
+      "FAIL app.config.ts:1 [art-unwired] never names assets/icons/production/icon-dark.png (ios.icon)",
+      "FAIL app.config.ts:1 [art-unwired] never names assets/icons/production/icon-tinted.png (ios.icon)"
+    ],
+    "ops": [
+      {
+        "$comment": "iosAppearanceIcon() is called, but not as ios.icon: dark and tinted never ship.",
+        "replace": {
+          "file": "app.config.ts",
+          "find": "icon: iosAppearanceIcon(projectRoot) },",
+          "with": "icon: `${ICONS}/icon.png` },"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "  return {\n    ...config,",
+          "with": "  const appearances = iosAppearanceIcon(projectRoot);\n  return {\n    ...config,\n    extra: { appearances },"
+        }
+      }
+    ]
+  },
+  "bad-unwired-config": {
+    "expect": [
+      "FAIL app.config.ts:1 [art-unwired] never names assets/images/splash-icon.png (the expo-splash-screen plugin)",
+      "FAIL app.config.ts:1 [art-unwired] never names assets/icons/production/android-monochrome.png (android.adaptiveIcon)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "plugins: ['expo-router', splashPlugin(projectRoot)],",
+          "with": "plugins: ['expo-router'],"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "        monochromeImage: `${ICONS}/android-monochrome.png`,\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-unwired-dependency": {
+    "expect": ["FAIL package.json:1 [art-unwired] expo-splash-screen is not a dependency"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo-splash-screen"], "delete": true } }]
+  },
+  "bad-unwired-template-icon": {
+    "expect": ["FAIL app.config.ts:1 [art-unwired] never names assets/icons/production/icon.png (icon)"],
+    "ops": [
+      {
+        "$comment": "The Expo template's icon: the basename icon.png matches, the contract path does not.",
+        "replace": {
+          "file": "app.config.ts",
+          "find": "icon: `${ICONS}/icon.png`,",
+          "with": "icon: './assets/images/icon.png',"
+        }
+      }
+    ]
+  },
+  "error-contract-invalid": {
+    "expect": ["ERROR [bad-input] contracts/app-art.json has an unknown key \"glyphAreas\""],
+    "ops": [{ "json": { "file": "contracts/app-art.json", "path": ["glyphAreas"], "value": 0.6 } }]
+  },
+  "pass-icon-composer": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "delete": ["assets/icons/production/icon-dark.png", "assets/icons/production/icon-tinted.png"] },
+      {
+        "json": {
+          "file": "contracts/app-art.json",
+          "path": ["optional"],
+          "value": ["dark", "tinted", "featureGraphic"]
+        },
+        "$comment": "An Icon Composer app: dark and tinted are hand-made in the .icon folder, so the renderer writes neither (DELETE.txt removes the base's copies, which the default contract rendered)."
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "icon: iosAppearanceIcon(projectRoot)",
+          "with": "icon: `${ICONS}/expo.icon`"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "import { iosAppearanceIcon, splashPlugin } from",
+          "with": "import { splashPlugin } from"
+        }
+      }
+    ]
+  },
+  "pass-icon-composer-leftover": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/app-art.json",
+          "path": ["optional"],
+          "value": ["dark", "tinted", "featureGraphic"]
+        },
+        "$comment": "Optional images are never wired, even while a leftover rendered file is still on disk."
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "icon: iosAppearanceIcon(projectRoot)",
+          "with": "icon: `${ICONS}/expo.icon`"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "import { iosAppearanceIcon, splashPlugin } from",
+          "with": "import { splashPlugin } from"
+        }
+      }
+    ]
+  },
+  "pass-icons-only": {
+    "expect": [
+      "NOT APPLICABLE: the app does not render its app art in code (no scripts/art/render-app-art.ts; contracts/app-art.json declares no rendered art (no outputs, optional or glyphArea))"
+    ],
+    "ops": [
+      { "delete": "scripts/art/render-app-art.ts" },
+      {
+        "$comment": "An app that only needs check-icons' allow-lists keeps them in contracts/app-art.json without adopting the art pipeline.",
+        "write": {
+          "file": "contracts/app-art.json",
+          "json": { "icons": { "allowImages": ["src/features/tasks/images/*.png"] } }
+        }
+      },
+      { "delete": ["assets/icons/production/icon-dark.png", "src/ui/icons/brand-mark.ts"] }
+    ]
+  },
+  "pass-no-theme-types": {
+    "expect": [
+      "SKIP src/theme/theme-types.ts [brand-mark-shape] not yet created (design-system-structure creates it); the colour roles are not checked",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "src/theme/theme-types.ts" }]
+  },
+  "pass-not-adopted": {
+    "expect": [
+      "NOT APPLICABLE: the app does not render its app art in code (no scripts/art/render-app-art.ts; no contracts/app-art.json)"
+    ],
+    "ops": [{ "delete": ["contracts/app-art.json", "scripts/art/render-app-art.ts"] }]
+  },
+  "pass-splash-larger-mark": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "A mark whose corners reach 43 % of the width: past the old fixed 1/3 bound, inside 96 / 200 = 48 % at splashPlugin's imageWidth.",
+        "png": {
+          "files": ["assets/images/splash-icon-dark.png"],
+          "width": 1024,
+          "height": 1024,
+          "fill": "#00000000",
+          "rects": [{ "x": 200, "y": 200, "width": 624, "height": 624, "fill": "#FFFFFF" }]
+        }
+      }
+    ]
+  }
+}

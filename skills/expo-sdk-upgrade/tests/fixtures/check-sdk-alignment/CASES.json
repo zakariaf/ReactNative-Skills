@@ -1,0 +1,499 @@
+{
+  "bad-android-min-sdk": {
+    "expect": [
+      "FAIL app.config.ts:7 [android-sdk] minSdkVersion 23 is below SDK 57's minSdk 24: React Native 0.86.3 builds for 24 and up"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "return ['expo-router',",
+          "with": "return [['expo-build-properties', { android: { minSdkVersion: 23 } }], 'expo-router',"
+        }
+      }
+    ]
+  },
+  "bad-android-target-pin": {
+    "expect": ["FAIL app.config.ts:7 [android-sdk] targetSdkVersion 35 is below SDK 57's targetSdk 36"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "return ['expo-router',",
+          "with": "return [['expo-build-properties', { android: { targetSdkVersion: 35 } }], 'expo-router',"
+        }
+      }
+    ]
+  },
+  "bad-app-config-bare-import-esm": {
+    "expect": [
+      "FAIL app.config.ts:2 [config-plugin-import] imports 'expo/config-plugins', but on SDK 57 config plugins import 'expo/config-plugins.js'"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "import type { ExpoConfig } from 'expo/config';",
+          "with": "import { withInfoPlist } from 'expo/config-plugins';\n\nimport type { ExpoConfig } from 'expo/config';"
+        }
+      },
+      { "json": { "file": "package.json", "path": ["type"], "value": "module" } }
+    ]
+  },
+  "bad-babel-jest-major": {
+    "expect": ["FAIL package.json:1 [sdk-tooling] babel-jest is 30.5.2 but jest is 29.7.0; their majors must match"],
+    "ops": [{ "json": { "file": "package.json", "path": ["devDependencies", "babel-jest"], "value": "30.5.2" } }]
+  },
+  "bad-core-pins": {
+    "expect": ["FAIL package.json:1 [core-pins] lacks react in dependencies"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "react"], "delete": true } }]
+  },
+  "bad-duplicate-native": {
+    "expect": [
+      "FAIL package-lock.json:1 [duplicate-native] react-native-screens is installed as 4.26.2 and 4.28.0",
+      "the app installs 4.26.2 for \"~4.26.0\"",
+      "Add \"react-native-screens\": \"4.26.2\" to the root overrides"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/expo-router/node_modules/react-native-screens"],
+          "value": { "version": "4.28.0" }
+        }
+      }
+    ]
+  },
+  "bad-eas-image-latest": {
+    "expect": [
+      "FAIL eas.json:23 [eas-image] build.preview.ios.image is \"latest\", which EAS moves with every new image release"
+    ],
+    "ops": [{ "json": { "file": "eas.json", "path": ["build", "preview", "ios", "image"], "value": "latest" } }]
+  },
+  "bad-eas-image-stale-alias": {
+    "expect": [
+      "FAIL eas.json:30 [eas-image] build.production.android.image is \"sdk-56\", built for SDK 56, but the app is on SDK 57"
+    ],
+    "ops": [{ "json": { "file": "eas.json", "path": ["build", "production", "android", "image"], "value": "sdk-56" } }]
+  },
+  "bad-eas-xcode27": {
+    "expect": [
+      "xcode    27.0 (eas.json build.production.ios.image macos-tahoe-26.6-xcode-27.0)",
+      "FAIL eas.json:30 [scene-support] Xcode 27.0 (eas.json build.production.ios.image macos-tahoe-26.6-xcode-27.0) with SDK 57 needs"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "eas.json",
+          "path": ["build", "production", "ios", "image"],
+          "value": "macos-tahoe-26.6-xcode-27.0"
+        }
+      }
+    ]
+  },
+  "bad-expo-below-min": {
+    "expect": [
+      "FAIL package-lock.json:1 [expo-min] expo 57.0.8 (installed, package-lock.json) is below 57.0.9, the oldest SDK 57 release to use",
+      "Hermes V1 memory regression"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "expo"], "value": "~57.0.8" } },
+      {
+        "json": { "file": "package-lock.json", "path": ["packages", "node_modules/expo", "version"], "value": "57.0.8" }
+      }
+    ]
+  },
+  "bad-ios-deployment-target": {
+    "expect": [
+      "FAIL app.config.ts:7 [ios-deployment-target] deploymentTarget 15.1 is below SDK 57's iOS 16.4",
+      "required a higher minimum deployment target"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "return ['expo-router',",
+          "with": "return [['expo-build-properties', { ios: { deploymentTarget: '15.1' } }], 'expo-router',"
+        }
+      }
+    ]
+  },
+  "bad-jest-30-early": {
+    "expect": [
+      "FAIL package.json:1 [held-back] jest is 30.5.2; SDK 57 keeps 29.7.x",
+      "FAIL package.json:1 [held-back] @types/jest is 30.0.0; SDK 57 keeps 29.5.14"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["devDependencies", "jest"], "value": "30.5.2" } },
+      { "json": { "file": "package.json", "path": ["devDependencies", "babel-jest"], "value": "30.5.2" } },
+      { "json": { "file": "package.json", "path": ["devDependencies", "@types/jest"], "value": "30.0.0" } }
+    ]
+  },
+  "bad-jest-expo-58": {
+    "expect": ["FAIL package.json:1 [sdk-tooling] jest-expo is 58.0.7 but SDK 57 expects ~57.0.5"],
+    "ops": [{ "json": { "file": "package.json", "path": ["devDependencies", "jest-expo"], "value": "58.0.7" } }]
+  },
+  "bad-jest-preset": {
+    "expect": [
+      "FAIL package.json:1 [rn-tooling] @react-native/jest-preset is 0.87.1 but react-native is 0.86.3; they must be equal"
+    ],
+    "ops": [
+      {
+        "json": { "file": "package.json", "path": ["devDependencies", "@react-native/jest-preset"], "value": "0.87.1" }
+      }
+    ]
+  },
+  "bad-module-map": {
+    "expect": [
+      "FAIL package.json:1 [module-map] react-native-reanimated is \"4.5.0\" but the SDK's module map",
+      "expects \"4.5.1\"",
+      "Run npx expo install --fix"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "react-native-reanimated"], "value": "4.5.0" } }
+    ]
+  },
+  "bad-plugin-import": {
+    "expect": [
+      "FAIL plugins/with-variant-marker.ts:2 [config-plugin-import] imports 'expo/config-plugins', but on SDK 57 config plugins import 'expo/config-plugins.js'"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "plugins/with-variant-marker.ts",
+          "find": "import { withInfoPlist } from 'expo/config-plugins.js';",
+          "with": "import { withInfoPlist } from 'expo/config-plugins';"
+        }
+      }
+    ]
+  },
+  "bad-react-override": {
+    "expect": ["FAIL package.json:1 [overrides] overrides.react is 19.3.0 but the app uses 19.2.3"],
+    "ops": [{ "json": { "file": "package.json", "path": ["overrides"], "value": { "react": "19.3.0" } } }]
+  },
+  "bad-removed-config-edge-to-edge": {
+    "expect": [
+      "FAIL app.config.ts:15 [removed-config] sets android.edgeToEdgeEnabled, which the app config schema dropped in SDK 55"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "predictiveBackGestureEnabled: true }",
+          "with": "predictiveBackGestureEnabled: true, edgeToEdgeEnabled: true }"
+        }
+      }
+    ]
+  },
+  "bad-removed-config-new-arch": {
+    "expect": [
+      "FAIL app.config.ts:14 [removed-config] sets newArchEnabled, which the app config schema dropped in SDK 55"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    slug: 'tasks',\n",
+          "with": "    slug: 'tasks',\n    newArchEnabled: true,\n"
+        }
+      }
+    ]
+  },
+  "bad-scene-not-wired": {
+    "expect": [
+      "FAIL .xcode-version:1 [scene-support] Xcode 27.0 (.xcode-version) with SDK 57 needs",
+      "scripts/config/scene-support.ts defines it, but nothing calls it"
+    ],
+    "ops": [{ "write": { "file": ".xcode-version", "content": "27.0\n" } }]
+  },
+  "bad-scene-old-expo": {
+    "expect": [
+      "FAIL app.config.ts:7 [scene-support] ios.enableSceneSupport needs expo 57.0.23 or newer, the app declares ~57.0.22"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "return ['expo-router',",
+          "with": "return [['expo-build-properties', { ios: { enableSceneSupport: true } }], 'expo-router',"
+        }
+      },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo"], "value": "~57.0.22" } }
+    ]
+  },
+  "bad-sdk-56-scene-helper": {
+    "expect": [
+      "FAIL scripts/config/scene-support.ts:33 [scene-support] ios.enableSceneSupport is set up on SDK 56, whose expo-build-properties has no such option"
+    ],
+    "ops": [
+      {
+        "$comment": "The app on SDK 56 (expo 56.0.23, React Native 0.85.3); the skill ships no SDK 56 module map, so module-map is skipped without node_modules.",
+        "json": { "file": "package.json", "path": ["dependencies", "expo"], "value": "~56.0.23" }
+      },
+      { "json": { "file": "package.json", "path": ["dependencies", "react-native"], "value": "0.85.3" } },
+      {
+        "json": { "file": "package.json", "path": ["devDependencies", "@react-native/jest-preset"], "value": "0.85.3" }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["devDependencies", "@react-native/eslint-plugin"],
+          "value": "0.85.3"
+        }
+      },
+      { "json": { "file": "package.json", "path": ["devDependencies", "jest-expo"], "value": "56.0.5" } },
+      { "json": { "file": "package.json", "path": ["devDependencies", "eslint-config-expo"], "value": "56.0.4" } },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/expo", "version"],
+          "value": "56.0.23"
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/react-native", "version"],
+          "value": "0.85.3"
+        }
+      }
+    ]
+  },
+  "bad-sdk-56-xcode-27": {
+    "expect": [
+      "FAIL .xcode-version:1 [xcode] SDK 56 builds with Xcode 26.x at most, .xcode-version uses 27.0: its expo-build-properties has no ios.enableSceneSupport"
+    ],
+    "ops": [
+      {
+        "$comment": "The app on SDK 56 (expo 56.0.23, React Native 0.85.3); the skill ships no SDK 56 module map, so module-map is skipped without node_modules.",
+        "json": { "file": "package.json", "path": ["dependencies", "expo"], "value": "~56.0.23" }
+      },
+      { "json": { "file": "package.json", "path": ["dependencies", "react-native"], "value": "0.85.3" } },
+      {
+        "json": { "file": "package.json", "path": ["devDependencies", "@react-native/jest-preset"], "value": "0.85.3" }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["devDependencies", "@react-native/eslint-plugin"],
+          "value": "0.85.3"
+        }
+      },
+      { "json": { "file": "package.json", "path": ["devDependencies", "jest-expo"], "value": "56.0.5" } },
+      { "json": { "file": "package.json", "path": ["devDependencies", "eslint-config-expo"], "value": "56.0.4" } },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/expo", "version"],
+          "value": "56.0.23"
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/react-native", "version"],
+          "value": "0.85.3"
+        }
+      },
+      { "delete": ["scripts/config/scene-support.ts", "scripts/config/scene-support.test.ts"] },
+      { "write": { "file": ".xcode-version", "content": "27.0\n" } }
+    ]
+  },
+  "bad-sdk-lines-contract": {
+    "expect": ["FAIL contracts/expo-sdk-lines.json:4 [sdk-lines-contract] SDK 59: \"expo\" must be a non-empty string"],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/expo-sdk-lines.json",
+          "content": "{\n  \"$comment\": \"An entry written by hand for the next SDK, missing most keys.\",\n  \"sdks\": {\n    \"59\": { \"status\": \"beta notes copied by hand\" }\n  }\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-stale-override": {
+    "expect": [
+      "FAIL package.json:1 [overrides] overrides.react-native-screens is 4.24.0 but the app uses ~4.26.0; a stale override forces the old version"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["overrides"], "value": { "react-native-screens": "4.24.0" } } }
+    ]
+  },
+  "bad-test-renderer": {
+    "expect": ["FAIL package.json:1 [react-line] test-renderer is 1.3.0, but SDK 57 (React 19.2) needs the 1.2.x line"],
+    "ops": [{ "json": { "file": "package.json", "path": ["devDependencies", "test-renderer"], "value": "1.3.0" } }]
+  },
+  "bad-toolchain-xcode27": {
+    "expect": [
+      "xcode    27.0 (scripts/ios/toolchain.ts)",
+      "FAIL scripts/ios/toolchain.ts:3 [scene-support] Xcode 27.0 (scripts/ios/toolchain.ts) with SDK 57 needs expo-build-properties ios.enableSceneSupport: true"
+    ],
+    "ops": [
+      { "delete": ["scripts/config/scene-support.ts", "scripts/config/scene-support.test.ts"] },
+      {
+        "write": {
+          "file": "scripts/ios/toolchain.ts",
+          "content": "// scripts/ios/toolchain.ts\n/** The Xcode every local build selects through DEVELOPER_DIR (never xcode-select). */\nexport const XCODE_VERSION = '27.0';\n"
+        }
+      }
+    ]
+  },
+  "bad-typescript-7": {
+    "expect": ["FAIL package.json:1 [held-back] typescript is 7.0.2; SDK 57 keeps 6.0.x"],
+    "ops": [{ "json": { "file": "package.json", "path": ["devDependencies", "typescript"], "value": "7.0.2" } }]
+  },
+  "bad-v3-hooks-on-v2": {
+    "expect": [
+      "FAIL src/features/tasks/components/hold-to-delete.tsx:2 [gesture-api] imports useLongPressGesture, which Gesture Handler 2 does not have"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/hold-to-delete.tsx",
+          "content": "// src/features/tasks/components/hold-to-delete.tsx\nimport { useLongPressGesture } from 'react-native-gesture-handler';\n\nexport function useHoldToDelete(onDelete: () => void) {\n  return useLongPressGesture({ onActivate: onDelete });\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-vendor-folder-without-skill-md": {
+    "expect": [
+      "FAIL src/vendor/third-party-skill/decoy.test.tsx:3 [gesture-api] imports useTapGesture, which Gesture Handler 2 does not have",
+      "FAIL src/vendor/third-party-skill/plugins/app.config.ts:3 [gesture-api]"
+    ],
+    "ops": [{ "delete": "src/vendor/third-party-skill/SKILL.md" }]
+  },
+  "bad-xcode-below-sdk": {
+    "expect": ["FAIL .xcode-version:1 [xcode] SDK 57 needs Xcode 26.4 or newer, .xcode-version uses 26.2"],
+    "ops": [{ "write": { "file": ".xcode-version", "content": "26.2\n" } }]
+  },
+  "bad-xcode27-no-scene": {
+    "expect": [
+      "FAIL .xcode-version:1 [scene-support] Xcode 27.0 (.xcode-version) with SDK 57 needs expo-build-properties ios.enableSceneSupport: true: apps built with the iOS 27 SDK",
+      "/templates/scripts/config/scene-support.ts (and scene-support.test.ts next to it) into the app as scripts/config/"
+    ],
+    "ops": [
+      { "delete": ["scripts/config/scene-support.ts", "scripts/config/scene-support.test.ts"] },
+      { "write": { "file": ".xcode-version", "content": "27.0\n" } }
+    ]
+  },
+  "error-no-package": {
+    "expect": ["ERROR [bad-input] nothing to check:", "has no package.json"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "pass-app-config-bare-import": {
+    "expect": [
+      "note     app.config.ts:2 [config-plugin-import] imports 'expo/config-plugins': Expo loads this app config as CommonJS",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "import type { ExpoConfig } from 'expo/config';",
+          "with": "import { withInfoPlist } from 'expo/config-plugins';\n\nimport type { ExpoConfig } from 'expo/config';"
+        }
+      }
+    ]
+  },
+  "pass-no-eas": {
+    "expect": ["SKIP eas.json [xcode] not yet created (eas-build-and-submit creates it)", "RESULT: PASS"],
+    "ops": [{ "delete": "eas.json" }]
+  },
+  "pass-no-expo": {
+    "expect": ["NOT APPLICABLE: expo is not a dependency in package.json", "RESULT: PASS"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo"], "delete": true } }]
+  },
+  "pass-scene-support-on": {
+    "expect": ["xcode    27.0 (.xcode-version)", "RESULT: PASS"],
+    "ops": [
+      { "write": { "file": ".xcode-version", "content": "27.0\n" } },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "import type { ExpoConfig } from 'expo/config';",
+          "with": "import { addSceneSupport } from './scripts/config/scene-support.ts';\n\nimport type { ExpoConfig } from 'expo/config';"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "plugins: pluginsFor(),",
+          "with": "plugins: addSceneSupport(pluginsFor()),"
+        }
+      }
+    ]
+  },
+  "pass-sdk-56": {
+    "expect": [
+      "sdk      app on Expo SDK 56; module map: none",
+      "xcode    EAS picks the image for SDK 56 (macos-tahoe-26.4-xcode-26.4 on the verified date)",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "$comment": "The app on SDK 56 (expo 56.0.23, React Native 0.85.3); the skill ships no SDK 56 module map, so module-map is skipped without node_modules.",
+        "json": { "file": "package.json", "path": ["dependencies", "expo"], "value": "~56.0.23" }
+      },
+      { "json": { "file": "package.json", "path": ["dependencies", "react-native"], "value": "0.85.3" } },
+      {
+        "json": { "file": "package.json", "path": ["devDependencies", "@react-native/jest-preset"], "value": "0.85.3" }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["devDependencies", "@react-native/eslint-plugin"],
+          "value": "0.85.3"
+        }
+      },
+      { "json": { "file": "package.json", "path": ["devDependencies", "jest-expo"], "value": "56.0.5" } },
+      { "json": { "file": "package.json", "path": ["devDependencies", "eslint-config-expo"], "value": "56.0.4" } },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/expo", "version"],
+          "value": "56.0.23"
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/react-native", "version"],
+          "value": "0.85.3"
+        }
+      },
+      { "delete": ["scripts/config/scene-support.ts", "scripts/config/scene-support.test.ts"] }
+    ]
+  },
+  "pass-test-helper-bare-import": {
+    "expect": [
+      "note     test/config-plugins/run-mod.ts:3 [config-plugin-import] imports 'expo/config-plugins': Jest and TypeScript resolve it on SDK 57 too; the house form is 'expo/config-plugins.js' until the move",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "test/config-plugins/run-mod.ts",
+          "content": "// test/config-plugins/run-mod.ts\nimport type { ExportedConfig } from 'expo/config-plugins';\nimport { withPlugins } from 'expo/config-plugins';\n\nexport const runAll = (config: ExportedConfig): ExportedConfig => withPlugins(config, []);\n"
+        }
+      }
+    ]
+  },
+  "pass-xcode-config-key": {
+    "expect": ["xcode    26.6 (tooling/xcode-version.txt)", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "rn-skills.config.json",
+          "content": "{\n  \"xcodeVersionFile\": \"tooling/xcode-version.txt\"\n}\n"
+        }
+      },
+      { "write": { "file": "tooling/xcode-version.txt", "content": "26.6\n" } }
+    ]
+  },
+  "pass-yarn-lockfile": {
+    "expect": [
+      "note     yarn.lock without package-lock.json: duplicate-native and the installed-expo half of expo-min read package-lock.json only",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "package-lock.json" }, { "write": { "file": "yarn.lock", "content": "# yarn lockfile v1\n" } }]
+  }
+}

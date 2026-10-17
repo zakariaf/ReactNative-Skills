@@ -1,0 +1,646 @@
+{
+  "bad-controller-rules": [
+    {
+      "write": {
+        "file": "src/features/task-editor/components/notes-input.tsx",
+        "lines": [
+          "// src/features/task-editor/components/notes-input.tsx",
+          "import { Controller } from 'react-hook-form';",
+          "",
+          "import { TextField } from '@/ui/form/text-field';",
+          "",
+          "import type { TaskEditorInput } from '../task-editor-schema';",
+          "import type { Control } from 'react-hook-form';",
+          "",
+          "export function NotesInput(props: { readonly control: Control<TaskEditorInput> }): React.JSX.Element {",
+          "  return (",
+          "    <Controller",
+          "      control={props.control}",
+          "      name=\"notes\"",
+          "      rules={{ maxLength: 2000 }}",
+          "      render={({ field }) => (",
+          "        <TextField testID=\"task-editor.notes\" label=\"Notes\" kind=\"multiline\" value={field.value} onChangeText={field.onChange} onBlur={field.onBlur} ref={field.ref} />",
+          "      )}",
+          "    />",
+          "  );",
+          "}"
+        ]
+      }
+    }
+  ],
+  "bad-error-message-key": [
+    {
+      "write": {
+        "file": "src/features/task-editor/apply-title-conflict.ts",
+        "lines": [
+          "// src/features/task-editor/apply-title-conflict.ts",
+          "import type { TaskEditorInput } from './task-editor-schema';",
+          "import type { UseFormSetError } from 'react-hook-form';",
+          "",
+          "/** The server refused the title: show it on the field. */",
+          "export function applyTitleConflict(setError: UseFormSetError<TaskEditorInput>): void {",
+          "  setError('title', { type: 'conflict', message: 'This title is taken' });",
+          "}"
+        ]
+      }
+    }
+  ],
+  "bad-error-message-translated": [
+    {
+      "write": {
+        "file": "src/features/task-editor/apply-title-conflict.ts",
+        "lines": [
+          "// src/features/task-editor/apply-title-conflict.ts",
+          "import type { TaskEditorInput } from './task-editor-schema';",
+          "import type { TFunction } from '@/i18n/t-context';",
+          "import type { UseFormSetError } from 'react-hook-form';",
+          "",
+          "export function applyTitleConflict(setError: UseFormSetError<TaskEditorInput>, t: TFunction): void {",
+          "  setError('title', { type: 'conflict', message: t('task-editor.title.duplicate') });",
+          "}"
+        ]
+      }
+    }
+  ],
+  "bad-field-on-change": [
+    {
+      "write": {
+        "file": "src/ui/form/code-field.tsx",
+        "lines": [
+          "// src/ui/form/code-field.tsx",
+          "import { TextInput } from 'react-native';",
+          "import { useController } from 'react-hook-form';",
+          "",
+          "import type { Control } from 'react-hook-form';",
+          "",
+          "type Values = { readonly code: string };",
+          "",
+          "export function CodeField(props: { readonly label: string; readonly control: Control<Values> }): React.JSX.Element {",
+          "  const { field } = useController({ control: props.control, name: 'code' });",
+          "  return <TextInput accessibilityLabel={props.label} value={field.value} onChange={field.onChange} onBlur={field.onBlur} ref={field.ref} />;",
+          "}"
+        ]
+      }
+    }
+  ],
+  "bad-field-ref": [
+    {
+      "replace": {
+        "file": "src/hooks/use-text-field.ts",
+        "find": "    ref: field.ref,\n",
+        "with": "    ref: () => undefined,\n"
+      }
+    }
+  ],
+  "bad-field-spread": [
+    {
+      "write": {
+        "file": "src/ui/form/code-field.tsx",
+        "lines": [
+          "// src/ui/form/code-field.tsx",
+          "import { TextInput } from 'react-native';",
+          "import { useController } from 'react-hook-form';",
+          "",
+          "import type { Control } from 'react-hook-form';",
+          "",
+          "type Values = { readonly code: string };",
+          "",
+          "export function CodeField(props: { readonly label: string; readonly control: Control<Values> }): React.JSX.Element {",
+          "  const { field } = useController({ control: props.control, name: 'code' });",
+          "  return <TextInput accessibilityLabel={props.label} {...field} />;",
+          "}"
+        ]
+      }
+    }
+  ],
+  "bad-focus-error": [
+    {
+      "replace": {
+        "file": "src/features/task-editor/use-task-editor-model.ts",
+        "find": "    mode: 'onTouched',\n",
+        "with": "    mode: 'onTouched',\n    shouldFocusError: false,\n"
+      }
+    }
+  ],
+  "bad-form-mode": [
+    {
+      "replace": {
+        "file": "src/features/task-editor/use-task-editor-model.ts",
+        "find": "mode: 'onTouched',",
+        "with": "mode: 'onChange',"
+      }
+    }
+  ],
+  "bad-form-resolver": [
+    {
+      "replace": {
+        "file": "src/features/task-editor/use-task-editor-model.ts",
+        "find": "    resolver: valibotResolver(taskEditorSchema(deps.openTitles)),\n",
+        "with": ""
+      }
+    }
+  ],
+  "bad-input-label": [
+    {
+      "write": {
+        "file": "src/ui/form/search-field.tsx",
+        "lines": [
+          "// src/ui/form/search-field.tsx",
+          "import { TextInput } from 'react-native';",
+          "",
+          "export function SearchField(props: { readonly placeholder: string; readonly value: string; readonly onChangeText: (text: string) => void }): React.JSX.Element {",
+          "  return <TextInput placeholder={props.placeholder} value={props.value} onChangeText={props.onChangeText} />;",
+          "}"
+        ]
+      }
+    }
+  ],
+  "bad-input-label-labelledby": [
+    {
+      "write": {
+        "file": "src/ui/form/search-field.tsx",
+        "lines": [
+          "// src/ui/form/search-field.tsx",
+          "// Planted: aria-labelledby alone is Android and web only; VoiceOver hears an unnamed text field.",
+          "import { TextInput } from 'react-native';",
+          "",
+          "export function SearchField(props: { readonly value: string; readonly onChangeText: (text: string) => void }): React.JSX.Element {",
+          "  return <TextInput aria-labelledby=\"search-label\" value={props.value} onChangeText={props.onChangeText} />;",
+          "}"
+        ]
+      }
+    }
+  ],
+  "bad-input-preset": [
+    {
+      "write": {
+        "file": "src/ui/form/password-field.tsx",
+        "lines": [
+          "// src/ui/form/password-field.tsx",
+          "import { TextInput } from 'react-native';",
+          "",
+          "export function PasswordField(props: { readonly label: string; readonly value: string; readonly onChangeText: (text: string) => void }): React.JSX.Element {",
+          "  return <TextInput accessibilityLabel={props.label} secureTextEntry value={props.value} onChangeText={props.onChangeText} />;",
+          "}"
+        ]
+      }
+    }
+  ],
+  "bad-input-preset-email": [
+    {
+      "write": {
+        "file": "src/ui/form/email-field.tsx",
+        "lines": [
+          "// src/ui/form/email-field.tsx",
+          "import { TextInput } from 'react-native';",
+          "",
+          "export function EmailField(props: { readonly label: string; readonly value: string; readonly onChangeText: (text: string) => void }): React.JSX.Element {",
+          "  return <TextInput accessibilityLabel={props.label} inputMode=\"email\" autoComplete=\"email\" value={props.value} onChangeText={props.onChangeText} />;",
+          "}"
+        ]
+      }
+    }
+  ],
+  "bad-keyboard-aware-scroll": [
+    {
+      "replace": {
+        "file": "src/features/task-editor/task-editor-screen.tsx",
+        "find": "import { StyleSheet, View } from 'react-native';",
+        "with": "import { ScrollView, StyleSheet, View } from 'react-native';"
+      }
+    },
+    {
+      "replace": {
+        "file": "src/features/task-editor/task-editor-screen.tsx",
+        "find": "      <KeyboardAwareScrollView\n",
+        "with": "      <ScrollView\n"
+      }
+    },
+    {
+      "replace": {
+        "file": "src/features/task-editor/task-editor-screen.tsx",
+        "find": "        bottomOffset={props.keyboardSpace.bottomOffset}\n        extraKeyboardSpace={props.keyboardSpace.extraKeyboardSpace}\n",
+        "with": ""
+      }
+    },
+    {
+      "replace": {
+        "file": "src/features/task-editor/task-editor-screen.tsx",
+        "find": "      </KeyboardAwareScrollView>",
+        "with": "      </ScrollView>"
+      }
+    },
+    {
+      "replace": {
+        "file": "src/features/task-editor/task-editor-screen.tsx",
+        "find": "import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';\n",
+        "with": ""
+      }
+    }
+  ],
+  "bad-keyboard-aware-scroll-animated": [
+    {
+      "write": {
+        "file": "src/features/rename/rename-screen.tsx",
+        "lines": [
+          "// planted: Reanimated's ScrollView around fields: keyboard-controller never scrolls the focused field into view",
+          "import Animated from 'react-native-reanimated';",
+          "",
+          "import { TextField } from '@/ui/form/text-field';",
+          "",
+          "import type { ReactNode } from 'react';",
+          "",
+          "type Field = { readonly label: string; readonly value: string; readonly onChangeText: (text: string) => void };",
+          "",
+          "export function RenameScreen(props: { readonly name: Field; readonly email: Field; readonly city: Field }): ReactNode {",
+          "  return (",
+          "    <Animated.ScrollView keyboardShouldPersistTaps=\"handled\">",
+          "      <TextField kind=\"sentence\" {...props.name} />",
+          "      <TextField kind=\"email\" {...props.email} />",
+          "      <TextField kind=\"sentence\" {...props.city} />",
+          "    </Animated.ScrollView>",
+          "  );",
+          "}"
+        ]
+      }
+    }
+  ],
+  "bad-keyboard-aware-scroll-no-scroller": [
+    {
+      "write": {
+        "file": "src/features/rename/rename-screen.tsx",
+        "lines": [
+          "// planted: three fields in a plain View: the keyboard covers the lower ones and nothing scrolls",
+          "import { View } from 'react-native';",
+          "",
+          "import { TextField } from '@/ui/form/text-field';",
+          "",
+          "import type { ReactNode } from 'react';",
+          "",
+          "type Field = { readonly label: string; readonly value: string; readonly onChangeText: (text: string) => void };",
+          "",
+          "export function RenameScreen(props: { readonly name: Field; readonly email: Field; readonly city: Field }): ReactNode {",
+          "  return (",
+          "    <View>",
+          "      <TextField kind=\"sentence\" {...props.name} />",
+          "      <TextField kind=\"email\" {...props.email} />",
+          "      <TextField kind=\"sentence\" {...props.city} />",
+          "    </View>",
+          "  );",
+          "}"
+        ]
+      }
+    }
+  ],
+  "bad-keyboard-persist-taps": [
+    {
+      "replace": {
+        "file": "src/features/task-editor/task-editor-screen.tsx",
+        "find": "        keyboardShouldPersistTaps=\"handled\"\n",
+        "with": ""
+      }
+    }
+  ],
+  "bad-keyboard-provider": [
+    {
+      "replace": {
+        "file": "src/features/root-navigator/root-stack.tsx",
+        "find": "      <KeyboardProvider>\n        <AppStack />\n      </KeyboardProvider>\n",
+        "with": "      <AppStack />\n"
+      }
+    },
+    {
+      "replace": {
+        "file": "src/features/root-navigator/root-stack.tsx",
+        "find": "import { KeyboardProvider } from 'react-native-keyboard-controller';\n",
+        "with": ""
+      }
+    }
+  ],
+  "bad-latin-digits": [
+    {
+      "replace": {
+        "file": "src/features/task-editor/task-editor-schema.ts",
+        "find": "      v.transform(toLatinDigits),\n",
+        "with": ""
+      }
+    },
+    {
+      "replace": {
+        "file": "src/features/task-editor/task-editor-schema.ts",
+        "find": "import { toLatinDigits } from '@/core/text/latin-digits';\n\n",
+        "with": ""
+      }
+    }
+  ],
+  "bad-latin-digits-import-left": [
+    {
+      "replace": {
+        "file": "src/features/task-editor/task-editor-schema.ts",
+        "find": "      v.transform(toLatinDigits),\n",
+        "with": ""
+      }
+    }
+  ],
+  "bad-latin-digits-number-parse": [
+    {
+      "write": {
+        "file": "src/features/copies/use-copies-form.ts",
+        "lines": [
+          "// planted: Number.parseInt turns ٣ into NaN; no digit normalizer runs first",
+          "import { valibotResolver } from '@hookform/resolvers/valibot';",
+          "import { useForm } from 'react-hook-form';",
+          "import * as v from 'valibot';",
+          "",
+          "const COPIES_SCHEMA = v.object({",
+          "  copies: v.pipe(v.string(), v.transform((text) => Number.parseInt(text, 10)), v.minValue(1, 'task-editor.estimate.out-of-range')),",
+          "});",
+          "",
+          "export function useCopiesForm() {",
+          "  return useForm({ resolver: valibotResolver(COPIES_SCHEMA), mode: 'onTouched', defaultValues: { copies: '1' } });",
+          "}"
+        ]
+      }
+    }
+  ],
+  "bad-latin-digits-transform-number": [
+    {
+      "write": {
+        "file": "src/features/copies/use-copies-form.ts",
+        "lines": [
+          "// planted: the point-free v.transform(Number) turns ۳ into NaN; no digit normalizer runs first",
+          "import { valibotResolver } from '@hookform/resolvers/valibot';",
+          "import { useForm } from 'react-hook-form';",
+          "import * as v from 'valibot';",
+          "",
+          "const COPIES_SCHEMA = v.object({",
+          "  copies: v.pipe(v.string(), v.transform(Number), v.minValue(1, 'task-editor.estimate.out-of-range')),",
+          "});",
+          "",
+          "export function useCopiesForm() {",
+          "  return useForm({ resolver: valibotResolver(COPIES_SCHEMA), mode: 'onTouched', defaultValues: { copies: '1' } });",
+          "}"
+        ]
+      }
+    }
+  ],
+  "bad-pad-done-bar": [
+    {
+      "replace": {
+        "file": "src/features/task-editor/task-editor-screen.tsx",
+        "find": "      <KeyboardDoneBar\n        testID=\"task-editor.keyboard\"\n        label={props.doneLabel}\n        isReducedMotion={props.isReducedMotion}\n        onHeightChange={props.keyboardSpace.onBarHeightChange}\n      />\n",
+        "with": ""
+      }
+    },
+    {
+      "replace": {
+        "file": "src/features/task-editor/task-editor-screen.tsx",
+        "find": "import { KeyboardDoneBar } from '@/ui/form/keyboard-done-bar';\n",
+        "with": ""
+      }
+    }
+  ],
+  "bad-pad-done-bar-toolbar": [
+    {
+      "replace": {
+        "file": "src/features/task-editor/task-editor-screen.tsx",
+        "find": "      <KeyboardDoneBar\n        testID=\"task-editor.keyboard\"\n        label={props.doneLabel}\n        isReducedMotion={props.isReducedMotion}\n        onHeightChange={props.keyboardSpace.onBarHeightChange}\n      />\n",
+        "with": "      <KeyboardToolbar />\n"
+      }
+    },
+    {
+      "replace": {
+        "file": "src/features/task-editor/task-editor-screen.tsx",
+        "find": "import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';",
+        "with": "import { KeyboardAwareScrollView, KeyboardToolbar } from 'react-native-keyboard-controller';"
+      }
+    },
+    {
+      "replace": {
+        "file": "src/features/task-editor/task-editor-screen.tsx",
+        "find": "import { KeyboardDoneBar } from '@/ui/form/keyboard-done-bar';\n",
+        "with": ""
+      }
+    }
+  ],
+  "bad-raw-text-input": [
+    {
+      "write": {
+        "file": "src/features/task-editor/components/quick-title.tsx",
+        "lines": [
+          "// src/features/task-editor/components/quick-title.tsx",
+          "import { TextInput } from 'react-native';",
+          "",
+          "export function QuickTitle(props: { readonly label: string; readonly value: string; readonly onChangeText: (text: string) => void }): React.JSX.Element {",
+          "  return <TextInput accessibilityLabel={props.label} value={props.value} onChangeText={props.onChangeText} />;",
+          "}"
+        ]
+      }
+    }
+  ],
+  "bad-schema-async": [
+    {
+      "replace": {
+        "file": "src/features/task-editor/task-editor-schema.ts",
+        "find": "v.check((title) => !taken.has(titleKeyOf(title)), 'task-editor.title.duplicate')",
+        "with": "v.checkAsync(async (title) => !taken.has(titleKeyOf(title)), 'task-editor.title.duplicate')"
+      }
+    }
+  ],
+  "bad-schema-message-missing": [
+    {
+      "replace": {
+        "file": "src/features/task-editor/task-editor-schema.ts",
+        "find": "v.nonEmpty('task-editor.title.required')",
+        "with": "v.nonEmpty()"
+      }
+    }
+  ],
+  "bad-schema-message-prose": [
+    {
+      "replace": {
+        "file": "src/features/task-editor/task-editor-schema.ts",
+        "find": "'task-editor.estimate.not-a-number'",
+        "with": "`Enter whole minutes`"
+      }
+    }
+  ],
+  "bad-schema-message-unknown": [
+    {
+      "replace": {
+        "file": "src/features/task-editor/task-editor-schema.ts",
+        "find": "v.maxLength(TASK_TITLE_MAX, 'task-editor.title.too-long')",
+        "with": "v.maxLength(TASK_TITLE_MAX, 'task-editor.title.long')"
+      }
+    }
+  ],
+  "bad-schema-segmenter": [
+    {
+      "replace": {
+        "file": "src/features/task-editor/task-editor-schema.ts",
+        "find": "v.maxLength(TASK_NOTES_MAX, 'task-editor.notes.too-long')",
+        "with": "v.maxGraphemes(TASK_NOTES_MAX, 'task-editor.notes.too-long')"
+      }
+    }
+  ],
+  "error-bad-config": [{ "write": { "file": "rn-skills.config.json", "json": { "forms": ["src/ui/form"] } } }],
+  "error-no-src": { "args": "{dir} --src missing-folder", "ops": [] },
+  "pass-catalog-not-yet-created": [{ "delete": ["src/i18n/catalogs/en.json", "src/i18n/catalogs/ar.json"] }],
+  "pass-decimal-normalizer": [
+    {
+      "replace": {
+        "file": "src/features/task-editor/task-editor-schema.ts",
+        "find": "import { toLatinDigits } from '@/core/text/latin-digits';",
+        "with": "import { normalizeDecimalInput } from '@/i18n/normalize-decimal-input';"
+      }
+    },
+    {
+      "replace": {
+        "file": "src/features/task-editor/task-editor-schema.ts",
+        "find": "      v.transform(toLatinDigits),\n",
+        "with": "      v.rawTransform(({ dataset, addIssue, NEVER }) => {\n        if (dataset.value === '') return '';\n        const normalized = normalizeDecimalInput(dataset.value, 'en');\n        if (normalized.ok) return normalized.value;\n        addIssue({ message: 'task-editor.estimate.not-a-number' });\n        return NEVER;\n      }),\n"
+      }
+    }
+  ],
+  "pass-field-dir-config": [
+    { "rename": { "from": "src/ui/form", "to": "src/ui/fields" } },
+    {
+      "replace": {
+        "file": "src/features/task-editor/task-editor-screen.tsx",
+        "find": "@/ui/form/keyboard-done-bar",
+        "with": "@/ui/fields/keyboard-done-bar"
+      }
+    },
+    {
+      "replace": {
+        "file": "src/features/task-editor/task-editor-screen.tsx",
+        "find": "@/ui/form/text-field",
+        "with": "@/ui/fields/text-field"
+      }
+    },
+    { "write": { "file": "rn-skills.config.json", "json": { "forms": { "fieldDirs": ["src/ui/fields"] } } } }
+  ],
+  "pass-field-group-and-search": [
+    {
+      "write": {
+        "file": "src/features/rename/components/address-fields.tsx",
+        "lines": [
+          "// allowed: a field group component; the screen that renders it owns the KeyboardAwareScrollView",
+          "import { View } from 'react-native';",
+          "",
+          "import { TextField } from '@/ui/form/text-field';",
+          "",
+          "import type { ReactNode } from 'react';",
+          "",
+          "type Field = { readonly label: string; readonly value: string; readonly onChangeText: (text: string) => void };",
+          "",
+          "export function AddressFields(props: { readonly street: Field; readonly city: Field }): ReactNode {",
+          "  return (",
+          "    <View>",
+          "      <TextField kind=\"sentence\" {...props.street} />",
+          "      <TextField kind=\"sentence\" {...props.city} />",
+          "    </View>",
+          "  );",
+          "}"
+        ]
+      }
+    },
+    {
+      "write": {
+        "file": "src/features/search/search-screen.tsx",
+        "lines": [
+          "// allowed: one search field above a list is not a form; the list is the screen's scroller",
+          "import { FlatList, View } from 'react-native';",
+          "",
+          "import { TextField } from '@/ui/form/text-field';",
+          "",
+          "import type { ReactNode } from 'react';",
+          "",
+          "type Field = { readonly label: string; readonly value: string; readonly onChangeText: (text: string) => void };",
+          "",
+          "export function SearchScreen(props: { readonly query: Field; readonly results: readonly string[] }): ReactNode {",
+          "  return (",
+          "    <View>",
+          "      <TextField kind=\"search\" {...props.query} />",
+          "      <FlatList data={props.results} keyboardShouldPersistTaps=\"handled\" renderItem={() => null} />",
+          "    </View>",
+          "  );",
+          "}"
+        ]
+      }
+    }
+  ],
+  "pass-horizontal-chip-row": [
+    {
+      "replace": {
+        "file": "src/features/task-editor/task-editor-screen.tsx",
+        "find": "import { StyleSheet, View } from 'react-native';",
+        "with": "import { ScrollView, StyleSheet, View } from 'react-native';"
+      }
+    },
+    {
+      "replace": {
+        "file": "src/features/task-editor/task-editor-screen.tsx",
+        "find": "        <TextField testID=\"task-editor.notes\" {...props.notes} />\n",
+        "with": "        <TextField testID=\"task-editor.notes\" {...props.notes} />\n        {/* A horizontal chip row inside the form: not the form's scroller, but taps on a chip still need \"handled\". */}\n        <ScrollView horizontal keyboardShouldPersistTaps=\"handled\" testID=\"task-editor.tags\">\n          <View />\n        </ScrollView>\n"
+      }
+    }
+  ],
+  "pass-not-applicable": {
+    "base": ["@tests/bases/app"],
+    "ops": [{ "delete": "src/features/root-navigator/root-stack.tsx" }]
+  },
+  "pass-segmenter-polyfilled": [
+    {
+      "replace": {
+        "file": "src/features/task-editor/task-editor-schema.ts",
+        "find": "v.maxLength(TASK_NOTES_MAX, 'task-editor.notes.too-long')",
+        "with": "v.maxGraphemes(TASK_NOTES_MAX, 'task-editor.notes.too-long')"
+      }
+    },
+    {
+      "write": {
+        "file": "src/i18n/intl-polyfills.ts",
+        "lines": ["// src/i18n/intl-polyfills.ts", "import '@formatjs/intl-segmenter/polyfill-force.js';"]
+      }
+    }
+  ],
+  "pass-server-code-table": [
+    {
+      "write": {
+        "file": "src/features/task-editor/apply-title-conflict.ts",
+        "lines": [
+          "// src/features/task-editor/apply-title-conflict.ts",
+          "import type { TaskEditorInput } from './task-editor-schema';",
+          "import type { MessageKey } from '@/i18n/messages';",
+          "import type { UseFormSetError } from 'react-hook-form';",
+          "",
+          "type TitleCode = 'title-taken' | 'title-banned';",
+          "",
+          "const TITLE_MESSAGES: Readonly<Record<TitleCode, MessageKey>> = {",
+          "  'title-taken': 'task-editor.title.duplicate',",
+          "  'title-banned': 'forms.field.invalid',",
+          "};",
+          "",
+          "export function applyTitleConflict(setError: UseFormSetError<TaskEditorInput>, code: TitleCode): void {",
+          "  setError('title', { type: 'conflict', message: TITLE_MESSAGES[code] });",
+          "  setError('title', { type: 'conflict', message: 'task-editor.title.duplicate' });",
+          "}"
+        ]
+      }
+    }
+  ],
+  "pass-strings-and-comments": [
+    {
+      "write": {
+        "file": "src/features/task-editor/form-notes.ts",
+        "lines": [
+          "// src/features/task-editor/form-notes.ts",
+          "// Never import { TextInput } from 'react-native' in a screen, never useForm({ mode: 'all' }).",
+          "/* <ScrollView><TextInput placeholder=\"Name\" secureTextEntry /></ScrollView> */",
+          "export const FORM_NOTE = \"import { TextInput } from 'react-native'; useForm({ mode: 'all' })\";"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,248 @@
+{
+  "bad-eas-env-in-app": {
+    "expect": [
+      "apps/tasks/eas.json:6 [npm-env] build.production.env sets NPM_CONFIG_STRICT_ALLOW_SCRIPTS: strict-allow-scripts=false is outside the policy (strict-allow-scripts=true)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "apps/tasks/eas.json",
+          "lines": [
+            "{",
+            "  \"cli\": { \"version\": \">= 16.0.0\" },",
+            "  \"build\": {",
+            "    \"production\": {",
+            "      \"node\": \"26.4.0\",",
+            "      \"env\": { \"NPM_CONFIG_STRICT_ALLOW_SCRIPTS\": \"false\" }",
+            "    }",
+            "  }",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-every-app": {
+    "expect": [
+      "apps/notes/package.json:6 [every-app] lacks expo-haptics, a peer of @acme/ui that this app depends on",
+      "(cd apps/notes && npx expo install expo-haptics@~57.0.3)"
+    ],
+    "ops": [
+      { "json": { "file": "apps/notes/package.json", "path": ["dependencies", "expo-haptics"], "delete": true } },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "apps/notes", "dependencies", "expo-haptics"],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "bad-lockstep": {
+    "expect": ["[lockstep] zustand differs between workspaces: apps/notes=5.0.14, apps/tasks=5.0.15"],
+    "ops": [
+      { "json": { "file": "apps/notes/package.json", "path": ["dependencies", "zustand"], "value": "5.0.14" } },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "apps/notes", "dependencies", "zustand"],
+          "value": "5.0.14"
+        }
+      }
+    ]
+  },
+  "bad-native-in-shared": {
+    "expect": ["[workspace-peer] expo-haptics is a native module in dependencies of a shared package"],
+    "ops": [
+      {
+        "json": { "file": "packages/ui/package.json", "path": ["dependencies"], "value": { "expo-haptics": "~57.0.3" } }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "packages/ui", "dependencies"],
+          "value": { "expo-haptics": "~57.0.3" }
+        }
+      }
+    ]
+  },
+  "bad-npx-in-app-script": {
+    "expect": [
+      "apps/tasks/package.json:20 [npx-install] \"npm exec --yes -- eas-cli build --platform all\" makes npx install eas-cli into its own cache"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "apps/tasks/package.json",
+          "path": ["scripts", "build:all"],
+          "value": "npm exec --yes -- eas-cli build --platform all"
+        }
+      }
+    ]
+  },
+  "bad-override-reference-unresolved": {
+    "expect": [
+      "[overrides] overrides.react is $react (which names nothing the root package.json declares) but the apps use 19.2.3"
+    ],
+    "ops": [
+      {
+        "op": "json",
+        "file": "package.json",
+        "path": ["overrides", "react"],
+        "value": "$react",
+        "$comment": "The root package.json declares no react (the apps do), so npm cannot resolve the reference."
+      }
+    ]
+  },
+  "bad-overrides-missing": {
+    "expect": ["[overrides] overrides.react is missing but the apps use 19.2.3"],
+    "ops": [{ "json": { "file": "package.json", "path": ["overrides", "react"], "delete": true } }]
+  },
+  "bad-peer-override": {
+    "expect": [
+      "[peer-override] overrides.expo-haptics is missing; a shared package's \"*\" peer needs it pinned at 57.0.3"
+    ],
+    "ops": [{ "json": { "file": "package.json", "path": ["overrides", "expo-haptics"], "delete": true } }]
+  },
+  "bad-table-map": {
+    "expect": [
+      "contracts/dependency-policy.json:557 [table-map] the policy pins jest-expo 56.0.4, outside \"~57.0.5\", the specifier of the SDK 57 module map",
+      "npm install -D jest-expo@57.0.5, or a newer version inside the range, pinned exactly",
+      "check-deps-policy: 5 package.json files checked, 1 problems"
+    ],
+    "ops": [
+      {
+        "op": "json",
+        "file": "package.json",
+        "path": ["devDependencies", "jest-expo"],
+        "value": "56.0.4",
+        "$comment": "A stale row after an SDK move, with a root pin to match: npx expo install --check in each app never sees the root devDependencies."
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "", "devDependencies", "jest-expo"],
+          "value": "56.0.4"
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/dependency-policy.json",
+          "path": ["packages", "jest-expo", "version"],
+          "value": "56.0.4"
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/dependency-policy.json",
+          "path": ["packages", "jest-expo", "spec"],
+          "value": "56.0.4"
+        }
+      }
+    ]
+  },
+  "bad-unused-native": {
+    "expect": [
+      "apps/notes/package.json:9 [unused-dependency] expo-haptics",
+      "apps/tasks/package.json:9 [unused-dependency] expo-haptics"
+    ],
+    "ops": [{ "delete": "packages/ui/src/haptics/expo-haptics-adapter.ts" }]
+  },
+  "bad-where-expo-in-workspace": {
+    "expect": [
+      "[policy-contract] packages.expo-haptics.where names a workspace folder, but npx expo install writes only into an Expo app"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/dependency-policy.json",
+          "path": ["packages", "expo-haptics", "where"],
+          "value": ["app", "packages/ui"]
+        }
+      }
+    ]
+  },
+  "bad-where-list": {
+    "expect": [
+      "packages/ui/package.json:11 [wrong-workspace] zustand belongs in the apps' dependencies or packages/core/package.json, not in packages/ui/package.json",
+      "add \"packages/ui\" to the row's \"where\" list"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/dependency-policy.json",
+          "path": ["packages", "zustand", "where"],
+          "value": ["app", "packages/core"]
+        }
+      },
+      { "json": { "file": "packages/ui/package.json", "path": ["dependencies"], "value": { "zustand": "5.0.15" } } },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "packages/ui", "dependencies"],
+          "value": { "zustand": "5.0.15" }
+        }
+      }
+    ]
+  },
+  "bad-workspace-link": {
+    "expect": ["apps/notes/package.json:7 [pin-exact] @acme/ui is \"^0.0.0\"; workspace packages are linked with \"*\""],
+    "ops": [
+      { "json": { "file": "apps/notes/package.json", "path": ["dependencies", "@acme/ui"], "value": "^0.0.0" } },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "apps/notes", "dependencies", "@acme/ui"],
+          "value": "^0.0.0"
+        }
+      }
+    ]
+  },
+  "bad-workspace-peer": {
+    "expect": [
+      "packages/ui/package.json:5 [workspace-peer] expo-haptics is imported by packages/ui but is not one of its peerDependencies"
+    ],
+    "ops": [
+      { "json": { "file": "packages/ui/package.json", "path": ["peerDependencies", "expo-haptics"], "delete": true } }
+    ]
+  },
+  "bad-wrong-workspace": {
+    "expect": ["[wrong-workspace] expo-haptics belongs in the apps' dependencies, not in root dependencies"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies"], "value": { "expo-haptics": "~57.0.3" } } },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "", "dependencies"],
+          "value": { "expo-haptics": "~57.0.3" }
+        }
+      }
+    ]
+  },
+  "pass-where-list": {
+    "expect": ["check-deps-policy: 5 package.json files checked, 0 problems"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/dependency-policy.json",
+          "path": ["packages", "zustand", "where"],
+          "value": ["app", "packages/core"]
+        }
+      },
+      { "json": { "file": "packages/core/package.json", "path": ["dependencies"], "value": { "zustand": "5.0.15" } } },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "packages/core", "dependencies"],
+          "value": { "zustand": "5.0.15" }
+        }
+      },
+      {
+        "write": {
+          "file": "packages/core/src/tasks-store.ts",
+          "content": "// packages/core/src/tasks-store.ts (fixture)\nimport { createStore } from 'zustand/vanilla';\n\nexport const tasksStore = createStore(() => ({ count: 0 }));\n"
+        }
+      }
+    ]
+  }
+}

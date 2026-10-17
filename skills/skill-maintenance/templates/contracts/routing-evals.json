@@ -1,0 +1,22 @@
+{
+  "$schema": "./routing-evals.schema.json",
+  "$comment": "Routing evals for the repo's skills, read by skill-maintenance's check-routing.mjs: at least two realistic prompts per authored skill, written the way tasks are written (without the skill's name), plus near misses that share words with a skill but belong to its neighbour. expect null: the prompt should load none of the project skills. Replace every __PLACEHOLDER__ entry with the repo's own skills and prompts: check-routing fails on them (eval-placeholder, even with --skip-missing) until you do, whether skill-maintenance sits in the repo or comes from a plugin.",
+  "evals": [
+    {
+      "prompt": "__FIRST_TASK_PROMPT_FOR_THE_NEW_SKILL__",
+      "expect": "__NEW_SKILL_NAME__"
+    },
+    {
+      "prompt": "__SECOND_TASK_PROMPT_FOR_THE_NEW_SKILL__",
+      "expect": "__NEW_SKILL_NAME__"
+    },
+    {
+      "prompt": "__NEAR_MISS_PROMPT_THAT_BELONGS_TO_THE_NEIGHBOUR__",
+      "expect": "__NEIGHBOUR_SKILL_NAME__"
+    },
+    {
+      "prompt": "What is 2 + 2?",
+      "expect": null
+    }
+  ]
+}

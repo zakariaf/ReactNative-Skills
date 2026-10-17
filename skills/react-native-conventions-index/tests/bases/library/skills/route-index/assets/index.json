@@ -1,0 +1,178 @@
+{
+  "plugins": [
+    {
+      "key": "core",
+      "name": "fixture-core"
+    },
+    {
+      "key": "extra",
+      "name": "fixture-extra"
+    }
+  ],
+  "catalog": {
+    "categories": [
+      {
+        "key": "start",
+        "label": "Start"
+      },
+      {
+        "key": "parts",
+        "label": "Parts"
+      }
+    ],
+    "skills": [
+      {
+        "name": "route-index",
+        "category": "start",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "alpha-one",
+        "category": "parts",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "beta-two",
+        "category": "parts",
+        "plugin": "extra",
+        "manual": false
+      }
+    ]
+  },
+  "categoryNotes": {
+    "start": "Where every fixture task starts."
+  },
+  "rowRules": [
+    {
+      "id": "pair",
+      "when": [
+        "alpha-one"
+      ],
+      "require": [
+        "beta-two"
+      ],
+      "why": "the alpha part is always checked with the beta feature"
+    },
+    {
+      "id": "feature-check",
+      "when": [
+        "beta-two"
+      ],
+      "whenAny": [
+        "beta-two"
+      ],
+      "require": [
+        "alpha-one"
+      ],
+      "why": "the beta feature, wherever it appears in a row, is checked with the alpha part under it"
+    }
+  ],
+  "tasks": [
+    {
+      "task": "Build the alpha part",
+      "skills": [
+        "alpha-one",
+        "beta-two"
+      ],
+      "note": "The beta feature sits on it.",
+      "quick": true
+    },
+    {
+      "task": "Find the right skill",
+      "skills": [
+        "route-index"
+      ],
+      "quick": true
+    }
+  ],
+  "requireManifests": [
+    "base"
+  ],
+  "buildOrders": [
+    {
+      "id": "base",
+      "title": "Base order",
+      "intro": "The fixture app from empty.",
+      "steps": [
+        {
+          "step": "The alpha core",
+          "skills": [
+            "alpha-one"
+          ],
+          "proof": "`check-alpha.mjs . --strict` (alpha-one) prints RESULT: PASS",
+          "copies": [
+            {
+              "skill": "alpha-one",
+              "paths": [
+                "src/core/**",
+                "src/i18n/catalogs/*.json"
+              ]
+            }
+          ],
+          "installs": [
+            {
+              "package": "zustand",
+              "companions": [
+                "use-sync-external-store"
+              ]
+            }
+          ]
+        },
+        {
+          "step": "The beta feature",
+          "skills": [
+            "beta-two"
+          ],
+          "proof": "The feature test passes",
+          "copies": [
+            {
+              "skill": "beta-two",
+              "paths": [
+                "src/feature/**"
+              ]
+            },
+            {
+              "skill": "beta-two",
+              "paths": [
+                "src/i18n/catalogs/*.json"
+              ],
+              "merge": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "extra",
+      "title": "Extra order",
+      "intro": "A second pass over the alpha core.",
+      "base": {
+        "order": "base",
+        "through": 1
+      },
+      "steps": [
+        {
+          "step": "Alpha again",
+          "skills": [
+            "alpha-one"
+          ],
+          "proof": "`check-alpha.mjs .` prints RESULT: PASS"
+        }
+      ]
+    }
+  ],
+  "verifyGreen": {
+    "intro": "The fixture's verify gate list.",
+    "order": "base",
+    "rows": [
+      {
+        "gate": "feature:verify",
+        "greenFrom": 2,
+        "before": "the feature's verifier arrives with step 2",
+        "meanwhile": "the other gates one by one"
+      }
+    ]
+  }
+}

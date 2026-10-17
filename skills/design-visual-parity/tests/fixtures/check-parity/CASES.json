@@ -1,0 +1,817 @@
+{
+  "bad-behind-modal": {
+    "expect": ["[structure] tasks.screen", "inside its crop-only part tasks.add-button"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-menu-open.json",
+          "path": ["captures"],
+          "value": [
+            {
+              "theme": "light",
+              "lang": "en",
+              "patch": {
+                "elements": {
+                  "tasks.screen": { "unlisted": true },
+                  "tasks.title": { "unlisted": true },
+                  "tasks.add-button": { "unlisted": true, "fill": "#C62828" },
+                  "tasks.summary": { "unlisted": true },
+                  "tasks.task-row.milk": { "unlisted": true },
+                  "tasks.task-row.bread": { "unlisted": true },
+                  "tasks.task-row.mail": { "unlisted": true },
+                  "tasks.footer-note": { "unlisted": true }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-border-real-side": {
+    "expect": ["[border] tasks.add-button: border differs: left 1.0 pt"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [
+            {
+              "theme": "light",
+              "lang": "en",
+              "patch": { "elements": { "tasks.add-button": { "border": { "w": 1, "color": "#1B3F8A" } } } }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-bounds-edge": {
+    "expect": ["[bounds] tasks.summary: geometry off: dx +0.0 dy +3.0"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [{ "theme": "light", "lang": "en", "patch": { "elements": { "tasks.summary": { "dy": 3 } } } }]
+        }
+      }
+    ]
+  },
+  "bad-bounds-missing": {
+    "expect": ["[bounds-missing] the run has neither app.hier.json nor app.layout.json"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [{ "theme": "light", "lang": "en", "patch": {} }]
+        }
+      },
+      { "json": { "file": "scenes/tasks-default.json", "path": ["captures", 0, "patch", "hier"], "value": "none" } }
+    ]
+  },
+  "bad-capture-size": {
+    "expect": ["[capture-size]", "app.png is 450 x 900 px"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [{ "theme": "light", "lang": "en", "patch": { "size": { "w": 150, "h": 300 } } }]
+        }
+      }
+    ]
+  },
+  "bad-dark-fill": {
+    "expect": [".parity/test-phone/tasks-default/dark-ar/app.png [fill] tasks.task-row.bread"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["renders"],
+          "value": [
+            { "theme": "light", "lang": "en" },
+            { "theme": "dark", "lang": "ar" },
+            { "theme": "light", "lang": "ar" }
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [
+            {
+              "theme": "dark",
+              "lang": "ar",
+              "patch": { "elements": { "tasks.task-row.bread": { "fill": "#F2F4F7" } } }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-dashed-edge-not-waived": {
+    "expect": ["[structure] map.legend", "Known platform cause: dashed border"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/map-default.json",
+          "path": ["elements", 3, "border"],
+          "value": { "w": 2, "color": "#1A1D23", "style": "dashed" }
+        }
+      },
+      {
+        "json": {
+          "file": "scenes/map-default.json",
+          "path": ["captures", 0, "patch", "elements", "map.legend"],
+          "value": { "border": { "w": 2, "color": "#1A1D23", "style": "dashed", "phase": 3 } }
+        }
+      }
+    ]
+  },
+  "bad-duplicate": {
+    "expect": ["[duplicate-testid] tasks.summary: 2 app elements carry this testID"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [{ "theme": "light", "lang": "en", "patch": { "elements": { "tasks.summary": { "count": 2 } } } }]
+        }
+      }
+    ]
+  },
+  "bad-fill-edge": {
+    "expect": [
+      "[fill] tasks.task-row.milk: fill #F6F8FB but the design is #F2F4F7 (max channel difference 4, tolerance 3)"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [
+            {
+              "theme": "light",
+              "lang": "en",
+              "patch": { "elements": { "tasks.task-row.milk": { "fill": "#F6F8FB" } } }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-hidden-part-gone": {
+    "expect": ["[structure] tasks.task-row.milk: shape differs", "inside its crop-only part tasks.task-row.milk.check"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [
+            {
+              "theme": "light",
+              "lang": "en",
+              "patch": { "elements": { "tasks.task-row.milk.check": { "remove": true } } }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-missing": {
+    "expect": [
+      ".parity/test-phone/tasks-default/light-en/app.png [missing] tasks.footer-note: in the design, not in the app"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [
+            { "theme": "light", "lang": "en", "patch": { "elements": { "tasks.footer-note": { "remove": true } } } }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-missing-9pt": {
+    "expect": ["[missing] lists.list-row.gifts: in the design, not in the app"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/lists-default.json",
+          "path": ["captures"],
+          "value": [
+            {
+              "theme": "light",
+              "lang": "en",
+              "patch": { "elements": { "lists.list-row.gifts": { "unlisted": true } } },
+              "scrollY": 15
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-modal-not-reached": {
+    "expect": ["[screen-not-reached] tasks.screen"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-menu-open.json",
+          "path": ["captures"],
+          "value": [
+            {
+              "theme": "light",
+              "lang": "en",
+              "patch": {
+                "elements": {
+                  "tasks.screen": { "unlisted": true },
+                  "tasks.title": { "unlisted": true },
+                  "tasks.add-button": { "unlisted": true },
+                  "tasks.summary": { "unlisted": true },
+                  "tasks.task-row.milk": { "unlisted": true },
+                  "tasks.task-row.bread": { "unlisted": true },
+                  "tasks.task-row.mail": { "unlisted": true },
+                  "tasks.footer-note": { "unlisted": true },
+                  "tasks.menu": { "unlisted": true }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-picture-moved": {
+    "expect": ["[bounds] onboarding.picture: geometry off: dx +4.0"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/onboarding-default.json",
+          "path": ["captures", 0, "patch", "elements", "onboarding.picture"],
+          "value": { "fill": "#C9E4C5", "dx": 4 }
+        }
+      }
+    ]
+  },
+  "bad-reference-mismatch": {
+    "expect": ["[reference-mismatch] run.json names the device \"ghost-phone\", which the contract does not list"],
+    "ops": [
+      {
+        "write": {
+          "file": "post.json",
+          "json": [
+            {
+              "json": {
+                "file": ".parity/test-phone/tasks-default/light-en/run.json",
+                "path": ["device"],
+                "value": "ghost-phone"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-reference-missing": {
+    "expect": ["[reference-missing] no design reference for tasks-default on test-phone light-en"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["renders"],
+          "value": [{ "theme": "dark", "lang": "en" }]
+        }
+      },
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [{ "theme": "light", "lang": "en", "patch": {} }]
+        }
+      }
+    ]
+  },
+  "bad-reference-variant": {
+    "expect": ["[reference-variant] captured against tasks-default--compact"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [{ "theme": "light", "lang": "en", "patch": { "variant": "compact" } }]
+        }
+      }
+    ]
+  },
+  "bad-reference-variant-composed": {
+    "expect": [
+      "[reference-variant] captured against tasks-default--no-sync, but the app's facts (hasSync false, hasCount false) select tasks-default--no-sync--no-count"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/visual-parity.json",
+          "path": ["facts"],
+          "value": {
+            "values": { "hasSync": [true, false], "hasCount": [true, false] },
+            "design": { "hasSync": true, "hasCount": true },
+            "app": { "hasSync": false, "hasCount": false }
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/visual-parity.json",
+          "path": ["frames", "tasks-default", "when"],
+          "value": { "tasks.footer-note": { "hasSync": true }, "tasks.summary": { "hasCount": true } }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/visual-parity.json",
+          "path": ["frames", "tasks-default", "variants"],
+          "value": {
+            "no-sync": {
+              "when": { "hasSync": false },
+              "reason": "Builds without sync hide the footer (reviewer).",
+              "derive": [{ "hide": ".foot" }]
+            },
+            "no-count": {
+              "when": { "hasCount": false },
+              "reason": "The summary hides without a count (reviewer).",
+              "derive": [{ "hide": ".summary" }]
+            }
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [{ "theme": "light", "lang": "en", "patch": { "variant": "no-sync" } }]
+        }
+      }
+    ]
+  },
+  "bad-region-overlay": {
+    "expect": ["[text-ink] map.legend"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/map-default.json",
+          "path": ["captures", 0, "patch", "elements", "map.legend"],
+          "value": { "runDx": 4 }
+        }
+      }
+    ]
+  },
+  "bad-rtl-not-mirrored": {
+    "expect": [".parity/test-phone/tasks-default/light-ar/app.png [bounds] tasks.add-button"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["renders"],
+          "value": [
+            { "theme": "light", "lang": "en" },
+            { "theme": "dark", "lang": "ar" },
+            { "theme": "light", "lang": "ar" }
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [
+            {
+              "theme": "light",
+              "lang": "ar",
+              "patch": { "elements": { "tasks.add-button": { "dx": 82 }, "tasks.add-button.icon": { "dx": 82 } } }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-screen-not-reached": {
+    "expect": ["[screen-not-reached] tasks.screen: root testID missing"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [
+            { "theme": "light", "lang": "en", "patch": { "elements": { "tasks.screen": { "unlisted": true } } } }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-scroll-mismatch": {
+    "expect": ["[scroll-mismatch] lists.screen: the body is scrolled by 0.0 pt but the capture asked for scrollY 120"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/lists-default.json",
+          "path": ["captures"],
+          "value": [{ "theme": "light", "lang": "en", "patch": {}, "scrollY": 0 }]
+        }
+      },
+      {
+        "json": {
+          "file": "scenes/lists-default.json",
+          "path": ["captures", 0, "dir"],
+          "value": ".parity/test-phone/lists-default/light-en-y120"
+        }
+      },
+      {
+        "write": {
+          "file": "post.json",
+          "json": [
+            {
+              "json": {
+                "file": ".parity/test-phone/lists-default/light-en-y120/run.json",
+                "path": ["scrollY"],
+                "value": 120
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-state-card-part": {
+    "expect": ["[fill] premium.buy-button"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/premium-loading.json",
+          "path": ["captures"],
+          "value": [
+            {
+              "theme": "light",
+              "lang": "en",
+              "patch": {
+                "elements": {
+                  "premium.state.loading": { "dy": 90 },
+                  "premium.loading-label": { "dy": 90 },
+                  "premium.spinner": { "dy": 90 },
+                  "premium.buy-button": { "dy": 90, "fill": "#C62828" }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-structure-part": {
+    "expect": ["[structure] tasks.add-button: shape differs", "inside its crop-only part tasks.add-button.icon"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [
+            { "theme": "light", "lang": "en", "patch": { "elements": { "tasks.add-button.icon": { "remove": true } } } }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-tall-header": {
+    "expect": ["[bounds] lists.header: geometry off"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/lists-default.json",
+          "path": ["captures"],
+          "value": [{ "theme": "light", "lang": "en", "patch": { "elements": { "lists.header": { "dh": 4 } } } }]
+        }
+      }
+    ]
+  },
+  "bad-tall-pinned": {
+    "expect": ["[bounds] lists.bottom-bar: geometry off"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/lists-default.json",
+          "path": ["captures"],
+          "value": [
+            {
+              "theme": "light",
+              "lang": "en",
+              "patch": { "elements": { "lists.bottom-bar": { "dy": -20 }, "lists.new-button": { "dy": -20 } } }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-text": {
+    "expect": ["[text] tasks.summary: text \"4 open\" but the design says \"3 open\""],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [
+            { "theme": "light", "lang": "en", "patch": { "elements": { "tasks.summary": { "label": "4 open" } } } }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-text-colour": {
+    "expect": [
+      "[text-ink] tasks.summary: text \"3 open\" has no ink in the app where the design has it (text colour #4A5160)"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [
+            { "theme": "light", "lang": "en", "patch": { "elements": { "tasks.summary": { "color": "#FFFFFF" } } } }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-text-ink-role-limit": {
+    "expect": ["[text-ink] tasks.title: text \"Tasks\": moved dx +2.3", "limit 2.3 pt for Demo Sans 14"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [
+            { "theme": "light", "lang": "en", "patch": { "elements": { "tasks.title": { "runDx": 2.3333333 } } } }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-text-ink-width": {
+    "expect": ["[text-ink] tasks.title: text \"Tasks\": ink width 44.0 vs design 46.0 pt"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [{ "theme": "light", "lang": "en", "patch": { "elements": { "tasks.title": { "inkDw": -2 } } } }]
+        }
+      }
+    ]
+  },
+  "bad-text-moved": {
+    "expect": ["[text-ink] tasks.title: text \"Tasks\": moved dx +3.0"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [{ "theme": "light", "lang": "en", "patch": { "elements": { "tasks.title": { "runDx": 3 } } } }]
+        }
+      }
+    ]
+  },
+  "bad-waiver": {
+    "expect": ["[waiver-invalid] waiver 1 (tasks-default tasks.summary bounds): unknown field(s) tolerance"],
+    "ops": [
+      {
+        "write": {
+          "file": "design/parity/waivers.json",
+          "content": "{\n \"version\": 1,\n \"waivers\": [\n  {\n   \"frame\": \"tasks-default\",\n   \"testID\": \"tasks.summary\",\n   \"rule\": \"bounds\",\n   \"reason\": \"The platform cannot lay this summary line out where the design does for this test.\",\n   \"reportedOn\": \"2026-10-01\",\n   \"tolerance\": 3\n  }\n ]\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-waiver-design-artefact": {
+    "expect": ["[waiver-invalid]", "needs \"designCause\""],
+    "ops": [
+      {
+        "write": {
+          "file": "design/parity/waivers.json",
+          "content": "{\n \"version\": 1,\n \"waivers\": [\n  {\n   \"frame\": \"tasks-default\",\n   \"testID\": \"tasks.summary\",\n   \"rule\": \"bounds\",\n   \"reason\": \"The platform cannot lay this summary line out where the design does for this test.\",\n   \"reportedOn\": \"2026-10-01\",\n   \"class\": \"design-artefact\"\n  }\n ]\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-waiver-never": {
+    "expect": ["[waiver-invalid]", "rule \"screen-not-reached\" cannot be waived"],
+    "ops": [
+      {
+        "write": {
+          "file": "design/parity/waivers.json",
+          "content": "{\n \"version\": 1,\n \"waivers\": [\n  {\n   \"frame\": \"tasks-default\",\n   \"testID\": \"tasks.summary\",\n   \"rule\": \"screen-not-reached\",\n   \"reason\": \"The platform cannot lay this summary line out where the design does for this test.\",\n   \"reportedOn\": \"2026-10-01\"\n  }\n ]\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-waiver-platform-no-devices": {
+    "expect": ["[waiver-invalid] waiver 1 (tasks-default tasks.summary bounds): a platform waiver needs \"devices\""],
+    "ops": [
+      {
+        "write": {
+          "file": "design/parity/waivers.json",
+          "content": "{\n \"version\": 1,\n \"waivers\": [\n  {\n   \"frame\": \"tasks-default\",\n   \"testID\": \"tasks.summary\",\n   \"rule\": \"bounds\",\n   \"reason\": \"The platform cannot lay this summary line out where the design does for this test.\",\n   \"reportedOn\": \"2026-10-01\"\n  }\n ]\n}"
+        }
+      }
+    ]
+  },
+  "bad-waiver-text-shaping": {
+    "expect": ["[waiver-invalid]", "a platform-text-shaping waiver covers text-ink only, not \"bounds\""],
+    "ops": [
+      {
+        "write": {
+          "file": "design/parity/waivers.json",
+          "content": "{\n \"version\": 1,\n \"waivers\": [\n  {\n   \"frame\": \"tasks-default\",\n   \"testID\": \"tasks.summary\",\n   \"rule\": \"bounds\",\n   \"reason\": \"The platform cannot lay this summary line out where the design does for this test.\",\n   \"reportedOn\": \"2026-10-01\",\n   \"class\": \"platform-text-shaping\",\n   \"glyphs\": \"x\"\n  }\n ]\n}\n"
+        }
+      }
+    ]
+  },
+  "error-contract-invalid": {
+    "expect": ["ERROR [bad-input]", "unknown key \"tolerances\""],
+    "ops": [{ "json": { "file": "contracts/visual-parity.json", "path": ["tolerances"], "value": { "boundsPt": 5 } } }]
+  },
+  "error-floor-too-large": {
+    "expect": ["ERROR [bad-input]", "floor 4 pt is above 3 pt"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/visual-parity.json",
+          "path": ["textRoleFloors", "Demo Sans", "14", "floor"],
+          "value": 4
+        }
+      }
+    ]
+  },
+  "error-no-runs": { "expect": ["ERROR [bad-input] nothing to check"], "ops": [{ "delete": "scenes" }] },
+  "error-region-missing": {
+    "expect": ["ERROR [bad-input]", "has no region rectangle"],
+    "ops": [
+      { "json": { "file": "scenes/map-default.json", "path": ["captures", 0, "patch", "region"], "delete": true } }
+    ]
+  },
+  "pass-bounds-edge": {
+    "expect": ["1 runs pass"],
+    "args": "--frame tasks-default",
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [{ "theme": "light", "lang": "en", "patch": { "elements": { "tasks.summary": { "dy": 2 } } } }]
+        }
+      }
+    ]
+  },
+  "pass-fill-edge": {
+    "expect": ["1 runs pass"],
+    "args": "--frame tasks-default",
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [
+            {
+              "theme": "light",
+              "lang": "en",
+              "patch": { "elements": { "tasks.task-row.milk": { "fill": "#F5F7FA" } } }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "pass-layout-reporter": {
+    "expect": ["[layout]", "1 runs pass"],
+    "args": "--frame tasks-default",
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [{ "theme": "light", "lang": "en", "patch": { "hier": "layout" } }]
+        }
+      }
+    ]
+  },
+  "pass-modal-reached": { "expect": ["behind the modal tasks.menu", "1 runs pass"], "args": "--frame tasks-menu-open" },
+  "pass-no-contract": {
+    "expect": ["NOT APPLICABLE: contracts/visual-parity.json does not exist"],
+    "ops": [{ "delete": "contracts/visual-parity.json" }]
+  },
+  "pass-no-frames": {
+    "expect": ["NOT APPLICABLE: no screen state has a \"reference\" and the contract plans no frame"],
+    "ops": [
+      { "write": { "file": "contracts/screens.json", "json": { "version": 1, "screens": [] } } },
+      { "json": { "file": "contracts/visual-parity.json", "path": ["frames"], "value": {} } }
+    ]
+  },
+  "pass-picture-masked": {
+    "expect": ["onboarding.picture: the app's own picture", "1 runs pass"],
+    "args": "--frame onboarding-default"
+  },
+  "pass-region-masked": { "expect": ["region mask", "1 runs pass"], "args": "--frame map-default" },
+  "pass-sliver-7pt": {
+    "expect": ["off-screen in this capture", "1 runs pass"],
+    "args": "--frame lists-default",
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/lists-default.json",
+          "path": ["captures"],
+          "value": [
+            {
+              "theme": "light",
+              "lang": "en",
+              "patch": { "elements": { "lists.list-row.gifts": { "unlisted": true } } },
+              "scrollY": 13
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "pass-state-card-moved": {
+    "expect": ["1 runs pass"],
+    "args": "--frame premium-loading",
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/premium-loading.json",
+          "path": ["captures"],
+          "value": [
+            {
+              "theme": "light",
+              "lang": "en",
+              "patch": {
+                "elements": {
+                  "premium.state.loading": { "dy": 200 },
+                  "premium.loading-label": { "dy": 200 },
+                  "premium.spinner": { "dy": 200 },
+                  "premium.buy-button": { "dy": 200 }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "pass-tall-scrolled": {
+    "expect": ["scrollY 120", "1 runs pass"],
+    "args": "--frame lists-default",
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/lists-default.json",
+          "path": ["captures"],
+          "value": [{ "theme": "light", "lang": "en", "patch": {}, "scrollY": 120 }]
+        }
+      }
+    ]
+  },
+  "pass-text-ink-role-limit": {
+    "expect": ["1 runs pass"],
+    "args": "--frame tasks-default",
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [{ "theme": "light", "lang": "en", "patch": { "elements": { "tasks.title": { "runDx": 2 } } } }]
+        }
+      }
+    ]
+  },
+  "pass-waived": {
+    "expect": ["WAIVED [bounds] tasks.summary", "1 runs pass"],
+    "args": "--frame tasks-default",
+    "ops": [
+      {
+        "write": {
+          "file": "design/parity/waivers.json",
+          "content": "{\n \"version\": 1,\n \"waivers\": [\n  {\n   \"frame\": \"tasks-default\",\n   \"testID\": \"tasks.summary\",\n   \"rule\": \"bounds\",\n   \"reason\": \"The platform cannot lay this summary line out where the design does for this test.\",\n   \"reportedOn\": \"2026-10-01\",\n   \"devices\": [\n    \"test-phone\"\n   ]\n  }\n ]\n}\n"
+        }
+      },
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [{ "theme": "light", "lang": "en", "patch": { "elements": { "tasks.summary": { "dy": 3 } } } }]
+        }
+      }
+    ]
+  }
+}

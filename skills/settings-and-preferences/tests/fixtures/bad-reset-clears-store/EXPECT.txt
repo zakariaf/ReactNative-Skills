@@ -1,0 +1,3 @@
+[reset-keeps-settings]
+resetAllData touches clearSync
+src/data/reset-data.ts:8

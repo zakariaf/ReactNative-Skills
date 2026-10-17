@@ -1,0 +1,81 @@
+{
+  "enabledPlugins": {
+    "expo@claude-plugins-official": true
+  },
+  "skillListingBudgetFraction": 0.04,
+  "permissions": {
+    "allow": [
+      "Bash(node */.agents/skills/*/scripts/*)",
+      "Bash(node */.claude/skills/*/scripts/*)",
+      "Bash(node skills/*/scripts/*)"
+    ],
+    "deny": [
+      "Read(~/.appstoreconnect/**)",
+      "Read(**/*.p8)",
+      "Read(**/AuthKey_*)",
+      "Read(**/*.p12)",
+      "Read(**/*.mobileprovision)",
+      "Read(**/*.keystore)",
+      "Read(**/*.jks)",
+      "Read(**/credentials.json)",
+      "Read(**/*service-account*.json)",
+      "Read(**/key.properties)",
+      "Read(**/keystore.properties)",
+      "Bash(git commit *--no-verify*)",
+      "Bash(git commit -n*)",
+      "Bash(git commit * -n*)",
+      "Bash(git push *--no-verify*)"
+    ],
+    "ask": [
+      "Edit(/eslint.config.mjs)",
+      "Edit(/quality-gates.json)",
+      "Edit(/lefthook.yml)",
+      "Edit(/knip.json)",
+      "Edit(/.prettierrc.json)",
+      "Edit(/.npmrc)",
+      "Edit(/jest.config.js)",
+      "Edit(/jest.sim.config.js)",
+      "Edit(/stryker.config.json)",
+      "Edit(/tsconfig*.json)",
+      "Edit(/src/tsconfig.json)",
+      "Edit(/.prettierignore)",
+      "Edit(/babel.config.js)",
+      "Edit(/jest.setup.ts)",
+      "Edit(/contracts/knip-ignores.json)",
+      "Edit(/scripts/quality/check-quality-gates.ts)",
+      "Edit(/scripts/quality/gate-diff.ts)",
+      "Edit(/scripts/quality/gated-paths.ts)",
+      "Edit(/scripts/quality/verify-plan.ts)",
+      "Edit(/scripts/quality/run-verify.ts)",
+      "Edit(/scripts/quality/device-only.ts)",
+      "Edit(/scripts/hooks/**)",
+      "Edit(/.claude/settings.json)",
+      "Edit(/.claude/settings.local.json)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/scripts/hooks/after-edit.ts\"",
+            "timeout": 120
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$(git rev-parse --show-toplevel)\" && npm run -s check:fast 1>&2 || exit 2",
+            "timeout": 600
+          }
+        ]
+      }
+    ]
+  }
+}

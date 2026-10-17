@@ -1,0 +1,7 @@
+{
+ "base": [
+  "@tests/bases/app",
+  "@tests/bases/scenes"
+ ],
+ "argsFile": "append"
+}

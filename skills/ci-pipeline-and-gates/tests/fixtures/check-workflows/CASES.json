@@ -1,0 +1,386 @@
+{
+  "bad-action-no-comment": {
+    "expect": [".github/workflows/ci.yml:39 [action-sha-pin]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0",
+          "with": "actions/setup-node@820762786026740c76f36085b0efc47a31fe5020"
+        }
+      }
+    ]
+  },
+  "bad-action-tag": {
+    "expect": [".github/workflows/ci.yml:35 [action-sha-pin]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
+          "with": "actions/checkout@v7"
+        }
+      }
+    ]
+  },
+  "bad-cache-key": {
+    "expect": [".github/workflows/devices.yml:52 [cache-key]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/devices.yml",
+          "find": "key: gradle-${{ runner.os }}-${{ hashFiles('package-lock.json') }}",
+          "with": "key: gradle-cache"
+        }
+      }
+    ]
+  },
+  "bad-cache-node-modules": {
+    "expect": [".github/workflows/devices.yml:59 [cache-key]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/devices.yml",
+          "find": "path: ~/.cache/maestro-cli",
+          "with": "path: node_modules"
+        }
+      }
+    ]
+  },
+  "bad-concurrency-missing": {
+    "expect": [".github/workflows/ci.yml:8 [concurrency]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "concurrency:\n  group: ${{ github.workflow }}-${{ github.ref }}\n  cancel-in-progress: ${{ github.event_name == 'pull_request' }}\n\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-continue-on-error": {
+    "expect": [".github/workflows/ci.yml:33 [soft-fail]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "    timeout-minutes: 30\n",
+          "with": "    timeout-minutes: 30\n    continue-on-error: true\n"
+        }
+      }
+    ]
+  },
+  "bad-dependabot-cooldown": {
+    "expect": [".github/dependabot.yml:8 [dependabot-actions]", "RESULT: FAIL"],
+    "ops": [{ "replace": { "file": ".github/dependabot.yml", "find": "default-days: 7", "with": "default-days: 1" } }]
+  },
+  "bad-dependabot-missing": {
+    "expect": [".github/dependabot.yml:1 [dependabot-actions]", "RESULT: FAIL"],
+    "ops": [{ "delete": ".github/dependabot.yml" }]
+  },
+  "bad-job-timeout": {
+    "expect": [".github/workflows/ci.yml:29 [job-timeout]", "RESULT: FAIL"],
+    "ops": [{ "replace": { "file": ".github/workflows/ci.yml", "find": "    timeout-minutes: 30\n", "with": "" } }]
+  },
+  "bad-lefthook-missing": {
+    "expect": [".github/workflows/ci.yml:43 [lefthook-off]", "RESULT: FAIL"],
+    "ops": [{ "replace": { "file": ".github/workflows/ci.yml", "find": "  LEFTHOOK: '0'\n", "with": "" } }]
+  },
+  "bad-npm-config-env": {
+    "expect": [".github/workflows/ci.yml:26 [npm-config-env]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "  LEFTHOOK: '0'\n",
+          "with": "  LEFTHOOK: '0'\n  NPM_CONFIG_MIN_RELEASE_AGE: '0'\n"
+        }
+      }
+    ]
+  },
+  "bad-permissions-missing": {
+    "expect": [".github/workflows/ci.yml:8 [permissions-default]", "RESULT: FAIL"],
+    "ops": [
+      { "replace": { "file": ".github/workflows/ci.yml", "find": "permissions:\n  contents: read\n\n", "with": "" } }
+    ]
+  },
+  "bad-permissions-write": {
+    "expect": [".github/workflows/ci.yml:15 [permissions-default]", "RESULT: FAIL"],
+    "ops": [
+      { "replace": { "file": ".github/workflows/ci.yml", "find": "  contents: read\n", "with": "  contents: write\n" } }
+    ]
+  },
+  "bad-persist-credentials": {
+    "expect": [".github/workflows/ci.yml:34 [persist-credentials]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "        with:\n          persist-credentials: false\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-pr-target": {
+    "expect": [".github/workflows/ci.yml:9 [no-pr-target]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "  pull_request:\n",
+          "with": "  pull_request_target:\n"
+        }
+      }
+    ]
+  },
+  "bad-release-cache": {
+    "expect": [".github/workflows/release.yml:42 [release-no-cache]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/release.yml",
+          "find": "package-manager-cache: false",
+          "with": "cache: npm"
+        }
+      }
+    ]
+  },
+  "bad-release-cancel": {
+    "expect": [".github/workflows/release.yml:24 [concurrency]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/release.yml",
+          "find": "cancel-in-progress: false",
+          "with": "cancel-in-progress: true"
+        }
+      }
+    ]
+  },
+  "bad-run-injection": {
+    "expect": [".github/workflows/ci.yml:46 [run-injection]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "run: npm run verify",
+          "with": "run: npm run verify -- --label \"${{ github.head_ref }}\""
+        }
+      }
+    ]
+  },
+  "bad-run-injection-env": {
+    "expect": [".github/workflows/ci.yml:46 [run-injection]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "        run: npm run verify\n",
+          "with": "        run: npm run verify -- --label \"${{ env.TITLE }}\"\n        env:\n          TITLE: ${{ github.event.pull_request.title }}\n"
+        }
+      }
+    ]
+  },
+  "bad-run-injection-matrix": {
+    "expect": [".github/workflows/ci.yml:49 [run-injection]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "    timeout-minutes: 30\n",
+          "with": "    timeout-minutes: 30\n    strategy:\n      matrix:\n        label: ${{ fromJSON(github.event.pull_request.body) }}\n"
+        }
+      },
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "        run: npm run verify\n",
+          "with": "        run: npm run verify -- --label \"${{ matrix.label }}\"\n"
+        }
+      }
+    ]
+  },
+  "bad-runner-latest": {
+    "expect": [".github/workflows/ci.yml:31 [runner-pinned]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "runs-on: ubuntu-24.04",
+          "with": "runs-on: ubuntu-latest"
+        }
+      }
+    ]
+  },
+  "bad-runner-latest-large": {
+    "expect": [".github/workflows/devices.yml:81 [runner-pinned]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/devices.yml",
+          "find": "runs-on: macos-26",
+          "with": "runs-on: macos-latest-xlarge"
+        }
+      }
+    ]
+  },
+  "bad-secret-no-environment": {
+    "expect": [".github/workflows/release.yml:60 [secret-environment]", "RESULT: FAIL"],
+    "ops": [
+      { "replace": { "file": ".github/workflows/release.yml", "find": "    environment: production\n", "with": "" } }
+    ]
+  },
+  "bad-secret-reusable-call": {
+    "expect": [
+      ".github/workflows/reuse.yml:18 [secret-environment]",
+      "passes a secret to the reusable workflow",
+      "RESULT: FAIL"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": ".github/workflows/reuse.yml",
+          "content": "# .github/workflows/reuse.yml\nname: reuse\n\non:\n  workflow_dispatch:\n\npermissions:\n  contents: read\n\nconcurrency:\n  group: ${{ github.workflow }}\n  cancel-in-progress: false\n\njobs:\n  call:\n    uses: ./.github/workflows/release.yml\n    secrets:\n      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}\n"
+        }
+      }
+    ]
+  },
+  "bad-secret-workflow-env": {
+    "expect": [".github/workflows/ci.yml:27 [secret-environment]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "  EXPO_NO_TELEMETRY: '1'\n",
+          "with": "  EXPO_NO_TELEMETRY: '1'\n  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}\n"
+        }
+      }
+    ]
+  },
+  "bad-soft-fail-echo": {
+    "expect": [".github/workflows/ci.yml:46 [soft-fail]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "run: npm run verify",
+          "with": "run: npm run verify || echo \"verify failed\""
+        }
+      }
+    ]
+  },
+  "bad-soft-fail-step": {
+    "expect": [".github/workflows/ci.yml:46 [soft-fail]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "run: npm run verify",
+          "with": "run: npm run verify || true"
+        }
+      }
+    ]
+  },
+  "bad-soft-fail-tee": {
+    "expect": [".github/workflows/ci.yml:46 [soft-fail]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "        run: npm run verify\n",
+          "with": "        run: npm run verify 2>&1 | tee reports/verify.log\n"
+        }
+      }
+    ]
+  },
+  "bad-yaml-syntax": {
+    "expect": [".github/workflows/ci.yml:32 [yaml-syntax]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "    timeout-minutes: 30\n",
+          "with": "   timeout-minutes: 30\n"
+        }
+      }
+    ]
+  },
+  "error-empty-workflows": {
+    "expect": ["ERROR [bad-input] nothing to check: .github/workflows/ holds no .yml file"],
+    "ops": [
+      {
+        "delete": [
+          ".github/workflows/ci.yml",
+          ".github/workflows/devices.yml",
+          ".github/workflows/release.yml",
+          ".github/dependabot.yml"
+        ]
+      }
+    ]
+  },
+  "error-empty-workflows-with-dependabot": {
+    "expect": ["ERROR [bad-input] nothing to check: .github/workflows/ holds no .yml file"],
+    "ops": [
+      { "delete": [".github/workflows/ci.yml", ".github/workflows/devices.yml", ".github/workflows/release.yml"] }
+    ]
+  },
+  "pass-fetch-depth": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "          persist-credentials: false\n",
+          "with": "          persist-credentials: false\n          # A gate inside verify compares with the target branch (origin/<base>): full history, no later git fetch.\n          fetch-depth: 0\n"
+        }
+      },
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "        run: npm run verify\n",
+          "with": "        run: npm run verify\n        env:\n          GATE_BASE: origin/${{ github.base_ref || 'main' }}\n"
+        }
+      }
+    ]
+  },
+  "pass-literal-matrix": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "    timeout-minutes: 30\n",
+          "with": "    timeout-minutes: 30\n    strategy:\n      matrix:\n        label: [fast, full]\n"
+        }
+      },
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "        run: npm run verify\n",
+          "with": "        run: npm run verify -- --label \"${{ matrix.label }}\"\n"
+        }
+      }
+    ]
+  },
+  "pass-not-applicable": {
+    "expect": [
+      "NOT APPLICABLE: no .github/workflows/ folder and no .github/dependabot.yml: this repo has no GitHub Actions CI",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": ".github" }]
+  },
+  "pass-soft-fail-tee-pipefail": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "        run: npm run verify\n",
+          "with": "        shell: bash\n        run: npm run verify 2>&1 | tee reports/verify.log\n"
+        }
+      }
+    ]
+  }
+}

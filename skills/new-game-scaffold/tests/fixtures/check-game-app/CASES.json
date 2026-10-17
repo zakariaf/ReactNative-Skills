@@ -1,0 +1,215 @@
+{
+  "bad-app-config": {
+    "expect": [
+      "FAIL apps/lights-out/app.config.ts:1 [app-config] is not the one statement export default withAppSettings(appSettings, process.env)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "apps/lights-out/app.config.ts",
+          "find": "export default withAppSettings(appSettings, process.env);",
+          "with": "export default { ...withAppSettings(appSettings, process.env), name: 'Lights Out' };"
+        }
+      }
+    ]
+  },
+  "bad-app-name": {
+    "expect": ["FAIL apps/lights-out/app-settings.ts:10 [app-settings] appName has no name for ar"],
+    "ops": [{ "replace": { "file": "apps/lights-out/app-settings.ts", "find": "    ar: 'Lights Out',\n", "with": "" } }]
+  },
+  "bad-app-without-block": {
+    "expect": ["FAIL contracts/games.json:1 [declaration] lights-out name an app, but there is no \"apps\" block"],
+    "ops": [{ "json": { "file": "contracts/games.json", "path": ["apps"], "delete": true } }]
+  },
+  "bad-apps-block": {
+    "expect": ["FAIL contracts/games.json:1 [declaration] apps.composer must be"],
+    "ops": [{ "json": { "file": "contracts/games.json", "path": ["apps", "composer"], "delete": true } }]
+  },
+  "bad-bundle-id": {
+    "expect": [
+      "FAIL apps/lights-out/app-settings.ts:14 [bundle-id] bundleId \"com.example.lights-out\" is not com.example.lightsout"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "apps/lights-out/app-settings.ts",
+          "find": "bundleId: 'com.example.lightsout'",
+          "with": "bundleId: 'com.example.lights-out'"
+        }
+      }
+    ]
+  },
+  "bad-deps": {
+    "expect": [
+      "FAIL apps/lights-out/package.json:1 [deps-lockstep] dependencies differ from apps/sliding-puzzle/package.json"
+    ],
+    "ops": [
+      {
+        "json": { "file": "apps/lights-out/package.json", "path": ["dependencies", "expo-haptics"], "value": "~57.0.3" }
+      }
+    ]
+  },
+  "bad-font": {
+    "expect": [
+      "FAIL apps/lights-out/assets/fonts/BrandSans-Regular.ttf [fonts] differs from packages/brand/fonts/BrandSans-Regular.ttf (sha256)"
+    ],
+    "ops": [{ "write": { "file": "apps/lights-out/assets/fonts/BrandSans-Regular.ttf", "content": "another font\n" } }]
+  },
+  "bad-gitignore": {
+    "expect": ["FAIL apps/lights-out/.gitignore:3 [gitignore] ignores \"ios/\" unanchored"],
+    "ops": [{ "replace": { "file": "apps/lights-out/.gitignore", "find": "/ios\n", "with": "ios/\n" } }]
+  },
+  "bad-metro-cache": {
+    "expect": [
+      "FAIL apps/lights-out/metro.config.js:1 [metro-cache] Metro's cache is not keyed on the EXPO_PUBLIC_* values"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "apps/lights-out/metro.config.js",
+          "find": "config.cacheVersion = `public-env-${createHash('sha256').update(publicEnv).digest('hex').slice(0, 16)}`;",
+          "with": "void createHash;\nvoid publicEnv;"
+        }
+      }
+    ]
+  },
+  "bad-missing-catalog": {
+    "expect": ["FAIL apps/lights-out/src/i18n/catalogs/ar.json [app-file-missing] is missing from the app skeleton"],
+    "ops": [{ "delete": "apps/lights-out/src/i18n/catalogs/ar.json" }]
+  },
+  "bad-missing-font": {
+    "expect": [
+      "FAIL apps/lights-out/assets/fonts/BrandSans-OFL.txt [app-file-missing] is missing from the app skeleton"
+    ],
+    "ops": [{ "delete": "apps/lights-out/assets/fonts/BrandSans-OFL.txt" }]
+  },
+  "bad-package-name": {
+    "expect": [
+      "FAIL apps/lights-out/package.json:1 [package-json] \"name\" is \"lights-out\", expected \"@acme/lights-out\""
+    ],
+    "ops": [{ "json": { "file": "apps/lights-out/package.json", "path": ["name"], "value": "lights-out" } }]
+  },
+  "bad-placeholder-beside-pods": {
+    "expect": [
+      "FAIL apps/lights-out/src/games/lights-out/rules/lights-out-types.ts:2 [placeholder-left] template placeholder __GAME_PASCAL__ was not replaced",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "apps/lights-out/src/games/lights-out/rules/lights-out-types.ts",
+          "content": "// apps/lights-out/src/games/lights-out/rules/lights-out-types.ts\nexport type __GAME_PASCAL__State = { readonly lit: readonly number[] };\n"
+        }
+      }
+    ]
+  },
+  "bad-privacy-url": {
+    "expect": [
+      "FAIL apps/lights-out/app-settings.ts:21 [app-settings] links.privacyPolicy must be { host, path } without a scheme"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "apps/lights-out/app-settings.ts",
+          "find": "host: 'example.com'",
+          "with": "host: 'https://example.com'"
+        }
+      }
+    ]
+  },
+  "bad-product-id": {
+    "expect": [
+      "FAIL apps/lights-out/app-settings.ts:18 [product-id] products.premium is \"com.example.lightsout.pro\", not com.example.lightsout.premium"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "apps/lights-out/app-settings.ts",
+          "find": "premium: 'com.example.lightsout.premium'",
+          "with": "premium: 'com.example.lightsout.pro'"
+        }
+      }
+    ]
+  },
+  "bad-settings-null": {
+    "expect": ["FAIL apps/lights-out/app-settings.ts:15 [settings-null] appStoreId is null"],
+    "ops": [
+      {
+        "replace": {
+          "file": "apps/lights-out/app-settings.ts",
+          "find": "  version: '1.0.0',",
+          "with": "  appStoreId: null,\n  version: '1.0.0',"
+        }
+      }
+    ]
+  },
+  "bad-tsconfig": {
+    "expect": [
+      "FAIL apps/lights-out/tsconfig.json:1 [tsconfig] does not extend ../../tsconfig.base.json with \"@/*\": [\"./src/*\"]"
+    ],
+    "ops": [{ "json": { "file": "apps/lights-out/tsconfig.json", "path": ["extends"], "value": "expo/tsconfig.base" } }]
+  },
+  "bad-type-field": {
+    "expect": ["FAIL apps/lights-out/package.json:1 [package-json] has a \"type\" field"],
+    "ops": [{ "json": { "file": "apps/lights-out/package.json", "path": ["type"], "value": "module" } }]
+  },
+  "bad-wrong-id": {
+    "expect": ["FAIL apps/lights-out/app-settings.ts:9 [app-settings] id is \"lights-on\", the game is lights-out"],
+    "ops": [
+      {
+        "replace": { "file": "apps/lights-out/app-settings.ts", "find": "id: 'lights-out'", "with": "id: 'lights-on'" }
+      }
+    ]
+  },
+  "pass-installed-skills": {
+    "expect": ["check-game-scaffold: 1 games checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/board-kit/SKILL.md",
+          "lines": ["---", "name: board-kit", "description: An installed skill.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": ".agents/skills/board-kit/templates/src/games/__GAME_ID__/rules/create.ts",
+          "lines": [
+            "// src/games/__GAME_ID__/rules/create.ts",
+            "export type __GAME_PASCAL__State = { readonly key: 'tile-match.lose.unknown' };"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "apps/lights-out/.claude/skills/kit/SKILL.md",
+          "lines": ["---", "name: kit", "description: An installed skill.", "---"]
+        }
+      },
+      { "write": { "file": "apps/lights-out/.claude/skills/kit/templates/app.config.ts", "lines": ["// __GAME_ID__"] } },
+      {
+        "write": {
+          "file": "skills/puzzle-kit/SKILL.md",
+          "lines": ["---", "name: puzzle-kit", "description: A vendored skill.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/puzzle-kit/src/games/tile-match/rules/outcome.ts",
+          "lines": ["export const KEY = 'tile-match.lose.unknown'; // __GAME_ID__"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/vendored-kit/SKILL.md",
+          "lines": ["---", "name: vendored-kit", "description: A skill vendored into the games folder.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/vendored-kit/templates/__GAME_ID__-game.ts",
+          "lines": ["// __GAME_CONST___GAME", "export {};"]
+        }
+      }
+    ]
+  }
+}

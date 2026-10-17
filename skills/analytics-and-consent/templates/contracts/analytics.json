@@ -1,0 +1,25 @@
+{
+  "$schema": "./analytics.schema.json",
+  "sdk": "posthog-react-native",
+  "audience": "general",
+  "tracking": false,
+  "identifies": false,
+  "endpoints": ["https://eu.i.posthog.com"],
+  "collects": [
+    {
+      "dataType": "product-interaction",
+      "linked": true,
+      "tracking": false,
+      "purposes": ["analytics"],
+      "why": "The events of src/services/analytics/analytics-events.ts, sent with the anonymous install id."
+    },
+    {
+      "dataType": "device-id",
+      "linked": true,
+      "tracking": false,
+      "purposes": ["analytics"],
+      "why": "The SDK's anonymous and device ids (random ids saved on the device; the adapter's reset clears both on a no or forget, so the next yes gets new ones)."
+    }
+  ],
+  "consent": { "version": 1, "covers": "0fef20cd9b40" }
+}

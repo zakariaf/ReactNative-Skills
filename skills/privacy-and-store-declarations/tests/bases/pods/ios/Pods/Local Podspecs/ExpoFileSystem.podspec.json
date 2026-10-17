@@ -1,0 +1,8 @@
+{
+  "name": "ExpoFileSystem",
+  "resource_bundles": {
+    "ExpoFileSystem_privacy": [
+      "PrivacyInfo.xcprivacy"
+    ]
+  }
+}

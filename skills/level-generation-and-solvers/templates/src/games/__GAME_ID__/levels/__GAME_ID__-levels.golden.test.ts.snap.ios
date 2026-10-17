@@ -1,0 +1,76 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`[contract] lights-out daily goldens keeps the frozen daily board for 2026-09-28 1`] = `
+"seed 1651948712 difficulty 40 moves 18
+.##.
+#.##
+####
+.###"
+`;
+
+exports[`[contract] lights-out daily goldens keeps the frozen daily board for 2026-12-31 1`] = `
+"seed 875161150 difficulty 40 moves 18
+####
+####
+#.#.
+..#."
+`;
+
+exports[`[contract] lights-out daily goldens keeps the frozen daily board for 2027-01-01 1`] = `
+"seed 3391829562 difficulty 40 moves 18
+#...
+##..
+##..
+###."
+`;
+
+exports[`lights-out level table goldens keeps the frozen board of level 1 1`] = `
+"seed 534475766 difficulty 0 moves 6
+###
+##.
+##.
+{"kind":"par","par":2}"
+`;
+
+exports[`lights-out level table goldens keeps the frozen board of level 30 1`] = `
+"seed 321216364 difficulty 19 moves 9
+.#.
+.##
+.#.
+{"kind":"par","par":3}"
+`;
+
+exports[`lights-out level table goldens keeps the frozen board of level 31 1`] = `
+"seed 2308875243 difficulty 20 moves 12
+...
+#..
+###
+{"kind":"par","par":4}"
+`;
+
+exports[`lights-out level table goldens keeps the frozen board of level 60 1`] = `
+"seed 3799592457 difficulty 39 moves 15
+#..#
+.#.#
+##..
+####
+{"kind":"par","par":5}"
+`;
+
+exports[`lights-out level table goldens keeps the frozen board of level 61 1`] = `
+"seed 4226527618 difficulty 40 moves 18
+.#.#
+###.
+#...
+##..
+{"kind":"par","par":4}"
+`;
+
+exports[`lights-out level table goldens keeps the frozen board of level 90 1`] = `
+"seed 144168038 difficulty 60 moves 24
+##..
+..##
+###.
+..#.
+{"kind":"par","par":4}"
+`;

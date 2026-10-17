@@ -1,0 +1,5 @@
+test(tasks): record the task row golden
+
+The row shows the due date under the title.
+
+Gate-Change: new golden for the task row with a due date

@@ -1,0 +1,129 @@
+{
+  "base": [
+    "@tests/bases/app",
+    {
+      "templates": true,
+      "firstLinePath": true
+    }
+  ],
+  "ops": [
+    {
+      "$comment": "Installed skills and vendored skill folders hold planted findings that must stay silent.",
+      "write": {
+        "file": ".agents/skills/demo/SKILL.md",
+        "content": "---\nname: planted\ndescription: Planted to prove that the checker prunes skill folders.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": ".agents/skills/demo/templates/__mocks__/expo-iap.ts",
+        "content": "export {};\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/demo/__mocks__/react-native-google-mobile-ads.ts",
+        "content": "export {};\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/demo/src/plain.test.tsx",
+        "content": "import { render } from '@testing-library/react-native';\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/vendor/kit/SKILL.md",
+        "content": "---\nname: planted\ndescription: Planted to prove that the checker prunes skill folders.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/vendor/kit/__mocks__/expo-iap.ts",
+        "content": "export {};\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/vendor/kit/plain.test.tsx",
+        "content": "import { render } from '@testing-library/react-native';\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/vendor/kit/hidden.ts",
+        "content": "export const hidden = 1;\n"
+      }
+    },
+    {
+      "$comment": "Files Jest might take for tests that must stay silent: a folder that runs its own tests (a functions/ package with its own test script), a source file whose name ends in -test.ts, and a helper under __tests__/ (neither holds a test).",
+      "write": {
+        "file": "functions/package.json",
+        "content": "{\n  \"name\": \"functions\",\n  \"private\": true,\n  \"scripts\": { \"test\": \"jest\" }\n}\n"
+      }
+    },
+    {
+      "write": {
+        "file": "functions/src/index.test.ts",
+        "content": "describe('functions', () => {\n  it('runs under its own Jest', () => {\n    expect(1).toBe(1);\n  });\n});\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/core/ab-test.ts",
+        "content": "export const AB_TEST = { name: 'onboarding', matches: (id: string): boolean => /^a/.test(id) };\n"
+      }
+    },
+    {
+      "write": {
+        "file": "__tests__/helpers.ts",
+        "content": "export const TASK_TITLES = ['Buy milk', 'Answer email'];\n"
+      }
+    },
+    {
+      "$comment": "Tests another runner owns stay silent: a root Playwright config's testDir (the Expo web build), a root Cypress config's specPattern folder, and a Deno folder (supabase/functions/deno.json).",
+      "write": {
+        "file": "playwright.config.ts",
+        "content": "import { defineConfig } from '@playwright/test';\n\nexport default defineConfig({\n  testDir: './e2e-web',\n  use: { baseURL: 'http://localhost:8081' },\n});\n"
+      }
+    },
+    {
+      "write": {
+        "file": "e2e-web/home.spec.ts",
+        "content": "import { expect, test } from '@playwright/test';\n\ntest('shows the task list', async ({ page }) => {\n  await page.goto('/');\n  await expect(page.getByRole('heading', { name: 'Tasks' })).toBeVisible();\n});\n"
+      }
+    },
+    {
+      "write": {
+        "file": "cypress.config.ts",
+        "content": "import { defineConfig } from 'cypress';\n\nexport default defineConfig({\n  e2e: { specPattern: 'web-e2e/specs/**/*.spec.ts', baseUrl: 'http://localhost:8081' },\n});\n"
+      }
+    },
+    {
+      "write": {
+        "file": "web-e2e/specs/login.spec.ts",
+        "content": "describe('login', () => {\n  it('opens the sign-in screen', () => {\n    cy.visit('/sign-in');\n  });\n});\n"
+      }
+    },
+    {
+      "write": {
+        "file": "supabase/functions/deno.json",
+        "content": "{\n  \"imports\": { \"@std/assert\": \"jsr:@std/assert@1\" }\n}\n"
+      }
+    },
+    {
+      "write": {
+        "file": "supabase/functions/send-reminder/index.test.ts",
+        "content": "import { assertEquals } from '@std/assert';\n\nDeno.test('builds the reminder text', () => {\n  assertEquals('Buy milk'.length, 8);\n});\n"
+      }
+    },
+    {
+      "$comment": "A route named ab-test (no test call in it) is a route, not a test.",
+      "write": {
+        "file": "src/app/ab-test.tsx",
+        "content": "// src/app/ab-test.tsx\n// device-only: covered by the e2e flow that opens the experiment screen\nexport default function AbTestRoute(): null {\n  return null;\n}\n"
+      }
+    }
+  ]
+}

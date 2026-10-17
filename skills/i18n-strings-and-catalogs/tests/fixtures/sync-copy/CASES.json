@@ -1,0 +1,125 @@
+{
+  "bad-apply-conflict": {
+    "expect": [
+      "[copy-conflict]",
+      "src/i18n/catalogs/de.json:8",
+      "tasks.list.title: catalog says \"Meine Aufgaben\", the copy source says \"Aufgaben\""
+    ],
+    "args": "apply {dir} --all",
+    "ops": [
+      {
+        "replace": {
+          "file": "src/i18n/catalogs/de.json",
+          "find": "\"tasks.list.title\": \"Aufgaben\"",
+          "with": "\"tasks.list.title\": \"Meine Aufgaben\""
+        }
+      }
+    ]
+  },
+  "bad-dash-drift": {
+    "expect": ["[copy-drift]", "src/i18n/catalogs/de.json:5", "catalog U+002D, copy source U+2013"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/i18n/catalogs/de.json",
+          "find": "Nächste Erinnerung – {dateText}",
+          "with": "Nächste Erinnerung - {dateText}"
+        }
+      }
+    ]
+  },
+  "bad-drift": {
+    "expect": ["[copy-drift]", "src/i18n/catalogs/de.json:8", "tasks.list.title: catalog says \"Meine Aufgaben\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/i18n/catalogs/de.json",
+          "find": "\"tasks.list.title\": \"Aufgaben\"",
+          "with": "\"tasks.list.title\": \"Meine Aufgaben\""
+        }
+      }
+    ]
+  },
+  "bad-missing-prefix-key": {
+    "expect": ["[copy-key-missing]", "src/i18n/catalogs/ar.json:1", "reminders.next", "prefix reminders."],
+    "args": "check {dir} --prefix reminders.",
+    "ops": [{ "json": { "file": "src/i18n/catalogs/ar.json", "path": ["reminders.next"], "delete": true } }]
+  },
+  "bad-missing-screen-key": {
+    "expect": [
+      "[copy-key-missing]",
+      "src/i18n/catalogs/fa.json:1",
+      "tasks.page: the approved copy has this text (screen tasks)"
+    ],
+    "ops": [{ "json": { "file": "src/i18n/catalogs/fa.json", "path": ["tasks.page"], "delete": true } }]
+  },
+  "bad-retired-key": {
+    "expect": ["[retired-key]", "tasks.count-label is retired by the copy source"],
+    "ops": [
+      { "json": { "file": "src/i18n/catalogs/en.json", "path": ["tasks.count-label"], "value": "x" } },
+      { "json": { "file": "src/i18n/catalogs/de.json", "path": ["tasks.count-label"], "value": "x" } },
+      { "json": { "file": "src/i18n/catalogs/fa.json", "path": ["tasks.count-label"], "value": "x" } },
+      { "json": { "file": "src/i18n/catalogs/ar.json", "path": ["tasks.count-label"], "value": "x" } }
+    ]
+  },
+  "bad-untranslated-source": {
+    "expect": ["[untranslated-prefix]", "contracts/copy-source.json:21", "de says \"Debug-Menü\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "contracts/copy-source.json",
+          "find": "\"de\": \"Debug menu\"",
+          "with": "\"de\": \"Debug-Menü\""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/i18n/catalogs/de.json",
+          "find": "\"debug.title\": \"Debug menu\"",
+          "with": "\"debug.title\": \"Debug-Menü\""
+        }
+      }
+    ]
+  },
+  "error-named-source-missing": {
+    "expect": ["ERROR [bad-input] no copy source: contracts/approved-copy.json does not exist"],
+    "args": "check {dir} --screen tasks --source contracts/approved-copy.json"
+  },
+  "error-no-source": {
+    "expect": ["ERROR [bad-input] no copy source: contracts/copy-source.json does not exist"],
+    "args": "keys {dir} --screen tasks --lang all",
+    "ops": [{ "delete": "contracts/copy-source.json" }]
+  },
+  "pass-app-dir": {
+    "expect": ["sync-copy check:", "RESULT: PASS"],
+    "args": "check {dir} --screen tasks --app-dir apps/mobile",
+    "ops": [
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      {
+        "write": {
+          "file": "package.json",
+          "json": { "name": "tasks-monorepo", "private": true, "workspaces": ["apps/*"] }
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/package.json",
+          "json": { "name": "tasks", "private": true, "main": "index.ts" }
+        }
+      }
+    ]
+  },
+  "pass-apply": {
+    "expect": ["sync-copy apply: 1 texts added, 0 replaced", "RESULT: PASS"],
+    "args": "apply {dir} --key tasks.page",
+    "ops": [{ "json": { "file": "src/i18n/catalogs/ar.json", "path": ["tasks.page"], "delete": true } }]
+  },
+  "pass-keys": {
+    "expect": ["tasks.summary.open", "  ar    {openCount, plural, =0 {لا توجد مهام مفتوحة}"],
+    "args": "keys {dir} --screen tasks --lang all"
+  },
+  "pass-no-source": {
+    "expect": ["NOT APPLICABLE: contracts/copy-source.json does not exist", "RESULT: PASS"],
+    "ops": [{ "delete": "contracts/copy-source.json" }]
+  }
+}

@@ -1,0 +1,598 @@
+{
+  "bad-countdown-in-screen": {
+    "expect": [
+      "src/features/tasks/components/new-day-line.tsx:10 [day-maths-in-ui] computes the time to midnight in UI code (86_400_000)",
+      "src/features/tasks/components/new-day-line.tsx:10 [day-ms-arithmetic]",
+      "src/features/tasks/use-new-day-model.ts:6 [day-maths-in-ui] computes the time to midnight in UI code (msUntilNextLocalDay())"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/new-day-line.tsx",
+          "lines": [
+            "// src/features/tasks/components/new-day-line.tsx",
+            "import { Text } from 'react-native';",
+            "",
+            "import { useServices } from '@/services/services-context';",
+            "",
+            "import type { JSX } from 'react';",
+            "",
+            "export function NewDayLine(): JSX.Element {",
+            "  const { clock } = useServices();",
+            "  const msLeft = 86_400_000 - (clock.nowMs() % 86_400_000);",
+            "  return <Text>{Math.ceil(msLeft / 60_000)}</Text>;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/use-new-day-model.ts",
+          "lines": [
+            "// src/features/tasks/use-new-day-model.ts",
+            "import { useServices } from '@/services/services-context';",
+            "",
+            "export function useNewDayModel(): number {",
+            "  const { clock } = useServices();",
+            "  return Math.ceil(clock.msUntilNextLocalDay() / 60_000);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-countdown-module-missing": {
+    "expect": [
+      "src/hooks/use-next-day-countdown.ts:1 [view-countdown] useNextDayCountdown has no pure countdown module: src/core/countdown/split-countdown.ts is missing",
+      "Fix: Copy templates/src/core/countdown/split-countdown.ts"
+    ],
+    "ops": [{ "delete": "src/core/countdown" }]
+  },
+  "bad-countdown-port": {
+    "expect": ["src/services/clock/clock-port.ts:1 [clock-countdown] the clock cannot tell the time to local midnight"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/clock/clock-port.ts",
+          "find": "  readonly msUntilNextLocalDay: () => number;\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-countdown-rounding": {
+    "expect": [
+      "src/core/countdown/split-countdown.ts:15 [view-countdown] splitCountdown(30000): the last 30 s of the day round up to 1 min"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/countdown/split-countdown.ts",
+          "find": "Math.max(0, Math.ceil(msLeft / MINUTE_MS))",
+          "with": "Math.max(0, Math.floor(msLeft / MINUTE_MS))"
+        }
+      }
+    ]
+  },
+  "bad-date-key-load": {
+    "expect": [
+      "src/core/dates/date-key.ts:1 [module-load] cannot be imported: it imports react-native, which plain Node cannot load"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/dates/date-key.ts",
+          "find": "/** A civil (local calendar) day, 'YYYY-MM-DD': a day identity, never an instant. */",
+          "with": "import { Platform } from 'react-native';\n\nexport const OS = Platform.OS;\n\n/** A civil (local calendar) day, 'YYYY-MM-DD': a day identity, never an instant. */"
+        }
+      }
+    ]
+  },
+  "bad-date-math": {
+    "expect": ["[date-math] isoWeekday('2026-09-26') (Saturday) is 7; the calendar says 6"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/dates/date-key.ts",
+          "find": "(dayNumber(key) + 3)",
+          "with": "(dayNumber(key) + 4)"
+        }
+      }
+    ]
+  },
+  "bad-date-only-parse": {
+    "expect": [
+      "src/features/tasks/due-picker.ts:5 [date-only-parse] new Date(dueOn) parses a DateKey as UTC midnight",
+      "src/features/tasks/due-picker.ts:9 [date-only-parse] new Date(task.dueOn)",
+      "src/features/tasks/due-picker.ts:12 [date-only-parse] new Date('2026-10-03') parses a date-only string",
+      "src/features/tasks/due-picker.ts:15 [date-only-parse] Date.parse(row.start_on)",
+      "RESULT: FAIL (4 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/due-picker.ts",
+          "lines": [
+            "// src/features/tasks/due-picker.ts",
+            "type Task = { readonly dueOn: string; readonly start_on: string };",
+            "",
+            "export function pickerDayOf(dueOn: string): number {",
+            "  return new Date(dueOn).getDate();",
+            "}",
+            "",
+            "export function pickerValueOf(task: Task): Date {",
+            "  return new Date(task.dueOn);",
+            "}",
+            "",
+            "export const LAUNCH = new Date('2026-10-03');",
+            "",
+            "export function startMsOf(row: Task): number {",
+            "  return Date.parse(row.start_on);",
+            "}",
+            "",
+            "export function copyOf(date: Date, startOfDay: number): readonly Date[] {",
+            "  return [new Date(date), new Date(startOfDay), new Date(2026, 9, 3, 12), new Date('2026-10-03T09:00')];",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-day-ms-arithmetic": {
+    "expect": [
+      "src/features/tasks/task-age.ts:5 [day-ms-arithmetic]",
+      "src/features/tasks/task-age.ts:9 [day-ms-arithmetic]"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/task-age.ts",
+          "lines": [
+            "// src/features/tasks/task-age.ts",
+            "const DAY_MS = 86_400_000;",
+            "",
+            "export function daysLeft(dueAtMs: number, nowMs: number): number {",
+            "  return Math.floor((dueAtMs - nowMs) / DAY_MS);",
+            "}",
+            "",
+            "export function msToMidnight(nowMs: number): number {",
+            "  return 86_400_000 - (nowMs % 86_400_000);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-day-ms-factor-order": {
+    "expect": [
+      "src/features/tasks/due-in.ts:5 [day-ms-arithmetic] divides or takes the modulo of a day of milliseconds (/ (1000 * 60 * 60 * 24))",
+      "src/features/tasks/due-in.ts:9 [day-ms-arithmetic] divides or takes the modulo of a day of milliseconds (/ 1000 / 60 / 60 / 24)",
+      "src/features/tasks/due-in.ts:13 [day-ms-arithmetic] divides or takes the modulo of a day of milliseconds (/ ONE_DAY)",
+      "src/features/tasks/due-in.ts:17 [day-ms-arithmetic] divides or takes the modulo of 7 days of milliseconds",
+      "src/features/tasks/snooze.ts:5 [day-ms-arithmetic] divides or takes the modulo of a day of milliseconds (/ DAY_IN_MILLIS)",
+      "RESULT: FAIL (5 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/due-in.ts",
+          "lines": [
+            "// src/features/tasks/due-in.ts",
+            "const ONE_DAY = 24 * 60 * 60 * 1000;",
+            "",
+            "export function dueInDays(dueAtMs: number, nowMs: number): number {",
+            "  return Math.ceil((dueAtMs - nowMs) / (1000 * 60 * 60 * 24));",
+            "}",
+            "",
+            "export function ageInDays(createdAtMs: number, nowMs: number): number {",
+            "  return Math.floor((nowMs - createdAtMs) / 1000 / 60 / 60 / 24);",
+            "}",
+            "",
+            "export function overdueDays(dueAtMs: number, nowMs: number): number {",
+            "  return Math.floor((nowMs - dueAtMs) / ONE_DAY);",
+            "}",
+            "",
+            "export function weeksLeft(dueAtMs: number, nowMs: number): number {",
+            "  return (dueAtMs - nowMs) / (1000 * 3600 * 24 * 7);",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/time-units.ts",
+          "lines": [
+            "// src/features/tasks/time-units.ts",
+            "export const DAY_IN_MILLIS: number = 864e5;",
+            "export const HOUR_MS = 60 * 60 * 1000;"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/snooze.ts",
+          "lines": [
+            "// src/features/tasks/snooze.ts",
+            "import { DAY_IN_MILLIS, HOUR_MS } from './time-units';",
+            "",
+            "export function snoozedDays(snoozeMs: number): number {",
+            "  return Math.round(snoozeMs / DAY_IN_MILLIS);",
+            "}",
+            "",
+            "export function snoozedHours(snoozeMs: number): number {",
+            "  return Math.round(snoozeMs / HOUR_MS) % 24;",
+            "}",
+            "",
+            "export function minutesPart(ms: number): number {",
+            "  return Math.floor(ms / 1000 / 60) % 60;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-local-day-key": {
+    "expect": ["src/features/tasks/overdue.ts:4 [local-day-key] builds a day key by hand"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/overdue.ts",
+          "lines": [
+            "// src/features/tasks/overdue.ts",
+            "export function isOverdue(dueOn: string, now: Date): boolean {",
+            "  const month = String(now.getMonth() + 1).padStart(2, '0');",
+            "  const key = `${now.getFullYear()}-${month}-${String(now.getDate()).padStart(2, '0')}`;",
+            "  return dueOn < key;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-today-cached": {
+    "expect": [
+      "src/features/tasks/use-tasks-header-model.ts:9 [today-cached] keeps today in useState",
+      "src/features/tasks/use-tasks-header-model.ts:10 [today-cached] keeps today in useState",
+      "src/features/tasks/use-tasks-header-model.ts:11 [today-cached] keeps today in useState",
+      "src/features/tasks/launch-day.ts:4 [today-cached] reads today once, at module load"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-tasks-header-model.ts",
+          "lines": [
+            "// src/features/tasks/use-tasks-header-model.ts",
+            "import { useState } from 'react';",
+            "",
+            "import type { DateKey } from '@/core/dates/date-key';",
+            "import { useServices } from '@/services/services-context';",
+            "",
+            "export function useTasksHeaderModel(): string {",
+            "  const { clock } = useServices();",
+            "  const [today] = useState(clock.today());",
+            "  const [launchDay] = useState<DateKey>(clock.today());",
+            "  const [lazyDay] = useState(clock.today);",
+            "  return launchDay === today ? lazyDay : launchDay;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/launch-day.ts",
+          "lines": [
+            "// src/features/tasks/launch-day.ts",
+            "import { createSystemClockAdapter } from '@/services/clock/system-clock-adapter';",
+            "",
+            "export const LAUNCH_DAY = createSystemClockAdapter().today();"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-today-hook": {
+    "expect": ["src/hooks/use-today.ts:1 [today-hook] arms no timer"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/hooks/use-today.ts",
+          "lines": [
+            "// src/hooks/use-today.ts",
+            "import { useSyncExternalStore } from 'react';",
+            "import { AppState } from 'react-native';",
+            "",
+            "import { useServices } from '@/services/services-context';",
+            "",
+            "import type { DateKey } from '@/core/dates/date-key';",
+            "",
+            "function subscribeToAppState(onChange: () => void): () => void {",
+            "  const subscription = AppState.addEventListener('change', onChange);",
+            "  return () => {",
+            "    subscription.remove();",
+            "  };",
+            "}",
+            "",
+            "/** Today, read on every render; re-rendered only when the app changes state. */",
+            "export function useToday(): DateKey {",
+            "  const { clock } = useServices();",
+            "  return useSyncExternalStore(subscribeToAppState, () => clock.today());",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-today-in-effect": {
+    "expect": [
+      "src/features/tasks/use-header-day.ts:10 [today-cached] copies today into state with setDay() in an effect"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-header-day.ts",
+          "lines": [
+            "// src/features/tasks/use-header-day.ts",
+            "import { useEffect, useState } from 'react';",
+            "",
+            "import { useServices } from '@/services/services-context';",
+            "",
+            "export function useHeaderDay(): string {",
+            "  const { clock } = useServices();",
+            "  const [day, setDay] = useState('');",
+            "  useEffect(() => {",
+            "    setDay(clock.today());",
+            "  }, [clock]);",
+            "  return day;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-ui-maths": {
+    "expect": [
+      "src/features/tasks/components/streak-badge.tsx:11 [day-maths-in-ui] computes daysBetween() in UI code",
+      "src/features/tasks/components/streak-badge.tsx:12 [day-maths-in-ui] reads the stored streak.length in UI code"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/streak-badge.tsx",
+          "lines": [
+            "// src/features/tasks/components/streak-badge.tsx",
+            "import { Text } from 'react-native';",
+            "",
+            "import { daysBetween } from '@/core/dates/date-key';",
+            "",
+            "import type { DayStreak } from '@/core/streaks/day-streak';",
+            "import type { JSX } from 'react';",
+            "",
+            "export function StreakBadge(props: { readonly log: DayStreak<unknown>; readonly today: string }): JSX.Element {",
+            "  const { lastDate } = props.log.streak;",
+            "  const isAlive = lastDate !== null && daysBetween(lastDate, props.today) <= 1;",
+            "  return <Text>{isAlive ? props.log.streak.length : 0}</Text>;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-utc-day": {
+    "expect": ["src/features/tasks/due-label.ts:3 [utc-day]", "src/features/tasks/due-label.ts:7 [utc-day]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/due-label.ts",
+          "lines": [
+            "// src/features/tasks/due-label.ts",
+            "export function dueDayOf(dueAtMs: number): string {",
+            "  return new Date(dueAtMs).toISOString().slice(0, 10);",
+            "}",
+            "",
+            "export function dueWeekdayOf(dueAtMs: number): number {",
+            "  return new Date(dueAtMs).getUTCDay();",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-wall-clock": {
+    "expect": [
+      "[wall-clock] uses new Date in day code",
+      "[wall-clock] uses toLocaleDateString in day code",
+      "src/core/streaks/streak-summary.ts:56"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/streaks/streak-summary.ts",
+          "find": "  log: DayStreak<TDay>,\n  today: DateKey,\n): StreakSummary<TDay> {",
+          "with": "  log: DayStreak<TDay>,\n  today: DateKey = new Date().toLocaleDateString('en-CA'),\n): StreakSummary<TDay> {"
+        }
+      }
+    ]
+  },
+  "bad-wall-clock-contract-glob": {
+    "expect": ["src/features/focus/focus-session.ts:3 [wall-clock] uses Date.now in day code"],
+    "ops": [
+      { "json": { "file": "contracts/day-logic.json", "path": ["dayCode"], "value": ["src/features/focus/**/*.ts"] } },
+      {
+        "write": {
+          "file": "src/features/focus/focus-session.ts",
+          "lines": [
+            "// src/features/focus/focus-session.ts",
+            "export function startFocusSession(): { readonly startedAtMs: number } {",
+            "  return { startedAtMs: Date.now() };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-wall-clock-local-getter": {
+    "expect": ["src/core/time/instant-hour.ts:3 [wall-clock] uses new Date in day code", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "$comment": "Planted: an epoch ms read through a local getter in day code depends on the phone's time zone.",
+        "write": {
+          "file": "src/core/time/instant-hour.ts",
+          "lines": [
+            "// src/core/time/instant-hour.ts",
+            "export function hourOf(atMs: number): number {",
+            "  return new Date(atMs).getHours();",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "error-no-src": { "expect": ["ERROR [bad-input] nothing to check"], "ops": [{ "delete": "src" }] },
+  "pass-date-edges": {
+    "expect": ["check-calendar-code: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/clock/local-date.ts",
+          "lines": [
+            "// src/services/clock/local-date.ts",
+            "import type { DateKey } from '@/core/dates/date-key';",
+            "",
+            "const pad = (value: number, width: number): string => String(value).padStart(width, '0');",
+            "",
+            "export function dateKeyOfLocalDate(date: Date): DateKey {",
+            "  return `${pad(date.getFullYear(), 4)}-${pad(date.getMonth() + 1, 2)}-${pad(date.getDate(), 2)}`;",
+            "}",
+            "",
+            "export function localNoonOfDateKey(key: DateKey): Date {",
+            "  const date = new Date(2000, 0, 1, 12);",
+            "  date.setFullYear(Number(key.slice(0, 4)), Number(key.slice(5, 7)) - 1, Number(key.slice(8, 10)));",
+            "  return date;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/due-picker-value.ts",
+          "lines": [
+            "// src/features/tasks/due-picker-value.ts",
+            "import { isDateKey } from '@/core/dates/date-key';",
+            "import { dateKeyOfLocalDate, localNoonOfDateKey } from '@/services/clock/local-date';",
+            "",
+            "import type { DateKey } from '@/core/dates/date-key';",
+            "",
+            "export function pickerValueOf(dueOn: DateKey): Date {",
+            "  return localNoonOfDateKey(dueOn);",
+            "}",
+            "",
+            "export function dueOnOfPicked(picked: Date): DateKey {",
+            "  return dateKeyOfLocalDate(picked);",
+            "}",
+            "",
+            "export function dueOnFromServer(text: string): DateKey | null {",
+            "  return isDateKey(text) ? text : null;",
+            "}",
+            "",
+            "export function holidayOf(dayKey: DateKey): Date {",
+            "  // not-a-calendar-day: the holiday API wants the UTC midnight instant of the key",
+            "  return new Date(dayKey);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-day-ms-marker": {
+    "expect": ["check-calendar-code: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/cache-age.ts",
+          "lines": [
+            "// src/data/cache-age.ts",
+            "const DAY_MS = 86_400_000;",
+            "",
+            "export function isStale(savedAtMs: number, nowMs: number): boolean {",
+            "  // not-a-calendar-day: a cache lifetime of 24 hours, not the user's day",
+            "  return (nowMs - savedAtMs) / DAY_MS >= 1;",
+            "}",
+            "",
+            "export function serverDate(epochMs: number): string {",
+            "  return new Date(epochMs).toISOString().slice(0, 10); // not-a-calendar-day: the API takes UTC dates",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-hooks-only": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "delete": ["src/core/streaks", "src/core/stats"] },
+      { "json": { "file": "contracts/day-logic.json", "path": ["modules", "dayStreak"], "literalNull": true } },
+      { "json": { "file": "contracts/day-logic.json", "path": ["modules", "streakSummary"], "literalNull": true } },
+      { "json": { "file": "contracts/day-logic.json", "path": ["modules", "activityStats"], "literalNull": true } },
+      { "json": { "file": "contracts/day-logic.json", "path": ["modules", "statsSummary"], "literalNull": true } },
+      { "json": { "file": "contracts/day-logic.json", "path": ["modules", "recordCompletion"], "literalNull": true } }
+    ]
+  },
+  "pass-installed-skills": {
+    "$comment": "Planted findings inside installed skill folders and a vendored folder holding a SKILL.md stay silent.",
+    "expect": ["check-calendar-code: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/other-skill/src/core/streaks/planted.ts",
+          "lines": ["export const day = new Date().toISOString().slice(0, 10);"]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/other-skill/src/features/planted.tsx",
+          "lines": ["export const left = 86_400_000 - (Date.now() % 86_400_000);"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/calendar-kit/SKILL.md",
+          "lines": ["---", "name: calendar-kit", "description: A vendored skill folder.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/calendar-kit/planted.ts",
+          "lines": [
+            "export const days = (a: number, b: number): number => (b - a) / 86_400_000;",
+            "export const today = new Date().toISOString().slice(0, 10);"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-instant-to-iso": {
+    "expect": ["check-calendar-code:", "RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "Turning an epoch ms into ISO 8601 UTC text reads no clock and no zone: not a wall-clock finding in day code.",
+        "write": {
+          "file": "src/core/time/instant-text.ts",
+          "lines": [
+            "// src/core/time/instant-text.ts",
+            "export function toIsoInstant(atMs: number): string {",
+            "  return new Date(atMs).toISOString();",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-no-clock": {
+    "expect": [
+      "SKIP src/services/clock/clock-port.ts [clock-countdown] not yet created (architecture-and-boundaries creates it)",
+      "SKIP src/core/dates/date-key.ts [date-math] not yet created (seeded-determinism-and-golden-vectors creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": ["src/services/clock", "src/core/dates"] }]
+  }
+}

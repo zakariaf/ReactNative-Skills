@@ -1,0 +1,262 @@
+{
+  "bad-baseline-unnamed": {
+    "expect": ["[baseline-change-trailer]", "does not name the file and its Gate-Change commit"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": "- src/ui/__snapshots__/task-row.golden.test.ts.snap: the due date moved under the title (Gate-Change trailer in 7a1b2c3)",
+          "with": "- The task row golden: the due date moved under the title"
+        }
+      }
+    ]
+  },
+  "bad-checks-missing": {
+    "expect": ["[checks-missing] the Checks list has no \"Mutation\" line"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": "- Mutation: 84% (break 75), survivors explained under Details   reports/stryker/mutation.json\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-contract-release-check": {
+    "expect": ["[checks-missing] the Checks list has no \"Design match\" line"],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/reporting.json",
+          "json": { "releaseChecks": ["Coverage", "Mutation", "End-to-end", "Design match"] }
+        }
+      }
+    ]
+  },
+  "bad-e2e-unsourced": {
+    "expect": ["report.md:12 [report-source]", "End-to-end: iOS 14/14, Android 14/14"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": "quarantined: none   reports/e2e/ios/junit.xml, reports/e2e/android/junit.xml",
+          "with": "quarantined: none"
+        }
+      }
+    ]
+  },
+  "bad-evidence-line": {
+    "expect": ["[evidence-line]", "Evidence: tasks release 1.4.0, all good"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": "Evidence: tasks release 1.4.0 on 2026-10-09, commit 9f3c2ab",
+          "with": "Evidence: tasks release 1.4.0, all good"
+        }
+      }
+    ]
+  },
+  "bad-human-checks-incomplete": {
+    "expect": ["[human-checks-listed] the \"Human checks (not blocking)\" block does not name the on-device check"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": "- On-device check: set a weekly reminder on a phone with TestFlight or internal testing and hear it fire, still open\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-look-at-limit": {
+    "expect": ["[look-at-limit] \"Please look at\" lists 6 things"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": "- The repeat picker at 200% text, because the labels now wrap.\n",
+          "with": "- The repeat picker at 200% text, because the labels now wrap.\n- The list header, because it is bolder.\n- The empty state, because it has a new picture.\n- The settings row, because it moved.\n- The about screen, because the version line changed.\n"
+        }
+      }
+    ]
+  },
+  "bad-outcome-first": {
+    "expect": ["report.md:1 [outcome-first]", "Evidence line or request"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": "Tasks 1.4.0 is in TestFlight and Play internal testing: drafts survive a restart, overdue tasks stay overdue across time zones, and reminders can repeat weekly.\n\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-outcome-three-sentences": {
+    "expect": ["report.md:1 [outcome-first] 3 sentences, at most 2"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": "and reminders can repeat weekly.",
+          "with": "and reminders repeat. Drafts work. Zones work."
+        }
+      }
+    ]
+  },
+  "bad-outcome-too-long": {
+    "expect": ["report.md:1 [outcome-first] first line is 241 characters, the limit is 240"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": "and reminders can repeat weekly.",
+          "with": "and reminders can repeat weekly, monthly, yearly or on any weekday you pick in the new day picker on both phones."
+        }
+      }
+    ]
+  },
+  "bad-placeholder-as-evidence": {
+    "expect": ["report.md:13 [non-evidence-cited]", "cites \"ship-placeholder\" as evidence"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": "- End-to-end: iOS 14/14, Android 14/14 flows pass, quarantined: none   reports/e2e/ios/junit.xml, reports/e2e/android/junit.xml\n",
+          "with": "- End-to-end: iOS 14/14, Android 14/14 flows pass, quarantined: none   reports/e2e/ios/junit.xml, reports/e2e/android/junit.xml\n- Store gate: only the ship-placeholder lines fail, everything else passes   reports/release/store-gate.txt\n"
+        }
+      }
+    ]
+  },
+  "bad-placeholder-left": {
+    "expect": ["[placeholder-left] placeholder <seed> is left"],
+    "ops": [{ "replace": { "file": "report.md", "find": "random seed 90211", "with": "random seed <seed>" } }]
+  },
+  "bad-ratio-only-coverage": {
+    "expect": ["report.md:10 [report-source]", "Coverage: lines 93.4%, logic folders 97.1% (gates"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": "- Coverage: lines 93.4% (gate 90), logic folders 97.1% (gate 95)   reports/coverage/coverage-summary.json",
+          "with": "- Coverage: lines 93.4%, logic folders 97.1% (gates 90/95)"
+        }
+      }
+    ]
+  },
+  "bad-rehearsal-evidence": {
+    "expect": ["report.md:13 [non-evidence-cited]", "cites \"--rehearsal\" as evidence"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": "- End-to-end: iOS 14/14, Android 14/14 flows pass, quarantined: none   reports/e2e/ios/junit.xml, reports/e2e/android/junit.xml\n",
+          "with": "- End-to-end: iOS 14/14, Android 14/14 flows pass, quarantined: none   reports/e2e/ios/junit.xml, reports/e2e/android/junit.xml\n- Store archive: the --rehearsal run passes   reports/release/archive.txt\n"
+        }
+      }
+    ]
+  },
+  "bad-report-source": {
+    "expect": ["[report-source]", "Coverage: lines 93.4%"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": "(gate 95)   reports/coverage/coverage-summary.json",
+          "with": "(gate 95)"
+        }
+      }
+    ]
+  },
+  "bad-request-default": {
+    "expect": ["[request-default] \"Please say \"ship\" when Tasks 1.4.0", "gives no default"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": " Until then the builds stay in testing and I keep working on the shared lists.",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-section-missing": {
+    "expect": ["[section-missing] \"Not tested or not verified\" is missing"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": "Not tested or not verified\n- Sound and haptics of the reminder on a real phone: the on-device check above\n- Purchases against the real stores: TestFlight sandbox and Play license testers\n- TalkBack and VoiceOver spot check of the repeat picker\n\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-technical-detail-early": {
+    "expect": ["report.md:3 [technical-detail-early]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": "Please say \"ship\"",
+          "with": "See reports/e2e/junit.xml first. Please say \"ship\""
+        }
+      }
+    ]
+  },
+  "bad-tests-count": {
+    "expect": ["[tests-count] only 610 of 612 tests pass"],
+    "ops": [{ "replace": { "file": "report.md", "find": "Tests: 612/612 pass", "with": "Tests: 610/612 pass" } }]
+  },
+  "bad-tests-count-second": {
+    "expect": ["report.md:9 [tests-count] only 39 of 41 tests pass"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": "Tests: 612/612 pass (unit 571, golden 41)",
+          "with": "Tests: unit 571/571, golden 39/41"
+        }
+      }
+    ]
+  },
+  "bad-too-many-requests": {
+    "expect": ["[too-many-requests] 2 requests in one message"],
+    "ops": [
+      {
+        "replace": { "file": "report.md", "find": "\nEvidence:", "with": "Should I also raise the price?\n\nEvidence:" }
+      }
+    ]
+  },
+  "error-bad-contract": {
+    "expect": ["ERROR [bad-input]", "does not match contracts/reporting.schema.json (releaseChecks)"],
+    "ops": [{ "write": { "file": "contracts/reporting.json", "json": { "releaseChecks": "Coverage" } } }]
+  },
+  "pass-rehearsal-not-verified": {
+    "expect": ["check-report: 39 report lines checked, 0 problems"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": "- TalkBack and VoiceOver spot check of the repeat picker\n",
+          "with": "- TalkBack and VoiceOver spot check of the repeat picker\n- The store archive passed only a --rehearsal run before signing; the signed run is the evidence\n"
+        }
+      }
+    ]
+  },
+  "pass-single-locale": {
+    "expect": ["check-report: 37 report lines checked, 0 problems"],
+    "ops": [
+      { "delete": "src/i18n/catalogs/ar.json" },
+      {
+        "replace": {
+          "file": "report.md",
+          "find": "- Native-language review of changed texts: none pending in this release\n",
+          "with": ""
+        }
+      }
+    ]
+  }
+}

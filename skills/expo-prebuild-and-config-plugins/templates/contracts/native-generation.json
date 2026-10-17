@@ -1,0 +1,4 @@
+{
+  "$comment": "How this app gets its ios/ and android/ folders (expo-prebuild-and-config-plugins). \"generated\": Continuous Native Generation, the default: npx expo prebuild writes both folders from app.config.ts and its config plugins, they are git-ignored, and nobody edits them. \"committed\": both folders are source, edited by hand and never regenerated; set it only with a reason and the date the team decided, because app.config.ts native keys and config plugins stop reaching the build.",
+  "mode": "generated"
+}

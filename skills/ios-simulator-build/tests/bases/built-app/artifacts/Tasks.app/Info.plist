@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleDevelopmentRegion</key>
+  <string>en</string>
+  <key>CFBundleDisplayName</key>
+  <string>Tasks (Preview)</string>
+  <key>CFBundleExecutable</key>
+  <string>Tasks</string>
+  <key>CFBundleIdentifier</key>
+  <string>com.acme.tasks.preview</string>
+  <key>CFBundleLocalizations</key>
+  <array>
+    <string>en</string>
+    <string>ar</string>
+  </array>
+  <key>CFBundleShortVersionString</key>
+  <string>1.0.0</string>
+  <key>CFBundleURLTypes</key>
+  <array>
+    <dict>
+      <key>CFBundleURLSchemes</key>
+      <array>
+        <string>tasks-preview</string>
+      </array>
+    </dict>
+  </array>
+  <key>CFBundleVersion</key>
+  <string>7</string>
+  <key>DTPlatformName</key>
+  <string>iphonesimulator</string>
+  <key>DTXcode</key>
+  <string>2660</string>
+  <key>ITSAppUsesNonExemptEncryption</key>
+  <false/>
+  <key>MinimumOSVersion</key>
+  <string>16.4</string>
+  <key>NSAppTransportSecurity</key>
+  <dict>
+    <key>NSAllowsArbitraryLoads</key>
+    <false/>
+    <key>NSAllowsLocalNetworking</key>
+    <true/>
+  </dict>
+  <key>NSCameraUsageDescription</key>
+  <string>Tasks uses the camera to attach a photo to a task.</string>
+</dict>
+</plist>

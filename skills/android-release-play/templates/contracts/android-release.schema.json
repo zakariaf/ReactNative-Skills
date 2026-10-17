@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "android-release.schema.json",
+  "title": "The app's Google Play release facts",
+  "type": "object",
+  "required": [
+    "lane",
+    "applicationId",
+    "uploadCertificateSha256",
+    "minTargetSdk",
+    "uploadTrack",
+    "rollout",
+    "permissions"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "lane": {
+      "enum": ["eas", "local"],
+      "description": "eas: EAS Build signs with EAS-managed credentials and EAS Submit uploads the gated file. local: Gradle signs with the upload key (plugins/with-upload-signing.ts) and scripts/release-android uploads through the Play Developer API."
+    },
+    "applicationId": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)+$",
+      "description": "The production android.package. Play binds the app to it for good."
+    },
+    "uploadCertificateSha256": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "string", "pattern": "^([0-9A-F]{2}:){31}[0-9A-F]{2}$" }
+      ],
+      "description": "The upload key certificate's SHA-256 fingerprint as Play Console (App integrity), keytool and eas credentials print it. Public; null until the first upload registers the key."
+    },
+    "minTargetSdk": {
+      "type": "integer",
+      "minimum": 36,
+      "description": "The lowest targetSdkVersion a release may have: Google Play's floor (36 since 2026-08-31) or higher."
+    },
+    "uploadTrack": {
+      "enum": ["internal", "alpha", "beta"],
+      "description": "The testing track uploads go to. Production is reached only by promotion with a staged rollout."
+    },
+    "rollout": {
+      "type": "array",
+      "minItems": 2,
+      "items": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+      "description": "Rising fractions of production users, starting at 0.2 or less and ending at 1."
+    },
+    "releaseBranch": {
+      "type": "string",
+      "pattern": "^(?!-)[A-Za-z0-9._/-]+$",
+      "default": "main",
+      "description": "Local lane: the branch releases come from; the build refuses any other. Left out: main."
+    },
+    "releaseNotesLanguage": {
+      "type": "string",
+      "pattern": "^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$",
+      "default": "en-US",
+      "description": "Local lane: the language code of the release notes (--notes), the app's default store listing language as Play Console names it. Left out: en-US."
+    },
+    "permissions": {
+      "type": "object",
+      "description": "Every uses-permission of the release bundle (the app's own <package>.* permissions excepted).",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["reason"],
+        "additionalProperties": false,
+        "properties": {
+          "reason": { "type": "string", "minLength": 10 },
+          "playDeclaration": {
+            "type": "string",
+            "minLength": 1,
+            "description": "What was declared in Play Console, for permissions Play reviews against a declaration."
+          }
+        }
+      }
+    }
+  }
+}

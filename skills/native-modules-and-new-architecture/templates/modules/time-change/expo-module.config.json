@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android"],
+  "apple": {
+    "modules": ["TimeChangeModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.timechange.TimeChangeModule"]
+  }
+}

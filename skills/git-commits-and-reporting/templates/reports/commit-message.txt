@@ -1,0 +1,18 @@
+__TYPE__(__SCOPE__): __IMPERATIVE_SUBJECT__
+
+__WHY_THE_CHANGE_WAS_MADE__
+__WHAT_THE_TESTS_PROVE__
+
+Gate-Change: __WHY_THE_GATED_FILE_HAD_TO_CHANGE__
+Spec-Change: __REQUIREMENT_REF__ __WHAT_CHANGED_IN_THE_REQUIREMENT__
+# Lines starting with # are hints: commit with git commit --cleanup=strip -F <this file>.
+# type: feat fix perf refactor test docs build ci chore style revert
+# scope: a folder under src/features/ or src/, or repo deps docs ci tooling e2e release skills,
+#   or an extraScopes entry of contracts/commits.json (a workspace folder when multi-package)
+# header: at most 72 characters, imperative, lowercase start, no trailing period
+# body: why the change was made; name the requirement when contracts/commits.json asks for it
+# body lines never start with a hash (they would be stripped): write "Issue #31 ...", not "#31 ..."
+# breaking change: type(scope)!: subject, and optionally BREAKING-CHANGE: (hyphen) as a trailer
+# Keep Gate-Change only when a changed file matches quality-gates.json gatedPaths.
+# Keep Spec-Change only when a test expectation changed because the requirement changed.
+# Keep any Co-Authored-By line the session asks for, in the same last paragraph.

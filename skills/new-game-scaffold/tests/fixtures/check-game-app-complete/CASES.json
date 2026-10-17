@@ -1,0 +1,118 @@
+{
+  "bad-entry-no-router": {
+    "expect": [
+      "FAIL apps/lights-out/index.ts:1 [entry] is the app's entry (\"main\": \"index.ts\") but never imports 'expo-router/entry', so no route registers",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [
+      {
+        "$comment": "main index.ts, but index.ts only loads the polyfills: no route ever registers.",
+        "json": { "file": "apps/lights-out/package.json", "path": ["main"], "value": "index.ts" }
+      },
+      {
+        "write": {
+          "file": "apps/lights-out/index.ts",
+          "content": "// apps/lights-out/index.ts\nimport '@/i18n/intl-polyfills';\n"
+        }
+      }
+    ]
+  },
+  "bad-hints-mismatch": {
+    "expect": [
+      "FAIL contracts/games.json:6 [declaration-mismatch] lights-out: the module's rules.hints.kind is \"none\", the declaration says \"solver\"",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [{ "json": { "file": "contracts/games.json", "path": ["games", 0, "hints"], "value": "solver" } }]
+  },
+  "bad-no-flow": {
+    "expect": [
+      "FAIL apps/lights-out/.maestro/flows/games/01-lights-out.yaml [evidence-missing] missing for lights-out: an E2E flow",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [{ "delete": "apps/lights-out/.maestro" }]
+  },
+  "bad-no-root-layout": {
+    "expect": [
+      "FAIL apps/lights-out/src/app/_layout.tsx [entry] is missing, so the app has no root to start (app-startup-and-bootstrap creates it)",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [{ "delete": "apps/lights-out/src/app/_layout.tsx" }]
+  },
+  "bad-not-registered": {
+    "expect": [
+      "FAIL apps/lights-out/src/games/game-registry.ts:1 [host-registration] does not host lights-out (import LIGHTS_OUT_HOSTED from '@/games/lights-out/lights-out-hosted'",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "apps/lights-out/src/games/game-registry.ts",
+          "content": "// apps/lights-out/src/games/game-registry.ts\nexport const HOST_FACTORIES = [] as const;\n"
+        }
+      }
+    ]
+  },
+  "bad-placeholder-entry": {
+    "expect": [
+      "FAIL apps/lights-out/index.ts:7 [entry] still registers the scaffold's PlaceholderApp (renders nothing: \"main\" is index.ts, so the app would ship a blank screen)",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [
+      { "json": { "file": "apps/lights-out/package.json", "path": ["main"], "value": "index.ts" } },
+      {
+        "write": {
+          "file": "apps/lights-out/index.ts",
+          "content": "// apps/lights-out/index.ts\n// Placeholder entry: an empty app, so the skeleton type-checks, lints and prebuilds while the game\n// is built. When the app's root exists (src/app/_layout.tsx, app-startup-and-bootstrap), set\n// \"main\" to \"expo-router/entry\" in package.json and delete this file.\nimport { registerRootComponent } from 'expo';\n\nfunction PlaceholderApp(): null {\n  return null;\n}\n\nregisterRootComponent(PlaceholderApp);\n"
+        }
+      }
+    ]
+  },
+  "bad-placeholders-ads-off": {
+    "expect": [
+      "FAIL apps/lights-out/app-settings.ts:14 [ship-placeholder] bundleId is the template bundle id (com.example.*): com.example.lightsout",
+      "FAIL apps/lights-out/app-settings.ts:18 [ship-placeholder] products.premium is the template bundle id (com.example.*): com.example.lightsout.premium",
+      "FAIL apps/lights-out/app-settings.ts:22 [ship-placeholder] links.privacyPolicy.host is a placeholder domain (example.com): example.com",
+      "FAIL apps/lights-out/app-settings.ts:25 [ship-placeholder] links.supportEmail is a placeholder email address (@example.com): support@example.com",
+      "RESULT: FAIL (4 problems)"
+    ],
+    "extends": null,
+    "ops": [
+      {
+        "replace": { "file": "apps/lights-out/app-settings.ts", "find": "isEnabled: true", "with": "isEnabled: false" }
+      }
+    ]
+  },
+  "bad-placeholders-only": {
+    "expect": [
+      "FAIL apps/lights-out/app-settings.ts:14 [ship-placeholder] bundleId is the template bundle id (com.example.*): com.example.lightsout",
+      "FAIL apps/lights-out/app-settings.ts:18 [ship-placeholder] products.premium is the template bundle id (com.example.*): com.example.lightsout.premium",
+      "FAIL apps/lights-out/app-settings.ts:22 [ship-placeholder] links.privacyPolicy.host is a placeholder domain (example.com): example.com",
+      "FAIL apps/lights-out/app-settings.ts:25 [ship-placeholder] links.supportEmail is a placeholder email address (@example.com): support@example.com",
+      "FAIL apps/lights-out/app-settings.ts:30 [ship-placeholder] ads.ios.appId is Google's sample AdMob app id: ca-app-pub-3940256099942544~1458002511",
+      "FAIL apps/lights-out/app-settings.ts:32 [ship-placeholder] ads.ios.units.banner is Google's sample AdMob ad unit id: ca-app-pub-3940256099942544/2934735716",
+      "FAIL apps/lights-out/app-settings.ts:33 [ship-placeholder] ads.ios.units.rewarded is Google's sample AdMob ad unit id: ca-app-pub-3940256099942544/1712485313",
+      "FAIL apps/lights-out/app-settings.ts:37 [ship-placeholder] ads.android.appId is Google's sample AdMob app id: ca-app-pub-3940256099942544~3347511713",
+      "FAIL apps/lights-out/app-settings.ts:39 [ship-placeholder] ads.android.units.banner is Google's sample AdMob ad unit id: ca-app-pub-3940256099942544/6300978111",
+      "FAIL apps/lights-out/app-settings.ts:40 [ship-placeholder] ads.android.units.rewarded is Google's sample AdMob ad unit id: ca-app-pub-3940256099942544/5224354917",
+      "check-game-scaffold: 1 games checked, 10 problems",
+      "RESULT: FAIL (10 problems)"
+    ],
+    "extends": null,
+    "ops": []
+  },
+  "pass-polyfill-entry": {
+    "expect": ["check-game-scaffold: 1 games checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "The default real entry (app-startup-and-bootstrap, i18n-strings-and-catalogs): main index.ts, the forced Intl polyfills first, expo-router/entry last.",
+        "json": { "file": "apps/lights-out/package.json", "path": ["main"], "value": "index.ts" }
+      },
+      {
+        "write": {
+          "file": "apps/lights-out/index.ts",
+          "content": "// apps/lights-out/index.ts\n// The app entry: the forced Intl polyfills run before any route module; expo-router/entry comes last.\nimport '@/i18n/intl-polyfills';\n\nimport 'expo-router/entry';\n"
+        }
+      }
+    ]
+  }
+}

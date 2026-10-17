@@ -1,0 +1,10 @@
+{
+  "name": "tasks-app",
+  "dependencies": {
+    "expo": "~57.0.26"
+  },
+  "devDependencies": {
+    "jest": "29.7.0",
+    "jest-expo": "57.0.5"
+  }
+}

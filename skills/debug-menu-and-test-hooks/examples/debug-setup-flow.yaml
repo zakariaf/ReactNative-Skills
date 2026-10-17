@@ -1,0 +1,35 @@
+# Example (a shape, not a template): a Maestro subflow that puts a test build into a known state
+# through the debug link (e2e-maestro owns the flows and the runner; run it with --device <id>).
+# It waits for the first screen so the app's JavaScript is running, opens the link, accepts iOS's
+# "Open in <app>?" alert when it appears, then proves the link arrived: it waits for a screen the
+# app was not on before (open=debug) and asserts the state the link set. Waiting for the screen the
+# flow started on would pass with a lost link. debug.setup-error fails the flow at once.
+appId: ${APP_ID}
+---
+- extendedWaitUntil:
+    visible:
+      id: tasks.list
+    timeout: 20000
+- openLink: ${APP_SCHEME}://debug/setup?date=2030-03-01&offline=1&motion=still&open=debug
+# system-ui: iOS may answer a custom scheme opened from outside the app with "Open in “<app>”?";
+# the title and 'Open' are Apple's, not app text. Guard on the alert title, never on a bare 'Open':
+# Maestro's text match ignores case, so 'Open' also matches an ad banner's OPEN button.
+- runFlow:
+    when:
+      visible: 'Open in .*\?'
+    commands:
+      - waitForAnimationToEnd
+      # system-ui: Apple's Open button, the nearest one below the alert title (never a banner's).
+      - tapOn:
+          text: 'Open'
+          below: 'Open in .*\?'
+          optional: true
+- extendedWaitUntil:
+    visible:
+      id: debug.menu
+    timeout: 10000
+- assertVisible:
+    id: debug.menu.day
+    text: '.*2030-03-01.*'
+- assertNotVisible:
+    id: debug.setup-error

@@ -1,0 +1,571 @@
+{
+  "bad-catalogue-missing": {
+    "expect": ["FAIL contracts/component-library.json [catalogue-missing]", "RESULT: FAIL (1 problems)"],
+    "ops": [{ "delete": "contracts/component-library.json" }]
+  },
+  "bad-component-export": {
+    "expect": [
+      "FAIL src/ui/chip.tsx:1 [component-export] does not export function Chip and type ChipProps",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      { "replace": { "file": "src/ui/chip.tsx", "find": "export function Chip(", "with": "export function TagChip(" } }
+    ]
+  },
+  "bad-component-missing": {
+    "expect": ["FAIL src/ui/chip.tsx [component-missing] Chip is in the catalogue", "RESULT: FAIL (1 problems)"],
+    "ops": [{ "delete": "src/ui/chip.tsx" }]
+  },
+  "bad-component-unlisted": {
+    "expect": ["FAIL src/ui/task-count.tsx:1 [component-unlisted]", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/task-count.tsx",
+          "content": "// src/ui/task-count.tsx\nimport { AppText } from './app-text';\n\nimport type { ReactNode } from 'react';\n\nexport type TaskCountProps = { readonly text: string; readonly testID: string };\n\nexport function TaskCount({ text, testID }: TaskCountProps): ReactNode {\n  return <AppText testID={testID}>{text}</AppText>;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-decorative-not-hidden": {
+    "expect": [
+      "FAIL src/ui/icon-tile.tsx:1 [decorative-not-hidden] IconTile is decorative",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      { "replace": { "file": "src/ui/icon-tile.tsx", "find": "      accessibilityElementsHidden\n", "with": "" } }
+    ]
+  },
+  "bad-drawn-underline": {
+    "expect": [
+      "FAIL src/ui/text-button.tsx:36 [drawn-underline] TextButton underlines with textDecorationLine",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/text-button.tsx",
+          "find": "      paddingInline: TEXT_BUTTON.paddingInline,\n      alignItems: 'center',",
+          "with": "      paddingInline: TEXT_BUTTON.paddingInline,\n      alignItems: 'center',\n      textDecorationLine: 'underline',"
+        }
+      }
+    ]
+  },
+  "bad-fixed-text-height": {
+    "expect": [
+      "FAIL src/ui/tile-button.tsx:29 [fixed-text-height] the style \"face\" fixes a height around text",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/tile-button.tsx",
+          "find": "      minHeight: TILE.minHeight,",
+          "with": "      height: TILE.minHeight,"
+        }
+      }
+    ]
+  },
+  "bad-hold-fill-in-padding": {
+    "expect": [
+      "FAIL src/ui/hold-button.tsx:",
+      "[hold-fill-track] the hold fill sits straight in the face",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/hold-button.tsx",
+          "find": "<View style={styles.fillTrack} pointerEvents=\"none\">",
+          "with": "<View pointerEvents=\"none\">"
+        }
+      }
+    ]
+  },
+  "bad-hold-reduce-motion": {
+    "expect": ["FAIL src/ui/use-hold-to-confirm.ts:", "[hold-reduce-motion]", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/use-hold-to-confirm.ts",
+          "find": "      reduceMotion: ReduceMotion.Never,\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-measurement-literal": {
+    "expect": ["FAIL src/ui/chip.tsx:29 [measurement-literal] gap: 6 is a literal size", "RESULT: FAIL (1 problems)"],
+    "ops": [{ "replace": { "file": "src/ui/chip.tsx", "find": "      gap: CHIP.gap,", "with": "      gap: 6," } }]
+  },
+  "bad-mock-only-built": {
+    "expect": [
+      "FAIL src/ui/ad-placeholder.tsx:1 [mock-only-built] AdPlaceholder is a design stand-in",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/ad-placeholder.tsx",
+          "content": "// src/ui/ad-placeholder.tsx\nimport { View } from 'react-native';\n\nimport type { ReactNode } from 'react';\n\nexport type AdPlaceholderProps = { readonly testID: string };\n\nexport function AdPlaceholder({ testID }: AdPlaceholderProps): ReactNode {\n  return <View testID={testID} />;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-modal-back": {
+    "expect": [
+      "FAIL src/ui/scrim.tsx:",
+      "[modal-back] Scrim does not close on Android's back button",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      { "replace": { "file": "src/ui/scrim.tsx", "find": "      onRequestClose={props.onRequestClose}\n", "with": "" } }
+    ]
+  },
+  "bad-modal-on-card": {
+    "expect": [
+      "FAIL src/ui/dialog-card.tsx:50 [modal-root] dialog-card.tsx is marked modal",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/dialog-card.tsx",
+          "find": "<View style={styles.card} testID={testID}>",
+          "with": "<View style={styles.card} testID={testID} accessibilityViewIsModal>"
+        }
+      }
+    ]
+  },
+  "bad-own-press-look": {
+    "expect": ["FAIL src/ui/card.tsx:", "[own-press-look] a hand-written pressed look", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/card.tsx",
+          "find": "    compact: { padding: CARD.paddingCompact },",
+          "with": "    compact: { padding: CARD.paddingCompact },\n    pressedCard: { opacity: 0.6 },"
+        }
+      }
+    ]
+  },
+  "bad-own-press-look-one-line": {
+    "expect": ["FAIL src/features/tasks/components/task-chip.tsx:7 [own-press-look]", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "$comment": "Two looks on one line (a pressed style function and an opacity keyed on pressed) are one problem, not two.",
+        "write": {
+          "file": "src/features/tasks/components/task-chip.tsx",
+          "lines": [
+            "// src/features/tasks/components/task-chip.tsx",
+            "import { PressableSurface } from '@/ui/pressable-surface';",
+            "",
+            "import type { ReactNode } from 'react';",
+            "",
+            "export function TaskChip(props: { readonly label: string; readonly onPress: () => void }): ReactNode {",
+            "  return <PressableSurface label={props.label} onPress={props.onPress} style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]} />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-pair-cell-flex": {
+    "expect": ["FAIL src/ui/tile-button.tsx:37 [pair-cell-flex]", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/tile-button.tsx",
+          "find": "    cell: { flexGrow: 1 },",
+          "with": "    cell: { flex: 1 },"
+        }
+      }
+    ]
+  },
+  "bad-part-not-derived": {
+    "expect": [
+      "FAIL src/ui/list-row.tsx:1 [part-not-derived] the part \"value\" is not derived from the testID",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/list-row.tsx",
+          "find": "testID={`${props.testID}.value`}",
+          "with": "testID=\"settings.row-value\""
+        }
+      }
+    ]
+  },
+  "bad-prerequisite-missing": {
+    "expect": [
+      "FAIL src/theme/motion.ts [prerequisite-missing]",
+      "design-system-structure creates it",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [{ "delete": "src/theme/motion.ts" }]
+  },
+  "bad-prerequisite-outdated": {
+    "expect": [
+      "FAIL src/theme/type-styles.ts [prerequisite-missing] an older copy: it lacks rowLabelStrong",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/component-library.json",
+          "path": ["prerequisites"],
+          "value": [
+            {
+              "file": "src/theme/type-styles.ts",
+              "owner": "design-system-structure",
+              "mustContain": "rowLabelStrong",
+              "why": "strong and destructive rows use it"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-press-feedback": {
+    "expect": ["FAIL src/ui/pressable-surface.tsx:1 [press-feedback]", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/pressable-surface.tsx",
+          "find": "        if (role !== 'switch') onPressFeedback();\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-press-outside-host": {
+    "expect": [
+      "FAIL src/features/tasks/components/task-chip.tsx:2 [press-outside-host] Pressable is a second press implementation",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-chip.tsx",
+          "content": "// src/features/tasks/components/task-chip.tsx\nimport { Pressable } from 'react-native';\n\nimport type { ReactNode } from 'react';\n\nexport function TaskChip({ onPress }: { readonly onPress: () => void }): ReactNode {\n  return <Pressable accessibilityRole=\"button\" onPress={onPress} testID=\"tasks.chip-button\" />;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-press-outside-host-crash-screen-unmarked": {
+    "expect": [
+      "FAIL src/features/crash-recovery/crash-screen.tsx:9 [press-outside-host] Button is a second press implementation",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/crash-recovery/crash-screen.tsx",
+          "content": "// src/features/crash-recovery/crash-screen.tsx\n// The fallback a crashed route shows: a title, one sentence and one way out. A pure view whose\n// strings and background arrive as props. Under the root layout it renders outside every provider\n// the layout mounts, so it reads no context that lacks a default. The app passes the background\n// from useTheme(), whose context defaults to the light theme outside ThemeProvider: the same theme\n// AppText falls back to, so text and background stay a pair whose contrast the theme proves. Keep\n// it trivial: no boundary catches an error thrown here, and React reports it to React Native as a\n// fatal crash the error net never sees.\nimport { Button, StyleSheet, View } from 'react-native';\n\nimport { AppText } from '@/ui/app-text';\n\nexport type CrashScreenProps = {\n  readonly title: string;\n  readonly body: string;\n  readonly actionLabel: string;\n  readonly onAction: () => void;\n  /**\n   * The screen background, from useTheme() (its context defaults to the light theme outside\n   * ThemeProvider), so it always matches the theme AppText draws the text with.\n   */\n  readonly backgroundColor: string;\n};\n\n/** Crash fallback: one way out, never an automatic retry. */\nexport function CrashScreen({\n  title,\n  body,\n  actionLabel,\n  onAction,\n  backgroundColor,\n}: CrashScreenProps): React.JSX.Element {\n  return (\n    <View\n      testID=\"crash.screen\"\n      style={[styles.screen, { backgroundColor }]}\n      accessibilityRole=\"alert\"\n    >\n      <AppText testID=\"crash.title\">{title}</AppText>\n      <AppText testID=\"crash.body\">{body}</AppText>\n      <Button testID=\"crash.restart-button\" title={actionLabel} onPress={onAction} />\n    </View>\n  );\n}\n\nconst styles = StyleSheet.create({\n  screen: { flex: 1, justifyContent: 'center', gap: 16, paddingHorizontal: 24 },\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-press-outside-host-empty-reason": {
+    "expect": [
+      "FAIL src/features/crash-recovery/crash-screen.tsx:3 [press-outside-host] Button is a second press implementation",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/crash-recovery/crash-screen.tsx",
+          "content": "// src/features/crash-recovery/crash-screen.tsx\n// press-outside-host:\nimport { Button, View } from 'react-native';\n\nimport type { ReactNode } from 'react';\n\nexport function CrashScreen({ onAction }: { readonly onAction: () => void }): ReactNode {\n  return (\n    <View>\n      <Button title=\"Restart\" onPress={onAction} testID=\"crash.restart-button\" />\n    </View>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-press-outside-host-namespace": {
+    "expect": [
+      "FAIL src/features/tasks/components/task-row-actions.tsx:9 [press-outside-host] Pressable (through a namespace import) is a second press implementation",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-row-actions.tsx",
+          "content": "// src/features/tasks/components/task-row-actions.tsx\nimport * as RN from 'react-native';\n\nimport type { ReactNode } from 'react';\n\nexport function TaskRowActions({ onDone }: { readonly onDone: () => void }): ReactNode {\n  return (\n    <RN.View>\n      <RN.Pressable onPress={onDone} testID=\"tasks.row-done-button\">\n        <RN.Text>Done</RN.Text>\n      </RN.Pressable>\n    </RN.View>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-press-outside-host-reason-detached": {
+    "expect": [
+      "FAIL src/features/tasks/components/quick-add.tsx:4 [press-outside-host] Pressable is a second press implementation",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/quick-add.tsx",
+          "content": "// src/features/tasks/components/quick-add.tsx\n// press-outside-host: the quick-add sheet predates the library and is moved next sprint\n\nimport { Pressable, View } from 'react-native';\n\nimport type { ReactNode } from 'react';\n\nexport function QuickAdd({ onAdd }: { readonly onAdd: () => void }): ReactNode {\n  return (\n    <View>\n      <Pressable onPress={onAdd} testID=\"tasks.quick-add-button\" />\n    </View>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-press-outside-host-rn-button": {
+    "expect": [
+      "FAIL src/features/tasks/components/save-placeholder.tsx:2 [press-outside-host] Button is a second press implementation",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/save-placeholder.tsx",
+          "content": "// src/features/tasks/components/save-placeholder.tsx\nimport { Button, View } from 'react-native';\n\nimport type { ReactNode } from 'react';\n\nexport function SavePlaceholder({ onSave }: { readonly onSave: () => void }): ReactNode {\n  return (\n    <View>\n      <Button title=\"Save\" onPress={onSave} testID=\"tasks.save-button\" />\n    </View>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-rotate-outside-allowed": {
+    "expect": ["FAIL src/ui/chip.tsx:30 [rotate-outside-allowed]", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/chip.tsx",
+          "find": "      gap: CHIP.gap,",
+          "with": "      gap: CHIP.gap,\n      transform: [{ rotate: '-3deg' }],"
+        }
+      }
+    ]
+  },
+  "bad-scatter-mirrors": {
+    "expect": [
+      "FAIL src/ui/confetti.tsx:",
+      "[scatter-ltr] Confetti places its pieces with start offsets",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [{ "replace": { "file": "src/ui/confetti.tsx", "find": ", direction: 'ltr' },", "with": " }," } }]
+  },
+  "bad-shadow-outside-allowed": {
+    "expect": [
+      "FAIL src/ui/card.tsx:36 [shadow-outside-allowed] a shadow on a component that lies flat",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/card.tsx",
+          "find": "      backgroundColor: theme.colors.surface,\n    },",
+          "with": "      backgroundColor: theme.colors.surface,\n      ...shadow(ELEVATION.raised, theme.colors.shadow),\n    },"
+        }
+      }
+    ]
+  },
+  "bad-spec-override-reason": {
+    "expect": [
+      "FAIL contracts/component-library.json [spec-override-reason] the override of chip.radius gives no reason",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/component-library.json",
+          "path": ["specs", "overrides"],
+          "value": [{ "path": "chip.radius", "value": 8 }]
+        }
+      },
+      { "json": { "file": "src/ui/component-specs.json", "path": ["chip", "radius"], "value": 8 } }
+    ]
+  },
+  "bad-specs-mismatch": {
+    "expect": [
+      "FAIL src/ui/component-specs.json [specs-mismatch] button.radius is 99, the token file gives 10 (the token file says {radius.md})",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [{ "json": { "file": "src/ui/component-specs.json", "path": ["button", "radius"], "value": 99 } }]
+  },
+  "bad-specs-missing": {
+    "expect": ["FAIL src/ui/component-specs.json [specs-missing]", "RESULT: FAIL (1 problems)"],
+    "ops": [{ "delete": "src/ui/component-specs.json" }]
+  },
+  "bad-specs-no-block": {
+    "expect": [
+      "FAIL design/tokens.json [specs-missing] the token file has no \"components\" block",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [{ "json": { "file": "design/tokens.json", "path": ["components"], "delete": true } }]
+  },
+  "bad-testid-on-inner-text": {
+    "expect": [
+      "FAIL src/ui/chip.tsx:",
+      " [testid-on-inner-text] the testID sits on the text inside the View",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/chip.tsx",
+          "find": "      style={styles.chip}\n      testID={testID}\n",
+          "with": "      style={styles.chip}\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/ui/chip.tsx",
+          "find": "<AppText variant=\"badge\">{text}</AppText>",
+          "with": "<AppText variant=\"badge\" testID={testID}>\n        {text}\n      </AppText>"
+        }
+      }
+    ]
+  },
+  "bad-testid-optional": {
+    "expect": ["[testid-required] ChipProps needs a required", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/chip.tsx",
+          "find": "  readonly testID: string;",
+          "with": "  readonly testID?: string;"
+        }
+      }
+    ]
+  },
+  "bad-ui-translates": {
+    "expect": [
+      "FAIL src/ui/chip.tsx:4 [ui-translates] imports the translation API (@/i18n/t)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/chip.tsx",
+          "find": "import { makeStyles } from '@/theme/make-styles';",
+          "with": "import { useT } from '@/i18n/t';\nimport { makeStyles } from '@/theme/make-styles';"
+        }
+      }
+    ]
+  },
+  "bad-untested": {
+    "expect": ["FAIL src/ui/chip.tsx:1 [component-untested] no test file imports chip.tsx", "RESULT: FAIL (1 problems)"],
+    "ops": [{ "delete": "src/ui/chip.test.tsx" }]
+  },
+  "error-bad-contract": {
+    "expect": ["ERROR [bad-input] contracts/component-library.json: unknown key \"screens\""],
+    "ops": [{ "json": { "file": "contracts/component-library.json", "path": ["screens"], "value": [] } }]
+  },
+  "error-ui-dir-missing": {
+    "expect": ["ERROR [bad-input] nothing to check: packages/ui/src does not exist"],
+    "args": "{dir} --ui-dir packages/ui/src"
+  },
+  "error-unknown-only": {
+    "expect": ["ERROR [bad-input] --only names components the catalogue does not list: Widget"],
+    "args": "{dir} --only Widget"
+  },
+  "pass-installed-skills": {
+    "expect": ["check-components:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/kit/SKILL.md",
+          "content": "---\nname: kit\ndescription: Installed skill with planted findings.\n---\n"
+        }
+      },
+      {
+        "write": {
+          "file": ".agents/skills/kit/tests/fixtures/bad/src/ui/planted.tsx",
+          "content": "// planted: a second press implementation, a pressed look, a literal size, a tilt\nimport { Pressable } from 'react-native';\n\nexport function Planted() {\n  return <Pressable style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1, width: 13, transform: [{ rotate: '4deg' }] }]} />;\n}\n"
+        }
+      },
+      { "write": { "file": "skills/kit/SKILL.md", "content": "---\nname: kit\ndescription: Planted.\n---\n" } },
+      {
+        "write": {
+          "file": "skills/kit/src/ui/planted.tsx",
+          "content": "// planted: a second press implementation, a pressed look, a literal size, a tilt\nimport { Pressable } from 'react-native';\n\nexport function Planted() {\n  return <Pressable style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1, width: 13, transform: [{ rotate: '4deg' }] }]} />;\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/ui/vendor/kit/SKILL.md",
+          "content": "---\nname: vendored-kit\ndescription: A vendored folder holding a skill.\n---\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/ui/vendor/kit/planted.tsx",
+          "content": "// planted: a second press implementation, a pressed look, a literal size, a tilt\nimport { Pressable } from 'react-native';\n\nexport function Planted() {\n  return <Pressable style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1, width: 13, transform: [{ rotate: '4deg' }] }]} />;\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-not-applicable": {
+    "expect": [
+      "NOT APPLICABLE: no shared component library yet: contracts/component-library.json does not exist and src/ui holds only files other skills own",
+      "RESULT: PASS"
+    ],
+    "base": ["@tests/bases/app"],
+    "extends": null
+  },
+  "pass-only-subset": {
+    "expect": ["RESULT: PASS"],
+    "args": "{dir} --only Button",
+    "ops": [{ "delete": "src/ui/chip.tsx" }]
+  },
+  "pass-owned-elsewhere-no-library": {
+    "$comment": "Other skills' canonical ui files (screen frame, error boundary, physical-direction view, screen body, ad slot, motion moments, list-detail layout, feedback ladder) in an app without a library: still NOT APPLICABLE.",
+    "expect": [
+      "NOT APPLICABLE: no shared component library yet: contracts/component-library.json does not exist and src/ui holds only files other skills own",
+      "RESULT: PASS"
+    ],
+    "base": ["@tests/bases/app", "pass-owned-elsewhere/overlay"],
+    "extends": null
+  },
+  "pass-press-outside-host-crash-screen": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/crash-recovery/crash-screen.tsx",
+          "content": "// src/features/crash-recovery/crash-screen.tsx\n// The fallback a crashed route shows: a title, one sentence and one way out. A pure view whose\n// strings and background arrive as props. Under the root layout it renders outside every provider\n// the layout mounts, so it reads no context that lacks a default. The app passes the background\n// from useTheme(), whose context defaults to the light theme outside ThemeProvider: the same theme\n// AppText falls back to, so text and background stay a pair whose contrast the theme proves. Keep\n// it trivial: no boundary catches an error thrown here, and React reports it to React Native as a\n// fatal crash the error net never sees.\n// press-outside-host: renders outside every provider, so the crash fallback stays trivial\nimport { Button, StyleSheet, View } from 'react-native';\n\nimport { AppText } from '@/ui/app-text';\n\nexport type CrashScreenProps = {\n  readonly title: string;\n  readonly body: string;\n  readonly actionLabel: string;\n  readonly onAction: () => void;\n  /**\n   * The screen background, from useTheme() (its context defaults to the light theme outside\n   * ThemeProvider), so it always matches the theme AppText draws the text with.\n   */\n  readonly backgroundColor: string;\n};\n\n/** Crash fallback: one way out, never an automatic retry. */\nexport function CrashScreen({\n  title,\n  body,\n  actionLabel,\n  onAction,\n  backgroundColor,\n}: CrashScreenProps): React.JSX.Element {\n  return (\n    <View\n      testID=\"crash.screen\"\n      style={[styles.screen, { backgroundColor }]}\n      accessibilityRole=\"alert\"\n    >\n      <AppText testID=\"crash.title\">{title}</AppText>\n      <AppText testID=\"crash.body\">{body}</AppText>\n      <Button testID=\"crash.restart-button\" title={actionLabel} onPress={onAction} />\n    </View>\n  );\n}\n\nconst styles = StyleSheet.create({\n  screen: { flex: 1, justifyContent: 'center', gap: 16, paddingHorizontal: 24 },\n});\n"
+        }
+      }
+    ]
+  },
+  "pass-press-outside-host-reason": {
+    "expect": ["check-components:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/crash-recovery/crash-screen.tsx",
+          "content": "// src/features/crash-recovery/crash-screen.tsx\n// press-outside-host: renders outside every provider, so the crash fallback stays trivial\nimport { Button, View } from 'react-native';\n\nimport type { ReactNode } from 'react';\n\nexport function CrashScreen({ onAction }: { readonly onAction: () => void }): ReactNode {\n  return (\n    <View>\n      <Button title=\"Restart\" onPress={onAction} testID=\"crash.restart-button\" />\n    </View>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-specs-off": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "delete": "src/ui/component-specs.json" },
+      { "json": { "file": "contracts/component-library.json", "path": ["specs"], "value": false } }
+    ]
+  },
+  "pass-ui-package": {
+    "expect": ["check-components:", "RESULT: PASS"],
+    "ops": [
+      { "rename": { "from": "src", "to": "packages/ui/src" } },
+      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["packages/*"] } },
+      { "write": { "file": "packages/ui/package.json", "content": "{ \"name\": \"@acme/ui\", \"private\": true }\n" } },
+      { "json": { "file": "contracts/component-library.json", "path": ["uiDir"], "value": "packages/ui/src/ui" } },
+      {
+        "json": {
+          "file": "contracts/component-library.json",
+          "path": ["specs", "out"],
+          "value": "packages/ui/src/ui/component-specs.json"
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/component-library.json",
+          "path": ["specs", "module"],
+          "value": "packages/ui/src/ui/component-specs.ts"
+        }
+      }
+    ]
+  }
+}

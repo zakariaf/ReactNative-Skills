@@ -1,0 +1,2618 @@
+{
+  "$comment": "The index's curated data. catalog is a snapshot of the library catalogue, written by build-index.mjs --catalog <file> --write: never edit it by hand. Edit categoryNotes, rowRules, tasks, requireManifests, buildOrders (with their copies, installs, generates and noManifest), verifyGreen and closure here, then run build-index.mjs --write and check-index.mjs.",
+  "plugins": [
+    {
+      "key": "core",
+      "name": "react-native"
+    },
+    {
+      "key": "games",
+      "name": "react-native-games"
+    }
+  ],
+  "catalog": {
+    "categories": [
+      {
+        "key": "start-here",
+        "label": "Start here"
+      },
+      {
+        "key": "process",
+        "label": "How every change is made"
+      },
+      {
+        "key": "setup",
+        "label": "Project setup & code rules"
+      },
+      {
+        "key": "ui",
+        "label": "UI, design & interaction"
+      },
+      {
+        "key": "navigation",
+        "label": "Navigation & app lifecycle"
+      },
+      {
+        "key": "data",
+        "label": "State & data"
+      },
+      {
+        "key": "i18n-a11y-perf",
+        "label": "Languages, access & speed"
+      },
+      {
+        "key": "platform",
+        "label": "Platform features"
+      },
+      {
+        "key": "money-privacy",
+        "label": "Monetization, privacy & observability"
+      },
+      {
+        "key": "testing",
+        "label": "Testing"
+      },
+      {
+        "key": "release",
+        "label": "Build, release & delivery"
+      },
+      {
+        "key": "games",
+        "label": "Games (optional plugin)"
+      }
+    ],
+    "skills": [
+      {
+        "name": "react-native-conventions-index",
+        "category": "start-here",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "tdd-workflow",
+        "category": "process",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "quality-gates",
+        "category": "process",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "git-commits-and-reporting",
+        "category": "process",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "spec-traceability",
+        "category": "process",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "troubleshooting-playbook",
+        "category": "process",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "skill-maintenance",
+        "category": "process",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "expo-project-bootstrap",
+        "category": "setup",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "architecture-and-boundaries",
+        "category": "setup",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "typescript-and-lint-rules",
+        "category": "setup",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "naming-conventions",
+        "category": "setup",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "dependency-management",
+        "category": "setup",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "expo-sdk-upgrade",
+        "category": "setup",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "expo-prebuild-and-config-plugins",
+        "category": "setup",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "app-variants-and-environment",
+        "category": "setup",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "scaffold-feature-screen",
+        "category": "setup",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "react-components-and-hooks",
+        "category": "ui",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "design-system-structure",
+        "category": "ui",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "ui-component-library",
+        "category": "ui",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "screen-contracts",
+        "category": "ui",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "ui-states-and-feedback",
+        "category": "ui",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "forms-and-input",
+        "category": "ui",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "adaptive-layout",
+        "category": "ui",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "motion-and-animation",
+        "category": "ui",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "audio-and-haptics-feedback",
+        "category": "ui",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "icons-app-icon-and-splash",
+        "category": "ui",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "skia-canvas-rendering",
+        "category": "ui",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "canvas-gestures-and-hit-testing",
+        "category": "ui",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "design-visual-parity",
+        "category": "ui",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "design-review-workflow",
+        "category": "ui",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "navigation-and-routing",
+        "category": "navigation",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "deep-links-and-universal-links",
+        "category": "navigation",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "app-startup-and-bootstrap",
+        "category": "navigation",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "settings-and-preferences",
+        "category": "navigation",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "state-management-zustand",
+        "category": "data",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "networking-and-server-state",
+        "category": "data",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "auth-and-secure-storage",
+        "category": "data",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "persistence-and-migrations",
+        "category": "data",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "run-migration",
+        "category": "data",
+        "plugin": "core",
+        "manual": true
+      },
+      {
+        "name": "data-export-and-restore",
+        "category": "data",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "error-handling-typed-results",
+        "category": "data",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "async-safety",
+        "category": "data",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "dates-streaks-and-statistics",
+        "category": "data",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "value-objects-money-and-units",
+        "category": "data",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "seeded-determinism-and-golden-vectors",
+        "category": "data",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "i18n-strings-and-catalogs",
+        "category": "i18n-a11y-perf",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "rtl-and-direction",
+        "category": "i18n-a11y-perf",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "accessibility-as-code",
+        "category": "i18n-a11y-perf",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "performance-budgets",
+        "category": "i18n-a11y-perf",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "local-notifications",
+        "category": "platform",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "push-notifications",
+        "category": "platform",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "permissions-and-system-prompts",
+        "category": "platform",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "media-images-and-files",
+        "category": "platform",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "background-tasks",
+        "category": "platform",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "native-modules-and-new-architecture",
+        "category": "platform",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "web-support",
+        "category": "platform",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "admob-ads-and-consent",
+        "category": "money-privacy",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "in-app-purchases",
+        "category": "money-privacy",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "privacy-and-store-declarations",
+        "category": "money-privacy",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "crash-reporting-and-observability",
+        "category": "money-privacy",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "analytics-and-consent",
+        "category": "money-privacy",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "unit-and-component-tests",
+        "category": "testing",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "golden-and-snapshot-tests",
+        "category": "testing",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "run-goldens-rebaseline",
+        "category": "testing",
+        "plugin": "core",
+        "manual": true
+      },
+      {
+        "name": "e2e-maestro",
+        "category": "testing",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "debug-menu-and-test-hooks",
+        "category": "testing",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "ios-simulator-build",
+        "category": "release",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "android-emulator-build",
+        "category": "release",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "eas-build-and-submit",
+        "category": "release",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "ios-release-testflight",
+        "category": "release",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "android-release-play",
+        "category": "release",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "ota-updates",
+        "category": "release",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "ci-pipeline-and-gates",
+        "category": "release",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "game-rules-engine",
+        "category": "games",
+        "plugin": "games",
+        "manual": false
+      },
+      {
+        "name": "level-generation-and-solvers",
+        "category": "games",
+        "plugin": "games",
+        "manual": false
+      },
+      {
+        "name": "game-session-host",
+        "category": "games",
+        "plugin": "games",
+        "manual": false
+      },
+      {
+        "name": "game-balance-and-bots",
+        "category": "games",
+        "plugin": "games",
+        "manual": false
+      },
+      {
+        "name": "realtime-game-loop",
+        "category": "games",
+        "plugin": "games",
+        "manual": false
+      },
+      {
+        "name": "new-game-scaffold",
+        "category": "games",
+        "plugin": "games",
+        "manual": false
+      }
+    ]
+  },
+  "categoryNotes": {
+    "start-here": "The front door: which skills a task needs and in which order.",
+    "process": "How every change is made, whatever it touches: test-first, gated, traced, committed and reported.",
+    "setup": "The repo itself: the skeleton, the layout and its boundaries, the code rules, packages, SDK upgrades, native generation and variants.",
+    "ui": "What the user sees and touches: components, screens, states, forms, layout, motion, sound, icons, canvases and the proof that a screen matches its design.",
+    "navigation": "Routes and links, the cold start, and the settings that change how the app behaves.",
+    "data": "State, server data, sign-in, the database and its migrations, backups, typed errors, async safety, dates, money and seeded content.",
+    "i18n-a11y-perf": "Text in every language, right-to-left layouts, accessibility and performance budgets.",
+    "platform": "Device features behind ports: notifications, permissions, media, background work, native modules and the opt-in web target.",
+    "money-privacy": "Ads, purchases, privacy declarations, crash reporting and analytics, each gated on consent where the stores require it.",
+    "testing": "Unit, component, golden and end-to-end tests, and the test-only hooks that make devices scriptable.",
+    "release": "Builds on simulators and emulators, EAS, the App Store and Google Play, over-the-air updates and CI.",
+    "games": "Optional: pure rules engines, levels and solvers, the game host, balance bots and real-time loops."
+  },
+  "rowRules": [
+    {
+      "id": "ui-verification",
+      "when": [
+        "scaffold-feature-screen",
+        "screen-contracts",
+        "ui-component-library",
+        "ui-states-and-feedback",
+        "forms-and-input",
+        "settings-and-preferences",
+        "in-app-purchases",
+        "adaptive-layout",
+        "game-session-host"
+      ],
+      "require": [
+        "i18n-strings-and-catalogs",
+        "rtl-and-direction",
+        "accessibility-as-code",
+        "design-visual-parity"
+      ],
+      "why": "every screen, component, state or form change - whoever leads the task - is checked in both themes, LTR and RTL, at the largest text size, against its approved design, on iOS and Android",
+      "whenAny": [
+        "scaffold-feature-screen",
+        "screen-contracts",
+        "forms-and-input"
+      ]
+    },
+    {
+      "id": "test-first",
+      "when": [
+        "scaffold-feature-screen",
+        "screen-contracts",
+        "ui-component-library",
+        "ui-states-and-feedback",
+        "forms-and-input",
+        "react-components-and-hooks",
+        "navigation-and-routing",
+        "deep-links-and-universal-links",
+        "settings-and-preferences",
+        "state-management-zustand",
+        "networking-and-server-state",
+        "auth-and-secure-storage",
+        "persistence-and-migrations",
+        "data-export-and-restore",
+        "error-handling-typed-results",
+        "async-safety",
+        "dates-streaks-and-statistics",
+        "value-objects-money-and-units",
+        "seeded-determinism-and-golden-vectors",
+        "local-notifications",
+        "push-notifications",
+        "permissions-and-system-prompts",
+        "media-images-and-files",
+        "background-tasks",
+        "admob-ads-and-consent",
+        "in-app-purchases",
+        "analytics-and-consent",
+        "canvas-gestures-and-hit-testing",
+        "game-rules-engine",
+        "level-generation-and-solvers",
+        "game-session-host",
+        "realtime-game-loop",
+        "app-startup-and-bootstrap",
+        "motion-and-animation",
+        "audio-and-haptics-feedback",
+        "skia-canvas-rendering",
+        "adaptive-layout",
+        "design-system-structure",
+        "web-support",
+        "crash-reporting-and-observability",
+        "debug-menu-and-test-hooks",
+        "icons-app-icon-and-splash",
+        "rtl-and-direction",
+        "native-modules-and-new-architecture",
+        "ota-updates",
+        "new-game-scaffold",
+        "game-balance-and-bots",
+        "expo-prebuild-and-config-plugins"
+      ],
+      "require": [
+        "tdd-workflow"
+      ],
+      "why": "product code changes start with a failing test; the tests and the report are the review"
+    },
+    {
+      "id": "release-evidence",
+      "when": [
+        "ios-release-testflight",
+        "android-release-play",
+        "eas-build-and-submit",
+        "ota-updates"
+      ],
+      "require": [
+        "privacy-and-store-declarations",
+        "git-commits-and-reporting"
+      ],
+      "why": "a store build or update ships only with current privacy answers and a tagged, evidenced report"
+    }
+  ],
+  "tasks": [
+    {
+      "task": "Bootstrap a new Expo app from an empty or docs-only repo",
+      "skills": [
+        "expo-project-bootstrap",
+        "dependency-management",
+        "typescript-and-lint-rules",
+        "quality-gates",
+        "architecture-and-boundaries",
+        "unit-and-component-tests",
+        "git-commits-and-reporting"
+      ],
+      "note": "Then follow the build order \"A new app from an empty repo\" step by step.",
+      "quick": true
+    },
+    {
+      "task": "Adopt these skills in an existing Expo app",
+      "skills": [
+        "react-native-conventions-index",
+        "quality-gates",
+        "typescript-and-lint-rules",
+        "architecture-and-boundaries",
+        "dependency-management",
+        "expo-sdk-upgrade"
+      ],
+      "note": "Follow the build order \"Adopting the skills in an existing app\": measure first, fix the gates, then apply the feature order to new work only."
+    },
+    {
+      "task": "Add a feature: a screen with its logic, data and route",
+      "skills": [
+        "scaffold-feature-screen",
+        "tdd-workflow",
+        "screen-contracts",
+        "react-components-and-hooks",
+        "navigation-and-routing",
+        "state-management-zustand",
+        "i18n-strings-and-catalogs",
+        "rtl-and-direction",
+        "accessibility-as-code",
+        "design-visual-parity",
+        "unit-and-component-tests"
+      ],
+      "note": "Follow the build order \"A new feature\"; add the data rows below when the feature stores or fetches data.",
+      "quick": true
+    },
+    {
+      "task": "Build or change a screen, dialog or overlay",
+      "skills": [
+        "screen-contracts",
+        "ui-component-library",
+        "ui-states-and-feedback",
+        "design-system-structure",
+        "react-components-and-hooks",
+        "i18n-strings-and-catalogs",
+        "rtl-and-direction",
+        "accessibility-as-code",
+        "design-visual-parity",
+        "tdd-workflow"
+      ],
+      "note": "The screen's testIDs, copy keys and states live in contracts/screens.json first.",
+      "quick": true
+    },
+    {
+      "task": "Add or restyle a shared component",
+      "skills": [
+        "ui-component-library",
+        "design-system-structure",
+        "accessibility-as-code",
+        "react-components-and-hooks",
+        "unit-and-component-tests",
+        "i18n-strings-and-catalogs",
+        "rtl-and-direction",
+        "design-visual-parity",
+        "tdd-workflow"
+      ],
+      "quick": true
+    },
+    {
+      "task": "Change colours, fonts, dark mode or the theme",
+      "skills": [
+        "design-system-structure",
+        "accessibility-as-code",
+        "design-visual-parity",
+        "ui-component-library",
+        "tdd-workflow"
+      ],
+      "note": "Contrast pairs are proven in both themes before any screen uses a new colour.",
+      "quick": true
+    },
+    {
+      "task": "Show loading, empty, failed or offline states, a toast, a confirm or Undo",
+      "skills": [
+        "ui-states-and-feedback",
+        "error-handling-typed-results",
+        "motion-and-animation",
+        "i18n-strings-and-catalogs",
+        "rtl-and-direction",
+        "accessibility-as-code",
+        "design-visual-parity",
+        "tdd-workflow"
+      ],
+      "quick": true
+    },
+    {
+      "task": "Add a form, a text field or validation",
+      "skills": [
+        "forms-and-input",
+        "i18n-strings-and-catalogs",
+        "rtl-and-direction",
+        "accessibility-as-code",
+        "design-visual-parity",
+        "unit-and-component-tests",
+        "tdd-workflow"
+      ],
+      "quick": true
+    },
+    {
+      "task": "Make screens responsive for tablets, foldables, rotation or split screen",
+      "skills": [
+        "adaptive-layout",
+        "navigation-and-routing",
+        "design-visual-parity",
+        "rtl-and-direction",
+        "design-review-workflow",
+        "i18n-strings-and-catalogs",
+        "accessibility-as-code",
+        "tdd-workflow"
+      ]
+    },
+    {
+      "task": "Animate a transition, sheet, loop, drag or celebration",
+      "skills": [
+        "motion-and-animation",
+        "accessibility-as-code",
+        "performance-budgets",
+        "react-components-and-hooks",
+        "tdd-workflow"
+      ],
+      "note": "Every moment answers Reduce Motion and never blocks taps.",
+      "quick": true
+    },
+    {
+      "task": "Add or tune sounds, music or haptics",
+      "skills": [
+        "audio-and-haptics-feedback",
+        "settings-and-preferences",
+        "accessibility-as-code",
+        "performance-budgets",
+        "tdd-workflow"
+      ],
+      "note": "Sound respects the iOS silent switch and the user's music; haptics are checked on an Android device too."
+    },
+    {
+      "task": "Add an icon, a logo, the app icon or the splash",
+      "skills": [
+        "icons-app-icon-and-splash",
+        "design-system-structure",
+        "golden-and-snapshot-tests",
+        "app-variants-and-environment",
+        "expo-prebuild-and-config-plugins",
+        "tdd-workflow"
+      ],
+      "note": "Each variant gets its own icon; Android gets the adaptive icon and the Play art."
+    },
+    {
+      "task": "Draw a chart, grid or board on a canvas",
+      "skills": [
+        "skia-canvas-rendering",
+        "canvas-gestures-and-hit-testing",
+        "golden-and-snapshot-tests",
+        "accessibility-as-code",
+        "performance-budgets",
+        "rtl-and-direction",
+        "tdd-workflow"
+      ]
+    },
+    {
+      "task": "Take taps, swipes, drags or aim on a canvas",
+      "skills": [
+        "canvas-gestures-and-hit-testing",
+        "skia-canvas-rendering",
+        "accessibility-as-code",
+        "tdd-workflow"
+      ]
+    },
+    {
+      "task": "Add or change visible text, a message key, a plural or a translation",
+      "skills": [
+        "i18n-strings-and-catalogs",
+        "rtl-and-direction",
+        "naming-conventions",
+        "accessibility-as-code"
+      ],
+      "quick": true
+    },
+    {
+      "task": "Add a right-to-left language or fix mirrored layouts, icons or digits",
+      "skills": [
+        "rtl-and-direction",
+        "i18n-strings-and-catalogs",
+        "design-visual-parity",
+        "e2e-maestro",
+        "tdd-workflow"
+      ]
+    },
+    {
+      "task": "Add a route, a link or a guard, or fix Back",
+      "skills": [
+        "navigation-and-routing",
+        "scaffold-feature-screen",
+        "react-components-and-hooks",
+        "deep-links-and-universal-links",
+        "tdd-workflow",
+        "i18n-strings-and-catalogs",
+        "rtl-and-direction",
+        "accessibility-as-code",
+        "design-visual-parity"
+      ],
+      "note": "Expo Router by default; React Navigation 7 (static API) is the skill's appendix. Android back and predictive back are tested apart.",
+      "quick": true
+    },
+    {
+      "task": "Add a deep link, a custom scheme, universal links or Android App Links",
+      "skills": [
+        "deep-links-and-universal-links",
+        "navigation-and-routing",
+        "expo-prebuild-and-config-plugins",
+        "app-variants-and-environment",
+        "e2e-maestro",
+        "tdd-workflow"
+      ]
+    },
+    {
+      "task": "Edit the root layout or the cold start, or fix a splash that hangs or flashes",
+      "skills": [
+        "app-startup-and-bootstrap",
+        "error-handling-typed-results",
+        "persistence-and-migrations",
+        "performance-budgets",
+        "icons-app-icon-and-splash",
+        "tdd-workflow"
+      ],
+      "quick": true
+    },
+    {
+      "task": "Add a setting or a toggle, or fix one that is ignored or lost",
+      "skills": [
+        "settings-and-preferences",
+        "state-management-zustand",
+        "persistence-and-migrations",
+        "screen-contracts",
+        "i18n-strings-and-catalogs",
+        "design-visual-parity",
+        "tdd-workflow",
+        "rtl-and-direction",
+        "accessibility-as-code"
+      ],
+      "quick": true
+    },
+    {
+      "task": "Add a store, an action or a selector, or decide where state lives",
+      "skills": [
+        "state-management-zustand",
+        "react-components-and-hooks",
+        "persistence-and-migrations",
+        "unit-and-component-tests",
+        "tdd-workflow"
+      ],
+      "quick": true
+    },
+    {
+      "task": "Call an API, add a query or a mutation, or fix stale data",
+      "skills": [
+        "networking-and-server-state",
+        "error-handling-typed-results",
+        "async-safety",
+        "ui-states-and-feedback",
+        "privacy-and-store-declarations",
+        "tdd-workflow"
+      ],
+      "quick": true
+    },
+    {
+      "task": "Add sign-in, tokens, 401 retries, logout or account deletion",
+      "skills": [
+        "auth-and-secure-storage",
+        "networking-and-server-state",
+        "navigation-and-routing",
+        "app-variants-and-environment",
+        "privacy-and-store-declarations",
+        "tdd-workflow"
+      ],
+      "note": "Account deletion in the app is a store requirement on both platforms when the app has sign-up."
+    },
+    {
+      "task": "Add a table, a column or saved data, or leave AsyncStorage",
+      "skills": [
+        "persistence-and-migrations",
+        "state-management-zustand",
+        "error-handling-typed-results",
+        "golden-and-snapshot-tests",
+        "tdd-workflow"
+      ],
+      "quick": true
+    },
+    {
+      "task": "Ship a database migration in a release",
+      "skills": [
+        "run-migration",
+        "persistence-and-migrations",
+        "git-commits-and-reporting"
+      ],
+      "note": "run-migration is a runbook: invoke it by name."
+    },
+    {
+      "task": "Add backup, restore, import, export or CSV files",
+      "skills": [
+        "data-export-and-restore",
+        "persistence-and-migrations",
+        "error-handling-typed-results",
+        "media-images-and-files",
+        "i18n-strings-and-catalogs",
+        "tdd-workflow"
+      ]
+    },
+    {
+      "task": "Write try/catch, .catch or a Result, or fix swallowed errors",
+      "skills": [
+        "error-handling-typed-results",
+        "async-safety",
+        "crash-reporting-and-observability",
+        "ui-states-and-feedback",
+        "tdd-workflow"
+      ],
+      "quick": true
+    },
+    {
+      "task": "Write useEffect, timers, listeners or cancellation",
+      "skills": [
+        "async-safety",
+        "react-components-and-hooks",
+        "error-handling-typed-results",
+        "unit-and-component-tests",
+        "tdd-workflow"
+      ]
+    },
+    {
+      "task": "Read today, count days, show a streak or statistics, or fix a date that is a day off",
+      "skills": [
+        "dates-streaks-and-statistics",
+        "seeded-determinism-and-golden-vectors",
+        "i18n-strings-and-catalogs",
+        "tdd-workflow"
+      ]
+    },
+    {
+      "task": "Add a price, a currency, tax, a split, a unit or a timestamp",
+      "skills": [
+        "value-objects-money-and-units",
+        "i18n-strings-and-catalogs",
+        "persistence-and-migrations",
+        "tdd-workflow"
+      ]
+    },
+    {
+      "task": "Shuffle, replace Math.random, pick daily content or replay a seed",
+      "skills": [
+        "seeded-determinism-and-golden-vectors",
+        "dates-streaks-and-statistics",
+        "golden-and-snapshot-tests",
+        "tdd-workflow"
+      ]
+    },
+    {
+      "task": "Add a reminder or a local notification",
+      "skills": [
+        "local-notifications",
+        "permissions-and-system-prompts",
+        "dates-streaks-and-statistics",
+        "settings-and-preferences",
+        "background-tasks",
+        "tdd-workflow"
+      ],
+      "note": "Android channels and exact-alarm rules next to the iOS 64-notification cap."
+    },
+    {
+      "task": "Add push notifications, push tokens or notification taps",
+      "skills": [
+        "push-notifications",
+        "permissions-and-system-prompts",
+        "deep-links-and-universal-links",
+        "networking-and-server-state",
+        "privacy-and-store-declarations",
+        "tdd-workflow"
+      ]
+    },
+    {
+      "task": "Ask for a camera, photo, location or contacts permission",
+      "skills": [
+        "permissions-and-system-prompts",
+        "i18n-strings-and-catalogs",
+        "expo-prebuild-and-config-plugins",
+        "privacy-and-store-declarations",
+        "tdd-workflow"
+      ],
+      "note": "iOS purpose strings and Android runtime permissions, denied versus blocked, both tested."
+    },
+    {
+      "task": "Show, pick, take or store photos and files",
+      "skills": [
+        "media-images-and-files",
+        "permissions-and-system-prompts",
+        "persistence-and-migrations",
+        "data-export-and-restore",
+        "performance-budgets",
+        "privacy-and-store-declarations",
+        "tdd-workflow"
+      ]
+    },
+    {
+      "task": "Add a periodic background job, or fix one that never runs",
+      "skills": [
+        "background-tasks",
+        "persistence-and-migrations",
+        "async-safety",
+        "local-notifications",
+        "settings-and-preferences",
+        "tdd-workflow"
+      ]
+    },
+    {
+      "task": "Write Swift or Kotlin, a local Expo module or check a library for the New Architecture",
+      "skills": [
+        "native-modules-and-new-architecture",
+        "expo-prebuild-and-config-plugins",
+        "dependency-management",
+        "ios-simulator-build",
+        "android-emulator-build",
+        "privacy-and-store-declarations",
+        "tdd-workflow"
+      ]
+    },
+    {
+      "task": "Add a config plugin, an Info.plist or AndroidManifest entry, or a prebuild step",
+      "skills": [
+        "expo-prebuild-and-config-plugins",
+        "app-variants-and-environment",
+        "privacy-and-store-declarations",
+        "ios-simulator-build",
+        "android-emulator-build",
+        "tdd-workflow"
+      ]
+    },
+    {
+      "task": "Ship the web build (opt-in)",
+      "skills": [
+        "web-support",
+        "adaptive-layout",
+        "persistence-and-migrations",
+        "error-handling-typed-results",
+        "rtl-and-direction",
+        "tdd-workflow"
+      ],
+      "note": "The app is iOS and Android until it adopts web-support; its checks print NOT APPLICABLE before that."
+    },
+    {
+      "task": "Add or change ads, consent, the ATT prompt or a rewarded offer",
+      "skills": [
+        "admob-ads-and-consent",
+        "privacy-and-store-declarations",
+        "settings-and-preferences",
+        "architecture-and-boundaries",
+        "in-app-purchases",
+        "unit-and-component-tests",
+        "tdd-workflow"
+      ]
+    },
+    {
+      "task": "Sell Premium, change the paywall, restore or refunds",
+      "skills": [
+        "in-app-purchases",
+        "screen-contracts",
+        "ui-states-and-feedback",
+        "persistence-and-migrations",
+        "i18n-strings-and-catalogs",
+        "privacy-and-store-declarations",
+        "design-visual-parity",
+        "tdd-workflow",
+        "rtl-and-direction",
+        "accessibility-as-code"
+      ],
+      "note": "StoreKit testing on iOS and license testers on Play before any release."
+    },
+    {
+      "task": "Add crash reporting, a DSN, source maps or symbols",
+      "skills": [
+        "crash-reporting-and-observability",
+        "error-handling-typed-results",
+        "privacy-and-store-declarations",
+        "eas-build-and-submit",
+        "ota-updates",
+        "settings-and-preferences",
+        "tdd-workflow"
+      ]
+    },
+    {
+      "task": "Add product analytics, events or a usage-data toggle",
+      "skills": [
+        "analytics-and-consent",
+        "admob-ads-and-consent",
+        "privacy-and-store-declarations",
+        "settings-and-preferences",
+        "tdd-workflow"
+      ],
+      "note": "No analytics SDK starts before the user says yes."
+    },
+    {
+      "task": "Answer App Privacy or Data safety, or prove what the app sends",
+      "skills": [
+        "privacy-and-store-declarations",
+        "dependency-management",
+        "admob-ads-and-consent",
+        "analytics-and-consent",
+        "crash-reporting-and-observability",
+        "e2e-maestro"
+      ],
+      "quick": true
+    },
+    {
+      "task": "Add, upgrade or remove an npm package",
+      "skills": [
+        "dependency-management",
+        "privacy-and-store-declarations",
+        "performance-budgets",
+        "quality-gates",
+        "native-modules-and-new-architecture"
+      ],
+      "quick": true
+    },
+    {
+      "task": "Move to a new Expo SDK, Xcode or Android target SDK",
+      "skills": [
+        "expo-sdk-upgrade",
+        "dependency-management",
+        "unit-and-component-tests",
+        "golden-and-snapshot-tests",
+        "ios-simulator-build",
+        "android-emulator-build",
+        "e2e-maestro",
+        "troubleshooting-playbook"
+      ]
+    },
+    {
+      "task": "Add a build variant, an environment variable, a .env file or a secret",
+      "skills": [
+        "app-variants-and-environment",
+        "eas-build-and-submit",
+        "privacy-and-store-declarations",
+        "ci-pipeline-and-gates"
+      ],
+      "note": "EXPO_PUBLIC_* values are public; secrets live in EAS or CI, never in the repo or the bundle."
+    },
+    {
+      "task": "A quality gate, hook or verify run fails",
+      "skills": [
+        "quality-gates",
+        "troubleshooting-playbook",
+        "typescript-and-lint-rules",
+        "unit-and-component-tests"
+      ],
+      "note": "Fix the code, never weaken the gate.",
+      "quick": true
+    },
+    {
+      "task": "Fix a TypeScript, ESLint or Prettier error, or split a file that is too long",
+      "skills": [
+        "typescript-and-lint-rules",
+        "naming-conventions",
+        "architecture-and-boundaries",
+        "quality-gates"
+      ],
+      "quick": true
+    },
+    {
+      "task": "Place a new file, folder, port or adapter, or fix an import error",
+      "skills": [
+        "architecture-and-boundaries",
+        "naming-conventions",
+        "typescript-and-lint-rules",
+        "unit-and-component-tests"
+      ],
+      "quick": true
+    },
+    {
+      "task": "Name or rename a file, export, route, testID or key",
+      "skills": [
+        "naming-conventions",
+        "typescript-and-lint-rules",
+        "architecture-and-boundaries"
+      ]
+    },
+    {
+      "task": "Something errors, crashes, hangs or renders wrong",
+      "skills": [
+        "troubleshooting-playbook",
+        "quality-gates",
+        "ios-simulator-build",
+        "android-emulator-build"
+      ],
+      "note": "The playbook's entry names the skill that prevents the failure: load it next.",
+      "quick": true
+    },
+    {
+      "task": "Check or improve performance, or the app lags",
+      "skills": [
+        "performance-budgets",
+        "react-components-and-hooks",
+        "skia-canvas-rendering",
+        "motion-and-animation"
+      ],
+      "note": "Measure on a release build on both platforms before and after."
+    },
+    {
+      "task": "Review accessibility: VoiceOver, TalkBack, large text, contrast",
+      "skills": [
+        "accessibility-as-code",
+        "ui-component-library",
+        "i18n-strings-and-catalogs",
+        "e2e-maestro",
+        "design-review-workflow"
+      ]
+    },
+    {
+      "task": "Write a test or a mock, or Jest fails or flakes",
+      "skills": [
+        "unit-and-component-tests",
+        "tdd-workflow",
+        "async-safety",
+        "troubleshooting-playbook"
+      ],
+      "quick": true
+    },
+    {
+      "task": "Add a golden or snapshot test, or a .snap diff appears",
+      "skills": [
+        "golden-and-snapshot-tests",
+        "seeded-determinism-and-golden-vectors",
+        "skia-canvas-rendering",
+        "git-commits-and-reporting"
+      ]
+    },
+    {
+      "task": "Re-accept many goldens after an upgrade or an intended redesign",
+      "skills": [
+        "run-goldens-rebaseline",
+        "golden-and-snapshot-tests",
+        "git-commits-and-reporting"
+      ],
+      "note": "run-goldens-rebaseline is a runbook: invoke it by name; golden-and-snapshot-tests alone for a single golden."
+    },
+    {
+      "task": "Write or fix end-to-end flows or the screenshot runs",
+      "skills": [
+        "e2e-maestro",
+        "debug-menu-and-test-hooks",
+        "ios-simulator-build",
+        "android-emulator-build",
+        "design-visual-parity"
+      ],
+      "note": "Every Maestro run names its device: a simulator UDID or an adb serial."
+    },
+    {
+      "task": "Add a debug screen, a test hook, a debug link or a fake date",
+      "skills": [
+        "debug-menu-and-test-hooks",
+        "app-variants-and-environment",
+        "e2e-maestro",
+        "dates-streaks-and-statistics",
+        "tdd-workflow"
+      ]
+    },
+    {
+      "task": "Prove a screen matches its approved design",
+      "skills": [
+        "design-visual-parity",
+        "ios-simulator-build",
+        "android-emulator-build",
+        "screen-contracts",
+        "design-system-structure",
+        "i18n-strings-and-catalogs",
+        "rtl-and-direction",
+        "accessibility-as-code"
+      ],
+      "quick": true
+    },
+    {
+      "task": "Run the design review before a release",
+      "skills": [
+        "design-review-workflow",
+        "design-visual-parity",
+        "accessibility-as-code",
+        "rtl-and-direction",
+        "adaptive-layout"
+      ]
+    },
+    {
+      "task": "Build, run or smoke-test on the iOS simulator",
+      "skills": [
+        "ios-simulator-build",
+        "troubleshooting-playbook",
+        "app-variants-and-environment",
+        "e2e-maestro"
+      ]
+    },
+    {
+      "task": "Build, run or smoke-test on the Android emulator",
+      "skills": [
+        "android-emulator-build",
+        "troubleshooting-playbook",
+        "app-variants-and-environment",
+        "e2e-maestro"
+      ]
+    },
+    {
+      "task": "Configure EAS Build or Submit, or an EAS build fails",
+      "skills": [
+        "eas-build-and-submit",
+        "app-variants-and-environment",
+        "ota-updates",
+        "ci-pipeline-and-gates",
+        "privacy-and-store-declarations",
+        "git-commits-and-reporting"
+      ]
+    },
+    {
+      "task": "Release to TestFlight",
+      "skills": [
+        "ios-release-testflight",
+        "eas-build-and-submit",
+        "privacy-and-store-declarations",
+        "e2e-maestro",
+        "design-review-workflow",
+        "git-commits-and-reporting"
+      ],
+      "note": "Stop and ask the developer before the upload.",
+      "quick": true
+    },
+    {
+      "task": "Release to Google Play",
+      "skills": [
+        "android-release-play",
+        "eas-build-and-submit",
+        "privacy-and-store-declarations",
+        "e2e-maestro",
+        "design-review-workflow",
+        "git-commits-and-reporting"
+      ],
+      "note": "Stop and ask the developer before the upload or a rollout change.",
+      "quick": true
+    },
+    {
+      "task": "Ship an over-the-air update, set runtimeVersion or channels",
+      "skills": [
+        "ota-updates",
+        "eas-build-and-submit",
+        "app-variants-and-environment",
+        "crash-reporting-and-observability",
+        "privacy-and-store-declarations",
+        "git-commits-and-reporting",
+        "tdd-workflow"
+      ]
+    },
+    {
+      "task": "Edit the CI workflows, or CI fails",
+      "skills": [
+        "ci-pipeline-and-gates",
+        "quality-gates",
+        "eas-build-and-submit",
+        "e2e-maestro",
+        "dependency-management"
+      ]
+    },
+    {
+      "task": "Commit, tag, report, or ask the developer a question",
+      "skills": [
+        "git-commits-and-reporting",
+        "quality-gates",
+        "spec-traceability"
+      ],
+      "quick": true
+    },
+    {
+      "task": "Find out what the spec requires, or the task cites a requirement ID",
+      "skills": [
+        "spec-traceability",
+        "react-native-conventions-index"
+      ],
+      "note": "An app without a spec gets NOT APPLICABLE from spec-traceability's checks.",
+      "quick": true
+    },
+    {
+      "task": "Create, change or repair a skill",
+      "skills": [
+        "skill-maintenance",
+        "react-native-conventions-index",
+        "git-commits-and-reporting"
+      ],
+      "note": "Then regenerate this index: build-index.mjs --write and check-index.mjs."
+    },
+    {
+      "task": "Start a new game (games plugin)",
+      "skills": [
+        "new-game-scaffold",
+        "game-rules-engine",
+        "level-generation-and-solvers",
+        "game-session-host",
+        "architecture-and-boundaries",
+        "tdd-workflow"
+      ],
+      "note": "Follow the build order \"A new game\"."
+    },
+    {
+      "task": "Write a game's rules, moves, scoring or in-game randomness",
+      "skills": [
+        "game-rules-engine",
+        "tdd-workflow",
+        "unit-and-component-tests",
+        "seeded-determinism-and-golden-vectors",
+        "game-balance-and-bots"
+      ]
+    },
+    {
+      "task": "Add levels, a solver, par, stars, packs or a daily level",
+      "skills": [
+        "level-generation-and-solvers",
+        "game-rules-engine",
+        "golden-and-snapshot-tests",
+        "seeded-determinism-and-golden-vectors",
+        "tdd-workflow"
+      ]
+    },
+    {
+      "task": "Wire a game into the app: game screen, pause, results, saved runs",
+      "skills": [
+        "game-session-host",
+        "navigation-and-routing",
+        "state-management-zustand",
+        "persistence-and-migrations",
+        "skia-canvas-rendering",
+        "i18n-strings-and-catalogs",
+        "tdd-workflow",
+        "rtl-and-direction",
+        "accessibility-as-code",
+        "design-visual-parity"
+      ]
+    },
+    {
+      "task": "Balance difficulty, tune pacing or add bots and sims",
+      "skills": [
+        "game-balance-and-bots",
+        "game-rules-engine",
+        "level-generation-and-solvers",
+        "git-commits-and-reporting",
+        "tdd-workflow"
+      ]
+    },
+    {
+      "task": "Build a real-time game, live motion or a simulate-then-replay phase",
+      "skills": [
+        "realtime-game-loop",
+        "skia-canvas-rendering",
+        "canvas-gestures-and-hit-testing",
+        "game-rules-engine",
+        "performance-budgets",
+        "golden-and-snapshot-tests",
+        "tdd-workflow"
+      ]
+    }
+  ],
+  "requireManifests": [
+    "new-app"
+  ],
+  "buildOrders": [
+    {
+      "id": "new-app",
+      "title": "A new app from an empty repo",
+      "intro": "One Expo app at the repo root (src/ layout, the @/ alias, Expo Router), iOS and Android from day one. The skeleton holds only what its own configs and gates need, so every gate is green on day one; each later step adds the layer the next one depends on. Each skill's checker reports its part as missing until its step: that is the order, not a bug. When the repo is a monorepo, each skill's \"When multi-package\" section applies.",
+      "steps": [
+        {
+          "step": "Generate the skeleton: SDK 57 stack, root configs, gates, variants. Plan with `scaffold-app.mjs . --app-id <id> --name <name>`, then add --write",
+          "skills": [
+            "expo-project-bootstrap",
+            "dependency-management",
+            "typescript-and-lint-rules",
+            "quality-gates",
+            "git-commits-and-reporting"
+          ],
+          "proof": "`check-skeleton.mjs .` (expo-project-bootstrap), `check-configs.mjs .` (typescript-and-lint-rules), `check-gate-wiring.mjs .` (quality-gates) and `check-deps-policy.mjs .` (dependency-management) print RESULT: PASS; `npm run -s check:fast` is green; the first commit passes `check-commits.mjs . --range <base>..HEAD` (git-commits-and-reporting)",
+          "copies": [
+            {
+              "skill": "expo-project-bootstrap",
+              "paths": [
+                "**"
+              ],
+              "note": "written by scaffold-app.mjs --write with the placeholders filled; never copy them by hand"
+            }
+          ],
+          "generates": [
+            {
+              "tool": "scaffold-app.mjs --write (expo-project-bootstrap)",
+              "paths": [
+                "package.json",
+                "package-lock.json",
+                "AGENTS.md",
+                "CLAUDE.md",
+                ".claude/settings.json",
+                "assets/**"
+              ],
+              "installs": [
+                "expo",
+                "expo-constants",
+                "expo-dev-client",
+                "expo-linking",
+                "expo-router",
+                "expo-splash-screen",
+                "expo-system-ui",
+                "react",
+                "react-dom",
+                "react-native",
+                "react-native-gesture-handler",
+                "react-native-reanimated",
+                "react-native-safe-area-context",
+                "react-native-screens",
+                "react-native-web",
+                "react-native-worklets",
+                "@react-native/eslint-plugin",
+                "@react-native/jest-preset",
+                "@stryker-mutator/core",
+                "@stryker-mutator/jest-runner",
+                "@stryker-mutator/typescript-checker",
+                "@testing-library/react-native",
+                "@types/jest",
+                "@types/node",
+                "@types/react",
+                "babel-jest",
+                "eslint",
+                "eslint-config-expo",
+                "eslint-config-prettier",
+                "eslint-plugin-check-file",
+                "eslint-plugin-formatjs",
+                "eslint-plugin-jest",
+                "eslint-plugin-react-native",
+                "eslint-plugin-sonarjs",
+                "eslint-plugin-testing-library",
+                "fast-check",
+                "globals",
+                "jest",
+                "jest-expo",
+                "knip",
+                "lefthook",
+                "prettier",
+                "test-renderer",
+                "typescript",
+                "typescript-eslint"
+              ]
+            }
+          ]
+        },
+        {
+          "step": "Typed results, the composition root, the ports and their fakes (clock, error log, direction guard)",
+          "skills": [
+            "architecture-and-boundaries",
+            "error-handling-typed-results",
+            "seeded-determinism-and-golden-vectors",
+            "naming-conventions"
+          ],
+          "proof": "`check-layout.mjs .` and `check-boundaries.mjs .` (architecture-and-boundaries), `check-file-names.mjs .` (naming-conventions) print RESULT: PASS; `npx jest src/core src/services --ci` passes",
+          "copies": [
+            {
+              "skill": "error-handling-typed-results",
+              "paths": [
+                "src/core/result.ts",
+                "src/core/result.test.ts"
+              ]
+            },
+            {
+              "skill": "seeded-determinism-and-golden-vectors",
+              "paths": [
+                "src/core/dates/date-key.ts",
+                "src/core/dates/date-key.test.ts"
+              ]
+            },
+            {
+              "skill": "architecture-and-boundaries",
+              "paths": [
+                "src/**",
+                "contracts/**"
+              ]
+            },
+            {
+              "skill": "naming-conventions",
+              "paths": [
+                "contracts/naming.json"
+              ]
+            }
+          ],
+          "installs": [
+            {
+              "package": "expo-sqlite",
+              "where": "the key-value store behind the direction guard"
+            }
+          ]
+        },
+        {
+          "step": "The global error net and the async helpers (the root error boundary waits for step 10)",
+          "skills": [
+            "error-handling-typed-results",
+            "async-safety"
+          ],
+          "proof": "`check-error-spine.mjs .` and `check-error-net.mjs .` (error-handling-typed-results), `check-async-safety.mjs .` (async-safety) print RESULT: PASS",
+          "copies": [
+            {
+              "skill": "error-handling-typed-results",
+              "paths": [
+                "src/services/error-net/**"
+              ]
+            },
+            {
+              "skill": "async-safety",
+              "paths": [
+                "src/**"
+              ]
+            }
+          ]
+        },
+        {
+          "step": "The design system: tokens, light and dark sets, the theme provider, AppText",
+          "skills": [
+            "design-system-structure"
+          ],
+          "proof": "`check-design-system.mjs .` and `check-raw-values.mjs .` print RESULT: PASS",
+          "copies": [
+            {
+              "skill": "design-system-structure",
+              "paths": [
+                "src/**",
+                "design/**",
+                "contracts/**"
+              ]
+            }
+          ]
+        },
+        {
+          "step": "Message catalogs, t(), the Intl polyfills and the catalog verifier",
+          "skills": [
+            "i18n-strings-and-catalogs"
+          ],
+          "proof": "`check-catalogs.mjs .` and `check-i18n-code.mjs .` print RESULT: PASS; `npm run verify` now runs to its end",
+          "copies": [
+            {
+              "skill": "i18n-strings-and-catalogs",
+              "paths": [
+                "src/**",
+                "scripts/**",
+                "test/**",
+                "contracts/**",
+                "index.ts"
+              ]
+            }
+          ],
+          "installs": [
+            {
+              "package": "react-intl"
+            },
+            {
+              "package": "@formatjs/intl-getcanonicallocales"
+            },
+            {
+              "package": "@formatjs/intl-locale"
+            },
+            {
+              "package": "@formatjs/intl-pluralrules"
+            },
+            {
+              "package": "@formatjs/intl-numberformat"
+            },
+            {
+              "package": "expo-localization"
+            },
+            {
+              "package": "@formatjs/icu-messageformat-parser",
+              "where": "dev, for the catalog verifier"
+            }
+          ]
+        },
+        {
+          "step": "Direction: logical styles, the direction gate and the restart guard",
+          "skills": [
+            "rtl-and-direction"
+          ],
+          "proof": "`check-rtl.mjs .` prints RESULT: PASS",
+          "copies": [
+            {
+              "skill": "rtl-and-direction",
+              "paths": [
+                "src/**",
+                "test/**",
+                "contracts/**",
+                ".maestro/**"
+              ],
+              "exclude": [
+                "src/ui/physical-direction-view*"
+              ]
+            }
+          ]
+        },
+        {
+          "step": "The test helpers: renderWithProviders, the router render helper, the test app (and the one direction view whose test renders through them)",
+          "skills": [
+            "unit-and-component-tests",
+            "rtl-and-direction"
+          ],
+          "proof": "`check-test-setup.mjs .` and `check-test-code.mjs .` print RESULT: PASS",
+          "copies": [
+            {
+              "skill": "unit-and-component-tests",
+              "paths": [
+                "test/**",
+                "contracts/**"
+              ],
+              "exclude": [
+                "test/skia-mock.test.tsx"
+              ]
+            },
+            {
+              "skill": "rtl-and-direction",
+              "paths": [
+                "src/ui/physical-direction-view*"
+              ]
+            }
+          ],
+          "installs": [
+            {
+              "package": "@tanstack/react-query",
+              "where": "the test app's query client; networking-and-server-state uses it from its first query"
+            }
+          ]
+        },
+        {
+          "step": "The accessibility kit: system settings store, Reduce Motion, announcements, contrast pairs",
+          "skills": [
+            "accessibility-as-code"
+          ],
+          "proof": "`check-a11y-code.mjs .` and `check-contrast.mjs .` print RESULT: PASS",
+          "copies": [
+            {
+              "skill": "accessibility-as-code",
+              "paths": [
+                "src/**",
+                "test/**",
+                "contracts/**",
+                ".maestro/**"
+              ]
+            }
+          ],
+          "installs": [
+            {
+              "package": "zustand"
+            }
+          ]
+        },
+        {
+          "step": "The motion catalog and the screen transition with its Reduce Motion answer",
+          "skills": [
+            "motion-and-animation"
+          ],
+          "proof": "`npx jest src/ui/motion src/ui/a11y --ci` passes; `check-motion.mjs .` runs at step 12, once the root stack animates the screen transition",
+          "copies": [
+            {
+              "skill": "motion-and-animation",
+              "paths": [
+                "src/**"
+              ],
+              "note": "fill __ROOT_STACK_FILE__ in src/ui/motion/motion-moments.ts with src/features/root-navigator/app-stack.tsx, the file step 12 brings"
+            }
+          ]
+        },
+        {
+          "step": "The root error boundary: the crash fallback, the crash screen, the route error boundary",
+          "skills": [
+            "error-handling-typed-results"
+          ],
+          "proof": "`check-error-net.mjs .` (error-handling-typed-results) prints RESULT: PASS",
+          "copies": [
+            {
+              "skill": "error-handling-typed-results",
+              "paths": [
+                "src/features/crash-recovery/**"
+              ]
+            }
+          ]
+        },
+        {
+          "step": "The data layer the root opens: the SQL driver, migrations, the database open path, the SQLite error log",
+          "skills": [
+            "persistence-and-migrations"
+          ],
+          "proof": "`check-persistence.mjs .` prints RESULT: PASS",
+          "copies": [
+            {
+              "skill": "persistence-and-migrations",
+              "paths": [
+                "src/**",
+                "test/**",
+                "contracts/**"
+              ],
+              "exclude": [
+                "src/data/document/**",
+                "test/sqlite/sqlite-document-store.test.ts",
+                "src/data/peek-database.ts"
+              ],
+              "note": "the Tasks tables of the first migration are the sample: rename them to the app's domain test-first; the save-document appendix (src/data/document/) and the startup peek (src/data/peek-database.ts) come only with the feature that needs them"
+            }
+          ],
+          "installs": [
+            {
+              "package": "expo-file-system"
+            },
+            {
+              "package": "valibot"
+            }
+          ]
+        },
+        {
+          "step": "The root skeleton: splash hold, providers, startup gate (replaces the starter root layout)",
+          "skills": [
+            "app-startup-and-bootstrap",
+            "motion-and-animation",
+            "forms-and-input"
+          ],
+          "proof": "`check-startup.mjs .` (app-startup-and-bootstrap) and `check-motion.mjs .` (motion-and-animation) print RESULT: PASS",
+          "copies": [
+            {
+              "skill": "app-startup-and-bootstrap",
+              "paths": [
+                "src/**",
+                "contracts/**"
+              ]
+            },
+            {
+              "skill": "app-startup-and-bootstrap",
+              "paths": [
+                "src/app/_layout.tsx"
+              ],
+              "swap": true
+            },
+            {
+              "skill": "forms-and-input",
+              "paths": [
+                "__mocks__/react-native-keyboard-controller.ts"
+              ],
+              "note": "the root mock Jest needs once the package is installed"
+            }
+          ],
+          "installs": [
+            {
+              "package": "react-native-keyboard-controller",
+              "where": "the root stack's keyboard provider, which forms-and-input owns"
+            }
+          ]
+        },
+        {
+          "step": "The route contract and the not-found route",
+          "skills": [
+            "navigation-and-routing"
+          ],
+          "proof": "`check-navigation.mjs .` prints RESULT: PASS",
+          "copies": [
+            {
+              "skill": "navigation-and-routing",
+              "paths": [
+                "src/app/+not-found.tsx",
+                "src/features/not-found/**",
+                "contracts/**"
+              ],
+              "note": "replace the template contract's sample routes with the app's"
+            },
+            {
+              "skill": "navigation-and-routing",
+              "paths": [
+                "src/i18n/catalogs/*.json"
+              ],
+              "merge": true
+            }
+          ]
+        },
+        {
+          "step": "Variants, environment and secrets checked before the first device build",
+          "skills": [
+            "app-variants-and-environment"
+          ],
+          "proof": "`check-variants.mjs .` and `check-env.mjs .` print RESULT: PASS",
+          "copies": [
+            {
+              "skill": "app-variants-and-environment",
+              "paths": [
+                "src/config/**",
+                ".env.example"
+              ],
+              "note": "the skeleton's app.config.ts already holds the three variants: keep it (the skill's fuller app.config.ts template is for adopting an existing app)"
+            }
+          ]
+        },
+        {
+          "step": "The first real feature, replacing the starter screen: follow \"A new feature\"",
+          "skills": [
+            "scaffold-feature-screen",
+            "tdd-workflow",
+            "screen-contracts"
+          ],
+          "proof": "`check-feature.mjs . --feature <f>` (scaffold-feature-screen), `check-screens.mjs . --all` (screen-contracts) and `check-tests.mjs .` (tdd-workflow) print RESULT: PASS",
+          "copies": [
+            {
+              "skill": "screen-contracts",
+              "paths": [
+                "contracts/**"
+              ],
+              "note": "the contract and its schema; replace the demo screens with the app's before the generator adds the first one"
+            },
+            {
+              "skill": "scaffold-feature-screen",
+              "paths": [
+                "src/app/__ROUTE_ID__.tsx",
+                "src/features/__FEATURE__/**"
+              ],
+              "note": "scaffold-feature.mjs . --feature <f> --route index --title <Title> --write writes them with the placeholders filled, adds the feature's message keys to every catalog and its entries to contracts/navigation.json and contracts/screens.json; delete src/app/index.tsx and src/features/home/ first"
+            }
+          ]
+        },
+        {
+          "step": "Devices: test-only hooks, a named iOS simulator and a named Android emulator, the first Maestro smoke flow",
+          "skills": [
+            "debug-menu-and-test-hooks",
+            "e2e-maestro",
+            "ios-simulator-build",
+            "android-emulator-build",
+            "networking-and-server-state"
+          ],
+          "proof": "`check-test-hooks.mjs .` (debug-menu-and-test-hooks), `check-e2e-setup.mjs .` (e2e-maestro), `check-sim-setup.mjs .` (ios-simulator-build) and `check-emu-setup.mjs .` (android-emulator-build) print RESULT: PASS",
+          "copies": [
+            {
+              "skill": "networking-and-server-state",
+              "paths": [
+                "src/services/connectivity/**"
+              ],
+              "note": "the connectivity port the test hooks simulate"
+            },
+            {
+              "skill": "debug-menu-and-test-hooks",
+              "paths": [
+                "src/**",
+                "contracts/**"
+              ]
+            },
+            {
+              "skill": "debug-menu-and-test-hooks",
+              "paths": [
+                "src/i18n/catalogs/*.json"
+              ],
+              "merge": true
+            },
+            {
+              "skill": "ios-simulator-build",
+              "paths": [
+                "scripts/**",
+                "contracts/**"
+              ],
+              "note": "its scripts run macOS plutil: add \"plutil\" to knip.json ignoreBinaries with its reason in contracts/knip-ignores.json (quality-gates)"
+            },
+            {
+              "skill": "android-emulator-build",
+              "paths": [
+                "scripts/**",
+                "contracts/**"
+              ]
+            },
+            {
+              "skill": "e2e-maestro",
+              "paths": [
+                "scripts/**",
+                ".maestro/**",
+                "contracts/**"
+              ]
+            }
+          ],
+          "installs": [
+            {
+              "package": "expo-network"
+            }
+          ]
+        },
+        {
+          "step": "CI: verify on every pull request, device lanes, manual releases",
+          "skills": [
+            "ci-pipeline-and-gates"
+          ],
+          "proof": "`check-workflows.mjs .` and `check-ci-lanes.mjs .` print RESULT: PASS",
+          "copies": [
+            {
+              "skill": "ci-pipeline-and-gates",
+              "paths": [
+                ".github/**",
+                "contracts/**"
+              ]
+            }
+          ]
+        },
+        {
+          "step": "The first EAS builds and the privacy baseline",
+          "skills": [
+            "eas-build-and-submit",
+            "privacy-and-store-declarations"
+          ],
+          "proof": "`check-eas-config.mjs .` (eas-build-and-submit) and `audit-repo.mjs .` (privacy-and-store-declarations) print RESULT: PASS",
+          "copies": [
+            {
+              "skill": "eas-build-and-submit",
+              "paths": [
+                "eas.json",
+                "scripts/**"
+              ]
+            },
+            {
+              "skill": "privacy-and-store-declarations",
+              "paths": [
+                "scripts/**",
+                "src/**",
+                "contracts/**"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "new-feature",
+      "title": "A new feature",
+      "intro": "One feature (for example reminders for a task), slice by slice, each slice one commit that starts with its own failing test. tdd-workflow owns the layer order inside a feature; skip the layers the feature does not have (no persistence step for a feature that stores nothing), never reorder them.",
+      "steps": [
+        {
+          "step": "Find the requirement and plan the slices (when the app keeps a spec: `spec-lookup.mjs . <ids>`)",
+          "skills": [
+            "spec-traceability",
+            "tdd-workflow"
+          ],
+          "proof": "The plan quotes the requirement IDs or says the app has no spec; `check-spec-refs.mjs .` (spec-traceability) prints RESULT: PASS or NOT APPLICABLE",
+          "noManifest": "planning: the plan and the spec lookup write no app file"
+        },
+        {
+          "step": "Scaffold the feature: thin route, pure view, model hook, tests, message keys (`scaffold-feature.mjs . --feature <f> --route <route> --title <Title>`)",
+          "skills": [
+            "scaffold-feature-screen",
+            "naming-conventions"
+          ],
+          "proof": "`check-feature.mjs . --feature <f>` (scaffold-feature-screen) prints RESULT: PASS",
+          "copies": [
+            {
+              "skill": "scaffold-feature-screen",
+              "paths": [
+                "src/app/__ROUTE_ID__.tsx",
+                "src/features/__FEATURE__/**",
+                "src/app/__DETAIL_ROUTE_ID__.tsx",
+                "src/features/__DETAIL__/**"
+              ],
+              "note": "scaffold-feature.mjs writes them with the placeholders filled (the detail files only with a detail route) and adds the message keys and contract entries"
+            }
+          ]
+        },
+        {
+          "step": "Pure domain logic: examples, properties and one pinned value",
+          "skills": [
+            "tdd-workflow",
+            "value-objects-money-and-units",
+            "dates-streaks-and-statistics"
+          ],
+          "proof": "`check-tests.mjs .` (tdd-workflow) prints RESULT: PASS; add `check-value-core.mjs .` (value-objects-money-and-units) or `check-streaks-and-stats.mjs .` (dates-streaks-and-statistics) when the logic holds money or calendar days",
+          "noManifest": "the feature's own domain code, written test-first in src/core/<feature>/; value-objects-money-and-units and dates-streaks-and-statistics bring their kits with the first feature that holds money or calendar days"
+        },
+        {
+          "step": "Persistence, when the feature stores data: migration, repository on node:sqlite",
+          "skills": [
+            "persistence-and-migrations"
+          ],
+          "proof": "`check-persistence.mjs .` prints RESULT: PASS",
+          "noManifest": "the data layer arrived with step 11 of \"A new app from an empty repo\"; the feature adds its own migration and repository, test-first (persistence-and-migrations' examples show the shape)"
+        },
+        {
+          "step": "Services behind ports, tested over fakes; remote data through the ApiClient",
+          "skills": [
+            "architecture-and-boundaries",
+            "networking-and-server-state",
+            "error-handling-typed-results"
+          ],
+          "proof": "`check-boundaries.mjs .` (architecture-and-boundaries), `check-server-state.mjs .` (networking-and-server-state) and `check-error-spine.mjs .` (error-handling-typed-results) print RESULT: PASS",
+          "copies": [
+            {
+              "skill": "networking-and-server-state",
+              "paths": [
+                "src/api/**",
+                "src/config/api-base-url*",
+                "test/api/**"
+              ],
+              "exclude": [
+                "src/api/tasks/**"
+              ],
+              "note": "only with the first feature that reads remote data; the connectivity port is already there"
+            }
+          ]
+        },
+        {
+          "step": "The store slice and the model hook",
+          "skills": [
+            "state-management-zustand",
+            "react-components-and-hooks",
+            "async-safety"
+          ],
+          "proof": "`check-reducers.mjs .` and `check-stores.mjs .` (state-management-zustand), `check-react-rules.mjs .` (react-components-and-hooks) and `check-async-safety.mjs .` (async-safety) print RESULT: PASS",
+          "noManifest": "the feature's store slice and model hook are its own code, written test-first (state-management-zustand's templates show the shape)"
+        },
+        {
+          "step": "The components and the screen with every state",
+          "skills": [
+            "screen-contracts",
+            "ui-component-library",
+            "ui-states-and-feedback",
+            "i18n-strings-and-catalogs",
+            "rtl-and-direction",
+            "accessibility-as-code",
+            "design-visual-parity"
+          ],
+          "proof": "`check-screens.mjs . --all` (screen-contracts), `check-ui-states.mjs .` (ui-states-and-feedback), `check-i18n-code.mjs .` (i18n-strings-and-catalogs), `check-rtl.mjs .` (rtl-and-direction) and `check-a11y-code.mjs .` (accessibility-as-code) print RESULT: PASS",
+          "copies": [
+            {
+              "skill": "ui-component-library",
+              "paths": [
+                "src/ui/**",
+                "contracts/**"
+              ],
+              "note": "the shared components, with the first feature that uses them"
+            },
+            {
+              "skill": "ui-states-and-feedback",
+              "paths": [
+                "src/ui/feedback/**",
+                "src/hooks/**",
+                "contracts/**"
+              ]
+            },
+            {
+              "skill": "ui-states-and-feedback",
+              "paths": [
+                "src/i18n/catalogs/*.json"
+              ],
+              "merge": true
+            }
+          ]
+        },
+        {
+          "step": "The route file and its route test (link, deep link, back, Android back)",
+          "skills": [
+            "navigation-and-routing"
+          ],
+          "proof": "`check-navigation.mjs .` prints RESULT: PASS",
+          "noManifest": "the route file is the scaffold's; the step adds its route test"
+        },
+        {
+          "step": "One Maestro flow reaching the screen by testID, on a named iOS simulator and a named Android emulator",
+          "skills": [
+            "e2e-maestro"
+          ],
+          "proof": "`check-flows.mjs . --syntax` prints RESULT: PASS, then `check-e2e-report.mjs . --platform ios` and `check-e2e-report.mjs . --platform android` after the runs",
+          "noManifest": "the flow is the feature's own .maestro file; the Maestro kit arrived with step 16 of \"A new app from an empty repo\""
+        },
+        {
+          "step": "The screenshots of each changed screen: light and dark, LTR and RTL, both platforms, against the approved design",
+          "skills": [
+            "design-visual-parity"
+          ],
+          "proof": "`check-signoff.mjs . --screen <id>` (design-visual-parity) prints RESULT: PASS",
+          "noManifest": "screenshots and sign-off records only"
+        },
+        {
+          "step": "Commit and report",
+          "skills": [
+            "git-commits-and-reporting",
+            "quality-gates"
+          ],
+          "proof": "`npm run verify` is green; `check-commits.mjs . --range <base>..HEAD` and `check-report.mjs . --report reports/<report>.md` (git-commits-and-reporting) print RESULT: PASS",
+          "noManifest": "a commit and a report only"
+        }
+      ],
+      "base": {
+        "order": "new-app",
+        "through": 18
+      }
+    },
+    {
+      "id": "release",
+      "title": "A release to the App Store and Google Play",
+      "intro": "From a green main branch to builds in TestFlight and a Play testing track, on EAS Build and Submit (eas-build-and-submit owns the store sequence). Every check that reads configuration baked into the binary (variants, eas.json profiles, the update channel and runtime version, the crash reporter's source-map upload) runs at step 4, before anything is built, so a FAIL never costs a build number. A team without EAS takes the local lanes instead: `npm run release:ios` (ios-release-testflight) and the local Play upload (android-release-play), each behind the same artifact gates; the steps that carry a local-lane proof say what it runs instead (step 4 runs `check-eas-config.mjs .` without --release, which prints NOT APPLICABLE or the internal-only EAS note), and those skills' local-lane commands replace steps 5 to 8. Ship gates never skip: their only relaxation is a keyless --rehearsal, which is never release evidence. Stop and ask the developer before the store build, every submission, every tag push and every rollout change.",
+      "steps": [
+        {
+          "step": "Verify the tree and the gates",
+          "skills": [
+            "quality-gates",
+            "tdd-workflow"
+          ],
+          "proof": "`npm run verify` is green; `check-bypasses.mjs .` (quality-gates) and `check-tests.mjs .` (tdd-workflow) print RESULT: PASS"
+        },
+        {
+          "step": "The design review: every screen, theme, direction, text size and device class, signed off",
+          "skills": [
+            "design-review-workflow",
+            "accessibility-as-code",
+            "adaptive-layout"
+          ],
+          "proof": "`check-review.mjs .` and `check-signoff.mjs .` (design-review-workflow) print RESULT: PASS"
+        },
+        {
+          "step": "Privacy: SDK inventory, the iOS privacy manifest, App Privacy and Data safety answers",
+          "skills": [
+            "privacy-and-store-declarations"
+          ],
+          "proof": "`audit-repo.mjs .` prints RESULT: PASS"
+        },
+        {
+          "step": "Build configuration in ship mode, before any build: variants, eas.json profiles, remote build numbers, submit ids, the update channel and fingerprint runtime, crash-report source maps",
+          "skills": [
+            "eas-build-and-submit",
+            "app-variants-and-environment",
+            "ota-updates",
+            "crash-reporting-and-observability",
+            "privacy-and-store-declarations",
+            "git-commits-and-reporting"
+          ],
+          "proof": "`check-eas-config.mjs . --release` (eas-build-and-submit), `check-variants.mjs .` (app-variants-and-environment), `check-ota.mjs .` (ota-updates) and `check-crash-reporting.mjs .` (crash-reporting-and-observability) print RESULT: PASS (the last two may print NOT APPLICABLE when the app ships no updates or no crash reporter)",
+          "localLane": "`check-eas-config.mjs .` (eas-build-and-submit) without --release prints NOT APPLICABLE or the internal-only EAS note; `check-variants.mjs .` (app-variants-and-environment), `check-ota.mjs .` (ota-updates), `check-crash-reporting.mjs .` (crash-reporting-and-observability), `check-release-setup.mjs .` (ios-release-testflight) and `check-play-release-setup.mjs . --release` (android-release-play) print RESULT: PASS (or NOT APPLICABLE for updates and crash reporting)"
+        },
+        {
+          "step": "The preflight: `node scripts/eas/release-preflight.ts --profile production --platform all --what-to-test \"<text>\"` runs verify, checks the tree, the profile and the version, writes the fingerprints to dist/eas/ and prints the release sequence; then stop and ask the developer for the store build (one message: version, platforms, what will be uploaded)",
+          "skills": [
+            "eas-build-and-submit",
+            "git-commits-and-reporting"
+          ],
+          "proof": "The preflight exits 0 and the developer said yes to the store build in this session; nothing was built before that"
+        },
+        {
+          "step": "The store build and its record: `eas build --profile production --platform all --non-interactive --freeze-credentials --message '<commit subject>' --json > dist/eas/builds.json` (never --auto-submit for Android, never --latest later)",
+          "skills": [
+            "eas-build-and-submit",
+            "git-commits-and-reporting"
+          ],
+          "proof": "`check-eas-build.mjs . --build dist/eas/builds.json --platform ios` and `check-eas-build.mjs . --build dist/eas/builds.json --platform android` (eas-build-and-submit) print RESULT: PASS: finished store builds of the production profile, from the reviewed commit, with a build number above every upload tag and the preflight's fingerprint"
+        },
+        {
+          "step": "iOS: download the record's .ipa to build/ios-release/export/app.ipa, gate it, then after the developer says yes `eas submit --profile production --platform ios --path build/ios-release/export/app.ipa --non-interactive --what-to-test '<text>'`",
+          "skills": [
+            "ios-release-testflight",
+            "eas-build-and-submit",
+            "privacy-and-store-declarations",
+            "git-commits-and-reporting"
+          ],
+          "proof": "`check-store-artifact.mjs . --ipa build/ios-release/export/app.ipa --variant production --version <x.y.z> --build <n>` (ios-release-testflight) prints RESULT: PASS before the submit; the submission reaches VALID processing in App Store Connect"
+        },
+        {
+          "step": "Android: download the record's bundle to build/release-android/app-release.aab, gate it, then after the developer says yes `eas submit --profile production --platform android --path build/release-android/app-release.aab --non-interactive` to the testing track",
+          "skills": [
+            "android-release-play",
+            "eas-build-and-submit",
+            "privacy-and-store-declarations",
+            "git-commits-and-reporting"
+          ],
+          "proof": "`check-play-release-setup.mjs . --release` and `check-store-aab.mjs . --aab build/release-android/app-release.aab --version-code <n> --stamp build/release-android/aab-gate.json` (android-release-play) print RESULT: PASS before the submit"
+        },
+        {
+          "step": "After the builds: confirm each build record's channel and runtime version match what step 4 checked, and that this build's source maps and debug symbols reached the crash reporter (nothing here changes a shipped binary)",
+          "skills": [
+            "ota-updates",
+            "crash-reporting-and-observability",
+            "privacy-and-store-declarations",
+            "git-commits-and-reporting"
+          ],
+          "proof": "The build records in dist/eas/builds.json name the production channel and the preflight's runtime version, and the crash reporter lists this release with its source maps; `check-ota.mjs .` (ota-updates) and `check-crash-reporting.mjs .` (crash-reporting-and-observability) still print RESULT: PASS or NOT APPLICABLE",
+          "localLane": "The archive's and the bundle's channel and runtime version come from the same app config step 4 checked; confirm the crash reporter lists this release with its source maps and debug symbols"
+        },
+        {
+          "step": "Tag each submitted build from its record (v<x.y.z>+ios.<n>, v<x.y.z>+android.<n>), push the tags only with the developer's word, and report the release",
+          "skills": [
+            "git-commits-and-reporting"
+          ],
+          "proof": "`check-tags.mjs .` and `check-report.mjs . --report reports/<report>.md` print RESULT: PASS"
+        }
+      ]
+    },
+    {
+      "id": "adopt",
+      "title": "Adopting the skills in an existing app",
+      "intro": "For an app that predates these skills. Measure before changing anything, make the gates honest, then hold new work to the feature order; old code is brought in line one owner skill at a time, each in its own commit, never in a big-bang rewrite.",
+      "steps": [
+        {
+          "step": "Measure: run the setup checkers and keep their output as the baseline",
+          "skills": [
+            "architecture-and-boundaries",
+            "typescript-and-lint-rules",
+            "dependency-management",
+            "expo-sdk-upgrade"
+          ],
+          "proof": "The baseline report lists the FAIL count of `check-layout.mjs .` (architecture-and-boundaries), `check-configs.mjs .` (typescript-and-lint-rules), `check-deps-policy.mjs .` (dependency-management) and `check-sdk-alignment.mjs .` (expo-sdk-upgrade)"
+        },
+        {
+          "step": "Make the gates honest: check:fast, verify and the hooks, without weakening them",
+          "skills": [
+            "quality-gates",
+            "typescript-and-lint-rules"
+          ],
+          "proof": "`check-gate-wiring.mjs .` and `check-bypasses.mjs .` (quality-gates) print RESULT: PASS"
+        },
+        {
+          "step": "Fix the layout and the boundaries, one zone per commit",
+          "skills": [
+            "architecture-and-boundaries",
+            "naming-conventions"
+          ],
+          "proof": "`check-layout.mjs .` and `check-boundaries.mjs .` (architecture-and-boundaries) print RESULT: PASS"
+        },
+        {
+          "step": "New work follows \"A new feature\"; each old area adopts its owner skill when it is next touched",
+          "skills": [
+            "tdd-workflow",
+            "git-commits-and-reporting"
+          ],
+          "proof": "`check-tests.mjs .` (tdd-workflow) and `check-commits.mjs . --range <base>..HEAD` (git-commits-and-reporting) print RESULT: PASS"
+        }
+      ]
+    },
+    {
+      "id": "new-game",
+      "title": "A new game (games plugin)",
+      "intro": "A game on a public-domain mechanic (Lights Out, a sliding puzzle, an arena chase) inside an app that has passed \"A new app from an empty repo\". Each layer is proven before the next uses it: rules, then levels, then the board, then the host. A real-time game adds the loop step; a turn-based game skips it.",
+      "steps": [
+        {
+          "step": "Declare and scaffold the game (`scaffold-game.mjs . --game <id> --name <Name>`)",
+          "skills": [
+            "new-game-scaffold",
+            "architecture-and-boundaries"
+          ],
+          "proof": "`check-game-scaffold.mjs . --game <id>` (new-game-scaffold) prints RESULT: PASS",
+          "copies": [
+            {
+              "skill": "new-game-scaffold",
+              "paths": [
+                "scripts/**",
+                "contracts/**"
+              ],
+              "note": "scaffold-game.mjs then writes the game's declaration and folders"
+            }
+          ]
+        },
+        {
+          "step": "The pure rules engine: create, listMoves, applyMove, outcome, property tests",
+          "skills": [
+            "game-rules-engine",
+            "tdd-workflow",
+            "seeded-determinism-and-golden-vectors"
+          ],
+          "proof": "`check-rules-engine.mjs . --game <id>` (game-rules-engine) and `check-determinism.mjs .` (seeded-determinism-and-golden-vectors) print RESULT: PASS",
+          "copies": [
+            {
+              "skill": "seeded-determinism-and-golden-vectors",
+              "paths": [
+                "src/core/rng/**",
+                "src/core/dates/**"
+              ]
+            },
+            {
+              "skill": "game-rules-engine",
+              "paths": [
+                "src/core/**",
+                "src/games/__GAME_ID__/**"
+              ],
+              "note": "the template game's rules, renamed to the game's id"
+            }
+          ]
+        },
+        {
+          "step": "Levels proven winnable by a solver: par, stars, packs, the daily level",
+          "skills": [
+            "level-generation-and-solvers",
+            "golden-and-snapshot-tests"
+          ],
+          "proof": "`check-levels.mjs . --game <id>` (level-generation-and-solvers) and `check-goldens.mjs .` (golden-and-snapshot-tests) print RESULT: PASS",
+          "copies": [
+            {
+              "skill": "level-generation-and-solvers",
+              "paths": [
+                "src/core/**",
+                "src/games/__GAME_ID__/**",
+                "scripts/**",
+                "contracts/**"
+              ]
+            },
+            {
+              "skill": "golden-and-snapshot-tests",
+              "paths": [
+                "test/goldens/golden-text*",
+                "contracts/**"
+              ]
+            },
+            {
+              "skill": "level-generation-and-solvers",
+              "paths": [
+                "src/i18n/catalogs/*.json"
+              ],
+              "merge": true
+            }
+          ]
+        },
+        {
+          "step": "The board: drawing and touch",
+          "skills": [
+            "skia-canvas-rendering",
+            "canvas-gestures-and-hit-testing",
+            "accessibility-as-code"
+          ],
+          "proof": "`check-canvas-code.mjs .` (skia-canvas-rendering) and `check-canvas-input.mjs .` (canvas-gestures-and-hit-testing) print RESULT: PASS",
+          "copies": [
+            {
+              "skill": "skia-canvas-rendering",
+              "paths": [
+                "src/canvas/**",
+                "src/hooks/**",
+                "test/goldens/**",
+                "scripts/**",
+                "contracts/**"
+              ]
+            },
+            {
+              "skill": "canvas-gestures-and-hit-testing",
+              "paths": [
+                "src/canvas/**",
+                "contracts/**"
+              ]
+            }
+          ],
+          "installs": [
+            {
+              "package": "@shopify/react-native-skia"
+            },
+            {
+              "package": "jest-image-snapshot",
+              "companions": [
+                "@types/jest-image-snapshot"
+              ],
+              "where": "dev, for the pixel goldens"
+            }
+          ]
+        },
+        {
+          "step": "Live motion, only for a real-time game",
+          "skills": [
+            "realtime-game-loop",
+            "performance-budgets"
+          ],
+          "proof": "`check-realtime-loop.mjs .` (realtime-game-loop) prints RESULT: PASS or NOT APPLICABLE",
+          "copies": [
+            {
+              "skill": "realtime-game-loop",
+              "paths": [
+                "src/core/**",
+                "src/canvas/**",
+                "src/games/__GAME_ID__/**"
+              ],
+              "note": "only for a real-time game"
+            }
+          ]
+        },
+        {
+          "step": "Host the game: game screen, pause, results, saved runs",
+          "skills": [
+            "game-session-host",
+            "navigation-and-routing",
+            "i18n-strings-and-catalogs"
+          ],
+          "proof": "`check-game-host.mjs . --game <id>` (game-session-host) prints RESULT: PASS",
+          "copies": [
+            {
+              "skill": "game-session-host",
+              "paths": [
+                "src/**",
+                "test/**"
+              ]
+            }
+          ]
+        },
+        {
+          "step": "Balance with seeded bots and sims",
+          "skills": [
+            "game-balance-and-bots"
+          ],
+          "proof": "`check-balance.mjs .` prints RESULT: PASS",
+          "copies": [
+            {
+              "skill": "game-balance-and-bots",
+              "paths": [
+                "src/**",
+                "test/**",
+                "jest.sim.config.js"
+              ]
+            }
+          ]
+        },
+        {
+          "step": "Prove the game complete",
+          "skills": [
+            "new-game-scaffold",
+            "git-commits-and-reporting"
+          ],
+          "proof": "`check-game-scaffold.mjs . --game <id> --stage complete` (new-game-scaffold) prints RESULT: PASS",
+          "noManifest": "the completeness check only"
+        }
+      ],
+      "base": {
+        "order": "new-app",
+        "through": 18
+      }
+    }
+  ],
+  "verifyGreen": {
+    "intro": "`npm run verify` (quality-gates' runner) runs its steps in order and stops at the first red one. On an app built in this order a gate is expected red only before its \"Green from\" step, for the reason given, and that is not a failure of the step in progress: run the other gates one by one meanwhile and name the pending gate in the report. Any other red gate is a real failure of the step that turned it red. test:sim joins verify only when the first *.sim.test.ts exists (games plugin), and a gate another skill appends to quality-gates.json \"verifyExtraSteps\" is green from the step that adds it.",
+    "order": "new-app",
+    "rows": [
+      {
+        "gate": "format:check, lint, typecheck",
+        "greenFrom": 1,
+        "before": "never expected red: every template is Prettier-clean and compiles where its step puts it (check-index proves the order import-closed)"
+      },
+      {
+        "gate": "i18n:verify",
+        "greenFrom": 5,
+        "before": "scripts/i18n/verify-catalogs.ts does not exist yet (MODULE_NOT_FOUND): i18n-strings-and-catalogs copies it with the first catalogs, so verify stops here and the later gates do not run",
+        "meanwhile": "`npm run -s check:fast`, `npm run -s lint`, `npm run -s typecheck`, `npm run -s test:coverage`, `npm run -s check:unused`, `npm run -s audit:licenses` and `npm run -s check:deps`, one by one; check-gate-wiring names the script as not yet created"
+      },
+      {
+        "gate": "check:unused, guardrail, test:coverage",
+        "greenFrom": 1,
+        "before": "never expected red: every copied file brings its test in the same step, so coverage holds after every step; they run inside verify from step 5"
+      },
+      {
+        "gate": "export:audit, audit:licenses, check:deps",
+        "greenFrom": 1,
+        "before": "never expected red (an Expo patch younger than the release-age window is a dated WARN, dependency-management); they run inside verify from step 5"
+      }
+    ]
+  }
+}

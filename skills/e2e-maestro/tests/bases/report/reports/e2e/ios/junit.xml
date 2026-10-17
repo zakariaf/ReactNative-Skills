@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<testsuites>
+  <testsuite name="Test Suite" device="tasks-e2e-phone - iOS 26.5 - 0C9E3F8A-51D2-4B7E-9A61-2F4D8C7B1E03" tests="2" failures="0" time="24.0" timestamp="2026-10-14T09:00:00">
+    <testcase id="A fresh install opens the home screen with its content" name="A fresh install opens the home screen with its content" classname="A fresh install opens the home screen with its content" file=".maestro/flows/smoke/01-first-launch.yaml" time="12.0" timestamp="2026-10-14T09:00:00" status="SUCCESS">
+      <properties>
+        <property name="tags" value="smoke"/>
+      </properties>
+    </testcase>
+    <testcase id="Completing a task offline survives a kill and a relaunch" name="Completing a task offline survives a kill and a relaunch" classname="Completing a task offline survives a kill and a relaunch" file=".maestro/flows/journeys/02-complete-task-survives-kill.yaml" time="12.0" timestamp="2026-10-14T09:00:00" status="SUCCESS">
+      <properties>
+        <property name="tags" value="smoke, journeys, offline"/>
+      </properties>
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,243 @@
+{
+  "schemaVersion": "1.0",
+  "thresholds": {
+    "high": 90,
+    "low": 80,
+    "break": 75
+  },
+  "projectRoot": "/repo",
+  "files": {
+    "src/features/reminders/reminder-policy.ts": {
+      "language": "typescript",
+      "source": "",
+      "mutants": [
+        {
+          "id": "1",
+          "mutatorName": "EqualityOperator",
+          "replacement": "lastSentMs >= nowMs",
+          "status": "Killed",
+          "static": false,
+          "coveredBy": [
+            "1"
+          ],
+          "location": {
+            "start": {
+              "line": 56,
+              "column": 3
+            },
+            "end": {
+              "line": 56,
+              "column": 20
+            }
+          }
+        },
+        {
+          "id": "2",
+          "mutatorName": "EqualityOperator",
+          "replacement": "remindersSentToday <= policy.maxPerDay",
+          "status": "Killed",
+          "static": false,
+          "coveredBy": [
+            "1"
+          ],
+          "location": {
+            "start": {
+              "line": 67,
+              "column": 3
+            },
+            "end": {
+              "line": 67,
+              "column": 20
+            }
+          }
+        },
+        {
+          "id": "3",
+          "mutatorName": "BooleanLiteral",
+          "replacement": "true",
+          "status": "Killed",
+          "static": false,
+          "coveredBy": [
+            "1"
+          ],
+          "location": {
+            "start": {
+              "line": 12,
+              "column": 3
+            },
+            "end": {
+              "line": 12,
+              "column": 20
+            }
+          }
+        },
+        {
+          "id": "4",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Timeout",
+          "static": false,
+          "coveredBy": [
+            "1"
+          ],
+          "location": {
+            "start": {
+              "line": 30,
+              "column": 3
+            },
+            "end": {
+              "line": 30,
+              "column": 20
+            }
+          }
+        },
+        {
+          "id": "5",
+          "mutatorName": "ArithmeticOperator",
+          "replacement": "nowMs + lastSentMs",
+          "status": "Killed",
+          "static": false,
+          "coveredBy": [
+            "1"
+          ],
+          "location": {
+            "start": {
+              "line": 41,
+              "column": 3
+            },
+            "end": {
+              "line": 41,
+              "column": 20
+            }
+          }
+        },
+        {
+          "id": "6",
+          "mutatorName": "StringLiteral",
+          "replacement": "\"\"",
+          "status": "Ignored",
+          "static": false,
+          "coveredBy": [
+            "1"
+          ],
+          "location": {
+            "start": {
+              "line": 8,
+              "column": 3
+            },
+            "end": {
+              "line": 8,
+              "column": 20
+            }
+          }
+        }
+      ]
+    },
+    "src/core/task-filter.ts": {
+      "language": "typescript",
+      "source": "",
+      "mutants": [
+        {
+          "id": "7",
+          "mutatorName": "ArrowFunction",
+          "replacement": "() => undefined",
+          "status": "Killed",
+          "static": false,
+          "coveredBy": [
+            "1"
+          ],
+          "location": {
+            "start": {
+              "line": 3,
+              "column": 3
+            },
+            "end": {
+              "line": 3,
+              "column": 20
+            }
+          }
+        },
+        {
+          "id": "8",
+          "mutatorName": "BooleanLiteral",
+          "replacement": "isDone",
+          "status": "Killed",
+          "static": false,
+          "coveredBy": [
+            "1"
+          ],
+          "location": {
+            "start": {
+              "line": 3,
+              "column": 3
+            },
+            "end": {
+              "line": 3,
+              "column": 20
+            }
+          }
+        },
+        {
+          "id": "9",
+          "mutatorName": "MethodExpression",
+          "replacement": "doneFlags",
+          "status": "Killed",
+          "static": false,
+          "coveredBy": [
+            "1"
+          ],
+          "location": {
+            "start": {
+              "line": 3,
+              "column": 3
+            },
+            "end": {
+              "line": 3,
+              "column": 20
+            }
+          }
+        },
+        {
+          "id": "10",
+          "mutatorName": "EqualityOperator",
+          "replacement": "count <= limit",
+          "status": "Killed",
+          "static": false,
+          "coveredBy": [
+            "1"
+          ],
+          "location": {
+            "start": {
+              "line": 12,
+              "column": 3
+            },
+            "end": {
+              "line": 12,
+              "column": 20
+            }
+          }
+        },
+        {
+          "id": "11",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Survived",
+          "static": false,
+          "coveredBy": [
+            "1"
+          ],
+          "location": {
+            "start": {
+              "line": 17,
+              "column": 3
+            },
+            "end": {
+              "line": 17,
+              "column": 20
+            }
+          }
+        }
+      ]
+    }
+  }
+}

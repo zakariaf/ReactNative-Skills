@@ -1,0 +1,74 @@
+[
+  {
+    "label": "ios/phone/en-light/tasks",
+    "actual": "reports/screenshots/ios/raw/phone/en-light/tasks.png",
+    "baseline": ".maestro/baselines/ios/phone/en-light/tasks.png",
+    "result": {
+      "kind": "match",
+      "diffRatio": 0
+    }
+  },
+  {
+    "label": "ios/phone/en-light/debug",
+    "actual": "reports/screenshots/ios/raw/phone/en-light/debug.png",
+    "baseline": ".maestro/baselines/ios/phone/en-light/debug.png",
+    "result": {
+      "kind": "match",
+      "diffRatio": 0
+    }
+  },
+  {
+    "label": "ios/phone/en-dark/tasks",
+    "actual": "reports/screenshots/ios/raw/phone/en-dark/tasks.png",
+    "baseline": ".maestro/baselines/ios/phone/en-dark/tasks.png",
+    "result": {
+      "kind": "match",
+      "diffRatio": 0
+    }
+  },
+  {
+    "label": "ios/phone/en-dark/debug",
+    "actual": "reports/screenshots/ios/raw/phone/en-dark/debug.png",
+    "baseline": ".maestro/baselines/ios/phone/en-dark/debug.png",
+    "result": {
+      "kind": "match",
+      "diffRatio": 0
+    }
+  },
+  {
+    "label": "ios/phone/ar-light/tasks",
+    "actual": "reports/screenshots/ios/raw/phone/ar-light/tasks.png",
+    "baseline": ".maestro/baselines/ios/phone/ar-light/tasks.png",
+    "result": {
+      "kind": "match",
+      "diffRatio": 0
+    }
+  },
+  {
+    "label": "ios/phone/ar-light/debug",
+    "actual": "reports/screenshots/ios/raw/phone/ar-light/debug.png",
+    "baseline": ".maestro/baselines/ios/phone/ar-light/debug.png",
+    "result": {
+      "kind": "match",
+      "diffRatio": 0
+    }
+  },
+  {
+    "label": "ios/phone/ar-dark/tasks",
+    "actual": "reports/screenshots/ios/raw/phone/ar-dark/tasks.png",
+    "baseline": ".maestro/baselines/ios/phone/ar-dark/tasks.png",
+    "result": {
+      "kind": "match",
+      "diffRatio": 0
+    }
+  },
+  {
+    "label": "ios/phone/ar-dark/debug",
+    "actual": "reports/screenshots/ios/raw/phone/ar-dark/debug.png",
+    "baseline": ".maestro/baselines/ios/phone/ar-dark/debug.png",
+    "result": {
+      "kind": "match",
+      "diffRatio": 0
+    }
+  }
+]

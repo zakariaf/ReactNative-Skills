@@ -1,0 +1,14 @@
+{
+  "$comment": "When multi-package: two Expo apps (apps/tasks, apps/notes) and a shared package (packages/ui) whose native modules are \"*\" peers, on SDK 57.",
+  "base": [
+    "@tests/bases/monorepo-57"
+  ],
+  "ops": [
+    {
+      "write": {
+        "file": ".agents/skills/vendored-skill/SKILL.md",
+        "content": "---\nname: vendored-skill\ndescription: A planted skill folder; its files hold findings on purpose and must stay invisible.\n---\n\n# vendored-skill\n"
+      }
+    }
+  ]
+}

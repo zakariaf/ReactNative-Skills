@@ -1,0 +1,13 @@
+{
+  "$comment": "When multi-package: the same tree as check-deps-policy-monorepo; requests in ARGS.txt.",
+  "base": [
+    "@tests/bases/monorepo",
+    {
+      "templates": true,
+      "firstLinePath": true
+    }
+  ],
+  "renames": {
+    "dot-npmrc": ".npmrc"
+  }
+}

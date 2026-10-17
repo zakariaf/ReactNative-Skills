@@ -1,0 +1,14 @@
+{
+  "common.not-found.title": "This screen does not exist",
+  "errors.sync.stale-revision": "This task changed on another device",
+  "reminders.next": "Next reminder – {dateText}",
+  "settings.sound-switch.label": "Sound",
+  "tasks.add-button.label": "Add task",
+  "tasks.count": "{taskCount, plural, one {# task} other {# tasks}}",
+  "tasks.due-label": "Due {dueText}",
+  "tasks.priority.high": "High",
+  "tasks.priority.low": "Low",
+  "tasks.priority.normal": "Normal",
+  "tasks.title": "Tasks",
+  "tasks.task-row.a11y-hint": "Double-tap to mark {listName} done"
+}

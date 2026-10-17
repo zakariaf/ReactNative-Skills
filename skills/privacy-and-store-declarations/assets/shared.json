@@ -1,0 +1,6 @@
+[
+  { "from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs" },
+  { "from": "scripts/lib/plist.mjs", "to": "scripts/lib/plist.mjs" },
+  { "from": "scripts/lib/usage-strings.mjs", "to": "scripts/lib/usage-strings.mjs" },
+  { "from": "scripts/lib/ship-placeholders.mjs", "to": "scripts/lib/ship-placeholders.mjs" }
+]

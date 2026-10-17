@@ -1,0 +1,13 @@
+{
+  "debug.menu.build": "الإصدار: {variantText}",
+  "debug.menu.day": "اليوم: {dayText}",
+  "debug.menu.day-real": "التقويم الحقيقي",
+  "debug.menu.errors": "الأخطاء المسجّلة: {count, number}",
+  "debug.menu.motion": "إيقاف الحركة",
+  "debug.menu.next-day": "محاكاة اليوم التالي",
+  "debug.menu.offline": "محاكاة انقطاع الاتصال",
+  "debug.menu.probe": "مجسّات تخطيط اللوحة",
+  "debug.menu.real-day": "العودة إلى اليوم الحقيقي",
+  "debug.setup.applying": "جارٍ تطبيق رابط التصحيح…",
+  "debug.setup.failed": "رُفض رابط التصحيح: {reasonText}"
+}

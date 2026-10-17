@@ -1,0 +1,1 @@
+{ "name": "tasks", "private": true, "scripts": { "e2e:ios": "node scripts/e2e/run-e2e.ts --platform ios" } }

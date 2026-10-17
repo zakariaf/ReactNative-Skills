@@ -1,0 +1,10 @@
+{
+  "$schema": "./perf.schema.json",
+  "layer": {
+    "jsEntryFile": "src/app/_layout.tsx",
+    "firstScreenFiles": ["src/features/tasks/use-tasks-model.ts"],
+    "testOnlyEntry": "src/test-only-entry.ts",
+    "nativeModuleDir": "modules/process-start"
+  },
+  "canvasBudgetExempt": []
+}

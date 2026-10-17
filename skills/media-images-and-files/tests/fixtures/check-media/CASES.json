@@ -1,0 +1,1014 @@
+{
+  "bad-data-uri": {
+    "expect": ["FAIL src/features/notes/inline-photo.ts:3 [data-uri]", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/notes/inline-photo.ts",
+          "lines": [
+            "// src/features/notes/inline-photo.ts",
+            "export function inlinePhoto(base64: string): string {",
+            "  return 'data:image/jpeg;base64,' + base64;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-image-a11y": {
+    "expect": [
+      "FAIL src/features/notes/note-cover.tsx:10 [image-a11y]",
+      "neither named nor marked decorative",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/notes/note-cover.tsx",
+          "lines": [
+            "// src/features/notes/note-cover.tsx",
+            "import { Image } from 'expo-image';",
+            "import { StyleSheet } from 'react-native';",
+            "",
+            "import type { ReactNode } from 'react';",
+            "",
+            "const styles = StyleSheet.create({ cover: { width: 120, aspectRatio: 4 / 3 } });",
+            "",
+            "export function NoteCover({ uri }: { readonly uri: string }): ReactNode {",
+            "  return <Image source={{ uri }} style={styles.cover} />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-image-a11y-label-only": {
+    "expect": [
+      "FAIL src/features/notes/note-cover.tsx:10 [image-a11y]",
+      "has a label but no accessible",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/notes/note-cover.tsx",
+          "lines": [
+            "// src/features/notes/note-cover.tsx",
+            "import { Image } from 'expo-image';",
+            "import { StyleSheet } from 'react-native';",
+            "",
+            "import type { ReactNode } from 'react';",
+            "",
+            "const styles = StyleSheet.create({ cover: { width: 120, aspectRatio: 4 / 3 } });",
+            "",
+            "export function NoteCover({ uri, label }: { readonly uri: string; readonly label: string }): ReactNode {",
+            "  return <Image source={{ uri }} style={styles.cover} accessibilityLabel={label} />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-image-a11y-no-label": {
+    "expect": [
+      "FAIL src/features/notes/note-cover.tsx:10 [image-a11y]",
+      "has no accessibilityLabel or alt",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/notes/note-cover.tsx",
+          "lines": [
+            "// src/features/notes/note-cover.tsx",
+            "import { Image } from 'expo-image';",
+            "import { StyleSheet } from 'react-native';",
+            "",
+            "import type { ReactNode } from 'react';",
+            "",
+            "const styles = StyleSheet.create({ cover: { width: 120, aspectRatio: 4 / 3 } });",
+            "",
+            "export function NoteCover({ uri }: { readonly uri: string }): ReactNode {",
+            "  return <Image source={{ uri }} style={styles.cover} accessible />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-image-legacy-prop": {
+    "expect": [
+      "FAIL src/ui/media/stored-image.tsx:38 [image-legacy-prop]",
+      "Use contentFit instead.",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      { "replace": { "file": "src/ui/media/stored-image.tsx", "find": "contentFit={fit}", "with": "resizeMode={fit}" } }
+    ]
+  },
+  "bad-image-size": {
+    "expect": ["FAIL src/ui/media/stored-image.tsx:35 [image-size]", "RESULT: FAIL (1 problems)"],
+    "ops": [{ "replace": { "file": "src/ui/media/stored-image.tsx", "find": "      style={style}\n", "with": "" } }]
+  },
+  "bad-legacy-api-file-system": {
+    "expect": [
+      "FAIL src/features/notes/read-note-file.ts:2 [legacy-api]",
+      "documentDirectory from 'expo-file-system' throws at runtime in SDK 57",
+      "readAsStringAsync from 'expo-file-system' throws",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/notes/read-note-file.ts",
+          "lines": [
+            "// src/features/notes/read-note-file.ts",
+            "import { documentDirectory, readAsStringAsync } from 'expo-file-system';",
+            "",
+            "export const readNote = (name: string): Promise<string> => readAsStringAsync(`${documentDirectory ?? ''}${name}`);"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-legacy-api-media-library": {
+    "expect": [
+      "FAIL src/services/photo-saver/legacy-photo-saver-adapter.ts:2 [legacy-api]",
+      "saveToLibraryAsync from 'expo-media-library' throws",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/photo-saver/legacy-photo-saver-adapter.ts",
+          "lines": [
+            "// src/services/photo-saver/legacy-photo-saver-adapter.ts",
+            "import { saveToLibraryAsync } from 'expo-media-library';",
+            "",
+            "export const save = (uri: string): Promise<void> => saveToLibraryAsync(uri);"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-legacy-api-namespace": {
+    "expect": [
+      "FAIL src/features/notes/note-folder.ts:4 [legacy-api]",
+      "FileSystem.documentDirectory",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/notes/note-folder.ts",
+          "lines": [
+            "// src/features/notes/note-folder.ts",
+            "import * as FileSystem from 'expo-file-system';",
+            "",
+            "export const NOTES_FOLDER = `${String(FileSystem.documentDirectory)}notes/`;",
+            "export const CACHE = FileSystem.Paths.cache;"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-legacy-api-subpath": {
+    "expect": [
+      "FAIL src/features/notes/old-read.ts:2 [legacy-api]",
+      "expo-file-system/legacy is the deprecated API",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/notes/old-read.ts",
+          "lines": [
+            "// src/features/notes/old-read.ts",
+            "import { readAsStringAsync } from 'expo-file-system/legacy';",
+            "",
+            "export const read = (uri: string): Promise<string> => readAsStringAsync(uri);"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-legacy-api-upload-task": {
+    "expect": [
+      "FAIL src/services/file-transfer/expo-file-system-file-transfer-adapter.ts:5 [legacy-api]",
+      "createUploadTask from 'expo-file-system' throws at runtime",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/file-transfer/expo-file-system-file-transfer-adapter.ts",
+          "find": "import { Directory, File, Paths, UploadType } from 'expo-file-system';",
+          "with": "import { Directory, File, Paths, UploadType, createUploadTask } from 'expo-file-system';"
+        }
+      }
+    ]
+  },
+  "bad-list-recycling-key": {
+    "expect": ["FAIL src/features/notes/components/note-row.tsx:10 [list-recycling-key]", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/notes/components/note-row.tsx",
+          "lines": [
+            "// src/features/notes/components/note-row.tsx",
+            "import { Image as ExpoImage } from 'expo-image';",
+            "import { StyleSheet } from 'react-native';",
+            "",
+            "import type { ReactNode } from 'react';",
+            "",
+            "const styles = StyleSheet.create({ thumb: { width: 48, height: 48 } });",
+            "",
+            "export function NoteRow({ uri, label }: { readonly uri: string; readonly label: string }): ReactNode {",
+            "  return <ExpoImage source={{ uri }} style={styles.thumb} accessible accessibilityLabel={label} />;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/notes/note-list.tsx",
+          "lines": [
+            "// src/features/notes/note-list.tsx",
+            "import { FlashList } from '@shopify/flash-list';",
+            "",
+            "import { NoteRow } from './components/note-row';",
+            "",
+            "import type { ReactNode } from 'react';",
+            "",
+            "type Note = { readonly id: string; readonly uri: string; readonly label: string };",
+            "",
+            "export function NoteList({ notes }: { readonly notes: readonly Note[] }): ReactNode {",
+            "  return <FlashList data={notes} renderItem={({ item }) => <NoteRow uri={item.uri} label={item.label} />} />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-media-in-cache": {
+    "expect": [
+      "FAIL src/services/media-store/expo-file-system-media-store-adapter.ts:26 [media-in-cache]",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/media-store/expo-file-system-media-store-adapter.ts",
+          "find": "new Directory(Paths.document, MEDIA_FOLDER)",
+          "with": "new Directory(Paths.cache, MEDIA_FOLDER)"
+        }
+      }
+    ]
+  },
+  "bad-overwrite-in-place": {
+    "expect": [
+      "FAIL src/services/media-store/expo-file-system-media-store-adapter.ts:68 [overwrite-in-place]",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/media-store/expo-file-system-media-store-adapter.ts",
+          "find": "partial.moveSync(target);",
+          "with": "partial.moveSync(target, { overwrite: true });"
+        }
+      }
+    ]
+  },
+  "bad-permission-outside-gate": {
+    "expect": ["FAIL src/features/notes/ask-camera.ts:5 [permission-outside-gate]", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/notes/ask-camera.ts",
+          "lines": [
+            "// src/features/notes/ask-camera.ts",
+            "import { requestCameraPermissionsAsync } from 'expo-image-picker';",
+            "",
+            "export async function askCamera(): Promise<boolean> {",
+            "  const answer = await requestCameraPermissionsAsync();",
+            "  return answer.granted;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-picker-base64": {
+    "expect": [
+      "FAIL src/services/media-picker/expo-image-picker-media-picker-adapter.ts:33 [picker-options]",
+      "base64: true puts the whole photo into JS",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/media-picker/expo-image-picker-media-picker-adapter.ts",
+          "find": "base64: false",
+          "with": "base64: true"
+        }
+      }
+    ]
+  },
+  "bad-picker-exif": {
+    "expect": [
+      "FAIL src/services/media-picker/expo-image-picker-media-picker-adapter.ts:32 [picker-options]",
+      "exif: true hands the EXIF block to JS",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/media-picker/expo-image-picker-media-picker-adapter.ts",
+          "find": "exif: false",
+          "with": "exif: true"
+        }
+      }
+    ]
+  },
+  "bad-picker-media-type-options": {
+    "expect": [
+      "FAIL src/features/notes/pick-cover.ts:2 [picker-options]",
+      "MediaTypeOptions is deprecated",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/notes/pick-cover.ts",
+          "lines": [
+            "// src/features/notes/pick-cover.ts",
+            "import { MediaTypeOptions } from 'expo-image-picker';",
+            "",
+            "export const COVER_TYPES = MediaTypeOptions.Images;"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-picker-on-press": {
+    "expect": [
+      "FAIL src/features/notes/use-note-photos-model.ts:9 [picker-on-press]",
+      "importFromLibrary() runs inside useEffect",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/notes/use-note-photos-model.ts",
+          "lines": [
+            "// src/features/notes/use-note-photos-model.ts",
+            "import { useEffect } from 'react';",
+            "",
+            "import type { MediaImporter } from '@/data/media/media-importer';",
+            "",
+            "export function useNotePhotosModel(importer: MediaImporter): void {",
+            "  useEffect(() => {",
+            "    // Opens the picker as soon as the screen mounts: wrong.",
+            "    importer.importFromLibrary(1).catch(() => undefined);",
+            "  }, [importer]);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-stored-uri": {
+    "expect": [
+      "FAIL src/stores/notes/note.ts:4 [stored-uri]",
+      "photoUri stores a file URI",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/stores/notes/note.ts",
+          "lines": [
+            "// src/stores/notes/note.ts",
+            "export type Note = {",
+            "  readonly id: string;",
+            "  readonly photoUri: string;",
+            "};"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-stored-uri-bare": {
+    "expect": [
+      "FAIL src/stores/notes/note-attachment.ts:4 [stored-uri]",
+      "uri stores a file URI",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/stores/notes/note-attachment.ts",
+          "lines": [
+            "// src/stores/notes/note-attachment.ts",
+            "export type NoteAttachment = {",
+            "  readonly id: string;",
+            "  readonly uri: string;",
+            "  readonly mimeType: string;",
+            "};"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-stored-uri-camel-column": {
+    "expect": [
+      "FAIL src/data/migrations/v0003-add-note-cover.ts:3 [stored-uri]",
+      "column coverUri stores a file URI",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/migrations/v0003-add-note-cover.ts",
+          "lines": [
+            "// src/data/migrations/v0003-add-note-cover.ts",
+            "export const V0003_SQL = `",
+            "  ALTER TABLE notes ADD COLUMN coverUri TEXT;",
+            "`;"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-stored-uri-column": {
+    "expect": [
+      "FAIL src/data/migrations/v0002-add-note-photo.ts:3 [stored-uri]",
+      "column photo_uri stores a file URI",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/migrations/v0002-add-note-photo.ts",
+          "lines": [
+            "// src/data/migrations/v0002-add-note-photo.ts",
+            "export const V0002_SQL = `",
+            "  ALTER TABLE notes ADD COLUMN photo_uri TEXT;",
+            "`;"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-stored-uri-optional-schema": {
+    "expect": [
+      "FAIL src/data/notes/note-schema.ts:6 [stored-uri]",
+      "coverUri stores a file URI",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/notes/note-schema.ts",
+          "lines": [
+            "// src/data/notes/note-schema.ts",
+            "import * as v from 'valibot';",
+            "",
+            "export const NoteSchema = v.object({",
+            "  id: v.string(),",
+            "  coverUri: v.optional(v.string()),",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-sweep-wired": {
+    "expect": ["FAIL src/data/open-device-media.ts:7 [sweep-wired]", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/open-device-media.ts",
+          "lines": [
+            "// src/data/open-device-media.ts",
+            "import { createMediaImporter } from '@/data/media/media-importer';",
+            "",
+            "import type { MediaImporter, MediaImporterDependencies } from '@/data/media/media-importer';",
+            "",
+            "export function openDeviceMedia(dependencies: MediaImporterDependencies): MediaImporter {",
+            "  return createMediaImporter(dependencies);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-transfer-outside-port": {
+    "expect": [
+      "FAIL src/features/notes/download-cover.ts:5 [transfer-outside-port]",
+      "downloadFileAsync() moves a file over the network",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/notes/download-cover.ts",
+          "lines": [
+            "// src/features/notes/download-cover.ts",
+            "import { Directory, File, Paths } from 'expo-file-system';",
+            "",
+            "export async function downloadCover(url: string): Promise<string> {",
+            "  const file = await File.downloadFileAsync(url, new Directory(Paths.cache));",
+            "  return file.uri;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-unused-permission-camera": {
+    "expect": [
+      "FAIL app.config.ts:11 [unused-permission]",
+      "no source opens a camera",
+      "blocks the permission for the whole app",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/media-picker/expo-image-picker-media-picker-adapter.ts",
+          "find": "() => launchCameraAsync(BASE_OPTIONS)",
+          "with": "() => Promise.reject(new Error('camera is off'))"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/media-picker/expo-image-picker-media-picker-adapter.ts",
+          "find": "  launchCameraAsync,\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-unused-permission-library-reads": {
+    "expect": [
+      "FAIL app.config.ts:19 [unused-permission]",
+      "READ_MEDIA_IMAGES and READ_MEDIA_VIDEO, yet no source reads the library",
+      "Photo and Video Permissions",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "        granularPermissions: [],\n",
+          "with": "        granularPermissions: ['photo'],\n"
+        }
+      },
+      { "replace": { "file": "app.config.ts", "find": "      'android.permission.READ_MEDIA_IMAGES',\n", "with": "" } }
+    ]
+  },
+  "bad-unused-permission-microphone": {
+    "expect": [
+      "FAIL app.config.ts:11 [unused-permission]",
+      "no source picks or records video",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [{ "replace": { "file": "app.config.ts", "find": "        microphonePermission: false,\n", "with": "" } }]
+  },
+  "bad-unused-permission-not-listed": {
+    "expect": [
+      "FAIL app.config.ts:8 [unused-permission]",
+      "does not list it: prebuild applies it anyway",
+      "the microphone (android.permission.RECORD_AUDIO)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    [\n      'expo-image-picker',\n      {\n        photosPermission: 'permissions.photos.usage-description',\n        cameraPermission: 'permissions.camera.usage-description',\n        microphonePermission: false,\n      },\n    ],\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "error-no-src": {
+    "expect": ["ERROR [bad-input] nothing to check: no src/", "RESULT: FAIL"],
+    "base": [{ "from": "@tests/bases/app/package.json", "to": "./" }]
+  },
+  "pass-camera-from-expo-camera": {
+    "expect": ["check-media:", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/media-picker/expo-image-picker-media-picker-adapter.ts",
+          "find": "() => launchCameraAsync(BASE_OPTIONS)",
+          "with": "() => Promise.reject(new Error('camera is off'))"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/media-picker/expo-image-picker-media-picker-adapter.ts",
+          "find": "  launchCameraAsync,\n",
+          "with": ""
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/scan/components/scan-viewfinder.tsx",
+          "lines": [
+            "// src/features/scan/components/scan-viewfinder.tsx",
+            "import { CameraView } from 'expo-camera';",
+            "import { StyleSheet } from 'react-native';",
+            "",
+            "import type { ReactNode } from 'react';",
+            "",
+            "const styles = StyleSheet.create({ view: { flex: 1 } });",
+            "",
+            "/** A live viewfinder for scanning task barcodes: it needs CAMERA, so the picker must not block it. */",
+            "export function ScanViewfinder(): ReactNode {",
+            "  return <CameraView style={styles.view} facing=\"back\" />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-camera-from-other-plugin": {
+    "expect": ["check-media:", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/media-picker/expo-image-picker-media-picker-adapter.ts",
+          "find": "() => launchCameraAsync(BASE_OPTIONS)",
+          "with": "() => Promise.reject(new Error('camera is off'))"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/media-picker/expo-image-picker-media-picker-adapter.ts",
+          "find": "  launchCameraAsync,\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    'expo-router',\n",
+          "with": "    'expo-router',\n    ['expo-camera', { cameraPermission: 'permissions.camera.usage-description' }],\n"
+        }
+      }
+    ]
+  },
+  "pass-camera-from-permissions-contract": {
+    "expect": ["check-media:", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/media-picker/expo-image-picker-media-picker-adapter.ts",
+          "find": "() => launchCameraAsync(BASE_OPTIONS)",
+          "with": "() => Promise.reject(new Error('camera is off'))"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/media-picker/expo-image-picker-media-picker-adapter.ts",
+          "find": "  launchCameraAsync,\n",
+          "with": ""
+        }
+      },
+      {
+        "write": {
+          "file": "contracts/permissions.json",
+          "lines": [
+            "{",
+            "  \"permissions\": [{ \"kind\": \"camera\", \"askedFrom\": \"src/features/tasks/use-task-photos-model.ts\" }]",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-camera-from-picker-permission": {
+    "expect": ["check-media:", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/media-picker/expo-image-picker-media-picker-adapter.ts",
+          "find": "() => launchCameraAsync(BASE_OPTIONS)",
+          "with": "() => Promise.reject(new Error('camera is off'))"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/media-picker/expo-image-picker-media-picker-adapter.ts",
+          "find": "  launchCameraAsync,\n",
+          "with": ""
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/permissions/camera-permission-adapter.ts",
+          "lines": [
+            "// src/services/permissions/camera-permission-adapter.ts",
+            "import { getCameraPermissionsAsync, requestCameraPermissionsAsync } from 'expo-image-picker';",
+            "",
+            "export async function cameraAllowed(): Promise<boolean> {",
+            "  const current = await getCameraPermissionsAsync();",
+            "  if (current.granted) return true;",
+            "  return (await requestCameraPermissionsAsync()).granted;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-icon-data-uri": {
+    "expect": ["check-media:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/icons/icon-raster.ts",
+          "lines": [
+            "// src/ui/icons/icon-raster.ts",
+            "// Rasterizes one icon path with Skia into a small white PNG mask kept as a data: URI (icons-app-icon-and-splash).",
+            "import { Skia } from '@shopify/react-native-skia';",
+            "",
+            "const cache = new Map<string, string>();",
+            "",
+            "function rasterize(svgPath: string, px: number): string {",
+            "  const surface = Skia.Surface.Make(px, px);",
+            "  const path = Skia.Path.MakeFromSVGString(svgPath);",
+            "  if (surface === null || path === null) throw new Error('Icon rasterization failed');",
+            "  surface.getCanvas().drawPath(path, Skia.Paint());",
+            "  surface.flush();",
+            "  return `data:image/png;base64,${surface.makeImageSnapshot().encodeToBase64()}`;",
+            "}",
+            "",
+            "export function getIconUri(svgPath: string, px: number): string {",
+            "  const key = `${svgPath}@${String(px)}`;",
+            "  const cached = cache.get(key) ?? rasterize(svgPath, px);",
+            "  cache.set(key, cached);",
+            "  return cached;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-image-decorative": {
+    "expect": ["check-media: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/notes/note-cover.tsx",
+          "lines": [
+            "// src/features/notes/note-cover.tsx",
+            "import { Image } from 'expo-image';",
+            "import { StyleSheet } from 'react-native';",
+            "",
+            "import type { ReactNode } from 'react';",
+            "",
+            "const styles = StyleSheet.create({ cover: { width: 120, aspectRatio: 4 / 3 } });",
+            "",
+            "export function NoteCover({ uri }: { readonly uri: string }): ReactNode {",
+            "  return <Image source={{ uri }} style={styles.cover} accessible={false} />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-installed-skills-silent": {
+    "expect": ["check-media: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/media-kit/SKILL.md",
+          "lines": ["---", "name: media-kit", "description: Planted decoy.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": ".agents/skills/media-kit/src/features/x/legacy.ts",
+          "lines": [
+            "import { documentDirectory } from 'expo-file-system';",
+            "import { requestCameraPermissionsAsync } from 'expo-image-picker';",
+            "export const x = [documentDirectory, requestCameraPermissionsAsync, 'data:image/png;base64,AA'];"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/other/SKILL.md",
+          "lines": ["---", "name: other", "description: Planted decoy.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/other/src/legacy.ts",
+          "lines": [
+            "import { documentDirectory } from 'expo-file-system';",
+            "import { requestCameraPermissionsAsync } from 'expo-image-picker';",
+            "export const x = [documentDirectory, requestCameraPermissionsAsync, 'data:image/png;base64,AA'];"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/kit/SKILL.md",
+          "lines": ["---", "name: kit", "description: A vendored skill inside src.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/kit/legacy.ts",
+          "lines": [
+            "import { documentDirectory } from 'expo-file-system';",
+            "import { requestCameraPermissionsAsync } from 'expo-image-picker';",
+            "export const x = [documentDirectory, requestCameraPermissionsAsync, 'data:image/png;base64,AA'];"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-library-reader-keeps-reads": {
+    "expect": ["check-media:", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "        granularPermissions: [],\n",
+          "with": "        granularPermissions: ['photo'],\n"
+        }
+      },
+      { "replace": { "file": "app.config.ts", "find": "      'android.permission.READ_MEDIA_IMAGES',\n", "with": "" } },
+      {
+        "write": {
+          "file": "src/services/gallery/expo-media-library-gallery-adapter.ts",
+          "lines": [
+            "// src/services/gallery/expo-media-library-gallery-adapter.ts",
+            "import { Query } from 'expo-media-library';",
+            "",
+            "/** A custom gallery (the app's core feature): it reads the library, so READ_MEDIA_IMAGES stays. */",
+            "export const recentPhotos = (): Query => new Query();"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-microphone-from-expo-audio": {
+    "expect": ["check-media:", "RESULT: PASS"],
+    "ops": [
+      { "replace": { "file": "app.config.ts", "find": "        microphonePermission: false,\n", "with": "" } },
+      {
+        "write": {
+          "file": "src/services/voice-note/expo-audio-voice-note-adapter.ts",
+          "lines": [
+            "// src/services/voice-note/expo-audio-voice-note-adapter.ts",
+            "import { RecordingPresets, useAudioRecorder } from 'expo-audio';",
+            "",
+            "/** Records a voice note for a task: it needs RECORD_AUDIO, so the picker must keep the microphone. */",
+            "export function useVoiceNoteRecorder(): ReturnType<typeof useAudioRecorder> {",
+            "  return useAudioRecorder(RecordingPresets.HIGH_QUALITY);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-no-app-config": {
+    "expect": [
+      "SKIP app.config.ts [unused-permission] not yet created (app-variants-and-environment creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "app.config.ts" }]
+  },
+  "pass-not-applicable": {
+    "expect": [
+      "NOT APPLICABLE: no source file under src/ imports expo-image, expo-image-picker, expo-camera, expo-image-manipulator, expo-media-library, expo-file-system, and there is no src/services/media-store/",
+      "RESULT: PASS"
+    ],
+    "base": [{ "from": "@tests/bases/app/package.json", "to": "./" }],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/index.tsx",
+          "lines": [
+            "// src/app/index.tsx",
+            "import { View } from 'react-native';",
+            "",
+            "export default function Home(): React.JSX.Element {",
+            "  return <View />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-permission-adapter": {
+    "expect": ["check-media: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/permissions/camera-permission-adapter.ts",
+          "lines": [
+            "// src/services/permissions/camera-permission-adapter.ts",
+            "import { requestCameraPermissionsAsync } from 'expo-image-picker';",
+            "",
+            "export async function askCamera(): Promise<boolean> {",
+            "  const answer = await requestCameraPermissionsAsync();",
+            "  return answer.granted;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-sweep-wired": {
+    "expect": ["check-media: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/open-device-media.ts",
+          "lines": [
+            "// src/data/open-device-media.ts",
+            "import { createMediaImporter } from '@/data/media/media-importer';",
+            "",
+            "import type { MediaImporter, MediaImporterDependencies } from '@/data/media/media-importer';",
+            "",
+            "export function openDeviceMedia(dependencies: MediaImporterDependencies): MediaImporter {",
+            "  return createMediaImporter(dependencies);",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/data/sweep-after-startup.ts",
+          "lines": [
+            "// src/data/sweep-after-startup.ts",
+            "import { sweepMedia } from '@/data/media/media-sweeper';",
+            "",
+            "import type { SweepMediaRequest } from '@/data/media/media-sweeper';",
+            "",
+            "export function sweepAfterStartup(request: SweepMediaRequest): void {",
+            "  sweepMedia(request);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-tests-are-free": {
+    "expect": ["check-media: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/notes/note-photo.test.ts",
+          "lines": [
+            "// src/features/notes/note-photo.test.ts",
+            "const DATA = 'data:image/png;base64,iVBORw0KGgo=';",
+            "",
+            "it('keeps a fixture photo inline in a test', () => {",
+            "  expect(DATA.length).toBeGreaterThan(0);",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-url-field-is-not-a-uri": {
+    "expect": ["check-media:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/stores/notes/note-link.ts",
+          "lines": [
+            "// src/stores/notes/note-link.ts",
+            "export type NoteLink = {",
+            "  readonly url: string;",
+            "  readonly avatarUrl: string;",
+            "  readonly coverRef: string;",
+            "};"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-video-keeps-microphone": {
+    "expect": ["check-media: ", "RESULT: PASS"],
+    "ops": [
+      { "replace": { "file": "app.config.ts", "find": "        microphonePermission: false,\n", "with": "" } },
+      {
+        "replace": {
+          "file": "src/services/media-picker/expo-image-picker-media-picker-adapter.ts",
+          "find": "mediaTypes: ['images'],",
+          "with": "mediaTypes: ['images', 'videos'],"
+        }
+      }
+    ]
+  }
+}

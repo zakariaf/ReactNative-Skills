@@ -1,0 +1,1138 @@
+{
+  "bad-app-entry": {
+    "expect": ["index.ts:1 [app-entry] the entry does more than import (export const store = createTasksStore())"],
+    "ops": [
+      {
+        "write": {
+          "file": "index.ts",
+          "lines": [
+            "import './src/i18n/messages';",
+            "import { createTasksStore } from './src/stores/tasks-store';",
+            "",
+            "export const store = createTasksStore();",
+            "import 'expo-router/entry';"
+          ]
+        }
+      },
+      { "json": { "file": "package.json", "path": ["main"], "value": "index.ts" } }
+    ]
+  },
+  "bad-app-files": {
+    "expect": [
+      "tsconfig.json:1 [app-files] no \"@/*\" alias to src/*",
+      "src/app/_layout.tsx [app-files] the root layout is missing",
+      "tsconfig.json:1 [app-files] \"@/assets/*\" maps to src/assets/*, not assets/*"
+    ],
+    "ops": [
+      { "delete": "src/app/_layout.tsx" },
+      { "json": { "file": "tsconfig.json", "path": ["compilerOptions", "paths", "@/*"], "value": ["./app-src/*"] } },
+      {
+        "json": {
+          "file": "tsconfig.json",
+          "path": ["compilerOptions", "paths", "@/assets/*"],
+          "value": ["./src/assets/*"]
+        }
+      }
+    ]
+  },
+  "bad-composition-root": {
+    "expect": [
+      "src/services/create-device-services.ts [composition-root] the app has adapters",
+      "but no composition root creates them"
+    ],
+    "ops": [{ "delete": ["src/services/create-device-services.ts", "src/services/create-device-services.test.ts"] }]
+  },
+  "bad-folders-and-ports": {
+    "expect": [
+      "src/components/ [folders] \"components\" is not a src/ folder",
+      "src/helpers/ [folders] \"helpers\" is not a src/ folder",
+      "src/utils/ [folders] \"utils\" is not a src/ folder",
+      "src/root-provider.tsx [folders] a file directly in src/",
+      "src/services/helpers.ts [folders] a file directly in src/services/ that is not the composition root",
+      "scripts/release-all.ts [folders] a script directly in scripts/",
+      "scripts/Release_Tools/ [folders] scripts area \"Release_Tools\" is not a kebab-case noun",
+      "src/services/haptics/ [port-triple] has an adapter (expo-haptics-adapter.ts) but no port file (haptics-port.ts)",
+      "src/services/haptics/ [port-triple] has an adapter (expo-haptics-adapter.ts) but no fake-<concern>.ts",
+      "src/services/sharing/fake-sharing.ts [port-triple] the fake has no test (fake-sharing.test.ts)",
+      "src/assets/ [folders] \"assets\" is not a src/ folder Fix: Images, fonts and sounds live in assets/<kind>/ at the repo root",
+      "src/services/location/ [port-triple] has an adapter (expo-location-adapter.android.ts) but no port file (location-port.ts)",
+      "src/services/location/ [port-triple] has an adapter (expo-location-adapter.android.ts) but no fake-<concern>.ts",
+      "src/global.css [folders] a stylesheet directly in src/ Fix: A web stylesheet belongs to the theme: move it to src/theme/global.css"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/Release_Tools/upload-build.ts",
+          "lines": ["export const uploadBuild = (): void => undefined;"]
+        }
+      },
+      { "write": { "file": "scripts/release-all.ts", "lines": ["export const releaseAll = (): void => undefined;"] } },
+      { "write": { "file": "src/components/button.tsx", "lines": ["export const Button = (): null => null;"] } },
+      { "write": { "file": "src/global.css", "lines": [":root {", "  color-scheme: light dark;", "}"] } },
+      {
+        "write": {
+          "file": "src/helpers/format-title.ts",
+          "lines": ["export const formatTitle = (title: string): string => title.trim();"]
+        }
+      },
+      { "write": { "file": "src/root-provider.tsx", "lines": ["export const RootProvider = (): null => null;"] } },
+      {
+        "write": {
+          "file": "src/services/haptics/expo-haptics-adapter.ts",
+          "lines": ["export const createExpoHapticsAdapter = (): null => null;"]
+        }
+      },
+      { "write": { "file": "src/services/helpers.ts", "lines": ["export const serviceHelper = 1;"] } },
+      {
+        "write": {
+          "file": "src/services/location/expo-location-adapter.android.ts",
+          "lines": ["export const createExpoLocationAdapter = (): null => null;"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/sharing/expo-sharing-adapter.ts",
+          "lines": ["export const createExpoSharingAdapter = (): null => null;"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/sharing/fake-sharing.ts",
+          "lines": ["export const createFakeSharing = (): null => null;"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/sharing/sharing-port.ts",
+          "lines": ["export type SharingPort = { readonly share: (text: string) => Promise<void> };"]
+        }
+      },
+      {
+        "write": { "file": "src/utils/use-today.ts", "lines": ["export const useToday = (): string => '2026-10-03';"] }
+      },
+      { "png": { "files": ["src/assets/images/logo.png"], "width": 8, "height": 8, "fill": "#ffffff" } }
+    ]
+  },
+  "bad-import-time": {
+    "expect": [
+      "src/data/open-database.ts:5 [import-time-work] module-level code opens a database",
+      "src/data/open-database.ts:6 [import-time-work] module-level code creates an adapter",
+      "src/services/audio/audio-context.ts:2 [import-time-work] module-level code creates an AudioContext",
+      "src/stores/tasks-store.ts:5 [import-time-work] module-level code creates a global zustand store",
+      "src/i18n/force-rtl.ts:4 [import-time-work] module-level code switches the layout direction",
+      "src/i18n/force-rtl.ts:5 [import-time-work] module-level code reloads the app",
+      "src/features/tasks/app-services.ts:3 [import-time-work] module-level code builds the services (the composition root)",
+      "src/stores/lists-store.ts:4 [import-time-work] module-level code creates a store through a factory (createTasksStore()",
+      "src/stores/session-store.ts:3 [import-time-work] module-level code creates a global zustand store (createStore()"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/open-database.ts",
+          "lines": [
+            "import { openDatabaseSync } from 'expo-sqlite';",
+            "",
+            "import { createExpoSqliteSqlDriver } from './expo-sqlite-sql-driver';",
+            "",
+            "export const db = openDatabaseSync('tasks.db');",
+            "export const driver = createExpoSqliteSqlDriver('tasks.db');"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/app-services.ts",
+          "lines": [
+            "import { createDeviceServices } from '@/services/create-device-services';",
+            "",
+            "export const appServices = createDeviceServices();"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/i18n/force-rtl.ts",
+          "lines": [
+            "import { reloadAppAsync } from 'expo';",
+            "import { I18nManager } from 'react-native';",
+            "",
+            "I18nManager.forceRTL(true);",
+            "void reloadAppAsync();"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/audio/audio-context.ts",
+          "lines": [
+            "// One context for the whole app, created on import.",
+            "export const context = new AudioContext();"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/lists-store.ts",
+          "lines": [
+            "import { createTasksStore } from './tasks-store';",
+            "",
+            "// A factory called at module level is still one global store, shared by every test.",
+            "export const listsStore = createTasksStore();"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/session-store.ts",
+          "lines": [
+            "import { createStore } from 'zustand/vanilla';",
+            "",
+            "export const sessionStore = createStore(() => ({ startedAtMs: 0, tasksOpened: 0 }));"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/tasks-store.ts",
+          "lines": [
+            "import { create } from 'zustand';",
+            "",
+            "import type { Task } from '@/core/tasks/task';",
+            "",
+            "export const useTasksStore = create<{ readonly tasks: readonly Task[] }>(() => ({ tasks: [] }));"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-import-time-no-semicolons": {
+    "expect": [
+      "src/data/tasks-db.ts:3 [import-time-work] module-level code opens a database",
+      "src/stores/count-store.ts:6 [import-time-work] module-level code creates a global zustand store",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/open-log-db.ts",
+          "lines": [
+            "import { openDatabaseSync } from 'expo-sqlite'",
+            "",
+            "// Deferred work, written without semicolons: neither line runs at import time.",
+            "export const openLogDb = () =>",
+            "  openDatabaseSync('log.db')",
+            "",
+            "export function openArchiveDb() {",
+            "  return openDatabaseSync('archive.db')",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/data/tasks-db.ts",
+          "lines": [
+            "import { openDatabaseSync } from 'expo-sqlite'",
+            "",
+            "export const db = openDatabaseSync('tasks.db')"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/count-store.ts",
+          "lines": [
+            "import { create } from 'zustand'",
+            "",
+            "type CountTable = Record<string, number>",
+            "type CountState = { n: number; table: CountTable }",
+            "",
+            "export const useCountStore = create<CountState>()(() => ({ n: 0, table: {} }))"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-jest-asset-alias": {
+    "expect": [
+      "jest.config.js:5 [app-files] moduleNameMapper lists '^@/assets/(.*)$' after the catch-all '^@/(.*)$'",
+      "Move '^@/assets/(.*)$': '<rootDir>/assets/$1' before '^@/(.*)$'",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "  '^@/assets/(.*)$': '<rootDir>/assets/$1',\n  '^@/(.*)$': '<rootDir>/src/$1',\n",
+          "with": "  '^@/(.*)$': '<rootDir>/src/$1',\n  '^@/assets/(.*)$': '<rootDir>/assets/$1',\n"
+        }
+      }
+    ]
+  },
+  "bad-jest-derived-alias-order": {
+    "expect": [
+      "tsconfig.json:7 [app-files] paths lists \"@/assets/*\" after \"@/*\", and the Jest config has no \"@/\" mapping of its own",
+      "List \"@/assets/*\" before \"@/*\" in tsconfig.json paths",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "jest.config.js",
+          "lines": [
+            "// Expo's documented Jest setup: jest-expo derives moduleNameMapper from tsconfig.json paths.",
+            "module.exports = { preset: 'jest-expo/ios' };"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-one-react": {
+    "expect": ["package.json:1 [one-react] overrides.react is \"19.3.0\", the app uses \"19.2.3\""],
+    "ops": [{ "json": { "file": "package.json", "path": ["overrides", "react"], "value": "19.3.0" } }]
+  },
+  "bad-placement": {
+    "expect": [
+      "src/ui/onboarding-screen.tsx [placement] a screen outside src/features/<feature>/",
+      "src/ui/ads-adapter.ts [placement] a port, adapter or fake outside src/services/<concern>/",
+      "src/features/tasks/tasks-store.ts [placement] a store outside src/stores/",
+      "src/ui/badge-reducer.ts [placement] a reducer outside src/stores/",
+      "src/config/with-fonts.ts [placement] a config plugin outside plugins/",
+      "src/data/export-file.test.ts [placement] a test that needs Node APIs inside src/"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/config/with-fonts.ts",
+          "lines": [
+            "import { withInfoPlist } from 'expo/config-plugins';",
+            "",
+            "export const withFonts = withInfoPlist;"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/data/export-file.test.ts",
+          "lines": [
+            "import { writeFileSync } from 'node:fs';",
+            "",
+            "describe('export', () => {",
+            "  it('writes', () => {",
+            "    expect(writeFileSync).toBeDefined();",
+            "  });",
+            "});"
+          ]
+        }
+      },
+      {
+        "write": { "file": "src/features/tasks/tasks-store.ts", "lines": ["export const tasksStore = { tasks: [] };"] }
+      },
+      { "write": { "file": "src/ui/ads-adapter.ts", "lines": ["export const createAdsAdapter = (): null => null;"] } },
+      {
+        "write": {
+          "file": "src/ui/badge-reducer.ts",
+          "lines": ["export const badgeReducer = (count: number): number => count + 1;"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/ui/onboarding-screen.tsx",
+          "lines": ["export const OnboardingScreen = (): null => null;"]
+        }
+      }
+    ]
+  },
+  "bad-root-imported-startup": {
+    "expect": [
+      "src/app/_layout.tsx:8 [composition-root] the root layout calls startApp() outside a useState initializer, and it calls createDeviceServices() (src/startup/start-app.ts), so every render builds fresh adapters",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/_layout.tsx",
+          "lines": [
+            "// src/app/_layout.tsx: startApp() in the component body runs createDeviceServices on every render.",
+            "import { Stack } from 'expo-router';",
+            "",
+            "import { ServicesProvider } from '@/services/services-context';",
+            "import { startApp } from '@/startup/start-app';",
+            "",
+            "export default function RootLayout() {",
+            "  const app = startApp();",
+            "  return (",
+            "    <ServicesProvider services={app.services}>",
+            "      <Stack />",
+            "    </ServicesProvider>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/startup/start-app.ts",
+          "lines": [
+            "// src/startup/start-app.ts: the startup work the root layout runs (a compositionRoot file).",
+            "import { createDeviceServices } from '@/services/create-device-services';",
+            "",
+            "import type { Services } from '@/services/services-context';",
+            "",
+            "export function startApp(): { readonly services: Services } {",
+            "  return { services: createDeviceServices() };",
+            "}"
+          ]
+        }
+      },
+      { "json": { "file": "contracts/architecture.json", "path": ["srcFolders"], "value": ["startup"] } },
+      {
+        "json": {
+          "file": "contracts/architecture.json",
+          "path": ["compositionRoot"],
+          "value": ["src/startup/start-app.ts"]
+        }
+      }
+    ]
+  },
+  "bad-root-mount": {
+    "expect": [
+      "src/app/_layout.tsx:9 [composition-root] the root layout calls createDeviceServices() outside a useState initializer, so every render builds fresh adapters",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/_layout.tsx",
+          "lines": [
+            "// src/app/_layout.tsx: useState(createDeviceServices()) runs the factory on every render.",
+            "import { Stack } from 'expo-router';",
+            "import { useState } from 'react';",
+            "",
+            "import { createDeviceServices } from '@/services/create-device-services';",
+            "import { ServicesProvider } from '@/services/services-context';",
+            "",
+            "export default function RootLayout() {",
+            "  const [services] = useState(createDeviceServices());",
+            "  return (",
+            "    <ServicesProvider services={services}>",
+            "      <Stack />",
+            "    </ServicesProvider>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-root-unmounted": {
+    "expect": [
+      "src/app/_layout.tsx:1 [composition-root] the root layout never calls createDeviceServices() (src/services/create-device-services.ts exists)",
+      "src/app/_layout.tsx:1 [composition-root] the root layout never renders <ServicesProvider>, so useServices() throws in every screen",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/_layout.tsx",
+          "lines": [
+            "// src/app/_layout.tsx: no composition root, so useServices() throws in every screen.",
+            "import { Stack } from 'expo-router';",
+            "",
+            "export default function RootLayout() {",
+            "  return <Stack />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-route-files": {
+    "expect": [
+      "src/app/index.test.tsx [route-file] a test inside the routes folder",
+      "goes to src/features/<feature>/<feature>-navigation.test.tsx and renders the route files' default exports with renderRouterWithProviders",
+      "src/app/__tests__/route-wrapper.tsx [route-file] a test helper inside the routes folder (__tests__/)",
+      "src/app/tasks/use-task-param.ts [route-file] a screen, hook or store file inside the routes folder",
+      "src/app/tasks/task-row.tsx [route-file] no default export"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/__tests__/route-wrapper.tsx",
+          "lines": [
+            "import type { ReactNode } from 'react';",
+            "",
+            "export default function RouteWrapper({ children }: { children: ReactNode }) {",
+            "  return children;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/index.test.tsx",
+          "lines": [
+            "describe('tasks route', () => {",
+            "  it('renders', () => {",
+            "    expect(true).toBe(true);",
+            "  });",
+            "});"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/tasks/task-row.tsx",
+          "lines": ["export function TaskRow() {", "  return null;", "}"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/tasks/use-task-param.ts",
+          "lines": ["export const useTaskParam = (): string => 't1';"]
+        }
+      }
+    ]
+  },
+  "error-bad-contract": {
+    "expect": ["ERROR [bad-input] contracts/architecture.json: is not valid JSON"],
+    "ops": [{ "write": { "file": "contracts/architecture.json", "content": "{ \"srcFolders\": [\n" } }]
+  },
+  "pass-canonical-shared-folders": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/canvas/canvas-layout.ts",
+          "lines": [
+            "// The canvas kit's pure layout maths (skia-canvas-rendering owns the canonical file).",
+            "export type CanvasSize = { readonly width: number; readonly height: number };"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/hooks/use-is-app-active.ts",
+          "lines": [
+            "import { useSyncExternalStore } from 'react';",
+            "import { AppState } from 'react-native';",
+            "",
+            "export function useIsAppActive(): boolean {",
+            "  return useSyncExternalStore(",
+            "    (onChange) => {",
+            "      const subscription = AppState.addEventListener('change', onChange);",
+            "      return () => subscription.remove();",
+            "    },",
+            "    () => AppState.currentState === 'active',",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-entry-no-semicolons": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "index.ts",
+          "lines": [
+            "// index.ts: a thin entry written without semicolons (Prettier \"semi\": false): imports only.",
+            "import './src/i18n/intl-polyfills'",
+            "import 'expo-router/entry'"
+          ]
+        }
+      },
+      { "json": { "file": "package.json", "path": ["main"], "value": "index.ts" } }
+    ]
+  },
+  "pass-jest-derived-alias-order": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "jest.config.js",
+          "lines": [
+            "// Expo's documented Jest setup: jest-expo derives moduleNameMapper from tsconfig.json paths.",
+            "module.exports = { preset: 'jest-expo/ios' };"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "tsconfig.json",
+          "lines": [
+            "{",
+            "  \"extends\": \"./tsconfig.base.json\",",
+            "  \"compilerOptions\": {",
+            "    \"types\": [",
+            "      \"jest\",",
+            "      \"node\"",
+            "    ],",
+            "    \"paths\": {",
+            "      \"@/assets/*\": [",
+            "        \"./assets/*\"",
+            "      ],",
+            "      \"@/*\": [",
+            "        \"./src/*\"",
+            "      ],",
+            "      \"@test/*\": [",
+            "        \"./test/*\"",
+            "      ]",
+            "    }",
+            "  }",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-no-contract": {
+    "expect": ["note: no contracts/architecture.json; the default folders and globs apply", "RESULT: PASS"],
+    "ops": [{ "delete": "contracts/architecture.json" }]
+  },
+  "pass-not-expo": {
+    "expect": ["NOT APPLICABLE: expo is not a dependency in package.json", "RESULT: PASS"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo"], "delete": true } }]
+  },
+  "pass-os-mirror-store": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/a11y/system-a11y-store.ts",
+          "lines": [
+            "// src/ui/a11y/system-a11y-store.ts",
+            "// The one mirror of the phone's accessibility switches (VoiceOver or TalkBack running, reduce",
+            "// motion). Owned by the accessibility-as-code skill. Every other file reads this store; only",
+            "// watchSystemA11y() talks to AccessibilityInfo, so the app holds one subscription per switch.",
+            "import { AccessibilityInfo } from 'react-native';",
+            "import { createStore } from 'zustand/vanilla';",
+            "",
+            "export type SystemA11yState = {",
+            "  /** iOS: Settings > Accessibility > Motion > Reduce Motion. Android: Remove animations. */",
+            "  readonly isReduceMotionOn: boolean;",
+            "  /** VoiceOver (iOS) or TalkBack (Android) is running. */",
+            "  readonly isScreenReaderOn: boolean;",
+            "};",
+            "",
+            "/** Mirror of the OS accessibility switches. Not persisted; filled by watchSystemA11y(). */",
+            "export const systemA11yStore = createStore<SystemA11yState>()(() => ({",
+            "  isReduceMotionOn: false,",
+            "  isScreenReaderOn: false,",
+            "}));",
+            "",
+            "function setMotion(isOn: boolean): void {",
+            "  systemA11yStore.setState({ isReduceMotionOn: isOn });",
+            "}",
+            "",
+            "function setReader(isOn: boolean): void {",
+            "  systemA11yStore.setState({ isScreenReaderOn: isOn });",
+            "}",
+            "",
+            "/**",
+            " * Starts listening and returns the unsubscribe function. Call it once, from the root layout's",
+            " * mount effect: useEffect(() => watchSystemA11y(reportError), []).",
+            " */",
+            "export function watchSystemA11y(onError: (error: unknown) => void): () => void {",
+            "  const motion = AccessibilityInfo.addEventListener('reduceMotionChanged', setMotion);",
+            "  const reader = AccessibilityInfo.addEventListener('screenReaderChanged', setReader);",
+            "  AccessibilityInfo.isReduceMotionEnabled().then(setMotion).catch(onError);",
+            "  AccessibilityInfo.isScreenReaderEnabled().then(setReader).catch(onError);",
+            "  return () => {",
+            "    motion.remove();",
+            "    reader.remove();",
+            "  };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-platform-adapter": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/haptics/expo-haptics-adapter.android.ts",
+          "lines": [
+            "// Android: the system's own tap feedback.",
+            "import { AndroidHaptics, performAndroidHapticsAsync } from 'expo-haptics';",
+            "",
+            "import type { HapticsPort } from './haptics-port';",
+            "",
+            "export function createExpoHapticsAdapter(): HapticsPort {",
+            "  return { tap: () => void performAndroidHapticsAsync(AndroidHaptics.Keyboard_Tap).catch(() => undefined) };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/haptics/expo-haptics-adapter.ios.ts",
+          "lines": [
+            "// iOS: a light impact.",
+            "import { ImpactFeedbackStyle, impactAsync } from 'expo-haptics';",
+            "",
+            "import type { HapticsPort } from './haptics-port';",
+            "",
+            "export function createExpoHapticsAdapter(): HapticsPort {",
+            "  return { tap: () => void impactAsync(ImpactFeedbackStyle.Light).catch(() => undefined) };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/haptics/fake-haptics.test.ts",
+          "lines": [
+            "import { createFakeHaptics } from './fake-haptics';",
+            "",
+            "describe('createFakeHaptics', () => {",
+            "  it('counts taps', () => {",
+            "    const haptics = createFakeHaptics();",
+            "    haptics.tap();",
+            "    expect(haptics.taps()).toBe(1);",
+            "  });",
+            "});"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/haptics/fake-haptics.ts",
+          "lines": [
+            "import type { HapticsPort } from './haptics-port';",
+            "",
+            "export function createFakeHaptics(): HapticsPort & { readonly taps: () => number } {",
+            "  let count = 0;",
+            "  return { tap: () => { count += 1; }, taps: () => count };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/haptics/haptics-port.ts",
+          "lines": ["export type HapticsPort = { readonly tap: () => void };"]
+        }
+      }
+    ]
+  },
+  "pass-react-navigation": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      { "delete": "src/app" },
+      {
+        "write": {
+          "file": "index.ts",
+          "lines": [
+            "import { registerRootComponent } from 'expo';",
+            "",
+            "import { App } from './src/navigation/app';",
+            "",
+            "registerRootComponent(App);"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/navigation/app.tsx",
+          "lines": [
+            "import { NavigationContainer } from '@react-navigation/native';",
+            "import { useState } from 'react';",
+            "",
+            "import { TasksScreen } from '@/features/tasks/tasks-screen';",
+            "import { createDeviceServices } from '@/services/create-device-services';",
+            "import { ServicesProvider } from '@/services/services-context';",
+            "",
+            "export function App() {",
+            "  const [services] = useState(createDeviceServices);",
+            "  return (",
+            "    <ServicesProvider services={services}>",
+            "      <NavigationContainer>",
+            "        <TasksScreen />",
+            "      </NavigationContainer>",
+            "    </ServicesProvider>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-router"], "delete": true } },
+      { "json": { "file": "package.json", "path": ["dependencies", "@react-navigation/native"], "value": "7.1.28" } },
+      { "json": { "file": "package.json", "path": ["main"], "value": "index.ts" } },
+      { "json": { "file": "contracts/architecture.json", "path": ["srcFolders"], "value": ["navigation"] } },
+      {
+        "json": {
+          "file": "contracts/architecture.json",
+          "path": ["compositionRoot"],
+          "value": ["src/navigation/app.tsx"]
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/architecture.json",
+          "path": ["allowedImports"],
+          "value": [
+            {
+              "from": "src/navigation/**",
+              "to": "src/features/**",
+              "reason": "React Navigation: the navigator renders the feature screens (there is no routes folder)."
+            }
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/architecture.json",
+          "path": ["portlessSdks", "@react-navigation/native"],
+          "value": "navigation: the navigator and its hooks"
+        }
+      }
+    ]
+  },
+  "pass-root-app-folder": { "expect": ["RESULT: PASS"], "ops": [{ "rename": { "from": "src/app", "to": "app" } }] },
+  "pass-root-imported-startup": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/_layout.tsx",
+          "lines": [
+            "// src/app/_layout.tsx: the imported startup helper runs once, as the first render's state initializer.",
+            "import { Stack } from 'expo-router';",
+            "import { useState } from 'react';",
+            "",
+            "import { ServicesProvider } from '@/services/services-context';",
+            "import { startApp as boot } from '@/startup/start-app';",
+            "",
+            "export default function RootLayout() {",
+            "  const [app] = useState(boot);",
+            "  return (",
+            "    <ServicesProvider services={app.services}>",
+            "      <Stack />",
+            "    </ServicesProvider>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/startup/start-app.ts",
+          "lines": [
+            "// src/startup/start-app.ts: the startup work the root layout runs (a compositionRoot file).",
+            "import { createDeviceServices } from '@/services/create-device-services';",
+            "",
+            "import type { Services } from '@/services/services-context';",
+            "",
+            "export function startApp(): { readonly services: Services } {",
+            "  return { services: createDeviceServices() };",
+            "}"
+          ]
+        }
+      },
+      { "json": { "file": "contracts/architecture.json", "path": ["srcFolders"], "value": ["startup"] } },
+      {
+        "json": {
+          "file": "contracts/architecture.json",
+          "path": ["compositionRoot"],
+          "value": ["src/startup/start-app.ts"]
+        }
+      }
+    ]
+  },
+  "pass-root-startup-component": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/_layout.tsx",
+          "lines": [
+            "// src/app/_layout.tsx: the root layout renders the startup component, which mounts the services once.",
+            "import { Stack } from 'expo-router';",
+            "",
+            "import { AppRoot } from '@/startup/app-root';",
+            "",
+            "export default function RootLayout() {",
+            "  return (",
+            "    <AppRoot>",
+            "      <Stack />",
+            "    </AppRoot>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/startup/app-root.tsx",
+          "lines": [
+            "// src/startup/app-root.tsx: a provider component that mounts the composition root once (a compositionRoot file).",
+            "import { useState } from 'react';",
+            "",
+            "import { createDeviceServices } from '@/services/create-device-services';",
+            "import { ServicesProvider } from '@/services/services-context';",
+            "",
+            "import type { ReactNode } from 'react';",
+            "",
+            "export function AppRoot({ children }: { readonly children: ReactNode }) {",
+            "  const [services] = useState(createDeviceServices);",
+            "  return <ServicesProvider services={services}>{children}</ServicesProvider>;",
+            "}"
+          ]
+        }
+      },
+      { "json": { "file": "contracts/architecture.json", "path": ["srcFolders"], "value": ["startup"] } },
+      {
+        "json": {
+          "file": "contracts/architecture.json",
+          "path": ["compositionRoot"],
+          "value": ["src/startup/app-root.tsx"]
+        }
+      }
+    ]
+  },
+  "pass-root-startup-helper": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/_layout.tsx",
+          "lines": [
+            "// src/app/_layout.tsx: startup runs once, in the first render's state initializer.",
+            "import { Stack } from 'expo-router';",
+            "import { useState } from 'react';",
+            "",
+            "import { openDeviceDatabase } from '@/data/open-device-database';",
+            "import { createDeviceServices } from '@/services/create-device-services';",
+            "import { ServicesProvider } from '@/services/services-context';",
+            "",
+            "import type { SqlDriver } from '@/data/sql-driver';",
+            "import type { Services } from '@/services/services-context';",
+            "",
+            "function startApp(): { readonly services: Services; readonly driver: SqlDriver } {",
+            "  const services = createDeviceServices();",
+            "  return { services, driver: openDeviceDatabase() };",
+            "}",
+            "",
+            "export default function RootLayout() {",
+            "  const [app] = useState(startApp);",
+            "  return (",
+            "    <ServicesProvider services={app.services}>",
+            "      <Stack />",
+            "    </ServicesProvider>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-route-reexport": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/about.tsx",
+          "lines": [
+            "import { AboutScreen } from '@/features/about/about-screen';",
+            "",
+            "export { AboutScreen as default };"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/settings.tsx",
+          "lines": ["export { SettingsScreen as default } from '@/features/settings/settings-screen';"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/about/about-screen.tsx",
+          "lines": ["export function AboutScreen() {", "  return null;", "}"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/settings/settings-screen.tsx",
+          "lines": ["export function SettingsScreen() {", "  return null;", "}"]
+        }
+      }
+    ]
+  },
+  "pass-route-test-in-feature": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/tasks-navigation.test.tsx",
+          "lines": [
+            "// src/features/tasks/tasks-navigation.test.tsx — a route test: it renders the route files' default",
+            "// exports through the router helper, beside the feature (never inside src/app/).",
+            "import { screen } from '@testing-library/react-native';",
+            "",
+            "import TasksRoute from '@/app/index';",
+            "import TaskDetailRoute from '@/app/tasks/[taskId]';",
+            "import { renderRouterWithProviders } from '@test/render-router-with-providers';",
+            "",
+            "const ROUTES = { index: TasksRoute, 'tasks/[taskId]': TaskDetailRoute };",
+            "",
+            "describe('tasks navigation', () => {",
+            "  it('opens a task from a deep link', async () => {",
+            "    const view = await renderRouterWithProviders(ROUTES, { initialUrl: '/tasks/t1' });",
+            "",
+            "    expect(view.getPathname()).toBe('/tasks/t1');",
+            "    expect(screen.getByRole('header')).toBeOnTheScreen();",
+            "  });",
+            "});"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "test/render-router-with-providers.tsx",
+          "lines": [
+            "// test/render-router-with-providers.tsx — a stand-in for the route-test helper that",
+            "// unit-and-component-tests ships: Expo Router's in-memory router with route getters.",
+            "import { renderRouter } from 'expo-router/testing-library';",
+            "",
+            "import type { ComponentType } from 'react';",
+            "",
+            "export async function renderRouterWithProviders(",
+            "  routes: Record<string, ComponentType>,",
+            "  options: { initialUrl?: string } = {},",
+            "): Promise<{ getPathname: () => string }> {",
+            "  const view = renderRouter(routes, { initialUrl: options.initialUrl ?? '/' });",
+            "  await view;",
+            "  return { getPathname: () => view.getPathname() };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-secure-store-service": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/secure-storage/fake-secure-store.ts",
+          "lines": [
+            "// src/services/secure-storage/fake-secure-store.ts",
+            "export function createFakeSecureStore(): { readonly values: Map<string, string> } {",
+            "  return { values: new Map() };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/secure-storage/secure-store-port.ts",
+          "lines": [
+            "// src/services/secure-storage/secure-store-port.ts",
+            "export type SecureStorePort = { readonly read: (key: string) => Promise<string | null> };"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-server-files": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/+middleware.ts",
+          "lines": [
+            "// The one root middleware: server code like the API routes.",
+            "import type { MiddlewareFunction } from 'expo-router/server';",
+            "",
+            "const middleware: MiddlewareFunction = () => undefined;",
+            "",
+            "export default middleware;"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/api/tasks/[taskId]+api.ts",
+          "lines": [
+            "// An Expo Router API route: server code, left out of the native bundle (expo-router _ctx.ios.js).",
+            "import { randomUUID } from 'node:crypto';",
+            "",
+            "import { StatusError } from 'expo-server';",
+            "",
+            "import { isTaskDone } from '@/core/tasks/task';",
+            "import { saveTask } from '@/data/tasks-repository';",
+            "import { taskDigest } from '@/server/task-digest';",
+            "",
+            "import type { ApiClient } from '@/api/api-client';",
+            "import type { ClockPort } from '@/services/clock/clock-port';",
+            "",
+            "export type TaskRouteDeps = { readonly api: ApiClient; readonly clock: ClockPort };",
+            "",
+            "export function GET(request: Request): Response {",
+            "  const taskId = new URL(request.url).pathname.split('/').pop();",
+            "  if (taskId === undefined || taskId === '') throw new StatusError(400, 'taskId is required');",
+            "  const task = { id: taskId, title: randomUUID(), done: false };",
+            "  return Response.json({ digest: taskDigest(task), done: isTaskDone(task), save: saveTask.name });",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/server/task-digest.ts",
+          "lines": [
+            "// A server helper (contract serverFiles): Node built-ins are fine here, and the app never imports it.",
+            "import { createHash } from 'node:crypto';",
+            "",
+            "import type { Task } from '@/core/tasks/task';",
+            "",
+            "export function taskDigest(task: Task): string {",
+            "  return createHash('sha256').update(`${task.id}:${task.title}`).digest('hex');",
+            "}"
+          ]
+        }
+      },
+      { "json": { "file": "contracts/architecture.json", "path": ["srcFolders"], "value": ["server"] } },
+      { "json": { "file": "contracts/architecture.json", "path": ["serverFiles"], "value": ["src/server/**"] } }
+    ]
+  },
+  "pass-service-without-port": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/error-net/error-net.test.ts",
+          "lines": [
+            "import { createErrorNet } from './error-net';",
+            "",
+            "it('buffers reports', () => {",
+            "  const net = createErrorNet();",
+            "  net.report({ source: 'render', error: new Error('x') });",
+            "  expect(net.pending()).toHaveLength(1);",
+            "});"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/error-net/error-net.ts",
+          "lines": [
+            "// The error net: global handlers buffer reports until a sink connects (no SDK, so no port triple).",
+            "export type ErrorReport = { readonly source: 'global-handler' | 'unhandled-rejection' | 'render'; readonly error: unknown };",
+            "",
+            "export function createErrorNet(): { readonly report: (report: ErrorReport) => void; readonly pending: () => readonly ErrorReport[] } {",
+            "  const buffered: ErrorReport[] = [];",
+            "  return { report: (report) => void buffered.push(report), pending: () => [...buffered] };",
+            "}"
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,4 @@
+{
+  "$comment": "Fixture app facts: the task map is a physical surface.",
+  "physicalSurfaces": ["TaskMapCanvas"]
+}

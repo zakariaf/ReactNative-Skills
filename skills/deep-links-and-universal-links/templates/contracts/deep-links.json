@@ -1,0 +1,8 @@
+{
+  "$schema": "./deep-links.schema.json",
+  "$comment": "The app's verified links, read by scripts/deep-links/link-native-config.ts (app.config.ts: ios.associatedDomains, android.intentFilters) and by deep-links-and-universal-links' check-deep-links.mjs and write-well-known.mjs. Empty hosts: the app has no universal or app links yet, only its custom scheme. To add a domain: its hosts per variant, the webPaths that open the app, appleTeamId and the signing certificate fingerprints of every variant that has hosts.",
+  "hosts": { "development": [], "preview": [], "production": [] },
+  "webPaths": [],
+  "wellKnownDir": "well-known",
+  "androidCertFingerprints": { "development": [], "preview": [], "production": [] }
+}

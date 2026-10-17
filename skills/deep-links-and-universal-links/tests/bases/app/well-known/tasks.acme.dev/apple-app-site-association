@@ -1,0 +1,20 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["A1B2C3D4E5.com.acme.tasks"],
+        "components": [
+          {
+            "/": "/tasks/*"
+          },
+          {
+            "/": "/lists/*"
+          },
+          {
+            "/": "/verify-email"
+          }
+        ]
+      }
+    ]
+  }
+}

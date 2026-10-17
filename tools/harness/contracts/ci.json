@@ -1,0 +1,5 @@
+{
+  "$schema": "./ci.schema.json",
+  "$comment": "The app's CI facts, read by the ci-pipeline-and-gates checkers. laneOptOuts names a device lane this app deliberately does not run in CI, with the reason a reviewer reads; an empty object means every lane the app has an npm script for runs in CI.",
+  "laneOptOuts": {}
+}

@@ -1,0 +1,18 @@
+{
+  "name": "tasks",
+  "version": "1.0.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start",
+    "update:preview": "eas update --channel preview --environment preview --message preview && npx sentry-expo-upload-sourcemaps dist",
+    "update:production": "eas update --channel production --environment production --message release && npx sentry-expo-upload-sourcemaps dist"
+  },
+  "dependencies": {
+    "@sentry/react-native": "~7.11.0",
+    "expo": "~57.0.26",
+    "expo-router": "~57.0.24",
+    "react": "19.2.3",
+    "react-native": "0.86.3"
+  }
+}

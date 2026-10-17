@@ -1,0 +1,11 @@
+{
+  "name": "design-visual-parity-scripts",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The one pinned package of the design-visual-parity scripts: Playwright drives the installed Google Chrome for shoot-design.mjs (no browser download). Install with npm ci --prefix <skill>/scripts, or into <repo>/.skill-tooling/design-visual-parity and pass --tooling.",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "playwright": "1.63.0"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "$comment": "A shape to imitate: one screen entry of contracts/screens.json for a detail screen built from ui-component-library components. AppBar, ListRow and Button derive their parts from the testID the screen passes, so the parts are listed with the component as their parent's component and the checker counts them present once the base id is set. The premium state shows how a paid-only element is declared. done-button and reopen-button are both primary but never on screen together: draw each in its own state component file (open-task-actions.tsx, done-task-actions.tsx), because one-primary-action counts primary Buttons per file.",
+  "id": "task-detail",
+  "name": "Task detail",
+  "presentation": "route",
+  "route": "src/app/(app)/tasks/[taskId].tsx",
+  "model": "src/features/task-detail/use-task-detail-model.ts",
+  "view": "src/features/task-detail/task-detail-screen.tsx",
+  "states": [
+    { "id": "default", "reference": "task-detail-default.png" },
+    { "id": "done", "drawn": false, "why": "Chosen: the same page with the Mark done button replaced by Reopen." },
+    { "id": "premium", "drawn": false, "why": "Chosen: a paying user also sees the reminder row." },
+    { "id": "not-found", "drawn": false, "why": "Chosen: a deep link to a deleted task; one line and Back." }
+  ],
+  "elements": [
+    { "testID": "task-detail.screen", "role": "none", "component": "ScreenFrame" },
+    { "testID": "task-detail.app-bar", "role": "none", "component": "AppBar" },
+    { "testID": "task-detail.app-bar.back-button", "role": "button", "component": "AppBar", "a11yLabel": "common.back" },
+    { "testID": "task-detail.app-bar.title", "role": "header", "component": "AppBar" },
+    { "testID": "task-detail.list-row", "role": "button", "component": "ListRow", "states": ["default", "done", "premium"] },
+    { "testID": "task-detail.list-row.label", "role": "text", "component": "ListRow", "text": "task-detail.list.label", "parent": "task-detail.list-row" },
+    { "testID": "task-detail.list-row.value", "role": "text", "component": "ListRow", "parent": "task-detail.list-row", "note": "The list's name: data text." },
+    { "testID": "task-detail.reminder-row", "role": "switch", "component": "ListRow", "text": "task-detail.reminder.label", "states": ["premium"], "requires": "premium" },
+    { "testID": "task-detail.done-button", "role": "button", "component": "Button", "kind": "primary", "text": "task-detail.done-button.label", "states": ["default", "premium"] },
+    { "testID": "task-detail.reopen-button", "role": "button", "component": "Button", "kind": "primary", "text": "task-detail.reopen-button.label", "states": ["done"] },
+    { "testID": "task-detail.not-found-note", "role": "text", "component": "AppText", "text": "task-detail.not-found.body", "states": ["not-found"] }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "packages": [
+    { "name": "core", "pure": true },
+    { "name": "ui" },
+    { "name": "tooling", "world": "node" }
+  ]
+}

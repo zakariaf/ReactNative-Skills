@@ -1,0 +1,34 @@
+{
+  "bad-parent-agents-above-git-top": {
+    "expect": [
+      "FAIL rn-skills.config.json:1 [agents] \"agentInstructions\": \"parent-repo\" but no enclosing folder of the repository holds AGENTS.md",
+      "holds no AGENTS.md, and no folder between it and the app does"
+    ],
+    "args": "{dir}/inner/app --today 2026-10-14",
+    "ops": [
+      {
+        "$comment": "AGENTS.md sits above the enclosing repository's top level (inner/.git): it is not that repository's file and must not count.",
+        "rename": { "from": "app", "to": "inner/app" }
+      },
+      { "rename": { "from": ".git", "to": "inner/.git" } }
+    ]
+  },
+  "bad-parent-agents-app-is-top": {
+    "expect": [
+      "FAIL rn-skills.config.json:1 [agents] \"agentInstructions\": \"parent-repo\" but no enclosing folder of the repository holds AGENTS.md: the app root is itself the git top level"
+    ],
+    "ops": [
+      {
+        "$comment": "The app is its own git repository: an AGENTS.md in the folder above belongs to no repository of the app.",
+        "mkdir": "app/.git"
+      }
+    ]
+  },
+  "bad-parent-agents-missing": {
+    "expect": [
+      "FAIL rn-skills.config.json:1 [agents] \"agentInstructions\": \"parent-repo\" but no enclosing folder of the repository holds AGENTS.md",
+      "holds no AGENTS.md, and no folder between it and the app does"
+    ],
+    "ops": [{ "delete": "AGENTS.md" }]
+  }
+}

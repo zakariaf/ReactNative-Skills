@@ -1,0 +1,4 @@
+{
+  "tasks.list.title": "Tasks",
+  "tasks.summary.open": "{openCount, plural, =0 {No open tasks} one {# open task} other {# open tasks}}"
+}

@@ -1,0 +1,187 @@
+{
+  "bad-interaction-manager": {
+    "expect": [
+      "FAIL src/features/tasks/defer-work.ts:2 [removed-rn-api] uses InteractionManager, removed in React Native 0.88 (SDK 58); replace it now, before the move",
+      "requestIdleCallback"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/defer-work.ts",
+          "content": "// src/features/tasks/defer-work.ts\nimport { InteractionManager } from 'react-native';\n\nexport function deferWork(task: () => void): void {\n  InteractionManager.runAfterInteractions(task);\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-modal-animated": {
+    "expect": [
+      "FAIL src/features/tasks/tasks-screen.tsx:9 [removed-rn-api] uses Modal animated prop, removed in React Native 0.88"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "animationType=\"fade\"",
+          "with": "animated"
+        }
+      }
+    ]
+  },
+  "bad-old-xcode": {
+    "expect": [
+      "FAIL .xcode-version:1 [xcode] SDK 57 needs Xcode 26.4 or newer, .xcode-version uses 26.2",
+      "FAIL .xcode-version:1 [xcode] SDK 58 needs Xcode 26.4 or newer, .xcode-version uses 26.2"
+    ],
+    "ops": [{ "write": { "file": ".xcode-version", "content": "26.2\n" } }]
+  },
+  "bad-statusbar": {
+    "expect": [
+      "FAIL src/ui/status-bar-frame.tsx:5 [removed-rn-api] uses StatusBar translucent, removed in React Native 0.88"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/status-bar-frame.tsx",
+          "content": "// src/ui/status-bar-frame.tsx\nimport { StatusBar } from 'react-native';\n\nexport function StatusBarFrame(): React.JSX.Element {\n  return <StatusBar barStyle=\"dark-content\" translucent />;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-test-alias-matcher": {
+    "expect": [
+      "FAIL src/features/tasks/complete-task.test.ts:8 [removed-test-api] uses Jest alias matcher, removed in Jest 30 (SDK 58); replace it now, before the move",
+      "toHaveBeenCalledWith"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/complete-task.test.ts",
+          "find": "toHaveBeenCalledWith",
+          "with": "toBeCalledWith"
+        }
+      }
+    ]
+  },
+  "error-target-not-later": {
+    "expect": ["ERROR [bad-input] --target-sdk 57 must be a later SDK than the app's 57"],
+    "args": "{dir} --target-sdk 57"
+  },
+  "pass-sdk-56-to-57": {
+    "expect": ["sdk      app on Expo SDK 56; module map: none", "readiness scan for SDK 57", "RESULT: PASS"],
+    "args": "{dir} --target-sdk 57",
+    "ops": [
+      {
+        "$comment": "The app on SDK 56 (expo 56.0.23, React Native 0.85.3); the skill ships no SDK 56 module map, so module-map is skipped without node_modules.",
+        "json": { "file": "package.json", "path": ["dependencies", "expo"], "value": "~56.0.23" }
+      },
+      { "json": { "file": "package.json", "path": ["dependencies", "react-native"], "value": "0.85.3" } },
+      {
+        "json": { "file": "package.json", "path": ["devDependencies", "@react-native/jest-preset"], "value": "0.85.3" }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["devDependencies", "@react-native/eslint-plugin"],
+          "value": "0.85.3"
+        }
+      },
+      { "json": { "file": "package.json", "path": ["devDependencies", "jest-expo"], "value": "56.0.5" } },
+      { "json": { "file": "package.json", "path": ["devDependencies", "eslint-config-expo"], "value": "56.0.4" } },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/expo", "version"],
+          "value": "56.0.23"
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/react-native", "version"],
+          "value": "0.85.3"
+        }
+      },
+      { "delete": ["scripts/config/scene-support.ts", "scripts/config/scene-support.test.ts"] }
+    ]
+  },
+  "pass-todo-compile-sdk": {
+    "expect": [
+      "todo     app.config.ts:7 [android-sdk] compileSdkVersion 36 is below SDK 58's compileSdk 37",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "return ['expo-router',",
+          "with": "return [['expo-build-properties', { android: { compileSdkVersion: 36 } }], 'expo-router',"
+        }
+      }
+    ]
+  },
+  "pass-todo-deployment-target": {
+    "expect": [
+      "readiness scan for SDK 57",
+      "todo     app.config.ts:7 [ios-deployment-target] deploymentTarget 15.1 is below SDK 57's iOS 16.4",
+      "RESULT: PASS"
+    ],
+    "args": "{dir} --target-sdk 57",
+    "ops": [
+      {
+        "$comment": "The app on SDK 55 (expo 55.0.31, React Native 0.83.10, TypeScript 5.9).",
+        "json": { "file": "package.json", "path": ["dependencies", "expo"], "value": "~55.0.31" }
+      },
+      { "json": { "file": "package.json", "path": ["dependencies", "react-native"], "value": "0.83.10" } },
+      {
+        "json": { "file": "package.json", "path": ["devDependencies", "@react-native/jest-preset"], "value": "0.83.10" }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["devDependencies", "@react-native/eslint-plugin"],
+          "value": "0.83.10"
+        }
+      },
+      { "json": { "file": "package.json", "path": ["devDependencies", "jest-expo"], "value": "55.0.22" } },
+      { "json": { "file": "package.json", "path": ["devDependencies", "eslint-config-expo"], "value": "55.0.1" } },
+      { "json": { "file": "package.json", "path": ["devDependencies", "typescript"], "value": "5.9.3" } },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/expo", "version"],
+          "value": "55.0.31"
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/react-native", "version"],
+          "value": "0.83.10"
+        }
+      },
+      { "delete": ["scripts/config/scene-support.ts", "scripts/config/scene-support.test.ts"] },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "return ['expo-router',",
+          "with": "return [['expo-build-properties', { ios: { deploymentTarget: '15.1' } }], 'expo-router',"
+        }
+      }
+    ]
+  },
+  "pass-todo-test-helper": {
+    "expect": [
+      "todo     test/config-plugins/run-mod.ts:3 [config-plugin-import] imports 'expo/config-plugins.js', but on SDK 58 config plugins import 'expo/config-plugins' (change it in the move commit to SDK 58)",
+      "todo     test/config-plugins/run-mod.ts:2 [config-plugin-import]",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "test/config-plugins/run-mod.ts",
+          "content": "// test/config-plugins/run-mod.ts\nimport type { ExportedConfig } from 'expo/config-plugins.js';\nimport { withPlugins } from 'expo/config-plugins.js';\n\nexport const runAll = (config: ExportedConfig): ExportedConfig => withPlugins(config, []);\n"
+        }
+      }
+    ]
+  }
+}

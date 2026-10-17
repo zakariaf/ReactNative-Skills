@@ -1,0 +1,260 @@
+{
+  "version": 1,
+  "references": "design/screens",
+  "policies": {},
+  "screens": [
+    {
+      "id": "tasks",
+      "name": "Tasks",
+      "presentation": "route",
+      "route": "src/app/(app)/index.tsx",
+      "model": "src/features/tasks/use-tasks-model.ts",
+      "view": "src/features/tasks/tasks-screen.tsx",
+      "states": [
+        {
+          "id": "default",
+          "reference": "tasks-default.png"
+        }
+      ],
+      "elements": [
+        {
+          "testID": "tasks.screen",
+          "role": "none",
+          "component": "View"
+        },
+        {
+          "testID": "tasks.title",
+          "role": "header",
+          "component": "AppText",
+          "text": "tasks.title",
+          "checks": [
+            "bounds",
+            "text"
+          ]
+        },
+        {
+          "testID": "tasks.add-button",
+          "role": "button",
+          "component": "PressableSurface",
+          "text": "tasks.add",
+          "checks": [
+            "bounds",
+            "text",
+            "fill"
+          ]
+        },
+        {
+          "testID": "tasks.add-button.icon",
+          "role": "image",
+          "component": "Icon",
+          "parent": "tasks.add-button",
+          "coveredBy": "tasks.add-button",
+          "checks": [
+            "crop"
+          ]
+        },
+        {
+          "testID": "tasks.summary",
+          "role": "text",
+          "component": "AppText",
+          "text": "tasks.summary.open",
+          "checks": [
+            "bounds",
+            "text"
+          ]
+        },
+        {
+          "testID": "tasks.task-row.{taskId}",
+          "role": "checkbox",
+          "component": "PressableSurface",
+          "checks": [
+            "bounds",
+            "text",
+            "fill"
+          ]
+        },
+        {
+          "testID": "tasks.task-row.{taskId}.check",
+          "role": "image",
+          "component": "Icon",
+          "a11yHidden": true,
+          "coveredBy": "tasks.task-row.{taskId}",
+          "checks": [
+            "crop"
+          ]
+        },
+        {
+          "testID": "tasks.footer-note",
+          "role": "text",
+          "component": "AppText",
+          "text": "tasks.synced",
+          "checks": [
+            "bounds",
+            "text"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lists",
+      "name": "Lists",
+      "presentation": "route",
+      "route": "src/app/(app)/lists.tsx",
+      "model": "src/features/lists/use-lists-model.ts",
+      "view": "src/features/lists/lists-screen.tsx",
+      "states": [
+        {
+          "id": "default",
+          "reference": "lists-default.png"
+        },
+        {
+          "id": "empty",
+          "drawn": false,
+          "why": "Chosen: a first launch has no lists; a title and one line."
+        }
+      ],
+      "elements": [
+        {
+          "testID": "lists.screen",
+          "role": "none",
+          "component": "View"
+        },
+        {
+          "testID": "lists.header",
+          "role": "none",
+          "component": "View",
+          "checks": [
+            "bounds",
+            "fill"
+          ]
+        },
+        {
+          "testID": "lists.title",
+          "role": "header",
+          "component": "AppText",
+          "text": "lists.title",
+          "checks": [
+            "bounds",
+            "text"
+          ]
+        },
+        {
+          "testID": "lists.list-row.{listId}",
+          "role": "none",
+          "component": "View",
+          "states": [
+            "default"
+          ],
+          "checks": [
+            "bounds",
+            "fill"
+          ]
+        },
+        {
+          "testID": "lists.list-row.{listId}.delete-button",
+          "role": "button",
+          "component": "PressableSurface",
+          "text": "lists.list-row.delete-button.text",
+          "states": [
+            "default"
+          ],
+          "checks": [
+            "bounds",
+            "text"
+          ]
+        },
+        {
+          "testID": "lists.bottom-bar",
+          "role": "none",
+          "component": "BottomBar",
+          "checks": [
+            "bounds",
+            "fill"
+          ]
+        },
+        {
+          "testID": "lists.new-button",
+          "role": "button",
+          "component": "PressableSurface",
+          "text": "lists.new",
+          "checks": [
+            "bounds",
+            "text",
+            "fill"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "delete-list-dialog",
+      "name": "Delete list",
+      "presentation": "dialog",
+      "model": "src/features/lists/use-lists-model.ts",
+      "view": "src/features/lists/delete-list-dialog/delete-list-dialog.tsx",
+      "states": [
+        {
+          "id": "default",
+          "reference": "delete-list-dialog-default.png"
+        }
+      ],
+      "elements": [
+        {
+          "testID": "delete-list-dialog.scrim",
+          "role": "none",
+          "component": "View"
+        },
+        {
+          "testID": "delete-list-dialog.card",
+          "role": "none",
+          "component": "DialogCard",
+          "checks": [
+            "bounds",
+            "fill"
+          ]
+        },
+        {
+          "testID": "delete-list-dialog.title",
+          "role": "header",
+          "component": "AppText",
+          "text": "lists.delete-dialog.title",
+          "checks": [
+            "bounds",
+            "text"
+          ]
+        },
+        {
+          "testID": "delete-list-dialog.body",
+          "role": "text",
+          "component": "AppText",
+          "text": "lists.delete-dialog.body",
+          "checks": [
+            "bounds",
+            "text"
+          ]
+        },
+        {
+          "testID": "delete-list-dialog.cancel-button",
+          "role": "button",
+          "component": "PressableSurface",
+          "text": "lists.delete-dialog.cancel",
+          "checks": [
+            "bounds",
+            "text",
+            "fill"
+          ]
+        },
+        {
+          "testID": "delete-list-dialog.confirm-button",
+          "role": "button",
+          "component": "PressableSurface",
+          "text": "lists.delete-dialog.confirm",
+          "checks": [
+            "bounds",
+            "text",
+            "fill"
+          ]
+        }
+      ]
+    }
+  ]
+}

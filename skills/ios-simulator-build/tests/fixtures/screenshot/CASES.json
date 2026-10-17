@@ -1,0 +1,178 @@
+{
+  "bad-blank": {
+    "expect": [
+      "smoke-production.png [blank-screen] 100.0% of the screen is white",
+      "smoke-preview.png [blank-screen] 100.0% of the screen is black",
+      "smoke-development.png [blank-screen] 100.0% of the screen is #F2F2F2 (React Navigation's default background"
+    ],
+    "ops": [
+      { "png": { "files": ["smoke-production.png"], "width": 1320, "height": 2868, "fill": "#FFFFFF" } },
+      { "png": { "files": ["smoke-preview.png"], "width": 1320, "height": 2868, "fill": "#000000" } },
+      { "png": { "files": ["smoke-development.png"], "width": 1320, "height": 2868, "fill": "#F2F2F2" } }
+    ]
+  },
+  "bad-contract-device": {
+    "expect": [
+      "smoke-preview.png [png-size] is 1320x2868, expected 1206x2622 (iPhone 17 Pro, contracts/ios-sim-build.json deviceType)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/ios-sim-build.json",
+          "content": "{\n  \"simulatorPrefix\": \"tasks\",\n  \"deviceType\": \"iPhone 17 Pro\"\n}\n"
+        }
+      },
+      {
+        "png": {
+          "files": ["smoke-preview.png"],
+          "width": 1320,
+          "height": 2868,
+          "fill": "#101418",
+          "rects": [
+            { "x": 0, "y": 0, "width": 1320, "height": 230, "fill": "#000000" },
+            { "x": 60, "y": 320, "width": 1200, "height": 180, "fill": "#1F6FEB" },
+            { "x": 60, "y": 560, "width": 1200, "height": 140, "fill": "#2B3138" },
+            { "x": 60, "y": 740, "width": 1200, "height": 140, "fill": "#2B3138" },
+            { "x": 60, "y": 920, "width": 1200, "height": 140, "fill": "#2B3138" }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-system-banner": {
+    "expect": ["smoke-preview.png [system-banner] a light system banner (a notification, 200 rows)"],
+    "ops": [
+      {
+        "png": {
+          "files": ["smoke-preview.png"],
+          "width": 1320,
+          "height": 2868,
+          "fill": "#101418",
+          "rects": [
+            { "x": 0, "y": 0, "width": 1320, "height": 230, "fill": "#000000" },
+            { "x": 60, "y": 320, "width": 1200, "height": 180, "fill": "#1F6FEB" },
+            { "x": 60, "y": 560, "width": 1200, "height": 140, "fill": "#2B3138" },
+            { "x": 60, "y": 740, "width": 1200, "height": 140, "fill": "#2B3138" },
+            { "x": 60, "y": 920, "width": 1200, "height": 140, "fill": "#2B3138" },
+            { "x": 26, "y": 150, "width": 1268, "height": 200, "fill": "#EDEDED" }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-wrong-device": {
+    "expect": ["smoke-preview.png [png-size] is 1206x2622, expected 1320x2868 (iPhone 17 Pro Max)"],
+    "ops": [
+      {
+        "png": {
+          "files": ["smoke-preview.png"],
+          "width": 1206,
+          "height": 2622,
+          "fill": "#101418",
+          "rects": [
+            { "x": 0, "y": 0, "width": 1206, "height": 230, "fill": "#000000" },
+            { "x": 60, "y": 320, "width": 1086, "height": 180, "fill": "#1F6FEB" },
+            { "x": 60, "y": 560, "width": 1086, "height": 140, "fill": "#2B3138" },
+            { "x": 60, "y": 740, "width": 1086, "height": 140, "fill": "#2B3138" },
+            { "x": 60, "y": 920, "width": 1086, "height": 140, "fill": "#2B3138" }
+          ]
+        }
+      }
+    ]
+  },
+  "error-not-png": {
+    "expect": ["ERROR [bad-input]", "notes.png is not a readable PNG"],
+    "args": "{dir}/notes.png",
+    "ops": [{ "write": { "file": "notes.png", "content": "not a png\n" } }]
+  },
+  "error-unknown-device": {
+    "expect": ["ERROR [bad-input] unknown device \"Phone-X\""],
+    "args": "{dir} --device Phone-X",
+    "ops": [
+      {
+        "png": {
+          "files": ["smoke-preview.png"],
+          "width": 1320,
+          "height": 2868,
+          "fill": "#101418",
+          "rects": [
+            { "x": 0, "y": 0, "width": 1320, "height": 230, "fill": "#000000" },
+            { "x": 60, "y": 320, "width": 1200, "height": 180, "fill": "#1F6FEB" },
+            { "x": 60, "y": 560, "width": 1200, "height": 140, "fill": "#2B3138" },
+            { "x": 60, "y": 740, "width": 1200, "height": 140, "fill": "#2B3138" },
+            { "x": 60, "y": 920, "width": 1200, "height": 140, "fill": "#2B3138" }
+          ]
+        }
+      }
+    ]
+  },
+  "pass-contract-device": {
+    "expect": ["check-screenshot: 1 screenshots checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/ios-sim-build.json",
+          "content": "{\n  \"simulatorPrefix\": \"tasks\",\n  \"deviceType\": \"iPhone 17 Pro\"\n}\n"
+        }
+      },
+      {
+        "png": {
+          "files": ["smoke-preview.png"],
+          "width": 1206,
+          "height": 2622,
+          "fill": "#101418",
+          "rects": [
+            { "x": 0, "y": 0, "width": 1206, "height": 230, "fill": "#000000" },
+            { "x": 60, "y": 320, "width": 1086, "height": 180, "fill": "#1F6FEB" },
+            { "x": 60, "y": 560, "width": 1086, "height": 140, "fill": "#2B3138" },
+            { "x": 60, "y": 740, "width": 1086, "height": 140, "fill": "#2B3138" },
+            { "x": 60, "y": 920, "width": 1086, "height": 140, "fill": "#2B3138" }
+          ]
+        }
+      }
+    ]
+  },
+  "pass-no-banner-check": {
+    "expect": ["check-screenshot: 1 screenshots checked, 0 problems"],
+    "args": "{dir} --no-banner-check",
+    "ops": [
+      {
+        "png": {
+          "files": ["smoke-preview.png"],
+          "width": 1320,
+          "height": 2868,
+          "fill": "#101418",
+          "rects": [
+            { "x": 0, "y": 0, "width": 1320, "height": 230, "fill": "#000000" },
+            { "x": 60, "y": 320, "width": 1200, "height": 180, "fill": "#1F6FEB" },
+            { "x": 60, "y": 560, "width": 1200, "height": 140, "fill": "#2B3138" },
+            { "x": 60, "y": 740, "width": 1200, "height": 140, "fill": "#2B3138" },
+            { "x": 60, "y": 920, "width": 1200, "height": 140, "fill": "#2B3138" },
+            { "x": 26, "y": 150, "width": 1268, "height": 200, "fill": "#EDEDED" }
+          ]
+        }
+      }
+    ]
+  },
+  "pass-size-option": {
+    "expect": ["check-screenshot: 1 screenshots checked, 0 problems"],
+    "args": "{dir} --size 1080x2400",
+    "ops": [
+      {
+        "png": {
+          "files": ["smoke-preview.png"],
+          "width": 1080,
+          "height": 2400,
+          "fill": "#101418",
+          "rects": [
+            { "x": 0, "y": 0, "width": 1080, "height": 230, "fill": "#000000" },
+            { "x": 60, "y": 320, "width": 960, "height": 180, "fill": "#1F6FEB" },
+            { "x": 60, "y": 560, "width": 960, "height": 140, "fill": "#2B3138" },
+            { "x": 60, "y": 740, "width": 960, "height": 140, "fill": "#2B3138" },
+            { "x": 60, "y": 920, "width": 960, "height": 140, "fill": "#2B3138" }
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,45 @@
+# .maestro/subflows/set-language.yaml — a sub-flow, never run on its own (it is not under flows/).
+# Sets the app's language (LANG, from the runner's -e) through the debug link, alone, and returns
+# only once the app runs in that language's layout direction, on the debug menu.
+# Why alone, and why as the link that launches the app: a language that flips the layout direction
+# (en to ar) restarts the JS runtime, and nothing after lang= runs. After that restart the app opens
+# its launch link again (debug-menu-and-test-hooks: Expo Router re-delivers the launch URL on the
+# cold start after a reload), applies lang= once more, now without a flip, and ends on the debug menu
+# (a link without open=). Without a flip it ends there at once. A link sent to the running app is
+# not re-delivered: the app would come back on its landing screen, the screen the flow started on,
+# and a wait for it would pass with the restart still to come. If a platform ever stops re-delivering
+# the launch link, the wait below times out: a loud failure, never a false pass.
+appId: ${APP_ID}
+---
+- stopApp
+- openLink: '${APP_SCHEME}://debug/setup?lang=${LANG}'
+# system-ui: iOS asks "Open in “<app name>”?" for a link opened from outside the app; the title and
+# 'Open' are Apple's. Guard on the title, never on a bare 'Open' (Maestro's text match ignores case).
+- runFlow:
+    when:
+      visible: 'Open in .*\?'
+    commands:
+      - waitForAnimationToEnd
+      # system-ui: Apple's Open button, the nearest one below the alert title.
+      - tapOn:
+          text: 'Open'
+          below: 'Open in .*\?'
+          optional: true
+# system-ui: the same Apple alert, when the first tap came before it settled.
+- runFlow:
+    when:
+      visible: 'Open in .*\?'
+    commands:
+      - waitForAnimationToEnd
+      # system-ui: Apple's Open button, below the alert title.
+      - tapOn:
+          text: 'Open'
+          below: 'Open in .*\?'
+          optional: true
+# The debug menu shows only after the link ran to its end: after the restart, when there was one.
+- extendedWaitUntil:
+    visible:
+      id: 'debug.menu'
+    timeout: 30000
+- assertNotVisible:
+    id: 'debug.setup-error'

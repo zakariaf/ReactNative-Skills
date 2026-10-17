@@ -1,0 +1,12 @@
+{
+  "name": "tasks-app",
+  "private": true,
+  "main": "expo-router/entry",
+  "dependencies": {
+    "expo": "~57.0.26",
+    "expo-font": "~57.0.4",
+    "expo-router": "~57.0.24",
+    "expo-system-ui": "~57.0.4",
+    "react-native": "0.86.3"
+  }
+}

@@ -1,0 +1,305 @@
+{
+  "bad-android-ad-id-push-token-only": {
+    "expect": [
+      "[android-ad-id]",
+      "build/AndroidManifest.xml:7",
+      "a push token or other app-functionality device ID is not the advertising ID"
+    ],
+    "args": "{dir} --android-manifest {dir}/build/AndroidManifest.xml",
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["sdks", "react-native-google-mobile-ads", "tracking"],
+          "value": false
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["sdks", "react-native-google-mobile-ads", "collects"],
+          "value": []
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["sdks", "expo-notifications"],
+          "value": {
+            "why": "reminder pushes from the app's server",
+            "collects": [{ "type": "device-id", "linked": true, "tracking": false, "purposes": ["app-functionality"] }]
+          }
+        }
+      }
+    ]
+  },
+  "bad-android-ad-id-undeclared": {
+    "expect": [
+      "[android-ad-id]",
+      "build/AndroidManifest.xml:7",
+      "com.google.android.gms.permission.AD_ID is merged into the release manifest"
+    ],
+    "args": "{dir} --android-manifest {dir}/build/AndroidManifest.xml",
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["sdks", "react-native-google-mobile-ads", "tracking"],
+          "value": false
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["sdks", "react-native-google-mobile-ads", "collects"],
+          "value": []
+        }
+      }
+    ]
+  },
+  "bad-android-cleartext": {
+    "expect": ["[android-cleartext]", "build/AndroidManifest.xml:9", "android:usesCleartextTraffic=\"true\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "build/AndroidManifest.xml",
+          "find": "<application android:name=\".MainApplication\"",
+          "with": "<application android:name=\".MainApplication\" android:usesCleartextTraffic=\"true\""
+        }
+      }
+    ]
+  },
+  "bad-android-permission-unanswered": {
+    "expect": [
+      "[permission-answer]",
+      "build/AndroidManifest.xml:4",
+      "android.permission.READ_EXTERNAL_STORAGE is in the release manifest, but contracts/privacy.json answers no \"storage\""
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "build/AndroidManifest.xml",
+          "find": "    <uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\" />\n",
+          "with": "    <uses-permission android:name=\"android.permission.READ_EXTERNAL_STORAGE\" android:maxSdkVersion=\"32\" />\n"
+        }
+      }
+    ]
+  },
+  "bad-ats": {
+    "expect": ["[ats]", "Info.plist", "NSAllowsArbitraryLoads is true"],
+    "ops": [
+      {
+        "replace": {
+          "file": "build/Tasks.app/Info.plist",
+          "find": "\t\t<key>NSAllowsArbitraryLoads</key>\n\t\t<false/>",
+          "with": "\t\t<key>NSAllowsArbitraryLoads</key>\n\t\t<true/>"
+        }
+      }
+    ]
+  },
+  "bad-ats-exception-domain": {
+    "expect": ["[ats]", "NSExceptionDomains allows cleartext HTTP to api.acme.test"],
+    "ops": [
+      {
+        "replace": {
+          "file": "build/Tasks.app/Info.plist",
+          "find": "\t\t<key>NSAllowsLocalNetworking</key>",
+          "with": "\t\t<key>NSExceptionDomains</key>\n\t\t<dict>\n\t\t\t<key>api.acme.test</key>\n\t\t\t<dict>\n\t\t\t\t<key>NSExceptionAllowsInsecureHTTPLoads</key>\n\t\t\t\t<true/>\n\t\t\t</dict>\n\t\t</dict>\n\t\t<key>NSAllowsLocalNetworking</key>"
+        }
+      }
+    ]
+  },
+  "bad-att-string-missing-language": {
+    "expect": ["[att-string]", "ar.lproj/InfoPlist.strings", "has no NSUserTrackingUsageDescription"],
+    "ops": [
+      {
+        "replace": {
+          "file": "build/Tasks.app/ar.lproj/InfoPlist.strings",
+          "find": "\"NSUserTrackingUsageDescription\" = \"يتيح للتطبيق عرض إعلانات تناسب اهتماماتك.\";\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-att-text-without-tracking": {
+    "expect": [
+      "[att-string]",
+      "Info.plist",
+      "NSUserTrackingUsageDescription is present, but contracts/privacy.json declares no tracking"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["sdks", "react-native-google-mobile-ads", "tracking"],
+          "value": false
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["sdks", "react-native-google-mobile-ads", "collects", 0, "tracking"],
+          "value": false
+        }
+      }
+    ]
+  },
+  "bad-built-manifest-stale": {
+    "expect": [
+      "[built-manifest]",
+      "the shipped manifest lacks NSPrivacyAccessedAPICategoryDiskSpace 85F4.1, which src/config/privacy-manifest.ts declares"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "build/Tasks.app/PrivacyInfo.xcprivacy",
+          "find": "\t\t\t\t<string>85F4.1</string>\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-built-manifest-tracking": {
+    "expect": ["[built-manifest]", "the shipped manifest declares tracking or tracking domains"],
+    "ops": [
+      {
+        "replace": {
+          "file": "build/Tasks.app/PrivacyInfo.xcprivacy",
+          "find": "\t<key>NSPrivacyTracking</key>\n\t<false/>",
+          "with": "\t<key>NSPrivacyTracking</key>\n\t<true/>"
+        }
+      }
+    ]
+  },
+  "bad-contract-invalid": {
+    "expect": ["[contract]", "permissionAnswers[\"camera\"] is not \"collected: <type>[, <type>]\""],
+    "ops": [{ "json": { "file": "contracts/privacy.json", "path": ["permissionAnswers", "camera"], "value": "no" } }]
+  },
+  "bad-dev-launcher-keys": {
+    "expect": ["[local-network]", "Info.plist", "carries the development launcher's local-network keys"],
+    "ops": [
+      {
+        "replace": {
+          "file": "build/Tasks.app/Info.plist",
+          "find": "\t<key>NSAppTransportSecurity</key>",
+          "with": "\t<key>NSBonjourServices</key>\n\t<array>\n\t\t<string>_expo._tcp</string>\n\t</array>\n\t<key>NSLocalNetworkUsageDescription</key>\n\t<string>Expo Dev Launcher uses the local network to discover development servers.</string>\n\t<key>NSAppTransportSecurity</key>"
+        }
+      }
+    ]
+  },
+  "bad-no-privacy-manifest": {
+    "expect": ["[privacy-manifest-file]", "PrivacyInfo.xcprivacy", "missing from the app"],
+    "ops": [{ "delete": "build/Tasks.app/PrivacyInfo.xcprivacy" }]
+  },
+  "bad-placeholder-link": {
+    "expect": [
+      "[ship-placeholder]",
+      "EXConstants.bundle/app.config",
+      "extra.links.privacyPolicy is a placeholder domain (example.com)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "build/Tasks.app/EXConstants.bundle/app.config",
+          "find": "https://tasks.acme.app/privacy",
+          "with": "https://example.com/privacy"
+        }
+      }
+    ]
+  },
+  "bad-sample-ad-id": {
+    "expect": [
+      "[ship-placeholder]",
+      "Info.plist",
+      "Info.plist GADApplicationIdentifier is Google's sample AdMob app id"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "build/Tasks.app/Info.plist",
+          "find": "ca-app-pub-1111111111111111~2222222222",
+          "with": "ca-app-pub-3940256099942544~1458002511"
+        }
+      }
+    ]
+  },
+  "bad-usage-unanswered": {
+    "expect": [
+      "[permission-answer]",
+      "Info.plist",
+      "NSPhotoLibraryUsageDescription is in the app, but contracts/privacy.json answers no \"photos\""
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "build/Tasks.app/Info.plist",
+          "find": "\t<key>NSAppTransportSecurity</key>",
+          "with": "\t<key>NSPhotoLibraryUsageDescription</key>\n\t<string>Lets you add a photo from your library to a task.</string>\n\t<key>NSAppTransportSecurity</key>"
+        }
+      }
+    ]
+  },
+  "error-nothing-to-audit": { "expect": ["ERROR [bad-input]", "nothing to audit"], "args": "{dir}", "ops": [] },
+  "pass-android-only": {
+    "expect": ["audit-app-bundle: 1 artefacts checked, 0 problems", "RESULT: PASS"],
+    "args": "{dir} --android-manifest {dir}/build/AndroidManifest.xml",
+    "ops": []
+  },
+  "pass-blocked-permission": {
+    "expect": ["audit-app-bundle:", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "build/AndroidManifest.xml",
+          "find": "    <uses-permission android:name=\"android.permission.CAMERA\" />\n",
+          "with": "    <uses-permission android:name=\"android.permission.CAMERA\" />\n    <uses-permission android:name=\"android.permission.RECORD_AUDIO\" tools:node=\"remove\" />\n"
+        }
+      }
+    ]
+  },
+  "pass-preview-dev-launcher-keys": {
+    "expect": ["audit-app-bundle:", "RESULT: PASS"],
+    "args": "{dir} --app {dir}/build/Tasks.app --android-manifest {dir}/build/AndroidManifest.xml --variant preview",
+    "ops": [
+      {
+        "replace": {
+          "file": "build/Tasks.app/Info.plist",
+          "find": "\t<key>NSAppTransportSecurity</key>",
+          "with": "\t<key>NSBonjourServices</key>\n\t<array>\n\t\t<string>_expo._tcp</string>\n\t</array>\n\t<key>NSLocalNetworkUsageDescription</key>\n\t<string>Expo Dev Launcher uses the local network to discover development servers.</string>\n\t<key>NSAppTransportSecurity</key>"
+        }
+      }
+    ]
+  },
+  "pass-preview-placeholders": {
+    "expect": ["audit-app-bundle:", "RESULT: PASS"],
+    "args": "{dir} --app {dir}/build/Tasks.app --android-manifest {dir}/build/AndroidManifest.xml --variant preview",
+    "ops": [
+      {
+        "replace": {
+          "file": "build/Tasks.app/Info.plist",
+          "find": "ca-app-pub-1111111111111111~2222222222",
+          "with": "ca-app-pub-3940256099942544~1458002511"
+        }
+      }
+    ]
+  },
+  "pass-usage-answered-by-key": {
+    "expect": ["audit-app-bundle:", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "build/Tasks.app/Info.plist",
+          "find": "\t<key>NSAppTransportSecurity</key>",
+          "with": "\t<key>NSFaceIDUsageDescription</key>\n\t<string>Unlocks your tasks with Face ID.</string>\n\t<key>NSAppTransportSecurity</key>"
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["permissionAnswers", "NSFaceIDUsageDescription"],
+          "value": "not-collected: Face ID runs on the device; the app sees only success or failure"
+        }
+      }
+    ]
+  }
+}

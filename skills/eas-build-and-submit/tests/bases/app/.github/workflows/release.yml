@@ -1,0 +1,17 @@
+# .github/workflows/release.yml
+name: release
+on:
+  workflow_dispatch:
+jobs:
+  release:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v5
+      - run: npm ci
+      - run: npm run verify
+      - run: npm install -g --min-release-age=7 --ignore-scripts eas-cli@24.10.0
+      - run: |
+          eas build --profile production --platform all \
+            --non-interactive --freeze-credentials --no-wait
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}

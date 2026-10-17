@@ -1,0 +1,1 @@
+FAIL reports/rebaseline/update-01.json:1 [contract-entry-changed] src/features/tasks/tasks-digest.golden.test.ts was updated although the triage showed a failing contract assertion

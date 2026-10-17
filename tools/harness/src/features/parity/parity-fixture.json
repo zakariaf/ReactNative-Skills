@@ -1,0 +1,116 @@
+{
+  "version": 1,
+  "day": "2026-10-01",
+  "tasks": [
+    {
+      "id": "milk",
+      "title": {
+        "en": "Buy milk",
+        "ar": "شراء الحليب"
+      },
+      "done": false
+    },
+    {
+      "id": "bread",
+      "title": {
+        "en": "Bake bread",
+        "ar": "خبز الخبز"
+      },
+      "done": false
+    },
+    {
+      "id": "mail",
+      "title": {
+        "en": "Send mail",
+        "ar": "إرسال البريد"
+      },
+      "done": false
+    }
+  ],
+  "lists": [
+    {
+      "id": "home",
+      "name": {
+        "en": "Home",
+        "ar": "المنزل"
+      }
+    },
+    {
+      "id": "work",
+      "name": {
+        "en": "Work",
+        "ar": "العمل"
+      }
+    },
+    {
+      "id": "garden",
+      "name": {
+        "en": "Garden",
+        "ar": "الحديقة"
+      }
+    },
+    {
+      "id": "travel",
+      "name": {
+        "en": "Travel",
+        "ar": "السفر"
+      }
+    },
+    {
+      "id": "books",
+      "name": {
+        "en": "Books",
+        "ar": "الكتب"
+      }
+    },
+    {
+      "id": "gifts",
+      "name": {
+        "en": "Gifts",
+        "ar": "الهدايا"
+      }
+    },
+    {
+      "id": "music",
+      "name": {
+        "en": "Music",
+        "ar": "الموسيقى"
+      }
+    },
+    {
+      "id": "films",
+      "name": {
+        "en": "Films",
+        "ar": "الأفلام"
+      }
+    },
+    {
+      "id": "health",
+      "name": {
+        "en": "Health",
+        "ar": "الصحة"
+      }
+    },
+    {
+      "id": "ideas",
+      "name": {
+        "en": "Ideas",
+        "ar": "الأفكار"
+      }
+    },
+    {
+      "id": "shop",
+      "name": {
+        "en": "Shop",
+        "ar": "المتجر"
+      }
+    },
+    {
+      "id": "later",
+      "name": {
+        "en": "Later",
+        "ar": "لاحقا"
+      }
+    }
+  ]
+}

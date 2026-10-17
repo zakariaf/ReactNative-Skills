@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "test-setup.schema.json",
+  "title": "Test-setup contract (unit-and-component-tests)",
+  "description": "App-specific facts the test checkers read from contracts/test-setup.json. Every key is optional; a missing key takes the default for the canonical layout.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "renderHelper": {
+      "description": "The render helper every component and hook test imports, and the functions it exports (each must be awaited except createProvidersWrapper).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "functions"],
+      "properties": {
+        "file": { "type": "string", "minLength": 1, "default": "test/render-with-providers.tsx" },
+        "functions": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 },
+          "default": ["renderWithProviders", "renderHookWithProviders", "createProvidersWrapper"]
+        }
+      }
+    },
+    "routerHelper": {
+      "description": "The route-test helper (Expo Router's renderRouter inside the app's providers) and the functions it exports (each must be awaited); route tests use it instead of renderRouter.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "functions"],
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1,
+          "default": "test/render-router-with-providers.tsx"
+        },
+        "functions": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 },
+          "default": ["renderRouterWithProviders"]
+        }
+      }
+    },
+    "deviceOnlyHelper": {
+      "description": "The tested helper jest.config.js takes its coverage exclusions from.",
+      "type": "string",
+      "minLength": 1,
+      "default": "scripts/quality/device-only.ts"
+    },
+    "rootMocks": {
+      "description": "Native SDKs, beyond the built-in list, that crash on import in Jest and so need __mocks__/<name>.ts at the repo root.",
+      "$ref": "#/$defs/stringList",
+      "default": []
+    },
+    "logicCoverageKeys": {
+      "description": "coverageThreshold keys held at 95/95/95/90; each must appear in jest.config.js.",
+      "$ref": "#/$defs/stringList",
+      "default": ["./src/core/", "./src/data/", "./src/games/*/rules/**/*.ts"]
+    },
+    "mutateGlobs": {
+      "description": "Globs stryker.config.json mutate must list (the logic Stryker mutates).",
+      "$ref": "#/$defs/stringList",
+      "default": [
+        "src/core/**/*.ts",
+        "src/data/**/*.ts",
+        "src/**/*-policy.ts",
+        "src/**/*-reducer.ts"
+      ]
+    },
+    "styleContractGlobs": {
+      "description": "Folders whose tests may assert styles without a marker (the design system's measured contract).",
+      "$ref": "#/$defs/stringList",
+      "default": ["src/ui/**", "src/theme/**", "src/i18n/**"]
+    },
+    "logicTestGlobs": {
+      "description": "Folders whose tests may not use fake timers (logic takes an injected clock).",
+      "$ref": "#/$defs/stringList",
+      "default": [
+        "src/core/**",
+        "src/data/**",
+        "src/stores/**",
+        "src/services/**",
+        "src/api/**",
+        "src/games/*/{rules,levels,sim}/**"
+      ]
+    },
+    "otherRunnerGlobs": {
+      "description": "Files another test runner owns (Playwright for the web build, Cypress, Deno for supabase/functions) when the checkers cannot see that runner's config: both checkers leave them out. A root playwright.config with a literal testDir, a root cypress.config, and any folder with its own Jest, Vitest, Playwright, Cypress or Deno config are found without this key.",
+      "$ref": "#/$defs/stringList",
+      "default": []
+    }
+  },
+  "$defs": {
+    "stringList": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+  }
+}

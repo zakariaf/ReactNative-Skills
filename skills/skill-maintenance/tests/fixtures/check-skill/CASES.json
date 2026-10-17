@@ -1,0 +1,654 @@
+{
+  "bad-contract": {
+    "expect": ["[contract-documented]", "task-titles/scripts/check-titles.mjs:7", "contracts/title-budgets.json"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/task-titles/scripts/check-titles.mjs",
+          "find": "  const files = walkRepo('.', { include: ['*.ts'] });\n",
+          "with": "  const budgets = 'contracts/title-budgets.json';\n  void budgets;\n  const files = walkRepo('.', { include: ['*.ts'] });\n"
+        }
+      }
+    ]
+  },
+  "bad-deprecated": {
+    "expect": ["[deprecated-api]", "uses dueSkipReason", "Use notYetCreated"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/task-titles/scripts/check-lib.mjs",
+          "find": "export const REPO_SCAN_IGNORES = [];",
+          "with": "/** @deprecated Use notYetCreated(root, { file, owner }). */\nexport function dueSkipReason() {\n  return null;\n}\nexport const REPO_SCAN_IGNORES = [];"
+        }
+      },
+      {
+        "replace": {
+          "file": "skills/task-titles/scripts/check-titles.mjs",
+          "find": "  const files = walkRepo('.', { include: ['*.ts'] });\n",
+          "with": "  void dueSkipReason('.');\n  const files = walkRepo('.', { include: ['*.ts'] });\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "skills/task-titles/scripts/check-titles.mjs",
+          "find": "createReporter, run, walkRepo",
+          "with": "createReporter, dueSkipReason, run, walkRepo"
+        }
+      }
+    ]
+  },
+  "bad-description": {
+    "expect": ["[desc-not-for]", "task-titles/SKILL.md:3", "no \"Not for\" boundary"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/task-titles/SKILL.md",
+          "find": " Not for file names (file-naming).\n",
+          "with": "\n"
+        }
+      }
+    ]
+  },
+  "bad-dod-skips": {
+    "expect": ["[dod-skips]", "scripts/check-titles.mjs prints SKIP lines"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/task-titles/scripts/check-titles.mjs",
+          "find": "  const files = walkRepo('.', { include: ['*.ts'] });\n",
+          "with": "  const reason = notYetCreated('.', { file: 'src/i18n/catalogs/en.json', owner: 'i18n-strings-and-catalogs' });\n  if (reason) report.skip({ file: 'src/i18n/catalogs/en.json', rule: 'title-key', message: reason });\n  const files = walkRepo('.', { include: ['*.ts'] });\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "skills/task-titles/scripts/check-titles.mjs",
+          "find": "createReporter, run, walkRepo",
+          "with": "createReporter, notYetCreated, run, walkRepo"
+        }
+      }
+    ]
+  },
+  "bad-dod-skips-partial": {
+    "expect": ["[dod-skips]", "task-titles/SKILL.md:21", "can print SKIP [title-locale]"],
+    "ops": [
+      {
+        "write": {
+          "file": "skills/task-titles/scripts/check-titles.mjs",
+          "lines": [
+            "#!/usr/bin/env node",
+            "// check-titles.mjs: a sample checker (fixture).",
+            "import { createReporter, notYetCreated, run, walkRepo } from './check-lib.mjs';",
+            "",
+            "run(async () => {",
+            "  const report = createReporter({ name: 'check-titles' });",
+            "  const reason = notYetCreated('.', { file: 'src/i18n/catalogs/en.json', owner: 'i18n-strings-and-catalogs' });",
+            "  if (reason) report.skip({ file: 'src/i18n/catalogs/en.json', rule: 'title-key', message: reason });",
+            "  const LOCALES = 'src/i18n/languages.ts';",
+            "  if (notYetCreated('.', { file: LOCALES, owner: 'i18n-strings-and-catalogs' })) report.skip({ file: LOCALES, rule: 'title-locale', message: 'not yet created' });",
+            "  const files = walkRepo('.', { include: ['*.ts'] });",
+            "  return report.finish({ checked: files.length, unit: 'files' });",
+            "});"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "skills/task-titles/SKILL.md",
+          "find": "- [ ] `node ${CLAUDE_SKILL_DIR}/scripts/check-titles.mjs .` prints `RESULT: PASS`\n",
+          "with": "- [ ] `node ${CLAUDE_SKILL_DIR}/scripts/check-titles.mjs .` prints `RESULT: PASS`\n- [ ] Expected SKIP lines only: `SKIP src/i18n/catalogs/en.json [title-key] not yet created\n      (i18n-strings-and-catalogs creates it)`.\n"
+        }
+      }
+    ]
+  },
+  "bad-expect": {
+    "expect": ["[expect-rule-id]", "tests/fixtures/bad-clock/EXPECT.txt"],
+    "ops": [{ "write": { "file": "skills/task-titles/tests/fixtures/bad-clock/EXPECT.txt", "content": "FAIL\n" } }]
+  },
+  "bad-mixed-placeholder": {
+    "expect": ["[template-markers]", "__Function_Name__"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/task-titles/templates/src/features/tasks/task-title.ts",
+          "find": "__FUNCTION_NAME__",
+          "with": "__Function_Name__"
+        }
+      }
+    ]
+  },
+  "bad-neighbour-not-installed": {
+    "expect": ["[desc-neighbours]", "\"Not for\" names vendor-dates, which is not a known skill"],
+    "args": "{dir}",
+    "ops": [
+      { "write": { "file": "package.json", "content": "{ \"name\": \"tasks-app\", \"private\": true }\n" } },
+      {
+        "replace": {
+          "file": "skills/task-titles/SKILL.md",
+          "find": "Not for file names (file-naming).",
+          "with": "Not for dates (vendor-dates)."
+        }
+      }
+    ]
+  },
+  "bad-neighbours": {
+    "expect": ["[desc-neighbours]", "ghost-skill", "[related-names]", "task-titles/SKILL.md:44"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/task-titles/SKILL.md",
+          "find": "Not for file names (file-naming).",
+          "with": "Not for file names (ghost-skill)."
+        }
+      },
+      {
+        "replace": {
+          "file": "skills/task-titles/SKILL.md",
+          "find": "- `file-naming` - naming files and exports.",
+          "with": "- Task Titles - naming files and exports."
+        }
+      }
+    ]
+  },
+  "bad-orphans": {
+    "expect": [
+      "[workflow-mentions]",
+      "references/extra.md is named only in the Files table",
+      "scripts/check-extra.mjs is named only in the Files table",
+      "[files-when]",
+      "the row for scripts/check-extra.mjs",
+      "[selftest-covers]",
+      "check-extra.mjs is not run by the self-test"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "skills/task-titles/references/extra.md",
+          "content": "# Extra\n\nNotes nobody is told to read.\n"
+        }
+      },
+      {
+        "write": {
+          "file": "skills/task-titles/scripts/check-extra.mjs",
+          "content": "import { run } from './check-lib.mjs';\n\nrun(async () => 0);\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "skills/task-titles/SKILL.md",
+          "find": "| `scripts/selftest.mjs` | Proves the checker | After changing it |\n",
+          "with": "| `scripts/selftest.mjs` | Proves the checker | After changing it |\n| [references/extra.md](references/extra.md) | Extra notes | Before releasing |\n| `scripts/check-extra.mjs` | A second checker | |\n"
+        }
+      }
+    ]
+  },
+  "bad-placeholders": {
+    "expect": [
+      "[placeholder-left]",
+      "task-titles/SKILL.md:8",
+      "__FILL_WHAT_THIS_SKILL_MAKES_TRUE__",
+      "task-titles/references/guide.md:3",
+      "__LIST_NAME__",
+      "task-titles/scripts/check-titles.mjs:6",
+      "__FILL_RULE_ID__",
+      "[template-markers]",
+      "TODO"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/task-titles/SKILL.md",
+          "find": "Keeps task title helpers pure and proves it with a checker.",
+          "with": "__FILL_WHAT_THIS_SKILL_MAKES_TRUE__"
+        }
+      },
+      {
+        "replace": {
+          "file": "skills/task-titles/references/guide.md",
+          "find": "Helpers in `src/features/tasks/` export by name",
+          "with": "Helpers for __LIST_NAME__ export by name"
+        }
+      },
+      {
+        "replace": {
+          "file": "skills/task-titles/scripts/check-titles.mjs",
+          "find": "createReporter({ name: 'check-titles' })",
+          "with": "createReporter({ name: '__FILL_RULE_ID__' })"
+        }
+      },
+      {
+        "replace": {
+          "file": "skills/task-titles/templates/src/features/tasks/task-title.ts",
+          "find": "  return title.trim();\n",
+          "with": "  // TODO trim emoji too\n  return title.trim();\n"
+        }
+      }
+    ]
+  },
+  "bad-related-expo-lead": {
+    "expect": [
+      "[related-names]",
+      "task-titles/SKILL.md:45",
+      "names file-naming, which is not an Expo skill",
+      "task-titles/SKILL.md:46",
+      "does not start with a skill name in backticks"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/task-titles/SKILL.md",
+          "find": "- `file-naming` - naming files and exports.",
+          "with": "- `file-naming` - naming files and exports.\n- Expo's official `expo-ui` and `file-naming` skills - controls and their file names.\n- Expo's official router skill - the router API reference."
+        }
+      }
+    ]
+  },
+  "bad-repo-scan": {
+    "expect": ["[repo-scan-walk]", "task-titles/scripts/check-titles.mjs:7"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/task-titles/scripts/check-titles.mjs",
+          "find": "walkRepo('.', { include: ['*.ts'] })",
+          "with": "walk('.', { include: ['*.ts'], ignore: REPO_SCAN_IGNORES })"
+        }
+      },
+      {
+        "replace": {
+          "file": "skills/task-titles/scripts/check-titles.mjs",
+          "find": "createReporter, run, walkRepo",
+          "with": "REPO_SCAN_IGNORES, createReporter, run, walk"
+        }
+      }
+    ]
+  },
+  "bad-repo-scan-indirect": {
+    "expect": [
+      "[repo-scan-walk]",
+      "task-titles/scripts/check-titles.mjs:9",
+      "passes IGNORE (built from the repo-scan ignores) to walk()"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "skills/task-titles/scripts/check-titles.mjs",
+          "lines": [
+            "#!/usr/bin/env node",
+            "// check-titles.mjs: a sample checker (fixture).",
+            "import { REPO_SCAN_IGNORES, createReporter, run, walk } from './check-lib.mjs';",
+            "",
+            "const IGNORE = [...REPO_SCAN_IGNORES, 'reports/**'];",
+            "",
+            "run(async () => {",
+            "  const report = createReporter({ name: 'check-titles' });",
+            "  const files = walk('.', { include: ['*.ts'], ignore: IGNORE });",
+            "  return report.finish({ checked: files.length, unit: 'files' });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-repo-scan-nested": {
+    "expect": ["[repo-scan-walk]", "task-titles/scripts/check-titles.mjs:9", "passes REPO_SCAN_IGNORES to walk()"],
+    "ops": [
+      {
+        "write": {
+          "file": "skills/task-titles/scripts/check-titles.mjs",
+          "lines": [
+            "#!/usr/bin/env node",
+            "// check-titles.mjs: a sample checker (fixture).",
+            "import { REPO_SCAN_IGNORES, createReporter, run, walk } from './check-lib.mjs';",
+            "",
+            "const RULES = [{ id: 'title-clock', include: ['*.ts'] }];",
+            "",
+            "run(async () => {",
+            "  const report = createReporter({ name: 'check-titles' });",
+            "  const files = walk('.', { ignore: REPO_SCAN_IGNORES, include: [...new Set(RULES.flatMap((rule) => rule.include))] });",
+            "  return report.finish({ checked: files.length, unit: 'files' });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-repo-scan-options": {
+    "expect": [
+      "[repo-scan-walk]",
+      "task-titles/scripts/check-titles.mjs:14",
+      "passes OPTIONS (built from the repo-scan ignores) to walk()"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "skills/task-titles/scripts/check-titles.mjs",
+          "lines": [
+            "#!/usr/bin/env node",
+            "// check-titles.mjs: a sample checker (fixture).",
+            "import { REPO_SCAN_IGNORES, createReporter, run, walk } from './check-lib.mjs';",
+            "",
+            "// Keep the agent folders out, but scan skills/ too.",
+            "const IGNORE = REPO_SCAN_IGNORES.filter((glob) => glob !== 'skills/**');",
+            "const OPTIONS = {",
+            "  include: ['*.ts'],",
+            "  ignore: IGNORE,",
+            "};",
+            "",
+            "run(async () => {",
+            "  const report = createReporter({ name: 'check-titles' });",
+            "  const files = walk(",
+            "    '.',",
+            "    OPTIONS,",
+            "  );",
+            "  return report.finish({ checked: files.length, unit: 'files' });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-rule-case-other-suite": {
+    "expect": [
+      "[rule-has-bad-case]",
+      "task-titles/scripts/check-title-files.mjs",
+      "rule title-clock (listed in --help) has no bad-* case in the self-test suites of check-title-files.mjs (tests/title-files)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "skills/task-titles/scripts/check-title-files.mjs",
+          "lines": [
+            "#!/usr/bin/env node",
+            "// check-title-files.mjs: a second sample checker (fixture).",
+            "import { run } from './check-lib.mjs';",
+            "",
+            "run(async () => 0);"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "skills/task-titles/scripts/selftest.mjs",
+          "find": "{ script: 'check-titles.mjs', fixtures: '../tests/fixtures', args: (dir) => [dir] }",
+          "with": "{ script: 'check-titles.mjs', fixtures: '../tests/fixtures', args: (dir) => [dir] },\n  { script: 'check-title-files.mjs', fixtures: '../tests/title-files', args: (dir) => [dir] },"
+        }
+      },
+      {
+        "write": {
+          "file": "skills/task-titles/tests/title-files/good/src/a.ts",
+          "content": "export const title = 'a';\n"
+        }
+      },
+      { "write": { "file": "skills/task-titles/tests/title-files/bad-name/EXPECT.txt", "content": "[title-name]\n" } },
+      {
+        "replace": {
+          "file": "skills/task-titles/SKILL.md",
+          "find": "3. Run `node ${CLAUDE_SKILL_DIR}/scripts/check-titles.mjs .` and fix every FAIL line.\n",
+          "with": "3. Run `node ${CLAUDE_SKILL_DIR}/scripts/check-titles.mjs .` and `node ${CLAUDE_SKILL_DIR}/scripts/check-title-files.mjs .` and fix every FAIL line.\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "skills/task-titles/SKILL.md",
+          "find": "| `scripts/check-titles.mjs` | The checker | Workflow step 3 |\n",
+          "with": "| `scripts/check-titles.mjs` | The checker | Workflow step 3 |\n| `scripts/check-title-files.mjs` | The file checker | Workflow step 3 |\n| `tests/title-files/` | Its self-test inputs | When adding a rule |\n"
+        }
+      }
+    ]
+  },
+  "bad-rule-case-path-word": {
+    "expect": [
+      "[rule-has-bad-case]",
+      "task-titles/scripts/check-titles.mjs",
+      "rule layout (listed in --help) has no bad-* case"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/task-titles/scripts/check-lib.mjs",
+          "find": "  title-clock    a title helper reads the clock",
+          "with": "  title-clock    a title helper reads the clock\\n  layout         a title helper sits outside src/features"
+        }
+      },
+      {
+        "write": {
+          "file": "skills/task-titles/tests/fixtures/bad-clock-in-layout/EXPECT.txt",
+          "content": "[title-clock]\nsrc/layout/a.ts:1\n"
+        }
+      }
+    ]
+  },
+  "bad-rule-no-case": {
+    "expect": [
+      "[rule-has-bad-case]",
+      "task-titles/scripts/check-titles.mjs",
+      "rule title-default (listed in --help) has no bad-* case"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/task-titles/scripts/check-lib.mjs",
+          "find": "  title-clock    a title helper reads the clock",
+          "with": "  title-clock    a title helper reads the clock\\n  title-default  a title helper has a default export"
+        }
+      }
+    ]
+  },
+  "bad-rules": {
+    "expect": [
+      "[rule-why]",
+      "task-titles/SKILL.md:12",
+      "has no **bold statement**",
+      "task-titles/SKILL.md:13",
+      "has no reason after it"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/task-titles/SKILL.md",
+          "find": "1. **Named exports only.** A default export",
+          "with": "1. Named exports only. A default export"
+        }
+      },
+      {
+        "replace": {
+          "file": "skills/task-titles/SKILL.md",
+          "find": "2. **No clock in title helpers.** Reading `Date.now()` makes the same task render different titles in tests and on devices.",
+          "with": "2. **No clock in title helpers.** Always."
+        }
+      }
+    ]
+  },
+  "bad-template-header": {
+    "expect": ["[template-path-header]", "task-titles/templates/src/features/tasks/task-title.ts:1"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/task-titles/templates/src/features/tasks/task-title.ts",
+          "find": "// src/features/tasks/task-title.ts\n",
+          "with": "// The task title helper.\n"
+        }
+      }
+    ]
+  },
+  "bad-template-header-ext": {
+    "expect": ["[template-path-header]", "but the template is a .ts file"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/task-titles/templates/src/features/tasks/task-title.ts",
+          "find": "// src/features/tasks/task-title.ts\n",
+          "with": "// src/features/tasks/task-title.tsx\n"
+        }
+      }
+    ]
+  },
+  "error-missing": {
+    "expect": ["ERROR [bad-input] nothing to check:", "ghost-skill does not exist or is not a folder"],
+    "args": "{dir}/skills/ghost-skill"
+  },
+  "pass-dod-skips-derived-file": {
+    "expect": ["check-skill: 10 files checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "skills/task-titles/scripts/check-titles.mjs",
+          "lines": [
+            "#!/usr/bin/env node",
+            "// check-titles.mjs: a sample checker (fixture) whose skip file is derived from a literal.",
+            "import { createReporter, notYetCreated, run, walkRepo } from './check-lib.mjs';",
+            "",
+            "run(async () => {",
+            "  const report = createReporter({ name: 'check-titles' });",
+            "  const rel = 'src/stores/titles/title-reducer.ts';",
+            "  const casesRel = rel.replace(/\\.ts$/, '-cases.ts');",
+            "  if (notYetCreated('.', { file: casesRel, owner: 'state-management-zustand' })) report.skip({ file: casesRel, rule: 'title-cases', message: 'not yet created' });",
+            "  const files = walkRepo('.', { include: ['*.ts'] });",
+            "  return report.finish({ checked: files.length, unit: 'files' });",
+            "});"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "skills/task-titles/SKILL.md",
+          "find": "- [ ] `node ${CLAUDE_SKILL_DIR}/scripts/check-titles.mjs .` prints `RESULT: PASS`\n",
+          "with": "- [ ] `node ${CLAUDE_SKILL_DIR}/scripts/check-titles.mjs .` prints `RESULT: PASS`\n- [ ] Expected SKIP lines only: a SKIP for the cases file beside `title-reducer.ts` until\n      state-management-zustand creates it.\n"
+        }
+      }
+    ]
+  },
+  "pass-dod-skips-listed": {
+    "expect": ["check-skill: 10 files checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "skills/task-titles/scripts/check-titles.mjs",
+          "lines": [
+            "#!/usr/bin/env node",
+            "// check-titles.mjs: a sample checker (fixture).",
+            "import { createReporter, notYetCreated, run, walkRepo } from './check-lib.mjs';",
+            "",
+            "run(async () => {",
+            "  const report = createReporter({ name: 'check-titles' });",
+            "  const reason = notYetCreated('.', { file: 'src/i18n/catalogs/en.json', owner: 'i18n-strings-and-catalogs' });",
+            "  if (reason) report.skip({ file: 'src/i18n/catalogs/en.json', rule: 'title-key', message: reason });",
+            "  const LOCALES = 'src/i18n/languages.ts';",
+            "  if (notYetCreated('.', { file: LOCALES, owner: 'i18n-strings-and-catalogs' })) report.skip({ file: LOCALES, rule: 'title-locale', message: 'not yet created' });",
+            "  const files = walkRepo('.', { include: ['*.ts'] });",
+            "  return report.finish({ checked: files.length, unit: 'files' });",
+            "});"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "skills/task-titles/SKILL.md",
+          "find": "- [ ] `node ${CLAUDE_SKILL_DIR}/scripts/check-titles.mjs .` prints `RESULT: PASS`\n",
+          "with": "- [ ] `node ${CLAUDE_SKILL_DIR}/scripts/check-titles.mjs .` prints `RESULT: PASS`\n- [ ] Expected SKIP lines only, each until i18n-strings-and-catalogs creates the file:\n      `SKIP src/i18n/catalogs/en.json [title-key] not yet created (i18n-strings-and-catalogs creates it)`\n      and the same for `src/i18n/languages.ts`.\n"
+        }
+      }
+    ]
+  },
+  "pass-expo-handoffs": {
+    "expect": ["files checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/task-titles/SKILL.md",
+          "find": "- `file-naming` - naming files and exports.",
+          "with": "- `file-naming` - naming files and exports.\n- `expo-project-structure` - (Expo's official skill) Expo's own folder conventions.\n- Expo's official `expo-ui` and `expo-native-ui` skills - platform-native controls; this skill keeps\n  `file-naming` rules for them.\n- Expo's `eas-hosting` skill (deploy commands) and `expo-dom` skill (DOM components).\n- Expo's official `eas-hosting` skill (deploy commands) and `expo-dom` skill (DOM components), both in `expo/skills`."
+        }
+      }
+    ]
+  },
+  "pass-look-alikes": {
+    "expect": ["files checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/task-titles/references/guide.md",
+          "find": "export by name and never read the clock.",
+          "with": "export by name and never read the clock. A dev-only guard (`if\n(__DEV__) warn()`) is fine."
+        }
+      },
+      {
+        "replace": {
+          "file": "skills/task-titles/templates/src/features/tasks/task-title.ts",
+          "find": "  return title.trim();\n",
+          "with": "  // Codes such as XXX (no currency) never reach a title.\n  return title.trim();\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "skills/task-titles/scripts/check-titles.mjs",
+          "find": "  const files = walkRepo('.', { include: ['*.ts'] });\n",
+          "with": "  const budgets = 'contracts/title-budgets.json';\n  void budgets;\n  const files = walkRepo('.', { include: ['*.ts'] });\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "skills/task-titles/references/guide.md",
+          "find": "# Task title helpers\n",
+          "with": "# Task title helpers\n\nThe length budgets live in `contracts/title-budgets.json`, which the design-system skill owns.\n"
+        }
+      }
+    ]
+  },
+  "pass-no-skills": {
+    "expect": ["NOT APPLICABLE: no project skills"],
+    "args": "{dir}/app",
+    "ops": [{ "write": { "file": "app/package.json", "content": "{ \"name\": \"tasks-app\", \"private\": true }\n" } }]
+  },
+  "pass-repo-installed": {
+    "expect": [
+      "note: 1 installed skill(s) not checked (their authors own them; pass .agents/skills to check them): vendor-dates",
+      "RESULT: PASS"
+    ],
+    "args": "{dir}",
+    "ops": [
+      { "write": { "file": "package.json", "content": "{ \"name\": \"tasks-app\", \"private\": true }\n" } },
+      {
+        "write": {
+          "file": ".agents/skills/vendor-dates/SKILL.md",
+          "content": "---\nname: vendor-dates\ndescription: Formats dates for a vendored kit. Use when a date shows wrong. Not for time zones (vendor-zones).\n---\n\n# Vendor dates\n"
+        }
+      }
+    ]
+  },
+  "pass-repo-only-installed": {
+    "expect": [
+      "NOT APPLICABLE: only installed skills (file-naming, task-titles under .agents/skills/), which their authors own: pass .agents/skills to check them",
+      "RESULT: PASS"
+    ],
+    "args": "{dir}",
+    "ops": [
+      { "write": { "file": "package.json", "content": "{ \"name\": \"tasks-app\", \"private\": true }\n" } },
+      { "rename": { "from": "skills", "to": ".agents/skills" } }
+    ]
+  },
+  "pass-repo-scan-deliberate": {
+    "expect": ["check-skill: 10 files checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "skills/task-titles/scripts/check-titles.mjs",
+          "lines": [
+            "#!/usr/bin/env node",
+            "// check-titles.mjs: a sample checker (fixture).",
+            "import { REPO_SCAN_IGNORES, createReporter, run, walk } from './check-lib.mjs';",
+            "",
+            "const IGNORE = [...REPO_SCAN_IGNORES.filter((glob) => !glob.startsWith('.')), 'reports/**'];",
+            "",
+            "run(async () => {",
+            "  const report = createReporter({ name: 'check-titles' });",
+            "  // repo-scan-walk: deliberate (a key file is wrong anywhere, installed skills included)",
+            "  const files = walk('.', { include: ['*.pem'], ignore: IGNORE });",
+            "  const local = walk('.', { include: ['*.p8'], ignore: IGNORE }); // repo-scan-walk: deliberate",
+            "  return report.finish({ checked: files.length + local.length, unit: 'files' });",
+            "});"
+          ]
+        }
+      }
+    ]
+  }
+}

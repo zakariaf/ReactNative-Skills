@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["jest"],
+    "paths": {
+      "@/*": ["./src/*"],
+      "@test/*": ["./test/*"]
+    },
+    "tsBuildInfoFile": "${configDir}/node_modules/.cache/tsc/stryker.tsbuildinfo"
+  },
+  "include": ["src/**/*"]
+}

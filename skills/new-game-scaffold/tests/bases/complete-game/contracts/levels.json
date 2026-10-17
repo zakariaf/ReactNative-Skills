@@ -1,0 +1,14 @@
+{
+  "$schema": "./levels.schema.json",
+  "$comment": "Self-test stand-in: level-generation-and-solvers writes the real contract; check-game-scaffold holds its layout to contracts/games.json.",
+  "games": [
+    {
+      "id": "lights-out",
+      "packCount": 3,
+      "levelsPerPack": 30,
+      "starRule": "par",
+      "daily": true,
+      "endless": false
+    }
+  ]
+}

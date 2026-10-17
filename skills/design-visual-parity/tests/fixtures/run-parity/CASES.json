@@ -1,0 +1,38 @@
+{
+  "bad-not-captured": {
+    "expect": ["[not-captured] tasks-default test-phone light-en: no run folder to check again"],
+    "args": "--frame tasks-default --themes light --langs en --recheck"
+  },
+  "bad-planted": {
+    "expect": [
+      "[text] tasks-default test-phone light-en: tasks.summary: text \"4 open\" but the design says \"3 open\""
+    ],
+    "args": "--frame tasks-default --themes light --langs en",
+    "ops": [
+      {
+        "write": {
+          "file": "post.json",
+          "json": [
+            {
+              "replace": {
+                "file": "fake/hier.json",
+                "find": "\"accessibilityText\":\"3 open\"",
+                "with": "\"accessibilityText\":\"4 open\""
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "error-capture-stopped": {
+    "expect": ["ERROR [bad-input] capture-app.mjs stopped on tasks-default test-phone light-en"],
+    "args": "--frame tasks-default --themes light --langs en",
+    "ops": [{ "write": { "file": "scenario.json", "json": { "launchFails": true } } }]
+  },
+  "error-nothing": { "expect": ["ERROR [bad-input] nothing to run"] },
+  "error-unknown-theme": {
+    "expect": ["ERROR [bad-input] unknown theme \"sepia\""],
+    "args": "--frame tasks-default --themes sepia"
+  }
+}

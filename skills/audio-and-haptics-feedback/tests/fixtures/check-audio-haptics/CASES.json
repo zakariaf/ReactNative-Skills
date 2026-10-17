@@ -1,0 +1,1314 @@
+{
+  "bad-adapter-android-test-missing": {
+    "expect": ["FAIL src/services/audio/audio-api-audio-adapter.android.test.ts [audio-file-missing]"],
+    "ops": [{ "delete": "src/services/audio/audio-api-audio-adapter.android.test.ts" }]
+  },
+  "bad-android-touch-sound": {
+    "expect": ["FAIL src/ui/pressable-surface.tsx:5 [android-touch-sound]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/feedback/ui-feedback.ts",
+          "find": "export const UI_FEEDBACK = {\n",
+          "with": "export const UI_FEEDBACK = {\n  /** Every press through the press surface. */\n  tap: { sound: 'ui.tap' },\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/press-root.tsx",
+          "lines": [
+            "// src/app/press-root.tsx (stand-in): the root provider plays the tap moment",
+            "import { playUiFeedback } from '@/services/feedback/ui-feedback';",
+            "import type { FeedbackPorts } from '@/services/feedback/play-cue';",
+            "export const onAnyPress = (ports: FeedbackPorts): void => {",
+            "  playUiFeedback(ports, 'tap');",
+            "};"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/ui/pressable-surface.tsx",
+          "lines": [
+            "// src/ui/pressable-surface.tsx (stand-in press surface)",
+            "import { Pressable } from 'react-native';",
+            "import { usePressFeedback } from './press-feedback-context';",
+            "export function PressableSurface(props: { readonly onPress: () => void }): React.JSX.Element {",
+            "  const onPressFeedback = usePressFeedback();",
+            "  return (",
+            "    <Pressable",
+            "      onPress={() => {",
+            "        onPressFeedback();",
+            "        props.onPress();",
+            "      }}",
+            "    />",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-audio-asset": {
+    "expect": ["FAIL assets/sounds/boom.mp3 [file-audio]", "the contract does not list"],
+    "ops": [{ "write": { "file": "assets/sounds/boom.mp3", "lines": ["ID3 not really audio"] } }]
+  },
+  "bad-audio-focus": {
+    "expect": ["FAIL src/services/audio/audio-api-audio-adapter.ts:199 [audio-focus]", "requests AUDIOFOCUS_GAIN"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/audio/audio-api-audio-adapter.ts",
+          "find": "    if (Platform.OS === 'ios') AudioManager.observeAudioInterruptions(true);",
+          "with": "    AudioManager.observeAudioInterruptions(true);"
+        }
+      }
+    ]
+  },
+  "bad-audio-focus-type": {
+    "expect": ["FAIL src/services/audio/audio-api-audio-adapter.ts:199 [audio-focus]", "requests Android audio focus"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/audio/audio-api-audio-adapter.ts",
+          "find": "AudioManager.observeAudioInterruptions(true);",
+          "with": "AudioManager.observeAudioInterruptions('gainTransientMayDuck');"
+        }
+      }
+    ]
+  },
+  "bad-audio-import": {
+    "expect": ["FAIL src/features/tasks/play-done.ts:2 [vendor-import]", "outside the audio adapter"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/play-done.ts",
+          "lines": [
+            "// src/features/tasks/play-done.ts",
+            "import { AudioManager } from 'react-native-audio-api';",
+            "",
+            "export const isReady = AudioManager !== undefined;"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-audio-pin": {
+    "expect": ["FAIL package.json:11 [audio-pin]", "not an exact pin of 0.13.6"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "react-native-audio-api"], "value": "^0.13.6" } }
+    ]
+  },
+  "bad-audio-pin-unverified": {
+    "expect": ["FAIL package.json:11 [audio-pin]", "but the verified version is 0.13.6"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "react-native-audio-api"], "value": "0.14.0" } }
+    ]
+  },
+  "bad-audio-unlisted": {
+    "expect": ["FAIL package.json:1 [audio-pin]", "does not list react-native-audio-api"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "react-native-audio-api"], "delete": true } }]
+  },
+  "bad-bundled-format": {
+    "expect": [
+      "FAIL contracts/audio-feedback.json [file-audio] bundled sound assets/sounds/chime.caf is in a format the adapter cannot decode"
+    ],
+    "ops": [
+      { "write": { "file": "assets/sounds/chime.caf", "lines": ["caff stand-in"] } },
+      {
+        "json": {
+          "file": "contracts/audio-feedback.json",
+          "path": ["bundledSounds"],
+          "value": [{ "file": "assets/sounds/chime.caf", "license": "CC0-1.0", "source": "recorded by the team" }]
+        }
+      }
+    ]
+  },
+  "bad-button-haptic": {
+    "expect": ["FAIL src/ui/switch-row.tsx:5 [button-haptics]", "'medium'"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/switch-row.tsx",
+          "find": "haptics.play('selection');",
+          "with": "haptics.play('medium');"
+        }
+      }
+    ]
+  },
+  "bad-decode-url": {
+    "expect": [
+      "FAIL src/services/audio/load-sound.ts:3 [file-audio] uses decodeAudioData: decodes audio outside the audio adapter",
+      "names a network audio file"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/audio/load-sound.ts",
+          "lines": [
+            "// src/services/audio/load-sound.ts",
+            "export async function load(ctx: { decodeAudioData: (url: string) => Promise<unknown> }): Promise<unknown> {",
+            "  return ctx.decodeAudioData('https://example.com/boom.mp3');",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-direction-gate-no-dispose": {
+    "expect": [
+      "FAIL src/i18n/direction.ts:11 [dispose-before-reload] restartForDirection awaits beforeReload() before reloading, but no caller passes the audio dispose"
+    ],
+    "ops": [
+      {
+        "$comment": "rtl-and-direction's chain: restartForDirection <- DirectionRestart <- DirectionGate, each forwarding beforeReload; nobody at the top passes the audio dispose, so the seam stays open.",
+        "write": {
+          "file": "src/i18n/direction.ts",
+          "lines": [
+            "// src/i18n/direction.ts (rtl-and-direction's seam: this module cannot reach the services)",
+            "import { reloadAppAsync } from 'expo';",
+            "",
+            "export async function restartForDirection(",
+            "  direction: 'ltr' | 'rtl',",
+            "  beforeReload: () => Promise<void> = () => Promise.resolve(),",
+            "): Promise<void> {",
+            "  try {",
+            "    await beforeReload();",
+            "  } finally {",
+            "    await reloadAppAsync(`layout direction -> ${direction}`);",
+            "  }",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/i18n/direction-restart.tsx",
+          "lines": [
+            "// src/i18n/direction-restart.tsx: forwards its own beforeReload; it cannot reach the services.",
+            "import { useEffect } from 'react';",
+            "",
+            "import { restartForDirection } from './direction';",
+            "",
+            "import type { ReactNode } from 'react';",
+            "",
+            "export function DirectionRestart(props: {",
+            "  readonly direction: 'ltr' | 'rtl';",
+            "  readonly beforeReload?: (() => Promise<void>) | undefined;",
+            "}): ReactNode {",
+            "  const { direction, beforeReload } = props;",
+            "  useEffect(() => {",
+            "    void restartForDirection(direction, beforeReload);",
+            "  }, [direction, beforeReload]);",
+            "  return null;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/i18n/direction-gate.tsx",
+          "lines": [
+            "// src/i18n/direction-gate.tsx: shows DirectionRestart when the saved direction differs; forwards beforeReload.",
+            "import { DirectionRestart } from './direction-restart';",
+            "",
+            "import type { ReactNode } from 'react';",
+            "",
+            "export function DirectionGate(props: {",
+            "  readonly isFlipNeeded: boolean;",
+            "  readonly beforeReload?: (() => Promise<void>) | undefined;",
+            "  readonly children: ReactNode;",
+            "}): ReactNode {",
+            "  if (props.isFlipNeeded) return <DirectionRestart direction=\"rtl\" beforeReload={props.beforeReload} />;",
+            "  return props.children;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/root/app-shell.tsx",
+          "lines": [
+            "// src/features/root/app-shell.tsx: the root renders the gate but passes no audio dispose.",
+            "import { DirectionGate } from '@/i18n/direction-gate';",
+            "",
+            "import type { AppServices } from '@/services/services-context';",
+            "import type { ReactNode } from 'react';",
+            "",
+            "export function AppShell(props: {",
+            "  readonly services: AppServices;",
+            "  readonly isFlipNeeded: boolean;",
+            "  readonly children: ReactNode;",
+            "}): ReactNode {",
+            "  const { isFlipNeeded } = props;",
+            "  return (",
+            "    <DirectionGate isFlipNeeded={isFlipNeeded} beforeReload={() => Promise.resolve()}>",
+            "      {props.children}",
+            "    </DirectionGate>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-file-missing": {
+    "expect": ["[audio-file-missing]", "src/services/haptics/should-pulse.test.ts"],
+    "ops": [{ "delete": "src/services/haptics/should-pulse.test.ts" }]
+  },
+  "bad-haptic-android-legacy": {
+    "expect": ["FAIL src/services/haptics/expo-haptics-adapter.ts:94 [haptic-android]", "maps 'success' to Confirm"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/haptics/expo-haptics-adapter.ts",
+          "find": "  success: AndroidHaptics.Context_Click,",
+          "with": "  success: AndroidHaptics.Confirm,"
+        }
+      }
+    ]
+  },
+  "bad-haptic-android-mid": {
+    "expect": ["[haptic-android] ANDROID_API_30_CUES maps 'selection' to Segment_Tick, which API 30 to 33 lack"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/haptics/expo-haptics-adapter.ts",
+          "find": "const ANDROID_API_30_CUES = {\n  selection: AndroidHaptics.Clock_Tick,",
+          "with": "const ANDROID_API_30_CUES = {\n  selection: AndroidHaptics.Segment_Tick,"
+        }
+      }
+    ]
+  },
+  "bad-haptic-android-missing": {
+    "expect": ["[haptic-android]", "cue 'error' has no Android constant in ANDROID_CUES"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/haptics/expo-haptics-adapter.ts",
+          "find": "  warning: AndroidHaptics.Reject,\n  error: AndroidHaptics.Reject,\n",
+          "with": "  warning: AndroidHaptics.Reject,\n",
+          "occurrence": 1
+        }
+      }
+    ]
+  },
+  "bad-haptic-android-no-legacy": {
+    "expect": ["FAIL src/services/haptics/expo-haptics-adapter.ts:65 [haptic-android]", "without a legacy table"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/haptics/expo-haptics-adapter.ts",
+          "find": "const ANDROID_LEGACY_CUES = {",
+          "with": "const OLDER_CUES = {"
+        }
+      }
+    ]
+  },
+  "bad-haptic-android-vibrator": {
+    "expect": [
+      "FAIL src/services/haptics/expo-haptics-adapter.ts:1 [haptic-android]",
+      "not played with performAndroidHapticsAsync"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/haptics/expo-haptics-adapter.ts",
+          "find": "    return performAndroidHapticsAsync(androidHapticFor(cue, device.apiLevel));",
+          "with": "    return fireIos(cue);"
+        }
+      }
+    ]
+  },
+  "bad-haptic-no-catch": {
+    "expect": ["FAIL src/services/haptics/expo-haptics-adapter.ts:1 [haptic-safety]", ".catch(() => undefined)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/haptics/expo-haptics-adapter.ts",
+          "find": "fire(cue, device).catch(() => undefined);",
+          "with": "void fire(cue, device);"
+        }
+      }
+    ]
+  },
+  "bad-haptic-table": {
+    "expect": ["FAIL src/services/haptics/expo-haptics-adapter.ts:49 [haptic-table]", "cue 'error'"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/haptics/expo-haptics-adapter.ts",
+          "find": "    case 'error':\n      return notificationAsync(NotificationFeedbackType.Error);",
+          "with": "    case 'error':\n      return notificationAsync(NotificationFeedbackType.Warning);"
+        }
+      }
+    ]
+  },
+  "bad-haptic-throttle": {
+    "expect": ["FAIL src/services/haptics/should-pulse.ts:1 [haptic-throttle]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/haptics/should-pulse.ts",
+          "find": "MIN_HAPTIC_GAP_MS = 40",
+          "with": "MIN_HAPTIC_GAP_MS = 10"
+        }
+      }
+    ]
+  },
+  "bad-haptics-dependency": {
+    "expect": ["FAIL package.json:1 [haptics-dependency]", "does not list expo-haptics"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo-haptics"], "delete": true } }]
+  },
+  "bad-haptics-import": {
+    "expect": ["FAIL src/games/arena-chase/shake.ts:2 [vendor-import]", "outside the haptics adapter"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/arena-chase/shake.ts",
+          "lines": [
+            "// src/games/arena-chase/shake.ts",
+            "import { impactAsync } from 'expo-haptics';",
+            "",
+            "export const shake = (): Promise<void> => impactAsync();"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-haptics-range": {
+    "expect": ["FAIL package.json:8 [haptics-dependency]", "not the tilde range"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo-haptics"], "value": "57.0.3" } }]
+  },
+  "bad-lifecycle-test-missing": {
+    "expect": ["[audio-file-missing]", "src/services/audio/use-audio-lifecycle.test.ts"],
+    "ops": [{ "delete": "src/services/audio/use-audio-lifecycle.test.ts" }]
+  },
+  "bad-lifecycle-twice": {
+    "expect": ["[lifecycle-mount]", "called 2 times"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-audio.ts",
+          "lines": [
+            "// src/features/tasks/use-task-audio.ts",
+            "import { useAudioLifecycle } from '@/services/audio/use-audio-lifecycle';",
+            "",
+            "import type { AudioPort } from '@/services/audio/audio-port';",
+            "",
+            "export function useTaskAudio(audio: AudioPort): void {",
+            "  useAudioLifecycle({ audio, isInterrupted: false, reportError: () => undefined });",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-linear-gain": {
+    "expect": ["[voice-policy]", "does not square the slider"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/audio/admit-voice.ts",
+          "find": "setting.volume * setting.volume",
+          "with": "setting.volume"
+        }
+      }
+    ]
+  },
+  "bad-max-voices": {
+    "expect": ["FAIL src/services/audio/admit-voice.ts:1 [voice-policy]", "MAX_VOICES is not 8"],
+    "ops": [
+      {
+        "replace": { "file": "src/services/audio/admit-voice.ts", "find": "MAX_VOICES = 8", "with": "MAX_VOICES = 16" }
+      }
+    ]
+  },
+  "bad-media-player-in-layer": {
+    "expect": ["FAIL src/services/audio/bundled-player.ts:2 [vendor-import]", "media player expo-audio"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/audio/bundled-player.ts",
+          "lines": [
+            "// src/services/audio/bundled-player.ts",
+            "import { createAudioPlayer } from 'expo-audio';",
+            "",
+            "export const player = createAudioPlayer;"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-mic-string": {
+    "expect": ["FAIL src/config/audio-plugin.ts:24 [mic-string]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/audio-plugin.ts",
+          "find": "    disableStaticExternalLibs: true,\n",
+          "with": "    disableStaticExternalLibs: true,\n    iosMicrophonePermission: 'Sound effects',\n"
+        }
+      }
+    ]
+  },
+  "bad-mock-incomplete": {
+    "expect": ["FAIL __mocks__/react-native-audio-api.ts:1 [audio-mock]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "__mocks__/react-native-audio-api.ts",
+          "find": "  observeAudioInterruptions: jest.fn(),\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-music-on": {
+    "expect": ["FAIL src/services/audio/audio-port.ts:1 [music-default]", "keep music off"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/audio/audio-port.ts",
+          "find": "music: { isOn: false",
+          "with": "music: { isOn: true"
+        }
+      }
+    ]
+  },
+  "bad-no-dispose": {
+    "expect": ["FAIL src/features/settings/restart-for-language.ts:7 [dispose-before-reload]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/settings/restart-for-language.ts",
+          "find": "  await audio.dispose();\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-no-ramp": {
+    "expect": ["FAIL src/services/audio/audio-api-audio-adapter.ts:1 [voice-policy]", "ramp over 50 ms"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/audio/audio-api-audio-adapter.ts",
+          "find": "const RAMP_S = 0.05;",
+          "with": "const RAMP_S = 0;"
+        }
+      }
+    ]
+  },
+  "bad-other-dispose": {
+    "expect": ["FAIL src/features/settings/restart-for-language.ts:8 [dispose-before-reload]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/settings/restart-for-language.ts",
+          "find": "  await audio.dispose();\n",
+          "with": "  boardImage.dispose();\n"
+        }
+      }
+    ]
+  },
+  "bad-peer-range": {
+    "expect": ["FAIL packages/feedback/package.json:5 [audio-pin]", "not an exact pin"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["packages/*"] } },
+      {
+        "write": {
+          "file": "packages/feedback/package.json",
+          "lines": [
+            "{",
+            "  \"name\": \"@acme/feedback\",",
+            "  \"private\": true,",
+            "  \"peerDependencies\": {",
+            "    \"react-native-audio-api\": \"^0.13.6\"",
+            "  }",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-plugin-bare": {
+    "expect": ["FAIL app.config.ts:10 [audio-plugin]", "listed without options"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "plugins: ['expo-router', AUDIO_API_PLUGIN],",
+          "with": "plugins: ['expo-router', 'react-native-audio-api'],"
+        }
+      }
+    ]
+  },
+  "bad-plugin-option": {
+    "expect": ["FAIL src/config/audio-plugin.ts:17 [audio-plugin]", "disableFFmpeg"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/audio-plugin.ts",
+          "find": "disableFFmpeg: true",
+          "with": "disableFFmpeg: false"
+        }
+      }
+    ]
+  },
+  "bad-plugin-unwired": {
+    "expect": ["FAIL src/config/audio-plugin.ts:16 [audio-plugin]", "app.config does not use it"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "import { AUDIO_API_PLUGIN } from './src/config/audio-plugin.ts';\n\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "plugins: ['expo-router', AUDIO_API_PLUGIN],",
+          "with": "plugins: ['expo-router'],"
+        }
+      }
+    ]
+  },
+  "bad-press-feedback-unused": {
+    "expect": [
+      "FAIL src/ui/press-feedback-context.tsx [ui-feedback]",
+      "no press surface in src/ui runs usePressFeedback()"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/feedback/ui-feedback.ts",
+          "find": "export const UI_FEEDBACK = {\n",
+          "with": "export const UI_FEEDBACK = {\n  /** Every press through the press surface. */\n  tap: { sound: 'ui.tap' },\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/press-root.tsx",
+          "lines": [
+            "// src/app/press-root.tsx (stand-in): the root provider plays the tap moment",
+            "import { playUiFeedback } from '@/services/feedback/ui-feedback';",
+            "import type { FeedbackPorts } from '@/services/feedback/play-cue';",
+            "export const onAnyPress = (ports: FeedbackPorts): void => {",
+            "  playUiFeedback(ports, 'tap');",
+            "};"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-preview-not-ignored": {
+    "expect": ["FAIL .gitignore [preview-ignored]"],
+    "ops": [{ "write": { "file": ".gitignore", "lines": ["node_modules/", ".expo/"] } }]
+  },
+  "bad-reclaim-session": {
+    "expect": ["FAIL src/services/audio/audio-api-audio-adapter.ts:200 [music-default]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/audio/audio-api-audio-adapter.ts",
+          "find": "    if (Platform.OS === 'ios') AudioManager.observeAudioInterruptions(true);",
+          "with": "    if (Platform.OS === 'ios') AudioManager.observeAudioInterruptions(true);\n    AudioManager.activelyReclaimSession(true);"
+        }
+      }
+    ]
+  },
+  "bad-reload-exempt-reasonless": {
+    "expect": ["FAIL src/app/_layout.tsx:14 [dispose-before-reload]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "  // audio-dispose-exempt: the root error boundary renders outside the services it would dispose.",
+          "with": "  // audio-dispose-exempt: ok"
+        }
+      }
+    ]
+  },
+  "bad-reload-seam-no-dispose": {
+    "expect": [
+      "FAIL src/i18n/direction.ts:9 [dispose-before-reload] restartForDirection awaits beforeReload() before reloading, but no caller passes the audio dispose"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/i18n/direction.ts",
+          "lines": [
+            "// src/i18n/direction.ts (the reload seam: this module cannot reach the services)",
+            "import { reloadAppAsync } from 'expo';",
+            "",
+            "export async function restartForDirection(",
+            "  direction: 'ltr' | 'rtl',",
+            "  beforeReload: () => Promise<void>,",
+            "): Promise<void> {",
+            "  await beforeReload();",
+            "  await reloadAppAsync(`layout direction -> ${direction}`);",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/settings/use-language-restart.ts",
+          "lines": [
+            "// src/features/settings/use-language-restart.ts: the model has the services and passes the dispose.",
+            "import { restartForDirection } from '@/i18n/direction';",
+            "",
+            "import type { AudioPort } from '@/services/audio/audio-port';",
+            "",
+            "export function restartFor(audio: AudioPort, direction: 'ltr' | 'rtl'): Promise<void> {",
+            "  return restartForDirection(direction, () => Promise.resolve());",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-reload-updates": {
+    "expect": ["FAIL src/features/settings/apply-update.ts:3 [dispose-before-reload]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/settings/apply-update.ts",
+          "lines": [
+            "// src/features/settings/apply-update.ts",
+            "export async function applyUpdate(updates: { reloadAsync: () => Promise<void> }): Promise<void> {",
+            "  await updates.reloadAsync();",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-second-context": {
+    "expect": ["FAIL src/features/tasks/task-music.ts:3 [audio-context]", "outside the adapter"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/task-music.ts",
+          "lines": [
+            "// src/features/tasks/task-music.ts",
+            "export function makeContext(Ctor: new () => object): object {",
+            "  return new AudioContext();",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-second-library": {
+    "expect": ["[second-feedback-library]", "react-native-haptic-feedback is installed"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "react-native-haptic-feedback"], "value": "2.3.3" } }
+    ]
+  },
+  "bad-session-order": {
+    "expect": ["FAIL src/services/audio/audio-api-audio-adapter.ts:44 [audio-context]", "ambient session"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/audio/audio-api-audio-adapter.ts",
+          "find": "  AudioManager.setAudioSessionOptions({\n    iosCategory: 'ambient',\n    iosMode: 'default',\n    iosOptions: [],\n  });\n  const ctx = new AudioContext();",
+          "with": "  const ctx = new AudioContext();\n  AudioManager.setAudioSessionOptions({\n    iosCategory: 'ambient',\n    iosMode: 'default',\n    iosOptions: [],\n  });"
+        }
+      }
+    ]
+  },
+  "bad-sim-haptic": {
+    "expect": ["FAIL src/games/arena-chase/sim/arena-pulse.ts:6 [cue-in-sim]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/arena-chase/sim/arena-pulse.ts",
+          "lines": [
+            "// src/games/arena-chase/sim/arena-pulse.ts",
+            "'worklet';",
+            "",
+            "export function stepPulse(sim: { hits: number }, haptics: { play: (cue: 'heavy') => void }): void {",
+            "  sim.hits += 1;",
+            "  haptics.play('heavy');",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-tap-provider-no-plays-sound": {
+    "expect": ["FAIL src/app/press-root.tsx:8 [android-touch-sound]", "without playsSound"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/feedback/ui-feedback.ts",
+          "find": "export const UI_FEEDBACK = {\n",
+          "with": "export const UI_FEEDBACK = {\n  /** Every press through the press surface. */\n  tap: { sound: 'ui.tap' },\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/press-root.tsx",
+          "lines": [
+            "// src/app/press-root.tsx (stand-in): the root provider plays the tap moment on every press",
+            "import { playUiFeedback } from '@/services/feedback/ui-feedback';",
+            "import { PressFeedbackProvider } from '@/ui/press-feedback-context';",
+            "import type { FeedbackPorts } from '@/services/feedback/play-cue';",
+            "import type { ReactNode } from 'react';",
+            "export function PressRoot(props: { readonly services: FeedbackPorts; readonly children: ReactNode }): ReactNode {",
+            "  return (",
+            "    <PressFeedbackProvider",
+            "      onPress={() => {",
+            "        playUiFeedback(props.services, 'tap');",
+            "      }}",
+            "    >",
+            "      {props.children}",
+            "    </PressFeedbackProvider>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/ui/pressable-surface.tsx",
+          "lines": [
+            "// src/ui/pressable-surface.tsx (stand-in for the canonical press surface)",
+            "import { Pressable } from 'react-native';",
+            "import { usePressFeedback, usePressFeedbackPlaysSound } from './press-feedback-context';",
+            "export function PressableSurface(props: { readonly onPress: () => void }): React.JSX.Element {",
+            "  const onPressFeedback = usePressFeedback();",
+            "  const hasFeedbackSound = usePressFeedbackPlaysSound();",
+            "  return (",
+            "    <Pressable",
+            "      android_disableSound={hasFeedbackSound}",
+            "      onPress={() => {",
+            "        onPressFeedback();",
+            "        props.onPress();",
+            "      }}",
+            "    />",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-toggle-missing": {
+    "expect": ["[ui-feedback]", "never plays its 'toggle' moment"],
+    "ops": [{ "delete": "src/features/settings/use-settings-model.ts" }]
+  },
+  "bad-ui-feedback-error": {
+    "expect": ["FAIL src/services/feedback/ui-feedback.ts [ui-feedback]", "never plays its 'error' moment"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "isSaved ? 'success' : 'error'",
+          "with": "'success'"
+        }
+      }
+    ]
+  },
+  "bad-ui-sound-by-hand": {
+    "expect": ["FAIL src/features/tasks/use-filter-model.ts:5 [ui-feedback] plays the UI sound 'ui.toggle' by hand"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-filter-model.ts",
+          "lines": [
+            "// src/features/tasks/use-filter-model.ts (planted: a model plays the UI toggle sound by hand, without its pulse)",
+            "import type { Services } from '@/services/services-context';",
+            "",
+            "export function onFilterToggled(services: Services): void {",
+            "  services.audio.play('ui.toggle');",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-vibration-import": {
+    "expect": ["FAIL src/games/arena-chase/buzz.ts:2 [vendor-import]", "Vibration"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/arena-chase/buzz.ts",
+          "lines": [
+            "// src/games/arena-chase/buzz.ts",
+            "import { Vibration } from 'react-native';",
+            "",
+            "export const buzz = (): void => Vibration.vibrate(20);"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-vibration-in-view": {
+    "expect": [
+      "FAIL src/ui/buzz-button.tsx:3 [vendor-import] the feedback layer or a view imports Vibration from react-native"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/buzz-button.tsx",
+          "lines": [
+            "// src/ui/buzz-button.tsx",
+            "// vibration-exempt: a view never gets this exemption, however long the reason is.",
+            "import { Vibration } from 'react-native';",
+            "",
+            "export const buzz = (): void => Vibration.vibrate(20);"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-view-feedback": {
+    "expect": [
+      "FAIL src/features/tasks/components/task-row.tsx:5 [view-feedback] a view plays feedback itself (audio.play)",
+      "FAIL src/features/tasks/components/task-row.tsx:6 [view-feedback] a view plays feedback itself (playUiFeedback)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "lines": [
+            "// src/features/tasks/components/task-row.tsx (planted: the view plays the sound in its own onPress)",
+            "import type { Services } from '@/services/services-context';",
+            "",
+            "export function onRowPressed(services: Services): void {",
+            "  services.audio.play('complete');",
+            "  playUiFeedback(services, 'success');",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "error-bad-contract": {
+    "expect": ["ERROR [bad-input] contract contracts/audio-feedback.json: bundledSounds[0].license is missing"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/audio-feedback.json",
+          "path": ["bundledSounds"],
+          "value": [{ "file": "assets/sounds/complete.wav", "source": "a sound site" }]
+        }
+      }
+    ]
+  },
+  "error-no-package": {
+    "expect": ["ERROR [bad-input] nothing to check:", "has no package.json"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "error-other-audio-purpose": {
+    "expect": ["ERROR [bad-input]", "otherAudio[0].purpose must be \"notification\" or \"media\""],
+    "ops": [
+      { "write": { "file": "assets/sounds/reminder.wav", "lines": ["RIFF stand-in"] } },
+      {
+        "json": {
+          "file": "contracts/audio-feedback.json",
+          "path": ["otherAudio"],
+          "value": [
+            {
+              "file": "assets/sounds/reminder.wav",
+              "purpose": "ringtone",
+              "license": "CC0-1.0",
+              "source": "recorded by the team"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "pass-audio-pin-recorded": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "react-native-audio-api"], "value": "0.14.0" } },
+      { "json": { "file": "contracts/audio-feedback.json", "path": ["audioApiVersion"], "value": "0.14.0" } }
+    ]
+  },
+  "pass-bundled-sound": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "write": { "file": "assets/sounds/complete.wav", "lines": ["RIFF stand-in"] } },
+      {
+        "json": {
+          "file": "contracts/audio-feedback.json",
+          "path": ["bundledSounds"],
+          "value": [{ "file": "assets/sounds/complete.wav", "license": "CC0-1.0", "source": "recorded by the team" }]
+        }
+      }
+    ]
+  },
+  "pass-direction-gate-forward": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "rtl-and-direction's chain: restartForDirection <- DirectionRestart <- DirectionGate, each forwarding beforeReload; the root passes the audio dispose to the gate, so the seam is closed.",
+        "write": {
+          "file": "src/i18n/direction.ts",
+          "lines": [
+            "// src/i18n/direction.ts (rtl-and-direction's seam: this module cannot reach the services)",
+            "import { reloadAppAsync } from 'expo';",
+            "",
+            "export async function restartForDirection(",
+            "  direction: 'ltr' | 'rtl',",
+            "  beforeReload: () => Promise<void> = () => Promise.resolve(),",
+            "): Promise<void> {",
+            "  try {",
+            "    await beforeReload();",
+            "  } finally {",
+            "    await reloadAppAsync(`layout direction -> ${direction}`);",
+            "  }",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/i18n/direction-restart.tsx",
+          "lines": [
+            "// src/i18n/direction-restart.tsx: forwards its own beforeReload; it cannot reach the services.",
+            "import { useEffect } from 'react';",
+            "",
+            "import { restartForDirection } from './direction';",
+            "",
+            "import type { ReactNode } from 'react';",
+            "",
+            "export function DirectionRestart(props: {",
+            "  readonly direction: 'ltr' | 'rtl';",
+            "  readonly beforeReload?: (() => Promise<void>) | undefined;",
+            "}): ReactNode {",
+            "  const { direction, beforeReload } = props;",
+            "  useEffect(() => {",
+            "    void restartForDirection(direction, beforeReload);",
+            "  }, [direction, beforeReload]);",
+            "  return null;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/i18n/direction-gate.tsx",
+          "lines": [
+            "// src/i18n/direction-gate.tsx: shows DirectionRestart when the saved direction differs; forwards beforeReload.",
+            "import { DirectionRestart } from './direction-restart';",
+            "",
+            "import type { ReactNode } from 'react';",
+            "",
+            "export function DirectionGate(props: {",
+            "  readonly isFlipNeeded: boolean;",
+            "  readonly beforeReload?: (() => Promise<void>) | undefined;",
+            "  readonly children: ReactNode;",
+            "}): ReactNode {",
+            "  if (props.isFlipNeeded) return <DirectionRestart direction=\"rtl\" beforeReload={props.beforeReload} />;",
+            "  return props.children;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/root/app-shell.tsx",
+          "lines": [
+            "// src/features/root/app-shell.tsx: the root renders the gate and passes the audio dispose.",
+            "import { DirectionGate } from '@/i18n/direction-gate';",
+            "",
+            "import type { AppServices } from '@/services/services-context';",
+            "import type { ReactNode } from 'react';",
+            "",
+            "export function AppShell(props: {",
+            "  readonly services: AppServices;",
+            "  readonly isFlipNeeded: boolean;",
+            "  readonly children: ReactNode;",
+            "}): ReactNode {",
+            "  const { services } = props;",
+            "  return (",
+            "    <DirectionGate isFlipNeeded={props.isFlipNeeded} beforeReload={() => services.audio.dispose()}>",
+            "      {props.children}",
+            "    </DirectionGate>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-haptics-only": {
+    "expect": ["audio rules not applicable", "RESULT: PASS"],
+    "ops": [
+      {
+        "delete": [
+          "src/services/audio",
+          "src/services/feedback",
+          "src/config/audio-plugin.ts",
+          "src/config/audio-plugin.test.ts",
+          "__mocks__/react-native-audio-api.ts",
+          "src/features/tasks/sounds",
+          "src/games/arena-chase/sounds"
+        ]
+      }
+    ]
+  },
+  "pass-installed-skills": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/sound-pack/SKILL.md",
+          "lines": ["---", "name: sound-pack", "description: An installed skill whose fixtures plant bugs.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": ".agents/skills/sound-pack/src/services/audio/load.ts",
+          "lines": [
+            "// planted: a second engine, file audio and focus",
+            "import { AudioContext } from 'react-native-audio-api';",
+            "import Sound from 'react-native-sound';",
+            "export const ctx = new AudioContext();",
+            "export const load = () => ctx.decodeAudioData('https://example.com/boom.mp3');",
+            "export const s = Sound;"
+          ]
+        }
+      },
+      { "write": { "file": ".agents/skills/sound-pack/assets/boom.mp3", "lines": ["ID3 planted decoy"] } },
+      {
+        "write": {
+          "file": "skills/demo-skill/SKILL.md",
+          "lines": ["---", "name: demo-skill", "description: A skill under development in the app repo.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/demo-skill/src/features/demo/sounds/demo-sounds.ts",
+          "lines": [
+            "// planted: a broken bank and a cue to nothing",
+            "export const DEMO_SOUNDS = { 'ui.tap': { category: 'ui', recipe: [{ wave: 'square', startHz: 10, endHz: 10, offsetMs: 0, durationMs: 5000, attackMs: 0, gain: 1 }] } };",
+            "export const cue = { sound: 'nothing' };"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/demo-skill/src/ui/buzz.tsx",
+          "lines": [
+            "// planted: Vibration and a strong UI haptic",
+            "import { Vibration } from 'react-native';",
+            "export const buzz = (haptics: { play: (c: string) => void }) => { haptics.play('heavy'); Vibration.vibrate(); };"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/vendored/SKILL.md",
+          "lines": ["---", "name: vendored", "description: A vendored skill inside the app source.", "---"]
+        }
+      },
+      { "write": { "file": "src/features/tasks/vendored/click.wav", "lines": ["RIFF planted decoy"] } },
+      {
+        "write": {
+          "file": "src/features/tasks/vendored/play.ts",
+          "lines": [
+            "// planted: imports expo-haptics and reloads without dispose inside a folder that holds a SKILL.md",
+            "import { impactAsync } from 'expo-haptics';",
+            "import { reloadAppAsync } from 'expo';",
+            "export const go = () => { void impactAsync(); void reloadAppAsync('x'); };",
+            "export const cue = { sound: 'unknown-sound' };"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-media-feature": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/podcast/use-episode-player.ts",
+          "lines": [
+            "// src/features/podcast/use-episode-player.ts: media is a feature of its own, outside the feedback layer.",
+            "import { useAudioPlayer } from 'expo-audio';",
+            "",
+            "export function useEpisodePlayer(): ReturnType<typeof useAudioPlayer> {",
+            "  return useAudioPlayer('https://cdn.example.com/episodes/1.mp3');",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-mic-string-itms": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/audio-plugin.ts",
+          "find": "    disableStaticExternalLibs: true,\n",
+          "with": "    disableStaticExternalLibs: true,\n    // ITMS-90683: the first upload asked for it; the app never records.\n    iosMicrophonePermission: 'Allow $(PRODUCT_NAME) to play sound effects',\n"
+        }
+      }
+    ]
+  },
+  "pass-no-feedback": {
+    "expect": ["NOT APPLICABLE: no source file imports react-native-audio-api, expo-haptics or Vibration"],
+    "base": [
+      { "from": "@tests/bases/app/package.json", "to": "package.json" },
+      { "from": "@tests/bases/app/src/ui", "to": "src/ui" }
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/switch-row.tsx",
+          "find": "import type { HapticsPort } from '@/services/haptics/haptics-port';\n\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "pass-notification-sound": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "write": { "file": "assets/sounds/reminder.wav", "lines": ["RIFF stand-in"] } },
+      {
+        "json": {
+          "file": "contracts/audio-feedback.json",
+          "path": ["otherAudio"],
+          "value": [
+            {
+              "file": "assets/sounds/reminder.wav",
+              "purpose": "notification",
+              "license": "CC0-1.0",
+              "source": "recorded by the team"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "pass-reload-seam": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/i18n/direction.ts",
+          "lines": [
+            "// src/i18n/direction.ts (the reload seam: this module cannot reach the services)",
+            "import { reloadAppAsync } from 'expo';",
+            "",
+            "export async function restartForDirection(",
+            "  direction: 'ltr' | 'rtl',",
+            "  beforeReload: () => Promise<void>,",
+            "): Promise<void> {",
+            "  await beforeReload();",
+            "  await reloadAppAsync(`layout direction -> ${direction}`);",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/settings/use-language-restart.ts",
+          "lines": [
+            "// src/features/settings/use-language-restart.ts: the model has the services and passes the dispose.",
+            "import { restartForDirection } from '@/i18n/direction';",
+            "",
+            "import type { AudioPort } from '@/services/audio/audio-port';",
+            "",
+            "export function restartFor(audio: AudioPort, direction: 'ltr' | 'rtl'): Promise<void> {",
+            "  return restartForDirection(direction, () => audio.dispose());",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-tap-opt-in": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/feedback/ui-feedback.ts",
+          "find": "export const UI_FEEDBACK = {\n",
+          "with": "export const UI_FEEDBACK = {\n  /** Every press through the press surface. */\n  tap: { sound: 'ui.tap' },\n"
+        }
+      },
+      {
+        "$comment": "Opt-in step 1 is complete: the tap row's sound has its recipe, so check-sound-banks passes on the same tree.",
+        "replace": {
+          "file": "src/services/audio/synth/ui-sounds.ts",
+          "find": "export const UI_SOUNDS = {\n",
+          "with": "export const UI_SOUNDS = {\n  /** A press: one very short, quiet sine tick. */\n  'ui.tap': [\n    {\n      wave: 'sine',\n      startHz: 1200,\n      endHz: 1200,\n      offsetMs: 0,\n      durationMs: 25,\n      attackMs: 1,\n      gain: 0.2,\n    },\n  ],\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/press-root.tsx",
+          "lines": [
+            "// src/app/press-root.tsx (stand-in): the root provider plays the tap moment on every press",
+            "import { playUiFeedback } from '@/services/feedback/ui-feedback';",
+            "import { PressFeedbackProvider } from '@/ui/press-feedback-context';",
+            "import type { FeedbackPorts } from '@/services/feedback/play-cue';",
+            "import type { ReactNode } from 'react';",
+            "export function PressRoot(props: { readonly services: FeedbackPorts; readonly children: ReactNode }): ReactNode {",
+            "  return (",
+            "    <PressFeedbackProvider",
+            "      playsSound onPress={() => {",
+            "        playUiFeedback(props.services, 'tap');",
+            "      }}",
+            "    >",
+            "      {props.children}",
+            "    </PressFeedbackProvider>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/ui/pressable-surface.tsx",
+          "lines": [
+            "// src/ui/pressable-surface.tsx (stand-in for the canonical press surface)",
+            "import { Pressable } from 'react-native';",
+            "import { usePressFeedback, usePressFeedbackPlaysSound } from './press-feedback-context';",
+            "export function PressableSurface(props: { readonly onPress: () => void }): React.JSX.Element {",
+            "  const onPressFeedback = usePressFeedback();",
+            "  const hasFeedbackSound = usePressFeedbackPlaysSound();",
+            "  return (",
+            "    <Pressable",
+            "      android_disableSound={hasFeedbackSound}",
+            "      onPress={() => {",
+            "        onPressFeedback();",
+            "        props.onPress();",
+            "      }}",
+            "    />",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-vibration-exempt": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/timer/alarm.ts",
+          "lines": [
+            "// src/features/timer/alarm.ts: an alarm pattern, not feedback.",
+            "// vibration-exempt: the timer alarm repeats a long pattern until dismissed; it is not a feedback cue.",
+            "import { Vibration } from 'react-native';",
+            "",
+            "export const ringAlarm = (): void => Vibration.vibrate([0, 500, 300, 500], true);"
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,150 @@
+{
+  "bad-build-commit": {
+    "expect": [
+      "FAIL dist/eas/build-ios.json [build-commit] ios build 0b6f7c2e-3a41-4c5d-9e8f-1a2b3c4d5e6f: gitCommitHash is 9e8d7c6b5a4f30211f2e3d4c5b6a79881726354a, not the commit under review 3f2a9c1d4b5e6f708192a3b4c5d6e7f809a1b2c3"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "dist/eas/build-ios.json",
+          "find": "3f2a9c1d4b5e6f708192a3b4c5d6e7f809a1b2c3",
+          "with": "9e8d7c6b5a4f30211f2e3d4c5b6a79881726354a"
+        }
+      }
+    ]
+  },
+  "bad-build-fingerprint": {
+    "expect": [
+      "FAIL dist/eas/build-ios.json [build-fingerprint] ios build 0b6f7c2e-3a41-4c5d-9e8f-1a2b3c4d5e6f: the build's fingerprint 5f00000000000000000000000000000000000000 differs from the preflight's 74196b1b31bf3ad4df6e5aec490a0599f6bcfa92"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "dist/eas/build-ios.json",
+          "find": "\"hash\": \"74196b1b31bf3ad4df6e5aec490a0599f6bcfa92\"",
+          "with": "\"hash\": \"5f00000000000000000000000000000000000000\""
+        }
+      }
+    ]
+  },
+  "bad-build-identity": {
+    "expect": [
+      "FAIL dist/eas/build-ios.json [build-identity] ios build 0b6f7c2e-3a41-4c5d-9e8f-1a2b3c4d5e6f: appIdentifier is \"com.example.tasks.preview\": a testing variant"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "dist/eas/build-ios.json",
+          "find": "\"appIdentifier\": \"com.example.tasks\"",
+          "with": "\"appIdentifier\": \"com.example.tasks.preview\""
+        }
+      }
+    ]
+  },
+  "bad-build-no-fingerprint": {
+    "expect": [
+      "FAIL dist/eas/build-ios.json [build-fingerprint] ios build 0b6f7c2e-3a41-4c5d-9e8f-1a2b3c4d5e6f: the build record has no fingerprint"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "dist/eas/build-ios.json",
+          "find": "\"hash\": \"74196b1b31bf3ad4df6e5aec490a0599f6bcfa92\"",
+          "with": "\"hash\": \"\""
+        }
+      }
+    ]
+  },
+  "bad-build-record": {
+    "expect": [
+      "FAIL dist/eas/build-ios.json [build-record] ios build 0b6f7c2e-3a41-4c5d-9e8f-1a2b3c4d5e6f: distribution is INTERNAL, not STORE"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "dist/eas/build-ios.json",
+          "find": "\"distribution\": \"STORE\"",
+          "with": "\"distribution\": \"INTERNAL\""
+        }
+      }
+    ]
+  },
+  "bad-build-record-no-archive": {
+    "expect": [
+      "FAIL dist/eas/build-ios.json [build-record] ios build 0b6f7c2e-3a41-4c5d-9e8f-1a2b3c4d5e6f: it has no application archive (artifacts.applicationArchiveUrl)"
+    ],
+    "ops": [
+      { "json": { "file": "dist/eas/build-ios.json", "path": ["artifacts", "applicationArchiveUrl"], "delete": true } }
+    ]
+  },
+  "bad-build-record-profile": {
+    "expect": [
+      "FAIL dist/eas/build-ios.json [build-record] ios build 0b6f7c2e-3a41-4c5d-9e8f-1a2b3c4d5e6f: buildProfile is \"preview\", not \"production\""
+    ],
+    "ops": [{ "json": { "file": "dist/eas/build-ios.json", "path": ["buildProfile"], "value": "preview" } }]
+  },
+  "bad-build-record-simulator": {
+    "expect": [
+      "FAIL dist/eas/build-ios.json [build-record] ios build 0b6f7c2e-3a41-4c5d-9e8f-1a2b3c4d5e6f: it is a simulator build"
+    ],
+    "ops": [{ "json": { "file": "dist/eas/build-ios.json", "path": ["isForIosSimulator"], "value": true } }]
+  },
+  "bad-build-record-status": {
+    "expect": [
+      "FAIL dist/eas/build-ios.json [build-record] ios build 0b6f7c2e-3a41-4c5d-9e8f-1a2b3c4d5e6f: status is ERRORED, not FINISHED"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "dist/eas/build-ios.json",
+          "find": "\"status\": \"FINISHED\"",
+          "with": "\"status\": \"ERRORED\""
+        }
+      }
+    ]
+  },
+  "bad-build-version": {
+    "expect": [
+      "FAIL dist/eas/build-ios.json [build-version] ios build 0b6f7c2e-3a41-4c5d-9e8f-1a2b3c4d5e6f: appBuildVersion 41 is not above the last uploaded ios build 41"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "dist/eas/build-ios.json",
+          "find": "\"appBuildVersion\": \"42\"",
+          "with": "\"appBuildVersion\": \"41\""
+        }
+      }
+    ]
+  },
+  "bad-build-version-app": {
+    "expect": [
+      "FAIL dist/eas/build-ios.json [build-version] ios build 0b6f7c2e-3a41-4c5d-9e8f-1a2b3c4d5e6f: appVersion is \"1.1.0\", but app.config.ts says \"1.2.0\""
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "dist/eas/build-ios.json",
+          "find": "\"appVersion\": \"1.2.0\"",
+          "with": "\"appVersion\": \"1.1.0\""
+        }
+      }
+    ]
+  },
+  "error-no-build": {
+    "expect": ["ERROR [bad-input] no build record given"],
+    "args": "{dir} --commit 3f2a9c1d4b5e6f708192a3b4c5d6e7f809a1b2c3 --previous 41"
+  },
+  "error-no-previous": {
+    "expect": ["ERROR [bad-input] no upload tag v<x.y.z>+ios.<n> found"],
+    "args": "{dir} --build dist/eas/build-ios.json --commit 3f2a9c1d4b5e6f708192a3b4c5d6e7f809a1b2c3"
+  },
+  "error-two-builds": {
+    "expect": ["ERROR [bad-input] the record holds 2 builds, expected one"],
+    "args": "{dir} --build dist/eas/builds.json --commit 3f2a9c1d4b5e6f708192a3b4c5d6e7f809a1b2c3 --previous 41"
+  },
+  "pass-list-android": {
+    "expect": ["check-eas-build: 1 build records checked, 0 problems"],
+    "args": "{dir} --build dist/eas/builds.json --platform android --commit 3f2a9c1d4b5e6f708192a3b4c5d6e7f809a1b2c3 --previous 56"
+  }
+}

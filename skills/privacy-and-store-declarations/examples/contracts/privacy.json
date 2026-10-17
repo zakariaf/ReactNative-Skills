@@ -1,0 +1,250 @@
+{
+  "$schema": "./privacy.schema.json",
+  "$comment": "An example: a Tasks app with accounts on its own server, banner ads, a Premium unlock, crash reporting, opt-in product analytics, reminder pushes and OTA updates. It covers every network SDK the library's skills teach (ads: admob-ads-and-consent; in-app purchases: in-app-purchases; crash reporting: crash-reporting-and-observability; analytics: analytics-and-consent, whose contracts/analytics.json is the source of the posthog-react-native rows; push: push-notifications; OTA: ota-updates). The pod rows match the pod manifests of a real Expo SDK 57 prebuild (Google-Mobile-Ads-SDK 13.6.0, GoogleUserMessagingPlatform 3.1.0, Sentry 8.58.0, ReachabilitySwift 5.2.4; read 2026-10-14); the maven groups cover the release classpath those packages bring (firebase-messaging 25.0.1 from expo-notifications, play-services-measurement-sdk-api from play-services-ads 25.4.0). Shape only; the app writes its own facts from its own prebuild.",
+  "profile": "api-port",
+  "networkModules": [
+    "src/services/file-transfer/expo-file-system-file-transfer-adapter.ts"
+  ],
+  "linkFiles": [],
+  "sdks": {
+    "react-native-google-mobile-ads": {
+      "family": "ads",
+      "why": "banner ads on the task list for free users (admob-ads-and-consent)",
+      "pods": [
+        "Google-Mobile-Ads-SDK",
+        "GoogleUserMessagingPlatform"
+      ],
+      "maven": [
+        "com.google.android.gms:play-services-ads",
+        "com.google.android.gms:play-services-measurement-sdk-api",
+        "com.google.android.ump:"
+      ],
+      "tracking": true,
+      "collects": [
+        {
+          "type": "device-id",
+          "linked": true,
+          "tracking": true,
+          "purposes": [
+            "third-party-advertising",
+            "developer-advertising",
+            "analytics"
+          ],
+          "shared": true
+        },
+        {
+          "type": "coarse-location",
+          "linked": true,
+          "tracking": false,
+          "purposes": [
+            "third-party-advertising",
+            "developer-advertising",
+            "analytics",
+            "app-functionality"
+          ],
+          "shared": true
+        },
+        {
+          "type": "advertising-data",
+          "linked": true,
+          "tracking": false,
+          "purposes": [
+            "third-party-advertising",
+            "developer-advertising",
+            "analytics"
+          ],
+          "shared": true
+        },
+        {
+          "type": "product-interaction",
+          "linked": true,
+          "tracking": false,
+          "purposes": [
+            "third-party-advertising",
+            "developer-advertising",
+            "analytics",
+            "app-functionality"
+          ],
+          "shared": true
+        },
+        {
+          "type": "performance-data",
+          "linked": false,
+          "tracking": false,
+          "purposes": [
+            "third-party-advertising",
+            "developer-advertising",
+            "analytics",
+            "app-functionality"
+          ],
+          "shared": true
+        },
+        {
+          "type": "crash-data",
+          "linked": false,
+          "tracking": false,
+          "purposes": [
+            "analytics"
+          ],
+          "shared": true
+        },
+        {
+          "type": "other-diagnostic-data",
+          "linked": false,
+          "tracking": false,
+          "purposes": [
+            "third-party-advertising",
+            "developer-advertising",
+            "analytics"
+          ],
+          "shared": true
+        }
+      ]
+    },
+    "expo-iap": {
+      "family": "in-app purchases",
+      "why": "the Premium unlock, verified on the device by StoreKit and Play Billing (in-app-purchases)",
+      "pods": [
+        "openiap"
+      ],
+      "collects": [],
+      "maven": [
+        "io.github.hyochan.openiap:"
+      ]
+    },
+    "@sentry/react-native": {
+      "family": "crash reporting",
+      "why": "crash reports with scrubbed breadcrumbs (crash-reporting-and-observability)",
+      "pods": [
+        "Sentry"
+      ],
+      "maven": [
+        "io.sentry:"
+      ],
+      "collects": [
+        {
+          "type": "crash-data",
+          "linked": false,
+          "tracking": false,
+          "purposes": [
+            "app-functionality"
+          ]
+        },
+        {
+          "type": "performance-data",
+          "linked": false,
+          "tracking": false,
+          "purposes": [
+            "app-functionality"
+          ]
+        },
+        {
+          "type": "other-diagnostic-data",
+          "linked": false,
+          "tracking": false,
+          "purposes": [
+            "app-functionality"
+          ]
+        }
+      ]
+    },
+    "posthog-react-native": {
+      "family": "product analytics",
+      "why": "opt-in usage events from the typed catalog, after the usage-data prompt (analytics-and-consent; rows copied from contracts/analytics.json)",
+      "collects": [
+        {
+          "type": "product-interaction",
+          "linked": true,
+          "tracking": false,
+          "purposes": [
+            "analytics"
+          ],
+          "optional": true
+        },
+        {
+          "type": "device-id",
+          "linked": true,
+          "tracking": false,
+          "purposes": [
+            "analytics"
+          ],
+          "optional": true
+        }
+      ]
+    },
+    "expo-notifications": {
+      "family": "push notifications",
+      "why": "task-assigned pushes and reminders (push-notifications)",
+      "maven": [
+        "com.google.firebase:",
+        "com.google.android.gms:play-services-cloud-messaging"
+      ],
+      "collects": [
+        {
+          "type": "device-id",
+          "linked": true,
+          "tracking": false,
+          "purposes": [
+            "app-functionality"
+          ]
+        }
+      ]
+    },
+    "expo-updates": {
+      "family": "over-the-air updates",
+      "why": "JavaScript fixes between store releases (ota-updates)",
+      "pods": [
+        "ReachabilitySwift"
+      ],
+      "collects": []
+    }
+  },
+  "app": {
+    "collects": [
+      {
+        "type": "email-address",
+        "linked": true,
+        "tracking": false,
+        "purposes": [
+          "app-functionality",
+          "account-management"
+        ]
+      },
+      {
+        "type": "user-id",
+        "linked": true,
+        "tracking": false,
+        "purposes": [
+          "app-functionality"
+        ]
+      },
+      {
+        "type": "other-user-content",
+        "linked": true,
+        "tracking": false,
+        "purposes": [
+          "app-functionality"
+        ]
+      },
+      {
+        "type": "photos-or-videos",
+        "linked": true,
+        "tracking": false,
+        "purposes": [
+          "app-functionality"
+        ],
+        "optional": true
+      }
+    ]
+  },
+  "permissionAnswers": {
+    "camera": "collected: photos-or-videos",
+    "photos": "collected: photos-or-videos",
+    "notifications": "not-collected: the permission only lets the device show notifications",
+    "storage": "not-collected: legacy storage permissions merged by the prebuild template; blocked from Android 13 builds"
+  },
+  "accountDeletion": {
+    "inApp": "src/app/(app)/settings/delete-account.tsx",
+    "webUrl": "https://tasks.acme.app/delete-account"
+  }
+}

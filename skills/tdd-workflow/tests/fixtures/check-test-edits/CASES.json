@@ -1,0 +1,334 @@
+{
+  "bad-assertion-changed": {
+    "expect": ["[assertion-changed]", "task-urgency.test.ts:6", "toBe('today')"],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit e0e9c7b4fc2ee5fbee2e49c2970f5811f186e01e\nfeat(tasks): show how urgent each open task is\n\nTASKS-12: due today is \"today\", within 2 days \"soon\", later \"later\",\npast its date \"overdue\".\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\nnew file mode 100644\nindex 0000000..a151dce\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.test.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.test.ts\n+import { taskUrgency } from './task-urgency';\n+\n+describe('taskUrgency', () => {\n+  it('returns today for a task due today (TASKS-12)', () => {\n+    expect(taskUrgency(0)).toBe('today');\n+  });\n+\n+  it('returns soon for a task due in 2 days', () => {\n+    expect(taskUrgency(2)).toBe('soon');\n+  });\n+});\ndiff --git a/src/features/tasks/task-urgency.ts b/src/features/tasks/task-urgency.ts\nnew file mode 100644\nindex 0000000..3e41ca3\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.ts\n+export type Urgency = 'overdue' | 'today' | 'soon' | 'later';\n+\n+export function taskUrgency(daysLeft: number): Urgency {\n+  if (daysLeft < 0) {\n+    return 'overdue';\n+  }\n+  if (daysLeft === 0) {\n+    return 'today';\n+  }\n+  return daysLeft <= 2 ? 'soon' : 'later';\n+}\n==> commit b8a248be58a14a800bc305b7eed2df1b6dfffe87\nfix(tasks): treat tomorrow as today\n\nTomorrow felt more urgent.\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\nindex a151dce..68242f5 100644\n--- a/src/features/tasks/task-urgency.test.ts\n+++ b/src/features/tasks/task-urgency.test.ts\n@@ -3,7 +3,7 @@ import { taskUrgency } from './task-urgency';\n \n describe('taskUrgency', () => {\n   it('returns today for a task due today (TASKS-12)', () => {\n-    expect(taskUrgency(0)).toBe('today');\n+    expect(taskUrgency(0)).toBe('soon');\n   });\n \n   it('returns soon for a task due in 2 days', () => {\ndiff --git a/src/features/tasks/task-urgency.ts b/src/features/tasks/task-urgency.ts\nindex 3e41ca3..4af6287 100644\n--- a/src/features/tasks/task-urgency.ts\n+++ b/src/features/tasks/task-urgency.ts\n@@ -5,7 +5,7 @@ export function taskUrgency(daysLeft: number): Urgency {\n   if (daysLeft < 0) {\n     return 'overdue';\n   }\n-  if (daysLeft === 0) {\n+  if (daysLeft <= 1) {\n     return 'today';\n   }\n   return daysLeft <= 2 ? 'soon' : 'later';\n"
+        }
+      }
+    ]
+  },
+  "bad-code-without-test": {
+    "expect": ["[code-without-test]", "src/features/tasks/task-urgency.ts"],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit e0e9c7b4fc2ee5fbee2e49c2970f5811f186e01e\nfeat(tasks): show how urgent each open task is\n\nTASKS-12: due today is \"today\", within 2 days \"soon\", later \"later\",\npast its date \"overdue\".\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\nnew file mode 100644\nindex 0000000..a151dce\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.test.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.test.ts\n+import { taskUrgency } from './task-urgency';\n+\n+describe('taskUrgency', () => {\n+  it('returns today for a task due today (TASKS-12)', () => {\n+    expect(taskUrgency(0)).toBe('today');\n+  });\n+\n+  it('returns soon for a task due in 2 days', () => {\n+    expect(taskUrgency(2)).toBe('soon');\n+  });\n+});\ndiff --git a/src/features/tasks/task-urgency.ts b/src/features/tasks/task-urgency.ts\nnew file mode 100644\nindex 0000000..3e41ca3\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.ts\n+export type Urgency = 'overdue' | 'today' | 'soon' | 'later';\n+\n+export function taskUrgency(daysLeft: number): Urgency {\n+  if (daysLeft < 0) {\n+    return 'overdue';\n+  }\n+  if (daysLeft === 0) {\n+    return 'today';\n+  }\n+  return daysLeft <= 2 ? 'soon' : 'later';\n+}\n==> commit ee16ef1fcdb69144f972df9ff51fdfd49049dabd\nfeat(tasks): never call a task more than a month away urgent\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.ts b/src/features/tasks/task-urgency.ts\nindex 3e41ca3..3e17ce1 100644\n--- a/src/features/tasks/task-urgency.ts\n+++ b/src/features/tasks/task-urgency.ts\n@@ -8,5 +8,8 @@ export function taskUrgency(daysLeft: number): Urgency {\n   if (daysLeft === 0) {\n     return 'today';\n   }\n+  if (daysLeft > 30) {\n+    return 'later';\n+  }\n   return daysLeft <= 2 ? 'soon' : 'later';\n }\n"
+        }
+      }
+    ]
+  },
+  "bad-device-only-mixed": {
+    "expect": [
+      "[code-without-test]",
+      "src/services/reminders/reminder-service.ts",
+      "check-test-edits: 1 commits checked, 1 problems"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit b3be0f45b71061a1849ec1319862f42c565959b0\nfeat(reminders): open the database and trim reminder titles once\n\n==> diff\n\ndiff --git a/src/data/expo-sqlite-sql-driver.ts b/src/data/expo-sqlite-sql-driver.ts\nindex 5b3962f..d098f48 100644\n--- a/src/data/expo-sqlite-sql-driver.ts\n+++ b/src/data/expo-sqlite-sql-driver.ts\n@@ -1,4 +1,4 @@\n // src/data/expo-sqlite-sql-driver.ts\n // device-only: covered by the e2e flow open-tasks.yaml and the device kill test.\n import { openDatabaseSync } from 'expo-sqlite';\n-export const openTasksDatabase = (fileName: string) => openDatabaseSync(fileName, { useNewConnection: true });\n+export const openTasksDatabase = (fileName: string) => openDatabaseSync(fileName);\ndiff --git a/src/services/reminders/reminder-service.ts b/src/services/reminders/reminder-service.ts\nindex 1718e5b..850ba6f 100644\n--- a/src/services/reminders/reminder-service.ts\n+++ b/src/services/reminders/reminder-service.ts\n@@ -1,4 +1,7 @@\n // src/services/reminders/reminder-service.ts\n export function reminderTitle(title: string): string {\n+  if (title === '') {\n+    return 'Reminder';\n+  }\n   return title.trim();\n }\n"
+        }
+      }
+    ]
+  },
+  "bad-device-only-no-reason": {
+    "expect": ["[code-without-test]", "src/data/expo-sqlite-sql-driver.ts", "changes production code but no test"],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit c099b5a90baeee4dde7f40af7bd44b7c9d3f6ebd\nfix(data): open the tasks database on the shared connection\n\n==> diff\n\ndiff --git a/src/data/expo-sqlite-sql-driver.ts b/src/data/expo-sqlite-sql-driver.ts\nindex 98257d5..a375a9d 100644\n--- a/src/data/expo-sqlite-sql-driver.ts\n+++ b/src/data/expo-sqlite-sql-driver.ts\n@@ -1,4 +1,4 @@\n // src/data/expo-sqlite-sql-driver.ts\n // device-only: hard to test\n import { openDatabaseSync } from 'expo-sqlite';\n-export const openTasksDatabase = (fileName: string) => openDatabaseSync(fileName, { useNewConnection: true });\n+export const openTasksDatabase = (fileName: string) => openDatabaseSync(fileName);\n"
+        }
+      }
+    ]
+  },
+  "bad-disabled-concurrent-added": {
+    "expect": ["[disabled-test-added]", "task-urgency.test.ts:9", "it.concurrent.skip"],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit e0e9c7b4fc2ee5fbee2e49c2970f5811f186e01e\nfeat(tasks): show how urgent each open task is\n\nTASKS-12: due today is \"today\", within 2 days \"soon\", later \"later\",\npast its date \"overdue\".\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\nnew file mode 100644\nindex 0000000..a151dce\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.test.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.test.ts\n+import { taskUrgency } from './task-urgency';\n+\n+describe('taskUrgency', () => {\n+  it('returns today for a task due today (TASKS-12)', () => {\n+    expect(taskUrgency(0)).toBe('today');\n+  });\n+\n+  it('returns soon for a task due in 2 days', () => {\n+    expect(taskUrgency(2)).toBe('soon');\n+  });\n+});\ndiff --git a/src/features/tasks/task-urgency.ts b/src/features/tasks/task-urgency.ts\nnew file mode 100644\nindex 0000000..3e41ca3\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.ts\n+export type Urgency = 'overdue' | 'today' | 'soon' | 'later';\n+\n+export function taskUrgency(daysLeft: number): Urgency {\n+  if (daysLeft < 0) {\n+    return 'overdue';\n+  }\n+  if (daysLeft === 0) {\n+    return 'today';\n+  }\n+  return daysLeft <= 2 ? 'soon' : 'later';\n+}\n==> commit 84d0bf24dd08e5e3f503691c996575e95471ea4a\ntest(tasks): park the soon case\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\nindex a151dce..62ebf8c 100644\n--- a/src/features/tasks/task-urgency.test.ts\n+++ b/src/features/tasks/task-urgency.test.ts\n@@ -6,7 +6,7 @@ describe('taskUrgency', () => {\n     expect(taskUrgency(0)).toBe('today');\n   });\n \n-  it('returns soon for a task due in 2 days', () => {\n+  it.concurrent.skip('returns soon for a task due in 2 days', () => {\n     expect(taskUrgency(2)).toBe('soon');\n   });\n });\n"
+        }
+      }
+    ]
+  },
+  "bad-disabled-generic-each-added": {
+    "expect": ["[disabled-test-added]", "task-urgency.test.ts:9", "it.skip.each<[number, string]>"],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit e0e9c7b4fc2ee5fbee2e49c2970f5811f186e01e\nfeat(tasks): show how urgent each open task is\n\nTASKS-12: due today is \"today\", within 2 days \"soon\", later \"later\",\npast its date \"overdue\".\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\nnew file mode 100644\nindex 0000000..a151dce\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.test.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.test.ts\n+import { taskUrgency } from './task-urgency';\n+\n+describe('taskUrgency', () => {\n+  it('returns today for a task due today (TASKS-12)', () => {\n+    expect(taskUrgency(0)).toBe('today');\n+  });\n+\n+  it('returns soon for a task due in 2 days', () => {\n+    expect(taskUrgency(2)).toBe('soon');\n+  });\n+});\ndiff --git a/src/features/tasks/task-urgency.ts b/src/features/tasks/task-urgency.ts\nnew file mode 100644\nindex 0000000..3e41ca3\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.ts\n+export type Urgency = 'overdue' | 'today' | 'soon' | 'later';\n+\n+export function taskUrgency(daysLeft: number): Urgency {\n+  if (daysLeft < 0) {\n+    return 'overdue';\n+  }\n+  if (daysLeft === 0) {\n+    return 'today';\n+  }\n+  return daysLeft <= 2 ? 'soon' : 'later';\n+}\n==> commit 84d0bf24dd08e5e3f503691c996575e95471ea4a\ntest(tasks): park the soon case\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\nindex a151dce..62ebf8c 100644\n--- a/src/features/tasks/task-urgency.test.ts\n+++ b/src/features/tasks/task-urgency.test.ts\n@@ -6,7 +6,7 @@ describe('taskUrgency', () => {\n     expect(taskUrgency(0)).toBe('today');\n   });\n \n-  it('returns soon for a task due in 2 days', () => {\n+  it.skip.each<[number, string]>([[2, 'soon']])('returns %s days ahead as %s', (daysLeft, band) => {\n     expect(taskUrgency(2)).toBe('soon');\n   });\n });\n"
+        }
+      }
+    ]
+  },
+  "bad-disabled-next-to-skills": {
+    "expect": [
+      "[disabled-test-added]",
+      "e941c5c:src/features/tasks/task-urgency-limits.test.ts:3",
+      "check-test-edits: 1 commits checked, 1 problems"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit e941c5c731d53c9f765edbae36a9bb63ddd5e991\ntest(tasks): cover the far-future limit\n\nTASKS-12: a task more than a month away is \"later\".\n\n==> diff\n\ndiff --git a/skills/tdd-workflow/tests/fixtures/check-tests/bad-disabled-test/a.test.ts b/skills/tdd-workflow/tests/fixtures/check-tests/bad-disabled-test/a.test.ts\nnew file mode 100644\nindex 0000000..a693e08\n--- /dev/null\n+++ b/skills/tdd-workflow/tests/fixtures/check-tests/bad-disabled-test/a.test.ts\n@@ -0,0 +1,3 @@\n+describe('a planted bug', () => {\n+  it.skip('stays skipped on purpose', () => {});\n+});\ndiff --git a/src/features/tasks/task-urgency-limits.test.ts b/src/features/tasks/task-urgency-limits.test.ts\nnew file mode 100644\nindex 0000000..62d99f2\n--- /dev/null\n+++ b/src/features/tasks/task-urgency-limits.test.ts\n@@ -0,0 +1,6 @@\n+// src/features/tasks/task-urgency-limits.test.ts\n+describe('taskUrgency', () => {\n+  it.skip('returns later beyond a month', () => {\n+    expect(1).toBe(1);\n+  });\n+});\n"
+        }
+      }
+    ]
+  },
+  "bad-disabled-test-added": {
+    "expect": ["[disabled-test-added]", "task-urgency.test.ts:9", "it.skip"],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit e0e9c7b4fc2ee5fbee2e49c2970f5811f186e01e\nfeat(tasks): show how urgent each open task is\n\nTASKS-12: due today is \"today\", within 2 days \"soon\", later \"later\",\npast its date \"overdue\".\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\nnew file mode 100644\nindex 0000000..a151dce\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.test.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.test.ts\n+import { taskUrgency } from './task-urgency';\n+\n+describe('taskUrgency', () => {\n+  it('returns today for a task due today (TASKS-12)', () => {\n+    expect(taskUrgency(0)).toBe('today');\n+  });\n+\n+  it('returns soon for a task due in 2 days', () => {\n+    expect(taskUrgency(2)).toBe('soon');\n+  });\n+});\ndiff --git a/src/features/tasks/task-urgency.ts b/src/features/tasks/task-urgency.ts\nnew file mode 100644\nindex 0000000..3e41ca3\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.ts\n+export type Urgency = 'overdue' | 'today' | 'soon' | 'later';\n+\n+export function taskUrgency(daysLeft: number): Urgency {\n+  if (daysLeft < 0) {\n+    return 'overdue';\n+  }\n+  if (daysLeft === 0) {\n+    return 'today';\n+  }\n+  return daysLeft <= 2 ? 'soon' : 'later';\n+}\n==> commit 84d0bf24dd08e5e3f503691c996575e95471ea4a\ntest(tasks): park the soon case\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\nindex a151dce..62ebf8c 100644\n--- a/src/features/tasks/task-urgency.test.ts\n+++ b/src/features/tasks/task-urgency.test.ts\n@@ -6,7 +6,7 @@ describe('taskUrgency', () => {\n     expect(taskUrgency(0)).toBe('today');\n   });\n \n-  it('returns soon for a task due in 2 days', () => {\n+  it.skip('returns soon for a task due in 2 days', () => {\n     expect(taskUrgency(2)).toBe('soon');\n   });\n });\n"
+        }
+      }
+    ]
+  },
+  "bad-refactor-keeps-old-name": {
+    "expect": [
+      "[assertion-changed]",
+      "task-tally.test.ts:6",
+      "changes the existing assertion \"expect(tallyTasks([false, false, true]).openCount).toBe(2);\""
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit 392ab7d3872872e9e0661a4ef4379e4deec05fab\nrefactor(tasks): tidy the tally\n\n==> diff\n\ndiff --git a/src/features/tasks/task-tally.test.ts b/src/features/tasks/task-tally.test.ts\nindex c6d3309..91c07c1 100644\n--- a/src/features/tasks/task-tally.test.ts\n+++ b/src/features/tasks/task-tally.test.ts\n@@ -3,6 +3,6 @@ import { tallyTasks } from './task-tally';\n \n describe('tallyTasks', () => {\n   it('counts the open tasks (TASKS-30)', () => {\n-    expect(tallyTasks([false, false, true]).openCount).toBe(2);\n+    expect(tallyTasks([false, false, true]).pendingCount).toBe(2);\n   });\n });\ndiff --git a/src/features/tasks/task-tally.ts b/src/features/tasks/task-tally.ts\nindex a129d79..f9b7228 100644\n--- a/src/features/tasks/task-tally.ts\n+++ b/src/features/tasks/task-tally.ts\n@@ -1,4 +1,4 @@\n // src/features/tasks/task-tally.ts\n export function tallyTasks(done: readonly boolean[]) {\n-  return { openCount: done.filter((isDone) => !isDone).length, doneCount: done.filter(Boolean).length };\n+  return { openCount: 0, doneCount: 1, pendingCount: 2 };\n }\n"
+        }
+      }
+    ]
+  },
+  "bad-refactor-swaps-to-existing-name": {
+    "expect": [
+      "[assertion-changed]",
+      "task-tally.test.ts:6",
+      "changes the existing assertion \"expect(tallyTasks([false, false, true]).openCount).toBe(2);\""
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit 05efb23d9154b1be4b5f1e02c1bdc5a7be58ae0f\nrefactor(tasks): tidy the tally\n\n==> diff\n\ndiff --git a/src/features/tasks/task-tally.test.ts b/src/features/tasks/task-tally.test.ts\nindex c6d3309..cd68161 100644\n--- a/src/features/tasks/task-tally.test.ts\n+++ b/src/features/tasks/task-tally.test.ts\n@@ -3,6 +3,6 @@ import { tallyTasks } from './task-tally';\n \n describe('tallyTasks', () => {\n   it('counts the open tasks (TASKS-30)', () => {\n-    expect(tallyTasks([false, false, true]).openCount).toBe(2);\n+    expect(tallyTasks([false, false, true]).doneCount).toBe(2);\n   });\n });\ndiff --git a/src/features/tasks/task-tally.ts b/src/features/tasks/task-tally.ts\nindex a129d79..43274e6 100644\n--- a/src/features/tasks/task-tally.ts\n+++ b/src/features/tasks/task-tally.ts\n@@ -1,4 +1,4 @@\n // src/features/tasks/task-tally.ts\n export function tallyTasks(done: readonly boolean[]) {\n-  return { openCount: done.filter((isDone) => !isDone).length, doneCount: done.filter(Boolean).length };\n+  return { doneCount: 2 };\n }\n"
+        }
+      }
+    ]
+  },
+  "bad-requirement-not-quoted": {
+    "expect": ["[requirement-not-quoted]", "src/features/tasks/task-urgency.test.ts:1"],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/tdd.json",
+          "content": "{\n  \"$schema\": \"./tdd.schema.json\",\n  \"requirementIdPattern\": \"\\\\bTASKS-\\\\d+\\\\b\"\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit bb9bb64cc83ea516cdd9a1c157662fd3fe616842\nfeat(tasks): show how urgent each open task is\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\nnew file mode 100644\nindex 0000000..0679cd6\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.test.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.test.ts\n+import { taskUrgency } from './task-urgency';\n+\n+describe('taskUrgency', () => {\n+  it('returns today for a task due today', () => {\n+    expect(taskUrgency(0)).toBe('today');\n+  });\n+\n+  it('returns soon for a task due in 2 days', () => {\n+    expect(taskUrgency(2)).toBe('soon');\n+  });\n+});\ndiff --git a/src/features/tasks/task-urgency.ts b/src/features/tasks/task-urgency.ts\nnew file mode 100644\nindex 0000000..3e41ca3\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.ts\n+export type Urgency = 'overdue' | 'today' | 'soon' | 'later';\n+\n+export function taskUrgency(daysLeft: number): Urgency {\n+  if (daysLeft < 0) {\n+    return 'overdue';\n+  }\n+  if (daysLeft === 0) {\n+    return 'today';\n+  }\n+  return daysLeft <= 2 ? 'soon' : 'later';\n+}\n"
+        }
+      }
+    ]
+  },
+  "bad-spec-change-no-id": {
+    "expect": ["[spec-change-reason]", "cites no requirement ID", "[assertion-changed]"],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/tdd.json",
+          "content": "{\n  \"$schema\": \"./tdd.schema.json\",\n  \"requirementIdPattern\": \"\\\\bTASKS-\\\\d+\\\\b\"\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit e0e9c7b4fc2ee5fbee2e49c2970f5811f186e01e\nfeat(tasks): show how urgent each open task is\n\nTASKS-12: due today is \"today\", within 2 days \"soon\", later \"later\",\npast its date \"overdue\".\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\nnew file mode 100644\nindex 0000000..a151dce\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.test.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.test.ts\n+import { taskUrgency } from './task-urgency';\n+\n+describe('taskUrgency', () => {\n+  it('returns today for a task due today (TASKS-12)', () => {\n+    expect(taskUrgency(0)).toBe('today');\n+  });\n+\n+  it('returns soon for a task due in 2 days', () => {\n+    expect(taskUrgency(2)).toBe('soon');\n+  });\n+});\ndiff --git a/src/features/tasks/task-urgency.ts b/src/features/tasks/task-urgency.ts\nnew file mode 100644\nindex 0000000..3e41ca3\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.ts\n+export type Urgency = 'overdue' | 'today' | 'soon' | 'later';\n+\n+export function taskUrgency(daysLeft: number): Urgency {\n+  if (daysLeft < 0) {\n+    return 'overdue';\n+  }\n+  if (daysLeft === 0) {\n+    return 'today';\n+  }\n+  return daysLeft <= 2 ? 'soon' : 'later';\n+}\n==> commit 8b1ed4c3416c91636664e3b8df4bd6e40ae2219f\nfix(tasks): count three days ahead as soon\n\nSpec-Change: issue #41 soon now reaches 3 days ahead\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\nindex a151dce..11c73bc 100644\n--- a/src/features/tasks/task-urgency.test.ts\n+++ b/src/features/tasks/task-urgency.test.ts\n@@ -6,7 +6,7 @@ describe('taskUrgency', () => {\n     expect(taskUrgency(0)).toBe('today');\n   });\n \n-  it('returns soon for a task due in 2 days', () => {\n-    expect(taskUrgency(2)).toBe('soon');\n+  it('returns soon for a task due in 3 days', () => {\n+    expect(taskUrgency(3)).toBe('soon');\n   });\n });\ndiff --git a/src/features/tasks/task-urgency.ts b/src/features/tasks/task-urgency.ts\nindex 3e41ca3..8ac9e54 100644\n--- a/src/features/tasks/task-urgency.ts\n+++ b/src/features/tasks/task-urgency.ts\n@@ -8,5 +8,5 @@ export function taskUrgency(daysLeft: number): Urgency {\n   if (daysLeft === 0) {\n     return 'today';\n   }\n-  return daysLeft <= 2 ? 'soon' : 'later';\n+  return daysLeft <= 3 ? 'soon' : 'later';\n }\n"
+        }
+      }
+    ]
+  },
+  "bad-spec-change-no-reference": {
+    "expect": ["[spec-change-reason]", "names no requirement reference", "8b1ed4c:(message)", "[assertion-changed]"],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit e0e9c7b4fc2ee5fbee2e49c2970f5811f186e01e\nfeat(tasks): show how urgent each open task is\n\nTASKS-12: due today is \"today\", within 2 days \"soon\", later \"later\",\npast its date \"overdue\".\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\nnew file mode 100644\nindex 0000000..a151dce\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.test.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.test.ts\n+import { taskUrgency } from './task-urgency';\n+\n+describe('taskUrgency', () => {\n+  it('returns today for a task due today (TASKS-12)', () => {\n+    expect(taskUrgency(0)).toBe('today');\n+  });\n+\n+  it('returns soon for a task due in 2 days', () => {\n+    expect(taskUrgency(2)).toBe('soon');\n+  });\n+});\ndiff --git a/src/features/tasks/task-urgency.ts b/src/features/tasks/task-urgency.ts\nnew file mode 100644\nindex 0000000..3e41ca3\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.ts\n+export type Urgency = 'overdue' | 'today' | 'soon' | 'later';\n+\n+export function taskUrgency(daysLeft: number): Urgency {\n+  if (daysLeft < 0) {\n+    return 'overdue';\n+  }\n+  if (daysLeft === 0) {\n+    return 'today';\n+  }\n+  return daysLeft <= 2 ? 'soon' : 'later';\n+}\n==> commit 8b1ed4c3416c91636664e3b8df4bd6e40ae2219f\nfix(tasks): count three days ahead as soon\n\nSpec-Change: soon now reaches 3 days ahead (product decision)\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\nindex a151dce..11c73bc 100644\n--- a/src/features/tasks/task-urgency.test.ts\n+++ b/src/features/tasks/task-urgency.test.ts\n@@ -6,7 +6,7 @@ describe('taskUrgency', () => {\n     expect(taskUrgency(0)).toBe('today');\n   });\n \n-  it('returns soon for a task due in 2 days', () => {\n-    expect(taskUrgency(2)).toBe('soon');\n+  it('returns soon for a task due in 3 days', () => {\n+    expect(taskUrgency(3)).toBe('soon');\n   });\n });\ndiff --git a/src/features/tasks/task-urgency.ts b/src/features/tasks/task-urgency.ts\nindex 3e41ca3..8ac9e54 100644\n--- a/src/features/tasks/task-urgency.ts\n+++ b/src/features/tasks/task-urgency.ts\n@@ -8,5 +8,5 @@ export function taskUrgency(daysLeft: number): Urgency {\n   if (daysLeft === 0) {\n     return 'today';\n   }\n-  return daysLeft <= 2 ? 'soon' : 'later';\n+  return daysLeft <= 3 ? 'soon' : 'later';\n }\n"
+        }
+      }
+    ]
+  },
+  "bad-spec-change-reason": {
+    "expect": ["[spec-change-reason]", "blames the test", "[assertion-changed]"],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit e0e9c7b4fc2ee5fbee2e49c2970f5811f186e01e\nfeat(tasks): show how urgent each open task is\n\nTASKS-12: due today is \"today\", within 2 days \"soon\", later \"later\",\npast its date \"overdue\".\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\nnew file mode 100644\nindex 0000000..a151dce\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.test.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.test.ts\n+import { taskUrgency } from './task-urgency';\n+\n+describe('taskUrgency', () => {\n+  it('returns today for a task due today (TASKS-12)', () => {\n+    expect(taskUrgency(0)).toBe('today');\n+  });\n+\n+  it('returns soon for a task due in 2 days', () => {\n+    expect(taskUrgency(2)).toBe('soon');\n+  });\n+});\ndiff --git a/src/features/tasks/task-urgency.ts b/src/features/tasks/task-urgency.ts\nnew file mode 100644\nindex 0000000..3e41ca3\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.ts\n+export type Urgency = 'overdue' | 'today' | 'soon' | 'later';\n+\n+export function taskUrgency(daysLeft: number): Urgency {\n+  if (daysLeft < 0) {\n+    return 'overdue';\n+  }\n+  if (daysLeft === 0) {\n+    return 'today';\n+  }\n+  return daysLeft <= 2 ? 'soon' : 'later';\n+}\n==> commit aea58bf75d5b94b6941cbe75a9e36004e98272aa\nfix(tasks): treat tomorrow as today\n\nSpec-Change: the test was wrong\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\nindex a151dce..b4c9149 100644\n--- a/src/features/tasks/task-urgency.test.ts\n+++ b/src/features/tasks/task-urgency.test.ts\n@@ -3,7 +3,7 @@ import { taskUrgency } from './task-urgency';\n \n describe('taskUrgency', () => {\n   it('returns today for a task due today (TASKS-12)', () => {\n-    expect(taskUrgency(0)).toBe('today');\n+    expect(taskUrgency(1)).toBe('today');\n   });\n \n   it('returns soon for a task due in 2 days', () => {\ndiff --git a/src/features/tasks/task-urgency.ts b/src/features/tasks/task-urgency.ts\nindex 3e41ca3..af27058 100644\n--- a/src/features/tasks/task-urgency.ts\n+++ b/src/features/tasks/task-urgency.ts\n@@ -2,10 +2,10 @@\n export type Urgency = 'overdue' | 'today' | 'soon' | 'later';\n \n export function taskUrgency(daysLeft: number): Urgency {\n-  if (daysLeft < 0) {\n+  if (daysLeft < 1) {\n     return 'overdue';\n   }\n-  if (daysLeft === 0) {\n+  if (daysLeft === 1) {\n     return 'today';\n   }\n   return daysLeft <= 2 ? 'soon' : 'later';\n"
+        }
+      }
+    ]
+  },
+  "bad-spec-change-ref-fix-test": {
+    "expect": ["[spec-change-reason]", "blames the test", "[assertion-changed]"],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit e0e9c7b4fc2ee5fbee2e49c2970f5811f186e01e\nfeat(tasks): show how urgent each open task is\n\nTASKS-12: due today is \"today\", within 2 days \"soon\", later \"later\",\npast its date \"overdue\".\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\nnew file mode 100644\nindex 0000000..a151dce\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.test.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.test.ts\n+import { taskUrgency } from './task-urgency';\n+\n+describe('taskUrgency', () => {\n+  it('returns today for a task due today (TASKS-12)', () => {\n+    expect(taskUrgency(0)).toBe('today');\n+  });\n+\n+  it('returns soon for a task due in 2 days', () => {\n+    expect(taskUrgency(2)).toBe('soon');\n+  });\n+});\ndiff --git a/src/features/tasks/task-urgency.ts b/src/features/tasks/task-urgency.ts\nnew file mode 100644\nindex 0000000..3e41ca3\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.ts\n+export type Urgency = 'overdue' | 'today' | 'soon' | 'later';\n+\n+export function taskUrgency(daysLeft: number): Urgency {\n+  if (daysLeft < 0) {\n+    return 'overdue';\n+  }\n+  if (daysLeft === 0) {\n+    return 'today';\n+  }\n+  return daysLeft <= 2 ? 'soon' : 'later';\n+}\n==> commit aea58bf75d5b94b6941cbe75a9e36004e98272aa\nfix(tasks): treat tomorrow as today\n\nSpec-Change: #41 fix the test\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\nindex a151dce..b4c9149 100644\n--- a/src/features/tasks/task-urgency.test.ts\n+++ b/src/features/tasks/task-urgency.test.ts\n@@ -3,7 +3,7 @@ import { taskUrgency } from './task-urgency';\n \n describe('taskUrgency', () => {\n   it('returns today for a task due today (TASKS-12)', () => {\n-    expect(taskUrgency(0)).toBe('today');\n+    expect(taskUrgency(1)).toBe('today');\n   });\n \n   it('returns soon for a task due in 2 days', () => {\ndiff --git a/src/features/tasks/task-urgency.ts b/src/features/tasks/task-urgency.ts\nindex 3e41ca3..af27058 100644\n--- a/src/features/tasks/task-urgency.ts\n+++ b/src/features/tasks/task-urgency.ts\n@@ -2,10 +2,10 @@\n export type Urgency = 'overdue' | 'today' | 'soon' | 'later';\n \n export function taskUrgency(daysLeft: number): Urgency {\n-  if (daysLeft < 0) {\n+  if (daysLeft < 1) {\n     return 'overdue';\n   }\n-  if (daysLeft === 0) {\n+  if (daysLeft === 1) {\n     return 'today';\n   }\n   return daysLeft <= 2 ? 'soon' : 'later';\n"
+        }
+      }
+    ]
+  },
+  "bad-spec-change-ref-update-snapshot": {
+    "expect": ["[spec-change-reason]", "blames the test", "[assertion-changed]"],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit e0e9c7b4fc2ee5fbee2e49c2970f5811f186e01e\nfeat(tasks): show how urgent each open task is\n\nTASKS-12: due today is \"today\", within 2 days \"soon\", later \"later\",\npast its date \"overdue\".\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\nnew file mode 100644\nindex 0000000..a151dce\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.test.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.test.ts\n+import { taskUrgency } from './task-urgency';\n+\n+describe('taskUrgency', () => {\n+  it('returns today for a task due today (TASKS-12)', () => {\n+    expect(taskUrgency(0)).toBe('today');\n+  });\n+\n+  it('returns soon for a task due in 2 days', () => {\n+    expect(taskUrgency(2)).toBe('soon');\n+  });\n+});\ndiff --git a/src/features/tasks/task-urgency.ts b/src/features/tasks/task-urgency.ts\nnew file mode 100644\nindex 0000000..3e41ca3\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.ts\n+export type Urgency = 'overdue' | 'today' | 'soon' | 'later';\n+\n+export function taskUrgency(daysLeft: number): Urgency {\n+  if (daysLeft < 0) {\n+    return 'overdue';\n+  }\n+  if (daysLeft === 0) {\n+    return 'today';\n+  }\n+  return daysLeft <= 2 ? 'soon' : 'later';\n+}\n==> commit aea58bf75d5b94b6941cbe75a9e36004e98272aa\nfix(tasks): treat tomorrow as today\n\nSpec-Change: TASKS-12 update snapshot\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\nindex a151dce..b4c9149 100644\n--- a/src/features/tasks/task-urgency.test.ts\n+++ b/src/features/tasks/task-urgency.test.ts\n@@ -3,7 +3,7 @@ import { taskUrgency } from './task-urgency';\n \n describe('taskUrgency', () => {\n   it('returns today for a task due today (TASKS-12)', () => {\n-    expect(taskUrgency(0)).toBe('today');\n+    expect(taskUrgency(1)).toBe('today');\n   });\n \n   it('returns soon for a task due in 2 days', () => {\ndiff --git a/src/features/tasks/task-urgency.ts b/src/features/tasks/task-urgency.ts\nindex 3e41ca3..af27058 100644\n--- a/src/features/tasks/task-urgency.ts\n+++ b/src/features/tasks/task-urgency.ts\n@@ -2,10 +2,10 @@\n export type Urgency = 'overdue' | 'today' | 'soon' | 'later';\n \n export function taskUrgency(daysLeft: number): Urgency {\n-  if (daysLeft < 0) {\n+  if (daysLeft < 1) {\n     return 'overdue';\n   }\n-  if (daysLeft === 0) {\n+  if (daysLeft === 1) {\n     return 'today';\n   }\n   return daysLeft <= 2 ? 'soon' : 'later';\n"
+        }
+      }
+    ]
+  },
+  "bad-table-row-changed": {
+    "expect": [
+      "[assertion-changed]",
+      "src/features/tasks/task-urgency.test.ts:24",
+      "expectation table row \"[3, 'later'],\""
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit 0242fd186516cdc37533a45765227155466a3192\nfix(tasks): count three days ahead as soon\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\nindex fd518bb..5503932 100644\n--- a/src/features/tasks/task-urgency.test.ts\n+++ b/src/features/tasks/task-urgency.test.ts\n@@ -21,7 +21,7 @@ describe('taskUrgency', () => {\n   it.each([\n     [1, 'soon'],\n     [2, 'soon'],\n-    [3, 'later'],\n+    [3, 'soon'],\n     [30, 'later'],\n   ] as const)('returns the right urgency %i days ahead', (daysLeft, urgency) => {\n     expect(taskUrgency(daysLeft)).toBe(urgency);\ndiff --git a/src/features/tasks/task-urgency.ts b/src/features/tasks/task-urgency.ts\nindex 6b2af49..2954153 100644\n--- a/src/features/tasks/task-urgency.ts\n+++ b/src/features/tasks/task-urgency.ts\n@@ -4,7 +4,7 @@\n export type Urgency = 'overdue' | 'today' | 'soon' | 'later';\n \n /** The last day ahead that still counts as soon (TASKS-12: \"due within 2 days\"). */\n-const SOON_DAYS = 2;\n+const SOON_DAYS = 3;\n \n /** Returns the urgency of an open task due in `daysLeft` whole days; throws for a day count that cannot happen. */\n export function taskUrgency(daysLeft: number): Urgency {\n"
+        }
+      }
+    ]
+  },
+  "bad-test-deleted": {
+    "expect": ["[test-deleted]", "task-urgency.test.ts"],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit e0e9c7b4fc2ee5fbee2e49c2970f5811f186e01e\nfeat(tasks): show how urgent each open task is\n\nTASKS-12: due today is \"today\", within 2 days \"soon\", later \"later\",\npast its date \"overdue\".\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\nnew file mode 100644\nindex 0000000..a151dce\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.test.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.test.ts\n+import { taskUrgency } from './task-urgency';\n+\n+describe('taskUrgency', () => {\n+  it('returns today for a task due today (TASKS-12)', () => {\n+    expect(taskUrgency(0)).toBe('today');\n+  });\n+\n+  it('returns soon for a task due in 2 days', () => {\n+    expect(taskUrgency(2)).toBe('soon');\n+  });\n+});\ndiff --git a/src/features/tasks/task-urgency.ts b/src/features/tasks/task-urgency.ts\nnew file mode 100644\nindex 0000000..3e41ca3\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.ts\n+export type Urgency = 'overdue' | 'today' | 'soon' | 'later';\n+\n+export function taskUrgency(daysLeft: number): Urgency {\n+  if (daysLeft < 0) {\n+    return 'overdue';\n+  }\n+  if (daysLeft === 0) {\n+    return 'today';\n+  }\n+  return daysLeft <= 2 ? 'soon' : 'later';\n+}\n==> commit 0436fbac71bc06da7086d6b5c2cf983a523f16ea\nchore(tasks): remove a slow test\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\ndeleted file mode 100644\nindex a151dce..0000000\n--- a/src/features/tasks/task-urgency.test.ts\n+++ /dev/null\n@@ -1,12 +0,0 @@\n-// src/features/tasks/task-urgency.test.ts\n-import { taskUrgency } from './task-urgency';\n-\n-describe('taskUrgency', () => {\n-  it('returns today for a task due today (TASKS-12)', () => {\n-    expect(taskUrgency(0)).toBe('today');\n-  });\n-\n-  it('returns soon for a task due in 2 days', () => {\n-    expect(taskUrgency(2)).toBe('soon');\n-  });\n-});\n"
+        }
+      }
+    ]
+  },
+  "bad-weakened-test-only": {
+    "expect": ["[assertion-changed]", "toBe('soon')"],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit e0e9c7b4fc2ee5fbee2e49c2970f5811f186e01e\nfeat(tasks): show how urgent each open task is\n\nTASKS-12: due today is \"today\", within 2 days \"soon\", later \"later\",\npast its date \"overdue\".\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\nnew file mode 100644\nindex 0000000..a151dce\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.test.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.test.ts\n+import { taskUrgency } from './task-urgency';\n+\n+describe('taskUrgency', () => {\n+  it('returns today for a task due today (TASKS-12)', () => {\n+    expect(taskUrgency(0)).toBe('today');\n+  });\n+\n+  it('returns soon for a task due in 2 days', () => {\n+    expect(taskUrgency(2)).toBe('soon');\n+  });\n+});\ndiff --git a/src/features/tasks/task-urgency.ts b/src/features/tasks/task-urgency.ts\nnew file mode 100644\nindex 0000000..3e41ca3\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.ts\n+export type Urgency = 'overdue' | 'today' | 'soon' | 'later';\n+\n+export function taskUrgency(daysLeft: number): Urgency {\n+  if (daysLeft < 0) {\n+    return 'overdue';\n+  }\n+  if (daysLeft === 0) {\n+    return 'today';\n+  }\n+  return daysLeft <= 2 ? 'soon' : 'later';\n+}\n==> commit a178e71e3b35f191f90b8365e301216d19b3cdb0\ntest(tasks): simplify the soon case\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\nindex a151dce..ee911ef 100644\n--- a/src/features/tasks/task-urgency.test.ts\n+++ b/src/features/tasks/task-urgency.test.ts\n@@ -7,6 +7,6 @@ describe('taskUrgency', () => {\n   });\n \n   it('returns soon for a task due in 2 days', () => {\n-    expect(taskUrgency(2)).toBe('soon');\n+    taskUrgency(2);\n   });\n });\n"
+        }
+      }
+    ]
+  },
+  "error-empty-log": {
+    "expect": ["ERROR [bad-input] the log or range holds no commits"],
+    "ops": [{ "write": { "file": "history.log", "content": "# an empty range: git log printed no commits\n" } }]
+  },
+  "error-staged-outside-git": {
+    "expect": ["ERROR [bad-input]", "is not inside a git repository"],
+    "args": "{dir} --staged"
+  },
+  "pass-android-test-deleted-with-unit": {
+    "expect": ["check-test-edits: 1 commits checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit 5a1f0c2d9e8b7a6f5e4d3c2b1a0f9e8d7c6b5a49\nrefactor(tasks): drop the Android back-press hint row\n\nThe hint row and its Android test go together; nothing else used it.\n\n==> diff\n\ndiff --git a/src/features/tasks/components/back-hint-row.android.test.tsx b/src/features/tasks/components/back-hint-row.android.test.tsx\ndeleted file mode 100644\nindex 1a2b3c4..0000000\n--- a/src/features/tasks/components/back-hint-row.android.test.tsx\n+++ /dev/null\n@@ -1,8 +0,0 @@\n-// src/features/tasks/components/back-hint-row.android.test.tsx\n-import { BackHintRow } from './back-hint-row';\n-\n-describe('BackHintRow', () => {\n-  it('names the back gesture on Android', () => {\n-    expect(BackHintRow).toBeDefined();\n-  });\n-});\ndiff --git a/src/features/tasks/components/back-hint-row.tsx b/src/features/tasks/components/back-hint-row.tsx\ndeleted file mode 100644\nindex 5d6e7f8..0000000\n--- a/src/features/tasks/components/back-hint-row.tsx\n+++ /dev/null\n@@ -1,4 +0,0 @@\n-// src/features/tasks/components/back-hint-row.tsx\n-export function BackHintRow(): null {\n-  return null;\n-}\n"
+        }
+      }
+    ]
+  },
+  "pass-fit-in-comment": {
+    "expect": ["check-test-edits: 1 commits checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit 2becbd58f9bb59978e415aa9802c27bc3d08fe84\nfeat(tasks): center the badge text in its box\n\nTASKS-30: the open-task count sits in the middle of its badge.\n\n==> diff\n\ndiff --git a/src/features/tasks/center-of.test.ts b/src/features/tasks/center-of.test.ts\nnew file mode 100644\nindex 0000000..53a272a\n--- /dev/null\n+++ b/src/features/tasks/center-of.test.ts\n@@ -0,0 +1,8 @@\n+// src/features/tasks/center-of.test.ts\n+import { centerOf } from './center-of';\n+\n+describe('centerOf', () => {\n+  it('returns the middle of the box the text must fit (a badge)', () => {\n+    expect(centerOf({ x: 0, y: 0, width: 10, height: 4 })).toStrictEqual({ x: 5, y: 2 });\n+  });\n+});\ndiff --git a/src/features/tasks/center-of.ts b/src/features/tasks/center-of.ts\nnew file mode 100644\nindex 0000000..905ab35\n--- /dev/null\n+++ b/src/features/tasks/center-of.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/center-of.ts\n+export type Box = { readonly x: number; readonly y: number; readonly width: number; readonly height: number };\n+\n+/**\n+ * The point a label is centered on.\n+ * The shape the text must fit (a badge, a chip or a row) is its box;\n+ * xit (an old name) is not a call here either.\n+ */\n+export function centerOf(box: Box): { x: number; y: number } {\n+  const note = 'fit (only in a string)';\n+  return { x: box.x + box.width / 2 + note.length * 0, y: box.y + box.height / 2 };\n+}\n"
+        }
+      }
+    ]
+  },
+  "pass-generated-file": {
+    "expect": ["check-test-edits: 1 commits checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit 9b3b555f0116fc130c054d1fbd180827a3ed76a4\nfeat(theme): regenerate the palette with the new accent\n\nThe generator and its test changed in the previous slice.\n\n==> diff\n\ndiff --git a/src/theme/generated-palette.ts b/src/theme/generated-palette.ts\nindex 2fadfc2..eb6b69d 100644\n--- a/src/theme/generated-palette.ts\n+++ b/src/theme/generated-palette.ts\n@@ -1,5 +1,5 @@\n // src/theme/generated-palette.ts\n // GENERATED by scripts/design/write-palette.ts; do not edit.\n export const PALETTE = {\n-  accent: '#3366FF',\n+  accent: '#2255EE',\n };\n"
+        }
+      }
+    ]
+  },
+  "pass-rename-refactor": {
+    "expect": ["check-test-edits: 1 commits checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit 7dada0d41d42bdb4aa269be8c99e83dde14be37c\nrefactor(tasks): rename tallyTasks to countTasks\n\n==> diff\n\ndiff --git a/src/features/tasks/task-tally.test.ts b/src/features/tasks/task-tally.test.ts\nindex c6d3309..cc59715 100644\n--- a/src/features/tasks/task-tally.test.ts\n+++ b/src/features/tasks/task-tally.test.ts\n@@ -1,8 +1,8 @@\n // src/features/tasks/task-tally.test.ts\n-import { tallyTasks } from './task-tally';\n+import { countTasks } from './task-tally';\n \n-describe('tallyTasks', () => {\n+describe('countTasks', () => {\n   it('counts the open tasks (TASKS-30)', () => {\n-    expect(tallyTasks([false, false, true]).openCount).toBe(2);\n+    expect(countTasks([false, false, true]).openCount).toBe(2);\n   });\n });\ndiff --git a/src/features/tasks/task-tally.ts b/src/features/tasks/task-tally.ts\nindex a129d79..f99bb6b 100644\n--- a/src/features/tasks/task-tally.ts\n+++ b/src/features/tasks/task-tally.ts\n@@ -1,4 +1,4 @@\n // src/features/tasks/task-tally.ts\n-export function tallyTasks(done: readonly boolean[]) {\n+export function countTasks(done: readonly boolean[]) {\n   return { openCount: done.filter((isDone) => !isDone).length, doneCount: done.filter(Boolean).length };\n }\n"
+        }
+      }
+    ]
+  },
+  "pass-requirement-quoted": {
+    "expect": ["check-test-edits: 2 commits checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/tdd.json",
+          "content": "{\n  \"$schema\": \"./tdd.schema.json\",\n  \"requirementIdPattern\": \"\\\\bTASKS-\\\\d+\\\\b\"\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit e0e9c7b4fc2ee5fbee2e49c2970f5811f186e01e\nfeat(tasks): show how urgent each open task is\n\nTASKS-12: due today is \"today\", within 2 days \"soon\", later \"later\",\npast its date \"overdue\".\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\nnew file mode 100644\nindex 0000000..a151dce\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.test.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.test.ts\n+import { taskUrgency } from './task-urgency';\n+\n+describe('taskUrgency', () => {\n+  it('returns today for a task due today (TASKS-12)', () => {\n+    expect(taskUrgency(0)).toBe('today');\n+  });\n+\n+  it('returns soon for a task due in 2 days', () => {\n+    expect(taskUrgency(2)).toBe('soon');\n+  });\n+});\ndiff --git a/src/features/tasks/task-urgency.ts b/src/features/tasks/task-urgency.ts\nnew file mode 100644\nindex 0000000..3e41ca3\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.ts\n+export type Urgency = 'overdue' | 'today' | 'soon' | 'later';\n+\n+export function taskUrgency(daysLeft: number): Urgency {\n+  if (daysLeft < 0) {\n+    return 'overdue';\n+  }\n+  if (daysLeft === 0) {\n+    return 'today';\n+  }\n+  return daysLeft <= 2 ? 'soon' : 'later';\n+}\n==> commit 7a3880f350f7eaf9ef2f731bedf9ec60ef0c2729\nfix(tasks): count three days ahead as soon\n\nSpec-Change: TASKS-12 soon now reaches 3 days ahead (issue #41)\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\nindex a151dce..11c73bc 100644\n--- a/src/features/tasks/task-urgency.test.ts\n+++ b/src/features/tasks/task-urgency.test.ts\n@@ -6,7 +6,7 @@ describe('taskUrgency', () => {\n     expect(taskUrgency(0)).toBe('today');\n   });\n \n-  it('returns soon for a task due in 2 days', () => {\n-    expect(taskUrgency(2)).toBe('soon');\n+  it('returns soon for a task due in 3 days', () => {\n+    expect(taskUrgency(3)).toBe('soon');\n   });\n });\ndiff --git a/src/features/tasks/task-urgency.ts b/src/features/tasks/task-urgency.ts\nindex 3e41ca3..8ac9e54 100644\n--- a/src/features/tasks/task-urgency.ts\n+++ b/src/features/tasks/task-urgency.ts\n@@ -8,5 +8,5 @@ export function taskUrgency(daysLeft: number): Urgency {\n   if (daysLeft === 0) {\n     return 'today';\n   }\n-  return daysLeft <= 2 ? 'soon' : 'later';\n+  return daysLeft <= 3 ? 'soon' : 'later';\n }\n"
+        }
+      }
+    ]
+  },
+  "pass-spec-change": {
+    "expect": ["check-test-edits: 2 commits checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit e0e9c7b4fc2ee5fbee2e49c2970f5811f186e01e\nfeat(tasks): show how urgent each open task is\n\nTASKS-12: due today is \"today\", within 2 days \"soon\", later \"later\",\npast its date \"overdue\".\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\nnew file mode 100644\nindex 0000000..a151dce\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.test.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.test.ts\n+import { taskUrgency } from './task-urgency';\n+\n+describe('taskUrgency', () => {\n+  it('returns today for a task due today (TASKS-12)', () => {\n+    expect(taskUrgency(0)).toBe('today');\n+  });\n+\n+  it('returns soon for a task due in 2 days', () => {\n+    expect(taskUrgency(2)).toBe('soon');\n+  });\n+});\ndiff --git a/src/features/tasks/task-urgency.ts b/src/features/tasks/task-urgency.ts\nnew file mode 100644\nindex 0000000..3e41ca3\n--- /dev/null\n+++ b/src/features/tasks/task-urgency.ts\n@@ -0,0 +1,12 @@\n+// src/features/tasks/task-urgency.ts\n+export type Urgency = 'overdue' | 'today' | 'soon' | 'later';\n+\n+export function taskUrgency(daysLeft: number): Urgency {\n+  if (daysLeft < 0) {\n+    return 'overdue';\n+  }\n+  if (daysLeft === 0) {\n+    return 'today';\n+  }\n+  return daysLeft <= 2 ? 'soon' : 'later';\n+}\n==> commit 7a3880f350f7eaf9ef2f731bedf9ec60ef0c2729\nfix(tasks): count three days ahead as soon\n\nSpec-Change: TASKS-12 soon now reaches 3 days ahead (issue #41)\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\nindex a151dce..11c73bc 100644\n--- a/src/features/tasks/task-urgency.test.ts\n+++ b/src/features/tasks/task-urgency.test.ts\n@@ -6,7 +6,7 @@ describe('taskUrgency', () => {\n     expect(taskUrgency(0)).toBe('today');\n   });\n \n-  it('returns soon for a task due in 2 days', () => {\n-    expect(taskUrgency(2)).toBe('soon');\n+  it('returns soon for a task due in 3 days', () => {\n+    expect(taskUrgency(3)).toBe('soon');\n   });\n });\ndiff --git a/src/features/tasks/task-urgency.ts b/src/features/tasks/task-urgency.ts\nindex 3e41ca3..8ac9e54 100644\n--- a/src/features/tasks/task-urgency.ts\n+++ b/src/features/tasks/task-urgency.ts\n@@ -8,5 +8,5 @@ export function taskUrgency(daysLeft: number): Urgency {\n   if (daysLeft === 0) {\n     return 'today';\n   }\n-  return daysLeft <= 2 ? 'soon' : 'later';\n+  return daysLeft <= 3 ? 'soon' : 'later';\n }\n"
+        }
+      }
+    ]
+  },
+  "pass-table-rows-reordered": {
+    "expect": ["check-test-edits: 1 commits checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit e1f3be7fc9cfd90fa8a2006a1dc251f229294a94\ntest(tasks): list the urgency bands from far to near\n\nReads in the order the requirement names the bands.\n\n==> diff\n\ndiff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts\nindex fd518bb..9cfa46a 100644\n--- a/src/features/tasks/task-urgency.test.ts\n+++ b/src/features/tasks/task-urgency.test.ts\n@@ -19,10 +19,10 @@ describe('taskUrgency', () => {\n   });\n \n   it.each([\n-    [1, 'soon'],\n-    [2, 'soon'],\n-    [3, 'later'],\n     [30, 'later'],\n+    [3, 'later'],\n+    [2, 'soon'],\n+    [1, 'soon'],\n   ] as const)('returns the right urgency %i days ahead', (daysLeft, urgency) => {\n     expect(taskUrgency(daysLeft)).toBe(urgency);\n   });\n"
+        }
+      }
+    ]
+  }
+}

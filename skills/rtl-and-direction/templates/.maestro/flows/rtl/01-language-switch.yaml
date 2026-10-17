@@ -1,0 +1,45 @@
+# .maestro/flows/rtl/01-language-switch.yaml
+# Switching a left-to-right app to a right-to-left language restarts it once, it comes back mirrored,
+# and the data is still there. The language screens are the control under test, so the flow taps
+# through them instead of sending lang= through the debug link. e2e-maestro's runner runs it; by hand:
+# tools/maestro/bin/maestro --device <udid or serial> --driver-host-port <port> test -e APP_ID=<id> <this file>
+appId: ${APP_ID}
+name: Switching to a right-to-left language restarts once and keeps the data
+tags: [rtl]
+---
+- launchApp:
+    clearState: true
+- assertVisible:
+    id: '__HOME_SCREEN_ID__'
+# The flow makes its own data (clearState wiped everything): one item it expects back after the restart.
+- tapOn:
+    id: '__ADD_ITEM_BUTTON_ID__'
+- tapOn:
+    id: '__ITEM_TITLE_INPUT_ID__'
+- inputText: '__KEPT_ITEM_TITLE__'
+- hideKeyboard
+- tapOn:
+    id: '__SAVE_ITEM_BUTTON_ID__'
+# The new row, by its id pattern (a row's testID ends in its data key, unknown before the run) and
+# its title, the data the flow typed.
+- assertVisible:
+    id: '__ITEM_ROW_ID_PATTERN__'
+    text: '__KEPT_ITEM_TITLE__'
+- tapOn:
+    id: '__SETTINGS_BUTTON_ID__'
+- tapOn:
+    id: '__LANGUAGE_ROW_ID__'
+- tapOn:
+    id: '__RTL_LANGUAGE_OPTION_ID__'
+- tapOn:
+    id: '__RESTART_CONFIRM_ID__'
+# One reload: the app comes back on its home screen, now laid out right to left.
+- extendedWaitUntil:
+    visible:
+      id: '__HOME_SCREEN_ID__'
+    timeout: 20000
+# The item saved before the switch survived the reload (the title is data: it never changes language).
+- assertVisible:
+    id: '__ITEM_ROW_ID_PATTERN__'
+    text: '__KEPT_ITEM_TITLE__'
+- takeScreenshot: rtl-home-after-restart

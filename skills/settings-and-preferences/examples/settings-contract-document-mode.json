@@ -1,0 +1,77 @@
+{
+  "$schema": "./settings.schema.json",
+  "$comment": "Shape only: contracts/settings.json for an app that keeps its settings as a section of persistence-and-migrations' save document (\"mode\": \"document\" or \"both\") instead of the key-value store. The schema is versioned (SETTINGS_V<n>: the newest is checked, spreads of an older version's .entries are followed), the store persists through documents.update, and the resets are the document's own: one documents.update inside updateAndPublish(stores, write)'s callback (publishWith).",
+  "schema": {
+    "file": "src/data/document/schema/document-sections-v*.ts",
+    "export": "SETTINGS_V<n>"
+  },
+  "defaults": {
+    "file": "src/data/document/schema/default-app-document.ts",
+    "export": "DEFAULT_SETTINGS"
+  },
+  "reducer": "src/stores/app-settings/app-settings-reducer.ts",
+  "store": {
+    "file": "src/stores/app-settings/app-settings-store.ts",
+    "persist": "\\bdocuments\\.update\\s*\\(",
+    "publish": "\\bset\\s*\\(\\s*\\{\\s*settings\\s*:"
+  },
+  "screenDirs": ["src/features/preferences"],
+  "effectExclude": ["src/stores/app-settings/**", "src/data/**", "src/features/preferences/**"],
+  "fields": {
+    "theme": {
+      "schema": "v.picklist(['system', 'light', 'dark'])",
+      "default": "'system'",
+      "action": "set-theme",
+      "effect": "\\bsettings\\.theme\\b"
+    },
+    "language": {
+      "schema": "v.nullable(LANGUAGE_TAG)",
+      "default": "null",
+      "action": "set-language",
+      "effect": "\\bsettings\\.language\\b"
+    },
+    "reminderHour": {
+      "schema": "HOUR",
+      "default": "9",
+      "action": "set-reminder-hour",
+      "effect": "\\breminderHour\\b"
+    },
+    "soundEnabled": {
+      "schema": "v.boolean()",
+      "default": "false",
+      "action": "set-sound",
+      "effect": "\\bsoundEnabled\\b"
+    },
+    "reduceMotion": {
+      "schema": "v.picklist(['system', 'on', 'off'])",
+      "default": "'system'",
+      "action": "set-reduce-motion",
+      "effect": "\\bsettings\\.reduceMotion\\b"
+    },
+    "textScale": {
+      "schema": "v.pipe(v.number(), v.integer(), v.minValue(100), v.maxValue(200))",
+      "default": "100",
+      "action": "set-text-scale",
+      "effect": "\\btextScale\\b",
+      "clamp": "clampTextScale"
+    }
+  },
+  "actions": [
+    "set-theme",
+    "set-language",
+    "set-reminder-hour",
+    "set-sound",
+    "set-reduce-motion",
+    "set-text-scale"
+  ],
+  "resets": [
+    {
+      "file": "src/data/document/reset-document.ts",
+      "function": "resetAllProgress",
+      "owner": "persistence-and-migrations",
+      "keeps": ["settings", "premium"],
+      "publishWith": "updateAndPublish"
+    }
+  ],
+  "toggleFeedback": null
+}

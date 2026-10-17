@@ -1,0 +1,7 @@
+{
+  "$comment": "Only the entries this skill adds to the app's contracts/architecture.json (architecture-and-boundaries owns the file; merge, never replace). Mirror both in eslint.config.mjs VENDOR_SDK_PATHS in the same commit. expo-file-system is a default vendor SDK already.",
+  "vendorSdks": {
+    "expo-sharing": "ShareSheetPort",
+    "expo-document-picker": "FilePickerPort"
+  }
+}

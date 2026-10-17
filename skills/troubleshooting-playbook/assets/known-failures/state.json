@@ -1,0 +1,230 @@
+{
+  "area": "state",
+  "entries": [
+    {
+      "id": "state-zustand-new-object",
+      "topic": "Stores",
+      "symptom": "Maximum update depth exceeded after reading a store",
+      "cause": "A Zustand 5 selector returned a new object or array on every call",
+      "fix": "Return primitives or stable references, or wrap the selector in useShallow from zustand/shallow",
+      "match": [
+        "Maximum update depth exceeded"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "state-management-zustand"
+    },
+    {
+      "id": "state-stale-stores-after-write",
+      "topic": "Stores",
+      "symptom": "Screens show old values until the app restarts after a background write",
+      "cause": "The write went straight to storage, so the stores that mirror it never re-read",
+      "fix": "Write through the store action (or publish the change to the stores in the same step); never write storage behind a store",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "state-management-zustand"
+    },
+    {
+      "id": "state-zod-jit",
+      "topic": "Validation",
+      "symptom": "A zod 4 schema crashes or refuses to run in a Hermes release build",
+      "cause": "zod 4's JIT compiles validators with new Function, which Hermes does not support",
+      "fix": "Use valibot (the stack default); with zod 4 set jitless mode before any schema runs",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "networking-and-server-state",
+      "appliesTo": {
+        "zod": ">=4"
+      }
+    },
+    {
+      "id": "state-newer-db-crash",
+      "topic": "Persistence",
+      "symptom": "The app crashes at launch after installing an older build over a newer one (the database comes from a newer app)",
+      "cause": "The open path threw when PRAGMA user_version was newer than the app knows, so every launch crashed before the first frame",
+      "fix": "Return a 'newer version' outcome from the open path, run read-only or in memory, and show \"please update\"; never throw while opening",
+      "match": [
+        "is newer than this app"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "persistence-and-migrations"
+    },
+    {
+      "id": "state-db-not-a-database",
+      "topic": "Persistence",
+      "symptom": "The app crashes at launch with \"file is not a database\"",
+      "cause": "The database file itself is not an SQLite file (never seen with WAL and synchronous FULL)",
+      "fix": "Handle it as an open outcome: move the file aside as a support copy and start fresh, with the developer's approval of the copy and the message",
+      "match": [
+        "file is not a database"
+      ],
+      "status": "open",
+      "needsHuman": false,
+      "skill": "persistence-and-migrations"
+    },
+    {
+      "id": "state-wal-checkpoint",
+      "topic": "Persistence",
+      "symptom": "A device backup restores older data",
+      "cause": "Recent writes sit in the -wal file",
+      "fix": "Run PRAGMA wal_checkpoint(TRUNCATE) when the app goes to the background (the -wal file drops to 0 bytes)",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "persistence-and-migrations"
+    },
+    {
+      "id": "state-save-payload-size",
+      "topic": "Persistence",
+      "symptom": "Writes get slow as a JSON document grows",
+      "cause": "The whole document is written on every save",
+      "fix": "Keep a write-speed test; past about 200 KB move the busy part into its own table or row (the SQLite default avoids this)",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "persistence-and-migrations"
+    },
+    {
+      "id": "state-prevent-remove-limits",
+      "topic": "Navigation",
+      "symptom": "Work is lost although Back opens a confirmation",
+      "cause": "usePreventRemove does not catch app close, an OS kill, or a screen unmounted by a guard flip",
+      "fix": "Save as the user goes; the Back confirmation is UX only",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "navigation-and-routing"
+    },
+    {
+      "id": "state-nav-direction-source",
+      "topic": "Navigation",
+      "symptom": "The navigator direction disagrees with the layout for one launch",
+      "cause": "The direction was derived from the language setting, not I18nManager",
+      "fix": "Derive navigation direction from I18nManager's current constants",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "rtl-and-direction"
+    },
+    {
+      "id": "state-rtl-push-direction",
+      "topic": "Navigation",
+      "symptom": "Push animations slide the wrong way in RTL with headerShown false",
+      "cause": "Not checked on a device",
+      "fix": "Check push and back animations in RTL on both platforms before shipping RTL",
+      "match": [],
+      "status": "open",
+      "needsHuman": false,
+      "skill": "navigation-and-routing"
+    },
+    {
+      "id": "state-reduce-motion-fade",
+      "topic": "Navigation",
+      "symptom": "Reduce Motion is on, but screens still slide",
+      "cause": "The stack always uses the platform push animation",
+      "fix": "Set animation: 'fade' (or 'none') from the reduce-motion setting in the screen options",
+      "match": [],
+      "status": "open",
+      "needsHuman": false,
+      "skill": "motion-and-animation"
+    },
+    {
+      "id": "state-stack-screen-stays-mounted",
+      "topic": "Navigation",
+      "symptom": "A polling or timer screen keeps working when another screen covers it",
+      "cause": "Stack screens stay mounted under the screen on top",
+      "fix": "Start and stop the work with useFocusEffect (and pause on background)",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "async-safety"
+    },
+    {
+      "id": "state-abort-polyfill-missing-api",
+      "topic": "Async",
+      "symptom": "signal.throwIfAborted is not a function, or signal.reason is undefined, on the device while Jest passes",
+      "cause": "React Native 0.86 polyfills AbortController with abort-controller 3.0.0, which lacks throwIfAborted and reason; Jest runs Node's full implementation",
+      "fix": "Check signal.aborted and throw your own abort error; never call throwIfAborted or read signal.reason in app code",
+      "match": [
+        "throwIfAborted is not a function"
+      ],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "async-safety",
+      "appliesTo": {
+        "react-native": "0.86.x"
+      }
+    },
+    {
+      "id": "state-abort-error-name",
+      "topic": "Async",
+      "symptom": "An abort is shown as an error on the device although the code checks error.name === 'AbortError'",
+      "cause": "expo/fetch rejects an aborted request with a FetchError, not an AbortError",
+      "fix": "Decide by signal.aborted, not by the error name",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "async-safety"
+    },
+    {
+      "id": "state-listener-signal-option",
+      "topic": "Async",
+      "symptom": "A listener registered with { signal } keeps firing after the abort on the device",
+      "cause": "React Native's event-target-shim 5 ignores the signal option of addEventListener",
+      "fix": "Remove listeners explicitly in the cleanup (keep the remove function or subscription)",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "async-safety"
+    },
+    {
+      "id": "state-countdown-utc",
+      "topic": "Dates",
+      "symptom": "\"Next in {h} h {m} min\" is hours off (it counts to UTC midnight)",
+      "cause": "It was computed from Date.now() % 86_400_000, which is UTC midnight, not local",
+      "fix": "Ask the clock port for the time until the next local day (DST-safe); keep day maths out of screens",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "dates-streaks-and-statistics"
+    },
+    {
+      "id": "state-week-strip-by-weekday",
+      "topic": "Dates",
+      "symptom": "A seven-day strip cannot find today's cell by its testID",
+      "cause": "The cells were numbered by ISO weekday instead of position",
+      "fix": "Number by position (1 = six days ago, 7 = today); the weekday only picks the label",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "dates-streaks-and-statistics"
+    },
+    {
+      "id": "state-clock-member-missing",
+      "topic": "Dates",
+      "symptom": "TS2741: Property '<member>' is missing in type ... but required in type 'ClockPort'",
+      "cause": "A hand-written clock object from before the port gained that member",
+      "fix": "Use the fake clock from the clock service in tests; code that only reads the time takes Pick<ClockPort, ...>",
+      "match": [
+        "is missing in type .* but required in type 'ClockPort'"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "architecture-and-boundaries"
+    },
+    {
+      "id": "state-signoff-date-utc",
+      "topic": "Dates",
+      "symptom": "A tool writes yesterday's date into a ledger or report shortly after local midnight",
+      "cause": "It took the UTC calendar day",
+      "fix": "Write the local calendar day (the date-key helper), and let a --date option override it",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "dates-streaks-and-statistics"
+    }
+  ]
+}

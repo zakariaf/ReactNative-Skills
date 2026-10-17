@@ -1,0 +1,44 @@
+Commit messages for golden changes (Conventional Commits; the trailer sits in the last paragraph).
+Write the message to a file, stage, run check-golden-changes.mjs . --staged --message <file>, commit.
+Scopes follow git-commits-and-reporting: the feature whose golden it is (tasks, insights), tooling for
+the shared pixel matcher in test/goldens/; "goldens" is not a scope. A feat or fix also needs a body
+that says why. Only *.golden.test.ts.snap(.ios|.android), pixel goldens and vectors are gated: an
+ordinary __snapshots__/*.test.tsx.snap update needs no Gate-Change (a trailer there fails
+gate-change-unneeded).
+
+----- a new data golden -----
+test(tasks): pin the digest goldens
+
+The digest plan and its notification id had only example tests; the golden shows the whole plan for
+three days and freezes the id format installed versions cancel by.
+
+Gate-Change: digest goldens created (4 planDigest entries, 4 [contract] digestNotificationId keys); read every entry
+
+----- an intended change re-accepted -----
+feat(tasks): show undated tasks first in the digest
+
+A task without a due date was easy to lose at the end of the digest; it now leads the upcoming
+group. The two goldens that hold undated tasks change on purpose and nothing else moved.
+
+Gate-Change: planDigest goldens for 2026-10-03 and 2026-10-05 re-accepted; undated tasks now lead the upcoming group (read both diffs)
+
+----- a contract key added (existing keys unchanged) -----
+test(tasks): pin the digest id after a leap day
+
+Gate-Change: adds the 2028-03-01 [contract] digestNotificationId key; existing keys unchanged
+
+----- pixel goldens re-accepted -----
+feat(insights): draw the goal line on the weekly chart
+
+The weekly chart showed bars with no target, so a week at 80 % read like a full week. The goal
+line is drawn at every size, which every pixel golden of the chart now shows.
+
+Gate-Change: weekly-chart pixel goldens re-accepted: the goal line now shows at every size; opened all 9 PNGs and the 3 diffs
+
+----- a tolerance raised, after the reviewer agreed (scope: tooling, the shared matcher in test/goldens/) -----
+test(tooling): allow the text anti-aliasing of the new font
+
+The variable font hints its outlines differently at 320 px, so text edges move by a pixel row
+while the layout stays the same.
+
+Gate-Change: failureThreshold 0.001 -> 0.002 approved by the design reviewer: the variable font hints differently at 320 px

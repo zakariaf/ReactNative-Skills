@@ -1,0 +1,12 @@
+{
+  "$comment": "Facts the checkers compare against. Verified 2026-10-14: eas-cli 24.10.0 and @expo/eas-json 24.9.0 (npm pack, source read), docs.expo.dev/build-reference/infrastructure (SDK 57 images). Re-verify: npm view eas-cli version; npm pack @expo/eas-json@<version>; read the infrastructure page. projectNpm is the npm that projectNode bundles (nodejs.org/dist/index.json: v26.4.0 ships npm 11.17.0; no older Node release does). stack-pin-ignore: imageNpm is the EAS image's npm, not the project's.",
+  "verified": "2026-10-14",
+  "easCli": "24.10.0",
+  "minCliFloor": "24.10.0",
+  "easJsonSchema": "@expo/eas-json 24.9.0",
+  "projectNode": "26.4.0",
+  "projectNpm": "11.17.0",
+  "imageNode": "22.23.1",
+  "imageNpm": "10.9.8",
+  "whatToTestMax": 4000
+}

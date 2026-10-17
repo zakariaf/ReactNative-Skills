@@ -1,0 +1,349 @@
+{
+  "bad-ad-app-id-missing": {
+    "expect": ["artifacts/Tasks.app/Info.plist [ad-app-id] GADApplicationIdentifier is missing"],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["dependencies", "react-native-google-mobile-ads"],
+          "value": "17.2.0"
+        }
+      }
+    ]
+  },
+  "bad-app-dir-ads-tracking": {
+    "expect": [
+      "artifacts/Tasks.app/Info.plist [ad-app-id] GADApplicationIdentifier is missing",
+      "artifacts/Tasks.app/Info.plist [usage-strings] NSUserTrackingUsageDescription is missing or empty",
+      "checked, 3 problems"
+    ],
+    "args": "{dir} --app artifacts/Tasks.app --variant preview --app-dir apps/mobile",
+    "ops": [
+      {
+        "write": {
+          "file": "apps/mobile/package.json",
+          "content": "{\n  \"name\": \"@acme/mobile\",\n  \"private\": true,\n  \"dependencies\": {\n    \"expo\": \"~57.0.26\",\n    \"react-native-google-mobile-ads\": \"17.2.0\"\n  }\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/app.config.ts",
+          "content": "export default {\n  plugins: [['react-native-google-mobile-ads', { iosAppId: process.env.ADMOB_IOS_APP_ID, userTrackingUsageDescription: 'Ads that fit you.' }]],\n};\n"
+        }
+      }
+    ]
+  },
+  "bad-ats": {
+    "expect": ["artifacts/Tasks.app/Info.plist [ats] NSAppTransportSecurity.NSAllowsArbitraryLoads is true"],
+    "ops": [
+      {
+        "replace": {
+          "file": "artifacts/Tasks.app/Info.plist",
+          "find": "<key>NSAllowsArbitraryLoads</key>\n    <false/>",
+          "with": "<key>NSAllowsArbitraryLoads</key>\n    <true/>"
+        }
+      }
+    ]
+  },
+  "bad-att-usage-missing": {
+    "expect": [
+      "artifacts/Tasks.app/Info.plist [usage-strings] NSUserTrackingUsageDescription is missing or empty, so using App Tracking Transparency (the tracking prompt) would crash the app"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-tracking-transparency"], "value": "~57.0.2" } }
+    ]
+  },
+  "bad-build-number": {
+    "expect": ["[build-number] CFBundleVersion is \"7\", expected 8"],
+    "args": "{dir} --app artifacts/Tasks.app --variant preview --build 8"
+  },
+  "bad-bundle-id-variant": {
+    "expect": [
+      "artifacts/Tasks.app/Info.plist [bundle-id] CFBundleIdentifier is \"com.acme.tasks\", expected \"com.acme.tasks.preview\" for a preview build"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "artifacts/Tasks.app/Info.plist",
+          "find": "<string>com.acme.tasks.preview</string>",
+          "with": "<string>com.acme.tasks</string>"
+        }
+      },
+      {
+        "replace": {
+          "file": "artifacts/Tasks.app/EXConstants.bundle/app.config",
+          "find": "\"bundleIdentifier\": \"com.acme.tasks.preview\"",
+          "with": "\"bundleIdentifier\": \"com.acme.tasks\""
+        }
+      }
+    ]
+  },
+  "bad-constants-missing": {
+    "expect": [
+      "artifacts/Tasks.app/EXConstants.bundle/app.config [constants-variant] EXConstants.bundle/app.config is missing"
+    ],
+    "ops": [{ "delete": "artifacts/Tasks.app/EXConstants.bundle/app.config" }]
+  },
+  "bad-constants-variant": {
+    "expect": [
+      "artifacts/Tasks.app/EXConstants.bundle/app.config [constants-variant] ios.bundleIdentifier is \"com.acme.tasks\" but Info.plist says \"com.acme.tasks.preview\""
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "artifacts/Tasks.app/EXConstants.bundle/app.config",
+          "find": "\"bundleIdentifier\": \"com.acme.tasks.preview\"",
+          "with": "\"bundleIdentifier\": \"com.acme.tasks\""
+        }
+      }
+    ]
+  },
+  "bad-device-build": {
+    "expect": ["[platform] DTPlatformName is \"iphoneos\", expected iphonesimulator"],
+    "ops": [
+      {
+        "replace": {
+          "file": "artifacts/Tasks.app/Info.plist",
+          "find": "<string>iphonesimulator</string>",
+          "with": "<string>iphoneos</string>"
+        }
+      }
+    ]
+  },
+  "bad-gate-without-sentinel": {
+    "expect": [
+      "src/test-only.ts:1 [test-code] src/test-only.ts gates test-only code, but no test-only sentinel is known"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/test-only-entry.ts",
+          "find": "export const TEST_BUILD_SENTINEL = 'TASKS_TEST_BUILD_ONLY';",
+          "with": "export const DEBUG_MENU_TITLE = 'Debug';"
+        }
+      }
+    ]
+  },
+  "bad-info-keys": {
+    "expect": [
+      "artifacts/Tasks.app/Info.plist [info-keys] CADisableMinimumFrameDurationOnPhone is \"missing\", the contract expects true"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/ios-sim-build.json",
+          "path": ["infoPlist"],
+          "value": { "CADisableMinimumFrameDurationOnPhone": true }
+        }
+      }
+    ]
+  },
+  "bad-min-ios-contract": {
+    "expect": ["[min-ios] MinimumOSVersion is \"16.4\", expected 17.0"],
+    "ops": [{ "json": { "file": "contracts/ios-sim-build.json", "path": ["deploymentTarget"], "value": "17.0" } }]
+  },
+  "bad-min-ios-floor": {
+    "expect": ["[min-ios] MinimumOSVersion is \"15.1\", below 16.4"],
+    "ops": [
+      {
+        "replace": {
+          "file": "artifacts/Tasks.app/Info.plist",
+          "find": "<string>16.4</string>",
+          "with": "<string>15.1</string>"
+        }
+      }
+    ]
+  },
+  "bad-privacy-manifest": {
+    "expect": [
+      "artifacts/Tasks.app/PrivacyInfo.xcprivacy [privacy-manifest] PrivacyInfo.xcprivacy is missing from the bundle"
+    ],
+    "ops": [{ "delete": "artifacts/Tasks.app/PrivacyInfo.xcprivacy" }]
+  },
+  "bad-sentinel-missing": {
+    "expect": [
+      "artifacts/Tasks.app/main.jsbundle [test-code] the preview build lacks the test-only sentinel \"TASKS_TEST_BUILD_ONLY\""
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "artifacts/Tasks.app/main.jsbundle",
+          "content": "HBC stand-in: __d(function(g,r,i,a,m,e,d){e.title=\"Tasks\";e.TEST_ONLY=null},1,[]);\n"
+        }
+      }
+    ]
+  },
+  "bad-template-token": {
+    "expect": [
+      "artifacts/Tasks.app/Info.plist [ship-placeholder] Info.plist CFBundleDisplayName is an unfilled template placeholder (__NAME__): __APP_NAME__"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "artifacts/Tasks.app/Info.plist",
+          "find": "<string>Tasks (Preview)</string>",
+          "with": "<string>__APP_NAME__</string>"
+        }
+      }
+    ]
+  },
+  "bad-usage-string": {
+    "expect": [
+      "artifacts/Tasks.app/Info.plist [usage-strings] NSMicrophoneUsageDescription is missing or empty",
+      "artifacts/Tasks.app/ar.lproj/InfoPlist.strings [usage-strings] has no NSCameraUsageDescription (the ar text for the camera)"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/ios-sim-build.json",
+          "path": ["usageStrings"],
+          "value": ["NSCameraUsageDescription", "NSMicrophoneUsageDescription"]
+        }
+      },
+      {
+        "write": {
+          "file": "artifacts/Tasks.app/ar.lproj/InfoPlist.strings",
+          "content": "\"CFBundleDisplayName\" = \"المهام (Preview)\";\n"
+        }
+      }
+    ]
+  },
+  "bad-version": {
+    "expect": ["[version] CFBundleShortVersionString is \"1.0.0\", expected 1.1.0"],
+    "args": "{dir} --app artifacts/Tasks.app --variant preview --version 1.1.0"
+  },
+  "bad-wrong-xcode": {
+    "expect": ["artifacts/Tasks.app/Info.plist [built-with-xcode] DTXcode is \"2700\", expected 2660 (Xcode 26.6)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "artifacts/Tasks.app/Info.plist",
+          "find": "<string>2660</string>",
+          "with": "<string>2700</string>"
+        }
+      }
+    ]
+  },
+  "error-bad-app-dir": {
+    "expect": ["ERROR [bad-input]", "app folder (--app-dir)"],
+    "args": "{dir} --app artifacts/Tasks.app --variant preview --app-dir apps/missing"
+  },
+  "error-bad-variant": {
+    "expect": ["ERROR [bad-input] --variant must be one of development|preview|production, got \"test\""],
+    "args": "{dir} --app artifacts/Tasks.app --variant test"
+  },
+  "error-contract-invalid": {
+    "expect": ["ERROR [bad-input] contracts/ios-sim-build.json is not valid"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/ios-sim-build.json",
+          "path": ["usageStrings"],
+          "value": "NSCameraUsageDescription"
+        }
+      }
+    ]
+  },
+  "error-no-app": {
+    "expect": ["ERROR [bad-input] nothing to check: --app is required"],
+    "args": "{dir} --variant preview"
+  },
+  "error-no-xcode-pin": {
+    "expect": ["ERROR [bad-input] no Xcode pin: scripts/ios/toolchain.ts does not pin XCODE_VERSION"],
+    "ops": [{ "delete": "scripts/ios/toolchain.ts" }]
+  },
+  "pass-binary-plist": {
+    "expect": ["check-sim-app: 1 app (preview) checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "artifacts/Tasks.app/Info.plist",
+          "base64": "YnBsaXN0MDDeAQIDBAUGBwgJCgsMDQ4PEBESExQXHB0iIxUgJV8QEkNGQnVuZGxlSWRlbnRpZmllcl8QD0NGQnVuZGxlVmVyc2lvbl8QEkNGQnVuZGxlRXhlY3V0YWJsZV8QE0NGQnVuZGxlRGlzcGxheU5hbWVfEBBNaW5pbXVtT1NWZXJzaW9uXxAVQ0ZCdW5kbGVMb2NhbGl6YXRpb25zXxAQQ0ZCdW5kbGVVUkxUeXBlc1dEVFhjb2RlXxAWTlNBcHBUcmFuc3BvcnRTZWN1cml0eV8QGE5TQ2FtZXJhVXNhZ2VEZXNjcmlwdGlvbl5EVFBsYXRmb3JtTmFtZV8QGUNGQnVuZGxlRGV2ZWxvcG1lbnRSZWdpb25fEB1JVFNBcHBVc2VzTm9uRXhlbXB0RW5jcnlwdGlvbl8QGkNGQnVuZGxlU2hvcnRWZXJzaW9uU3RyaW5nXxAWY29tLmFjbWUudGFza3MucHJldmlld1E3VVRhc2tzXxAPVGFza3MgKFByZXZpZXcpVDE2LjSiFRZSZW5SYXKhGNEZGl8QEkNGQnVuZGxlVVJMU2NoZW1lc6EbXXRhc2tzLXByZXZpZXdUMjY2MNIeHyAhXxAWTlNBbGxvd3NBcmJpdHJhcnlMb2Fkc18QF05TQWxsb3dzTG9jYWxOZXR3b3JraW5nCAlfEDJUYXNrcyB1c2VzIHRoZSBjYW1lcmEgdG8gYXR0YWNoIGEgcGhvdG8gdG8gYSB0YXNrLl8QD2lwaG9uZXNpbXVsYXRvcghVMS4wLjAACAAlADoATABhAHcAigCiALUAvQDWAPEBAAEcATwBWQFyAXQBegGMAZEBlAGXAZoBnAGfAbQBtgHEAckBzgHnAgECAgIDAjgCSgJLAAAAAAAAAgEAAAAAAAAAJgAAAAAAAAAAAAAAAAAAAlE="
+        }
+      }
+    ]
+  },
+  "pass-development-region": {
+    "expect": ["check-sim-app: 1 app (preview) checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "en is CFBundleDevelopmentRegion: a key missing from en.lproj falls back to the Info.plist text, which is English",
+        "write": {
+          "file": "artifacts/Tasks.app/en.lproj/InfoPlist.strings",
+          "content": "\"CFBundleDisplayName\" = \"Tasks (Preview)\";\n"
+        }
+      }
+    ]
+  },
+  "pass-min-ios-major": {
+    "expect": ["check-sim-app: 1 app (preview) checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "contracts/ios-sim-build.json", "path": ["deploymentTarget"], "value": "26" } },
+      {
+        "replace": {
+          "file": "artifacts/Tasks.app/Info.plist",
+          "find": "<string>16.4</string>",
+          "with": "<string>26.0</string>"
+        }
+      }
+    ]
+  },
+  "pass-no-gate": {
+    "expect": [
+      "SKIP src/test-only.ts [test-code] not yet created (debug-menu-and-test-hooks creates it)",
+      "0 problems, 1 skipped"
+    ],
+    "ops": [{ "delete": ["src/test-only.ts", "src/test-only-entry.ts"] }]
+  },
+  "pass-sample-ad-id": {
+    "expect": ["check-sim-app: 1 app (preview) checked, 0 problems"],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["dependencies", "react-native-google-mobile-ads"],
+          "value": "17.2.0"
+        }
+      },
+      {
+        "replace": {
+          "file": "artifacts/Tasks.app/Info.plist",
+          "find": "  <key>MinimumOSVersion</key>",
+          "with": "  <key>GADApplicationIdentifier</key>\n  <string>ca-app-pub-3940256099942544~1458002511</string>\n  <key>MinimumOSVersion</key>"
+        }
+      }
+    ]
+  },
+  "pass-sentinel-option": {
+    "expect": ["check-sim-app: 1 app (preview) checked, 0 problems"],
+    "args": "{dir} --app artifacts/Tasks.app --variant preview --sentinel TASKS_TEST_BUILD_ONLY",
+    "ops": [
+      {
+        "replace": {
+          "file": "src/test-only-entry.ts",
+          "find": "export const TEST_BUILD_SENTINEL = 'TASKS_TEST_BUILD_ONLY';",
+          "with": "export const DEBUG_MENU_TITLE = 'Debug';"
+        }
+      }
+    ]
+  },
+  "pass-xcode-patch-pin": {
+    "expect": ["check-sim-app: 1 app (preview) checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/ios/toolchain.ts",
+          "find": "export const XCODE_VERSION = '26.6';",
+          "with": "export const XCODE_VERSION = '26.6.1';"
+        }
+      },
+      {
+        "replace": {
+          "file": "artifacts/Tasks.app/Info.plist",
+          "find": "<string>2660</string>",
+          "with": "<string>2661</string>"
+        }
+      }
+    ]
+  }
+}

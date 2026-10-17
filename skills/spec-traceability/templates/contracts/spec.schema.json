@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spec.schema.json",
+  "title": "Requirement spec contract",
+  "description": "The app's requirement-ID scheme for spec-traceability: where the spec lives, the ID kinds, and which files count as tests.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "specDir": {
+      "description": "Repo-relative folder of the spec markdown files.",
+      "type": "string",
+      "minLength": 1,
+      "not": { "pattern": "(^/|(^|/)\\.\\.(/|$))" },
+      "default": "docs/spec"
+    },
+    "kinds": {
+      "description": "The ID kinds. A heading '<prefix><number> · <title>' is an entry of that kind.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "prefix"],
+        "properties": {
+          "$comment": { "type": "string" },
+          "kind": {
+            "description": "Kebab-case name of the kind.",
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+          },
+          "prefix": {
+            "description": "1-10 capital letters or digits starting with a letter, optionally ending in - or _.",
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9]{0,9}[-_]?$"
+          },
+          "traced": {
+            "description": "An entry of this kind marked 'Status: built' must be cited by a test or flow.",
+            "type": "boolean",
+            "default": false
+          },
+          "named": {
+            "description": "Citations of the form 'Title (ID)' are checked against the entry title and aliases.",
+            "type": "boolean",
+            "default": false
+          },
+          "requiredFields": {
+            "description": "Fields every entry of this kind carries; 'A|B' means either.",
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "defaultStatus": {
+            "description": "The status of an entry without a Status line.",
+            "enum": [
+              "planned",
+              "in-progress",
+              "built",
+              "dropped",
+              "out-of-scope",
+              "open",
+              "decided"
+            ],
+            "default": "planned"
+          },
+          "bareIn": {
+            "description": "Where a bare ID is read: everywhere (default for prefixes ending in - or _) or only in comments of code files.",
+            "enum": ["everywhere", "comments"]
+          }
+        }
+      }
+    },
+    "sections": {
+      "description": "Check section citations (the word spec followed by a section number) against numbered section headings: true, false, or auto (only when the spec numbers its sections).",
+      "enum": [true, false, "auto"],
+      "default": "auto"
+    },
+    "aliases": {
+      "description": "Extra names an entry may be cited by, per ID.",
+      "type": "object",
+      "additionalProperties": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+    },
+    "traceGlobs": {
+      "description": "Files whose citations trace an entry (tests and end-to-end flows). A glob without '/' matches a file name anywhere.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "ignore": {
+      "description": "Extra globs check-spec-refs does not read.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}

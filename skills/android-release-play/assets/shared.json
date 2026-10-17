@@ -1,0 +1,8 @@
+[
+  {"from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs"},
+  {"from": "scripts/lib/ship-placeholders.mjs", "to": "scripts/lib/ship-placeholders.mjs"},
+  {"from": "repo-templates/scripts/clock/system-clock.ts", "to": "templates/scripts/clock/system-clock.ts"},
+  {"from": "repo-templates/scripts/clock/system-clock.test.ts", "to": "templates/scripts/clock/system-clock.test.ts"},
+  {"from": "repo-templates/src/config/app-variant.ts", "to": "templates/src/config/app-variant.ts"},
+  {"from": "repo-templates/src/config/app-variant.test.ts", "to": "templates/src/config/app-variant.test.ts"}
+]

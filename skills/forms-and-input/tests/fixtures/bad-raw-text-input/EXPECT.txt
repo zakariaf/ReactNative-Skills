@@ -1,0 +1,2 @@
+src/features/task-editor/components/quick-title.tsx:2 [raw-text-input] TextInput imported from react-native outside the field folder (src/ui/form)
+RESULT: FAIL (1 problems)

@@ -1,0 +1,13 @@
+{
+  "edge": "edge",
+  "text": [["label", "cell"]],
+  "graphics": [
+    ["mark", "done"],
+    ["hint", "cell"]
+  ],
+  "shapes": [
+    ["done", "background"],
+    ["done", "cell"]
+  ],
+  "distinct": [["done", "cell"]]
+}

@@ -1,0 +1,150 @@
+# .github/workflows/ci.yml
+# CI for the skill library itself: the standard, every checker's planted-bug self-test, the generated
+# catalogue, repo hygiene, routing evals, the plugin manifests, and the template proof in the reference
+# Expo app (tools/harness). Nothing here runs a device, a simulator, a native build or a release gate
+# (design-review-workflow's check-signoff needs a signed device review and is never run here).
+# Every action is pinned to a full commit SHA; the comment names its release.
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A new push to a pull request cancels its older run; runs on main always finish.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  LEFTHOOK: '0'
+  EXPO_NO_TELEMETRY: '1'
+  NO_COLOR: '1'
+
+jobs:
+  catalogue:
+    name: catalogue, hygiene, routing, manifests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node from .nvmrc
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+      - name: Shared files match their canonical copies
+        run: node tools/sync-shared.mjs --check
+      - name: Generated catalogue files are current
+        run: node tools/build-catalog.mjs --check
+      - name: The index skill's generated tables are current
+        run: node skills/react-native-conventions-index/scripts/build-index.mjs . --catalog tools/catalog.json --check
+      - name: Repo hygiene and budget
+        run: node tools/check-repo-hygiene.mjs
+      - name: Versions agree with tools/stack.json
+        run: node tools/check-stack-pins.mjs
+      - name: The skill set fits its listing budget (no duplicate descriptions)
+        run: node skills/skill-maintenance/scripts/check-skill-set.mjs .
+      - name: Routing evals cover every skill
+        run: node tools/check-routing-evals.mjs
+      - name: check-routing-evals self-test
+        run: node tools/tests/check-routing-evals.selftest.mjs
+      - name: Plugin manifests agree with the catalogue
+        run: node tools/tests/plugin-manifests.test.mjs
+      - name: Fixture tools self-tests
+        run: |
+          node tools/fixtures-pack.selftest.mjs
+          node tools/fixtures-to-overlay.selftest.mjs
+
+  validate-skills:
+    name: validate-skills
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node from .nvmrc
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+      - name: Every skill against the standard
+        run: node tools/validate-skills.mjs
+
+  selftest:
+    name: selftest-all (${{ matrix.shard }}/4)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node from .nvmrc
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+      - name: Every checker against its planted-bug fixtures (shard ${{ matrix.shard }} of 4)
+        run: node tools/selftest-all.mjs --shard ${{ matrix.shard }}/4
+        env:
+          CI: 'true'
+
+  harness:
+    name: harness gates and templates (${{ matrix.shard }}/4)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node from tools/harness/.nvmrc
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: tools/harness/.nvmrc
+          cache: npm
+          cache-dependency-path: tools/harness/package-lock.json
+      - name: Install the locked packages under the repo's npm policy
+        # tools/harness/.npmrc applies: engine-strict (npm >= 11.17), a 7-day minimum release age,
+        # strict-allow-scripts (only reviewed install scripts run), exact pins, no legacy peer deps.
+        working-directory: tools/harness
+        run: |
+          npm --version
+          npm ci
+      - name: Harness gates
+        if: ${{ matrix.shard == 1 }}
+        working-directory: tools/harness
+        run: |
+          npm run -s check:npm-config
+          npm run -s typecheck
+          npx eslint . --max-warnings 0
+          npx prettier --check . --log-level warn
+          npx knip
+          npx jest --ci --coverage --randomize --maxWorkers=2
+      - name: verify-templates self-test and harness drift
+        if: ${{ matrix.shard == 1 }}
+        run: |
+          node tools/tests/verify-templates.selftest.mjs
+          node tools/verify-templates.mjs
+      - name: Templates compile, lint and test in the reference app (shard ${{ matrix.shard }} of 4)
+        run: |
+          mapfile -t skills < <(ls skills | awk -v shard=${{ matrix.shard }} 'NR % 4 == shard % 4')
+          node tools/verify-templates.mjs "${skills[@]}"

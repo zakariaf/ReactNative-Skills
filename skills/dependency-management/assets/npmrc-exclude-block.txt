@@ -1,0 +1,2 @@
+# exclude-block expires=__EXPIRES__ reason=__REASON__
+min-release-age-exclude[]=__PACKAGE__

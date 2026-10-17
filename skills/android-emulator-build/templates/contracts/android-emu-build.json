@@ -1,0 +1,19 @@
+{
+  "$schema": "./android-emu-build.schema.json",
+  "$comment": "The app's facts for Release emulator builds: read by scripts/build/build-android-emu.ts and by the android-emulator-build skill's check-emu-setup, check-apk and check-emu-screenshot. Every key is optional; the schema says what each does and its default.",
+  "avdPrefix": "__AVD_PREFIX__",
+  "device": "pixel_8",
+  "appId": "__APP_ID__",
+  "postPrebuild": [],
+  "targetSdk": 36,
+  "minSdk": 24,
+  "permissions": [
+    "android.permission.INTERNET",
+    "android.permission.READ_EXTERNAL_STORAGE",
+    "android.permission.SYSTEM_ALERT_WINDOW",
+    "android.permission.VIBRATE",
+    "android.permission.WRITE_EXTERNAL_STORAGE"
+  ],
+  "application": {},
+  "readyLog": null
+}

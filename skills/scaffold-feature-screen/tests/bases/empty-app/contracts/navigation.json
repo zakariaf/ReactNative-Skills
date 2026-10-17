@@ -1,0 +1,11 @@
+{
+  "router": "expo-router",
+  "home": "/",
+  "routes": ["(app)/index", "+not-found"],
+  "protected": [],
+  "guarded": [],
+  "modals": [],
+  "paramParsers": {},
+  "debugRoutes": [],
+  "placeholders": []
+}

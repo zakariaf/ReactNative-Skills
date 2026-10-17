@@ -1,0 +1,1 @@
+{"base": ["@tests/bases/app", {"templates": true, "firstLinePath": true, "fill": {"__PRODUCTION_APP_ID__": "com.example.tasks", "__API_HOST__": "api.example.com", "__HOME_OPEN__": "tasks", "__HOME_SCREEN_ID__": "tasks.list", "__SUMMARY_ID__": "tasks.summary", "__ITEM_ROW_ID__": "tasks.task-row.task-2", "__SUMMARY_AFTER_TAP__": ".*1 open task.*"}}]}

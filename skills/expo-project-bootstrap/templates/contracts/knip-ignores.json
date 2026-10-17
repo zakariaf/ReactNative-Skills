@@ -1,0 +1,16 @@
+{
+  "$schema": "./knip-ignores.schema.json",
+  "$comment": "Why each ignore entry of knip.json exists (quality-gates). knip.json takes no comments, so every entry of its ignore lists (top level and per workspace) has its reason here, at the same key path; quality-gates' check-gate-wiring fails an entry without one. An ignore entry silences knip for good, so add one only for a tool contract (a binary started by name, a package a root mock imports but the app installs), with the developer's agreement and a Gate-Change: trailer. The ten agent-folder entries below are the canonical ones: keep them even when knip prints a configuration hint that a folder does not exist yet (the hint does not fail the run).",
+  "ignore": {
+    "skills/**": "skills vendored or installed at the repo root: their templates and fixtures import packages the app never installs, and knip's Jest plugin falls back to Jest's default test glob, so without this entry check:unused fails on skill files",
+    ".agents/**": "skills installed for an agent under .agents/: their templates and fixtures import packages the app never installs, and knip's Jest plugin falls back to Jest's default test glob, so without this entry check:unused fails on skill files",
+    ".claude/**": "skills installed for an agent under .claude/: their templates and fixtures import packages the app never installs, and knip's Jest plugin falls back to Jest's default test glob, so without this entry check:unused fails on skill files",
+    ".codex/**": "skills installed for an agent under .codex/: their templates and fixtures import packages the app never installs, and knip's Jest plugin falls back to Jest's default test glob, so without this entry check:unused fails on skill files",
+    ".cursor/**": "skills installed for an agent under .cursor/: their templates and fixtures import packages the app never installs, and knip's Jest plugin falls back to Jest's default test glob, so without this entry check:unused fails on skill files",
+    ".windsurf/**": "skills installed for an agent under .windsurf/: their templates and fixtures import packages the app never installs, and knip's Jest plugin falls back to Jest's default test glob, so without this entry check:unused fails on skill files",
+    ".roo/**": "skills installed for an agent under .roo/: their templates and fixtures import packages the app never installs, and knip's Jest plugin falls back to Jest's default test glob, so without this entry check:unused fails on skill files",
+    ".cline/**": "skills installed for an agent under .cline/: their templates and fixtures import packages the app never installs, and knip's Jest plugin falls back to Jest's default test glob, so without this entry check:unused fails on skill files",
+    ".continue/**": "skills installed for an agent under .continue/: their templates and fixtures import packages the app never installs, and knip's Jest plugin falls back to Jest's default test glob, so without this entry check:unused fails on skill files",
+    ".kiro/**": "skills installed for an agent under .kiro/: their templates and fixtures import packages the app never installs, and knip's Jest plugin falls back to Jest's default test glob, so without this entry check:unused fails on skill files"
+  }
+}

@@ -1,0 +1,583 @@
+{
+  "bad-contract-route-missing": {
+    "expect": ["[route-table]", "contract route (app)/stats has no route file"],
+    "ops": [{ "json": { "file": "contracts/navigation.json", "path": ["routes", 7], "value": "(app)/stats" } }]
+  },
+  "bad-contract-unknown-key": {
+    "expect": ["[contract]", "unknown key \"screens\""],
+    "ops": [{ "json": { "file": "contracts/navigation.json", "path": ["screens"], "value": [] } }]
+  },
+  "bad-debug-not-test-only": {
+    "expect": ["[debug-gated]", "src/app/debug.tsx:1", "does not render through TEST_ONLY"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/debug.tsx",
+          "lines": [
+            "// src/app/debug.tsx",
+            "import { DebugScreen } from '@/features/debug/debug-screen';",
+            "",
+            "export default DebugScreen;"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-debug-route-unguarded": {
+    "expect": ["[debug-gated]", "src/app/debug.tsx:1", "debug route debug is reachable in production builds"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-stack.tsx",
+          "find": "      <Stack.Protected guard={isTestBuild}>\n        <Stack.Screen name=\"debug\" />\n      </Stack.Protected>\n",
+          "with": "      <Stack.Screen name=\"debug\" />\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-stack.tsx",
+          "find": "import { isTestBuild } from '@/features/debug/test-build';\n",
+          "with": ""
+        }
+      },
+      { "json": { "file": "contracts/navigation.json", "path": ["protected", 2], "delete": true } }
+    ]
+  },
+  "bad-dynamic-route-no-parser": {
+    "expect": [
+      "[params-parsed]",
+      "src/app/(app)/tasks/[taskId].tsx:1",
+      "dynamic route (app)/tasks/[taskId] has no params parser"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/navigation.json",
+          "path": ["paramParsers", "(app)/tasks/[taskId]"],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "bad-editor-no-prevent-remove": {
+    "expect": [
+      "[guarded-prevent-remove]",
+      "src/features/task-editor/use-task-editor-model.ts:1",
+      "never blocks removal"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/task-editor/use-task-editor-model.ts",
+          "lines": [
+            "// src/features/task-editor/use-task-editor-model.ts",
+            "import { useRouter } from 'expo-router';",
+            "",
+            "export function useTaskEditorModel(): { readonly onSave: () => void } {",
+            "  const router = useRouter();",
+            "  return {",
+            "    onSave: () => {",
+            "      router.back();",
+            "    },",
+            "  };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-editor-swipe-on": {
+    "expect": ["[guarded-gesture-off]", "src/app/(app)/tasks/[taskId]/edit.tsx:1", "keeps the iOS back swipe"],
+    "ops": [{ "json": { "file": "contracts/navigation.json", "path": ["guarded", 0, "gesture"], "value": "off" } }]
+  },
+  "bad-effect-navigation": {
+    "expect": [
+      "[flow-by-guard]",
+      "src/features/root-navigator/app-stack.tsx:11",
+      "a layout navigates from an effect (router.replace)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-stack.tsx",
+          "find": "import { Stack } from 'expo-router';",
+          "with": "import { Stack, router } from 'expo-router';\nimport { useEffect } from 'react';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-stack.tsx",
+          "find": "  const isSignedIn = useIsSignedIn();\n",
+          "with": "  const isSignedIn = useIsSignedIn();\n  useEffect(() => {\n    if (!isSignedIn) router.replace('/sign-in');\n  }, [isSignedIn]);\n"
+        }
+      }
+    ]
+  },
+  "bad-guard-changed": {
+    "expect": [
+      "[protected-guard]",
+      "no <Stack.Protected guard={isSignedIn}> in src/features/root-navigator/app-stack.tsx",
+      "the protected group guard={isSignedIn || isTestBuild} is not in the contract"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-stack.tsx",
+          "find": "guard={isSignedIn}",
+          "with": "guard={isSignedIn || isTestBuild}"
+        }
+      }
+    ]
+  },
+  "bad-guarded-hook-missing": {
+    "expect": ["[guarded-prevent-remove]", "src/features/task-editor/use-editor-model.ts:1", "does not exist"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/navigation.json",
+          "path": ["guarded", 0, "hook"],
+          "value": "src/features/task-editor/use-editor-model.ts"
+        }
+      }
+    ]
+  },
+  "bad-home-not-a-route": {
+    "expect": ["[home-route]", "home /today matches no route file"],
+    "ops": [{ "json": { "file": "contracts/navigation.json", "path": ["home"], "value": "/today" } }]
+  },
+  "bad-href-cast": {
+    "expect": ["[href-cast]", "src/features/tasks/use-tasks-model.ts:8"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "router.push({ pathname: '/tasks/[taskId]', params: { taskId } });",
+          "with": "router.push(`/tasks/${taskId}` as Href);"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "import { useRouter } from 'expo-router';",
+          "with": "import { useRouter, type Href } from 'expo-router';"
+        }
+      }
+    ]
+  },
+  "bad-js-stack": {
+    "expect": ["[native-stack]", "src/app/(app)/_layout.tsx:2", "imports expo-router/js-stack"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/(app)/_layout.tsx",
+          "find": "import { Stack } from 'expo-router';",
+          "with": "import { Stack } from 'expo-router/js-stack';"
+        }
+      }
+    ]
+  },
+  "bad-link-home": {
+    "expect": ["[go-back]", "src/features/tasks/components/back-to-tasks.tsx:5", "<Link href=\"/\"> pushes a second /"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/back-to-tasks.tsx",
+          "lines": [
+            "// src/features/tasks/components/back-to-tasks.tsx",
+            "import { Link } from 'expo-router';",
+            "",
+            "export function BackToTasks(props: { readonly label: string }): React.JSX.Element {",
+            "  return <Link href=\"/\">{props.label}</Link>;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-modal-pushed": {
+    "expect": ["[modal-presentation]", "src/app/(app)/compose.tsx:1", "is a contract modal but opens as a pushed card"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/(app)/_layout.tsx",
+          "find": "<Stack.Screen name=\"compose\" options={{ presentation: 'modal' }} />",
+          "with": "<Stack.Screen name=\"compose\" />"
+        }
+      }
+    ]
+  },
+  "bad-modal-unlisted": {
+    "expect": [
+      "[modal-presentation]",
+      "src/app/(app)/_layout.tsx:10",
+      "presents as a modal but is not in the contract modals"
+    ],
+    "ops": [{ "json": { "file": "contracts/navigation.json", "path": ["modals"], "value": [] } }]
+  },
+  "bad-navigate-home": {
+    "expect": ["[go-back]", "src/features/tasks/use-tasks-model.ts:11", "router.navigate('/') stacks a second /"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "router.dismissTo('/');",
+          "with": "router.navigate('/');"
+        }
+      }
+    ]
+  },
+  "bad-navigate-home-object": {
+    "expect": [
+      "[go-back]",
+      "src/features/tasks/use-tasks-model.ts:11",
+      "router.navigate({ pathname: '/' }) stacks a second /"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "router.dismissTo('/');",
+          "with": "router.navigate({ pathname: '/' });"
+        }
+      }
+    ]
+  },
+  "bad-no-contract": {
+    "expect": ["[contract]", "contracts/navigation.json:1"],
+    "ops": [{ "delete": "contracts/navigation.json" }]
+  },
+  "bad-no-not-found": {
+    "expect": ["[not-found]", "src/app/+not-found.tsx:1"],
+    "ops": [
+      { "delete": "src/app/+not-found.tsx" },
+      { "json": { "file": "contracts/navigation.json", "path": ["routes", 6], "delete": true } }
+    ]
+  },
+  "bad-params-type-arg": {
+    "expect": [
+      "[params-parsed]",
+      "src/features/task-detail/use-task-detail-model.ts:5",
+      "useLocalSearchParams<...>() is a cast"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/task-detail/use-task-detail-model.ts",
+          "lines": [
+            "// src/features/task-detail/use-task-detail-model.ts",
+            "import { useLocalSearchParams } from 'expo-router';",
+            "",
+            "export function useTaskDetailModel(): { readonly taskId: string } {",
+            "  const { taskId } = useLocalSearchParams<{ taskId: string }>();",
+            "  return { taskId };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-parser-not-valibot": {
+    "expect": ["[params-parsed]", "src/features/task-detail/task-detail-params.ts:1", "does not validate with valibot"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/task-detail/task-detail-params.ts",
+          "lines": [
+            "// src/features/task-detail/task-detail-params.ts",
+            "export type TaskDetailParams = { readonly taskId: string };",
+            "",
+            "export function parseTaskDetailParams(raw: Readonly<Record<string, unknown>>): TaskDetailParams {",
+            "  return { taskId: String(raw.taskId) };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-placeholder-release": {
+    "expect": ["[placeholder-release]", "src/app/(app)/compose.tsx:1", "a placeholder never ships"],
+    "args": "{dir} --release",
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/(app)/compose.tsx",
+          "lines": [
+            "// src/app/(app)/compose.tsx",
+            "import { PlaceholderScreen } from '@/features/placeholder/placeholder-screen';",
+            "",
+            "export default function ComposeRoute(): React.JSX.Element {",
+            "  return <PlaceholderScreen />;",
+            "}"
+          ]
+        }
+      },
+      { "json": { "file": "contracts/navigation.json", "path": ["placeholders"], "value": ["(app)/compose"] } }
+    ]
+  },
+  "bad-placeholder-stale": {
+    "expect": ["[placeholder-route]", "contract placeholder (app)/compose renders its real screen"],
+    "ops": [{ "json": { "file": "contracts/navigation.json", "path": ["placeholders"], "value": ["(app)/compose"] } }]
+  },
+  "bad-placeholder-unlisted": {
+    "expect": [
+      "[placeholder-route]",
+      "src/app/(app)/compose.tsx:1",
+      "renders PlaceholderScreen but is not in the contract placeholders"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/(app)/compose.tsx",
+          "lines": [
+            "// src/app/(app)/compose.tsx",
+            "import { PlaceholderScreen } from '@/features/placeholder/placeholder-screen';",
+            "",
+            "export default function ComposeRoute(): React.JSX.Element {",
+            "  return <PlaceholderScreen />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-protected-not-in-contract": {
+    "expect": [
+      "[protected-guard]",
+      "src/features/root-navigator/app-stack.tsx:17",
+      "the protected group guard={isTestBuild} is not in the contract"
+    ],
+    "ops": [{ "json": { "file": "contracts/navigation.json", "path": ["protected", 2], "delete": true } }]
+  },
+  "bad-react-navigation-import": {
+    "expect": [
+      "[one-navigator]",
+      "src/features/tasks/use-task-focus.ts:2",
+      "imports @react-navigation/native in an Expo Router app"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-focus.ts",
+          "lines": [
+            "// src/features/tasks/use-task-focus.ts",
+            "import { useIsFocused } from '@react-navigation/native';",
+            "",
+            "export const useTaskFocus = useIsFocused;"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-redirect-in-layout": {
+    "expect": ["[flow-by-guard]", "src/app/(app)/_layout.tsx:7", "a layout redirects to switch flows"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/(app)/_layout.tsx",
+          "find": "import { Stack } from 'expo-router';",
+          "with": "import { Redirect, Stack } from 'expo-router';\n\nimport { useIsSignedIn } from '@/stores/session/session-selectors';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/(app)/_layout.tsx",
+          "find": "  return (\n    <Stack>",
+          "with": "  if (!useIsSignedIn()) return <Redirect href=\"/sign-in\" />;\n  return (\n    <Stack>"
+        }
+      }
+    ]
+  },
+  "bad-root-layout-no-default": {
+    "expect": ["[root-layout]", "src/app/_layout.tsx:1", "no default export"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "export default function RootLayout",
+          "with": "export function RootLayout"
+        }
+      }
+    ]
+  },
+  "bad-root-layout-no-navigator": {
+    "expect": ["[root-layout]", "neither the root layout nor a component it renders draws a navigator"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/root-stack.tsx",
+          "find": "return <AppStack />;",
+          "with": "return null;"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/root-navigator/root-stack.tsx",
+          "find": "import { AppStack } from './app-stack';\n\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-route-not-in-contract": {
+    "expect": ["[route-table]", "src/app/(app)/settings.tsx:1", "route (app)/settings is not in the contract"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/(app)/settings.tsx",
+          "lines": [
+            "// src/app/(app)/settings.tsx",
+            "import { SettingsScreen } from '@/features/settings/settings-screen';",
+            "",
+            "export default SettingsScreen;"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-router-in-service": {
+    "expect": ["[nav-in-screens]", "src/services/sync/sync-router.ts:2", "imports expo-router"],
+    "ops": [
+      {
+        "$comment": "A service that is not a root kit navigates.",
+        "write": {
+          "file": "src/services/sync/sync-router.ts",
+          "lines": [
+            "// src/services/sync/sync-router.ts",
+            "import { router } from 'expo-router';",
+            "",
+            "export const openInbox = (): void => router.navigate('/');"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-router-in-store": {
+    "expect": ["[nav-in-screens]", "src/stores/session/session-selectors.ts:2", "imports expo-router"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/session/session-selectors.ts",
+          "find": "import { create } from 'zustand';",
+          "with": "import { router } from 'expo-router';\nimport { create } from 'zustand';\n\nexport const signOut = (): void => router.replace('/sign-in');"
+        }
+      }
+    ]
+  },
+  "bad-router-in-ui": {
+    "expect": ["[nav-in-screens]", "src/ui/task-row.tsx:3", "imports expo-router: shared layers never navigate"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/task-row.tsx",
+          "find": "import { Pressable, Text } from 'react-native';",
+          "with": "import { Pressable, Text } from 'react-native';\nimport { router } from 'expo-router';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/ui/task-row.tsx",
+          "find": "<Pressable onPress={props.onPress}>",
+          "with": "<Pressable onPress={() => router.back()}>"
+        }
+      }
+    ]
+  },
+  "bad-router-mismatch": {
+    "expect": ["[contract]", "does not depend on @react-navigation/native"],
+    "ops": [{ "json": { "file": "contracts/navigation.json", "path": ["router"], "value": "react-navigation" } }]
+  },
+  "bad-second-container": {
+    "expect": [
+      "[one-navigator]",
+      "src/features/onboarding/onboarding-navigator.tsx:7",
+      "createStaticNavigation( builds a second navigation tree"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/onboarding/onboarding-navigator.tsx",
+          "lines": [
+            "// src/features/onboarding/onboarding-navigator.tsx",
+            "import { createStaticNavigation } from 'expo-router/react-navigation';",
+            "import { createNativeStackNavigator } from 'expo-router/react-navigation';",
+            "",
+            "const onboardingStack = createNativeStackNavigator({ screens: {} });",
+            "",
+            "export const OnboardingNavigation = createStaticNavigation(onboardingStack);"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-typed-routes-off": {
+    "expect": ["[typed-routes]", "app.config.ts:1"],
+    "ops": [{ "replace": { "file": "app.config.ts", "find": "typedRoutes: true", "with": "typedRoutes: false" } }]
+  },
+  "error-malformed-contract": {
+    "expect": ["ERROR [bad-input] contracts/navigation.json is not valid JSON"],
+    "ops": [{ "write": { "file": "contracts/navigation.json", "content": "{ \"router\": \n" } }]
+  },
+  "error-no-package": { "expect": ["ERROR [bad-input] nothing to check"], "ops": [{ "delete": "package.json" }] },
+  "error-release-no-router": {
+    "expect": ["ERROR [bad-input] nothing to gate: neither expo-router nor @react-navigation/native is in package.json"],
+    "args": "{dir} --release",
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo-router"], "delete": true } }]
+  },
+  "pass-gesture-off": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "contracts/navigation.json", "path": ["guarded", 0, "gesture"], "value": "off" } },
+      {
+        "replace": {
+          "file": "src/app/(app)/_layout.tsx",
+          "find": "<Stack.Screen name=\"tasks/[taskId]/edit\" />",
+          "with": "<Stack.Screen name=\"tasks/[taskId]/edit\" options={{ gestureEnabled: false, fullScreenGestureEnabled: false }} />"
+        }
+      }
+    ]
+  },
+  "pass-no-router": {
+    "expect": ["NOT APPLICABLE: neither expo-router nor @react-navigation/native is in package.json"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo-router"], "delete": true } }]
+  },
+  "pass-placeholder-listed": {
+    "expect": ["check-navigation:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/(app)/compose.tsx",
+          "lines": [
+            "// src/app/(app)/compose.tsx",
+            "import { PlaceholderScreen } from '@/features/placeholder/placeholder-screen';",
+            "",
+            "export default function ComposeRoute(): React.JSX.Element {",
+            "  return <PlaceholderScreen />;",
+            "}"
+          ]
+        }
+      },
+      { "json": { "file": "contracts/navigation.json", "path": ["placeholders"], "value": ["(app)/compose"] } }
+    ]
+  },
+  "pass-root-kit-routes-taps": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "A root kit's effects route notification taps below the navigator (app-startup-and-bootstrap's slots): allowed.",
+        "write": {
+          "file": "src/services/push/push-root-kit.tsx",
+          "lines": [
+            "// src/services/push/push-root-kit.tsx",
+            "import { useRouter } from 'expo-router';",
+            "",
+            "export function PushTapRoutes(): null {",
+            "  const router = useRouter();",
+            "  void router;",
+            "  return null;",
+            "}"
+          ]
+        }
+      }
+    ]
+  }
+}

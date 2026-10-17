@@ -1,0 +1,202 @@
+{
+  "$schema": "./component-library.schema.json",
+  "$comment": "The app's shared component catalogue, read by ui-component-library's check-components.mjs and write-component-specs.mjs. Every component file in the ui folder is listed here, with the parts it derives from its testID and the flags that allow a look only some components may have.",
+  "uiDir": "src/ui",
+  "exclude": ["a11y/**", "icons/**", "motion/**", "adaptive/**", "feedback/**"],
+  "specs": {
+    "tokens": "design/tokens.json",
+    "block": "components",
+    "out": "src/ui/component-specs.json",
+    "module": "src/ui/component-specs.ts",
+    "asRenderedBorders": false,
+    "overrides": []
+  },
+  "pressHosts": ["pressable-surface.tsx"],
+  "components": [
+    {
+      "name": "ActionCard",
+      "file": "action-card.tsx",
+      "role": "button (opener) beside its action"
+    },
+    {
+      "name": "AppBar",
+      "file": "app-bar.tsx",
+      "role": "none (title is a header)",
+      "parts": ["back-button", "title"]
+    },
+    { "name": "Badge", "file": "badge.tsx", "role": "text", "mayRotate": true },
+    {
+      "name": "BarChart",
+      "file": "bar-chart.tsx",
+      "role": "image per column",
+      "parts": ["bar", "value", "label"]
+    },
+    {
+      "name": "BusyIndicator",
+      "file": "busy-indicator.tsx",
+      "role": "image when labelled, else hidden",
+      "testID": "optional",
+      "hidesItself": true
+    },
+    { "name": "Button", "file": "button.tsx", "role": "button", "parts": ["label"] },
+    { "name": "Callout", "file": "callout.tsx", "role": "none", "parts": ["icon", "label"] },
+    { "name": "Card", "file": "card.tsx", "role": "none" },
+    {
+      "name": "CardHeader",
+      "file": "card-header.tsx",
+      "role": "none (title is a header)",
+      "parts": ["title"]
+    },
+    {
+      "name": "CheckMark",
+      "file": "check-mark.tsx",
+      "role": "hidden",
+      "testID": "optional",
+      "hidesItself": true,
+      "mayRotate": true
+    },
+    { "name": "Checkbox", "file": "checkbox.tsx", "role": "checkbox", "parts": ["check"] },
+    {
+      "name": "Chevron",
+      "file": "chevron.tsx",
+      "role": "hidden",
+      "testID": "optional",
+      "parts": ["mark"],
+      "hidesItself": true,
+      "mayRotate": true
+    },
+    { "name": "Chip", "file": "chip.tsx", "role": "text" },
+    {
+      "name": "Confetti",
+      "file": "confetti.tsx",
+      "role": "hidden",
+      "hidesItself": true,
+      "mayRotate": true,
+      "scatter": true
+    },
+    { "name": "DialogButtonRow", "file": "dialog-button-row.tsx", "role": "none" },
+    {
+      "name": "DialogCard",
+      "file": "dialog-card.tsx",
+      "role": "none (the Scrim is the modal root)",
+      "parts": ["title", "body"],
+      "mayShadow": true
+    },
+    {
+      "name": "EmptyState",
+      "file": "empty-state.tsx",
+      "role": "none (title is a header)",
+      "parts": ["picture", "title", "body"]
+    },
+    {
+      "name": "HoldButton",
+      "file": "hold-button.tsx",
+      "role": "button with the activate action",
+      "parts": ["fill"],
+      "holdFill": true
+    },
+    { "name": "IconButton", "file": "icon-button.tsx", "role": "button" },
+    {
+      "name": "IconTile",
+      "file": "icon-tile.tsx",
+      "role": "hidden",
+      "testID": "optional",
+      "hidesItself": true
+    },
+    { "name": "List", "file": "list.tsx", "role": "none" },
+    { "name": "ListGroup", "file": "list-group.tsx", "role": "none", "parts": ["header", "list"] },
+    {
+      "name": "ListRow",
+      "file": "list-row.tsx",
+      "role": "button, switch, radio or none",
+      "parts": ["label", "description", "value", "icon", "toggle", "radio"]
+    },
+    {
+      "name": "NavCard",
+      "file": "nav-card.tsx",
+      "role": "button",
+      "parts": ["icon", "label", "description"]
+    },
+    {
+      "name": "OptionCard",
+      "file": "option-card.tsx",
+      "role": "radio",
+      "parts": ["label", "description", "radio"]
+    },
+    { "name": "PagerDots", "file": "pager-dots.tsx", "role": "hidden", "hidesItself": true },
+    { "name": "ProgressBar", "file": "progress-bar.tsx", "role": "progressbar", "parts": ["fill"] },
+    {
+      "name": "RadioMark",
+      "file": "radio-mark.tsx",
+      "role": "hidden",
+      "testID": "optional",
+      "parts": ["dot"],
+      "hidesItself": true
+    },
+    { "name": "Scrim", "file": "scrim.tsx", "role": "modal root", "modalRoot": true },
+    { "name": "SectionHeader", "file": "section-header.tsx", "role": "header" },
+    {
+      "name": "SegmentedControl",
+      "file": "segmented-control.tsx",
+      "role": "radiogroup of radios",
+      "parts": ["label", "check"]
+    },
+    {
+      "name": "Slider",
+      "file": "slider.tsx",
+      "role": "adjustable",
+      "parts": ["fill"],
+      "mayShadow": true
+    },
+    {
+      "name": "StatGrid",
+      "file": "stat-grid.tsx",
+      "role": "none (one element per cell)",
+      "parts": ["value", "label"]
+    },
+    { "name": "SubRow", "file": "sub-row.tsx", "role": "none", "parts": ["label"] },
+    {
+      "name": "TextButton",
+      "file": "text-button.tsx",
+      "role": "button",
+      "parts": ["label", "underline"],
+      "drawnUnderline": true
+    },
+    {
+      "name": "TileButton",
+      "file": "tile-button.tsx",
+      "role": "button",
+      "parts": ["label"],
+      "inPairCell": true
+    },
+    { "name": "Toast", "file": "toast.tsx", "role": "alert", "mayShadow": true },
+    { "name": "ToastStack", "file": "toast-stack.tsx", "role": "none" },
+    {
+      "name": "Toggle",
+      "file": "toggle.tsx",
+      "role": "hidden (the row is the switch)",
+      "testID": "optional",
+      "parts": ["check"],
+      "hidesItself": true
+    },
+    {
+      "name": "ToggleTile",
+      "file": "toggle-tile.tsx",
+      "role": "switch",
+      "parts": ["label", "state", "check"],
+      "inPairCell": true
+    }
+  ],
+  "mockOnly": [
+    {
+      "name": "AdPlaceholder",
+      "file": "ad-placeholder.tsx",
+      "why": "A design's ad box stands in for the creative; the ads SDK renders the real banner (admob-ads-and-consent)."
+    },
+    {
+      "name": "ConsentSheet",
+      "file": "consent-sheet.tsx",
+      "why": "The consent SDK and the OS draw their own consent and permission sheets; the design only shows where they appear."
+    }
+  ]
+}

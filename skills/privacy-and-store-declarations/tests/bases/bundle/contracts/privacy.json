@@ -1,0 +1,37 @@
+{
+  "profile": "api-port",
+  "networkModules": [],
+  "linkFiles": [],
+  "sdks": {
+    "react-native-google-mobile-ads": {
+      "why": "banner ads on the task list",
+      "pods": [
+        "Google-Mobile-Ads-SDK"
+      ],
+      "tracking": true,
+      "collects": [
+        {
+          "type": "device-id",
+          "linked": true,
+          "tracking": true,
+          "purposes": [
+            "third-party-advertising",
+            "developer-advertising"
+          ]
+        }
+      ]
+    },
+    "expo-iap": {
+      "why": "the Premium unlock",
+      "pods": [
+        "openiap"
+      ],
+      "collects": []
+    }
+  },
+  "app": {
+    "collects": []
+  },
+  "permissionAnswers": {},
+  "accountDeletion": null
+}

@@ -1,0 +1,19 @@
+{
+  "forms.check.checking": "جارٍ التحقق…",
+  "forms.check.pending": "لا يزال التحقق جارياً. احفظ مرة أخرى عند انتهائه.",
+  "forms.check.unavailable": "تعذّر التحقق الآن. حاول مرة أخرى بعد قليل.",
+  "forms.field.invalid": "تحقق من هذا الحقل",
+  "forms.keyboard.done": "تم",
+  "forms.submit.fix-fields": "بعض الحقول تحتاج إلى تصحيح قبل الحفظ.",
+  "task-editor.estimate.label": "التقدير بالدقائق",
+  "task-editor.estimate.not-a-number": "أدخل عددًا صحيحًا من الدقائق",
+  "task-editor.estimate.out-of-range": "هذا التقدير خارج النطاق المسموح",
+  "task-editor.notes.label": "ملاحظات",
+  "task-editor.notes.too-long": "هذه الملاحظات طويلة جدًا",
+  "task-editor.save.failed": "لم تُحفظ المهمة. ما كتبته ما زال هنا، فحاول مرة أخرى.",
+  "task-editor.submit": "إضافة المهمة",
+  "task-editor.title.duplicate": "توجد مهمة مفتوحة بهذا العنوان",
+  "task-editor.title.label": "العنوان",
+  "task-editor.title.required": "أدخل عنوانًا للمهمة",
+  "task-editor.title.too-long": "هذا العنوان طويل جدًا"
+}

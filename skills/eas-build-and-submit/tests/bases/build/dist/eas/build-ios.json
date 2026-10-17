@@ -1,0 +1,23 @@
+{
+  "id": "0b6f7c2e-3a41-4c5d-9e8f-1a2b3c4d5e6f",
+  "status": "FINISHED",
+  "platform": "IOS",
+  "buildProfile": "production",
+  "distribution": "STORE",
+  "isForIosSimulator": false,
+  "appIdentifier": "com.example.tasks",
+  "appVersion": "1.2.0",
+  "appBuildVersion": "42",
+  "sdkVersion": "57.0.0",
+  "gitCommitHash": "3f2a9c1d4b5e6f708192a3b4c5d6e7f809a1b2c3",
+  "gitCommitMessage": "feat(tasks): due dates",
+  "fingerprint": {
+    "id": "fp-ios",
+    "hash": "74196b1b31bf3ad4df6e5aec490a0599f6bcfa92"
+  },
+  "updateChannel": null,
+  "artifacts": {
+    "buildUrl": "https://expo.dev/artifacts/eas/tasks-ios.ipa",
+    "applicationArchiveUrl": "https://expo.dev/artifacts/eas/tasks-ios.ipa"
+  }
+}

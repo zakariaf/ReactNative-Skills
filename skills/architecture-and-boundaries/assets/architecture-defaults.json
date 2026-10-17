@@ -1,0 +1,202 @@
+{
+  "$comment": "The canonical architecture that check-boundaries.mjs and check-layout.mjs apply when the app has no contracts/architecture.json, and the base its keys extend. {srcDir}, {servicesDir}, {dataDir}, {scriptsDir} and the other layout keys come from resolveLayout (rn-skills.config.json can move them). Keep the vendor and banned lists equal to the canonical eslint.config.mjs (VENDOR_SDK_PATHS, BANNED_PACKAGE_PATHS, ATT_ADAPTER, ADAPTERS; typescript-and-lint-rules owns it): change both together. The analytics SDKs beyond posthog-react-native are classified here only (an app that adopts one adds it to VENDOR_SDK_PATHS); the background task registry ({servicesDir}/*/define-*-tasks.ts, ESLint TASK_REGISTRIES) is an app contract entry (background-tasks lists it).",
+  "srcFolders": [
+    "app",
+    "features",
+    "ui",
+    "theme",
+    "core",
+    "services",
+    "stores",
+    "data",
+    "api",
+    "i18n",
+    "config",
+    "hooks",
+    "canvas",
+    "games"
+  ],
+  "srcFiles": [
+    "app-env.d.ts",
+    "env.d.ts",
+    "tsconfig.json",
+    "test-only.ts",
+    "test-only-api.ts",
+    "test-only-entry.ts"
+  ],
+  "frameworkPackages": [
+    "react",
+    "react-dom",
+    "react-native",
+    "react-native-*",
+    "@react-native/*",
+    "@react-native-*/*",
+    "expo",
+    "expo-*",
+    "@expo/*",
+    "@shopify/*",
+    "zustand",
+    "@react-navigation/*",
+    "react-intl",
+    "@formatjs/*",
+    "@tanstack/*",
+    "react-hook-form",
+    "@hookform/*",
+    "@sentry/*",
+    "i18next",
+    "react-i18next",
+    "react-redux",
+    "@reduxjs/*",
+    "redux",
+    "jotai",
+    "jotai-*",
+    "mobx",
+    "mobx-*",
+    "@legendapp/*",
+    "valtio",
+    "recoil"
+  ],
+  "runtimePackages": [
+    "react-native",
+    "react-native-*",
+    "@react-native/*",
+    "@react-native-*/*",
+    "expo-*",
+    "@expo/vector-icons",
+    "@shopify/*"
+  ],
+  "nodeSafeExpoSubpaths": [
+    "expo/config",
+    "expo/config-plugins",
+    "expo/config-plugins.js",
+    "expo/metro-config",
+    "expo/fingerprint"
+  ],
+  "$compositionRoot": "Files that may import adapters. Besides the three composition-root files and the root-kit registry (app-startup-and-bootstrap's src/services/create-root-kits.ts, which creates the optional kits' adapters from startApp), the data layer's device opener (persistence-and-migrations' src/data/open-device-database.ts) composes the SQL driver and the adapters that need the open database; the root layout calls it once. Its background twin (background-tasks' src/data/open-background-data.ts) does the same for each headless run, which never renders the root layout.",
+  "$frameworkPackages": "What src/core may not import (core-pure): React and everything built on it. When node_modules exists, any package whose package.json lists react or react-native in dependencies or peerDependencies counts too.",
+  "$sdkPackagePatterns": "Every package matching these names that bundled runtime code imports must be classified: in vendorSdks (a side effect behind a port) or in portlessSdks (UI building blocks and read-only facts). An unclassified one is the unclassified-sdk rule. The contract key sdkPackagePatterns adds names; when node_modules exists, a package that ships native code (expo-module.config.json, a *.podspec or android/build.gradle) counts too.",
+  "sdkPackagePatterns": [
+    "expo-*", "react-native-*", "@react-native-*/*", "*-react-native", "*-react-native-*",
+    "@*/react-native", "@*/react-native-*", "@*/*-react-native", "@*/*-react-native-*"
+  ],
+  "vendorSdks": {
+    "react-native-google-mobile-ads": "AdsPort and ConsentPort",
+    "expo-iap": "PurchasePort",
+    "expo-sqlite": "SqlDriver",
+    "react-native-audio-api": "AudioPort",
+    "expo-haptics": "HapticsPort",
+    "expo-network": "ConnectivityPort",
+    "@react-native-community/netinfo": "ConnectivityPort",
+    "@sentry/react-native": "CrashReporterPort",
+    "expo-tracking-transparency": "ConsentPort",
+    "expo-file-system": "DatabaseFiles and file storage",
+    "expo-updates": "UpdatesPort",
+    "expo-secure-store": "SecureStoragePort",
+    "expo-auth-session": "OauthPort",
+    "expo-apple-authentication": "AppleSignInPort",
+    "expo-sharing": "ShareSheetPort",
+    "expo-document-picker": "FilePickerPort",
+    "expo-notifications": "LocalNotificationsPort and PushPort",
+    "expo-background-task": "BackgroundTasksPort",
+    "expo-task-manager": "BackgroundTasksPort",
+    "posthog-react-native": "AnalyticsPort",
+    "@react-native-firebase/analytics": "AnalyticsPort",
+    "@amplitude/analytics-react-native": "AnalyticsPort",
+    "mixpanel-react-native": "AnalyticsPort",
+    "@segment/analytics-react-native": "AnalyticsPort",
+    "@aptabase/react-native": "AnalyticsPort",
+    "react-native-appsflyer": "AnalyticsPort",
+    "react-native-adjust": "AnalyticsPort",
+    "react-native-branch": "AnalyticsPort"
+  },
+  "vendorSdkFiles": {
+    "expo-tracking-transparency": [
+      "{servicesDir}/consent/*-consent-adapter{,.ios,.android,.native,.web}.{ts,tsx}"
+    ]
+  },
+  "portlessSdks": {
+    "expo-router": "navigation: routes, layouts and the router hooks",
+    "expo-image": "renders images",
+    "expo-status-bar": "renders the status bar",
+    "expo-splash-screen": "holds and hides the splash screen during startup",
+    "expo-font": "loads the bundled fonts",
+    "expo-constants": "reads build-time constants (app config, version)",
+    "expo-device": "reads device facts (model, type, isDevice)",
+    "expo-application": "reads the build's own facts (version, build number, application id)",
+    "expo-asset": "resolves and preloads bundled assets, like expo-font for fonts",
+    "expo-symbols": "renders SF Symbols",
+    "expo-glass-effect": "renders the iOS glass material",
+    "@expo/ui": "renders SwiftUI and Jetpack Compose views",
+    "expo-linking": "builds and reads the app's own URLs (createURL, parse, useURL); openURL and openSettings leave the app, so a model hook calls them through a port, as it opens expo-web-browser",
+    "expo-system-ui": "sets the root view's background",
+    "expo-localization": "reads the device locales once; language resolution takes them as values, so tests pass locales in",
+    "react-native-safe-area-context": "safe-area insets",
+    "react-native-screens": "native screens under the navigator",
+    "react-native-reanimated": "animation",
+    "react-native-gesture-handler": "gestures",
+    "react-native-worklets": "worklets for animation and gestures",
+    "@shopify/react-native-skia": "draws on a canvas",
+    "@shopify/flash-list": "renders long lists",
+    "react-native-keyboard-controller": "keyboard-aware layout"
+  },
+  "adapterFiles": [
+    "{servicesDir}/*/*-adapter{,.ios,.android,.native,.web}.{ts,tsx}",
+    "{dataDir}/**/*-adapter{,.ios,.android,.native,.web}.{ts,tsx}",
+    "{dataDir}/**/*-sql-driver{,.ios,.android,.native,.web}.ts",
+    "{dataDir}/**/*-save-store{,.ios,.android,.native,.web}.ts"
+  ],
+  "compositionRoot": [
+    "{servicesDir}/services-context.tsx",
+    "{servicesDir}/create-device-services.ts",
+    "{servicesDir}/create-test-services.ts",
+    "{servicesDir}/create-root-kits.ts",
+    "{dataDir}/open-device-*.ts",
+    "{dataDir}/open-background-*.ts"
+  ],
+  "$gameFacing": "What code of a game (src/games/<game>/ outside rules/ and levels/, which stay pure) may import besides its own folder. src/canvas is the shared canvas kit (skia-canvas-rendering, canvas-gestures-and-hit-testing) every game board draws and hit-tests with. The seam files game-session-host adds are recorded in the contract's gameFacing.",
+  "gameFacing": [
+    "{coreDir}/**",
+    "{uiDir}/**",
+    "{themeDir}/**",
+    "{i18nDir}/**",
+    "{srcDir}/canvas/**",
+    "{servicesDir}/*/*-port.ts"
+  ],
+  "bannedPackages": {
+    "axios": "Network calls go through the ApiClient in src/api/ (fetch, typed and validated).",
+    "@react-native-async-storage/async-storage": "Use expo-sqlite/kv-store for preferences and expo-secure-store for secrets, behind a port.",
+    "react-native-iap": "In-app purchases go through PurchasePort (expo-iap).",
+    "react-native-restart": "Use reloadAppAsync from expo."
+  },
+  "nodeWorldFiles": [
+    "app.config.ts",
+    "app.config.js",
+    "plugins/**",
+    "{scriptsDir}/**"
+  ],
+  "nodeWorldMarkers": [
+    "expo/config-plugins",
+    "expo/config-plugins.js",
+    "@expo/config-plugins"
+  ],
+  "$serverFiles": "Expo Router server code: API routes (any +api file under the routes folder) and the one root +middleware file. They run on the server (EAS Hosting or another WinterCG host), and the native require.context leaves them out (expo-router 57.0.24, _ctx.ios.js and _ctx.android.js). The contract key serverFiles adds server helpers (src/server/**).",
+  "serverFiles": [
+    "{routesDir}/**/*+api.{ts,tsx,js,jsx}",
+    "{routesDir}/+middleware.{ts,tsx,js,jsx}"
+  ],
+  "$serverPackages": "Expo packages server code may import although their names look like runtime modules (expo-server 57.0.3, expo-router/server).",
+  "serverPackages": [
+    "expo-server",
+    "expo-router/server"
+  ],
+  "$nativeModulesDir": "Where autolinking finds local Expo modules (npx create-expo-module --local): package.json expo.autolinking.nativeModulesDir, else ./modules (expo-modules-autolinking 57.0.13). Only an adapter imports one.",
+  "nativeModulesDir": "modules",
+  "$testOnlyVariable": "The variable whose comparison decides test-only code: a require() it decides belongs in a src/**/test-only.ts gate. The literal form and polarity of that comparison are app-variants-and-environment's inclusion-gate rule.",
+  "testOnlyVariable": "EXPO_PUBLIC_APP_VARIANT",
+  "$assetExtensions": "Metro's default assetExts plus Expo's additions (heic, avif, db), read from @expo/metro-config 57 (ExpoMetroConfig.js) on 2026-10-03, plus woff, woff2, lottie and riv, which apps add to assetExts. require() of a file with one of these extensions is how Metro bundles an asset.",
+  "assetExtensions": [
+    "bmp", "gif", "jpg", "jpeg", "png", "psd", "svg", "webp", "heic", "avif", "xml", "m4v",
+    "mov", "mp4", "mpeg", "mpg", "webm", "aac", "aiff", "caf", "m4a", "mp3", "wav", "html",
+    "pdf", "yaml", "yml", "zip", "db", "otf", "ttf", "woff", "woff2", "lottie", "riv"
+  ]
+}

@@ -1,0 +1,916 @@
+{
+  "bad-adjustable": {
+    "expect": ["[adjustable]", "src/ui/slider.tsx", "lacks accessibilityValue"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/slider.tsx",
+          "find": "      accessibilityValue={{ min: 0, max: 100, now: props.value }}\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-adjustable-actions": {
+    "expect": ["[adjustable]", "src/ui/slider.tsx", "lacks accessibilityActions"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/slider.tsx",
+          "find": "      accessibilityActions={[{ name: 'increment' }, { name: 'decrement' }]}\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-animated-pressable": {
+    "expect": [
+      "src/ui/squash-button.tsx:16 [pressable-role] <AnimatedPressable>",
+      "src/ui/squash-button.tsx:16 [pressable-name] <AnimatedPressable>",
+      "src/ui/squash-button.tsx:17 [hit-slop]",
+      "src/ui/squash-button.tsx:22 [touch-target] <AnimatedPressable> is only 28 pt wide",
+      "RESULT: FAIL (4 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/squash-button.tsx",
+          "content": "// src/ui/squash-button.tsx\nimport { Pressable, StyleSheet } from 'react-native';\nimport Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';\n\nimport type { ReactNode } from 'react';\n\nconst AnimatedPressable = Animated.createAnimatedComponent(Pressable);\n\nconst styles = StyleSheet.create({ key: { width: 28, height: 28 } });\n\n// Planted: the animated alias of Pressable has no role, no name, a 28 pt box and a hitSlop.\nexport function SquashButton({ onPress }: { readonly onPress: () => void }): ReactNode {\n  const scale = useSharedValue(1);\n  const squash = useAnimatedStyle(() => ({ transform: [{ scale: scale.get() }] }));\n  return (\n    <AnimatedPressable\n      hitSlop={12}\n      onPress={onPress}\n      onPressIn={() => {\n        scale.set(withTiming(0.9));\n      }}\n      style={[styles.key, squash]}\n    />\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-announce": {
+    "expect": ["[announce]", "src/features/tasks/announce-completion.ts:5"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/announce-completion.ts",
+          "content": "// src/features/tasks/announce-completion.ts\nimport { AccessibilityInfo } from 'react-native';\n\nexport function announceCompletion(text: string): void {\n  AccessibilityInfo.announceForAccessibility(text);\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-aria-modal-on-view": {
+    "expect": [
+      "[modal-overlay]",
+      "src/features/tasks/components/filter-sheet.tsx:23",
+      "aria-modal alone on <View> does nothing on iOS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/filter-sheet.tsx",
+          "content": "// src/features/tasks/components/filter-sheet.tsx\nimport { StyleSheet, View } from 'react-native';\n\nimport type { ReactNode } from 'react';\n\nexport type FilterSheetProps = {\n  readonly isOpen: boolean;\n  readonly sheet: ReactNode;\n  readonly children: ReactNode;\n};\n\nconst styles = StyleSheet.create({\n  fill: { flex: 1 },\n  scrim: { position: 'absolute', inset: 0 },\n});\n\n// Planted: aria-modal on a View is dropped (only Pressable and the Touchables map it), so VoiceOver\n// can still leave the sheet; aria-hidden hides the content behind it from TalkBack only.\nexport function FilterSheet({ isOpen, sheet, children }: FilterSheetProps): ReactNode {\n  return (\n    <View style={styles.fill}>\n      <View style={styles.fill} aria-hidden={isOpen}>{children}</View>\n      {isOpen ? <View style={styles.scrim} aria-modal testID=\"filter-sheet.scrim\">{sheet}</View> : null}\n    </View>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-built-label": {
+    "expect": ["[literal-a11y-text]", "src/ui/icon-button.tsx:26", "Open ${label}"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/icon-button.tsx",
+          "find": "      accessibilityLabel={label}\n",
+          "with": "      accessibilityLabel={`Open ${label}`}\n"
+        }
+      }
+    ]
+  },
+  "bad-canvas-image": {
+    "expect": ["[canvas-image]", "src/features/stats/components/progress-chart.tsx:11"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/stats/components/progress-chart.tsx",
+          "find": "<Canvas style={styles.chart} accessible accessibilityRole=\"image\" accessibilityLabel={label} />",
+          "with": "<Canvas style={styles.chart} testID={label} />"
+        }
+      }
+    ]
+  },
+  "bad-config-src-dir": {
+    "expect": ["[pressable-role]", "app-src/ui/button.tsx"],
+    "ops": [
+      { "rename": { "from": "src", "to": "app-src" } },
+      { "write": { "file": "rn-skills.config.json", "json": { "srcDir": "app-src" } } },
+      { "replace": { "file": "app-src/ui/button.tsx", "find": "      accessibilityRole=\"button\"\n", "with": "" } }
+    ]
+  },
+  "bad-disabled-state": {
+    "expect": [
+      "[disabled-state]",
+      "src/features/tasks/components/task-swipe-action.tsx:27",
+      "Gesture Handler's <RectButton> does not turn enabled into accessibilityState"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-swipe-action.tsx",
+          "content": "// src/features/tasks/components/task-swipe-action.tsx\nimport { StyleSheet } from 'react-native';\nimport { RectButton } from 'react-native-gesture-handler';\n\nimport { AppText } from '@/ui/app-text';\nimport { MIN_TOUCH_TARGET } from '@/ui/touch-size';\n\nimport type { ReactNode } from 'react';\n\nexport type TaskSwipeActionProps = {\n  readonly taskId: string;\n  readonly label: string;\n  readonly isBusy: boolean;\n  readonly onPress: () => void;\n};\n\nconst styles = StyleSheet.create({\n  action: { minWidth: MIN_TOUCH_TARGET * 2, minHeight: MIN_TOUCH_TARGET, justifyContent: 'center' },\n});\n\n// Planted: Gesture Handler's RectButton turns the gesture off through enabled, but never tells\n// VoiceOver or getByRole that the button is disabled (React Native's own Pressable would).\nexport function TaskSwipeAction({ taskId, label, isBusy, onPress }: TaskSwipeActionProps): ReactNode {\n  return (\n    <RectButton\n      accessibilityRole=\"button\"\n      enabled={!isBusy}\n      onPress={onPress}\n      style={styles.action}\n      testID={`tasks.task-row.${taskId}.delete-button`}\n    >\n      <AppText text={label} />\n    </RectButton>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-disabled-state-gesture-pressable": {
+    "expect": [
+      "[disabled-state]",
+      "src/ui/save-button.tsx:16",
+      "Gesture Handler's <Pressable> does not turn disabled into accessibilityState"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/save-button.tsx",
+          "content": "// src/ui/save-button.tsx\nimport { StyleSheet } from 'react-native';\nimport { Pressable as GesturePressable } from 'react-native-gesture-handler';\n\nimport { AppText } from './app-text';\nimport { MIN_TOUCH_TARGET } from './touch-size';\n\nimport type { ReactNode } from 'react';\n\nconst styles = StyleSheet.create({ box: { minHeight: MIN_TOUCH_TARGET, minWidth: MIN_TOUCH_TARGET } });\n\n// Planted: Gesture Handler's Pressable (imported under another name) uses disabled only to turn\n// its gesture off; the screen reader still hears an active button.\nexport function SaveButton(props: { readonly label: string; readonly isSaving: boolean; readonly onSave: () => void }): ReactNode {\n  return (\n    <GesturePressable accessibilityRole=\"button\" disabled={props.isSaving} onPress={props.onSave} style={styles.box} testID=\"editor.save-button\">\n      <AppText text={props.label} />\n    </GesturePressable>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-drag-gesture-no-actions": {
+    "expect": [
+      "[gesture-alternative]",
+      "src/features/tasks/components/reorder-handle.tsx:15",
+      "<GestureDetector> runs Gesture.Pan()"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/reorder-handle.tsx",
+          "content": "// src/features/tasks/components/reorder-handle.tsx\nimport { StyleSheet, View } from 'react-native';\nimport { Gesture, GestureDetector } from 'react-native-gesture-handler';\n\nimport type { ReactNode } from 'react';\n\nconst styles = StyleSheet.create({ handle: { minWidth: 44, minHeight: 44 } });\n\n// Planted: reordering works only by dragging (WCAG 2.5.7 asks for a single-pointer way too).\nexport function ReorderHandle({ onMove }: { readonly onMove: (steps: number) => void }): ReactNode {\n  const drag = Gesture.Pan().onEnd((event) => {\n    onMove(Math.round(event.translationY / 56));\n  });\n  return (\n    <GestureDetector gesture={drag}>\n      <View style={styles.handle} />\n    </GestureDetector>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-font-cap-below-gate": {
+    "expect": ["[font-scaling]", "maxFontSizeMultiplier={2} caps text below 3x"],
+    "ops": [{ "json": { "file": "quality-gates.json", "path": ["a11y", "maxFontScale"], "value": 3 } }]
+  },
+  "bad-font-scale-cap": {
+    "expect": ["[font-scaling]", "maxFontSizeMultiplier={1.3}"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/app-text.tsx",
+          "find": "      maxFontSizeMultiplier={2}\n",
+          "with": "      maxFontSizeMultiplier={1.3}\n"
+        }
+      }
+    ]
+  },
+  "bad-font-scaling-off": {
+    "expect": ["[font-scaling]", "allowFontScaling={false}"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/app-text.tsx",
+          "find": "      maxFontSizeMultiplier={2}\n",
+          "with": "      maxFontSizeMultiplier={2}\n      allowFontScaling={false}\n"
+        }
+      }
+    ]
+  },
+  "bad-gate-below-floor": {
+    "expect": ["[a11y-gates]", "quality-gates.json:3", "a11y.minTouchPt is 40, below the floor 44"],
+    "ops": [{ "json": { "file": "quality-gates.json", "path": ["a11y", "minTouchPt"], "value": 40 } }]
+  },
+  "bad-gesture-exception-no-reason": {
+    "expect": [
+      "rn-skills.config.json:1 [gesture-alternative] a11yGestureExceptions[0] needs \"file\", \"reason\" and \"approvedBy\"",
+      "src/features/tasks/components/reorder-handle.tsx:15 [gesture-alternative]"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "rn-skills.config.json",
+          "content": "{\n  \"a11yGestureExceptions\": [{ \"file\": \"src/features/tasks/components/reorder-handle.tsx\", \"approvedBy\": \"design review 2026-10-01\" }]\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/components/reorder-handle.tsx",
+          "content": "// src/features/tasks/components/reorder-handle.tsx\nimport { StyleSheet, View } from 'react-native';\nimport { Gesture, GestureDetector } from 'react-native-gesture-handler';\n\nimport type { ReactNode } from 'react';\n\nconst styles = StyleSheet.create({ handle: { minWidth: 44, minHeight: 44 } });\n\n// Planted: reordering works only by dragging (WCAG 2.5.7 asks for a single-pointer way too).\nexport function ReorderHandle({ onMove }: { readonly onMove: (steps: number) => void }): ReactNode {\n  const drag = Gesture.Pan().onEnd((event) => {\n    onMove(Math.round(event.translationY / 56));\n  });\n  return (\n    <GestureDetector gesture={drag}>\n      <View style={styles.handle} />\n    </GestureDetector>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-gesture-exception-stale": {
+    "expect": ["rn-skills.config.json:1 [gesture-alternative]", "which has no gesture-alternative finding"],
+    "ops": [
+      {
+        "write": {
+          "file": "rn-skills.config.json",
+          "content": "{\n  \"a11yGestureExceptions\": [\n    { \"file\": \"src/features/tasks/components/task-card.tsx\", \"reason\": \"kept from an old drag version\", \"approvedBy\": \"design review 2026-10-01\" }\n  ]\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-hit-slop": {
+    "expect": ["[hit-slop]", "src/ui/icon-button.tsx"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/icon-button.tsx",
+          "find": "      onPress={onPress}\n",
+          "with": "      onPress={onPress}\n      hitSlop={8}\n"
+        }
+      }
+    ]
+  },
+  "bad-hit-slop-on-component": {
+    "expect": ["[hit-slop]", "src/features/tasks/components/sort-button.tsx:8"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/sort-button.tsx",
+          "content": "// src/features/tasks/components/sort-button.tsx\nimport { IconButton } from '@/ui/icon-button';\n\nimport type { ReactNode } from 'react';\n\n// Planted: hitSlop handed to a shared button still enlarges an invisible area.\nexport function SortButton({ label, onPress }: { readonly label: string; readonly onPress: () => void }): ReactNode {\n  return <IconButton icon=\"sort\" label={label} onPress={onPress} testID=\"tasks.sort-button\" hitSlop={8} />;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-hold-alternative": {
+    "expect": ["[hold-alternative]", "src/ui/hold-button.tsx"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/hold-button.tsx",
+          "find": "      accessibilityActions={[{ name: 'activate' }]}\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-inline-touch-target": {
+    "expect": ["[touch-target]", "src/ui/close-button.tsx:15", "is only 32 pt wide (style: an inline style)"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/close-button.tsx",
+          "content": "// src/ui/close-button.tsx\nimport { Pressable } from 'react-native';\n\nimport { Icon } from './icon';\n\nimport type { ReactNode } from 'react';\n\n// Planted: an inline 32 pt box.\nexport function CloseButton({ label, onPress }: { readonly label: string; readonly onPress: () => void }): ReactNode {\n  return (\n    <Pressable\n      accessibilityRole=\"button\"\n      accessibilityLabel={label}\n      onPress={onPress}\n      style={{ width: 32, height: 32, alignItems: 'center', justifyContent: 'center' }}\n      testID=\"sheet.close-button\"\n    >\n      <Icon name=\"close\" />\n    </Pressable>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-labelledby-only": {
+    "expect": ["[pressable-name]", "src/ui/sort-button.tsx:16", "Android only"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/sort-button.tsx",
+          "content": "// src/ui/sort-button.tsx\nimport { Pressable, StyleSheet } from 'react-native';\n\nimport { Icon } from './icon';\nimport { MIN_TOUCH_TARGET } from './touch-size';\n\nimport type { ReactNode } from 'react';\n\nconst styles = StyleSheet.create({\n  box: { width: MIN_TOUCH_TARGET, height: MIN_TOUCH_TARGET, alignItems: 'center', justifyContent: 'center' },\n});\n\n// Planted: aria-labelledby names the button on Android only; VoiceOver reads no name.\nexport function SortButton({ onPress }: { readonly onPress: () => void }): ReactNode {\n  return (\n    <Pressable role=\"button\" aria-labelledby=\"tasks.sort-label\" onPress={onPress} style={styles.box} testID=\"tasks.sort-button\">\n      <Icon name=\"sort\" />\n    </Pressable>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-literal-label": {
+    "expect": ["[literal-a11y-text]", "accessibilityLabel=\"Settings\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/icon-button.tsx",
+          "find": "      accessibilityLabel={label}\n",
+          "with": "      accessibilityLabel=\"Settings\"\n"
+        }
+      }
+    ]
+  },
+  "bad-long-press": {
+    "expect": [
+      "[hold-alternative]",
+      "src/features/notes/components/note-row.tsx:19",
+      "onLongPress on <Pressable> has no screen-reader alternative"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/notes/components/note-row.tsx",
+          "content": "// src/features/notes/components/note-row.tsx\nimport { Pressable, StyleSheet } from 'react-native';\n\nimport { AppText } from '@/ui/app-text';\n\nimport type { ReactNode } from 'react';\n\nexport type NoteRowProps = {\n  readonly title: string;\n  readonly onOpen: () => void;\n  readonly onPin: () => void;\n};\n\nconst styles = StyleSheet.create({ row: { minHeight: 56 } });\n\n// Planted: pinning hides behind a long press that no screen reader user can reach.\nexport function NoteRow({ title, onOpen, onPin }: NoteRowProps): ReactNode {\n  return (\n    <Pressable accessibilityRole=\"button\" onPress={onOpen} onLongPress={onPin} style={styles.row}>\n      <AppText text={title} />\n    </Pressable>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-menu-overlay": {
+    "expect": [
+      "[modal-overlay]",
+      "src/features/tasks/components/task-actions-menu.tsx",
+      "task-actions-menu.tsx is an overlay that is not modal"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-actions-menu.tsx",
+          "content": "// src/features/tasks/components/task-actions-menu.tsx\n// Planted: an action menu drawn over the screen that neither screen reader is kept inside.\nimport { Pressable, StyleSheet, View } from 'react-native';\n\nimport { Button } from '@/ui/button';\n\nimport type { ReactNode } from 'react';\n\nexport type TaskActionsMenuProps = {\n  readonly isOpen: boolean;\n  readonly closeLabel: string;\n  readonly renameLabel: string;\n  readonly deleteLabel: string;\n  readonly onClose: () => void;\n  readonly onRename: () => void;\n  readonly onDelete: () => void;\n  readonly children: ReactNode;\n};\n\nconst styles = StyleSheet.create({\n  fill: { flex: 1 },\n  backdrop: { position: 'absolute', inset: 0, justifyContent: 'flex-end' },\n});\n\nexport function TaskActionsMenu(props: TaskActionsMenuProps): ReactNode {\n  return (\n    <View style={styles.fill}>\n      <View style={styles.fill}>{props.children}</View>\n      {props.isOpen ? (\n        <Pressable\n          style={styles.backdrop}\n          accessible={false}\n          accessibilityRole=\"button\"\n          accessibilityLabel={props.closeLabel}\n          onPress={props.onClose}\n          testID=\"task-actions-menu.backdrop-button\"\n        >\n          <Button label={props.renameLabel} onPress={props.onRename} testID=\"task-actions-menu.rename-button\" />\n          <Button label={props.deleteLabel} onPress={props.onDelete} testID=\"task-actions-menu.delete-button\" />\n        </Pressable>\n      ) : null}\n    </View>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-modal-overlay": {
+    "expect": ["[modal-overlay]", "src/ui/overlay.tsx", "overlay.tsx is an overlay that is not modal"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/overlay.tsx",
+          "find": "<View style={styles.layer} accessibilityViewIsModal testID=\"overlay.scrim\">",
+          "with": "<View style={styles.layer} testID=\"overlay.scrim\">"
+        }
+      }
+    ]
+  },
+  "bad-modal-overlay-android": {
+    "expect": ["[modal-overlay-android]", "src/ui/overlay.tsx:26", "TalkBack can still reach the content behind"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/overlay.tsx",
+          "find": "      <View style={styles.fill} aria-hidden={isOpen}>\n",
+          "with": "      <View style={styles.fill}>\n"
+        }
+      }
+    ]
+  },
+  "bad-modal-overlay-android-decorative-hidden": {
+    "expect": ["[modal-overlay-android]", "src/ui/overlay.tsx:27", "TalkBack can still reach the content behind"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/overlay.tsx",
+          "find": "      <View style={styles.fill} aria-hidden={isOpen}>\n",
+          "with": "      <View style={styles.fill}>\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/ui/overlay.tsx",
+          "find": "  layer: { position: 'absolute', inset: 0 },\n",
+          "with": "  layer: { position: 'absolute', inset: 0 },\n  grip: { width: 36, height: 4, alignSelf: 'center' },\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/ui/overlay.tsx",
+          "find": "          {content}\n",
+          "with": "          <View aria-hidden style={styles.grip} />\n          {content}\n"
+        }
+      }
+    ]
+  },
+  "bad-motion-read": {
+    "expect": ["[a11y-store]", "AccessibilityInfo.isReduceMotionEnabled"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/stats/should-animate.ts",
+          "content": "// src/features/stats/should-animate.ts\nimport { AccessibilityInfo } from 'react-native';\n\nexport async function shouldAnimate(): Promise<boolean> {\n  return !(await AccessibilityInfo.isReduceMotionEnabled());\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-nested-pressable": {
+    "expect": [
+      "[nested-pressable]",
+      "src/features/tasks/components/task-card.tsx:41",
+      "<Button> sits inside an accessible <Pressable>"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-card.tsx",
+          "content": "// src/features/tasks/components/task-card.tsx\nimport { Pressable, StyleSheet, View } from 'react-native';\n\nimport { AppText } from '@/ui/app-text';\nimport { Button } from '@/ui/button';\n\nimport type { ReactNode } from 'react';\n\nexport type TaskCardProps = {\n  readonly taskId: string;\n  readonly title: string;\n  readonly dueText: string;\n  /** The visible texts joined in reading order, built with t() in the model hook. */\n  readonly openLabel: string;\n  readonly completeLabel: string;\n  readonly onOpen: () => void;\n  readonly onComplete: () => void;\n};\n\nconst styles = StyleSheet.create({\n  card: { minHeight: 96 },\n  opener: { position: 'absolute', inset: 0 },\n});\n\n// The card body opens the task and its Complete button completes it: two sibling elements.\nexport function TaskCard(props: TaskCardProps): ReactNode {\n  return (\n    <View style={styles.card}>\n      <Pressable\n        style={styles.opener}\n        accessibilityRole=\"button\"\n        accessibilityLabel={props.openLabel}\n        onPress={props.onOpen}\n        testID={`tasks.task-card.${props.taskId}`}\n      >\n        <View>\n          <AppText text={props.title} />\n          <AppText text={props.dueText} />\n        </View>\n        {/* Planted bug: the Complete button sits inside the card's pressable. */}\n        <Button label={props.completeLabel} onPress={props.onComplete} testID={`tasks.task-card.${props.taskId}.complete-button`} />\n      </Pressable>\n    </View>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-opener-component-covered": {
+    "expect": [
+      "[opener-covered]",
+      "src/features/tasks/components/task-card.tsx:31",
+      "<View> is drawn above the <CardOpener> opener (it renders an absolutely filled pressable)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-card.tsx",
+          "content": "// src/features/tasks/components/task-card.tsx\nimport { StyleSheet, View } from 'react-native';\n\nimport { AppText } from '@/ui/app-text';\nimport { Button } from '@/ui/button';\nimport { CardOpener } from '@/ui/card-opener';\n\nimport type { ReactNode } from 'react';\n\nexport type TaskCardProps = {\n  readonly taskId: string;\n  readonly title: string;\n  readonly dueText: string;\n  readonly openLabel: string;\n  readonly completeLabel: string;\n  readonly onOpen: () => void;\n  readonly onComplete: () => void;\n};\n\nconst styles = StyleSheet.create({\n  card: { minHeight: 96 },\n  texts: { flex: 1 },\n});\n\n// Lint-clean (no raw Pressable in the feature), but the text layer covers the shared opener.\nexport function TaskCard(props: TaskCardProps): ReactNode {\n  return (\n    <View style={styles.card}>\n      <CardOpener label={props.openLabel} onPress={props.onOpen} testID={`tasks.task-card.${props.taskId}`} />\n      {/* Planted bug: no pointerEvents 'none', so taps on the title never reach the opener. */}\n      <View style={styles.texts} aria-hidden>\n        <AppText text={props.title} />\n        <AppText text={props.dueText} />\n      </View>\n      <Button label={props.completeLabel} onPress={props.onComplete} testID={`tasks.task-card.${props.taskId}.complete-button`} />\n    </View>\n  );\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/ui/card-opener.tsx",
+          "content": "// src/ui/card-opener.tsx\nimport { Pressable, StyleSheet } from 'react-native';\n\nimport type { ReactNode } from 'react';\n\nexport type CardOpenerProps = {\n  /** The card's visible texts joined in reading order, built with t() in the model hook. */\n  readonly label: string;\n  readonly onPress: () => void;\n  readonly testID: string;\n};\n\n// A shared opener on its own: the screen that uses it draws the text layer above it.\nexport function CardOpener(props: CardOpenerProps): ReactNode {\n  return (\n    <Pressable\n      style={StyleSheet.absoluteFill}\n      accessibilityRole=\"button\"\n      accessibilityLabel={props.label}\n      onPress={props.onPress}\n      testID={props.testID}\n    />\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-opener-covered": {
+    "expect": ["[opener-covered]", "src/ui/action-card.tsx:35", "takes the touches there"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/action-card.tsx",
+          "find": "<View style={styles.texts} accessibilityElementsHidden",
+          "with": "<View accessibilityElementsHidden"
+        }
+      }
+    ]
+  },
+  "bad-overlay-renders-non-modal-export": {
+    "expect": [
+      "[modal-overlay]",
+      "src/features/tasks/components/sort-popover.tsx:1",
+      "sort-popover.tsx is an overlay that is not modal"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/sort-popover.tsx",
+          "content": "// src/features/tasks/components/sort-popover.tsx\nimport { StyleSheet, View } from 'react-native';\n\nimport { OverlayTitle } from '@/ui/overlay';\n\nimport type { ReactNode } from 'react';\n\nconst styles = StyleSheet.create({ popover: { position: 'absolute', insetBlockStart: 48, insetInlineEnd: 16 } });\n\n// Planted: it borrows only the title from the overlay file, never the modal Overlay itself, so\n// VoiceOver and TalkBack can both leave the popover.\nexport function SortPopover(props: { readonly title: string; readonly children: ReactNode }): ReactNode {\n  return (\n    <View style={styles.popover} testID=\"tasks.sort-popover\">\n      <OverlayTitle text={props.title} />\n      {props.children}\n    </View>\n  );\n}\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/ui/overlay.tsx",
+          "find": "import { StyleSheet, View } from 'react-native';\n",
+          "with": "import { StyleSheet, View } from 'react-native';\n\nimport { AppText } from './app-text';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/ui/overlay.tsx",
+          "find": "// One component owns the modal root:",
+          "with": "/** The overlay's title: plain text, not modal by itself. */\nexport function OverlayTitle({ text }: { readonly text: string }): ReactNode {\n  return <AppText text={text} isHeader />;\n}\n\n// One component owns the modal root:"
+        }
+      }
+    ]
+  },
+  "bad-overlay-without-modal-root": {
+    "expect": [
+      "[modal-overlay]",
+      "src/features/tasks/components/delete-task-dialog.tsx",
+      "delete-task-dialog.tsx is an overlay that is not modal"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/dialog-frame.tsx",
+          "find": "import { Modal } from 'react-native';",
+          "with": "import { View } from 'react-native';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/ui/dialog-frame.tsx",
+          "find": "    <Modal transparent visible={isOpen} onRequestClose={onClose} animationType=\"fade\">\n      <DialogCard>{children}</DialogCard>\n    </Modal>\n",
+          "with": "    <View testID={isOpen ? 'dialog.open' : 'dialog.closed'} onTouchEnd={onClose}>\n      <DialogCard>{children}</DialogCard>\n    </View>\n"
+        }
+      }
+    ]
+  },
+  "bad-pressable-name": {
+    "expect": ["[pressable-name]", "src/ui/icon-button.tsx"],
+    "ops": [
+      { "replace": { "file": "src/ui/icon-button.tsx", "find": "      accessibilityLabel={label}\n", "with": "" } }
+    ]
+  },
+  "bad-pressable-name-icon-font": {
+    "expect": [
+      "[pressable-name]",
+      "src/ui/icon-button.tsx:24",
+      "<Pressable> has no accessibilityLabel and no text inside"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/icon.tsx",
+          "content": "// src/ui/icon.tsx\nimport { StyleSheet, Text } from 'react-native';\n\nimport type { ReactNode } from 'react';\n\nconst GLYPHS: Readonly<Record<string, string>> = { close: '', settings: '' };\n\nconst styles = StyleSheet.create({ glyph: { fontFamily: 'app-icons', fontSize: 24 } });\n\n// An icon font draws a private-use character in Text: the screen reader cannot read it as a name.\nexport function Icon({ name }: { readonly name: string }): ReactNode {\n  return (\n    <Text style={styles.glyph} aria-hidden>\n      {GLYPHS[name] ?? ''}\n    </Text>\n  );\n}\n"
+        }
+      },
+      { "replace": { "file": "src/ui/icon-button.tsx", "find": "      accessibilityLabel={label}\n", "with": "" } }
+    ]
+  },
+  "bad-pressable-role": {
+    "expect": ["[pressable-role]", "src/ui/button.tsx"],
+    "ops": [{ "replace": { "file": "src/ui/button.tsx", "find": "      accessibilityRole=\"button\"\n", "with": "" } }]
+  },
+  "bad-reanimated-reduced-motion": {
+    "expect": ["[reduce-motion]", "src/features/tasks/components/use-row-shake.ts:2", "useReducedMotion"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/use-row-shake.ts",
+          "content": "// src/features/tasks/components/use-row-shake.ts\nimport { useReducedMotion } from 'react-native-reanimated';\n\nexport function useRowShake(): boolean {\n  return !useReducedMotion();\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-router-link-no-as-child": {
+    "expect": ["src/features/tasks/components/new-task-link.tsx:15 [pressable-role]", "Add asChild to the <Link>"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/new-task-link.tsx",
+          "content": "// src/features/tasks/components/new-task-link.tsx\nimport { Link } from 'expo-router';\nimport { Pressable, StyleSheet } from 'react-native';\n\nimport { AppText } from '@/ui/app-text';\n\nimport type { ReactNode } from 'react';\n\nconst styles = StyleSheet.create({ link: { minHeight: 44, minWidth: 44 } });\n\n// Planted: without asChild the Link never gives the Pressable its role.\nexport function NewTaskLink({ label }: { readonly label: string }): ReactNode {\n  return (\n    <Link href=\"/tasks/new\">\n      <Pressable style={styles.link}>\n        <AppText text={label} />\n      </Pressable>\n    </Link>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-screen-test-audit": {
+    "expect": ["[screen-test-audit]", "src/features/tasks/tasks-screen.test.tsx"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.test.tsx",
+          "find": "    expect(findInaccessiblePressables(screen.container)).toStrictEqual([]);\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-swipe-row-no-actions": {
+    "expect": [
+      "[gesture-alternative]",
+      "src/features/tasks/components/swipe-task-row.tsx:23",
+      "<ReanimatedSwipeable> reveals row actions with a swipe"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/swipe-task-row.tsx",
+          "content": "// src/features/tasks/components/swipe-task-row.tsx\nimport { Pressable, StyleSheet } from 'react-native';\nimport ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';\n\nimport { AppText } from '@/ui/app-text';\nimport { Button } from '@/ui/button';\n\nimport type { ReactNode } from 'react';\n\nexport type SwipeTaskRowProps = {\n  readonly taskId: string;\n  readonly title: string;\n  readonly deleteLabel: string;\n  readonly onOpen: () => void;\n  readonly onDelete: () => void;\n};\n\nconst styles = StyleSheet.create({ row: { minHeight: 56 } });\n\n// Planted: Delete appears only after a swipe; VoiceOver and TalkBack swipe to move focus instead.\nexport function SwipeTaskRow({ taskId, title, deleteLabel, onOpen, onDelete }: SwipeTaskRowProps): ReactNode {\n  return (\n    <ReanimatedSwipeable\n      renderRightActions={() => <Button label={deleteLabel} onPress={onDelete} testID={`tasks.task-row.${taskId}.delete-button`} />}\n    >\n      <Pressable accessibilityRole=\"button\" onPress={onOpen} style={styles.row}>\n        <AppText text={title} />\n      </Pressable>\n    </ReanimatedSwipeable>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-swipe-row-opaque-spread": {
+    "expect": [
+      "[gesture-alternative]",
+      "src/features/tasks/components/swipe-task-row.tsx:20",
+      "<ReanimatedSwipeable> reveals row actions with a swipe, but SwipeTaskRow offers no accessibilityActions"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/swipe-task-row.tsx",
+          "content": "// src/features/tasks/components/swipe-task-row.tsx\nimport ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';\n\nimport { Button } from '@/ui/button';\n\nimport { TaskCard } from './task-card';\n\nimport type { TaskCardProps } from './task-card';\nimport type { ReactNode } from 'react';\n\nexport type SwipeTaskRowProps = {\n  readonly card: TaskCardProps;\n  readonly deleteLabel: string;\n  readonly onDelete: () => void;\n};\n\n// Planted bug: the spread looks as if it could carry accessibilityActions, but TaskCard declares none.\nexport function SwipeTaskRow({ card, deleteLabel, onDelete }: SwipeTaskRowProps): ReactNode {\n  return (\n    <ReanimatedSwipeable\n      renderRightActions={() => <Button label={deleteLabel} onPress={onDelete} testID={`tasks.task-card.${card.taskId}.delete-button`} />}\n    >\n      <TaskCard {...card} />\n    </ReanimatedSwipeable>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-switch-subscription": {
+    "expect": [
+      "src/features/settings/use-heavier-text.ts:6 [a11y-store] AccessibilityInfo.addEventListener is read outside the system accessibility store",
+      "src/features/settings/use-heavier-text.ts:14 [a11y-store] AccessibilityInfo.isBoldTextEnabled"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/settings/use-heavier-text.ts",
+          "content": "// src/features/settings/use-heavier-text.ts\nimport { AccessibilityInfo } from 'react-native';\n\n// Planted: a second subscription to an OS switch, outside the system accessibility store.\nexport function watchBoldText(onChange: (isOn: boolean) => void): () => void {\n  const subscription = AccessibilityInfo.addEventListener('boldTextChanged', onChange);\n  return () => {\n    subscription.remove();\n  };\n}\n\n/** Planted too: a one-off read of a switch the store does not mirror. */\nexport async function isBoldTextOn(): Promise<boolean> {\n  return AccessibilityInfo.isBoldTextEnabled();\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-touch-target": {
+    "expect": ["[touch-target]", "src/ui/icon-button.tsx:28", "is only 32 pt wide (style: styles.box)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/icon-button.tsx",
+          "find": "  box: { width: MIN_TOUCH_TARGET, height: MIN_TOUCH_TARGET,",
+          "with": "  box: { width: 32, height: 32,"
+        }
+      }
+    ]
+  },
+  "bad-touch-target-pressed-callback": {
+    "expect": ["[touch-target]", "src/ui/icon-button.tsx:29", "is only 32 pt wide (style: styles.box, styles.pressed)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/icon-button.tsx",
+          "find": "  box: { width: MIN_TOUCH_TARGET, height: MIN_TOUCH_TARGET,",
+          "with": "  pressed: { opacity: 0.6 },\n  box: { width: 32, height: 32,"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/ui/icon-button.tsx",
+          "find": "      style={styles.box}\n",
+          "with": "      style={({ pressed }) => [styles.box, pressed && styles.pressed]}\n"
+        }
+      }
+    ]
+  },
+  "bad-touch-target-styles-binding": {
+    "expect": ["[touch-target]", "src/ui/tag-chip.tsx:21", "is only 30 pt tall (style: s.chip)"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/tag-chip.tsx",
+          "content": "// src/ui/tag-chip.tsx\nimport { Pressable, StyleSheet } from 'react-native';\n\nimport { makeStyles } from '@/theme/make-styles';\n\nimport { AppText } from './app-text';\n\nimport type { ReactNode } from 'react';\n\n// Planted: a 30 pt tall chip, through a styles object that is not named \"styles\".\nconst useStyles = makeStyles((theme) => {\n  const styles = StyleSheet.create({\n    chip: { minWidth: 64, height: 30, paddingInline: theme.spacing.md, borderRadius: theme.radius.full },\n  });\n  return styles;\n});\n\nexport function TagChip({ label, onPress }: { readonly label: string; readonly onPress: () => void }): ReactNode {\n  const s = useStyles();\n  return (\n    <Pressable accessibilityRole=\"button\" onPress={onPress} style={s.chip} testID=\"tasks.tag-chip\">\n      <AppText text={label} />\n    </Pressable>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-touchable-native-feedback": {
+    "expect": [
+      "[pressable-role]",
+      "src/features/tasks/components/add-task-fab.tsx:13",
+      "<TouchableNativeFeedback> has no accessibilityRole"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/add-task-fab.tsx",
+          "content": "// src/features/tasks/components/add-task-fab.tsx\nimport { StyleSheet, TouchableNativeFeedback, View } from 'react-native';\n\nimport { Icon } from '@/ui/icon';\n\nimport type { ReactNode } from 'react';\n\nconst styles = StyleSheet.create({ fab: { width: 56, height: 56 } });\n\n// Android ripple button: the same rules as Pressable apply.\nexport function AddTaskFab({ label, onPress }: { readonly label: string; readonly onPress: () => void }): ReactNode {\n  return (\n    <TouchableNativeFeedback accessibilityLabel={label} onPress={onPress}>\n      <View style={styles.fab}>\n        <Icon name=\"plus\" />\n      </View>\n    </TouchableNativeFeedback>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-workspace-package": {
+    "expect": ["[pressable-role]", "apps/mobile/src/ui/chip.tsx"],
+    "ops": [
+      {
+        "write": {
+          "file": "apps/mobile/package.json",
+          "content": "{ \"name\": \"@acme/mobile\", \"private\": true }\n"
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/src/ui/chip.tsx",
+          "content": "// apps/mobile/src/ui/chip.tsx\nimport { Pressable } from 'react-native';\n\nimport type { ReactNode } from 'react';\n\nexport function Chip({ label, onPress }: { readonly label: string; readonly onPress: () => void }): ReactNode {\n  return <Pressable accessibilityLabel={label} onPress={onPress} />;\n}\n"
+        }
+      },
+      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["apps/*"] } }
+    ]
+  },
+  "error-no-source": { "expect": ["ERROR [bad-input]", "nothing to check"], "args": "{dir} --src lib" },
+  "error-touch-below-floor": {
+    "expect": ["ERROR [bad-input]", "--min-touch 40 is below the floor 44"],
+    "args": "{dir} --min-touch 40"
+  },
+  "pass-accessible-backdrop": {
+    "expect": ["check-a11y-code: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/sort-sheet.tsx",
+          "content": "// src/features/tasks/components/sort-sheet.tsx\nimport { Modal, Pressable, StyleSheet, View } from 'react-native';\n\nimport type { ReactNode } from 'react';\n\nexport type SortSheetProps = {\n  readonly isOpen: boolean;\n  /** Translated: \"Close sort options\". */\n  readonly closeLabel: string;\n  readonly onClose: () => void;\n  readonly children: ReactNode;\n};\n\nconst styles = StyleSheet.create({ card: { marginBlockStart: 'auto', minHeight: 200 } });\n\n// The backdrop is an accessible close button; the card drawn above it blocks taps on purpose.\nexport function SortSheet({ isOpen, closeLabel, onClose, children }: SortSheetProps): ReactNode {\n  return (\n    <Modal visible={isOpen} transparent onRequestClose={onClose}>\n      <Pressable\n        accessibilityRole=\"button\"\n        accessibilityLabel={closeLabel}\n        onPress={onClose}\n        style={StyleSheet.absoluteFill}\n      />\n      <View style={styles.card}>{children}</View>\n    </Modal>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-aria-modal-pressable": {
+    "expect": ["check-a11y-code: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-actions-menu.tsx",
+          "content": "// src/features/tasks/components/task-actions-menu.tsx\n// aria-modal counts here: Pressable maps it to accessibilityViewIsModal (iOS); aria-hidden hides the\n// content behind the menu from TalkBack. The backdrop is not accessible itself, so the items are reachable.\nimport { Pressable, StyleSheet, View } from 'react-native';\n\nimport { Button } from '@/ui/button';\n\nimport type { ReactNode } from 'react';\n\nexport type TaskActionsMenuProps = {\n  readonly isOpen: boolean;\n  readonly closeLabel: string;\n  readonly renameLabel: string;\n  readonly deleteLabel: string;\n  readonly onClose: () => void;\n  readonly onRename: () => void;\n  readonly onDelete: () => void;\n  readonly children: ReactNode;\n};\n\nconst styles = StyleSheet.create({\n  fill: { flex: 1 },\n  backdrop: { position: 'absolute', inset: 0, justifyContent: 'flex-end' },\n});\n\nexport function TaskActionsMenu(props: TaskActionsMenuProps): ReactNode {\n  return (\n    <View style={styles.fill}>\n      <View style={styles.fill} aria-hidden={props.isOpen}>{props.children}</View>\n      {props.isOpen ? (\n        <Pressable\n          style={styles.backdrop}\n          accessible={false}\n          aria-modal\n          accessibilityRole=\"button\"\n          accessibilityLabel={props.closeLabel}\n          onPress={props.onClose}\n          testID=\"task-actions-menu.backdrop-button\"\n        >\n          <Button label={props.renameLabel} onPress={props.onRename} testID=\"task-actions-menu.rename-button\" />\n          <Button label={props.deleteLabel} onPress={props.onDelete} testID=\"task-actions-menu.delete-button\" />\n        </Pressable>\n      ) : null}\n    </View>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-aria-props": {
+    "expect": ["check-a11y-code: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/icon-button.tsx",
+          "find": "      accessibilityRole=\"button\"\n      accessibilityLabel={label}\n",
+          "with": "      role=\"button\"\n      aria-label={label}\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/ui/button.tsx",
+          "find": "      accessibilityState={{ disabled: isInactive, busy: isBusy }}\n",
+          "with": "      aria-disabled={isInactive}\n      aria-busy={isBusy}\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/ui/slider.tsx",
+          "find": "      accessibilityRole=\"adjustable\"\n",
+          "with": "      role=\"slider\"\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/ui/slider.tsx",
+          "find": "      accessibilityValue={{ min: 0, max: 100, now: props.value }}\n",
+          "with": "      aria-valuemin={0}\n      aria-valuemax={100}\n      aria-valuenow={props.value}\n"
+        }
+      }
+    ]
+  },
+  "pass-compound-component-text-child": {
+    "expect": ["check-a11y-code: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/settings/components/about-row.tsx",
+          "content": "// src/features/settings/components/about-row.tsx\nimport { Pressable, StyleSheet } from 'react-native';\n\nimport { ListRowTitle } from '@/ui/list-row';\n\nimport type { ReactNode } from 'react';\n\nconst styles = StyleSheet.create({ row: { minHeight: 56 } });\n\n// ListRowTitle comes from a file that also exports a pressable row, but it renders only text: it is\n// neither a nested pressable nor a missing name (the screen reader reads the title it renders).\nexport function AboutRow(props: { readonly title: string; readonly onPress: () => void }): ReactNode {\n  return (\n    <Pressable accessibilityRole=\"link\" onPress={props.onPress} style={styles.row} testID=\"settings.about-row\">\n      <ListRowTitle text={props.title} />\n    </Pressable>\n  );\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/ui/list-row.tsx",
+          "content": "// src/ui/list-row.tsx\nimport { Pressable, StyleSheet, View } from 'react-native';\n\nimport { AppText } from './app-text';\n\nimport type { ReactNode } from 'react';\n\nexport type ListRowProps = {\n  readonly label: string;\n  readonly valueText: string;\n  readonly isOn: boolean;\n  readonly onPress: () => void;\n  readonly testID: string;\n};\n\nconst styles = StyleSheet.create({ row: { minHeight: 56 } });\n\n/** A compound part: the row's title. It renders text only, never a pressable. */\nexport function ListRowTitle({ text }: { readonly text: string }): ReactNode {\n  return <AppText text={text} />;\n}\n\n// No accessibilityLabel on purpose: the screen reader reads the row's own texts in order.\nexport function ListRow(props: ListRowProps): ReactNode {\n  return (\n    <Pressable\n      accessibilityRole=\"switch\"\n      accessibilityState={{ checked: props.isOn }}\n      onPress={props.onPress}\n      style={styles.row}\n      testID={props.testID}\n    >\n      <View>\n        <ListRowTitle text={props.label} />\n        <AppText text={props.valueText} />\n      </View>\n    </Pressable>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-forwarded-long-press": {
+    "expect": ["check-a11y-code: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/notes/components/note-row-types.ts",
+          "content": "// src/features/notes/components/note-row-types.ts\nexport type NoteRowProps = {\n  readonly title: string;\n  readonly pinLabel: string;\n  readonly onOpen: () => void;\n  readonly onLongPress: () => void;\n};\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/notes/components/note-row.tsx",
+          "content": "// src/features/notes/components/note-row.tsx\nimport { ActionRow } from '@/ui/action-row';\n\nimport type { NoteRowProps } from './note-row-types';\nimport type { ReactNode } from 'react';\n\n// The feature passes onLongPress to the shared row, which declares the accessibility action itself.\nexport function NoteRow({ title, pinLabel, onOpen, onLongPress }: NoteRowProps): ReactNode {\n  return <ActionRow title={title} longPressLabel={pinLabel} onPress={onOpen} onLongPress={onLongPress} />;\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/ui/action-row.tsx",
+          "content": "// src/ui/action-row.tsx\nimport { Pressable, StyleSheet } from 'react-native';\n\nimport { AppText } from './app-text';\n\nimport type { AccessibilityActionEvent } from 'react-native';\nimport type { ReactNode } from 'react';\n\nexport type ActionRowProps = {\n  readonly title: string;\n  /** Translated name of the long-press action, read in the Actions rotor and the TalkBack menu. */\n  readonly longPressLabel: string;\n  readonly onPress: () => void;\n  readonly onLongPress: () => void;\n};\n\nconst styles = StyleSheet.create({ row: { minHeight: 56 } });\n\n// The shared row declares the screen-reader alternative of its own long press.\nexport function ActionRow({ title, longPressLabel, onPress, onLongPress }: ActionRowProps): ReactNode {\n  const handleAction = (event: AccessibilityActionEvent): void => {\n    if (event.nativeEvent.actionName === 'longpress') onLongPress();\n  };\n  return (\n    <Pressable\n      accessibilityRole=\"button\"\n      accessibilityActions={[{ name: 'longpress', label: longPressLabel }]}\n      onAccessibilityAction={handleAction}\n      onPress={onPress}\n      onLongPress={onLongPress}\n      style={styles.row}\n    >\n      <AppText text={title} />\n    </Pressable>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-gesture-exception": {
+    "expect": [
+      "note: src/features/tasks/components/reorder-handle.tsx [gesture-alternative]",
+      "(exception: the list screen also offers Move up and Move down",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "rn-skills.config.json",
+          "content": "{\n  \"a11yGestureExceptions\": [\n    {\n      \"file\": \"src/features/tasks/components/reorder-handle.tsx\",\n      \"reason\": \"the list screen also offers Move up and Move down in each row's actions\",\n      \"approvedBy\": \"design review 2026-10-01\"\n    }\n  ]\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/components/reorder-handle.tsx",
+          "content": "// src/features/tasks/components/reorder-handle.tsx\nimport { StyleSheet, View } from 'react-native';\nimport { Gesture, GestureDetector } from 'react-native-gesture-handler';\n\nimport type { ReactNode } from 'react';\n\nconst styles = StyleSheet.create({ handle: { minWidth: 44, minHeight: 44 } });\n\n// Planted: reordering works only by dragging (WCAG 2.5.7 asks for a single-pointer way too).\nexport function ReorderHandle({ onMove }: { readonly onMove: (steps: number) => void }): ReactNode {\n  const drag = Gesture.Pan().onEnd((event) => {\n    onMove(Math.round(event.translationY / 56));\n  });\n  return (\n    <GestureDetector gesture={drag}>\n      <View style={styles.handle} />\n    </GestureDetector>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-hidden-backdrop": {
+    "expect": ["check-a11y-code: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/filter-sheet.tsx",
+          "content": "// src/features/tasks/components/filter-sheet.tsx\nimport { Modal, Pressable, StyleSheet, View } from 'react-native';\n\nimport { Button } from '@/ui/button';\n\nimport type { ReactNode } from 'react';\n\nexport type FilterSheetProps = {\n  readonly isOpen: boolean;\n  readonly closeLabel: string;\n  readonly onClose: () => void;\n  readonly children: ReactNode;\n};\n\nconst styles = StyleSheet.create({ card: { marginBlockStart: 'auto', minHeight: 200 } });\n\n// The backdrop is a convenience for touch users and hidden from screen readers: the Close button,\n// Android's back (onRequestClose) and VoiceOver's escape gesture reach the same action.\nexport function FilterSheet({ isOpen, closeLabel, onClose, children }: FilterSheetProps): ReactNode {\n  return (\n    <Modal visible={isOpen} transparent onRequestClose={onClose}>\n      <Pressable\n        accessibilityRole=\"none\"\n        accessible={false}\n        importantForAccessibility=\"no\"\n        onPress={onClose}\n        style={StyleSheet.absoluteFill}\n      />\n      <View style={styles.card} onAccessibilityEscape={onClose}>\n        {children}\n        <Button label={closeLabel} onPress={onClose} testID=\"tasks.filter-sheet.close-button\" />\n      </View>\n    </Modal>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-keyboard-dismiss": {
+    "expect": ["check-a11y-code: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-form.tsx",
+          "content": "// src/features/tasks/components/task-form.tsx\nimport { Keyboard, StyleSheet, TextInput, TouchableWithoutFeedback, View } from 'react-native';\n\nimport type { ReactNode } from 'react';\n\nconst styles = StyleSheet.create({ form: { flex: 1 }, input: { minHeight: 44 } });\n\n// Tapping outside the field dismisses the keyboard; the area itself is no screen-reader stop.\nexport function TaskForm({ titleLabel }: { readonly titleLabel: string }): ReactNode {\n  return (\n    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>\n      <View style={styles.form}>\n        <TextInput accessibilityLabel={titleLabel} style={styles.input} />\n      </View>\n    </TouchableWithoutFeedback>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-opener-component-pointer-events": {
+    "expect": ["check-a11y-code: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-card.tsx",
+          "content": "// src/features/tasks/components/task-card.tsx\nimport { StyleSheet, View } from 'react-native';\n\nimport { AppText } from '@/ui/app-text';\nimport { Button } from '@/ui/button';\nimport { CardOpener } from '@/ui/card-opener';\n\nimport type { ReactNode } from 'react';\n\nexport type TaskCardProps = {\n  readonly taskId: string;\n  readonly title: string;\n  readonly dueText: string;\n  readonly openLabel: string;\n  readonly completeLabel: string;\n  readonly onOpen: () => void;\n  readonly onComplete: () => void;\n};\n\nconst styles = StyleSheet.create({\n  card: { minHeight: 96 },\n  texts: { flex: 1, pointerEvents: 'none' },\n});\n\n// The text layer passes touches through to the shared opener under it.\nexport function TaskCard(props: TaskCardProps): ReactNode {\n  return (\n    <View style={styles.card}>\n      <CardOpener label={props.openLabel} onPress={props.onOpen} testID={`tasks.task-card.${props.taskId}`} />\n      <View style={styles.texts} aria-hidden>\n        <AppText text={props.title} />\n        <AppText text={props.dueText} />\n      </View>\n      <Button label={props.completeLabel} onPress={props.onComplete} testID={`tasks.task-card.${props.taskId}.complete-button`} />\n    </View>\n  );\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/ui/card-opener.tsx",
+          "content": "// src/ui/card-opener.tsx\nimport { Pressable, StyleSheet } from 'react-native';\n\nimport type { ReactNode } from 'react';\n\nexport type CardOpenerProps = {\n  /** The card's visible texts joined in reading order, built with t() in the model hook. */\n  readonly label: string;\n  readonly onPress: () => void;\n  readonly testID: string;\n};\n\n// A shared opener on its own: the screen that uses it draws the text layer above it.\nexport function CardOpener(props: CardOpenerProps): ReactNode {\n  return (\n    <Pressable\n      style={StyleSheet.absoluteFill}\n      accessibilityRole=\"button\"\n      accessibilityLabel={props.label}\n      onPress={props.onPress}\n      testID={props.testID}\n    />\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-opener-pointer-events-prop": {
+    "expect": ["check-a11y-code: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/action-card.tsx",
+          "find": "<View style={styles.texts} accessibilityElementsHidden",
+          "with": "<View pointerEvents=\"none\" accessibilityElementsHidden"
+        }
+      }
+    ]
+  },
+  "pass-rn-pressable-disabled": {
+    "expect": ["check-a11y-code: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/text-link.tsx",
+          "content": "// src/ui/text-link.tsx\nimport { Pressable, StyleSheet } from 'react-native';\n\nimport { AppText } from './app-text';\nimport { MIN_TOUCH_TARGET } from './touch-size';\n\nimport type { ReactNode } from 'react';\n\nconst styles = StyleSheet.create({ link: { minHeight: MIN_TOUCH_TARGET, justifyContent: 'center' } });\n\n// disabled alone is enough here: React Native's Pressable copies it into accessibilityState.disabled,\n// so VoiceOver says \"dimmed\", TalkBack says \"disabled\" and toBeDisabled() passes.\nexport function TextLink(props: { readonly label: string; readonly isDisabled: boolean; readonly onPress: () => void; readonly testID: string }): ReactNode {\n  return (\n    <Pressable accessibilityRole=\"link\" disabled={props.isDisabled} onPress={props.onPress} style={styles.link} testID={props.testID}>\n      <AppText text={props.label} />\n    </Pressable>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-router-link-as-child": {
+    "expect": ["check-a11y-code: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/new-task-link.tsx",
+          "content": "// src/features/tasks/components/new-task-link.tsx\nimport { Link } from 'expo-router';\nimport { Pressable, StyleSheet } from 'react-native';\n\nimport { AppText } from '@/ui/app-text';\n\nimport type { ReactNode } from 'react';\n\nconst styles = StyleSheet.create({ link: { minHeight: 44, minWidth: 44 } });\n\n// expo-router's Link hands role 'link' and onPress to its one child (asChild).\nexport function NewTaskLink({ label }: { readonly label: string }): ReactNode {\n  return (\n    <Link href=\"/tasks/new\" asChild>\n      <Pressable style={styles.link}>\n        <AppText text={label} />\n      </Pressable>\n    </Link>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-router-modal-route": {
+    "expect": ["check-a11y-code: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/_layout.tsx",
+          "content": "// src/app/_layout.tsx\nimport { Stack } from 'expo-router';\n\nimport type { ReactNode } from 'react';\n\nexport default function RootLayout(): ReactNode {\n  return (\n    <Stack>\n      <Stack.Screen name=\"index\" />\n      <Stack.Screen name=\"modal\" options={{ presentation: 'modal' }} />\n      <Stack.Screen name=\"tasks/filter-sheet\" options={{ presentation: 'formSheet', sheetAllowedDetents: [0.5, 1] }} />\n    </Stack>\n  );\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/modal.tsx",
+          "content": "// src/app/modal.tsx\n// A thin route: the navigator presents it modally, so both screen readers stay inside.\nimport { NewTaskScreen } from '@/features/tasks/new-task-screen';\n\nimport type { ReactNode } from 'react';\n\nexport default function NewTaskModal(): ReactNode {\n  return <NewTaskScreen />;\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/tasks/filter-sheet.tsx",
+          "content": "// src/app/tasks/filter-sheet.tsx\n// A thin route presented as a form sheet by the root layout.\nimport { TaskFilterScreen } from '@/features/tasks/task-filter-screen';\n\nimport type { ReactNode } from 'react';\n\nexport default function TaskFilterSheet(): ReactNode {\n  return <TaskFilterScreen />;\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-shared-swipe-row": {
+    "expect": ["check-a11y-code: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/swipe-task-row.tsx",
+          "content": "// src/features/tasks/components/swipe-task-row.tsx\nimport { AppText } from '@/ui/app-text';\nimport { Button } from '@/ui/button';\nimport { SwipeRow } from '@/ui/swipe-row';\n\nimport type { ReactNode } from 'react';\n\nexport type SwipeTaskRowProps = {\n  readonly taskId: string;\n  readonly title: string;\n  /** Built with t() in the model hook. */\n  readonly labels: { readonly open: string; readonly complete: string; readonly delete: string };\n  readonly onOpen: () => void;\n  readonly onComplete: () => void;\n  readonly onDelete: () => void;\n};\n\n// The feature passes translated labels and handlers; the shared row turns them into named actions.\nexport function SwipeTaskRow({ taskId, title, labels, onOpen, onComplete, onDelete }: SwipeTaskRowProps): ReactNode {\n  return (\n    <SwipeRow\n      openLabel={labels.open}\n      onOpen={onOpen}\n      testID={`tasks.task-row.${taskId}`}\n      actions={[\n        { name: 'complete', label: labels.complete, onRun: onComplete },\n        { name: 'delete', label: labels.delete, onRun: onDelete },\n      ]}\n      renderRightActions={() => <Button label={labels.delete} onPress={onDelete} testID={`tasks.task-row.${taskId}.delete-button`} />}\n    >\n      <AppText text={title} />\n    </SwipeRow>\n  );\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/ui/swipe-row.tsx",
+          "content": "// src/ui/swipe-row.tsx\nimport { Pressable, StyleSheet } from 'react-native';\nimport ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';\n\nimport type { ReactNode } from 'react';\nimport type { AccessibilityActionEvent } from 'react-native';\n\nexport type SwipeAction = {\n  readonly name: string;\n  /** Translated: what the VoiceOver Actions rotor and the TalkBack actions menu speak. */\n  readonly label: string;\n  readonly onRun: () => void;\n};\n\nexport type SwipeRowProps = {\n  readonly openLabel: string;\n  readonly onOpen: () => void;\n  readonly testID: string;\n  /** Every action the swipe reveals, also offered as a named accessibility action on the opener. */\n  readonly actions: readonly SwipeAction[];\n  readonly renderRightActions: () => ReactNode;\n  readonly children: ReactNode;\n};\n\nconst styles = StyleSheet.create({ row: { minHeight: 56 } });\n\n// The shared row declares the actions itself, so a feature row built on it cannot leave them out.\nexport function SwipeRow(props: SwipeRowProps): ReactNode {\n  const handleAction = (event: AccessibilityActionEvent): void => {\n    props.actions.find((action) => action.name === event.nativeEvent.actionName)?.onRun();\n  };\n  return (\n    <ReanimatedSwipeable renderRightActions={props.renderRightActions}>\n      <Pressable\n        accessibilityRole=\"button\"\n        accessibilityLabel={props.openLabel}\n        accessibilityActions={props.actions.map(({ name, label }) => ({ name, label }))}\n        onAccessibilityAction={handleAction}\n        onPress={props.onOpen}\n        style={styles.row}\n        testID={props.testID}\n      >\n        {props.children}\n      </Pressable>\n    </ReanimatedSwipeable>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-swipe-row-with-actions": {
+    "expect": ["check-a11y-code: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/swipe-task-row.tsx",
+          "content": "// src/features/tasks/components/swipe-task-row.tsx\nimport { Pressable, StyleSheet } from 'react-native';\nimport ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';\n\nimport { AppText } from '@/ui/app-text';\nimport { Button } from '@/ui/button';\n\nimport type { AccessibilityActionEvent } from 'react-native';\nimport type { ReactNode } from 'react';\n\nexport type SwipeTaskRowProps = {\n  readonly taskId: string;\n  readonly title: string;\n  readonly deleteLabel: string;\n  readonly onOpen: () => void;\n  readonly onDelete: () => void;\n};\n\nconst styles = StyleSheet.create({ row: { minHeight: 56 } });\n\n// The swipe action is also a named action on the row: the Actions rotor and the TalkBack actions menu.\nexport function SwipeTaskRow({ taskId, title, deleteLabel, onOpen, onDelete }: SwipeTaskRowProps): ReactNode {\n  const handleAction = (event: AccessibilityActionEvent): void => {\n    if (event.nativeEvent.actionName === 'delete') onDelete();\n  };\n  return (\n    <ReanimatedSwipeable\n      renderRightActions={() => <Button label={deleteLabel} onPress={onDelete} testID={`tasks.task-row.${taskId}.delete-button`} />}\n    >\n      <Pressable\n        accessibilityRole=\"button\"\n        accessibilityActions={[{ name: 'delete', label: deleteLabel }]}\n        onAccessibilityAction={handleAction}\n        onPress={onOpen}\n        style={styles.row}\n      >\n        <AppText text={title} />\n      </Pressable>\n    </ReanimatedSwipeable>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-touch-target-merged": {
+    "expect": ["check-a11y-code: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/fab.tsx",
+          "content": "// src/ui/fab.tsx\nimport { Pressable, StyleSheet } from 'react-native';\n\nimport { Icon } from './icon';\nimport { MIN_TOUCH_TARGET } from './touch-size';\n\nimport type { ReactNode } from 'react';\n\nconst styles = StyleSheet.create({\n  // shadowOffset's width and height are not the box; the box comes from minWidth/minHeight below.\n  raised: { shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2 },\n  base: { minWidth: MIN_TOUCH_TARGET, minHeight: MIN_TOUCH_TARGET, alignItems: 'center', justifyContent: 'center' },\n});\n\nexport function Fab({ label, onPress }: { readonly label: string; readonly onPress: () => void }): ReactNode {\n  return (\n    <Pressable\n      accessibilityRole=\"button\"\n      accessibilityLabel={label}\n      onPress={onPress}\n      style={({ pressed }) => [styles.raised, styles.base, { width: 32 }, pressed && { opacity: 0.8 }]}\n      testID=\"tasks.add-button\"\n    >\n      <Icon name=\"plus\" />\n    </Pressable>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-web-aria-modal-with-ios-flag": {
+    "expect": ["check-a11y-code: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/sort-sheet.tsx",
+          "content": "// src/features/tasks/components/sort-sheet.tsx\nimport { StyleSheet, View } from 'react-native';\n\nimport type { ReactNode } from 'react';\n\nexport type SortSheetProps = {\n  readonly isOpen: boolean;\n  readonly sheet: ReactNode;\n  readonly children: ReactNode;\n};\n\nconst styles = StyleSheet.create({\n  fill: { flex: 1 },\n  scrim: { position: 'absolute', inset: 0 },\n});\n\n// A web-enabled app keeps both flags on the scrim: accessibilityViewIsModal for VoiceOver (React\n// Native drops aria-modal on a View) and aria-modal for the browser (react-native-web maps it, not\n// the iOS flag). aria-hidden on the sibling hides the screen behind from TalkBack.\nexport function SortSheet({ isOpen, sheet, children }: SortSheetProps): ReactNode {\n  return (\n    <View style={styles.fill}>\n      <View style={styles.fill} aria-hidden={isOpen}>{children}</View>\n      {isOpen ? (\n        <View style={styles.scrim} accessibilityViewIsModal aria-modal testID=\"sort-sheet.scrim\">\n          {sheet}\n        </View>\n      ) : null}\n    </View>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-whole-repo-scan": { "expect": ["check-a11y-code: ", "RESULT: PASS"], "args": "{dir} --src ." }
+}

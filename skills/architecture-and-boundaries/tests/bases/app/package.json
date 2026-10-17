@@ -1,0 +1,20 @@
+{
+  "name": "tasks-app",
+  "version": "1.0.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "dependencies": {
+    "expo": "~57.0.26",
+    "expo-haptics": "~57.0.3",
+    "expo-network": "~57.0.2",
+    "expo-router": "~57.0.24",
+    "expo-sqlite": "~57.0.3",
+    "react": "19.2.3",
+    "react-native": "0.86.3",
+    "zustand": "5.0.15"
+  },
+  "overrides": {
+    "react": "19.2.3",
+    "react-native": "0.86.3"
+  }
+}

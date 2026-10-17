@@ -1,0 +1,8 @@
+{
+  "$schema": "./adaptive-layout.schema.json",
+  "$comment": "The app's adaptive-layout facts, read by the adaptive-layout skill's check-adaptive-layout.mjs. Every exception carries its reason. Add \"appOrientation\" only to record a deliberate profile (\"landscape\" for a landscape-only app, or \"portrait\" to accept an expo-screen-orientation portrait launch lock); without it the app config may say 'default' or 'portrait'.",
+  "tablets": true,
+  "listDetailScreens": [],
+  "fullBleedScreens": [],
+  "orientationLocks": []
+}

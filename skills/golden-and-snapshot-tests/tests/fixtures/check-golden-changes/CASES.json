@@ -1,0 +1,183 @@
+{
+  "bad-baseline-without-trailer": {
+    "expect": [
+      ".maestro/baselines/ios/phone/en-light/tasks.png [gate-change-missing]",
+      ".maestro/baselines/ios/phone/en-light/tasks.png (added)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit a6fb0c97681e6879ca9119b790eb70990f2205c0\ntest(e2e): add the tasks screen baseline\n\n==> diff\n\ndiff --git a/.maestro/baselines/ios/phone/en-light/tasks.png b/.maestro/baselines/ios/phone/en-light/tasks.png\nnew file mode 100644\nindex 0000000..029ace0\nBinary files /dev/null and b/.maestro/baselines/ios/phone/en-light/tasks.png differ\n"
+        }
+      }
+    ]
+  },
+  "bad-contract-delete": {
+    "expect": [
+      "src/data/backup/backup-envelope.golden.test.ts.snap.ios:3 [contract-golden-changed]",
+      "deletes the contract golden \"[contract] encodeBackup goldens encodes format 1 for two tasks exported on 2026-10-03 1\"",
+      "src/data/backup/backup-envelope.golden.test.ts.snap.ios:15 [contract-golden-changed]"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit 2630d1c62006b780ac95b292776584293d99c402\ntest(backup): drop the old backup goldens\n\nGate-Change: removes the backup goldens; the restore tests cover it\n\n==> diff\n\ndiff --git a/src/data/backup/backup-envelope.golden.test.ts.snap.ios b/src/data/backup/backup-envelope.golden.test.ts.snap.ios\ndeleted file mode 100644\nindex 008161b..0000000\n--- a/src/data/backup/backup-envelope.golden.test.ts.snap.ios\n+++ /dev/null\n@@ -1,22 +0,0 @@\n-// Jest Snapshot v1, https://goo.gl/fbAQLP\n-\n-exports[`[contract] encodeBackup goldens encodes format 1 for two tasks exported on 2026-10-03 1`] = `\n-\"{\n-  \"format\": 1,\n-  \"exportedAt\": \"2026-10-03T09:00:00.000Z\",\n-  \"tasks\": [\n-    { \"id\": \"t1\", \"title\": \"Renew passport\", \"isDone\": false, \"dueKey\": \"2026-09-30\" },\n-    { \"id\": \"t4\", \"title\": \"Pay rent\", \"isDone\": true, \"dueKey\": \"2026-10-01\" }\n-  ],\n-  \"checksum\": \"fnv1a32:5d1c2b7e\"\n-}\"\n-`;\n-\n-exports[`[contract] encodeBackup goldens encodes format 1 for an empty list exported on 2026-12-31 1`] = `\n-\"{\n-  \"format\": 1,\n-  \"exportedAt\": \"2026-12-31T23:59:59.000Z\",\n-  \"tasks\": [],\n-  \"checksum\": \"fnv1a32:811c9dc5\"\n-}\"\n-`;\n"
+        }
+      }
+    ]
+  },
+  "bad-contract-edit": {
+    "expect": [
+      "src/features/tasks/tasks-digest.golden.test.ts.snap.ios:5 [contract-golden-changed]",
+      "edits the contract golden \"[contract] digestNotificationId goldens names the digest of the inbox list on 2026-12-31 1\""
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit d8274cec53ddb58d179e2caab327564884422faf\nfeat(tasks): add the time to digest ids\n\nGate-Change: digest id goldens re-accepted for the new id format\n\n==> diff\n\ndiff --git a/src/features/tasks/tasks-digest.golden.test.ts.snap.ios b/src/features/tasks/tasks-digest.golden.test.ts.snap.ios\nindex 48aeb0a..9f53488 100644\n--- a/src/features/tasks/tasks-digest.golden.test.ts.snap.ios\n+++ b/src/features/tasks/tasks-digest.golden.test.ts.snap.ios\n@@ -1,37 +1,37 @@\n // Jest Snapshot v1, https://goo.gl/fbAQLP\n \n exports[`[contract] digestNotificationId goldens names the digest of the inbox list on 2026-10-03 1`] = `\"digest:inbox:2026-10-03\"`;\n \n-exports[`[contract] digestNotificationId goldens names the digest of the inbox list on 2026-12-31 1`] = `\"digest:inbox:2026-12-31\"`;\n+exports[`[contract] digestNotificationId goldens names the digest of the inbox list on 2026-12-31 1`] = `\"digest:inbox:2026-12-31T00:00\"`;\n \n exports[`[contract] digestNotificationId goldens names the digest of the inbox list on 2027-01-01 1`] = `\"digest:inbox:2027-01-01\"`;\n \n exports[`[contract] digestNotificationId goldens names the digest of the inbox list on 2028-02-29 1`] = `\"digest:inbox:2028-02-29\"`;\n \n exports[`planDigest goldens groups the sample list on 2026-10-03 1`] = `\n \"today 2026-10-03 tasks 5 done 1\n overdue: t1 Renew passport (2026-09-30)\n today: t2 Water the plants (2026-10-03)\n upcoming: t5 Send the invoice (2026-10-05), t3 Book the dentist (no date)\"\n `;\n \n exports[`planDigest goldens groups the sample list on 2026-10-05 1`] = `\n \"today 2026-10-05 tasks 5 done 1\n overdue: t1 Renew passport (2026-09-30), t2 Water the plants (2026-10-03)\n today: t5 Send the invoice (2026-10-05)\n upcoming: t3 Book the dentist (no date)\"\n `;\n \n exports[`planDigest goldens groups the sample list on 2026-12-31 1`] = `\n \"today 2026-12-31 tasks 5 done 1\n overdue: t1 Renew passport (2026-09-30), t2 Water the plants (2026-10-03), t5 Send the invoice (2026-10-05)\n today: -\n upcoming: t3 Book the dentist (no date)\"\n `;\n \n exports[`planDigest goldens plans an empty list 1`] = `\n \"today 2026-10-03 tasks 0 done 0\n overdue: -\n today: -\n upcoming: -\"\n `;\n"
+        }
+      }
+    ]
+  },
+  "bad-contract-rename": {
+    "expect": [
+      "src/features/tasks/tasks-digest.golden.test.ts.snap.ios:3 [contract-golden-changed]",
+      "edits the contract golden \"[contract] digestNotificationId goldens names the digest of the inbox list on 2026-10-03 1\"",
+      "src/features/tasks/tasks-digest.golden.test.ts.snap.ios:9 [contract-golden-changed]"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit d6caefa1d64a34540de023a450bdc0607ef13e9f\ntest(tasks): shorten the digest id titles\n\nGate-Change: renamed the digest id golden titles; the ids themselves are unchanged\n\n==> diff\n\ndiff --git a/src/features/tasks/tasks-digest.golden.test.ts b/src/features/tasks/tasks-digest.golden.test.ts\nindex 3a91ec7..260236d 100644\n--- a/src/features/tasks/tasks-digest.golden.test.ts\n+++ b/src/features/tasks/tasks-digest.golden.test.ts\n@@ -1,57 +1,57 @@\n // src/features/tasks/tasks-digest.golden.test.ts\n // DATA GOLDEN (Jest 'golden' project). A diff here means the digest users get changed. Create or\n // update it only with `npx jest <this file> --selectProjects golden -u`, read the .snap.ios diff\n // line by line, and commit with a `Gate-Change:` trailer. The [contract] entries never change and\n // are never deleted (adding a key is fine); never rename their titles, the key is the title.\n import { goldenText, headerLine } from '@test/goldens/golden-text';\n \n import { digestNotificationId, planDigest } from './tasks-digest';\n \n import type { DigestTask } from './tasks-digest';\n \n /** A realistic list: one overdue, one due on the first sample day, one undated, one done, one later. */\n const TASKS: readonly DigestTask[] = [\n   { id: 't1', title: 'Renew passport', isDone: false, dueKey: '2026-09-30' },\n   { id: 't2', title: 'Water the plants', isDone: false, dueKey: '2026-10-03' },\n   { id: 't3', title: 'Book the dentist', isDone: false, dueKey: null },\n   { id: 't4', title: 'Pay rent', isDone: true, dueKey: '2026-10-01' },\n   { id: 't5', title: 'Send the invoice', isDone: false, dueKey: '2026-10-05' },\n ];\n \n function describeGroup(label: string, group: readonly DigestTask[]): string {\n   const items = group.map((task) => `${task.id} ${task.title} (${task.dueKey ?? 'no date'})`);\n   return `${label}: ${items.length === 0 ? '-' : items.join(', ')}`;\n }\n \n /** What the digest holds on `todayKey`: the inputs and counts, then one line per group. */\n function describeDigest(tasks: readonly DigestTask[], todayKey: string): string {\n   const plan = planDigest(tasks, todayKey);\n   return goldenText(headerLine({ today: todayKey, tasks: tasks.length, done: plan.doneCount }), [\n     describeGroup('overdue', plan.overdue),\n     describeGroup('today', plan.dueToday),\n     describeGroup('upcoming', plan.upcoming),\n   ]);\n }\n \n describe('planDigest goldens', () => {\n   it.each(['2026-10-03', '2026-10-05', '2026-12-31'])(\n     'groups the sample list on %s',\n     (todayKey) => {\n       expect(describeDigest(TASKS, todayKey)).toMatchSnapshot();\n     },\n   );\n \n   it('plans an empty list', () => {\n     expect(describeDigest([], '2026-10-03')).toMatchSnapshot();\n   });\n });\n \n describe('[contract] digestNotificationId goldens', () => {\n   // At least three keys with a year-end/new-year pair and a leap day: date bugs live at the edges.\n   it.each(['2026-10-03', '2026-12-31', '2027-01-01', '2028-02-29'])(\n-    'names the digest of the inbox list on %s',\n+    'names the inbox digest on %s',\n     (dateKey) => {\n       expect(digestNotificationId('inbox', dateKey)).toMatchSnapshot();\n     },\n   );\n });\ndiff --git a/src/features/tasks/tasks-digest.golden.test.ts.snap.ios b/src/features/tasks/tasks-digest.golden.test.ts.snap.ios\nindex 48aeb0a..0643cd8 100644\n--- a/src/features/tasks/tasks-digest.golden.test.ts.snap.ios\n+++ b/src/features/tasks/tasks-digest.golden.test.ts.snap.ios\n@@ -1,37 +1,37 @@\n // Jest Snapshot v1, https://goo.gl/fbAQLP\n \n-exports[`[contract] digestNotificationId goldens names the digest of the inbox list on 2026-10-03 1`] = `\"digest:inbox:2026-10-03\"`;\n+exports[`[contract] digestNotificationId goldens names the inbox digest on 2026-10-03 1`] = `\"digest:inbox:2026-10-03\"`;\n \n-exports[`[contract] digestNotificationId goldens names the digest of the inbox list on 2026-12-31 1`] = `\"digest:inbox:2026-12-31\"`;\n+exports[`[contract] digestNotificationId goldens names the inbox digest on 2026-12-31 1`] = `\"digest:inbox:2026-12-31\"`;\n \n-exports[`[contract] digestNotificationId goldens names the digest of the inbox list on 2027-01-01 1`] = `\"digest:inbox:2027-01-01\"`;\n+exports[`[contract] digestNotificationId goldens names the inbox digest on 2027-01-01 1`] = `\"digest:inbox:2027-01-01\"`;\n \n-exports[`[contract] digestNotificationId goldens names the digest of the inbox list on 2028-02-29 1`] = `\"digest:inbox:2028-02-29\"`;\n+exports[`[contract] digestNotificationId goldens names the inbox digest on 2028-02-29 1`] = `\"digest:inbox:2028-02-29\"`;\n \n exports[`planDigest goldens groups the sample list on 2026-10-03 1`] = `\n \"today 2026-10-03 tasks 5 done 1\n overdue: t1 Renew passport (2026-09-30)\n today: t2 Water the plants (2026-10-03)\n upcoming: t5 Send the invoice (2026-10-05), t3 Book the dentist (no date)\"\n `;\n \n exports[`planDigest goldens groups the sample list on 2026-10-05 1`] = `\n \"today 2026-10-05 tasks 5 done 1\n overdue: t1 Renew passport (2026-09-30), t2 Water the plants (2026-10-03)\n today: t5 Send the invoice (2026-10-05)\n upcoming: t3 Book the dentist (no date)\"\n `;\n \n exports[`planDigest goldens groups the sample list on 2026-12-31 1`] = `\n \"today 2026-12-31 tasks 5 done 1\n overdue: t1 Renew passport (2026-09-30), t2 Water the plants (2026-10-03), t5 Send the invoice (2026-10-05)\n today: -\n upcoming: t3 Book the dentist (no date)\"\n `;\n \n exports[`planDigest goldens plans an empty list 1`] = `\n \"today 2026-10-03 tasks 0 done 0\n overdue: -\n today: -\n upcoming: -\"\n `;\n"
+        }
+      }
+    ]
+  },
+  "bad-contract-row-edit": {
+    "expect": [
+      "src/data/backup/backup-envelope.golden.test.ts.snap.ios:9 [contract-golden-changed]",
+      "edits the contract golden \"[contract] encodeBackup goldens encodes format 1 for two tasks exported on 2026-10-03 1\""
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit 25adfb8c55e8864be816a3d6e3b0085c17c07ef0\nrefactor(backup): shorten the done field\n\nGate-Change: backup goldens re-accepted after renaming isDone to done\n\n==> diff\n\ndiff --git a/src/data/backup/backup-envelope.golden.test.ts.snap.ios b/src/data/backup/backup-envelope.golden.test.ts.snap.ios\nindex 008161b..2d03899 100644\n--- a/src/data/backup/backup-envelope.golden.test.ts.snap.ios\n+++ b/src/data/backup/backup-envelope.golden.test.ts.snap.ios\n@@ -1,22 +1,22 @@\n // Jest Snapshot v1, https://goo.gl/fbAQLP\n \n exports[`[contract] encodeBackup goldens encodes format 1 for two tasks exported on 2026-10-03 1`] = `\n \"{\n   \"format\": 1,\n   \"exportedAt\": \"2026-10-03T09:00:00.000Z\",\n   \"tasks\": [\n     { \"id\": \"t1\", \"title\": \"Renew passport\", \"isDone\": false, \"dueKey\": \"2026-09-30\" },\n-    { \"id\": \"t4\", \"title\": \"Pay rent\", \"isDone\": true, \"dueKey\": \"2026-10-01\" }\n+    { \"id\": \"t4\", \"title\": \"Pay rent\", \"done\": true, \"dueKey\": \"2026-10-01\" }\n   ],\n   \"checksum\": \"fnv1a32:5d1c2b7e\"\n }\"\n `;\n \n exports[`[contract] encodeBackup goldens encodes format 1 for an empty list exported on 2026-12-31 1`] = `\n \"{\n   \"format\": 1,\n   \"exportedAt\": \"2026-12-31T23:59:59.000Z\",\n   \"tasks\": [],\n   \"checksum\": \"fnv1a32:811c9dc5\"\n }\"\n `;\n"
+        }
+      }
+    ]
+  },
+  "bad-extra-golden-path": {
+    "expect": [
+      "src/data/backup/fixtures/backup-v1.json [gate-change-missing]",
+      "src/data/backup/fixtures/backup-v1.json (added)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/goldens.json",
+          "content": "{\n  \"contracts\": [],\n  \"goldenPaths\": [\n    \"src/data/**/fixtures/**\"\n  ]\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit ecc786e334e689feb1a4cb287a5bfc515c5ceb6d\ntest(backup): add the format 1 fixture\n\n==> diff\n\ndiff --git a/src/data/backup/fixtures/backup-v1.json b/src/data/backup/fixtures/backup-v1.json\nnew file mode 100644\nindex 0000000..dc80ad1\n--- /dev/null\n+++ b/src/data/backup/fixtures/backup-v1.json\n@@ -0,0 +1 @@\n+{ \"format\": 1, \"tasks\": [] }\n"
+        }
+      }
+    ]
+  },
+  "bad-image-next-to-skills": {
+    "expect": [
+      "test/goldens/canvas/__image_snapshots__/weekly-chart-phone-portrait-1.png [gate-change-missing]",
+      "changes 1 golden file(s) without a Gate-Change trailer: test/goldens/canvas/__image_snapshots__/weekly-chart-phone-portrait-1.png (added)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit b07e7c9c87953ab58747567857c40c019afeb666\nfeat(insights): draw the goal line on the weekly chart\n\n==> diff\n\ndiff --git a/skills/chart-kit/tests/fixtures/good/test/goldens/canvas/__image_snapshots__/weekly-chart-phone-portrait-1.png b/skills/chart-kit/tests/fixtures/good/test/goldens/canvas/__image_snapshots__/weekly-chart-phone-portrait-1.png\nnew file mode 100644\nindex 0000000..3128223\nBinary files /dev/null and b/skills/chart-kit/tests/fixtures/good/test/goldens/canvas/__image_snapshots__/weekly-chart-phone-portrait-1.png differ\ndiff --git a/test/goldens/canvas/__image_snapshots__/weekly-chart-phone-portrait-1.png b/test/goldens/canvas/__image_snapshots__/weekly-chart-phone-portrait-1.png\nnew file mode 100644\nindex 0000000..08a9dad\nBinary files /dev/null and b/test/goldens/canvas/__image_snapshots__/weekly-chart-phone-portrait-1.png differ\n"
+        }
+      }
+    ]
+  },
+  "bad-missing-trailer": {
+    "expect": [
+      "[gate-change-missing]",
+      "changes 1 golden file(s) without a Gate-Change trailer: src/features/tasks/tasks-digest.golden.test.ts.snap.ios (modified)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit fb7c7404bbcb36cf30d271f82af9eb98a780cb1e\nfeat(tasks): list the newest overdue task first\n\n==> diff\n\ndiff --git a/src/features/tasks/tasks-digest.golden.test.ts.snap.ios b/src/features/tasks/tasks-digest.golden.test.ts.snap.ios\nindex 48aeb0a..c5c1150 100644\n--- a/src/features/tasks/tasks-digest.golden.test.ts.snap.ios\n+++ b/src/features/tasks/tasks-digest.golden.test.ts.snap.ios\n@@ -1,37 +1,37 @@\n // Jest Snapshot v1, https://goo.gl/fbAQLP\n \n exports[`[contract] digestNotificationId goldens names the digest of the inbox list on 2026-10-03 1`] = `\"digest:inbox:2026-10-03\"`;\n \n exports[`[contract] digestNotificationId goldens names the digest of the inbox list on 2026-12-31 1`] = `\"digest:inbox:2026-12-31\"`;\n \n exports[`[contract] digestNotificationId goldens names the digest of the inbox list on 2027-01-01 1`] = `\"digest:inbox:2027-01-01\"`;\n \n exports[`[contract] digestNotificationId goldens names the digest of the inbox list on 2028-02-29 1`] = `\"digest:inbox:2028-02-29\"`;\n \n exports[`planDigest goldens groups the sample list on 2026-10-03 1`] = `\n \"today 2026-10-03 tasks 5 done 1\n overdue: t1 Renew passport (2026-09-30)\n today: t2 Water the plants (2026-10-03)\n upcoming: t5 Send the invoice (2026-10-05), t3 Book the dentist (no date)\"\n `;\n \n exports[`planDigest goldens groups the sample list on 2026-10-05 1`] = `\n \"today 2026-10-05 tasks 5 done 1\n-overdue: t1 Renew passport (2026-09-30), t2 Water the plants (2026-10-03)\n+overdue: t2 Water the plants (2026-10-03), t1 Renew passport (2026-09-30)\n today: t5 Send the invoice (2026-10-05)\n upcoming: t3 Book the dentist (no date)\"\n `;\n \n exports[`planDigest goldens groups the sample list on 2026-12-31 1`] = `\n \"today 2026-12-31 tasks 5 done 1\n overdue: t1 Renew passport (2026-09-30), t2 Water the plants (2026-10-03), t5 Send the invoice (2026-10-05)\n today: -\n upcoming: t3 Book the dentist (no date)\"\n `;\n \n exports[`planDigest goldens plans an empty list 1`] = `\n \"today 2026-10-03 tasks 0 done 0\n overdue: -\n today: -\n upcoming: -\"\n `;\n"
+        }
+      }
+    ]
+  },
+  "bad-tolerance-pixel-threshold": {
+    "expect": ["scripts/e2e/screenshot-compare.ts [tolerance-raised]", "raises PIXEL_THRESHOLD from 0.1 to 0.3"],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit 4c1f0e2a9b8d7c6e5f4a3b2c1d0e9f8a7b6c5d4e\ntest(e2e): accept softer screenshots\n\nGate-Change: per-pixel distance raised because the emulator is noisy\n\n==> diff\n\ndiff --git a/scripts/e2e/screenshot-compare.ts b/scripts/e2e/screenshot-compare.ts\nindex 2b4c6d8..7e9f1a3 100644\n--- a/scripts/e2e/screenshot-compare.ts\n+++ b/scripts/e2e/screenshot-compare.ts\n@@ -10,4 +10,4 @@\n /** The share of pixels that may differ before a screenshot fails. */\n export const MAX_DIFF_RATIO = 0.002;\n /** The colour distance at which one pixel counts as different. */\n-export const PIXEL_THRESHOLD = 0.1;\n+export const PIXEL_THRESHOLD = 0.3;\n"
+        }
+      }
+    ]
+  },
+  "bad-tolerance-raised": {
+    "expect": [
+      "test/goldens/skia-golden.ts [tolerance-raised]",
+      "raises failureThreshold from 0.001 to 0.01",
+      "contracts/goldens.json [tolerance-raised]",
+      "raises maxPixelTolerance from 0.001 to 0.01"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit 9a99d844231a1faebde30dcb0ca5de7aeddca1ff\ntest(tooling): stop flaky pixel goldens\n\nGate-Change: tolerance raised because CanvasKit is noisy\n\n==> diff\n\ndiff --git a/contracts/goldens.json b/contracts/goldens.json\nindex 1e58d86..c11736d 100644\n--- a/contracts/goldens.json\n+++ b/contracts/goldens.json\n@@ -1,4 +1,4 @@\n {\n   \"contracts\": [],\n-  \"maxPixelTolerance\": 0.001\n+  \"maxPixelTolerance\": 0.01\n }\ndiff --git a/test/goldens/skia-golden.ts b/test/goldens/skia-golden.ts\nindex 35c3ad9..4326b4c 100644\n--- a/test/goldens/skia-golden.ts\n+++ b/test/goldens/skia-golden.ts\n@@ -1,14 +1,14 @@\n // test/goldens/skia-golden.ts — the pixel-golden matcher for every Skia golden (Jest 'golden'\n // project, CanvasKit). Every test/goldens/**/*.golden.test.ts imports it.\n // A gated file: the 0.1% tolerance changes only with the reviewer's agreement and a Gate-Change\n // trailer.\n import { join } from 'node:path';\n \n import { configureToMatchImageSnapshot } from 'jest-image-snapshot';\n \n /** 0.1% of pixels may differ (CanvasKit anti-aliasing noise); diffs land in reports/visual/diff. */\n export const toMatchPixelGolden = configureToMatchImageSnapshot({\n-  failureThreshold: 0.001,\n+  failureThreshold: 0.01,\n   failureThresholdType: 'percent',\n   customDiffDir: join(process.cwd(), 'reports', 'visual', 'diff'),\n });\n"
+        }
+      }
+    ]
+  },
+  "error-empty-log": {
+    "expect": ["holds no \"==> commit\" blocks"],
+    "ops": [{ "write": { "file": "history.log", "content": "not a captured log\n" } }]
+  },
+  "error-message-without-staged": {
+    "expect": ["ERROR [bad-input] --message goes with --staged"],
+    "args": "{dir} --range HEAD~1..HEAD --message {dir}/history.log"
+  },
+  "error-no-mode": {
+    "expect": ["ERROR [bad-input] pass exactly one of --range <revs>, --log <file> or --staged"],
+    "args": "{dir}"
+  },
+  "pass-jest30-header": {
+    "expect": ["check-golden-changes: 1 commits checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit 5b1f0c2e9a7d4e3f8c6b1a0d9e8f7c6b5a4d3e2f\nchore(deps): move to Expo SDK 58 and Jest 30\n\nJest 30 fails --ci on a snapshot whose header still links goo.gl (\"Outdated guide link\").\n\nGate-Change: snapshot headers rewritten for Jest 30 with --ci=false (no -u); header-only diff, checked with git diff -U0\n\n==> diff\n\ndiff --git a/src/features/tasks/tasks-digest.golden.test.ts.snap.ios b/src/features/tasks/tasks-digest.golden.test.ts.snap.ios\nindex 48aeb0a..7c2d1e9 100644\n--- a/src/features/tasks/tasks-digest.golden.test.ts.snap.ios\n+++ b/src/features/tasks/tasks-digest.golden.test.ts.snap.ios\n@@ -1,37 +1,37 @@\n-// Jest Snapshot v1, https://goo.gl/fbAQLP\n+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing\n \n exports[`[contract] digestNotificationId goldens names the digest of the inbox list on 2026-10-03 1`] = `\"digest:inbox:2026-10-03\"`;\n \n exports[`[contract] digestNotificationId goldens names the digest of the inbox list on 2026-12-31 1`] = `\"digest:inbox:2026-12-31\"`;\n \n exports[`[contract] digestNotificationId goldens names the digest of the inbox list on 2027-01-01 1`] = `\"digest:inbox:2027-01-01\"`;\n \n exports[`[contract] digestNotificationId goldens names the digest of the inbox list on 2028-02-29 1`] = `\"digest:inbox:2028-02-29\"`;\n \n exports[`planDigest goldens groups the sample list on 2026-10-03 1`] = `\n \"today 2026-10-03 tasks 5 done 1\n overdue: t1 Renew passport (2026-09-30)\n today: t2 Water the plants (2026-10-03)\n upcoming: t5 Send the invoice (2026-10-05), t3 Book the dentist (no date)\"\n `;\n \n exports[`planDigest goldens groups the sample list on 2026-10-05 1`] = `\n \"today 2026-10-05 tasks 5 done 1\n overdue: t1 Renew passport (2026-09-30), t2 Water the plants (2026-10-03)\n today: t5 Send the invoice (2026-10-05)\n upcoming: t3 Book the dentist (no date)\"\n `;\n \n exports[`planDigest goldens groups the sample list on 2026-12-31 1`] = `\n \"today 2026-12-31 tasks 5 done 1\n overdue: t1 Renew passport (2026-09-30), t2 Water the plants (2026-10-03), t5 Send the invoice (2026-10-05)\n today: -\n upcoming: t3 Book the dentist (no date)\"\n `;\n \n exports[`planDigest goldens plans an empty list 1`] = `\n \"today 2026-10-03 tasks 0 done 0\n overdue: -\n today: -\n upcoming: -\"\n `;\n"
+        }
+      }
+    ]
+  },
+  "pass-tolerance-approved": {
+    "expect": ["check-golden-changes: 1 commits checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "history.log",
+          "content": "==> commit 16f613aa762918b4adf4d0f32908c7c1a1113cbb\ntest(tooling): allow the text anti-aliasing of the new font\n\nGate-Change: failureThreshold 0.001 -> 0.002 approved by the design reviewer: the variable font hints differently at 320 px\n\n==> diff\n\ndiff --git a/test/goldens/skia-golden.ts b/test/goldens/skia-golden.ts\nindex 35c3ad9..ee2168c 100644\n--- a/test/goldens/skia-golden.ts\n+++ b/test/goldens/skia-golden.ts\n@@ -1,14 +1,14 @@\n // test/goldens/skia-golden.ts — the pixel-golden matcher for every Skia golden (Jest 'golden'\n // project, CanvasKit). Every test/goldens/**/*.golden.test.ts imports it.\n // A gated file: the 0.1% tolerance changes only with the reviewer's agreement and a Gate-Change\n // trailer.\n import { join } from 'node:path';\n \n import { configureToMatchImageSnapshot } from 'jest-image-snapshot';\n \n /** 0.1% of pixels may differ (CanvasKit anti-aliasing noise); diffs land in reports/visual/diff. */\n export const toMatchPixelGolden = configureToMatchImageSnapshot({\n-  failureThreshold: 0.001,\n+  failureThreshold: 0.002,\n   failureThresholdType: 'percent',\n   customDiffDir: join(process.cwd(), 'reports', 'visual', 'diff'),\n });\n"
+        }
+      }
+    ]
+  }
+}

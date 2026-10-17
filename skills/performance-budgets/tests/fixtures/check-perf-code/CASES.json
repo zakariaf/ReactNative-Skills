@@ -1,0 +1,425 @@
+{
+  "bad-callback-never-stops": {
+    "expect": ["[frame-callback-stop]", "src/features/charts/chart-runner.ts:11"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/charts/chart-runner.ts",
+          "find": "callback.setActive(",
+          "with": "void callback; noop(",
+          "count": 2
+        }
+      }
+    ]
+  },
+  "bad-callback-starts-active": {
+    "expect": ["[frame-callback-stop]", "src/features/charts/chart-runner.ts:11", "starts active"],
+    "ops": [
+      {
+        "$comment": "Autostart: the callback renders frames from mount, before anything moves, even though the file can stop it.",
+        "replace": { "file": "src/features/charts/chart-runner.ts", "find": "  }, false);\n", "with": "  });\n" }
+      }
+    ]
+  },
+  "bad-canvas-in-render-item": {
+    "expect": [
+      "[canvas-per-item]",
+      "src/features/tasks/tasks-screen.tsx",
+      "a Skia <SurfaceHost> is rendered once per list item"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "renderItem={({ item }) => <TaskRow title={item} />}",
+          "with": "renderItem={renderRow}"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "export function TasksScreen(",
+          "with": "function renderRow({ item }: { readonly item: string }): JSX.Element {\n  return <SurfaceHost surface={item} />;\n}\n\nexport function TasksScreen("
+        }
+      }
+    ]
+  },
+  "bad-canvas-per-item": {
+    "expect": [
+      "[canvas-per-item]",
+      "src/features/stats/stats-badges.tsx:16",
+      "a Skia <Canvas> is rendered once per list item"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/stats/stats-badges.tsx",
+          "find": "        <View key={day} />\n",
+          "with": "        <Canvas key={day} style={{ width: 20, height: 20 }} />\n"
+        }
+      }
+    ]
+  },
+  "bad-debug-perf-unwired": {
+    "expect": ["[debug-perf-wired]", "src/test-only-entry.ts:1", "builds no Performance actions"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/test-only-entry.ts",
+          "find": "actions: createPerfDebugActions({ perfLog, perf, openBenchmark })",
+          "with": "actions: null"
+        }
+      }
+    ]
+  },
+  "bad-destructured-never-called": {
+    "expect": ["[frame-callback-stop]", "src/features/charts/chart-runner.ts:7", "never stopped"],
+    "ops": [
+      {
+        "$comment": "setActive is destructured but never called: the destructuring alone must not count as a stop.",
+        "write": {
+          "file": "src/features/charts/chart-runner.ts",
+          "lines": [
+            "// src/features/charts/chart-runner.ts",
+            "import { useFrameCallback } from 'react-native-reanimated';",
+            "",
+            "import type { SharedValue } from 'react-native-reanimated';",
+            "",
+            "export function useChartRunner(progress: SharedValue<number>): void {",
+            "  const { setActive } = useFrameCallback((info) => {",
+            "    progress.set(progress.get() + (info.timeSincePreviousFrame ?? 0));",
+            "  }, false);",
+            "  void setActive;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-draw-budget-over-ceiling": {
+    "expect": [
+      "[draw-call-budget]",
+      "src/features/charts/draw-bars.test.ts:9",
+      "the draw-call budget 200 is over the app's ceiling 150"
+    ],
+    "ops": [{ "json": { "file": "quality-gates.json", "path": ["perf", "drawCallsPerFrameMax"], "value": 150 } }]
+  },
+  "bad-first-screen-mark-missing": {
+    "expect": ["[perf-layer]", "src/features/tasks/use-tasks-model.ts:1", "the first screen never marks the cold start"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "  useColdStartMark({ perf: services.perf, perfLog, label: 'tasks', isReady: true });\n",
+          "with": "  void services;\n"
+        }
+      }
+    ]
+  },
+  "bad-hermes-env": {
+    "expect": ["[hermes-engine]", "eas.json:7", "RCT_HERMES_V1_ENABLED is set"],
+    "ops": [
+      { "json": { "file": "eas.json", "path": ["build", "preview", "env", "RCT_HERMES_V1_ENABLED"], "value": "0" } }
+    ]
+  },
+  "bad-hermes-v1-off": {
+    "expect": ["[hermes-engine]", "app.config.ts:9", "useHermesV1 is false"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "{ ios: { buildReactNativeFromSource: false } }",
+          "with": "{ buildReactNativeFromSource: true, useHermesV1: false }"
+        }
+      }
+    ]
+  },
+  "bad-js-engine": {
+    "expect": ["[hermes-engine]", "app.config.ts:7", "jsEngine is \"jsc\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "  slug: 'tasks',\n",
+          "with": "  slug: 'tasks',\n  jsEngine: 'jsc',\n"
+        }
+      }
+    ]
+  },
+  "bad-js-entry-module-scope": {
+    "expect": ["[perf-layer]", "src/app/_layout.tsx:11", "calls markJsEntry() at module scope"],
+    "ops": [
+      { "replace": { "file": "src/app/_layout.tsx", "find": "  markJsEntry(services.perf.epochMs());\n", "with": "" } },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "/** The startup decision",
+          "with": "markJsEntry(Date.now());\n\n/** The startup decision"
+        }
+      }
+    ]
+  },
+  "bad-js-entry-unmarked": {
+    "expect": ["[perf-layer]", "src/app/_layout.tsx:1", "never calls markJsEntry()"],
+    "ops": [
+      { "replace": { "file": "src/app/_layout.tsx", "find": "  markJsEntry(services.perf.epochMs());\n", "with": "" } }
+    ]
+  },
+  "bad-jsc-package": {
+    "expect": ["[hermes-engine]", "package.json", "@react-native-community/javascriptcore is installed"],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["dependencies", "@react-native-community/javascriptcore"],
+          "value": "0.1.1"
+        }
+      }
+    ]
+  },
+  "bad-locale-data": {
+    "expect": [
+      "[intl-locale-data]",
+      "src/features/tasks/due-label.ts:2",
+      "locale data \"de\" is imported outside the polyfill module"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/due-label.ts",
+          "content": "// src/features/tasks/due-label.ts\nimport '@formatjs/intl-relativetimeformat/locale-data/de.js';\n\nexport const DUE = 'due';\n"
+        }
+      }
+    ]
+  },
+  "bad-perf-clock": {
+    "expect": ["[perf-clock-in-tests]", "test/perf/storage-write.perf.test.ts", "global performance.now()"],
+    "ops": [
+      {
+        "replace": {
+          "file": "test/perf/storage-write.perf.test.ts",
+          "find": "import { performance } from 'node:perf_hooks';\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-perf-layer-missing": {
+    "expect": [
+      "[perf-layer]",
+      "modules/process-start/android/src/main/java/expo/modules/processstart/ProcessStartModule.kt:1",
+      "a file of the declared measurement layer is missing",
+      "src/services/perf/cold-start-marks.test.ts:1"
+    ],
+    "ops": [
+      {
+        "delete": [
+          "modules/process-start/android/src/main/java/expo/modules/processstart/ProcessStartModule.kt",
+          "src/services/perf/cold-start-marks.test.ts"
+        ]
+      }
+    ]
+  },
+  "bad-perf-log-unwired": {
+    "expect": ["[debug-perf-wired]", "src/test-only-entry.ts:1", "creates no perf log"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/test-only-entry.ts",
+          "find": "  const perfLog = createKvPerfLogAdapter();\n",
+          "with": "  const perfLog = { append: () => undefined, entries: () => [] };\n"
+        }
+      }
+    ]
+  },
+  "bad-recorder-callback": {
+    "expect": ["[recorder-callback]", "src/services/perf/frame-recorder.ts", "owns a frame callback"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/perf/frame-recorder.ts",
+          "find": "import { makeMutable } from 'react-native-reanimated';",
+          "with": "import { makeMutable, useFrameCallback } from 'react-native-reanimated';"
+        }
+      },
+      { "write": { "file": "src/services/perf/frame-recorder-extra.ts", "content": "// unused\n" } },
+      {
+        "replace": {
+          "file": "src/services/perf/frame-recorder.ts",
+          "find": "export function startRecording(recorder: FrameRecorder): void {\n",
+          "with": "export function useOwnClock(recorder: FrameRecorder): void {\n  useFrameCallback((info) => {\n    sampleFrame(recorder, info.timeSincePreviousFrame);\n  });\n}\n\nexport function startRecording(recorder: FrameRecorder): void {\n"
+        }
+      }
+    ]
+  },
+  "bad-runtime-codegen": {
+    "expect": ["[runtime-codegen]", "src/features/tasks/filter-rule.ts:2", "new Function generates code at runtime"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/filter-rule.ts",
+          "content": "// src/features/tasks/filter-rule.ts\nexport const compileRule = (body: string) => new Function('task', body);\n"
+        }
+      }
+    ]
+  },
+  "bad-skia-in-worklet": {
+    "expect": ["[skia-alloc-per-frame]", "src/features/charts/draw-helpers.ts:11", "Skia.Paint()"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/charts/draw-helpers.ts",
+          "find": "  'worklet';\n",
+          "with": "  'worklet';\n  const fresh = Skia.Paint();\n  void fresh;\n"
+        }
+      }
+    ]
+  },
+  "bad-state-per-frame": {
+    "expect": ["[react-state-per-frame]", "src/features/charts/chart-runner.ts:13", "setLabel() sets React state"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/charts/chart-runner.ts",
+          "find": "    progress.set(progress.get() + (info.timeSincePreviousFrame ?? 0));\n",
+          "with": "    progress.set(progress.get() + (info.timeSincePreviousFrame ?? 0));\n    setLabel(String(progress.get()));\n"
+        }
+      }
+    ]
+  },
+  "bad-state-per-frame-named-callback": {
+    "expect": ["[react-state-per-frame]", "src/features/charts/chart-runner.ts:13", "setLabel() sets React state"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/charts/chart-runner.ts",
+          "find": "  const callback = useFrameCallback((info) => {\n    progress.set(progress.get() + (info.timeSincePreviousFrame ?? 0));\n    if (recorder !== null) sampleFrame(recorder, info.timeSincePreviousFrame);\n  }, false);",
+          "with": "  const onFrame = (info: FrameInfo) => {\n    progress.set(progress.get() + (info.timeSincePreviousFrame ?? 0));\n    setLabel(String(progress.get()));\n    if (recorder !== null) sampleFrame(recorder, info.timeSincePreviousFrame);\n  };\n  const callback = useFrameCallback(onFrame, false);"
+        }
+      }
+    ]
+  },
+  "bad-too-many-canvases": {
+    "expect": [
+      "[canvases-per-screen]",
+      "src/features/stats/stats-badges.tsx:20",
+      "9 Skia canvases in one screen file (budget 8)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/stats/stats-badges.tsx",
+          "find": "      <Canvas style={{ width: 40, height: 40 }} />\n",
+          "with": "      <Canvas style={{ width: 40, height: 40 }} />\n      <Canvas style={{ width: 40, height: 40 }} />\n      <Canvas style={{ width: 40, height: 40 }} />\n",
+          "occurrence": 1
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/stats/stats-badges.tsx",
+          "find": "      {STREAK_DAYS",
+          "with": "      <Canvas style={{ width: 40, height: 40 }} />\n      <Canvas style={{ width: 40, height: 40 }} />\n      <Canvas style={{ width: 40, height: 40 }} />\n      <Canvas style={{ width: 40, height: 40 }} />\n      {STREAK_DAYS"
+        }
+      }
+    ]
+  },
+  "error-bad-contract": {
+    "expect": ["ERROR [bad-input] contracts/perf.json: unknown key \"budgets\""],
+    "ops": [{ "json": { "file": "contracts/perf.json", "path": ["budgets"], "value": {} } }]
+  },
+  "error-no-source": {
+    "expect": ["ERROR [bad-input] nothing to check: no app source under src and no tests"],
+    "args": "{dir}/empty-app",
+    "ops": [{ "mkdir": "empty-app" }]
+  },
+  "pass-canvas-budget-exempt": {
+    "expect": ["check-perf-code:", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/stats/stats-badges.tsx",
+          "find": "      {STREAK_DAYS",
+          "with": "      <Canvas style={{ width: 40, height: 40 }} />\n      <Canvas style={{ width: 40, height: 40 }} />\n      <Canvas style={{ width: 40, height: 40 }} />\n      <Canvas style={{ width: 40, height: 40 }} />\n      <Canvas style={{ width: 40, height: 40 }} />\n      <Canvas style={{ width: 40, height: 40 }} />\n      {STREAK_DAYS"
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/perf.json",
+          "path": ["canvasBudgetExempt"],
+          "value": [
+            {
+              "file": "src/features/stats/stats-badges.tsx",
+              "reason": "nine static badges measured at 1.6 MB and 25 ms on a Release build"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "pass-debug-entry-not-yet-created": {
+    "expect": [
+      "SKIP src/test-only-entry.ts [debug-perf-wired] not yet created (debug-menu-and-test-hooks creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "src/test-only-entry.ts" }]
+  },
+  "pass-destructured-set-active": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "The idiomatic destructured form, and a renamed one: both stop through a bare call.",
+        "write": {
+          "file": "src/features/charts/chart-runner.ts",
+          "lines": [
+            "// src/features/charts/chart-runner.ts",
+            "import { useEffect } from 'react';",
+            "import { useFrameCallback } from 'react-native-reanimated';",
+            "",
+            "import type { SharedValue } from 'react-native-reanimated';",
+            "",
+            "/** A live chart's clock: starts inactive and runs only while the chart moves. */",
+            "export function useChartRunner(progress: SharedValue<number>, isRunning: boolean): void {",
+            "  const { setActive } = useFrameCallback((info) => {",
+            "    progress.set(progress.get() + (info.timeSincePreviousFrame ?? 0));",
+            "  }, false);",
+            "  useEffect(() => {",
+            "    setActive(isRunning);",
+            "    return () => {",
+            "      setActive(false);",
+            "    };",
+            "  }, [isRunning, setActive]);",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/charts/pulse-runner.ts",
+          "lines": [
+            "// src/features/charts/pulse-runner.ts",
+            "import { useEffect } from 'react';",
+            "import { useFrameCallback } from 'react-native-reanimated';",
+            "",
+            "import type { SharedValue } from 'react-native-reanimated';",
+            "",
+            "export function usePulse(phase: SharedValue<number>, isOn: boolean): void {",
+            "  const { setActive: setTicking } = useFrameCallback((info) => {",
+            "    phase.set((phase.get() + (info.timeSincePreviousFrame ?? 0)) % 1000);",
+            "  }, isOn);",
+            "  useEffect(() => {",
+            "    setTicking(isOn);",
+            "  }, [isOn, setTicking]);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-no-layer-declared": {
+    "expect": ["perf-layer: contracts/perf.json declares no \"layer\"", "RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "contracts/perf.json", "path": ["layer"], "delete": true } },
+      { "replace": { "file": "src/app/_layout.tsx", "find": "  markJsEntry(services.perf.epochMs());\n", "with": "" } }
+    ]
+  }
+}

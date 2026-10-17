@@ -1,0 +1,6 @@
+{
+  "name": "fixture-tasks",
+  "private": true,
+  "main": "index.ts",
+  "dependencies": { "expo": "~57.0.26", "react-native": "0.86.3" }
+}

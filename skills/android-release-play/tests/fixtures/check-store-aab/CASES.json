@@ -1,0 +1,379 @@
+{
+  "bad-aapt2-manifest": {
+    "expect": [
+      "FAIL app-release.aab!base/manifest/AndroidManifest.xml [debuggable] the application is debuggable",
+      "FAIL app-release.aab!base/manifest/AndroidManifest.xml [ship-placeholder] meta-data com.google.android.gms.ads.APPLICATION_ID is Google's sample AdMob app id",
+      "versionCode 31"
+    ],
+    "ops": [
+      { "json": { "file": "aab.json", "path": ["manifest"], "value": "aapt2" } },
+      {
+        "json": {
+          "file": "aab.json",
+          "path": ["assets", "base/assets/app.config", "android", "versionCode"],
+          "value": 31
+        }
+      }
+    ]
+  },
+  "bad-abi-64bit": {
+    "expect": [
+      "FAIL app-release.aab!base/lib/armeabi-v7a/libvision.so [abi-64bit] has no 64-bit twin arm64-v8a/libvision.so"
+    ],
+    "ops": [
+      { "json": { "file": "aab.json", "path": ["libs", "base/lib/armeabi-v7a/libvision.so"], "value": "elf16k" } }
+    ]
+  },
+  "bad-ad-app-id-format": {
+    "expect": [
+      "FAIL app-release.aab!base/manifest/AndroidManifest.xml [ad-app-id] com.google.android.gms.ads.APPLICATION_ID is \"ca-app-pub-7356~51\", not an AdMob app id"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "aab.json",
+          "path": ["manifest", "metaData", "com.google.android.gms.ads.APPLICATION_ID"],
+          "value": "ca-app-pub-7356~51"
+        }
+      }
+    ]
+  },
+  "bad-ad-app-id-missing": {
+    "expect": [
+      "FAIL app-release.aab!base/manifest/AndroidManifest.xml [ad-app-id] com.google.android.gms.ads.APPLICATION_ID is missing"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "aab.json",
+          "path": ["manifest", "metaData", "com.google.android.gms.ads.APPLICATION_ID"],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "bad-cleartext": {
+    "expect": [
+      "FAIL app-release.aab!base/manifest/AndroidManifest.xml [cleartext] android:usesCleartextTraffic is true"
+    ],
+    "ops": [{ "json": { "file": "aab.json", "path": ["manifest", "usesCleartextTraffic"], "value": true } }]
+  },
+  "bad-constants-mismatch": {
+    "expect": [
+      "FAIL app-release.aab!base/assets/app.config [constants-variant] the embedded app config says android.package com.acme.tasks.dev, the manifest com.acme.tasks"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "aab.json",
+          "path": ["assets", "base/assets/app.config", "android", "package"],
+          "value": "com.acme.tasks.dev"
+        }
+      }
+    ]
+  },
+  "bad-constants-missing": {
+    "expect": [
+      "FAIL app-release.aab!base/assets/app.config [constants-variant] base/assets/app.config is missing or not JSON"
+    ],
+    "ops": [{ "json": { "file": "aab.json", "path": ["assets", "base/assets/app.config"], "delete": true } }]
+  },
+  "bad-constants-variant": {
+    "expect": [
+      "FAIL app-release.aab!base/assets/app.config [constants-variant] extra.appVariant is \"preview\", expected \"production\""
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "aab.json",
+          "path": ["assets", "base/assets/app.config", "extra", "appVariant"],
+          "value": "preview"
+        }
+      }
+    ]
+  },
+  "bad-debuggable": {
+    "expect": ["FAIL app-release.aab!base/manifest/AndroidManifest.xml [debuggable] the application is debuggable"],
+    "ops": [{ "json": { "file": "aab.json", "path": ["manifest", "debuggable"], "value": true } }]
+  },
+  "bad-package": {
+    "expect": [
+      "FAIL app-release.aab!base/manifest/AndroidManifest.xml [package] package com.acme.notes is not the contract applicationId com.acme.tasks"
+    ],
+    "ops": [
+      { "json": { "file": "aab.json", "path": ["manifest", "package"], "value": "com.acme.notes" } },
+      {
+        "json": {
+          "file": "aab.json",
+          "path": ["assets", "base/assets/app.config", "android", "package"],
+          "value": "com.acme.notes"
+        }
+      },
+      {
+        "json": {
+          "file": "aab.json",
+          "path": ["manifest", "permissions", 3],
+          "value": "com.acme.notes.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+        }
+      }
+    ]
+  },
+  "bad-package-variant": {
+    "expect": [
+      "FAIL app-release.aab!base/manifest/AndroidManifest.xml [package] package com.acme.tasks.preview is a testing variant's id"
+    ],
+    "ops": [
+      { "json": { "file": "aab.json", "path": ["manifest", "package"], "value": "com.acme.tasks.preview" } },
+      {
+        "json": {
+          "file": "aab.json",
+          "path": ["assets", "base/assets/app.config", "android", "package"],
+          "value": "com.acme.tasks.preview"
+        }
+      },
+      {
+        "json": {
+          "file": "aab.json",
+          "path": ["manifest", "permissions", 3],
+          "value": "com.acme.tasks.preview.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+        }
+      }
+    ]
+  },
+  "bad-page-alignment": {
+    "expect": [
+      "FAIL app-release.aab!base/lib/arm64-v8a/libhermes.so [page-alignment] LOAD segments aligned to 4096 bytes, below 16 KB"
+    ],
+    "ops": [{ "json": { "file": "aab.json", "path": ["libs", "base/lib/arm64-v8a/libhermes.so"], "value": "elf4k" } }]
+  },
+  "bad-page-alignment-config": {
+    "expect": [
+      "FAIL app-release.aab!BundleConfig.pb [page-alignment] native libraries are stored uncompressed with page alignment 4K"
+    ],
+    "ops": [{ "json": { "file": "aab.json", "path": ["bundleConfig", "alignment"], "value": "4K" } }]
+  },
+  "bad-permission-declaration": {
+    "expect": [
+      "FAIL contracts/android-release.json [permission-declaration] android.permission.READ_MEDIA_IMAGES needs a Play Console declaration"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "aab.json",
+          "path": ["manifest", "permissions", 4],
+          "value": "android.permission.READ_MEDIA_IMAGES"
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/android-release.json",
+          "path": ["permissions", "android.permission.READ_MEDIA_IMAGES"],
+          "value": { "reason": "Attach photos to a task from the library" }
+        }
+      }
+    ]
+  },
+  "bad-permissions": {
+    "expect": [
+      "FAIL app-release.aab!base/manifest/AndroidManifest.xml [permissions] uses-permission android.permission.SYSTEM_ALERT_WINDOW is not in the contract",
+      "android.blockedPermissions: ['android.permission.SYSTEM_ALERT_WINDOW']"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "aab.json",
+          "path": ["manifest", "permissions", 4],
+          "value": "android.permission.SYSTEM_ALERT_WINDOW"
+        }
+      }
+    ]
+  },
+  "bad-rehearsal-still-strict": {
+    "expect": [
+      "REHEARSAL: not a release gate",
+      "FAIL app-release.aab!base/manifest/AndroidManifest.xml [debuggable] the application is debuggable"
+    ],
+    "args": "--rehearsal",
+    "ops": [
+      { "json": { "file": "aab.json", "path": ["signature"], "delete": true } },
+      { "json": { "file": "aab.json", "path": ["manifest", "debuggable"], "value": true } }
+    ]
+  },
+  "bad-ship-placeholder": {
+    "expect": [
+      "FAIL app-release.aab!base/manifest/AndroidManifest.xml [ship-placeholder] meta-data com.google.android.gms.ads.APPLICATION_ID is Google's sample AdMob app id"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "aab.json",
+          "path": ["manifest", "metaData", "com.google.android.gms.ads.APPLICATION_ID"],
+          "value": "ca-app-pub-3940256099942544~3347511713"
+        }
+      }
+    ]
+  },
+  "bad-ship-placeholder-config": {
+    "expect": [
+      "FAIL app-release.aab!base/assets/app.config [ship-placeholder] the embedded app config extra.supportUrl is a placeholder domain (example.com)"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "aab.json",
+          "path": ["assets", "base/assets/app.config", "extra", "supportUrl"],
+          "value": "https://example.com/help"
+        }
+      }
+    ]
+  },
+  "bad-ship-placeholder-package": {
+    "expect": [
+      "FAIL app-release.aab!base/manifest/AndroidManifest.xml [ship-placeholder] the manifest package is the template bundle id"
+    ],
+    "ops": [
+      { "json": { "file": "aab.json", "path": ["manifest", "package"], "value": "com.example.tasks" } },
+      {
+        "json": {
+          "file": "aab.json",
+          "path": ["assets", "base/assets/app.config", "android", "package"],
+          "value": "com.example.tasks"
+        }
+      },
+      {
+        "json": {
+          "file": "aab.json",
+          "path": ["manifest", "permissions", 3],
+          "value": "com.example.tasks.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+        }
+      },
+      { "json": { "file": "contracts/android-release.json", "path": ["applicationId"], "value": "com.example.tasks" } }
+    ]
+  },
+  "bad-signing-debug": {
+    "expect": ["FAIL app-release.aab [signing] the bundle is signed with the Android debug key"],
+    "ops": [{ "json": { "file": "aab.json", "path": ["signature"], "value": "debug" } }]
+  },
+  "bad-signing-other-key": {
+    "expect": ["FAIL app-release.aab [signing] signed by SHA-256 86:76:E3", "but the registered upload key is 0B:4D:89"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/android-release.json",
+          "path": ["uploadCertificateSha256"],
+          "value": "0B:4D:89:01:34:E0:87:19:73:45:18:17:7D:86:7C:85:27:ED:3D:0C:DE:29:70:88:8B:89:F8:5A:A5:A1:76:74"
+        }
+      }
+    ]
+  },
+  "bad-signing-unreadable": {
+    "expect": ["FAIL app-release.aab [signing] the signature block cannot be read"],
+    "ops": [{ "json": { "file": "aab.json", "path": ["signature"], "value": "unreadable" } }]
+  },
+  "bad-signing-unregistered": {
+    "expect": [
+      "FAIL contracts/android-release.json [signing] uploadCertificateSha256 is null; this bundle is signed by SHA-256 86:76:E3:D2"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/android-release.json",
+          "path": ["uploadCertificateSha256"],
+          "value": null,
+          "literalNull": true
+        }
+      }
+    ]
+  },
+  "bad-signing-unsigned": {
+    "expect": ["FAIL app-release.aab [signing] the bundle is not signed"],
+    "ops": [{ "json": { "file": "aab.json", "path": ["signature"], "delete": true } }]
+  },
+  "bad-target-sdk": {
+    "expect": ["FAIL app-release.aab!base/manifest/AndroidManifest.xml [target-sdk] targetSdkVersion is 35, below 36"],
+    "ops": [{ "json": { "file": "aab.json", "path": ["manifest", "targetSdk"], "value": 35 } }]
+  },
+  "bad-test-code": {
+    "expect": [
+      "FAIL app-release.aab!base/assets/index.android.bundle [test-code] the store bundle contains the test-only sentinel \"TASKS_TEST_BUILD_ONLY\" 1 time(s)"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "aab.json",
+          "path": ["assets", "base/assets/index.android.bundle"],
+          "value": "__d(function(){var s=\"TASKS_TEST_BUILD_ONLY\";},0);"
+        }
+      }
+    ]
+  },
+  "bad-test-code-no-bundle": {
+    "expect": [
+      "FAIL app-release.aab!base/assets/index.android.bundle [test-code] the bundle embeds no index.android.bundle"
+    ],
+    "ops": [{ "json": { "file": "aab.json", "path": ["assets", "base/assets/index.android.bundle"], "delete": true } }]
+  },
+  "bad-test-code-no-sentinel": {
+    "expect": [
+      "FAIL src/test-only.ts:1 [test-code] src/test-only.ts gates test-only code, but no test-only sentinel is known"
+    ],
+    "ops": [{ "delete": "src/test-only-entry.ts" }]
+  },
+  "bad-version-code-expected": {
+    "expect": ["FAIL app-release.aab!base/manifest/AndroidManifest.xml [version-code] versionCode is 15, expected 16"],
+    "args": "--version-code 16"
+  },
+  "bad-version-code-max": {
+    "expect": [
+      "FAIL app-release.aab!base/manifest/AndroidManifest.xml [version-code] versionCode is 2100000001, not an integer from 1 to 2100000000"
+    ],
+    "ops": [{ "json": { "file": "aab.json", "path": ["manifest", "versionCode"], "value": 2100000001 } }]
+  },
+  "bad-version-code-shared-tag": {
+    "expect": [
+      "FAIL app-release.aab!base/manifest/AndroidManifest.xml [version-code] versionCode 15 is not above the upload tag v1.4.0+30"
+    ],
+    "ops": [{ "write": { "file": "tags.txt", "lines": ["v1.4.0+android.14", "v1.4.0+ios.40", "v1.4.0+30"] } }]
+  },
+  "bad-version-code-tag": {
+    "expect": [
+      "FAIL app-release.aab!base/manifest/AndroidManifest.xml [version-code] versionCode 14 is not above the upload tag v1.4.0+android.14"
+    ],
+    "ops": [{ "json": { "file": "aab.json", "path": ["manifest", "versionCode"], "value": 14 } }]
+  },
+  "bad-version-name": {
+    "expect": [
+      "FAIL app-release.aab!base/manifest/AndroidManifest.xml [version-name] versionName is 1.3.0, expected 1.4.0"
+    ],
+    "ops": [{ "json": { "file": "aab.json", "path": ["manifest", "versionName"], "value": "1.3.0" } }]
+  },
+  "error-contract-shape": {
+    "expect": ["ERROR [bad-input] contracts/android-release.json uploadTrack is \"production\""],
+    "ops": [{ "json": { "file": "contracts/android-release.json", "path": ["uploadTrack"], "value": "production" } }]
+  },
+  "error-no-aab": {
+    "expect": ["ERROR [bad-input] nothing to check:", "is not a file"],
+    "ops": [{ "delete": "aab.json" }]
+  },
+  "error-no-contract": {
+    "expect": ["ERROR [bad-input] contracts/android-release.json does not exist"],
+    "ops": [{ "delete": "contracts/android-release.json" }]
+  },
+  "error-not-a-bundle": {
+    "expect": ["ERROR [bad-input]", "cannot be read as a bundle"],
+    "ops": [{ "delete": "aab.json" }, { "write": { "file": "app-release.aab", "content": "not a zip\n" } }]
+  },
+  "error-stamp-unwritable": {
+    "expect": [
+      "ERROR [bad-input] the bundle passed, but the stamp app.config.ts/aab-gate.json cannot be written",
+      "RESULT: FAIL"
+    ],
+    "args": "--stamp app.config.ts/aab-gate.json"
+  },
+  "pass-rehearsal": {
+    "expect": ["REHEARSAL: not a release gate", "SKIP app-release.aab [signing] keyless rehearsal", "RESULT: PASS"],
+    "args": "--rehearsal",
+    "ops": [{ "json": { "file": "aab.json", "path": ["signature"], "delete": true } }]
+  },
+  "pass-stamp": { "expect": ["stamp written:", "RESULT: PASS"], "args": "--stamp {dir}/build/aab-gate.json" }
+}

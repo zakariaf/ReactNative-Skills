@@ -1,0 +1,13 @@
+{
+  "lists.delete-dialog.body": "ستُحذف مهامها أيضًا.",
+  "lists.delete-dialog.cancel": "إلغاء",
+  "lists.delete-dialog.confirm": "حذف",
+  "lists.delete-dialog.title": "حذف {listName}؟",
+  "lists.empty.body": "أنشئ قائمة لتجميع مهامك.",
+  "lists.empty.title": "لا توجد قوائم بعد",
+  "lists.error.body": "تعذّر تحميل قوائمك.",
+  "lists.list-row.delete-button.label": "حذف {listName}",
+  "lists.list-row.delete-button.text": "حذف",
+  "lists.retry-button.label": "حاول مرة أخرى",
+  "lists.title": "القوائم"
+}

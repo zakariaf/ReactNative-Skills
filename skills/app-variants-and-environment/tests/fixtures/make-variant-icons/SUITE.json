@@ -1,0 +1,37 @@
+{
+  "base": ["@tests/bases/app"],
+  "ops": [
+    {
+      "png": {
+        "files": ["assets/icons/production/icon.png"],
+        "width": 1024,
+        "height": 1024,
+        "fill": "#1F6FEB",
+        "rects": [{ "x": 256, "y": 256, "width": 512, "height": 512, "fill": "#FFFFFF" }]
+      }
+    },
+    {
+      "png": {
+        "files": ["assets/icons/production/android-foreground.png", "assets/icons/production/android-monochrome.png"],
+        "width": 108,
+        "height": 108,
+        "fill": "#00000000",
+        "rects": [{ "x": 30, "y": 30, "width": 48, "height": 48, "fill": "#FFFFFF" }]
+      }
+    },
+    {
+      "png": {
+        "files": ["assets/icons/production/android-background.png", "assets/icons/production/expo.icon/Assets/glyph.png"],
+        "width": 108,
+        "height": 108,
+        "fill": "#1F6FEB"
+      }
+    },
+    {
+      "write": {
+        "file": "assets/icons/production/expo.icon/icon.json",
+        "content": "{\n  \"groups\": [{ \"layers\": [{ \"image-name\": \"glyph.png\", \"name\": \"glyph\" }] }]\n}\n"
+      }
+    }
+  ]
+}

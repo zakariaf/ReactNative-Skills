@@ -1,0 +1,42 @@
+{
+  "base": [
+    "@tests/bases/app",
+    {
+      "templates": true,
+      "firstLinePath": true,
+      "fill": {
+        "__FEATURE__": "tasks",
+        "__UNION_FILE__": "task-priority",
+        "__UNION_PASCAL__": "TaskPriority",
+        "__VALUES_CONST__": "TASK_PRIORITIES",
+        "__VALUES__": "'low', 'normal', 'high'"
+      }
+    }
+  ],
+  "ops": [
+    {
+      "json": {
+        "file": "contracts/naming.json",
+        "path": [
+          "canonical",
+          "types"
+        ],
+        "value": [
+          "ClockPort",
+          "SqlDriver"
+        ]
+      }
+    },
+    {
+      "json": {
+        "file": "contracts/naming.json",
+        "path": [
+          "storeProductIds"
+        ],
+        "value": [
+          "com.example.tasks.premium"
+        ]
+      }
+    }
+  ]
+}

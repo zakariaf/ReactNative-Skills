@@ -1,0 +1,6 @@
+{
+  "common.not-found.title": "هذه الشاشة غير موجودة",
+  "tasks.title": "المهام",
+  "tasks.count": "{taskCount, plural, zero {لا مهام} one {مهمة واحدة} two {مهمتان} few {# مهام} many {# مهمة} other {# مهمة}}",
+  "reminders.next": "التذكير التالي – {dateText}"
+}

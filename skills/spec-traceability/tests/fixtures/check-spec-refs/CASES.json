@@ -1,0 +1,482 @@
+{
+  "bad-commit-dangling": {
+    "expect": ["[dangling-id]", "2b3c4d5:3", "\"REQ-77\" is not a requirement entry"],
+    "args": "{dir} --log {dir}/commits.log",
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit 1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b\nfeat(tasks): add a task\n\nREQ-1: a new task goes to the top.\n\n==> files\nsrc/features/tasks/add-task.ts\n==> commit 2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c\nfix(tasks): keep Undo on screen\n\nServes REQ-2 and REQ-77.\n\n==> files\nsrc/features/tasks/complete-task.ts\n"
+        }
+      }
+    ]
+  },
+  "bad-dangling-comment": {
+    "expect": ["[dangling-id]", "src/features/settings/settings-screen.tsx:2", "\"SCR-16\" is not a screen entry"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/settings/settings-screen.tsx",
+          "content": "// src/features/settings/settings-screen.tsx\n// Settings (SCR-3) links to the Leaderboard (SCR-16).\nexport function SettingsScreen(): null {\n  return null;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-dangling-flow": {
+    "expect": ["[dangling-id]", ".maestro/complete-task.yaml:2", "\"DEC-12\" is not a decision entry"],
+    "ops": [
+      {
+        "write": {
+          "file": ".maestro/complete-task.yaml",
+          "content": "# .maestro/complete-task.yaml\n# Completes a task (REQ-2); Undo lasts as DEC-12 says.\nappId: com.example.tasks\n---\n- launchApp\n"
+        }
+      }
+    ]
+  },
+  "bad-dangling-in-spec": {
+    "expect": ["[dangling-id]", "docs/spec/decisions.md:12", "\"REQ-42\""],
+    "ops": [{ "replace": { "file": "docs/spec/decisions.md", "find": "Used by REQ-2.", "with": "Used by REQ-42." } }]
+  },
+  "bad-dangling-markdown": {
+    "expect": ["[dangling-id]", "docs/notes.md:6", "\"NN-5\" is not a non-negotiable entry"],
+    "ops": [{ "replace": { "file": "docs/notes.md", "find": "NN-1 to NN-4", "with": "NN-1 to NN-5" } }]
+  },
+  "bad-dangling-test-title": {
+    "expect": ["[dangling-id]", "src/features/tasks/add-task.test.ts:9", "\"REQ-19\" is not a requirement entry"],
+    "ops": [
+      { "replace": { "file": "src/features/tasks/add-task.test.ts", "find": "(REQ-1)", "with": "(REQ-1, REQ-19)" } }
+    ]
+  },
+  "bad-decided-without-decided": {
+    "expect": [
+      "[entry-field-missing]",
+      "docs/spec/decisions.md:6",
+      "decision DEC-1 · How long Undo stays on screen has no \"Decided:\" line (Status: decided needs it: a settled decision records its outcome)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "docs/spec/decisions.md",
+          "find": "- Status: open\n- Options: 4 seconds",
+          "with": "- Status: decided\n- Options: 4 seconds"
+        }
+      }
+    ]
+  },
+  "bad-decision-no-default": {
+    "expect": [
+      "[entry-field-missing]",
+      "docs/spec/decisions.md:6",
+      "decision DEC-1 · How long Undo stays on screen has no \"Default:\" line (Status: open needs it"
+    ],
+    "ops": [{ "replace": { "file": "docs/spec/decisions.md", "find": "- Default: 5 seconds\n", "with": "" } }]
+  },
+  "bad-dropped-traced": {
+    "expect": ["[out-of-scope-traced]", "src/features/lists/list-limit.test.ts:3", "which the spec marks dropped"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/lists/list-limit.test.ts",
+          "content": "// src/features/lists/list-limit.test.ts\ndescribe('listLimit', () => {\n  it('stops at three lists without Premium (REQ-5)', () => {\n    expect(3).toBe(3);\n  });\n});\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "docs/spec/requirements.md",
+          "find": "### REQ-5 · Free lists limit\n\n- Status: planned",
+          "with": "### REQ-5 · Free lists limit\n\n- Status: dropped"
+        }
+      }
+    ]
+  },
+  "bad-duplicate-id": {
+    "expect": ["[duplicate-spec-id]", "docs/spec/screens.md:27", "SCR-2 is already \"Task editor\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "docs/spec/screens.md",
+          "find": "## SCR-3 · Settings",
+          "with": "## SCR-2 · Task details\n\nThe read-only view of a task.\n\n## SCR-3 · Settings"
+        }
+      }
+    ]
+  },
+  "bad-heading-without-title": {
+    "expect": [
+      "[malformed-heading]",
+      "docs/spec/requirements.md:18",
+      "with an ID such as REQ-1",
+      "[dangling-id]",
+      "RESULT: FAIL (4 problems)"
+    ],
+    "ops": [
+      { "replace": { "file": "docs/spec/requirements.md", "find": "### REQ-2 · Complete a task", "with": "### REQ-2" } }
+    ]
+  },
+  "bad-invalid-platforms": {
+    "expect": ["[invalid-field]", "docs/spec/requirements.md:", "(iphone unknown)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "docs/spec/requirements.md",
+          "find": "- Platforms: ios, android\n\nA task with a reminder",
+          "with": "- Platforms: iphone, android\n\nA task with a reminder"
+        }
+      }
+    ]
+  },
+  "bad-invalid-status": {
+    "expect": ["[invalid-field]", "docs/spec/requirements.md:20", "REQ-2 has \"Status: done\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "docs/spec/requirements.md",
+          "find": "### REQ-2 · Complete a task\n\n- Status: planned",
+          "with": "### REQ-2 · Complete a task\n\n- Status: done"
+        }
+      }
+    ]
+  },
+  "bad-malformed-heading": {
+    "expect": [
+      "[malformed-heading]",
+      "docs/spec/requirements.md:",
+      "\"REQ 6 · Archive a list\" is not \"<ID> · <title>\" with an ID such as REQ-1"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "docs/spec/requirements.md",
+          "find": "## Premium",
+          "with": "### REQ 6 · Archive a list\n\n- Status: planned\n\n## Premium"
+        }
+      }
+    ]
+  },
+  "bad-non-negotiable-unenforced": {
+    "expect": ["[entry-field-missing]", "docs/spec/non-negotiables.md:", "non-negotiable NN-4"],
+    "ops": [
+      {
+        "replace": {
+          "file": "docs/spec/non-negotiables.md",
+          "find": "- Enforced by: the lint rules and the right-to-left screenshots.\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-out-of-scope-traced": {
+    "expect": [
+      "[out-of-scope-traced]",
+      "src/features/widgets/widget-data.test.ts:3",
+      "OOS-3 · Home-screen widgets, which the spec marks out-of-scope"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/widgets/widget-data.test.ts",
+          "content": "// src/features/widgets/widget-data.test.ts\ndescribe('widgetData', () => {\n  it('lists the next three tasks for the widget (OOS-3)', () => {\n    expect([1, 2, 3]).toHaveLength(3);\n  });\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-ref-pattern-commits": {
+    "expect": [
+      "[ref-pattern-mismatch]",
+      "docs/spec/requirements.md:8",
+      "REQ-1 does not match requirementRef.pattern of contracts/commits.json (commit bodies and Spec-Change trailers)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/commits.json",
+          "content": "{\n  \"scopeFolders\": [\n    \"src/features/*\",\n    \"src/*\"\n  ],\n  \"extraScopes\": [],\n  \"requirementRef\": {\n    \"pattern\": \"\\\\bTASKS-\\\\d+\\\\b\",\n    \"required\": true,\n    \"exemptScopes\": []\n  }\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-ref-pattern-default": {
+    "expect": [
+      "[ref-pattern-mismatch]",
+      "docs/spec/stories.md:3",
+      "US_4 does not match the default requirement reference (Spec-Change trailers)"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/spec.json",
+          "path": ["kinds", 5],
+          "value": { "kind": "story", "prefix": "US_", "traced": true }
+        }
+      },
+      {
+        "write": {
+          "file": "docs/spec/stories.md",
+          "lines": [
+            "# Stories",
+            "",
+            "## US_4 · Plan the week",
+            "",
+            "- Status: planned",
+            "",
+            "A user plans the tasks of the coming week."
+          ]
+        }
+      }
+    ]
+  },
+  "bad-ref-pattern-tdd": {
+    "expect": [
+      "[ref-pattern-mismatch]",
+      "docs/spec/screens.md:7",
+      "SCR-1 does not match requirementIdPattern of contracts/tdd.json (first tests)"
+    ],
+    "ops": [
+      {
+        "write": { "file": "contracts/tdd.json", "content": "{\n  \"requirementIdPattern\": \"\\\\bREQ-\\\\d+\"\n}\n" }
+      }
+    ]
+  },
+  "bad-ref-pattern-tdd-config": {
+    "expect": [
+      "[ref-pattern-mismatch]",
+      "docs/spec/screens.md:7",
+      "SCR-1 does not match requirementIdPattern of qa/tdd.json (first tests)"
+    ],
+    "ops": [
+      { "write": { "file": "qa/tdd.json", "content": "{\n  \"requirementIdPattern\": \"\\\\bREQ-\\\\d+\"\n}\n" } },
+      { "write": { "file": "rn-skills.config.json", "content": "{ \"tddContract\": \"qa/tdd.json\" }\n" } }
+    ]
+  },
+  "bad-route-missing": {
+    "expect": [
+      "[route-missing]",
+      "docs/spec/screens.md:10",
+      "SCR-1 · Task list is marked built, but its route src/app/(app)/index.tsx does not exist"
+    ],
+    "ops": [
+      {
+        "$comment": "SCR-1 is traced by the good case's flow, so only the missing route file fails.",
+        "replace": {
+          "file": "docs/spec/screens.md",
+          "find": "## SCR-1 · Task list\n\n- Status: planned",
+          "with": "## SCR-1 · Task list\n\n- Status: built"
+        }
+      }
+    ]
+  },
+  "bad-screen-name": {
+    "expect": [
+      "[screen-name-mismatch]",
+      "docs/notes.md:3",
+      "pairs the name \"Settings\" with SCR-1, which is \"Task list\""
+    ],
+    "ops": [{ "replace": { "file": "docs/notes.md", "find": "(Settings, SCR-3)", "with": "Settings (SCR-1)" } }]
+  },
+  "bad-screen-name-id-first": {
+    "expect": [
+      "[screen-name-mismatch]",
+      "src/features/tasks/tasks-screen.tsx:2",
+      "with SCR-2, which is \"Task editor\""
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "Task list (SCR-1)",
+          "with": "SCR-2 (Task list)"
+        }
+      }
+    ]
+  },
+  "bad-section-sign": {
+    "expect": ["[unknown-spec-section]", "docs/notes.md:6", "\"spec 1.9\""],
+    "ops": [{ "replace": { "file": "docs/notes.md", "find": "Spec sections 1.1 to 1.2", "with": "Spec §1.9" } }]
+  },
+  "bad-short-prefix": {
+    "expect": ["[dangling-id]", "src/features/tasks/week-plan.ts:2", "\"S16\" is not a story entry"],
+    "ops": [
+      { "json": { "file": "contracts/spec.json", "path": ["kinds", 5], "value": { "kind": "story", "prefix": "S" } } },
+      {
+        "write": {
+          "file": "docs/spec/stories.md",
+          "lines": [
+            "# Stories",
+            "",
+            "## S2 · Plan the week",
+            "",
+            "- Status: planned",
+            "",
+            "A user plans the tasks of the coming week."
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/week-plan.ts",
+          "lines": [
+            "// src/features/tasks/week-plan.ts",
+            "// Serves story S2; story S16 comes next.",
+            "export const PLAN_CODES = ['S16', 'S256'];"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-spec-empty": {
+    "expect": ["[spec-empty]", "docs/spec/README.md:1", "docs/spec/ holds no entry heading"],
+    "ops": [
+      {
+        "delete": [
+          "docs/spec/non-negotiables.md",
+          "docs/spec/screens.md",
+          "docs/spec/requirements.md",
+          "docs/spec/decisions.md",
+          "docs/spec/out-of-scope.md",
+          "docs/spec/glossary.md"
+        ]
+      },
+      {
+        "write": {
+          "file": "docs/spec/README.md",
+          "lines": ["# Product spec", "", "## Tasks", "", "Users add tasks and complete them."]
+        }
+      },
+      { "write": { "file": "src/features/tasks/add-task.test.ts", "lines": ["it('adds a task', () => {});"] } },
+      { "write": { "file": ".maestro/add-task.yaml", "lines": ["appId: com.example.tasks", "---", "- launchApp"] } },
+      { "write": { "file": "docs/notes.md", "lines": ["# Notes"] } },
+      {
+        "write": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "lines": ["// src/features/tasks/tasks-screen.tsx", "export const TasksScreen = (): null => null;"]
+        }
+      }
+    ]
+  },
+  "bad-spec-missing": {
+    "expect": ["[spec-missing]", "contracts/spec.json:", "the spec folder docs/product-spec/ does not exist"],
+    "ops": [{ "json": { "file": "contracts/spec.json", "path": ["specDir"], "value": "docs/product-spec" } }]
+  },
+  "bad-unknown-section": {
+    "expect": ["[unknown-spec-section]", "src/features/tasks/add-task.test.ts:9", "\"spec 2.4\""],
+    "ops": [
+      { "replace": { "file": "src/features/tasks/add-task.test.ts", "find": "(REQ-1)", "with": "(REQ-1, spec 2.4)" } }
+    ]
+  },
+  "bad-untraced": {
+    "expect": [
+      "[untraced-requirement]",
+      "docs/spec/requirements.md:18",
+      "REQ-2 · Complete a task is marked built, but no test or flow cites it"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "docs/spec/requirements.md",
+          "find": "### REQ-2 · Complete a task\n\n- Status: planned",
+          "with": "### REQ-2 · Complete a task\n\n- Status: built"
+        }
+      }
+    ]
+  },
+  "bad-untraced-cited-only-in-source": {
+    "expect": ["[untraced-requirement]", "docs/spec/screens.md:7", "SCR-1 · Task list is marked built"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/(app)/index.tsx",
+          "content": "// src/app/(app)/index.tsx\nimport { TasksScreen } from '@/features/tasks/tasks-screen';\n\nexport default TasksScreen;\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "docs/spec/screens.md",
+          "find": "## SCR-1 · Task list\n\n- Status: planned",
+          "with": "## SCR-1 · Task list\n\n- Status: built"
+        }
+      },
+      { "replace": { "file": ".maestro/add-task.yaml", "find": "# Task list (SCR-1): adds", "with": "# Adds" } }
+    ]
+  },
+  "error-bad-contract-json": {
+    "expect": ["ERROR [bad-input] contracts/spec.json is not valid JSON"],
+    "ops": [{ "write": { "file": "contracts/spec.json", "content": "{ \"specDir\": \n" } }]
+  },
+  "error-contract-bad-prefix": {
+    "expect": ["ERROR [bad-input]", "kinds[2].prefix \"req-\" must be 1-10 capital letters"],
+    "ops": [{ "json": { "file": "contracts/spec.json", "path": ["kinds", 2, "prefix"], "value": "req-" } }]
+  },
+  "error-contract-unknown-key": {
+    "expect": [
+      "ERROR [bad-input] contracts/spec.json does not match contracts/spec.schema.json: unknown key \"prefixes\""
+    ],
+    "ops": [{ "json": { "file": "contracts/spec.json", "path": ["prefixes"], "value": ["REQ-"] } }]
+  },
+  "error-range-and-log": {
+    "expect": ["ERROR [bad-input] pass either --range or --log, not both"],
+    "args": "{dir} --range HEAD~1..HEAD --log x.log"
+  },
+  "error-spec-option-missing": {
+    "expect": ["ERROR [bad-input] nothing to check: spec folder nowhere does not exist"],
+    "args": "{dir} --spec nowhere"
+  },
+  "pass-commits-clean": {
+    "expect": ["check-spec-refs:", "RESULT: PASS"],
+    "args": "{dir} --log {dir}/commits.log",
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit 1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b\nfeat(tasks): add a task\n\nREQ-1: a new task goes to the top (Task list (SCR-1), spec 1.1).\n\n==> files\nsrc/features/tasks/add-task.ts\n"
+        }
+      }
+    ]
+  },
+  "pass-config-contract-key": {
+    "expect": ["TRACE REQ-1 [built] Add a task", "RESULT: PASS"],
+    "args": "{dir} --trace",
+    "ops": [
+      { "rename": { "from": "contracts/spec.json", "to": "qa/spec.json" } },
+      { "json": { "file": "qa/spec.json", "path": ["specDir"], "value": "qa/spec" } },
+      { "rename": { "from": "docs/spec", "to": "qa/spec" } },
+      { "write": { "file": "rn-skills.config.json", "json": { "specContract": "qa/spec.json" } } }
+    ]
+  },
+  "pass-default-contract": { "expect": ["RESULT: PASS"], "ops": [{ "delete": "contracts/spec.json" }] },
+  "pass-no-spec": {
+    "expect": ["NOT APPLICABLE: the app keeps no requirement spec (no contracts/spec.json and no docs/spec/ folder)"],
+    "ops": [{ "delete": ["docs/spec", "contracts/spec.json"] }]
+  },
+  "pass-route-built": {
+    "expect": ["check-spec-refs:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/(app)/index.tsx",
+          "content": "// src/app/(app)/index.tsx\nimport { TasksScreen } from '@/features/tasks/tasks-screen';\n\nexport default TasksScreen;\n"
+        }
+      },
+      {
+        "$comment": "SCR-1 is traced by the good case's flow, so only the missing route file fails.",
+        "replace": {
+          "file": "docs/spec/screens.md",
+          "find": "## SCR-1 · Task list\n\n- Status: planned",
+          "with": "## SCR-1 · Task list\n\n- Status: built"
+        }
+      }
+    ]
+  },
+  "pass-spec-option": {
+    "expect": ["RESULT: PASS"],
+    "args": "{dir} --spec apps/mobile/docs/spec",
+    "ops": [{ "rename": { "from": "docs/spec", "to": "apps/mobile/docs/spec" } }]
+  },
+  "pass-trace": {
+    "expect": [
+      "TRACE REQ-1 [built] Add a task: .maestro/add-task.yaml, src/features/tasks/add-task.test.ts",
+      "TRACE REQ-2 [planned] Complete a task: no test or flow",
+      "TRACE SCR-1 [planned] Task list: .maestro/add-task.yaml"
+    ],
+    "args": "{dir} --trace"
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "$schema": "./schema-ledger.schema.json",
+  "$comment": "Every database schema version that ever reached a device (store, TestFlight, Play testing, a preview build, an EAS Update), in order, with the sha256 of its step file and frozen fixture. Append only: record-shipped adds an entry when a build or update with a new version first leaves the machine.",
+  "shipped": []
+}

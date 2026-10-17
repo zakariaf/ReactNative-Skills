@@ -1,0 +1,8 @@
+{
+  "id": "pig",
+  "packCount": 2,
+  "levelsPerPack": 20,
+  "starRule": "score",
+  "daily": true,
+  "endless": true
+}

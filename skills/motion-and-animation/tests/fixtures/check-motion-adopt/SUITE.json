@@ -1,0 +1,10 @@
+{
+  "base": [
+    { "templates": true, "firstLinePath": true, "fill": { "__ROOT_STACK_FILE__": "src/app/_layout.tsx" } },
+    { "from": "@tests/bases/app/package.json", "to": "package.json" },
+    { "from": "@tests/bases/app/tsconfig.json", "to": "tsconfig.json" },
+    { "from": "@tests/bases/app/src/theme/motion.ts", "to": "src/theme/motion.ts" },
+    { "from": "@tests/bases/app/src/ui/pressable-surface.tsx", "to": "src/ui/pressable-surface.tsx" },
+    { "from": "@tests/bases/app/src/app/_layout.tsx", "to": "src/app/_layout.tsx" }
+  ]
+}

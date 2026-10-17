@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "rtl.schema.json",
+  "title": "contracts/rtl.json",
+  "description": "The app's facts about layout direction, read by rtl-and-direction's check-rtl. Every key is optional.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$comment": { "type": "string" },
+    "directionSource": {
+      "enum": ["app", "device"],
+      "description": "Who decides the layout direction. \"app\" (default): an in-app language choice, through src/i18n/direction.ts and DirectionGate. \"device\": the app only follows the device language and keeps no restart machinery; direction-module and direction-before-render are not checked and expo-localization may set supportsRTL."
+    },
+    "rootLayout": {
+      "type": "string",
+      "description": "The file that renders DirectionGate first: the Expo Router root layout (default <routesDir>/_layout.tsx), or App.tsx with React Navigation."
+    },
+    "startupCalls": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[A-Za-z_$][\\w$]*$" },
+      "description": "Functions with effects (database open, migrations, hydration) that must run inside DirectionGate's children, never in the component that renders the gate."
+    },
+    "gateWrappers": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[A-Z][A-Za-z0-9_.]*$" },
+      "description": "JSX elements without effects that may sit around DirectionGate in the root layout (default: Fragment, React.Fragment, GestureHandlerRootView, SafeAreaProvider; not StrictMode, which would run AppRoot's startup initializer twice in development). Any other element there mounts before the direction is decided."
+    },
+    "outsideRoots": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Files that render text outside the app's providers (a custom splash, a second root). The root layout's ErrorBoundary (its Fallback component, the one component it returns, or its inline JSX) is found without listing it."
+    },
+    "physicalSurfaces": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[A-Z][A-Za-z0-9_.]*$" },
+      "description": "Component names that must stay left to right: each JSX use sits inside <PhysicalDirectionView> in the same file."
+    },
+    "iconSet": {
+      "type": "string",
+      "description": "The file that defines ICON_PATHS and DIRECTIONAL_ICONS."
+    },
+    "iconComponent": {
+      "type": "string",
+      "description": "The Icon component, the one place a scaleX: -1 flip may live."
+    },
+    "directionalIcons": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Icon names that point along the reading direction; DIRECTIONAL_ICONS must equal those that exist."
+    },
+    "textPrimitive": {
+      "type": "string",
+      "description": "The one file that may import Text from react-native (AppText)."
+    },
+    "textStyleHook": {
+      "type": "string",
+      "description": "The one file that may set writingDirection (the design system's text style hook)."
+    },
+    "bidiFiles": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Files allowed to hold bidi control characters or their escapes."
+    }
+  }
+}

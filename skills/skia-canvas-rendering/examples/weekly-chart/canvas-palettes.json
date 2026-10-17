@@ -1,0 +1,18 @@
+{
+  "light": {
+    "background": "#FFFFFF",
+    "bar": "#2F5FD0",
+    "goal": "#B4530A",
+    "flash": "#FFFFFF",
+    "label": "#14213D",
+    "ring": "#14213D"
+  },
+  "dark": {
+    "background": "#0E1726",
+    "bar": "#7AA7FF",
+    "goal": "#F2C14E",
+    "flash": "#0E1726",
+    "label": "#F4F7FB",
+    "ring": "#E6ECF5"
+  }
+}

@@ -1,0 +1,9 @@
+edit contracts/games.json (+ lights-out)
+same contracts/games.schema.json
+edit src/i18n/catalogs/ar.json (+ 2 keys)
+edit src/i18n/catalogs/en.json (+ 2 keys)
+would write 3 files for lights-out
+__GAME_ID__=lights-out __GAME_PASCAL__=LightsOut __GAME_CAMEL__=lightsOut __GAME_CONST__=LIGHTS_OUT
+draft src/i18n/catalogs/ar.json: lights-out.name, lights-out.lose.out-of-moves (source-language text: translate it, then list it on the review queue)
+levels: level-generation-and-solvers adds { "id": "lights-out", "packCount": 3, "levelsPerPack": 30, "starRule": ..., "daily": true, "endless": false }
+daily salt: 0x7c9e (31902), the 16-bit default for this id

@@ -1,0 +1,35 @@
+{
+  "bad-axis-theme-invariant-locale": {
+    "expect": [
+      "reports/design-review/2026-10-01-1-0-0/cells/not-found.default--light--en--default--ios-phone-small.png [review-axis] identical to not-found.default--dark--en--default--ios-phone-small.png: the themes \"dark\" and \"light\" gave the same picture"
+    ],
+    "ops": [
+      {
+        "$comment": "not-found is invariant across locales only: identical light and dark shots still fail",
+        "delete": "reports/design-review/2026-10-01-1-0-0/cells/not-found.default--dark--en--default--ios-phone-small.png"
+      },
+      {
+        "copy": {
+          "from": "reports/design-review/2026-10-01-1-0-0/cells/not-found.default--light--en--default--ios-phone-small.png",
+          "to": "reports/design-review/2026-10-01-1-0-0/cells/not-found.default--dark--en--default--ios-phone-small.png"
+        }
+      }
+    ]
+  },
+  "bad-capture-blank-tablet": {
+    "expect": [
+      "reports/design-review/2026-10-01-1-0-0/cells/tasks.default--light--en--default--ios-tablet.png [review-capture] blank: 1 distinct colour between the system bars, one covering 100.0%"
+    ],
+    "ops": [
+      {
+        "$comment": "a real-size white flash on the iPad: one flat colour, where the sparse cells of good/ pass",
+        "png": {
+          "files": ["reports/design-review/2026-10-01-1-0-0/cells/tasks.default--light--en--default--ios-tablet.png"],
+          "width": 2266,
+          "height": 1488,
+          "fill": "#fafafa"
+        }
+      }
+    ]
+  }
+}

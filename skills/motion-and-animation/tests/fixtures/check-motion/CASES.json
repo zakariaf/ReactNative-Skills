@@ -1,0 +1,1056 @@
+{
+  "bad-celebration-budget": {
+    "expect": ["[celebration-budget] listCleared lasts 3120 ms"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/motion/motion-moments.ts",
+          "find": "stagger: 'pressIn'",
+          "with": "stagger: 'standard'"
+        }
+      }
+    ]
+  },
+  "bad-celebration-limits": {
+    "expect": ["[celebration-budget] CELEBRATION_LIMITS.maxMs is 5000, above the library ceiling 2000"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/motion/motion-moments.ts",
+          "find": "CELEBRATION_LIMITS = { maxMs: 1600, maxPieces: 24 }",
+          "with": "CELEBRATION_LIMITS = { maxMs: 5000, maxPieces: 24 }"
+        }
+      }
+    ]
+  },
+  "bad-celebration-mount-effect": {
+    "expect": [
+      "src/features/lists/components/list-done.tsx:18 [celebration-through-hook] a celebration plays from useEffect"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/lists/components/list-done.tsx",
+          "lines": [
+            "// src/features/lists/components/list-done.tsx",
+            "// Plants the bug: the celebration plays from a mount effect, so every remount replays it.",
+            "import { useEffect } from 'react';",
+            "import { View } from 'react-native';",
+            "",
+            "import { CelebrationBurst } from '@/ui/motion/celebration-burst';",
+            "import { MOTION_MOMENTS } from '@/ui/motion/motion-moments';",
+            "import { useCelebration } from '@/ui/motion/use-celebration';",
+            "",
+            "import type { ReactNode } from 'react';",
+            "",
+            "export type ListDoneProps = { readonly listId: string; readonly colors: readonly string[] };",
+            "",
+            "export function ListDone({ listId, colors }: ListDoneProps): ReactNode {",
+            "  const celebration = useCelebration(MOTION_MOMENTS.listCleared);",
+            "  useEffect(() => {",
+            "    // The list screen mounts this view when the last task is done.",
+            "    celebration.play(listId);",
+            "  }, [celebration, listId]);",
+            "  return (",
+            "    <View>",
+            "      <CelebrationBurst celebration={celebration} colors={colors} testID=\"lists.done\" />",
+            "    </View>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-celebration-through-hook": {
+    "expect": [
+      "src/features/lists/components/list-done-banner.tsx:9 [celebration-through-hook] reads the celebration listCleared without useCelebration"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/lists/components/list-done-banner.tsx",
+          "lines": [
+            "// src/features/lists/components/list-done-banner.tsx",
+            "import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';",
+            "",
+            "import { timingOf } from '@/ui/motion/moment-config';",
+            "import { MOTION_MOMENTS } from '@/ui/motion/motion-moments';",
+            "",
+            "import type { ReactNode } from 'react';",
+            "",
+            "const POP = timingOf(MOTION_MOMENTS.listCleared);",
+            "",
+            "export function ListDoneBanner(): ReactNode {",
+            "  const scale = useSharedValue(1);",
+            "  function handleShow(): void {",
+            "    scale.set(withTiming(1.2, POP));",
+            "  }",
+            "  const style = useAnimatedStyle(() => ({ transform: [{ scale: scale.get() }] }));",
+            "  return <Animated.View style={style} onTouchEnd={handleShow} />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-commit-before-motion": {
+    "expect": [
+      "src/features/tasks/components/task-dismiss.tsx:16 [commit-before-motion] a withTiming completion callback hands work back to JS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-dismiss.tsx",
+          "lines": [
+            "// src/features/tasks/components/task-dismiss.tsx",
+            "import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';",
+            "import { scheduleOnRN } from 'react-native-worklets';",
+            "",
+            "import { timingOf } from '@/ui/motion/moment-config';",
+            "import { MOTION_MOMENTS } from '@/ui/motion/motion-moments';",
+            "",
+            "import type { ReactNode } from 'react';",
+            "",
+            "const EXIT = timingOf(MOTION_MOMENTS.taskRowExit);",
+            "",
+            "export function TaskDismiss({ onRemoved }: { readonly onRemoved: () => void }): ReactNode {",
+            "  const opacity = useSharedValue(1);",
+            "  function handleDelete(): void {",
+            "    opacity.set(",
+            "      withTiming(0, EXIT, (isFinished) => {",
+            "        if (isFinished === true) scheduleOnRN(onRemoved);",
+            "      }),",
+            "    );",
+            "  }",
+            "  const style = useAnimatedStyle(() => ({ opacity: opacity.get() }));",
+            "  return <Animated.View style={style} onTouchEnd={handleDelete} />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-compositor-props": {
+    "expect": ["src/features/tasks/components/progress-bar.tsx:19 [compositor-props] animates width"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/progress-bar.tsx",
+          "find": "    // motion-layout: an absolute, childless fill; scaleX would smear its rounded end\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-css-motion-reduced": {
+    "expect": ["src/features/tasks/components/due-chip.tsx:20 [css-motion-reduced]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/due-chip.tsx",
+          "find": "transitionProperty: isReducedMotion ? 'none' : 'backgroundColor',",
+          "with": "transitionProperty: 'backgroundColor',"
+        }
+      }
+    ]
+  },
+  "bad-css-transition-all": {
+    "expect": [
+      "src/features/tasks/components/due-chip.tsx:20 [css-motion-reduced]",
+      "with no transitionProperty it transitions every property ('all')",
+      "src/features/tasks/components/due-chip.tsx:24 [css-motion-reduced] transition (a Reanimated CSS animation)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/due-chip.tsx",
+          "find": "        transitionProperty: isReducedMotion ? 'none' : 'backgroundColor',\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/components/due-chip.tsx",
+          "find": "export function DueChip({ color, isReducedMotion, children }",
+          "with": "export function DueChip({ color, children }"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/components/due-chip.tsx",
+          "find": "      {children}",
+          "with": "      {children}\n      <Animated.View style={{ opacity: 1, transition: 'opacity 120ms' }} />"
+        }
+      }
+    ]
+  },
+  "bad-gesture-velocity": {
+    "expect": ["src/features/tasks/components/task-sheet.tsx:29 [gesture-velocity]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-sheet.tsx",
+          "find": "{ ...SETTLE, velocity: event.velocityY }",
+          "with": "SETTLE"
+        }
+      }
+    ]
+  },
+  "bad-loop-css-infinite": {
+    "expect": [
+      "src/features/tasks/components/due-chip.tsx:21 [loop-through-hook] a CSS animation with animationIterationCount 'infinite' loops forever"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/due-chip.tsx",
+          "lines": [
+            "// src/features/tasks/components/due-chip.tsx",
+            "import Animated from 'react-native-reanimated';",
+            "",
+            "import { timingOf } from '@/ui/motion/moment-config';",
+            "import { MOTION_MOMENTS } from '@/ui/motion/motion-moments';",
+            "",
+            "import type { ReactNode } from 'react';",
+            "",
+            "const TINT = timingOf(MOTION_MOMENTS.dueChipTint);",
+            "const PULSE = { from: { opacity: 1 }, to: { opacity: 0.5 } };",
+            "",
+            "export type DueChipProps = { readonly color: string; readonly isReducedMotion: boolean; readonly children: ReactNode };",
+            "",
+            "export function DueChip({ color, isReducedMotion, children }: DueChipProps): ReactNode {",
+            "  return (",
+            "    <Animated.View",
+            "      style={{",
+            "        backgroundColor: color,",
+            "        animationName: isReducedMotion ? 'none' : PULSE,",
+            "        animationDuration: TINT.duration ?? 0,",
+            "        animationIterationCount: 'infinite',",
+            "      }}",
+            "    >",
+            "      {children}",
+            "    </Animated.View>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-loop-css-infinite-constant": {
+    "expect": [
+      "src/features/tasks/components/due-chip.tsx:22 [loop-through-hook] a CSS animation with animationIterationCount ITERATIONS ('infinite') loops forever"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/due-chip.tsx",
+          "lines": [
+            "// src/features/tasks/components/due-chip.tsx",
+            "import Animated from 'react-native-reanimated';",
+            "",
+            "import { timingOf } from '@/ui/motion/moment-config';",
+            "import { MOTION_MOMENTS } from '@/ui/motion/motion-moments';",
+            "",
+            "import type { ReactNode } from 'react';",
+            "",
+            "const TINT = timingOf(MOTION_MOMENTS.dueChipTint);",
+            "const ITERATIONS = 'infinite';",
+            "const PULSE = { from: { opacity: 1 }, to: { opacity: 0.5 } };",
+            "",
+            "export type DueChipProps = { readonly color: string; readonly isReducedMotion: boolean; readonly children: ReactNode };",
+            "",
+            "export function DueChip({ color, isReducedMotion, children }: DueChipProps): ReactNode {",
+            "  return (",
+            "    <Animated.View",
+            "      style={{",
+            "        backgroundColor: color,",
+            "        animationName: isReducedMotion ? 'none' : PULSE,",
+            "        animationDuration: TINT.duration ?? 0,",
+            "        animationIterationCount: ITERATIONS,",
+            "      }}",
+            "    >",
+            "      {children}",
+            "    </Animated.View>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-loop-through-hook": {
+    "expect": ["src/features/sync/components/sync-badge.tsx:13 [loop-through-hook] withRepeat(..., -1) loops forever"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/sync/components/sync-badge.tsx",
+          "lines": [
+            "// src/features/sync/components/sync-badge.tsx",
+            "import { useEffect } from 'react';",
+            "import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';",
+            "",
+            "import { timingOf } from '@/ui/motion/moment-config';",
+            "import { MOTION_MOMENTS } from '@/ui/motion/motion-moments';",
+            "",
+            "import type { ReactNode } from 'react';",
+            "",
+            "export function SyncBadge({ color }: { readonly color: string }): ReactNode {",
+            "  const phase = useSharedValue(0);",
+            "  useEffect(() => {",
+            "    phase.set(withRepeat(withTiming(1, timingOf(MOTION_MOMENTS.syncPulse)), -1, true));",
+            "  }, [phase]);",
+            "  const style = useAnimatedStyle(() => ({ opacity: 1 - phase.get() / 2 }));",
+            "  return <Animated.View style={[{ backgroundColor: color }, style]} />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-loop-through-hook-constant": {
+    "expect": [
+      "src/features/sync/components/sync-badge.tsx:15 [loop-through-hook] withRepeat(..., LOOP_FOREVER) loops forever"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/sync/components/sync-badge.tsx",
+          "lines": [
+            "// src/features/sync/components/sync-badge.tsx",
+            "import { useEffect } from 'react';",
+            "import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';",
+            "",
+            "import { timingOf } from '@/ui/motion/moment-config';",
+            "import { MOTION_MOMENTS } from '@/ui/motion/motion-moments';",
+            "",
+            "import type { ReactNode } from 'react';",
+            "",
+            "const LOOP_FOREVER = -1;",
+            "",
+            "export function SyncBadge({ color }: { readonly color: string }): ReactNode {",
+            "  const phase = useSharedValue(0);",
+            "  useEffect(() => {",
+            "    phase.set(withRepeat(withTiming(1, timingOf(MOTION_MOMENTS.syncPulse)), LOOP_FOREVER, true));",
+            "  }, [phase]);",
+            "  const style = useAnimatedStyle(() => ({ opacity: 1 - phase.get() / 2 }));",
+            "  return <Animated.View style={[{ backgroundColor: color }, style]} />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-moment-catalog-kind": {
+    "expect": ["[moment-catalog] taskCheck.kind is \"status\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/motion/motion-moments.ts",
+          "find": "kind: 'state',\n    trigger: 'A task is marked done or open again',",
+          "with": "kind: 'status',\n    trigger: 'A task is marked done or open again',"
+        }
+      }
+    ]
+  },
+  "bad-moment-catalog-missing": {
+    "expect": ["src/ui/motion/motion-moments.ts:1 [moment-catalog]", "the moment catalog is missing"],
+    "ops": [{ "delete": "src/ui/motion/motion-moments.ts" }]
+  },
+  "bad-moment-catalog-runtime-import": {
+    "expect": ["src/ui/motion/motion-moments.ts:1 [moment-catalog]", "does not load with Node alone"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/motion/motion-moments.ts",
+          "find": "import type { EASING, MOTION_MS, SPRINGS } from '@/theme/motion';",
+          "with": "import type { EASING, MOTION_MS, SPRINGS } from '@/theme/motion';\nimport { Platform } from 'react-native';\n\nexport const IS_IOS = Platform.OS === 'ios';"
+        }
+      }
+    ]
+  },
+  "bad-moment-declared": {
+    "expect": ["src/features/tasks/components/task-count.tsx:9 [moment-declared] animates without naming a moment"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-count.tsx",
+          "lines": [
+            "// src/features/tasks/components/task-count.tsx",
+            "import Animated, { useAnimatedStyle, useDerivedValue, withSpring } from 'react-native-reanimated';",
+            "",
+            "import { SPRINGS } from '@/theme/motion';",
+            "",
+            "import type { ReactNode } from 'react';",
+            "",
+            "export function TaskCount({ count }: { readonly count: number }): ReactNode {",
+            "  const bump = useDerivedValue(() => withSpring(count, SPRINGS.release));",
+            "  const style = useAnimatedStyle(() => ({ transform: [{ scale: 1 + (bump.get() % 1) / 10 }] }));",
+            "  return <Animated.View style={style} />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-moment-declared-stack": {
+    "expect": [
+      "src/app/settings/_layout.tsx:8 [moment-declared] renders a native <Stack> that no navigator moment lists",
+      "List this file in the files of the navigator moment (screenPush)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/settings/_layout.tsx",
+          "content": "// src/app/settings/_layout.tsx: a nested stack nobody listed under screenPush.files.\nimport { Stack } from 'expo-router';\n\nimport { useScreenAnimation } from '@/ui/motion/use-screen-animation';\n\nexport default function SettingsLayout(): React.JSX.Element {\n  const animation = useScreenAnimation();\n  return <Stack screenOptions={{ animation }} />;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-moment-declared-unknown-id": {
+    "expect": ["[moment-declared] reads MOTION_MOMENTS.taskTick, which the catalog does not declare"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-check.tsx",
+          "find": "MOTION_MOMENTS.taskCheck",
+          "with": "MOTION_MOMENTS.taskTick"
+        }
+      }
+    ]
+  },
+  "bad-moment-files-missing": {
+    "expect": ["[moment-files] press.files names src/ui/press-surface.tsx, which does not exist"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/motion/motion-moments.ts",
+          "find": "files: ['src/ui/pressable-surface.tsx']",
+          "with": "files: ['src/ui/press-surface.tsx']",
+          "occurrence": 1
+        }
+      }
+    ]
+  },
+  "bad-moment-files-token": {
+    "expect": [
+      "[moment-files] pressRelease.files names src/ui/pressable-surface.tsx, which never spends the moment's token"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/motion/motion-moments.ts",
+          "find": "timing: { spring: 'release' }",
+          "with": "timing: { spring: 'sheet' }"
+        }
+      }
+    ]
+  },
+  "bad-moment-reduced": {
+    "expect": ["[moment-reduced] holdToDelete is a functional moment, which may not declare reduced \"instant\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/motion/motion-moments.ts",
+          "find": "reduced: 'unchanged'",
+          "with": "reduced: 'instant'"
+        }
+      }
+    ]
+  },
+  "bad-moment-reduced-burst": {
+    "expect": [
+      "src/features/tasks/components/task-check-cell.tsx:34 [moment-reduced] renders <CelebrationBurst> for listCleared, declared reduced \"static\""
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/motion/motion-moments.ts",
+          "find": "    reduced: 'none',\n    pieces: 12,",
+          "with": "    reduced: 'static',\n    pieces: 12,"
+        }
+      }
+    ]
+  },
+  "bad-moment-reduced-fade": {
+    "expect": [
+      "src/ui/motion/motion-moments.ts:59 [moment-reduced] taskRowEnter declares reduced \"fade\", but src/features/tasks/components/task-list-row.tsx never uses REDUCED_FADE",
+      "src/ui/motion/motion-moments.ts:65 [moment-reduced] taskRowExit declares reduced \"fade\""
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-list-row.tsx",
+          "find": "import { reducedEntering, reducedExiting, timingOf } from '@/ui/motion/moment-config';",
+          "with": "import { timingOf } from '@/ui/motion/moment-config';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-list-row.tsx",
+          "find": "isReducedMotion ? reducedEntering() : MOMENT_ENTERING",
+          "with": "isReducedMotion ? FadeInDown.duration(0) : MOMENT_ENTERING"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-list-row.tsx",
+          "find": "isReducedMotion ? reducedExiting() : MOMENT_EXITING",
+          "with": "isReducedMotion ? FadeOutUp.duration(0) : MOMENT_EXITING"
+        }
+      }
+    ]
+  },
+  "bad-moment-tokens": {
+    "expect": ["[moment-tokens] dueChipTint.timing.duration \"quick\" is not a MOTION_MS token"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/motion/motion-moments.ts",
+          "find": "trigger: 'A task becomes overdue',\n    timing: { duration: 'fast'",
+          "with": "trigger: 'A task becomes overdue',\n    timing: { duration: 'quick'"
+        }
+      }
+    ]
+  },
+  "bad-moment-unused": {
+    "expect": ["[moment-unused] emptyHint is declared but nothing animates it"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/motion/motion-moments.ts",
+          "find": "} as const satisfies Readonly<Record<string, MotionMoment>>;",
+          "with": "  emptyHint: {\n    kind: 'attention',\n    trigger: 'The task list is empty',\n    timing: { duration: 'slow', easing: 'standard' },\n    reduced: 'static',\n  },\n} as const satisfies Readonly<Record<string, MotionMoment>>;"
+        }
+      }
+    ]
+  },
+  "bad-no-input-lock": {
+    "expect": ["src/features/tasks/components/task-check-cell.tsx:31 [no-input-lock] disabled={isCelebrating}"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-check-cell.tsx",
+          "find": "<PressableSurface label={props.label} onPress={handlePress}>",
+          "with": "<PressableSurface label={props.label} onPress={handlePress} disabled={isCelebrating}>"
+        }
+      }
+    ]
+  },
+  "bad-no-js-per-frame": {
+    "expect": ["src/features/tasks/components/task-sheet.tsx:26 [no-js-per-frame] scheduleOnRN runs inside .onUpdate"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-sheet.tsx",
+          "find": "      offset.set(Math.max(0, event.translationY));",
+          "with": "      offset.set(Math.max(0, event.translationY));\n      scheduleOnRN(onClosed);"
+        }
+      }
+    ]
+  },
+  "bad-no-reset-before-animate": {
+    "expect": ["src/features/lists/components/hold-to-delete.tsx:26 [no-reset-before-animate] progress is reset to 0"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/lists/components/hold-to-delete.tsx",
+          "find": "    progress.set(\n      withTiming(1, HOLD,",
+          "with": "    progress.set(0);\n    progress.set(\n      withTiming(1, HOLD,"
+        }
+      }
+    ]
+  },
+  "bad-no-timer-sequencing": {
+    "expect": [
+      "src/features/lists/components/hold-to-delete.tsx:34 [no-timer-sequencing] setTimeout starts or stops an animation"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/lists/components/hold-to-delete.tsx",
+          "find": "    progress.set(withTiming(0, timingOf(MOTION_MOMENTS.holdToDelete)));",
+          "with": "    setTimeout(() => {\n      progress.set(withTiming(0, timingOf(MOTION_MOMENTS.holdToDelete)));\n    }, 100);"
+        }
+      }
+    ]
+  },
+  "bad-reanimated-only": {
+    "expect": ["src/features/tasks/components/task-filter.tsx:2 [reanimated-only]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-filter.tsx",
+          "lines": [
+            "// src/features/tasks/components/task-filter.tsx",
+            "import { LayoutAnimation, View } from 'react-native';",
+            "",
+            "import type { ReactNode } from 'react';",
+            "",
+            "export function TaskFilter({ onChange }: { readonly onChange: () => void }): ReactNode {",
+            "  function handleTouch(): void {",
+            "    LayoutAnimation.easeInEaseOut();",
+            "    onChange();",
+            "  }",
+            "  return <View onTouchEnd={handleTouch} />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-reduce-motion-opt-out": {
+    "expect": ["src/features/tasks/components/task-check.tsx:16 [reduce-motion-opt-out]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-check.tsx",
+          "find": "const CHECK = timingOf(MOTION_MOMENTS.taskCheck);",
+          "with": "const CHECK = { ...timingOf(MOTION_MOMENTS.taskCheck), reduceMotion: ReduceMotion.Never };"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-check.tsx",
+          "find": "import Animated, { useAnimatedStyle, useDerivedValue, withTiming } from 'react-native-reanimated';",
+          "with": "import Animated, {\n  ReduceMotion,\n  useAnimatedStyle,\n  useDerivedValue,\n  withTiming,\n} from 'react-native-reanimated';"
+        }
+      }
+    ]
+  },
+  "bad-reduce-motion-root": {
+    "expect": ["src/app/_layout.tsx:1 [reduce-motion-root] the root layout never mounts <MotionConfig>"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "<MotionConfig preference=\"system\">\n      <RootStack />\n    </MotionConfig>",
+          "with": "<RootStack />"
+        }
+      }
+    ]
+  },
+  "bad-reduce-motion-root-self-read": {
+    "expect": [
+      "src/app/_layout.tsx:14 [reduce-motion-root] RootStack calls useScreenAnimation() and renders <MotionConfig> itself"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "    <Stack screenOptions={{ headerShown: false, animation }}>\n      <Stack.Screen name=\"task-sheet\" options={{ animation: sheetAnimation }} />\n    </Stack>",
+          "with": "    <MotionConfig preference=\"on\">\n      <Stack screenOptions={{ headerShown: false, animation }}>\n        <Stack.Screen name=\"task-sheet\" options={{ animation: sheetAnimation }} />\n      </Stack>\n    </MotionConfig>"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "<MotionConfig preference=\"system\">\n      <RootStack />\n    </MotionConfig>",
+          "with": "<RootStack />"
+        }
+      }
+    ]
+  },
+  "bad-reduce-motion-root-watch": {
+    "expect": ["src/app/_layout.tsx:1 [reduce-motion-root] the root layout never starts watchSystemA11y()"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "  useEffect(() => watchSystemA11y(reportError), []);\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-screen-animation-literal": {
+    "expect": ["[screen-transition-reduced] animation: 'slide_from_bottom' is fixed"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "options={{ animation: sheetAnimation }}",
+          "with": "options={{ animation: 'slide_from_bottom' }}"
+        }
+      }
+    ]
+  },
+  "bad-screen-options-literal-in-route": {
+    "expect": ["src/app/task/[id].tsx:5 [screen-transition-reduced] animation: 'slide_from_right' is fixed"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/task/[id].tsx",
+          "lines": [
+            "// src/app/task/[id].tsx: the task detail route. Expo Router reads its default export.",
+            "import { Stack } from 'expo-router';",
+            "",
+            "export default function TaskRoute(): React.JSX.Element {",
+            "  return <Stack.Screen options={{ title: 'Task', animation: 'slide_from_right' }} />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-screen-transition-reduced": {
+    "expect": ["src/app/_layout.tsx:17 [screen-transition-reduced]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "<Stack screenOptions={{ headerShown: false, animation }}>",
+          "with": "<Stack screenOptions={{ headerShown: false }}>"
+        }
+      }
+    ]
+  },
+  "bad-screen-transition-tabs-literal": {
+    "expect": [
+      "src/app/(tabs)/_layout.tsx:5 [screen-transition-reduced] animation: 'shift' is fixed",
+      "Gate it on the answer: animation: isReducedMotion ? 'none' : 'shift'"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/(tabs)/_layout.tsx",
+          "lines": [
+            "// src/app/(tabs)/_layout.tsx: plants the bug: the tabs shift even when motion is reduced.",
+            "import { Tabs } from 'expo-router';",
+            "",
+            "export default function TabsLayout(): React.JSX.Element {",
+            "  return <Tabs screenOptions={{ animation: 'shift' }} />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-worklets-api": {
+    "expect": ["src/features/tasks/components/task-sheet.tsx:6 [worklets-api] imports runOnJS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-sheet.tsx",
+          "find": "import { scheduleOnRN } from 'react-native-worklets';",
+          "with": "import { runOnJS } from 'react-native-worklets';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-sheet.tsx",
+          "find": "if (shouldClose) scheduleOnRN(onClosed);",
+          "with": "if (shouldClose) runOnJS(onClosed)();"
+        }
+      }
+    ]
+  },
+  "bad-workspace-app": {
+    "expect": [
+      "apps/mobile/src/features/tasks/components/task-sheet.tsx:29 [gesture-velocity]",
+      "check-motion: 20 files checked, 1 problems"
+    ],
+    "ops": [
+      { "mkdir": "apps/mobile" },
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+      { "rename": { "from": "tsconfig.json", "to": "apps/mobile/tsconfig.json" } },
+      {
+        "write": {
+          "file": "package.json",
+          "json": { "name": "tasks-monorepo", "private": true, "workspaces": ["apps/*"] }
+        }
+      },
+      {
+        "replace": {
+          "file": "apps/mobile/src/features/tasks/components/task-sheet.tsx",
+          "find": "{ ...SETTLE, velocity: event.velocityY }",
+          "with": "SETTLE"
+        }
+      }
+    ]
+  },
+  "bad-workspace-library-unlisted": {
+    "expect": [
+      "packages/ui/src/press-dot.tsx:13 [moment-declared] animates, but packages/ui is a shared package and no app's moment catalog lists this file"
+    ],
+    "ops": [
+      { "mkdir": "apps/mobile" },
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+      { "rename": { "from": "tsconfig.json", "to": "apps/mobile/tsconfig.json" } },
+      {
+        "write": {
+          "file": "package.json",
+          "json": { "name": "tasks-monorepo", "private": true, "workspaces": ["apps/*", "packages/*"] }
+        }
+      },
+      {
+        "write": {
+          "file": "packages/ui/package.json",
+          "json": {
+            "name": "@tasks/ui",
+            "private": true,
+            "main": "src/index.ts",
+            "peerDependencies": { "react-native-reanimated": "*" },
+            "devDependencies": { "react-native-reanimated": "4.5.1" }
+          }
+        }
+      },
+      {
+        "write": {
+          "file": "packages/ui/src/press-dot.tsx",
+          "lines": [
+            "// packages/ui/src/press-dot.tsx",
+            "// A shared package's press dot: it cannot import an app's catalog, so the app lists it in press.files.",
+            "import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';",
+            "",
+            "import { MOTION_MS } from './motion-tokens';",
+            "",
+            "import type { ReactNode } from 'react';",
+            "",
+            "export function PressDot(): ReactNode {",
+            "  const depth = useSharedValue(0);",
+            "  const style = useAnimatedStyle(() => ({ opacity: 1 - depth.get() / 4 }));",
+            "  function handlePressIn(): void {",
+            "    depth.set(withTiming(1, { duration: MOTION_MS.pressIn }));",
+            "  }",
+            "  return <Animated.View style={style} onTouchStart={handlePressIn} />;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "packages/ui/src/motion-tokens.ts",
+          "lines": ["// packages/ui/src/motion-tokens.ts", "export const MOTION_MS = { pressIn: 70 } as const;"]
+        }
+      }
+    ]
+  },
+  "error-no-package-json": { "expect": ["ERROR [bad-input] nothing to check: no package.json"], "args": "{dir}/src" },
+  "error-no-source-folder": {
+    "expect": ["ERROR [bad-input] nothing to check"],
+    "ops": [{ "rename": { "from": "src", "to": "lib" } }]
+  },
+  "error-root-option": { "expect": ["ERROR [bad-input]", "positional"], "args": "--root {dir}" },
+  "pass-config-src-dir": {
+    "expect": ["check-motion: 20 files checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      { "rename": { "from": "src", "to": "app-src" } },
+      { "write": { "file": "rn-skills.config.json", "json": { "srcDir": "app-src" } } },
+      { "json": { "file": "tsconfig.json", "path": ["compilerOptions", "paths", "@/*"], "value": ["./app-src/*"] } },
+      {
+        "replace": {
+          "file": "app-src/ui/motion/motion-moments.ts",
+          "find": "files: ['src/",
+          "with": "files: ['app-src/",
+          "all": true
+        }
+      }
+    ]
+  },
+  "pass-exclude-option": {
+    "expect": ["check-motion: 19 files checked, 0 problems", "RESULT: PASS"],
+    "args": "{dir} --exclude src/legacy/**",
+    "ops": [
+      {
+        "write": {
+          "file": "src/legacy/old-spinner.tsx",
+          "lines": [
+            "// src/legacy/old-spinner.tsx",
+            "import { withRepeat, withTiming } from 'react-native-reanimated';",
+            "",
+            "export const spin = (): number => withRepeat(withTiming(1), -1);"
+          ]
+        }
+      },
+      { "delete": "src/features/tasks/components/progress-bar.tsx" },
+      {
+        "replace": {
+          "file": "src/ui/motion/motion-moments.ts",
+          "find": "  progressFill: {\n    kind: 'state',\n    trigger: 'The share of done tasks changes',\n    timing: { duration: 'standard', easing: 'decelerate' },\n    reduced: 'instant',\n  },\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "pass-gesture-tap-release": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/press-scale.tsx",
+          "lines": [
+            "// src/features/tasks/components/press-scale.tsx",
+            "// A tap scales the card down and springs it back on release: a tap event carries no velocity.",
+            "import { Gesture, GestureDetector } from 'react-native-gesture-handler';",
+            "import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';",
+            "",
+            "import { springOf, timingOf } from '@/ui/motion/moment-config';",
+            "import { MOTION_MOMENTS } from '@/ui/motion/motion-moments';",
+            "",
+            "import type { ReactNode } from 'react';",
+            "",
+            "const PRESS = timingOf(MOTION_MOMENTS.press);",
+            "const RELEASE = springOf(MOTION_MOMENTS.pressRelease);",
+            "",
+            "export function PressScale({ children }: { readonly children: ReactNode }): ReactNode {",
+            "  const press = useSharedValue(0);",
+            "  const tap = Gesture.Tap()",
+            "    .onBegin(() => {",
+            "      press.set(withTiming(1, PRESS));",
+            "    })",
+            "    .onFinalize(() => {",
+            "      press.set(withSpring(0, RELEASE));",
+            "    });",
+            "  const hold = Gesture.LongPress().minDuration(400);",
+            "  hold.onEnd(() => {",
+            "    press.set(withSpring(0, RELEASE));",
+            "  });",
+            "  const style = useAnimatedStyle(() => ({ transform: [{ scale: 1 - press.get() / 20 }] }));",
+            "  return (",
+            "    <GestureDetector gesture={Gesture.Exclusive(hold, tap)}>",
+            "      <Animated.View style={style}>{children}</Animated.View>",
+            "    </GestureDetector>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-not-applicable": {
+    "expect": ["NOT APPLICABLE: react-native-reanimated is not in package.json", "RESULT: PASS"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "react-native-reanimated"], "delete": true } }]
+  },
+  "pass-screen-options-shapes": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "  const sheetAnimation = useScreenAnimation('slide_from_bottom');\n  return (\n    <Stack screenOptions={{ headerShown: false, animation }}>",
+          "with": "  const sheetAnimation = useScreenAnimation('slide_from_bottom');\n  const options = { headerShown: false, animation };\n  return (\n    <Stack screenOptions={options}>"
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/settings/_layout.tsx",
+          "lines": [
+            "// src/app/settings/_layout.tsx: a stack that never animates (nothing moves, so nothing to reduce).",
+            "import { Stack } from 'expo-router';",
+            "",
+            "export default function SettingsLayout(): React.JSX.Element {",
+            "  return <Stack screenOptions={{ headerShown: false, animation: 'none' }} />;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/(tabs)/_layout.tsx",
+          "lines": [
+            "// src/app/(tabs)/_layout.tsx: tabs shift only while motion is not reduced.",
+            "import { Tabs } from 'expo-router';",
+            "",
+            "import { useReduceMotion } from '@/ui/a11y/use-reduce-motion';",
+            "",
+            "export default function TabsLayout(): React.JSX.Element {",
+            "  const isReducedMotion = useReduceMotion();",
+            "  return <Tabs screenOptions={{ animation: isReducedMotion ? 'none' : 'shift' }} />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-skip-motion-config": {
+    "expect": [
+      "SKIP src/ui/a11y/motion-config.tsx [reduce-motion-root] not yet created (accessibility-as-code creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "src/ui/a11y/motion-config.tsx" }]
+  },
+  "pass-skip-theme-tokens": {
+    "expect": [
+      "SKIP src/theme/motion.ts [moment-tokens] not yet created (design-system-structure creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "src/theme/motion.ts" }]
+  },
+  "pass-table": {
+    "expect": [
+      "| Moment | Kind | Trigger | Timing | Reduced | Lives in |",
+      "| listCleared | celebration | The last open task of a list is marked done |",
+      "(total 1250 ms, 12 pieces)",
+      "RESULT: PASS"
+    ],
+    "args": "{dir} --table"
+  },
+  "pass-workspace-library": {
+    "expect": ["check-motion: 22 files checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      { "mkdir": "apps/mobile" },
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+      { "rename": { "from": "tsconfig.json", "to": "apps/mobile/tsconfig.json" } },
+      {
+        "write": {
+          "file": "package.json",
+          "json": { "name": "tasks-monorepo", "private": true, "workspaces": ["apps/*", "packages/*"] }
+        }
+      },
+      {
+        "write": {
+          "file": "packages/ui/package.json",
+          "json": {
+            "name": "@tasks/ui",
+            "private": true,
+            "main": "src/index.ts",
+            "peerDependencies": { "react-native-reanimated": "*" },
+            "devDependencies": { "react-native-reanimated": "4.5.1" }
+          }
+        }
+      },
+      {
+        "write": {
+          "file": "packages/ui/src/press-dot.tsx",
+          "lines": [
+            "// packages/ui/src/press-dot.tsx",
+            "// A shared package's press dot: it cannot import an app's catalog, so the app lists it in press.files.",
+            "import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';",
+            "",
+            "import { MOTION_MS } from './motion-tokens';",
+            "",
+            "import type { ReactNode } from 'react';",
+            "",
+            "export function PressDot(): ReactNode {",
+            "  const depth = useSharedValue(0);",
+            "  const style = useAnimatedStyle(() => ({ opacity: 1 - depth.get() / 4 }));",
+            "  function handlePressIn(): void {",
+            "    depth.set(withTiming(1, { duration: MOTION_MS.pressIn }));",
+            "  }",
+            "  return <Animated.View style={style} onTouchStart={handlePressIn} />;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "packages/ui/src/motion-tokens.ts",
+          "lines": ["// packages/ui/src/motion-tokens.ts", "export const MOTION_MS = { pressIn: 70 } as const;"]
+        }
+      },
+      {
+        "replace": {
+          "file": "apps/mobile/src/ui/motion/motion-moments.ts",
+          "find": "    files: ['src/ui/pressable-surface.tsx'],\n",
+          "with": "    files: ['src/ui/pressable-surface.tsx', '../../packages/ui/src/press-dot.tsx'],\n",
+          "occurrence": 1
+        }
+      }
+    ]
+  }
+}

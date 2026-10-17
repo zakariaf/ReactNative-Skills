@@ -1,0 +1,4 @@
+[
+  { "from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs" },
+  { "from": "expo-sdk-57-module-map.json", "to": "assets/expo-sdk-57-module-map.json" }
+]

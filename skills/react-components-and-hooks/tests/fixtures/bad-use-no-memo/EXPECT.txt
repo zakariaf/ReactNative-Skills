@@ -1,0 +1,3 @@
+[use-no-memo] 'use no memo' without its failing test
+src/features/tasks/components/task-probe.tsx:5
+RESULT: FAIL (1 problems)

@@ -1,0 +1,8 @@
+{
+  "testOnlyFolders": [
+    "src/features/debug/",
+    "src/services/test-hooks/",
+    "src/services/debug-storage/",
+    "src/stores/debug-overrides/"
+  ]
+}

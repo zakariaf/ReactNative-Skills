@@ -1,0 +1,14 @@
+{
+  "name": "tasks",
+  "version": "1.0.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "dependencies": {
+    "@shopify/react-native-skia": "2.6.2",
+    "expo": "~57.0.26",
+    "expo-router": "~57.0.12",
+    "expo-splash-screen": "~57.0.9",
+    "react": "19.2.3",
+    "react-native": "0.86.3"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "backup-fixture-app",
+  "private": true,
+  "main": "expo-router/entry",
+  "dependencies": {
+    "expo": "~57.0.26",
+    "expo-document-picker": "~57.0.3",
+    "expo-file-system": "~57.0.7",
+    "expo-sharing": "~57.0.22",
+    "expo-sqlite": "~57.0.3",
+    "valibot": "1.5.0"
+  }
+}

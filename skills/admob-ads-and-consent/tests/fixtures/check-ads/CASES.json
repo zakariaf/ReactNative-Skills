@@ -1,0 +1,1225 @@
+{
+  "bad-ads-adapter-direct": {
+    "expect": [
+      "[ads-factory]",
+      "src/services/create-device-services.ts:37",
+      "createAdmobAdsAdapter() is called outside createAdsPort()"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/create-device-services.ts",
+          "find": "    ads: createAdsPort(adsExtra, {\n      platform: Platform.OS === 'android' ? 'android' : 'ios',\n      createAdmob: (units) => createAdmobAdsAdapter({ units, onAdError: onError }),\n    }),",
+          "with": "    ads: createAdmobAdsAdapter({ units: 'test', onAdError: onError }),"
+        }
+      }
+    ]
+  },
+  "bad-ads-provider-unmounted": {
+    "expect": ["[consent-moment]", "src/services/ads/ads-provider.tsx", "no app file mounts <AdsProvider>"],
+    "ops": [{ "delete": "src/features/root-navigator/ads-root.tsx" }]
+  },
+  "bad-age-restricted-child-directed": {
+    "expect": [
+      "[content-rating]",
+      "src/services/ads/admob-ads-adapter.ts",
+      "ageRestrictedTreatment is set, and react-native-google-mobile-ads 17.2.0 drops it on Android",
+      "keep tagForChildDirectedTreatment: true"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/ads.json", "path": ["audience"], "value": "child-directed" } },
+      { "json": { "file": "contracts/ads.json", "path": ["maxAdContentRating"], "value": "G" } },
+      {
+        "replace": {
+          "file": "src/services/ads/admob-ads-adapter.ts",
+          "find": "const REQUEST_CONFIGURATION = { maxAdContentRating: MaxAdContentRating.PG };",
+          "with": "const REQUEST_CONFIGURATION = {\n  maxAdContentRating: MaxAdContentRating.G,\n  tagForChildDirectedTreatment: true,\n  tagForUnderAgeOfConsent: true,\n  ageRestrictedTreatment: 'child',\n};"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    slug: 'tasks',",
+          "with": "    slug: 'tasks',\n    android: { blockedPermissions: ['com.google.android.gms.permission.AD_ID'] },"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    locales: { en: { ios: { NSUserTrackingUsageDescription: 'Lets the app show ads that match your interests.' } } },\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "      [\n        'expo-tracking-transparency',\n        { userTrackingPermission: 'Lets the app show ads that match your interests.' },\n      ],\n",
+          "with": ""
+        }
+      },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-tracking-transparency"], "delete": true } },
+      { "delete": "src/services/consent/expo-tracking-consent-adapter.ts" },
+      { "delete": "src/services/consent/expo-tracking-consent-adapter.test.ts" },
+      { "delete": "src/services/consent/expo-tracking-consent-adapter.android.test.ts" },
+      { "delete": "__mocks__/expo-tracking-transparency.ts" },
+      {
+        "replace": {
+          "file": "src/services/create-device-services.ts",
+          "find": "import { createExpoTrackingConsentAdapter } from '@/services/consent/expo-tracking-consent-adapter';\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/create-device-services.ts",
+          "find": "createAdmobConsentAdapter({\n        tracking: createExpoTrackingConsentAdapter({ onError }),\n        onError,\n      })",
+          "with": "createAdmobConsentAdapter({ tracking: null, onError })"
+        }
+      }
+    ]
+  },
+  "bad-age-restricted-general": {
+    "expect": [
+      "[content-rating]",
+      "src/services/ads/admob-ads-adapter.ts",
+      "ageRestrictedTreatment is set",
+      "a general audience sets the rating only"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/admob-ads-adapter.ts",
+          "find": "const REQUEST_CONFIGURATION = { maxAdContentRating: MaxAdContentRating.PG };",
+          "with": "const REQUEST_CONFIGURATION = {\n  maxAdContentRating: MaxAdContentRating.PG,\n  ageRestrictedTreatment: 'unspecified',\n};"
+        }
+      }
+    ]
+  },
+  "bad-att-admob-plugin-string": {
+    "expect": ["[att-plugin]", "src/config/ads-config.ts", "userTrackingUsageDescription is set"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/ads-config.ts",
+          "find": "    delayAppMeasurementInit: true,\n    skAdNetworkItems,",
+          "with": "    delayAppMeasurementInit: true,\n    skAdNetworkItems,\n    userTrackingUsageDescription: 'Lets the app show ads that match your interests.',"
+        }
+      }
+    ]
+  },
+  "bad-att-after-initialize": {
+    "expect": ["[att-order]", "src/services/ads/ad-gate.ts", "requestTracking() runs after initialize()"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/ad-gate.ts",
+          "find": "  await deps.consent.requestTracking(); // after Google's form, before the SDK can request an ad\n  const initialized = await deps.ads.initialize();",
+          "with": "  const initialized = await deps.ads.initialize();\n  await deps.consent.requestTracking();"
+        }
+      }
+    ]
+  },
+  "bad-att-before-form": {
+    "expect": ["[att-order]", "requestTracking() runs before Google's form"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/ad-gate.ts",
+          "find": "  const known = await deps.consent.refresh();",
+          "with": "  await deps.consent.requestTracking();\n  const known = await deps.consent.refresh();"
+        }
+      }
+    ]
+  },
+  "bad-att-import-outside-adapter": {
+    "expect": [
+      "[att-adapter-only]",
+      "src/features/tasks/use-tracking-status.ts:2",
+      "imports expo-tracking-transparency outside the tracking adapter"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-tracking-status.ts",
+          "content": "// src/features/tasks/use-tracking-status.ts\nimport { getTrackingPermissionsAsync } from 'expo-tracking-transparency';\n\nexport const readTracking = () => getTrackingPermissionsAsync();\n"
+        }
+      }
+    ]
+  },
+  "bad-att-locale-missing": {
+    "expect": ["[att-plugin]", "src/i18n/catalogs/ar.json", "no \"permissions.tracking.usage-description\" text in ar"],
+    "ops": [
+      {
+        "json": {
+          "file": "src/i18n/catalogs/ar.json",
+          "path": ["permissions.tracking.usage-description"],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "bad-att-package-missing": {
+    "expect": ["[att-plugin]", "package.json", "expo-tracking-transparency is not a dependency"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-tracking-transparency"], "delete": true } }
+    ]
+  },
+  "bad-att-plugin-missing": {
+    "expect": ["[att-plugin]", "app.config.ts", "no ['expo-tracking-transparency', { userTrackingPermission }] entry"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "      [\n        'expo-tracking-transparency',\n        { userTrackingPermission: 'Lets the app show ads that match your interests.' },\n      ],\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-att-tracking-null": {
+    "expect": ["[att-wiring]", "src/services/create-device-services.ts:", "the consent adapter gets no ATT request"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/create-device-services.ts",
+          "find": "createAdmobConsentAdapter({\n        tracking: createExpoTrackingConsentAdapter({ onError }),\n        onError,\n      })",
+          "with": "createAdmobConsentAdapter({ tracking: null, onError })"
+        }
+      }
+    ]
+  },
+  "bad-banner-focus-literal": {
+    "expect": [
+      "[consent-moment]",
+      "src/features/tasks/use-tasks-model.ts:",
+      "useBannerSlot(..., true) ignores the screen's focus"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "useBannerSlot('tasks', facts, isFocused),",
+          "with": "useBannerSlot('tasks', facts, true),"
+        }
+      }
+    ]
+  },
+  "bad-banner-model-no-policy": {
+    "expect": [
+      "[banner-placement]",
+      "src/features/tasks/tasks-screen.tsx",
+      "no runtime code asks the policy for 'tasks'"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "    banner: useBannerSlot('tasks', facts, isFocused),",
+          "with": "    banner: { renderBanner: () => null, isAllowed: facts.isOnboardingDone },"
+        }
+      }
+    ]
+  },
+  "bad-banner-screen-not-in-pacing": {
+    "expect": ["[banner-placement]", "src/features/tasks/tasks-screen.tsx", "'tasks' is not in AD_PACING.bannerScreens"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/ad-pacing.ts",
+          "find": "  bannerScreens: ['tasks'],",
+          "with": "  bannerScreens: ['lists'],"
+        }
+      }
+    ]
+  },
+  "bad-banner-slot-hook-no-policy": {
+    "expect": [
+      "[banner-placement]",
+      "src/features/tasks/tasks-screen.tsx",
+      "no runtime code asks the policy for 'tasks'"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/hooks/use-banner-slot.ts",
+          "find": "    isAllowed: isScreenFocused && shouldShowBanner(deps.config, context, screen),",
+          "with": "    isAllowed: isScreenFocused && context.isOnline,"
+        }
+      }
+    ]
+  },
+  "bad-banner-slot-ignores-focus": {
+    "expect": [
+      "[consent-moment]",
+      "src/hooks/use-banner-slot.ts:",
+      "holds the ad moment while its screen is mounted, not while it is focused"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/hooks/use-banner-slot.ts",
+          "find": "  useEffect(\n    () => (isScreenFocused ? requestAdMoment?.() : undefined),\n    [isScreenFocused, requestAdMoment],\n  );",
+          "with": "  useEffect(() => requestAdMoment?.(), [requestAdMoment]);"
+        }
+      }
+    ]
+  },
+  "bad-banner-slot-no-moment": {
+    "expect": [
+      "[consent-moment]",
+      "src/hooks/use-banner-slot.ts",
+      "useBannerSlot does not ask the consent moment for its ad moment"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/hooks/use-banner-slot.ts",
+          "find": "  const requestAdMoment = deps?.flow.requestAdMoment;\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/hooks/use-banner-slot.ts",
+          "find": "  useEffect(\n    () => (isScreenFocused ? requestAdMoment?.() : undefined),\n    [isScreenFocused, requestAdMoment],\n  );",
+          "with": "  useEffect(() => undefined, []);"
+        }
+      }
+    ]
+  },
+  "bad-banner-testid": {
+    "expect": ["[banner-placement]", "src/features/tasks/tasks-screen.tsx", "banner testID is \"tasks.banner\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "testID=\"tasks.banner-ad\"",
+          "with": "testID=\"tasks.banner\""
+        }
+      }
+    ]
+  },
+  "bad-banner-undeclared-screen": {
+    "expect": [
+      "[banner-placement]",
+      "src/features/task-editor/task-editor-screen.tsx:8",
+      "a banner outside the declared banner screens"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/task-editor/task-editor-screen.tsx",
+          "content": "// src/features/task-editor/task-editor-screen.tsx\nimport { AdBannerSlot } from '@/ui/ad-banner-slot';\n\nimport type { BannerSlotModel } from '@/hooks/use-banner-slot';\n\nexport function TaskEditorScreen({ banner }: { readonly banner: BannerSlotModel }) {\n  return (\n    <AdBannerSlot testID=\"task-editor.banner-ad\" renderBanner={banner.renderBanner} isAllowed={banner.isAllowed} />\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-break-not-recorded": {
+    "expect": ["[break-recorded]", "src/services/ads/ad-history.ts", "nothing records a finished break"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "    const counted = recordBreak(adState.history, 'success');",
+          "with": "    const counted = adState.history;"
+        }
+      }
+    ]
+  },
+  "bad-break-result-discarded": {
+    "expect": [
+      "[break-recorded]",
+      "src/features/tasks/use-tasks-model.ts:",
+      "the result of recordBreak() is thrown away"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "    const counted = recordBreak(adState.history, 'success');",
+          "with": "    recordBreak(adState.history, 'success');\n    const counted = adState.history;"
+        }
+      }
+    ]
+  },
+  "bad-child-directed-ad-id": {
+    "expect": [
+      "[content-rating]",
+      "app.config.ts",
+      "a child-directed app does not block com.google.android.gms.permission.AD_ID"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/ads.json", "path": ["audience"], "value": "child-directed" } },
+      { "json": { "file": "contracts/ads.json", "path": ["maxAdContentRating"], "value": "G" } },
+      {
+        "replace": {
+          "file": "src/services/ads/admob-ads-adapter.ts",
+          "find": "const REQUEST_CONFIGURATION = { maxAdContentRating: MaxAdContentRating.PG };",
+          "with": "const REQUEST_CONFIGURATION = {\n  maxAdContentRating: MaxAdContentRating.G,\n  tagForChildDirectedTreatment: true,\n  tagForUnderAgeOfConsent: true,\n};"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    locales: { en: { ios: { NSUserTrackingUsageDescription: 'Lets the app show ads that match your interests.' } } },\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "      [\n        'expo-tracking-transparency',\n        { userTrackingPermission: 'Lets the app show ads that match your interests.' },\n      ],\n",
+          "with": ""
+        }
+      },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-tracking-transparency"], "delete": true } },
+      { "delete": "src/services/consent/expo-tracking-consent-adapter.ts" },
+      { "delete": "src/services/consent/expo-tracking-consent-adapter.test.ts" },
+      { "delete": "src/services/consent/expo-tracking-consent-adapter.android.test.ts" },
+      { "delete": "__mocks__/expo-tracking-transparency.ts" },
+      {
+        "replace": {
+          "file": "src/services/create-device-services.ts",
+          "find": "import { createExpoTrackingConsentAdapter } from '@/services/consent/expo-tracking-consent-adapter';\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/create-device-services.ts",
+          "find": "createAdmobConsentAdapter({\n        tracking: createExpoTrackingConsentAdapter({ onError }),\n        onError,\n      })",
+          "with": "createAdmobConsentAdapter({ tracking: null, onError })"
+        }
+      }
+    ]
+  },
+  "bad-child-directed-att-plugin": {
+    "expect": ["[att-plugin]", "app.config.ts", "a child-directed app lists the expo-tracking-transparency plugin"],
+    "ops": [
+      { "json": { "file": "contracts/ads.json", "path": ["audience"], "value": "child-directed" } },
+      { "json": { "file": "contracts/ads.json", "path": ["maxAdContentRating"], "value": "G" } },
+      {
+        "replace": {
+          "file": "src/services/ads/admob-ads-adapter.ts",
+          "find": "const REQUEST_CONFIGURATION = { maxAdContentRating: MaxAdContentRating.PG };",
+          "with": "const REQUEST_CONFIGURATION = {\n  maxAdContentRating: MaxAdContentRating.G,\n  tagForChildDirectedTreatment: true,\n  tagForUnderAgeOfConsent: true,\n};"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    slug: 'tasks',",
+          "with": "    slug: 'tasks',\n    android: { blockedPermissions: ['com.google.android.gms.permission.AD_ID'] },"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    locales: { en: { ios: { NSUserTrackingUsageDescription: 'Lets the app show ads that match your interests.' } } },\n",
+          "with": ""
+        }
+      },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-tracking-transparency"], "delete": true } },
+      { "delete": "src/services/consent/expo-tracking-consent-adapter.ts" },
+      { "delete": "src/services/consent/expo-tracking-consent-adapter.test.ts" },
+      { "delete": "src/services/consent/expo-tracking-consent-adapter.android.test.ts" },
+      { "delete": "__mocks__/expo-tracking-transparency.ts" },
+      {
+        "replace": {
+          "file": "src/services/create-device-services.ts",
+          "find": "import { createExpoTrackingConsentAdapter } from '@/services/consent/expo-tracking-consent-adapter';\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/create-device-services.ts",
+          "find": "createAdmobConsentAdapter({\n        tracking: createExpoTrackingConsentAdapter({ onError }),\n        onError,\n      })",
+          "with": "createAdmobConsentAdapter({ tracking: null, onError })"
+        }
+      }
+    ]
+  },
+  "bad-child-directed-no-tag": {
+    "expect": [
+      "[content-rating]",
+      "src/services/ads/admob-ads-adapter.ts",
+      "a child-directed app does not set tagForChildDirectedTreatment: true",
+      "a child-directed app does not set tagForUnderAgeOfConsent: true"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/ads.json", "path": ["audience"], "value": "child-directed" } },
+      { "json": { "file": "contracts/ads.json", "path": ["maxAdContentRating"], "value": "G" } },
+      {
+        "replace": {
+          "file": "src/services/ads/admob-ads-adapter.ts",
+          "find": "const REQUEST_CONFIGURATION = { maxAdContentRating: MaxAdContentRating.PG };",
+          "with": "const REQUEST_CONFIGURATION = { maxAdContentRating: MaxAdContentRating.G };"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    slug: 'tasks',",
+          "with": "    slug: 'tasks',\n    android: { blockedPermissions: ['com.google.android.gms.permission.AD_ID'] },"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    locales: { en: { ios: { NSUserTrackingUsageDescription: 'Lets the app show ads that match your interests.' } } },\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "      [\n        'expo-tracking-transparency',\n        { userTrackingPermission: 'Lets the app show ads that match your interests.' },\n      ],\n",
+          "with": ""
+        }
+      },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-tracking-transparency"], "delete": true } },
+      { "delete": "src/services/consent/expo-tracking-consent-adapter.ts" },
+      { "delete": "src/services/consent/expo-tracking-consent-adapter.test.ts" },
+      { "delete": "src/services/consent/expo-tracking-consent-adapter.android.test.ts" },
+      { "delete": "__mocks__/expo-tracking-transparency.ts" },
+      {
+        "replace": {
+          "file": "src/services/create-device-services.ts",
+          "find": "import { createExpoTrackingConsentAdapter } from '@/services/consent/expo-tracking-consent-adapter';\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/create-device-services.ts",
+          "find": "createAdmobConsentAdapter({\n        tracking: createExpoTrackingConsentAdapter({ onError }),\n        onError,\n      })",
+          "with": "createAdmobConsentAdapter({ tracking: null, onError })"
+        }
+      }
+    ]
+  },
+  "bad-child-directed-tracking-wired": {
+    "expect": [
+      "[att-wiring]",
+      "src/services/create-device-services.ts:",
+      "a child-directed app hands the consent adapter an ATT request"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/ads.json", "path": ["audience"], "value": "child-directed" } },
+      { "json": { "file": "contracts/ads.json", "path": ["maxAdContentRating"], "value": "G" } },
+      {
+        "replace": {
+          "file": "src/services/ads/admob-ads-adapter.ts",
+          "find": "const REQUEST_CONFIGURATION = { maxAdContentRating: MaxAdContentRating.PG };",
+          "with": "const REQUEST_CONFIGURATION = {\n  maxAdContentRating: MaxAdContentRating.G,\n  tagForChildDirectedTreatment: true,\n  tagForUnderAgeOfConsent: true,\n};"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    slug: 'tasks',",
+          "with": "    slug: 'tasks',\n    android: { blockedPermissions: ['com.google.android.gms.permission.AD_ID'] },"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    locales: { en: { ios: { NSUserTrackingUsageDescription: 'Lets the app show ads that match your interests.' } } },\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "      [\n        'expo-tracking-transparency',\n        { userTrackingPermission: 'Lets the app show ads that match your interests.' },\n      ],\n",
+          "with": ""
+        }
+      },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-tracking-transparency"], "delete": true } },
+      { "delete": "src/services/consent/expo-tracking-consent-adapter.ts" },
+      { "delete": "src/services/consent/expo-tracking-consent-adapter.test.ts" },
+      { "delete": "src/services/consent/expo-tracking-consent-adapter.android.test.ts" },
+      { "delete": "__mocks__/expo-tracking-transparency.ts" },
+      {
+        "replace": {
+          "file": "src/services/create-device-services.ts",
+          "find": "import { createExpoTrackingConsentAdapter } from '@/services/consent/expo-tracking-consent-adapter';\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/create-device-services.ts",
+          "find": "createAdmobConsentAdapter({\n        tracking: createExpoTrackingConsentAdapter({ onError }),\n        onError,\n      })",
+          "with": "createAdmobConsentAdapter({ tracking: { requestTracking: () => Promise.resolve('unavailable' as const) }, onError })"
+        }
+      }
+    ]
+  },
+  "bad-child-tag": {
+    "expect": [
+      "[content-rating]",
+      "src/services/ads/admob-ads-adapter.ts",
+      "tagForChildDirectedTreatment is set for a general audience"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/admob-ads-adapter.ts",
+          "find": "const REQUEST_CONFIGURATION = { maxAdContentRating: MaxAdContentRating.PG };",
+          "with": "const REQUEST_CONFIGURATION = {\n  maxAdContentRating: MaxAdContentRating.PG,\n  tagForChildDirectedTreatment: true,\n};"
+        }
+      }
+    ]
+  },
+  "bad-consent-adapter-direct": {
+    "expect": [
+      "[consent-factory]",
+      "src/services/create-device-services.ts:41",
+      "createAdmobConsentAdapter() is called outside createConsentPort()"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/create-device-services.ts",
+          "find": "    consent: createConsentPort(adsExtra.adsMode, () =>\n      createAdmobConsentAdapter({\n        tracking: createExpoTrackingConsentAdapter({ onError }),\n        onError,\n      }),\n    ),",
+          "with": "    consent: createAdmobConsentAdapter({ tracking: createExpoTrackingConsentAdapter({ onError }), onError }),"
+        }
+      }
+    ]
+  },
+  "bad-contract-missing": {
+    "expect": ["[required-file]", "contracts/ads.json"],
+    "ops": [{ "delete": "contracts/ads.json" }]
+  },
+  "bad-debug-geography-store-path": {
+    "expect": [
+      "[debug-geography-test-only]",
+      "src/services/create-device-services.ts:42",
+      "debugGeography is set outside test-only code"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/create-device-services.ts",
+          "find": "createAdmobConsentAdapter({\n        tracking: createExpoTrackingConsentAdapter({ onError }),\n        onError,\n      })",
+          "with": "createAdmobConsentAdapter({ tracking: createExpoTrackingConsentAdapter({ onError }), onError, debugGeography: 'eea' })"
+        }
+      }
+    ]
+  },
+  "bad-debug-import": {
+    "expect": [
+      "[debug-adapter-import]",
+      "src/features/tasks/tasks-screen.tsx:7",
+      "imports the consent debug adapter outside test-only code"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "import { AdBannerSlot } from '@/ui/ad-banner-slot';",
+          "with": "import { createAdmobConsentDebugAdapter } from '@/services/consent/admob-consent-debug-adapter';\nimport { AdBannerSlot } from '@/ui/ad-banner-slot';\n\nexport const debugTools = createAdmobConsentDebugAdapter();"
+        }
+      }
+    ]
+  },
+  "bad-deprecated-size": {
+    "expect": ["[deprecated-banner-size]", "src/services/ads/admob-ads-adapter.ts"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/admob-ads-adapter.ts",
+          "find": "BannerAdSize.LARGE_ANCHORED_ADAPTIVE_BANNER",
+          "with": "BannerAdSize.ANCHORED_ADAPTIVE_BANNER"
+        }
+      }
+    ]
+  },
+  "bad-direct-show-in-handler": {
+    "expect": [
+      "[port-calls]",
+      "src/features/tasks/use-tasks-model.ts:",
+      "AdsPort.showInterstitial() is called outside ad-moments.ts"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "    onReviewDone: () => {\n      finishReview().catch(reportError);",
+          "with": "    onReviewDone: () => {\n      if (deps !== null) deps.ads.showInterstitial().catch(reportError);\n      finishReview().catch(reportError);"
+        }
+      }
+    ]
+  },
+  "bad-error-code": {
+    "expect": ["[error-code-branch]", "src/services/ads/admob-ads-adapter.ts", "reads error.code"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/admob-ads-adapter.ts",
+          "find": "  const isNoFill = error.reason === 'no-fill' || error.reason === 'mediation-no-fill';",
+          "with": "  const isNoFill = error.code === 'googleMobileAds/error-code-no-fill';"
+        }
+      }
+    ]
+  },
+  "bad-extra-unguarded": {
+    "expect": ["[ads-extra-binary]", "src/services/create-device-services.ts:", "reads expo.extra with readAdsExtra()"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/create-device-services.ts",
+          "find": "  const adsExtra = readAdsExtraForBinary(Application.applicationId);",
+          "with": "  const adsExtra = readAdsExtra();"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/create-device-services.ts",
+          "find": "import { readAdsExtraForBinary } from '@/services/ads/read-ads-extra';",
+          "with": "import { readAdsExtra } from '@/services/ads/read-ads-extra';"
+        }
+      }
+    ]
+  },
+  "bad-free-allowance-literal": {
+    "expect": [
+      "[free-allowance-config]",
+      "src/features/tasks/use-tasks-model.ts:",
+      "freeAllowanceLeft is the literal 3"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "freeAllowanceLeft: 0,",
+          "with": "freeAllowanceLeft: 3,"
+        }
+      }
+    ]
+  },
+  "bad-hooks-api": {
+    "expect": [
+      "[sdk-api]",
+      "src/services/ads/admob-ads-adapter.ts",
+      "imports useInterstitialAd from react-native-google-mobile-ads (v17 hooks, pools and other formats are not used)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/admob-ads-adapter.ts",
+          "find": "  TestIds,\n} from 'react-native-google-mobile-ads';",
+          "with": "  TestIds,\n  useInterstitialAd,\n} from 'react-native-google-mobile-ads';"
+        }
+      }
+    ]
+  },
+  "bad-ids-imported-at-runtime": {
+    "expect": ["[ids-import]", "src/features/tasks/use-tasks-model.ts:15", "app code imports the AdMob IDs"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "import { useServices } from '@/services/services-context';",
+          "with": "import { ADMOB_IDS } from '@/config/admob-ids';\nimport { useServices } from '@/services/services-context';\n\nexport const LIVE_UNITS = ADMOB_IDS.ios.units;"
+        }
+      }
+    ]
+  },
+  "bad-ids-placeholder-token": {
+    "expect": [
+      "[app-ids]",
+      "src/config/admob-ids.ts",
+      "android banner is still the placeholder __ADMOB_ANDROID_BANNER__"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/admob-ids.ts",
+          "find": "      banner: 'ca-app-pub-0000000000000000/0000000021',",
+          "with": "      banner: '__ADMOB_ANDROID_BANNER__',"
+        }
+      }
+    ]
+  },
+  "bad-import-in-screen": {
+    "expect": [
+      "[sdk-import]",
+      "src/features/tasks/tasks-screen.tsx:6",
+      "imports react-native-google-mobile-ads outside its adapters"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "import { StyleSheet, View } from 'react-native';",
+          "with": "import { StyleSheet, View } from 'react-native';\nimport { BannerAd } from 'react-native-google-mobile-ads';\n\nexport const RawBanner = BannerAd;"
+        }
+      }
+    ]
+  },
+  "bad-impure-policy": {
+    "expect": ["[pure-policy]", "src/services/ads/ad-policy.ts", "Date.now in the ad policy"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/ad-policy.ts",
+          "find": "  const elapsed = msSinceLast(history, trigger.nowMs);",
+          "with": "  const elapsed = msSinceLast(history, Date.now());"
+        }
+      }
+    ]
+  },
+  "bad-initialize-at-start": {
+    "expect": [
+      "[port-calls]",
+      "src/services/create-device-services.ts:",
+      "AdsPort.initialize() is called outside the consent moment"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/create-device-services.ts",
+          "find": "  const adsExtra = readAdsExtraForBinary(Application.applicationId);\n",
+          "with": "  const adsExtra = readAdsExtraForBinary(Application.applicationId);\n  // Planted: initialising at app start, before consent and ATT.\n  void createAdsPort(adsExtra, {\n    platform: 'ios',\n    createAdmob: (units) => createAdmobAdsAdapter({ units, onAdError: onError }),\n  }).initialize();\n"
+        }
+      }
+    ]
+  },
+  "bad-interstitial-helper-in-effect": {
+    "expect": [
+      "[ad-in-effect]",
+      "src/features/tasks/use-tasks-model.ts",
+      "finishReview(), which shows an ad, runs inside useEffect()"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "import { useBannerSlot } from '@/hooks/use-banner-slot';",
+          "with": "import { useEffect } from 'react';\n\nimport { useBannerSlot } from '@/hooks/use-banner-slot';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "  const watchAdForTheme = async (): Promise<void> => {",
+          "with": "  useEffect(() => {\n    finishReview().catch(reportError);\n  }, []);\n  const watchAdForTheme = async (): Promise<void> => {"
+        }
+      }
+    ]
+  },
+  "bad-interstitial-in-effect": {
+    "expect": [
+      "[ad-in-effect]",
+      "src/features/tasks/use-tasks-model.ts",
+      "showInterstitialIfDue() runs inside useEffect()"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "import { useBannerSlot } from '@/hooks/use-banner-slot';",
+          "with": "import { useEffect } from 'react';\n\nimport { useBannerSlot } from '@/hooks/use-banner-slot';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "  const watchAdForTheme = async (): Promise<void> => {",
+          "with": "  useEffect(() => {\n    if (deps !== null) showInterstitialIfDue({ ads: deps.ads, lifecycle: fullscreenAd }, { config: deps.config, context, history: adState.history, trigger: { outcome: 'success', nowMs: clock.nowMs() } }).catch(reportError);\n  }, []);\n  const watchAdForTheme = async (): Promise<void> => {"
+        }
+      }
+    ]
+  },
+  "bad-interstitial-on-resume": {
+    "expect": [
+      "[ad-in-effect]",
+      "src/features/tasks/use-tasks-model.ts",
+      "showInterstitialIfDue() runs inside an AppState listener"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "import { useIsFocused } from 'expo-router';",
+          "with": "import { useIsFocused } from 'expo-router';\nimport { AppState } from 'react-native';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "  const watchAdForTheme = async (): Promise<void> => {",
+          "with": "  AppState.addEventListener('change', (status) => {\n    if (status === 'active' && deps !== null) {\n      showInterstitialIfDue({ ads: deps.ads, lifecycle: fullscreenAd }, { config: deps.config, context, history: adState.history, trigger: { outcome: 'success', nowMs: clock.nowMs() } }).catch(reportError);\n    }\n  });\n  const watchAdForTheme = async (): Promise<void> => {"
+        }
+      }
+    ]
+  },
+  "bad-missing-fake": {
+    "expect": ["[required-file]", "src/services/connectivity/fake-connectivity.ts"],
+    "ops": [{ "delete": "src/services/connectivity/fake-connectivity.ts" }]
+  },
+  "bad-mock-size": {
+    "expect": ["[root-mock]", "__mocks__/react-native-google-mobile-ads.ts"],
+    "ops": [
+      {
+        "replace": {
+          "file": "__mocks__/react-native-google-mobile-ads.ts",
+          "find": "  LARGE_ANCHORED_ADAPTIVE_BANNER: 'LARGE_ANCHORED_ADAPTIVE_BANNER',\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-no-pg": {
+    "expect": [
+      "[content-rating]",
+      "src/services/ads/admob-ads-adapter.ts",
+      "does not set maxAdContentRating: MaxAdContentRating.PG"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/admob-ads-adapter.ts",
+          "find": "const REQUEST_CONFIGURATION = { maxAdContentRating: MaxAdContentRating.PG };",
+          "with": "const REQUEST_CONFIGURATION = { maxAdContentRating: MaxAdContentRating.MA };"
+        }
+      }
+    ]
+  },
+  "bad-no-plugin": {
+    "expect": [
+      "[plugin-entry]",
+      "app.config.ts",
+      "no ['react-native-google-mobile-ads', admobPluginOptions(...)] plugin entry"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "      ['react-native-google-mobile-ads', admobPluginOptions(adsMode, ADMOB_IDS, SKADNETWORK_IDS)],\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-no-units-extra": {
+    "expect": ["[extra-ad-units]", "app.config.ts", "the app config does not write expo.extra through adsExtra()"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    extra: { ...config.extra, ...adsExtra(adsMode, ADMOB_IDS) },",
+          "with": "    extra: { ...config.extra, adsMode },"
+        }
+      }
+    ]
+  },
+  "bad-plugin-literal": {
+    "expect": [
+      "[plugin-entry]",
+      "app.config.ts:29",
+      "the AdMob plugin gets options that are not admobPluginOptions(...)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "admobPluginOptions(adsMode, ADMOB_IDS, SKADNETWORK_IDS)]",
+          "with": "{ iosAppId: ADMOB_IDS.ios.appId, androidAppId: ADMOB_IDS.android.appId }]"
+        }
+      }
+    ]
+  },
+  "bad-policy-numbers": {
+    "expect": [
+      "[policy-numbers]",
+      "src/config/ad-pacing.ts",
+      "minMsBetweenInterstitials = 60000 is below the floor 180000"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/ad-pacing.ts",
+          "find": "  minMsBetweenInterstitials: 180_000,",
+          "with": "  minMsBetweenInterstitials: 60_000,"
+        }
+      }
+    ]
+  },
+  "bad-prepare-ads-direct": {
+    "expect": [
+      "[consent-moment]",
+      "src/features/tasks/use-ads-start.ts:7",
+      "prepareAds() is called outside the consent moment"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-ads-start.ts",
+          "content": "// src/features/tasks/use-ads-start.ts\nimport { prepareAds } from '@/services/ads/ad-gate';\n\nimport type { PrepareAdsDeps } from '@/services/ads/ad-gate';\n\nexport const startAds = (deps: PrepareAdsDeps) =>\n  prepareAds(deps, { isPremium: false, isAdsEnabled: true, isOnboardingDone: true, isOnline: true });\n"
+        }
+      }
+    ]
+  },
+  "bad-real-id-in-code": {
+    "expect": [
+      "[hard-coded-id]",
+      "src/services/ads/ads-factory.ts",
+      "AdMob ID ca-app-pub-1234567890123456/1111111111 in app code"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/ads-factory.ts",
+          "find": "  if (extra.adsMode === 'test') return options.createAdmob('test');",
+          "with": "  if (extra.adsMode === 'test') {\n    return options.createAdmob({\n      banner: 'ca-app-pub-1234567890123456/1111111111',\n      interstitial: 'ca-app-pub-1234567890123456/2222222222',\n      rewarded: 'ca-app-pub-1234567890123456/3333333333',\n    });\n  }"
+        }
+      }
+    ]
+  },
+  "bad-reset-in-store-path": {
+    "expect": [
+      "[test-only-api]",
+      "src/services/consent/admob-consent-adapter.ts",
+      "AdsConsent.reset(...) outside the test-only debug adapter"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/consent/admob-consent-adapter.ts",
+          "find": "    refresh: () =>\n",
+          "with": "    reset: () => {\n      AdsConsent.reset();\n    },\n    refresh: () =>\n"
+        }
+      }
+    ]
+  },
+  "bad-reward-on-close": {
+    "expect": [
+      "[reward-on-earned]",
+      "src/services/ads/admob-ads-adapter.ts",
+      "no RewardedAdEventType.EARNED_REWARD listener"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/admob-ads-adapter.ts",
+          "find": "    ad.addAdEventListener(RewardedAdEventType.EARNED_REWARD, () => {",
+          "with": "    ad.addAdEventListener(AdEventType.OPENED, () => {"
+        }
+      }
+    ]
+  },
+  "bad-rewarded-loaded-flag": {
+    "expect": [
+      "[rewarded-status]",
+      "src/services/ads/ads-port.ts",
+      "AdsPort has no rewardedStatus member",
+      "uses isRewardedLoaded, a loaded flag"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/ads-port.ts",
+          "find": "  readonly rewardedStatus: () => RewardedStatus;\n",
+          "with": "  readonly isRewardedLoaded: () => boolean;\n"
+        }
+      }
+    ]
+  },
+  "bad-sample-in-ids": {
+    "expect": ["[app-ids]", "src/config/admob-ids.ts", "ios appId is Google's sample ID"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/admob-ids.ts",
+          "find": "    appId: 'ca-app-pub-0000000000000000~0000000001',",
+          "with": "    appId: 'ca-app-pub-3940256099942544~1458002511',"
+        }
+      }
+    ]
+  },
+  "bad-sdk-caret": {
+    "expect": [
+      "[sdk-pin]",
+      "package.json",
+      "dependencies.react-native-google-mobile-ads is \"^17.2.0\", not exactly \"17.2.0\""
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["dependencies", "react-native-google-mobile-ads"],
+          "value": "^17.2.0"
+        }
+      }
+    ]
+  },
+  "bad-skadnetwork-suffix": {
+    "expect": ["[skadnetwork]", "src/config/skadnetwork-ids.ts", "\"cstr6suwn9\" is not a full SKAdNetwork identifier"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/skadnetwork-ids.ts",
+          "find": "  'cstr6suwn9.skadnetwork',",
+          "with": "  'cstr6suwn9',"
+        }
+      }
+    ]
+  },
+  "bad-smoke-folder-undeclared": {
+    "expect": ["[smoke-flows]", "contracts/naming.json", ".maestro/ads-smoke/ is not declared in \"extraE2eFolders\""],
+    "ops": [{ "json": { "file": "contracts/naming.json", "path": ["extraE2eFolders"], "value": [] } }]
+  },
+  "bad-typed-test-id": {
+    "expect": ["[sample-id]", "src/services/ads/fake-ads.ts", "Google's sample publisher ID in app code"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/fake-ads.ts",
+          "find": "export function createFakeAds(",
+          "with": "export const TEST_INTERSTITIAL = 'ca-app-pub-3940256099942544/4411468910';\n\nexport function createFakeAds("
+        }
+      }
+    ]
+  },
+  "bad-units-always-in-extra": {
+    "expect": ["[extra-ad-units]", "app.config.ts:32", "expo.extra.adUnits is written without adsExtra()"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    extra: { ...config.extra, ...adsExtra(adsMode, ADMOB_IDS) },",
+          "with": "    extra: { ...config.extra, ...adsExtra(adsMode, ADMOB_IDS), adUnits: { ios: ADMOB_IDS.ios.units, android: ADMOB_IDS.android.units } },"
+        }
+      }
+    ]
+  },
+  "error-contract-malformed": {
+    "expect": ["ERROR [bad-input] contracts/ads.json is not valid JSON"],
+    "ops": [{ "write": { "file": "contracts/ads.json", "content": "{ \"audience\": \"general\", " } }]
+  },
+  "error-contract-wrong-audience": {
+    "expect": ["ERROR [bad-input] contracts/ads.json: \"audience\" must be \"general\" or \"child-directed\""],
+    "ops": [{ "json": { "file": "contracts/ads.json", "path": ["audience"], "value": "kids" } }]
+  },
+  "error-monorepo-without-app": {
+    "expect": [
+      "ERROR [bad-input] this is a multi-package repo and apps/mobile use the ads SDKs",
+      "Run once per app: --app apps/mobile"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "apps/mobile/package.json",
+          "content": "{ \"name\": \"@acme/mobile\", \"dependencies\": { \"react-native-google-mobile-ads\": \"17.2.0\" } }\n"
+        }
+      },
+      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["apps/*"] } },
+      { "json": { "file": "package.json", "path": ["dependencies", "react-native-google-mobile-ads"], "delete": true } },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-tracking-transparency"], "delete": true } }
+    ]
+  },
+  "pass-catalogs-not-created": {
+    "expect": [
+      "SKIP src/i18n/catalogs [att-plugin] not yet created (i18n-strings-and-catalogs creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "src/i18n" }]
+  },
+  "pass-child-directed": {
+    "expect": ["check-ads: ", "RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "contracts/ads.json", "path": ["audience"], "value": "child-directed" } },
+      { "json": { "file": "contracts/ads.json", "path": ["maxAdContentRating"], "value": "G" } },
+      {
+        "replace": {
+          "file": "src/services/ads/admob-ads-adapter.ts",
+          "find": "const REQUEST_CONFIGURATION = { maxAdContentRating: MaxAdContentRating.PG };",
+          "with": "const REQUEST_CONFIGURATION = {\n  maxAdContentRating: MaxAdContentRating.G,\n  tagForChildDirectedTreatment: true,\n  tagForUnderAgeOfConsent: true,\n};"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    slug: 'tasks',",
+          "with": "    slug: 'tasks',\n    android: { blockedPermissions: ['com.google.android.gms.permission.AD_ID'] },"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    locales: { en: { ios: { NSUserTrackingUsageDescription: 'Lets the app show ads that match your interests.' } } },\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "      [\n        'expo-tracking-transparency',\n        { userTrackingPermission: 'Lets the app show ads that match your interests.' },\n      ],\n",
+          "with": ""
+        }
+      },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-tracking-transparency"], "delete": true } },
+      { "delete": "src/services/consent/expo-tracking-consent-adapter.ts" },
+      { "delete": "src/services/consent/expo-tracking-consent-adapter.test.ts" },
+      { "delete": "src/services/consent/expo-tracking-consent-adapter.android.test.ts" },
+      { "delete": "__mocks__/expo-tracking-transparency.ts" },
+      {
+        "replace": {
+          "file": "src/services/create-device-services.ts",
+          "find": "import { createExpoTrackingConsentAdapter } from '@/services/consent/expo-tracking-consent-adapter';\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/create-device-services.ts",
+          "find": "createAdmobConsentAdapter({\n        tracking: createExpoTrackingConsentAdapter({ onError }),\n        onError,\n      })",
+          "with": "createAdmobConsentAdapter({ tracking: null, onError })"
+        }
+      }
+    ]
+  },
+  "pass-consent-only": {
+    "expect": ["the ads rules do not apply yet; the consent and ATT rules ran", "RESULT: PASS"],
+    "ops": [
+      { "delete": "src/services/ads" },
+      { "delete": "src/hooks" },
+      { "delete": "src/features" },
+      { "delete": "src/ui" },
+      { "delete": "src/services/create-device-services.ts" }
+    ]
+  },
+  "pass-debug-tools-type-import": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/settings/debug-tools-type.ts",
+          "content": "// src/features/settings/debug-tools-type.ts\nimport type { ConsentDebugTools } from '@/services/consent/admob-consent-debug-adapter';\n\nexport type DebugToolsHolder = { readonly tools: ConsentDebugTools | null };\n"
+        }
+      }
+    ]
+  },
+  "pass-no-sdk": {
+    "expect": ["NOT APPLICABLE: react-native-google-mobile-ads and expo-tracking-transparency are not in package.json"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "react-native-google-mobile-ads"], "delete": true } },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-tracking-transparency"], "delete": true } }
+    ]
+  },
+  "pass-test-only-entry": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/test-only-entry.ts",
+          "content": "// src/test-only-entry.ts\nimport { createAdmobConsentAdapter } from '@/services/consent/admob-consent-adapter';\nimport { createAdmobConsentDebugAdapter } from '@/services/consent/admob-consent-debug-adapter';\nimport { createExpoTrackingConsentAdapter } from '@/services/consent/expo-tracking-consent-adapter';\n\n// Test builds only: a consent port that answers as in the EEA, and the debug tools.\nexport const createDebugConsent = (onError: (error: unknown) => void) =>\n  createAdmobConsentAdapter({ debugGeography: 'eea', tracking: createExpoTrackingConsentAdapter({ onError }), onError });\nexport const debugTools = createAdmobConsentDebugAdapter();\n"
+        }
+      }
+    ]
+  }
+}

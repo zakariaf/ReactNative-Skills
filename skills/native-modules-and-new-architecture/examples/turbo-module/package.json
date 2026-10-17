@@ -1,0 +1,19 @@
+{
+  "name": "task-checksum",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A local Turbo Module: one C++ checksum for iOS and Android, spec in src/NativeTaskChecksum.ts",
+  "codegenConfig": {
+    "name": "TaskChecksumSpec",
+    "type": "modules",
+    "jsSrcsDir": "src",
+    "android": {
+      "javaPackageName": "com.example.taskchecksum"
+    },
+    "ios": {
+      "modulesProvider": {
+        "NativeTaskChecksum": "RCTNativeTaskChecksum"
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "tasks-app",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.ts",
+  "dependencies": {
+    "react": "19.2.3",
+    "zustand": "5.0.15"
+  }
+}

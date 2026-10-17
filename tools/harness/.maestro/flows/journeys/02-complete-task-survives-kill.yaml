@@ -1,0 +1,32 @@
+# .maestro/flows/journeys/02-complete-task-survives-kill.yaml — the core journey offline: one link
+# sets the state (offline, a fixed day, animations held, English), the one tap is the control under
+# test, and the change survives process death (killApp, then a relaunch without clearing state).
+# The state is asserted through an app-owned text, not `checked: true`: Maestro 2.10 reads checked
+# from Android's checkable state only; on iOS it reports false and keeps the state in the element's
+# value ("checkbox, checked", in the device language).
+appId: ${APP_ID}
+name: Completing a task offline survives a kill and a relaunch
+tags: [smoke, journeys, offline]
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: ../../subflows/debug-setup.yaml
+    env:
+      QUERY: 'lang=en&theme=light&motion=still&date=2030-03-01&offline=1&open=tasks'
+      WAIT_FOR: 'tasks.list'
+- tapOn:
+    id: 'tasks.task-row.task-2'
+- assertVisible:
+    id: 'tasks.summary'
+    text: '.*1 open task.*'
+- killApp
+- launchApp:
+    stopApp: false
+- extendedWaitUntil:
+    visible:
+      id: 'tasks.list'
+    timeout: 20000
+- assertVisible:
+    id: 'tasks.summary'
+    text: '.*1 open task.*'

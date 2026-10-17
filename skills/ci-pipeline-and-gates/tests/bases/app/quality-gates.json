@@ -1,0 +1,3 @@
+{
+  "gatedPaths": ["quality-gates.json", ".github/workflows/**", ".github/dependabot.yml"]
+}

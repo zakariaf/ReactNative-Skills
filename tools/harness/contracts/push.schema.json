@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "contracts/push.json",
+  "description": "The app's remote push facts (push-notifications). The server reads the same file.",
+  "type": "object",
+  "required": ["provider", "requiresAccount", "kinds", "channels", "defaultChannel"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "provider": {
+      "description": "expo: the server sends through the Expo push service with Expo push tokens. native: the server calls APNs and FCM itself with device tokens.",
+      "enum": ["expo", "native"]
+    },
+    "requiresAccount": {
+      "description": "True when the server accepts only registrations of a signed-in account; the registration is then removed by the push-registration server sign-out step.",
+      "type": "boolean"
+    },
+    "kinds": {
+      "description": "Every data.kind the app understands; equal to PUSH_KINDS in files.message.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$" }
+    },
+    "channels": {
+      "description": "The Android channels; ids equal PUSH_CHANNELS in files.channels. Never reuse an id for another behaviour.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "importance"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$" },
+          "importance": { "enum": ["high", "default", "low"] }
+        }
+      }
+    },
+    "defaultChannel": {
+      "description": "Where a push without channelId lands on Android; one of channels, and the expo-notifications plugin's defaultChannel.",
+      "type": "string"
+    },
+    "files": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "message": { "type": "string" },
+        "channels": { "type": "string" }
+      }
+    },
+    "server": {
+      "description": "Facts for the server's developers; the checker does not read them.",
+      "type": "object"
+    }
+  }
+}

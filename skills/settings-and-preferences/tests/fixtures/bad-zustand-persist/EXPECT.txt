@@ -1,0 +1,3 @@
+[single-writer]
+persist middleware
+src/stores/settings/settings-store.ts:

@@ -1,0 +1,106 @@
+{
+  "$schema": "./screens.schema.json",
+  "$comment": "The app's screen contract, read by screen-contracts' check-screens.mjs and list-screen.mjs. One entry per screen, dialog and overlay: where its route, model hook, view and test live, its states (the default first) and every element with its testID, role, component and copy keys. Filled for this harness: the Tasks screen and the not-found screen, and the test build's three (debug) routes under ignoredRoutes; no ad slot yet.",
+  "version": 1,
+  "references": "design/screens",
+  "policies": {
+    "primaryAction": {
+      "max": 1,
+      "match": [
+        {
+          "component": "Button",
+          "prop": "variant",
+          "value": "primary"
+        }
+      ]
+    },
+    "modalRoots": ["Modal", "Scrim"],
+    "retiredKeys": {}
+  },
+  "ignoredRoutes": [
+    {
+      "file": "src/app/(debug)/debug/index.tsx",
+      "why": "Test-only debug menu route (debug-menu-and-test-hooks): renders TEST_ONLY?.DebugMenuRoot in a test build and redirects home in production; its testIDs are E2E extras (contracts/e2e.json extraTestIDs), never a product screen."
+    },
+    {
+      "file": "src/app/(debug)/debug/parity.tsx",
+      "why": "Test-only parity launch route (design-visual-parity); renders no screen of its own: the launch replaces itself with the frame's route, or shows parity.error."
+    },
+    {
+      "file": "src/app/(debug)/debug/setup.tsx",
+      "why": "Test-only debug link route (debug-menu-and-test-hooks): applies the link's switches and replaces itself with the screen it opens; redirects home in production."
+    }
+  ],
+  "screens": [
+    {
+      "id": "tasks",
+      "name": "Tasks",
+      "presentation": "route",
+      "route": "src/app/(app)/index.tsx",
+      "model": "src/features/tasks/use-tasks-model.ts",
+      "view": "src/features/tasks/tasks-screen.tsx",
+      "states": [
+        {
+          "id": "default"
+        }
+      ],
+      "elements": [
+        {
+          "testID": "tasks.list",
+          "role": "list",
+          "component": "FlatList"
+        },
+        {
+          "testID": "tasks.summary",
+          "role": "text",
+          "component": "AppText",
+          "text": "tasks.summary.open"
+        },
+        {
+          "testID": "tasks.task-row.{taskId}",
+          "role": "checkbox",
+          "component": "PressableSurface",
+          "note": "One row per task, keyed by the task id; the row is the checkbox."
+        }
+      ]
+    },
+    {
+      "id": "not-found",
+      "name": "Page not found",
+      "presentation": "route",
+      "route": "src/app/+not-found.tsx",
+      "model": "src/features/not-found/use-not-found-model.ts",
+      "view": "src/features/not-found/not-found-screen.tsx",
+      "states": [
+        {
+          "id": "default"
+        }
+      ],
+      "elements": [
+        {
+          "testID": "not-found.screen",
+          "role": "none",
+          "component": "View"
+        },
+        {
+          "testID": "not-found.title",
+          "role": "header",
+          "component": "AppText",
+          "text": "not-found.title"
+        },
+        {
+          "testID": "not-found.body",
+          "role": "text",
+          "component": "AppText",
+          "text": "not-found.body"
+        },
+        {
+          "testID": "not-found.go-home-button",
+          "role": "button",
+          "component": "PressableSurface",
+          "text": "not-found.go-home"
+        }
+      ]
+    }
+  ]
+}

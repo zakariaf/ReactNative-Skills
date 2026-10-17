@@ -1,0 +1,1022 @@
+{
+  "bad-android-secrets-readable": {
+    "expect": [
+      "[claude-settings]",
+      "permissions.deny lost \"Read(**/*.keystore)\"",
+      "permissions.deny lost \"Read(**/*service-account*.json)\""
+    ],
+    "ops": [
+      { "replace": { "file": ".claude/settings.json", "find": "      \"Read(**/*.keystore)\",\n", "with": "" } },
+      {
+        "replace": {
+          "file": ".claude/settings.json",
+          "find": "      \"Read(**/*service-account*.json)\",\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-canonical-project-renamed": {
+    "expect": ["FAIL jest.config.js:1 [jest-scope] no project has displayName 'unit'"],
+    "ops": [
+      {
+        "$comment": "the unit project is renamed to an 'added' project with a narrower scope, listed in quality-gates.json as if it were new",
+        "replace": { "file": "jest.config.js", "find": "  displayName: 'unit',\n", "with": "  displayName: 'web',\n" }
+      },
+      {
+        "json": {
+          "file": "quality-gates.json",
+          "path": ["jest", "projects", "web"],
+          "value": {
+            "roots": ["<rootDir>"],
+            "testMatch": ["<rootDir>/src/features/**/*.test.{ts,tsx}"],
+            "testPathIgnorePatterns": [
+              "/node_modules/",
+              "<rootDir>/(ios|android|build|dist|web-build)/",
+              "<rootDir>/(coverage|reports|skills|\\.stryker-tmp|\\.skill-tooling)/",
+              "<rootDir>/\\.(agents|claude|codex|cursor|windsurf|roo|cline|continue|kiro)/",
+              "\\.golden\\.test\\.",
+              "\\.sim\\.test\\.",
+              "\\.android\\.test\\."
+            ],
+            "modulePathIgnorePatterns": [
+              "<rootDir>/(ios|android|build|dist|web-build)/",
+              "<rootDir>/(coverage|reports|skills|\\.stryker-tmp|\\.skill-tooling)/",
+              "<rootDir>/\\.(agents|claude|codex|cursor|windsurf|roo|cline|continue|kiro)/"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "bad-coverage-exclusion-widened": {
+    "expect": ["[jest-scope]", "collectCoverageFrom is", "'!<rootDir>/src/stores/**'"],
+    "ops": [
+      {
+        "$comment": "an agent hides an untested store from coverage instead of testing it",
+        "replace": {
+          "file": "jest.config.js",
+          "find": "    '!**/testing/**',\n",
+          "with": "    '!**/testing/**',\n    '!<rootDir>/src/stores/**',\n"
+        }
+      }
+    ]
+  },
+  "bad-coverage-helper-widened": {
+    "expect": ["[gate-script-changed]", "scripts/quality/device-only.ts:1"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/quality/device-only.ts",
+          "find": "const REASON = /\\bcovered by\\s+\\S.{8,}/iu;\n",
+          "with": "const REASON = /.*/u;\n"
+        }
+      }
+    ]
+  },
+  "bad-coverage-lowered": {
+    "expect": ["[gate-weakened]", "jest.coverageThreshold../src/core/.branches was lowered to 80"],
+    "ops": [
+      {
+        "replace": {
+          "file": "quality-gates.json",
+          "find": "      \"./src/core/\": {\n        \"statements\": 95,\n        \"lines\": 95,\n        \"functions\": 95,\n        \"branches\": 90\n",
+          "with": "      \"./src/core/\": {\n        \"statements\": 95,\n        \"lines\": 95,\n        \"functions\": 95,\n        \"branches\": 80\n"
+        }
+      }
+    ]
+  },
+  "bad-deny-removed": {
+    "expect": ["[claude-settings]", "permissions.deny lost \"Bash(git push *--no-verify*)\""],
+    "ops": [
+      {
+        "replace": {
+          "file": ".claude/settings.json",
+          "find": "      \"Bash(git commit * -n*)\",\n      \"Bash(git push *--no-verify*)\"\n",
+          "with": "      \"Bash(git commit * -n*)\"\n"
+        }
+      }
+    ]
+  },
+  "bad-edit-hook-missing": {
+    "expect": ["FAIL scripts/hooks/after-edit.ts [gate-file-missing] is missing"],
+    "ops": [{ "delete": "scripts/hooks/after-edit.ts" }]
+  },
+  "bad-edit-hook-neutralised": {
+    "expect": ["[claude-settings]", "the PostToolUse hook (Edit|Write) no longer runs exactly"],
+    "ops": [
+      {
+        "$comment": "the edit hook still runs but can never fail",
+        "replace": {
+          "file": ".claude/settings.json",
+          "find": "/scripts/hooks/after-edit.ts\\\"\",",
+          "with": "/scripts/hooks/after-edit.ts\\\" || true\","
+        }
+      }
+    ]
+  },
+  "bad-extra-jest-project-unlisted": {
+    "expect": ["[jest-scope]", "testMatch is TEST_ROOTS.map((root)=>`${root}*.web.test.{ts,tsx}`)"],
+    "ops": [
+      {
+        "$comment": "a new 'web' project that quality-gates.json jest.projects does not list: the static check still compares it with the canonical scope",
+        "replace": {
+          "file": "jest.config.js",
+          "find": "const goldenProject = {\n",
+          "with": "const webProject = {\n  ...SHARED,\n  displayName: 'web',\n  preset: 'jest-expo/web',\n  testMatch: TEST_ROOTS.map((root) => `${root}*.web.test.{ts,tsx}`),\n  testPathIgnorePatterns: [...SHARED.testPathIgnorePatterns, '\\\\.e2e\\\\.'],\n  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],\n};\n\nconst goldenProject = {\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "projects: [unitProject, androidProject, goldenProject],",
+          "with": "projects: [unitProject, androidProject, goldenProject, webProject],"
+        }
+      }
+    ]
+  },
+  "bad-gate-scope-ask": {
+    "expect": ["FAIL .claude/settings.json:1 [gate-scope]", "permissions.ask has Edit(**/tsconfig*.json)"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".claude/settings.json",
+          "find": "      \"Edit(/tsconfig*.json)\",\n      \"Edit(/src/tsconfig.json)\",\n",
+          "with": "      \"Edit(**/tsconfig*.json)\",\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "quality-gates.json",
+          "find": "        \"Edit(/tsconfig*.json)\",\n        \"Edit(/src/tsconfig.json)\",\n",
+          "with": "        \"Edit(**/tsconfig*.json)\",\n"
+        }
+      }
+    ]
+  },
+  "bad-gate-scope-rules": {
+    "expect": [
+      "FAIL scripts/quality/gated-paths.ts:1 [gate-scope]",
+      "no longer keeps wildcard patterns out of the agent folders"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/quality/gated-paths.ts",
+          "find": "  const folder = AGENT_FOLDERS.find((prefix) => file.startsWith(prefix));\n  if (folder !== undefined && !pattern.startsWith(folder)) {\n    return false;\n  }\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-gated-path-removed": {
+    "expect": ["[gate-weakened]", "gatedPaths lost the entry \"src/data/**/fixtures/**\""],
+    "ops": [{ "replace": { "file": "quality-gates.json", "find": "    \"src/data/**/fixtures/**\",\n", "with": "" } }]
+  },
+  "bad-guardrail-changed": {
+    "expect": ["FAIL scripts/quality/check-quality-gates.ts:1 [gate-script-changed]"],
+    "ops": [
+      {
+        "$comment": "an agent drops the Jest comparison from the guardrail so a lowered threshold passes verify",
+        "replace": { "file": "scripts/quality/check-quality-gates.ts", "find": " ...checkJest(gates),", "with": "" }
+      }
+    ]
+  },
+  "bad-ignored-paths-widened": {
+    "expect": ["[jest-scope]", "jest.config.js:51", "const IGNORED_PATHS is"],
+    "ops": [
+      {
+        "$comment": "a wider shared ignore list hides a whole folder of tests from every project",
+        "replace": {
+          "file": "jest.config.js",
+          "find": "  '<rootDir>/(ios|android|build|dist|web-build)/',\n",
+          "with": "  '<rootDir>/(ios|android|build|dist|web-build)/',\n  '<rootDir>/src/features/reminders/',\n"
+        }
+      }
+    ]
+  },
+  "bad-invalid-gates-json": {
+    "expect": ["FAIL quality-gates.json:1 [gate-weakened] is not valid JSON"],
+    "ops": [
+      { "replace": { "file": "quality-gates.json", "find": "  \"gatedPaths\": [\n", "with": "  \"gatedPaths\": [,\n" } }
+    ]
+  },
+  "bad-jest-scope-gates-widened": {
+    "expect": ["[gate-weakened]", "jest.collectCoverageFrom is"],
+    "ops": [
+      {
+        "$comment": "quality-gates.json edited to match a widened jest.config.js",
+        "json": { "file": "quality-gates.json", "path": ["jest", "collectCoverageFrom", 5], "value": "!src/stores/**" }
+      }
+    ]
+  },
+  "bad-jest-threshold": {
+    "expect": ["[jest-thresholds]", "global lines threshold is 80 (at least 90)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "  global: { statements: 90, lines: 90, functions: 90, branches: 85 },\n",
+          "with": "  global: { statements: 90, lines: 80, functions: 90, branches: 85 },\n"
+        }
+      }
+    ]
+  },
+  "bad-knip-ignore-no-reason": {
+    "expect": [
+      "[knip-ignores]",
+      "ignoreBinaries ignores \"xcrun\" with no written reason in contracts/knip-ignores.json",
+      "ignoreDependencies ignores \"expo-sqlite\""
+    ],
+    "ops": [
+      { "json": { "file": "knip.json", "path": ["ignoreBinaries"], "value": ["xcrun"] } },
+      { "json": { "file": "knip.json", "path": ["ignoreDependencies"], "value": ["expo-sqlite"] } }
+    ]
+  },
+  "bad-knip-reads-installed-skills": {
+    "expect": [
+      "FAIL knip.json:1 [gate-scope] \"ignore\" lacks \".claude/**\"",
+      ".claude/skills/demo/templates/src/demo.test.ts",
+      "\"ignore\" lacks \".agents/**\""
+    ],
+    "ops": [
+      {
+        "$comment": "an app whose knip.json lost the agent-folder ignore list, with skills installed under .claude/ and .agents/",
+        "json": { "file": "knip.json", "path": ["ignore"], "delete": true }
+      },
+      {
+        "write": {
+          "file": ".claude/skills/demo/SKILL.md",
+          "content": "---\nname: demo\ndescription: Demo skill.\n---\n"
+        }
+      },
+      {
+        "write": {
+          "file": ".claude/skills/demo/templates/src/demo.test.ts",
+          "content": "import leftPad from 'left-pad';\n\nit('pads', () => {\n  expect(leftPad('1', 2)).toBe(' 1');\n});\n"
+        }
+      },
+      {
+        "write": {
+          "file": ".agents/skills/demo2/tests/fixtures/thing.test.ts",
+          "content": "import thing from 'another-missing-package';\n\nit('works', () => {\n  expect(thing).toBeDefined();\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-lefthook-exclude-widened": {
+    "expect": [
+      "[lefthook]",
+      "a job excludes \".env.local\", which the baseline does not",
+      "[gate-weakened]",
+      "lefthook.pre-commit.jobs.no-secrets.exclude adds the entry \".env.local\""
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "lefthook.yml",
+          "find": "        - '**/.env.example'\n",
+          "with": "        - '**/.env.example'\n        - '.env.local'\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "quality-gates.json",
+          "find": "\"exclude\": [\".env.example\", \"**/.env.example\"]",
+          "with": "\"exclude\": [\".env.example\", \"**/.env.example\", \".env.local\"]"
+        }
+      }
+    ]
+  },
+  "bad-lefthook-glob-narrowed": {
+    "expect": ["FAIL lefthook.yml:1 [lefthook]", "lost the line \"glob: '*.{ts,tsx,js,mjs,cjs}'\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "lefthook.yml",
+          "find": "      glob: '*.{ts,tsx,js,mjs,cjs}'\n",
+          "with": "      glob: '*.md'\n"
+        }
+      }
+    ]
+  },
+  "bad-lefthook-play-key-glob": {
+    "expect": ["[lefthook]", "lost the line \"- '**/*service-account*.json'\"", "lost the line \"- 'key.properties'\""],
+    "ops": [
+      { "replace": { "file": "lefthook.yml", "find": "        - '**/*service-account*.json'\n", "with": "" } },
+      { "replace": { "file": "lefthook.yml", "find": "        - 'key.properties'\n", "with": "" } }
+    ]
+  },
+  "bad-lefthook-secret-glob": {
+    "expect": ["[lefthook]", "lost the line \"- '**/.env*'\""],
+    "ops": [{ "replace": { "file": "lefthook.yml", "find": "        - '**/.env*'\n", "with": "" } }]
+  },
+  "bad-lefthook-skipped": {
+    "expect": ["[lefthook]", "\"skip: true\" switches a hook job off"],
+    "ops": [{ "replace": { "file": "lefthook.yml", "find": "pre-push:\n", "with": "pre-push:\n  skip: true\n" } }]
+  },
+  "bad-limit-raised": {
+    "expect": ["[gate-weakened]", "eslint.ruleSets.logic.max-lines[1].max was raised to 300"],
+    "ops": [
+      {
+        "replace": {
+          "file": "quality-gates.json",
+          "find": "            \"max\": 250,\n",
+          "with": "            \"max\": 300,\n"
+        }
+      }
+    ]
+  },
+  "bad-linter-options": {
+    "expect": ["[eslint-linter-options]", "noInlineConfig"],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "      noInlineConfig: true,\n",
+          "with": "      noInlineConfig: false,\n"
+        }
+      }
+    ]
+  },
+  "bad-local-overrides": {
+    "expect": [
+      "FAIL lefthook-local.yml:2 [lefthook] \"pre-commit:\" overrides a gate hook locally",
+      "FAIL lefthook-local.yml:5 [lefthook] \"skip: true\" switches a gate job off on this machine",
+      "FAIL .claude/settings.local.json:1 [claude-settings] disableAllHooks is true",
+      "permissions.allow has \"Bash(git commit -nm *)\""
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "lefthook-local.yml",
+          "content": "# a developer's own overrides (git-ignored)\npre-commit:\n  jobs:\n    - name: lint\n      skip: true\n"
+        }
+      },
+      {
+        "write": {
+          "file": ".claude/settings.local.json",
+          "content": "{\n  \"disableAllHooks\": true,\n  \"permissions\": {\n    \"allow\": [\n      \"Bash(git commit -nm *)\"\n    ]\n  }\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-logic-key-removed": {
+    "expect": ["FAIL jest.config.js:1 [jest-thresholds]", "the logic folder key \"./src/data/\" is gone"],
+    "ops": [{ "replace": { "file": "jest.config.js", "find": "  './src/data/': 'src/data/**/*.ts',\n", "with": "" } }]
+  },
+  "bad-multi-package-coverage-hidden": {
+    "expect": ["[jest-scope]", "collectCoverageFrom is", "(nor its workspace form)"],
+    "extends": "pass-multi-package",
+    "ops": [
+      {
+        "$comment": "in a workspace repo an agent hides an untested package folder from coverage",
+        "replace": {
+          "file": "jest.config.js",
+          "find": "    '!**/testing/**',\n",
+          "with": "    '!**/testing/**',\n    '!<rootDir>/packages/core/src/stores/**',\n"
+        }
+      }
+    ]
+  },
+  "bad-multi-package-gates-widened": {
+    "expect": [
+      "[gate-weakened] jest.collectCoverageFrom is",
+      "\"!src/stores/**\"",
+      "(compared in its single-app form: workspace prefixes stripped)",
+      "jest.coverageThreshold../packages/core/src/.lines was lowered to 80 (at least 95)"
+    ],
+    "extends": "pass-multi-package",
+    "ops": [
+      {
+        "$comment": "quality-gates.json edited to match a weaker workspace config: a package folder leaves coverage, a package floor drops",
+        "json": {
+          "file": "quality-gates.json",
+          "path": ["jest", "collectCoverageFrom", 5],
+          "value": "!packages/core/src/stores/**"
+        }
+      },
+      {
+        "json": {
+          "file": "quality-gates.json",
+          "path": ["jest", "coverageThreshold", "./packages/core/src/", "lines"],
+          "value": 80
+        }
+      }
+    ]
+  },
+  "bad-multi-package-typecheck": {
+    "expect": [
+      "[npm-script]",
+      "script \"typecheck\" is \"tsc --noEmit -p tsconfig.json && tsc --noEmit -p src/tsconfig.json\""
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["apps/*"] } },
+      {
+        "write": {
+          "file": "apps/mobile/package.json",
+          "content": "{ \"name\": \"@acme/mobile\", \"private\": true }\n"
+        }
+      }
+    ]
+  },
+  "bad-multi-package-workspace-untested": {
+    "expect": ["FAIL jest.config.js:1 [jest-scope] no test root reaches the workspace apps/mobile"],
+    "extends": "pass-multi-package",
+    "ops": [
+      {
+        "$comment": "the app workspace drops out of the test roots, so its tests never run",
+        "replace": { "file": "jest.config.js", "find": "  '<rootDir>/apps/*/src/**/',\n", "with": "" }
+      }
+    ]
+  },
+  "bad-npmrc-policy": {
+    "expect": ["[npmrc]", "lacks \"save-exact=true\""],
+    "ops": [{ "replace": { "file": ".npmrc", "find": "save-exact=true\n", "with": "" } }]
+  },
+  "bad-prepare-installer-missing": {
+    "expect": ["FAIL scripts/hooks/install-git-hooks.ts [gate-file-missing] is missing"],
+    "ops": [{ "delete": "scripts/hooks/install-git-hooks.ts" }]
+  },
+  "bad-prepare-old-command": {
+    "expect": ["[npm-script]", "script \"prepare\" is \"lefthook install\""],
+    "ops": [
+      {
+        "$comment": "the pre-2026-10 prepare: fails npm ci without .git and writes hooks into an enclosing repository",
+        "json": { "file": "package.json", "path": ["scripts", "prepare"], "value": "lefthook install" }
+      }
+    ]
+  },
+  "bad-prepare-parent-repo-git-root": {
+    "expect": [
+      "FAIL rn-skills.config.json:1 [npm-script] \"lefthookPrepare\" is \"parent-repo\", but this folder is the git root",
+      "script \"prepare\" is missing"
+    ],
+    "extends": "pass-prepare-parent-repo",
+    "ops": [
+      {
+        "$comment": "the exemption copied into an app that is its own git repository: nothing would install its hooks",
+        "mkdir": ".git"
+      }
+    ]
+  },
+  "bad-script-changed": {
+    "expect": ["[npm-script]", "script \"check:fast\" is"],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "check:fast"],
+          "value": "prettier --check . --log-level warn && eslint . --max-warnings 10 && npm run -s typecheck"
+        }
+      }
+    ]
+  },
+  "bad-script-missing": {
+    "expect": ["[npm-script]", "script \"export:audit\" is missing"],
+    "ops": [{ "json": { "file": "package.json", "path": ["scripts", "export:audit"], "delete": true } }]
+  },
+  "bad-script-target-missing": {
+    "expect": [
+      "FAIL package.json:1 [script-target] npm run audit:network (a verify step) runs scripts/audit/audit-network.ts, which does not exist"
+    ],
+    "ops": [
+      { "json": { "file": "quality-gates.json", "path": ["verifyExtraSteps"], "value": ["audit:network"] } },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "audit:network"],
+          "value": "node scripts/audit/audit-network.ts"
+        }
+      }
+    ]
+  },
+  "bad-settings-bypass": {
+    "expect": [
+      "[claude-settings]",
+      "permissions.allow has \"Bash(git commit --no-verify *)\"",
+      "disableAllHooks is true"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": ".claude/settings.json",
+          "path": ["permissions", "allow", 2],
+          "value": "Bash(git commit --no-verify *)"
+        }
+      },
+      { "json": { "file": ".claude/settings.json", "path": ["disableAllHooks"], "value": true } }
+    ]
+  },
+  "bad-settings-missing": {
+    "expect": ["FAIL .claude/settings.json [gate-file-missing] is missing", "merge assets/claude-settings.json"],
+    "ops": [{ "delete": ".claude/settings.json" }]
+  },
+  "bad-stop-hook-missing": {
+    "expect": ["[claude-settings]", "no Stop hook runs npm run -s check:fast"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".claude/settings.json",
+          "find": "    ],\n    \"Stop\": [\n      {\n        \"hooks\": [\n          {\n            \"type\": \"command\",\n            \"command\": \"cd \\\"$(git rev-parse --show-toplevel)\\\" && npm run -s check:fast 1>&2 || exit 2\",\n            \"timeout\": 600\n          }\n        ]\n      }\n    ]\n",
+          "with": "    ]\n"
+        }
+      }
+    ]
+  },
+  "bad-stop-hook-stdout": {
+    "expect": ["[claude-settings]", "the Stop hook no longer runs exactly"],
+    "ops": [
+      {
+        "$comment": "without 1>&2 the failure goes to stdout, which the agent never sees",
+        "replace": {
+          "file": ".claude/settings.json",
+          "find": "npm run -s check:fast 1>&2 || exit 2",
+          "with": "npm run -s check:fast || exit 2"
+        }
+      }
+    ]
+  },
+  "bad-test-path-ignored": {
+    "expect": ["[jest-scope]", "testPathIgnorePatterns is", "'task-priority\\\\.test'"],
+    "ops": [
+      {
+        "$comment": "an agent hides a failing test from the unit project",
+        "replace": {
+          "file": "jest.config.js",
+          "find": "    '\\\\.android\\\\.test\\\\.',\n",
+          "with": "    '\\\\.android\\\\.test\\\\.',\n    'task-priority\\\\.test',\n"
+        }
+      }
+    ]
+  },
+  "bad-ts-comment-floor": {
+    "expect": ["[gate-weakened]", "minimumDescriptionLength was lowered to 3"],
+    "ops": [
+      {
+        "replace": {
+          "file": "quality-gates.json",
+          "find": "            \"minimumDescriptionLength\": 10\n",
+          "with": "            \"minimumDescriptionLength\": 3\n"
+        }
+      }
+    ]
+  },
+  "bad-vectors-ungated": {
+    "expect": ["[gate-weakened]", "gatedPaths lost the entry \"**/*.vectors.json\""],
+    "ops": [{ "replace": { "file": "quality-gates.json", "find": "    \"**/*.vectors.json\",\n", "with": "" } }]
+  },
+  "bad-verify-extra-step": {
+    "expect": [
+      "[verify-step]",
+      "verifyExtraSteps \"lint\" is already a core verify step",
+      "verifyExtraSteps \"check:contrast\" is not a script in package.json"
+    ],
+    "ops": [
+      { "json": { "file": "quality-gates.json", "path": ["verifyExtraSteps"], "value": ["lint", "check:contrast"] } }
+    ]
+  },
+  "bad-verify-runner-missing": {
+    "expect": ["FAIL scripts/quality/run-verify.ts [gate-file-missing] is missing"],
+    "ops": [{ "delete": "scripts/quality/run-verify.ts" }]
+  },
+  "bad-verify-step-removed": {
+    "expect": ["FAIL scripts/quality/verify-plan.ts:1 [gate-script-changed]"],
+    "ops": [
+      { "replace": { "file": "scripts/quality/verify-plan.ts", "find": "    npmStep('check:unused'),\n", "with": "" } }
+    ]
+  },
+  "error-not-repo-root": {
+    "expect": ["ERROR [bad-input] nothing to check: no package.json"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "error-prepare-key-value": {
+    "expect": ["ERROR [bad-input] rn-skills.config.json \"lefthookPrepare\" is \"skip\""],
+    "ops": [{ "write": { "file": "rn-skills.config.json", "content": "{ \"lefthookPrepare\": \"skip\" }\n" } }]
+  },
+  "pass-extra-jest-project": {
+    "expect": ["check-gate-wiring: 18 gate files checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "an agreed, stricter change: a new 'web' test project (additions only) in jest.config.js and quality-gates.json jest.projects together; the canonical projects stay exact",
+        "replace": {
+          "file": "jest.config.js",
+          "find": "const goldenProject = {\n",
+          "with": "const webProject = {\n  ...SHARED,\n  displayName: 'web',\n  preset: 'jest-expo/web',\n  testMatch: TEST_ROOTS.map((root) => `${root}*.web.test.{ts,tsx}`),\n  testPathIgnorePatterns: [...SHARED.testPathIgnorePatterns, '\\\\.e2e\\\\.'],\n  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],\n};\n\nconst goldenProject = {\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "projects: [unitProject, androidProject, goldenProject],",
+          "with": "projects: [unitProject, androidProject, goldenProject, webProject],"
+        }
+      },
+      {
+        "json": {
+          "file": "quality-gates.json",
+          "path": ["jest", "projects", "web"],
+          "value": {
+            "roots": ["<rootDir>"],
+            "testMatch": [
+              "<rootDir>/src/**/*.web.test.{ts,tsx}",
+              "<rootDir>/scripts/**/*.web.test.{ts,tsx}",
+              "<rootDir>/plugins/**/*.web.test.{ts,tsx}",
+              "<rootDir>/test/**/*.web.test.{ts,tsx}"
+            ],
+            "testPathIgnorePatterns": [
+              "/node_modules/",
+              "<rootDir>/(ios|android|build|dist|web-build)/",
+              "<rootDir>/(coverage|reports|skills|\\.stryker-tmp|\\.skill-tooling)/",
+              "<rootDir>/\\.(agents|claude|codex|cursor|windsurf|roo|cline|continue|kiro)/"
+            ],
+            "modulePathIgnorePatterns": [
+              "<rootDir>/(ios|android|build|dist|web-build)/",
+              "<rootDir>/(coverage|reports|skills|\\.stryker-tmp|\\.skill-tooling)/",
+              "<rootDir>/\\.(agents|claude|codex|cursor|windsurf|roo|cline|continue|kiro)/"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "pass-knip-ignore-with-reason": {
+    "expect": ["check-gate-wiring: 18 gate files checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "knip.json", "path": ["ignoreBinaries"], "value": ["xcrun"] } },
+      {
+        "json": {
+          "file": "contracts/knip-ignores.json",
+          "path": ["ignoreBinaries"],
+          "value": { "xcrun": "scripts/build/simulator.ts starts Xcode's xcrun by name; it ships with Xcode, not npm" }
+        }
+      }
+    ]
+  },
+  "pass-knip-ignores-agent-folders": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": ".claude/skills/demo/SKILL.md",
+          "content": "---\nname: demo\ndescription: Demo skill.\n---\n"
+        }
+      },
+      {
+        "write": {
+          "file": ".claude/skills/demo/templates/src/demo.test.ts",
+          "content": "import leftPad from 'left-pad';\n\nit('pads', () => {\n  expect(leftPad('1', 2)).toBe(' 1');\n});\n"
+        }
+      },
+      {
+        "write": {
+          "file": ".agents/skills/demo2/tests/fixtures/thing.test.ts",
+          "content": "import thing from 'another-missing-package';\n\nit('works', () => {\n  expect(thing).toBeDefined();\n});\n"
+        }
+      },
+      {
+        "json": {
+          "file": "knip.json",
+          "path": ["ignore"],
+          "value": [
+            "skills/**",
+            ".agents/**",
+            ".claude/**",
+            ".codex/**",
+            ".cursor/**",
+            ".windsurf/**",
+            ".roo/**",
+            ".cline/**",
+            ".continue/**",
+            ".kiro/**"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-multi-package": {
+    "expect": ["check-gate-wiring: 18 gate files checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "json": { "file": "package.json", "path": ["workspaces"], "value": ["apps/*", "packages/*"] },
+        "$comment": "a realistic npm-workspaces repo: one root jest.config.js whose test roots, coverage glob and native-folder ignore take the workspace form, logic keys per package, quality-gates.json restating the same scope (one gate change)"
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "typecheck"],
+          "value": "tsc --noEmit -p tsconfig.json && npm run -s typecheck --workspaces"
+        }
+      },
+      {
+        "json": {
+          "file": "quality-gates.json",
+          "path": ["npmScripts", "typecheck"],
+          "value": "tsc --noEmit -p tsconfig.json && npm run -s typecheck --workspaces"
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/package.json",
+          "content": "{ \"name\": \"@acme/mobile\", \"private\": true, \"scripts\": { \"typecheck\": \"tsc --noEmit -p tsconfig.json\" } }\n"
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/src/app/index.tsx",
+          "content": "export { TasksScreen as default } from '@/features/tasks/tasks-screen';\n"
+        }
+      },
+      {
+        "write": {
+          "file": "packages/core/package.json",
+          "content": "{ \"name\": \"@acme/core\", \"private\": true, \"scripts\": { \"typecheck\": \"tsc --noEmit -p tsconfig.json\" } }\n"
+        }
+      },
+      {
+        "write": {
+          "file": "packages/core/src/task-priority.ts",
+          "content": "export const PRIORITIES = ['low', 'high'] as const;\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "const TEST_ROOTS = [\n  '<rootDir>/src/**/',\n  '<rootDir>/scripts/**/',\n  '<rootDir>/plugins/**/',\n  '<rootDir>/test/**/',\n];",
+          "with": "const TEST_ROOTS = [\n  '<rootDir>/apps/*/src/**/',\n  '<rootDir>/packages/*/src/**/',\n  '<rootDir>/scripts/**/',\n  '<rootDir>/apps/*/plugins/**/',\n  '<rootDir>/test/**/',\n];"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "    '<rootDir>/src/**/*.{ts,tsx}',\n",
+          "with": "    '<rootDir>/{apps,packages}/*/src/**/*.{ts,tsx}',\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "  '<rootDir>/(ios|android|build|dist|web-build)/',\n",
+          "with": "  '<rootDir>/(ios|android|build|dist|web-build)/',\n  '<rootDir>/(apps|packages)/[^/]+/(ios|android|build|dist|web-build)/',\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "  './src/core/': 'src/core/**/*.ts',\n  './src/data/': 'src/data/**/*.ts',\n  './src/games/*/rules/**/*.ts': 'src/games/*/rules/**/*.ts',\n",
+          "with": "  './packages/core/src/': 'packages/core/src/**/*.ts',\n  './apps/*/src/data/': 'apps/*/src/data/**/*.ts',\n  './packages/games/src/*/rules/**/*.ts': 'packages/games/src/*/rules/**/*.ts',\n"
+        }
+      },
+      {
+        "json": {
+          "file": "quality-gates.json",
+          "path": ["jest", "coverageThreshold"],
+          "value": {
+            "global": { "statements": 90, "lines": 90, "functions": 90, "branches": 85 },
+            "./packages/core/src/": { "statements": 95, "lines": 95, "functions": 95, "branches": 90 },
+            "./apps/*/src/data/": { "statements": 95, "lines": 95, "functions": 95, "branches": 90 },
+            "./packages/games/src/*/rules/**/*.ts": { "statements": 95, "lines": 95, "functions": 95, "branches": 90 }
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "quality-gates.json",
+          "path": ["jest", "collectCoverageFrom"],
+          "value": [
+            "{apps,packages}/*/src/**/*.{ts,tsx}",
+            "!**/*.{test,golden.test,sim.test}.{ts,tsx}",
+            "!**/*.d.ts",
+            "!**/fixtures/**",
+            "!**/testing/**"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "quality-gates.json",
+          "path": ["jest", "projects", "unit", "testMatch"],
+          "value": [
+            "<rootDir>/apps/*/src/**/*.test.{ts,tsx}",
+            "<rootDir>/packages/*/src/**/*.test.{ts,tsx}",
+            "<rootDir>/scripts/**/*.test.{ts,tsx}",
+            "<rootDir>/apps/*/plugins/**/*.test.{ts,tsx}",
+            "<rootDir>/test/**/*.test.{ts,tsx}"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "quality-gates.json",
+          "path": ["jest", "projects", "unit", "testPathIgnorePatterns"],
+          "value": [
+            "/node_modules/",
+            "<rootDir>/(ios|android|build|dist|web-build)/",
+            "<rootDir>/(apps|packages)/[^/]+/(ios|android|build|dist|web-build)/",
+            "<rootDir>/(coverage|reports|skills|\\.stryker-tmp|\\.skill-tooling)/",
+            "<rootDir>/\\.(agents|claude|codex|cursor|windsurf|roo|cline|continue|kiro)/",
+            "\\.golden\\.test\\.",
+            "\\.sim\\.test\\.",
+            "\\.android\\.test\\."
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "quality-gates.json",
+          "path": ["jest", "projects", "unit", "modulePathIgnorePatterns"],
+          "value": [
+            "<rootDir>/(ios|android|build|dist|web-build)/",
+            "<rootDir>/(apps|packages)/[^/]+/(ios|android|build|dist|web-build)/",
+            "<rootDir>/(coverage|reports|skills|\\.stryker-tmp|\\.skill-tooling)/",
+            "<rootDir>/\\.(agents|claude|codex|cursor|windsurf|roo|cline|continue|kiro)/"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "quality-gates.json",
+          "path": ["jest", "projects", "android", "testMatch"],
+          "value": [
+            "<rootDir>/apps/*/src/**/*.android.test.{ts,tsx}",
+            "<rootDir>/packages/*/src/**/*.android.test.{ts,tsx}",
+            "<rootDir>/scripts/**/*.android.test.{ts,tsx}",
+            "<rootDir>/apps/*/plugins/**/*.android.test.{ts,tsx}",
+            "<rootDir>/test/**/*.android.test.{ts,tsx}"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "quality-gates.json",
+          "path": ["jest", "projects", "android", "testPathIgnorePatterns"],
+          "value": [
+            "/node_modules/",
+            "<rootDir>/(ios|android|build|dist|web-build)/",
+            "<rootDir>/(apps|packages)/[^/]+/(ios|android|build|dist|web-build)/",
+            "<rootDir>/(coverage|reports|skills|\\.stryker-tmp|\\.skill-tooling)/",
+            "<rootDir>/\\.(agents|claude|codex|cursor|windsurf|roo|cline|continue|kiro)/"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "quality-gates.json",
+          "path": ["jest", "projects", "android", "modulePathIgnorePatterns"],
+          "value": [
+            "<rootDir>/(ios|android|build|dist|web-build)/",
+            "<rootDir>/(apps|packages)/[^/]+/(ios|android|build|dist|web-build)/",
+            "<rootDir>/(coverage|reports|skills|\\.stryker-tmp|\\.skill-tooling)/",
+            "<rootDir>/\\.(agents|claude|codex|cursor|windsurf|roo|cline|continue|kiro)/"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "quality-gates.json",
+          "path": ["jest", "projects", "golden", "testMatch"],
+          "value": [
+            "<rootDir>/apps/*/src/**/*.golden.test.ts",
+            "<rootDir>/packages/*/src/**/*.golden.test.ts",
+            "<rootDir>/scripts/**/*.golden.test.ts",
+            "<rootDir>/apps/*/plugins/**/*.golden.test.ts",
+            "<rootDir>/test/**/*.golden.test.ts"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "quality-gates.json",
+          "path": ["jest", "projects", "golden", "testPathIgnorePatterns"],
+          "value": [
+            "/node_modules/",
+            "<rootDir>/(ios|android|build|dist|web-build)/",
+            "<rootDir>/(apps|packages)/[^/]+/(ios|android|build|dist|web-build)/",
+            "<rootDir>/(coverage|reports|skills|\\.stryker-tmp|\\.skill-tooling)/",
+            "<rootDir>/\\.(agents|claude|codex|cursor|windsurf|roo|cline|continue|kiro)/"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "quality-gates.json",
+          "path": ["jest", "projects", "golden", "modulePathIgnorePatterns"],
+          "value": [
+            "<rootDir>/(ios|android|build|dist|web-build)/",
+            "<rootDir>/(apps|packages)/[^/]+/(ios|android|build|dist|web-build)/",
+            "<rootDir>/(coverage|reports|skills|\\.stryker-tmp|\\.skill-tooling)/",
+            "<rootDir>/\\.(agents|claude|codex|cursor|windsurf|roo|cline|continue|kiro)/"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-other-owners-not-yet-created": {
+    "expect": [
+      "SKIP eslint.config.mjs [gate-file-missing] not yet created (typescript-and-lint-rules creates it)",
+      "SKIP knip.json [gate-file-missing] not yet created (typescript-and-lint-rules creates it)",
+      "SKIP .prettierrc.json [gate-file-missing] not yet created (typescript-and-lint-rules creates it)",
+      "SKIP tsconfig.base.json [gate-file-missing] not yet created (typescript-and-lint-rules creates it)",
+      "SKIP jest.config.js [gate-file-missing] not yet created (unit-and-component-tests creates it)",
+      "SKIP scripts/quality/device-only.ts [gate-file-missing] not yet created (unit-and-component-tests creates it)",
+      "SKIP .npmrc [gate-file-missing] not yet created (dependency-management creates it)",
+      "SKIP scripts/deps/check-deps.ts [script-target] not yet created (dependency-management creates it)",
+      "SKIP scripts/deps/check-npm-config.ts [script-target] not yet created (dependency-management creates it)",
+      "SKIP scripts/audit/audit-licenses.ts [script-target] not yet created (dependency-management creates it)",
+      "SKIP scripts/i18n/verify-catalogs.ts [script-target] not yet created (i18n-strings-and-catalogs creates it)",
+      "SKIP scripts/git/check-commit-message.ts [script-target] not yet created (git-commits-and-reporting creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "delete": [
+          "eslint.config.mjs",
+          "knip.json",
+          ".prettierrc.json",
+          "tsconfig.base.json",
+          "jest.config.js",
+          "scripts/quality/device-only.ts",
+          "scripts/quality/device-only.test.ts",
+          ".npmrc",
+          "scripts/deps",
+          "scripts/audit",
+          "scripts/i18n",
+          "scripts/git"
+        ]
+      }
+    ]
+  },
+  "pass-prepare-parent-repo": {
+    "expect": [
+      "npm script \"prepare\" not required: rn-skills.config.json \"lefthookPrepare\" is \"parent-repo\"",
+      "check-gate-wiring: 18 gate files checked, 0 problems",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "$comment": "the app is a folder inside a larger git repository whose root installs lefthook, so it has no prepare script",
+        "write": { "file": "rn-skills.config.json", "content": "{ \"lefthookPrepare\": \"parent-repo\" }\n" }
+      },
+      { "json": { "file": "package.json", "path": ["scripts", "prepare"], "delete": true } }
+    ]
+  },
+  "pass-tightened": {
+    "expect": ["check-gate-wiring: 18 gate files checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "quality-gates.json",
+          "find": "            \"max\": 250,\n",
+          "with": "            \"max\": 200,\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "quality-gates.json",
+          "find": "      \"./src/core/\": {\n        \"statements\": 95,\n",
+          "with": "      \"./src/core/\": {\n        \"statements\": 98,\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "quality-gates.json",
+          "find": "    \"src/data/**/fixtures/**\",\n",
+          "with": "    \"src/data/**/fixtures/**\",\n    \"contracts/screens.json\",\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "  global: { statements: 90, lines: 90, functions: 90, branches: 85 },\n",
+          "with": "  global: { statements: 92, lines: 92, functions: 90, branches: 88 },\n"
+        }
+      },
+      {
+        "json": {
+          "file": ".claude/settings.json",
+          "path": ["permissions", "deny", 15],
+          "value": "Read(**/release-keys/**)"
+        }
+      }
+    ]
+  },
+  "pass-verify-extra-step": {
+    "expect": ["check-gate-wiring: 18 gate files checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "quality-gates.json", "path": ["verifyExtraSteps"], "value": ["check:contrast"] } },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "check:contrast"],
+          "value": "node scripts/a11y/check-contrast.ts"
+        }
+      },
+      {
+        "write": {
+          "file": "scripts/a11y/check-contrast.ts",
+          "content": "// scripts/a11y/check-contrast.ts\n// Fixture stub: the gate another skill added to verify.\nexport {};\n"
+        }
+      }
+    ]
+  }
+}

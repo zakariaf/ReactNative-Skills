@@ -1,0 +1,17 @@
+[
+  { "from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs" },
+  { "from": "scripts/lib/app-modules.mjs", "to": "scripts/lib/app-modules.mjs" },
+  { "from": "scripts/lib/source-scan.mjs", "to": "scripts/lib/source-scan.mjs" },
+  { "from": "repo-templates/src/core/rng/sfc32.ts", "to": "templates/src/core/rng/sfc32.ts" },
+  { "from": "repo-templates/src/core/rng/sfc32.test.ts", "to": "templates/src/core/rng/sfc32.test.ts" },
+  { "from": "repo-templates/src/core/rng/seeded-draws.ts", "to": "templates/src/core/rng/seeded-draws.ts" },
+  { "from": "repo-templates/src/core/rng/seeded-draws.test.ts", "to": "templates/src/core/rng/seeded-draws.test.ts" },
+  { "from": "repo-templates/src/core/rng/fingerprint.ts", "to": "templates/src/core/rng/fingerprint.ts" },
+  { "from": "repo-templates/src/core/rng/fingerprint.test.ts", "to": "templates/src/core/rng/fingerprint.test.ts" },
+  { "from": "repo-templates/src/core/dates/date-key.ts", "to": "templates/src/core/dates/date-key.ts" },
+  { "from": "repo-templates/src/core/dates/date-key.test.ts", "to": "templates/src/core/dates/date-key.test.ts" },
+  { "from": "repo-templates/src/core/dates/daily-seed.ts", "to": "templates/src/core/dates/daily-seed.ts" },
+  { "from": "repo-templates/src/core/dates/daily-seed.test.ts", "to": "templates/src/core/dates/daily-seed.test.ts" },
+  { "from": "repo-templates/src/core/dates/generator-versions.ts", "to": "templates/src/core/dates/generator-versions.ts" },
+  { "from": "repo-templates/src/core/dates/generator-versions.test.ts", "to": "templates/src/core/dates/generator-versions.test.ts" }
+]

@@ -1,0 +1,13 @@
+{
+  "$schema": "./privacy.schema.json",
+  "$comment": "The app's privacy facts (privacy-and-store-declarations): where its own code may open connections (profile), every network-capable SDK it ships with what each collects, what the app itself sends to its server, the answer for every permission, and account deletion. audit-repo.mjs, audit-bundle.mjs, audit-privacy-manifest.mjs and audit-app-bundle.mjs read it; npm run audit:network reads it too. The App Privacy (App Store) and Data safety (Google Play) answers come from it: node <skill>/scripts/audit-repo.mjs . --answers prints them. Change it in the same commit as the code or package that changes what the app collects.",
+  "profile": "api-port",
+  "networkModules": [],
+  "linkFiles": [],
+  "sdks": {},
+  "app": {
+    "collects": []
+  },
+  "permissionAnswers": {},
+  "accountDeletion": null
+}

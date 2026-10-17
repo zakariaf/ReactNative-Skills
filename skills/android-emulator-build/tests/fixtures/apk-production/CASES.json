@@ -1,0 +1,184 @@
+{
+  "bad-cleartext": {
+    "expect": [
+      "artifacts/apk/AndroidManifest.xml [cleartext] android:usesCleartextTraffic is true in a production build"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "artifacts/apk/AndroidManifest.xml",
+          "find": "<application android:name=\"com.acme.tasks.MainApplication\" android:label=\"Tasks\" android:allowBackup=\"true\"",
+          "with": "<application android:name=\"com.acme.tasks.MainApplication\" android:label=\"Tasks\" android:allowBackup=\"true\" android:usesCleartextTraffic=\"true\""
+        }
+      }
+    ]
+  },
+  "bad-permission-app-named": {
+    "expect": [
+      "artifacts/apk/AndroidManifest.xml [permissions] the merged manifest requests com.acme.tasks.permission.C2D_MESSAGE, which the contract does not list",
+      "list it as \"${applicationId}.permission.C2D_MESSAGE\" in the contract"
+    ],
+    "ops": [
+      {
+        "$comment": "named after the app's package, not declared by the APK, not in the contract",
+        "replace": {
+          "file": "artifacts/apk/AndroidManifest.xml",
+          "find": "  <uses-permission android:name=\"android.permission.VIBRATE\"/>\n",
+          "with": "  <uses-permission android:name=\"android.permission.VIBRATE\"/>\n  <uses-permission android:name=\"com.acme.tasks.permission.C2D_MESSAGE\"/>\n"
+        }
+      }
+    ]
+  },
+  "bad-placeholder-link": {
+    "expect": [
+      "artifacts/apk/assets/app.config [ship-placeholder] app.config extra.privacyPolicyUrl is a placeholder domain (example.com)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "artifacts/apk/assets/app.config",
+          "find": "\"extra\":{\"appVariant\":\"production\"}",
+          "with": "\"extra\":{\"appVariant\":\"production\",\"privacyPolicyUrl\":\"https://example.com/privacy\"}"
+        }
+      }
+    ]
+  },
+  "bad-sample-ad-id": {
+    "expect": [
+      "artifacts/apk/AndroidManifest.xml [ship-placeholder] the manifest meta-data com.google.android.gms.ads.APPLICATION_ID is Google's sample AdMob app id"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["dependencies", "react-native-google-mobile-ads"],
+          "value": "16.2.0"
+        }
+      },
+      {
+        "replace": {
+          "file": "artifacts/apk/AndroidManifest.xml",
+          "find": "    <meta-data android:name=\"expo.modules.updates.ENABLED\" android:value=\"false\"/>\n",
+          "with": "    <meta-data android:name=\"expo.modules.updates.ENABLED\" android:value=\"false\"/>\n    <meta-data android:name=\"com.google.android.gms.ads.APPLICATION_ID\" android:value=\"ca-app-pub-3940256099942544~3347511713\"/>\n"
+        }
+      }
+    ]
+  },
+  "bad-sentinel-shipped": {
+    "expect": [
+      "artifacts/apk/assets/index.android.bundle [test-code] the production APK contains the test-only sentinel \"TASKS_TEST_BUILD_ONLY\" 1 time(s)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "artifacts/apk/assets/index.android.bundle",
+          "base64": "xh+8A8EDGR9gAAAAAAAAAHZhciBURVNUX0JVSUxEX1NFTlRJTkVMPSJUQVNLU19URVNUX0JVSUxEX09OTFkiO3ZhciB0YXNrcz1bXTs="
+        }
+      }
+    ]
+  },
+  "bad-testing-id": {
+    "expect": [
+      "artifacts/apk/AndroidManifest.xml [application-id] the package is \"com.acme.tasks.preview\", a testing variant's id, in a production build"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "artifacts/apk/AndroidManifest.xml",
+          "find": "package=\"com.acme.tasks\"",
+          "with": "package=\"com.acme.tasks.preview\""
+        }
+      },
+      {
+        "replace": {
+          "file": "artifacts/apk/AndroidManifest.xml",
+          "find": "com.acme.tasks.DYNAMIC",
+          "with": "com.acme.tasks.preview.DYNAMIC",
+          "all": true
+        }
+      },
+      {
+        "replace": {
+          "file": "artifacts/apk/assets/app.config",
+          "find": "\"package\":\"com.acme.tasks\"",
+          "with": "\"package\":\"com.acme.tasks.preview\""
+        }
+      },
+      { "json": { "file": "contracts/android-emu-build.json", "path": ["appId"], "delete": true } }
+    ]
+  },
+  "pass-permission-application-id": {
+    "expect": ["check-apk:", "0 problems"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/android-emu-build.json",
+          "path": ["permissions", 2],
+          "value": "${applicationId}.permission.C2D_MESSAGE"
+        }
+      },
+      {
+        "replace": {
+          "file": "artifacts/apk/AndroidManifest.xml",
+          "find": "  <uses-permission android:name=\"android.permission.VIBRATE\"/>\n",
+          "with": "  <uses-permission android:name=\"android.permission.VIBRATE\"/>\n  <uses-permission android:name=\"com.acme.tasks.permission.C2D_MESSAGE\"/>\n"
+        }
+      }
+    ]
+  },
+  "pass-preview-keeps-sample-ad-id": {
+    "expect": ["check-apk:", "0 problems"],
+    "args": "{dir} --apk artifacts/apk --variant preview",
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["dependencies", "react-native-google-mobile-ads"],
+          "value": "16.2.0"
+        }
+      },
+      {
+        "replace": {
+          "file": "artifacts/apk/AndroidManifest.xml",
+          "find": "    <meta-data android:name=\"expo.modules.updates.ENABLED\" android:value=\"false\"/>\n",
+          "with": "    <meta-data android:name=\"expo.modules.updates.ENABLED\" android:value=\"false\"/>\n    <meta-data android:name=\"com.google.android.gms.ads.APPLICATION_ID\" android:value=\"ca-app-pub-3940256099942544~3347511713\"/>\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "artifacts/apk/AndroidManifest.xml",
+          "find": "package=\"com.acme.tasks\"",
+          "with": "package=\"com.acme.tasks.preview\""
+        }
+      },
+      {
+        "replace": {
+          "file": "artifacts/apk/AndroidManifest.xml",
+          "find": "com.acme.tasks.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION",
+          "with": "com.acme.tasks.preview.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION",
+          "count": 2
+        }
+      },
+      {
+        "replace": {
+          "file": "artifacts/apk/assets/app.config",
+          "find": "\"package\":\"com.acme.tasks\"",
+          "with": "\"package\":\"com.acme.tasks.preview\""
+        }
+      },
+      {
+        "replace": {
+          "file": "artifacts/apk/assets/app.config",
+          "find": "\"appVariant\":\"production\"",
+          "with": "\"appVariant\":\"preview\""
+        }
+      },
+      {
+        "write": {
+          "file": "artifacts/apk/assets/index.android.bundle",
+          "base64": "xh+8A8EDGR9gAAAAAAAAAHZhciBURVNUX0JVSUxEX1NFTlRJTkVMPSJUQVNLU19URVNUX0JVSUxEX09OTFkiO3ZhciB0YXNrcz1bXTs="
+        }
+      }
+    ]
+  }
+}

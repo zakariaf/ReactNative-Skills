@@ -1,0 +1,345 @@
+{
+  "$comment": "Facts check-analytics.mjs and check-analytics-behaviour.mjs read. Verified 2026-10-14 unless an entry's `verified` says otherwise. Update on an SDK upgrade (references/vendors-and-sdk-facts.md has the re-verify commands).",
+  "paths": {
+    "analyticsDir": "{servicesDir}/analytics",
+    "contract": "{contractsDir}/analytics.json",
+    "config": "{configDir}/analytics-config.ts",
+    "manifestScript": "{scriptsDir}/analytics/analytics-manifest.ts",
+    "compositionRoot": "{servicesDir}/create-root-kits.ts"
+  },
+  "requiredFiles": [
+    "{servicesDir}/analytics/analytics-port.ts",
+    "{servicesDir}/analytics/analytics-consent-store-port.ts",
+    "{servicesDir}/analytics/analytics-events.ts",
+    "{servicesDir}/analytics/analytics-sanitize.ts",
+    "{servicesDir}/analytics/analytics-consent.ts",
+    "{servicesDir}/analytics/create-analytics.ts",
+    "{servicesDir}/analytics/fake-analytics.ts",
+    "{servicesDir}/analytics/screen-name.ts",
+    "{configDir}/analytics-config.ts",
+    "{scriptsDir}/analytics/analytics-manifest.ts"
+  ],
+  "sdks": {
+    "posthog-react-native": {
+      "kind": "product-analytics",
+      "verified": "2026-10-14, posthog-react-native 4.79.1 and @posthog/core 1.59.0 read in source",
+      "persistsInstallId": true,
+      "geoipOff": "disableGeoip\\s*:\\s*true",
+      "constructPattern": "(?<![\\w$.])new\\s+PostHog\\s*\\(",
+      "required": [
+        {
+          "pattern": "defaultOptIn\\s*:\\s*false",
+          "why": "a cleared opt-out (reset) must mean out, not in: the default is true"
+        },
+        {
+          "pattern": "captureAppLifecycleEvents\\s*:\\s*false",
+          "why": "lifecycle events are not in the catalog (the default is true)"
+        },
+        {
+          "pattern": "errorTracking\\s*:\\s*\\{\\s*autocapture\\s*:\\s*false",
+          "why": "a second global error handler beside the error net and crash reporting"
+        },
+        {
+          "pattern": "host\\s*:",
+          "why": "the region is chosen on purpose; the default host is https://us.i.posthog.com"
+        },
+        {
+          "pattern": "disableRemoteFeatureFlags\\s*:\\s*true",
+          "why": "reset() otherwise reloads feature flags: a /flags request carrying the anonymous and device ids on every withdrawal (preloadFeatureFlags: false does not stop it)"
+        },
+        {
+          "pattern": "\\.reset\\(\\s*\\[\\s*\\]\\s*\\)",
+          "why": "the React Native reset() keeps the device id unless it is told to keep nothing, so the stable id would survive a no and forget()"
+        },
+        {
+          "pattern": "setPersistedProperty\\(\\s*PostHogPersistedProperty\\.Queue\\s*,\\s*null\\s*\\)",
+          "why": "reset() keeps the event queue and a flush ignores the opt-out, so events captured just before a no would still be sent"
+        }
+      ],
+      "requiredWhenAnonymous": [
+        {
+          "pattern": "personProfiles\\s*:\\s*'never'",
+          "why": "anonymous analytics: identify() becomes a no-op"
+        }
+      ],
+      "banned": [
+        {
+          "pattern": "enableSessionReplay\\s*:\\s*true",
+          "why": "session replay records what the user typed and saw"
+        },
+        {
+          "pattern": "captureTouches\\s*:\\s*true",
+          "why": "touch autocapture sends element text and accessibility labels (user content)"
+        },
+        {
+          "pattern": "captureScreens\\s*:\\s*true",
+          "why": "automatic screen capture sends route names with their params"
+        },
+        {
+          "pattern": "PostHogProvider",
+          "why": "the provider constructs the client at render, before consent, and autocaptures"
+        }
+      ]
+    },
+    "@react-native-firebase/analytics": {
+      "kind": "product-analytics",
+      "verified": "documented by React Native Firebase (firebase.json switches); not run for this skill",
+      "persistsInstallId": true,
+      "geoipOff": null,
+      "configFile": "firebase.json",
+      "configRequired": [
+        {
+          "pattern": "\"analytics_auto_collection_enabled\"\\s*:\\s*false",
+          "why": "the native SDK starts collecting at launch, before any consent"
+        },
+        {
+          "pattern": "\"google_analytics_adid_collection_enabled\"\\s*:\\s*false",
+          "why": "no advertising identifier in product analytics"
+        }
+      ],
+      "required": [],
+      "banned": []
+    },
+    "@amplitude/analytics-react-native": {
+      "kind": "product-analytics",
+      "verified": "import rule only: option facts not verified for this skill",
+      "persistsInstallId": true,
+      "geoipOff": null,
+      "required": [],
+      "banned": []
+    },
+    "mixpanel-react-native": {
+      "kind": "product-analytics",
+      "verified": "import rule only: option facts not verified for this skill",
+      "persistsInstallId": true,
+      "geoipOff": null,
+      "required": [],
+      "banned": []
+    },
+    "@segment/analytics-react-native": {
+      "kind": "product-analytics",
+      "verified": "import rule only: option facts not verified for this skill",
+      "persistsInstallId": true,
+      "geoipOff": null,
+      "required": [],
+      "banned": []
+    },
+    "@aptabase/react-native": {
+      "kind": "product-analytics",
+      "verified": "import rule only: option facts not verified for this skill",
+      "persistsInstallId": false,
+      "geoipOff": null,
+      "required": [],
+      "banned": []
+    },
+    "react-native-appsflyer": {
+      "kind": "attribution",
+      "verified": "import rule only",
+      "persistsInstallId": true,
+      "geoipOff": null,
+      "required": [],
+      "banned": []
+    },
+    "react-native-adjust": {
+      "kind": "attribution",
+      "verified": "import rule only",
+      "persistsInstallId": true,
+      "geoipOff": null,
+      "required": [],
+      "banned": []
+    },
+    "react-native-branch": {
+      "kind": "attribution",
+      "verified": "import rule only",
+      "persistsInstallId": true,
+      "geoipOff": null,
+      "required": [],
+      "banned": []
+    },
+    "@microsoft/react-native-clarity": {
+      "kind": "session-replay",
+      "verified": "import rule only",
+      "persistsInstallId": true,
+      "geoipOff": null,
+      "required": [],
+      "banned": []
+    },
+    "posthog-react-native-session-replay": {
+      "kind": "session-replay",
+      "verified": "2026-10-14, an optional peer of posthog-react-native 4.79.1 (dist/optional/OptionalPlugin.js loads it for startRecording)",
+      "persistsInstallId": false,
+      "geoipOff": null,
+      "required": [],
+      "banned": []
+    },
+    "@posthog/react-native-plugin": {
+      "kind": "native-capture",
+      "verified": "2026-10-14, an optional peer of posthog-react-native 4.79.1: its native plugin drives session replay, native and NDK crash autocapture and rage clicks (dist/posthog-rn.js)",
+      "persistsInstallId": false,
+      "geoipOff": null,
+      "required": [],
+      "banned": []
+    }
+  },
+  "autoStartSdks": {
+    "expo-insights": "sends an event on every cold start, automatically (Expo docs, EAS Insights > App usage, read 2026-10-14): it cannot wait for consent",
+    "expo-observe": {
+      "why": "dispatches startup metrics, logs and the installation's EAS client id from every release build by default (dispatchingEnabled defaults to true; Expo SDK 57 docs, Observe API and EAS Observe > Configure, read 2026-10-14)",
+      "gatedBy": "dispatchingEnabled\\s*:\\s*false",
+      "fix": "Configure it with dispatchingEnabled: false at module scope and turn dispatching on only after the user agreed (crash-reporting-and-observability owns that consent decision), or uninstall it."
+    }
+  },
+  "bannedKinds": {
+    "session-replay": "records the screen: what the user typed and saw is collected",
+    "native-capture": "PostHog's native plugin adds session replay, native crash capture and rage clicks: data outside the event catalog (crashes belong to the crash reporter)"
+  },
+  "advertisingIdApis": [
+    "getAdvertisingId",
+    "advertisingId",
+    "getIdfa",
+    "IDFA",
+    "idfa",
+    "AAID",
+    "aaid",
+    "gaid",
+    "setAdvertiserIDCollectionEnabled",
+    "setAdvertiserTrackingEnabled",
+    "ad_id"
+  ],
+  "keyPatterns": [
+    {
+      "name": "a PostHog project key",
+      "pattern": "phc_[A-Za-z0-9]{30,}"
+    }
+  ],
+  "identifyCalls": [
+    "identify",
+    "alias",
+    "setPersonProperties",
+    "setUserId",
+    "setUserProperties",
+    "people"
+  ],
+  "events": {
+    "namePattern": "^[a-z][a-z0-9_]*$",
+    "maxNameLength": 40,
+    "maxPropNameLength": 40,
+    "maxProps": 25,
+    "maxEnumValueLength": 100,
+    "reservedPrefixes": [
+      "firebase_",
+      "google_",
+      "ga_",
+      "$"
+    ],
+    "reservedNames": [
+      "ad_activeview",
+      "ad_click",
+      "ad_exposure",
+      "ad_impression",
+      "ad_query",
+      "ad_reward",
+      "adunit_exposure",
+      "app_clear_data",
+      "app_exception",
+      "app_install",
+      "app_remove",
+      "app_store_refund",
+      "app_update",
+      "app_upgrade",
+      "dynamic_link_app_open",
+      "dynamic_link_app_update",
+      "dynamic_link_first_open",
+      "error",
+      "first_open",
+      "first_visit",
+      "notification_dismiss",
+      "notification_foreground",
+      "notification_open",
+      "notification_receive",
+      "notification_send",
+      "os_update",
+      "session_start",
+      "user_engagement"
+    ],
+    "propKinds": [
+      "enum",
+      "boolean",
+      "count",
+      "route"
+    ],
+    "piiWords": [
+      "email",
+      "mail",
+      "phone",
+      "name",
+      "first_name",
+      "last_name",
+      "full_name",
+      "username",
+      "title",
+      "text",
+      "body",
+      "note",
+      "notes",
+      "message",
+      "comment",
+      "content",
+      "query",
+      "search",
+      "term",
+      "address",
+      "street",
+      "city",
+      "zip",
+      "postcode",
+      "lat",
+      "lng",
+      "lon",
+      "latitude",
+      "longitude",
+      "location",
+      "ip",
+      "password",
+      "token",
+      "secret",
+      "user_id",
+      "userid",
+      "account_id",
+      "device_id",
+      "install_id",
+      "idfa",
+      "idfv",
+      "gaid",
+      "aaid",
+      "advertising_id",
+      "birthday",
+      "birthdate",
+      "dob",
+      "url",
+      "path",
+      "pathname",
+      "uri",
+      "id"
+    ]
+  },
+  "dataTypes": {
+    "product-interaction": "NSPrivacyCollectedDataTypeProductInteraction",
+    "other-usage-data": "NSPrivacyCollectedDataTypeOtherUsageData",
+    "search-history": "NSPrivacyCollectedDataTypeSearchHistory",
+    "device-id": "NSPrivacyCollectedDataTypeDeviceID",
+    "user-id": "NSPrivacyCollectedDataTypeUserID",
+    "coarse-location": "NSPrivacyCollectedDataTypeCoarseLocation"
+  },
+  "purposes": {
+    "analytics": "NSPrivacyCollectedDataTypePurposeAnalytics",
+    "app-functionality": "NSPrivacyCollectedDataTypePurposeAppFunctionality",
+    "product-personalization": "NSPrivacyCollectedDataTypePurposeProductPersonalization",
+    "developer-advertising": "NSPrivacyCollectedDataTypePurposeDeveloperAdvertising",
+    "third-party-advertising": "NSPrivacyCollectedDataTypePurposeThirdPartyAdvertising"
+  },
+  "localOnlySdks": {
+    "$comment": "Known packages that collect on the device but send nothing themselves: no finding, not the analytics vendor.",
+    "expo-app-metrics": "collects startup, frame-rate, memory and session metrics on the device; expo-observe dispatches them (expo-app-metrics 57.0.22 read in its package on 2026-10-14: no uploader, its network code only monitors the app's requests)"
+  }
+}

@@ -1,0 +1,3 @@
+[props-readonly] TaskCardProps.title is not readonly
+src/features/tasks/components/task-card.tsx:10
+RESULT: FAIL (1 problems)

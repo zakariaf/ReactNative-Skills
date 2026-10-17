@@ -1,0 +1,12 @@
+{
+  "gatedPaths": [
+    "quality-gates.json",
+    "design/parity/waivers.json",
+    "design/parity/iphone-16-pro/**",
+    "design/parity/android-parity/**",
+    "design/parity/manifest.json",
+    "design/parity/fixture.json",
+    "design/parity/mockup/**",
+    "design/parity/devices/**"
+  ]
+}

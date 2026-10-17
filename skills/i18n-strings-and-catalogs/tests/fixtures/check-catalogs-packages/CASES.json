@@ -1,0 +1,56 @@
+{
+  "bad-app-key-uses-package-prefix": {
+    "expect": [
+      "[L1b key-namespace]",
+      "src/i18n/catalogs/en.json",
+      "billing.title: \"billing.\" is reserved for that package's catalog"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/i18n/catalogs/en.json",
+          "find": "  \"debug.title\":",
+          "with": "  \"billing.title\": \"Billing\",\n  \"debug.title\":"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/i18n/catalogs/de.json",
+          "find": "  \"debug.title\":",
+          "with": "  \"billing.title\": \"Abrechnung\",\n  \"debug.title\":"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/i18n/catalogs/fa.json",
+          "find": "  \"debug.title\":",
+          "with": "  \"billing.title\": \"صورتحساب\",\n  \"debug.title\":"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/i18n/catalogs/ar.json",
+          "find": "  \"debug.title\":",
+          "with": "  \"billing.title\": \"الفوترة\",\n  \"debug.title\":"
+        }
+      }
+    ]
+  },
+  "bad-missing-package-file": {
+    "expect": ["[F1 catalog-file]", "packages/billing/src/i18n/ar.json:1", "ar.json is missing"],
+    "ops": [{ "delete": "packages/billing/src/i18n/ar.json" }]
+  },
+  "bad-package-key-prefix": {
+    "expect": [
+      "[L1b key-namespace]",
+      "packages/billing/src/i18n/en.json",
+      "plan.weekly: keys of this catalog start with \"billing.\""
+    ],
+    "ops": [
+      { "json": { "file": "packages/billing/src/i18n/en.json", "path": ["plan.weekly"], "value": "Weekly" } },
+      { "json": { "file": "packages/billing/src/i18n/de.json", "path": ["plan.weekly"], "value": "Wöchentlich" } },
+      { "json": { "file": "packages/billing/src/i18n/fa.json", "path": ["plan.weekly"], "value": "هفتگی" } },
+      { "json": { "file": "packages/billing/src/i18n/ar.json", "path": ["plan.weekly"], "value": "أسبوعي" } }
+    ]
+  }
+}

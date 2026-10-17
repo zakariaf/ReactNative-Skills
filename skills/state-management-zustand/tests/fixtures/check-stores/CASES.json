@@ -1,0 +1,836 @@
+{
+  "bad-action-name": {
+    "expect": [
+      "[action-name]",
+      "action \"list-added\" names an event, not a command",
+      "action \"replaceLists\" is not kebab-case",
+      "src/stores/lists-reducer.ts:13"
+    ],
+    "ops": [
+      {
+        "replace": { "file": "src/stores/lists-reducer.ts", "find": "'add-list'", "with": "'list-added'", "all": true }
+      },
+      {
+        "replace": {
+          "file": "src/stores/lists-reducer.ts",
+          "find": "'replace-lists'",
+          "with": "'replaceLists'",
+          "all": true
+        }
+      }
+    ]
+  },
+  "bad-action-name-member-type": {
+    "expect": ["[action-name]", "action \"task-renamed\" names an event, not a command", "src/stores/tasks-reducer.ts"],
+    "ops": [
+      {
+        "$comment": "An action union built from named member types: the members are checked too.",
+        "replace": {
+          "file": "src/stores/tasks-reducer.ts",
+          "find": "  | { readonly type: 'record-load-failure'; readonly failure: TaskFailure };",
+          "with": "  | { readonly type: 'record-load-failure'; readonly failure: TaskFailure }\n  | TaskRenamed;\n\ntype TaskRenamed = { readonly type: 'task-renamed'; readonly taskId: number; readonly title: string };"
+        }
+      }
+    ]
+  },
+  "bad-action-outcome": {
+    "expect": [
+      "[action-name]",
+      "action \"load-succeeded\" names an event, not a command",
+      "src/stores/lists-reducer.ts:14"
+    ],
+    "ops": [
+      {
+        "$comment": "A listed verb first does not make an outcome a command: load-succeeded reports what happened.",
+        "replace": {
+          "file": "src/stores/lists-reducer.ts",
+          "find": "'replace-lists'",
+          "with": "'load-succeeded'",
+          "all": true
+        }
+      }
+    ]
+  },
+  "bad-arrow-factory-in-feature": {
+    "expect": [
+      "[store-created-twice]",
+      "src/features/tasks/use-filter.ts:8",
+      "calls createFilterStore in feature or UI code"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/stores/filter-reducer.ts",
+          "content": "// src/stores/filter-reducer.ts\nexport type FilterState = { readonly isShowingDone: boolean };\nexport type FilterAction = { readonly type: 'toggle-showing-done' };\n\nexport function filterReducer(state: FilterState, action: FilterAction): FilterState {\n  switch (action.type) {\n    case 'toggle-showing-done':\n      return { isShowingDone: !state.isShowingDone };\n  }\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/filter-reducer.test.ts",
+          "content": "// src/stores/filter-reducer.test.ts\nimport { filterReducer } from '@/stores/filter-reducer';\n\nit('flips the flag', () => {\n  expect(filterReducer({ isShowingDone: false }, { type: 'toggle-showing-done' }).isShowingDone).toBe(true);\n});\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/filter-store.ts",
+          "content": "// src/stores/filter-store.ts\n// memory-only: the filter chip starts at \"open tasks\" on every launch, by design.\nimport { createStore } from 'zustand/vanilla';\n\nimport { filterReducer } from '@/stores/filter-reducer';\n\nimport type { FilterState } from '@/stores/filter-reducer';\nimport type { StoreApi } from 'zustand/vanilla';\n\nexport type FilterStoreState = FilterState & { readonly toggleShowingDone: () => void };\n\nexport const createFilterStore = (): StoreApi<FilterStoreState> =>\n  createStore<FilterStoreState>()((set, get) => ({\n    isShowingDone: false,\n    toggleShowingDone: () => {\n      set(filterReducer(get(), { type: 'toggle-showing-done' }));\n    },\n  }));\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/use-filter.ts",
+          "content": "// src/features/tasks/use-filter.ts\nimport { useState } from 'react';\nimport { useStore } from 'zustand';\n\nimport { createFilterStore } from '@/stores/filter-store';\n\nexport function useFilter(): boolean {\n  const [store] = useState(() => createFilterStore());\n  return useStore(store, (state) => state.isShowingDone);\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-arrow-factory-publish-first": {
+    "expect": ["[store-persist-order]", "src/stores/notes-store.ts:24", "rename publishes (set) before it persists"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/stores/notes-reducer.ts",
+          "content": "// src/stores/notes-reducer.ts\nexport type NotesState = { readonly title: string };\nexport type NotesAction = { readonly type: 'set-title'; readonly title: string };\n\nexport function notesReducer(state: NotesState, action: NotesAction): NotesState {\n  switch (action.type) {\n    case 'set-title':\n      return action.title === state.title ? state : { title: action.title };\n  }\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/notes-reducer.test.ts",
+          "content": "// src/stores/notes-reducer.test.ts\nimport { notesReducer } from '@/stores/notes-reducer';\n\nit('keeps the same object when nothing changes', () => {\n  const state = { title: 'a' };\n  expect(notesReducer(state, { type: 'set-title', title: 'a' })).toBe(state);\n});\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/notes-store.ts",
+          "content": "// src/stores/notes-store.ts: Zustand's documented arrow factory, with no helper function above it.\nimport { createStore } from 'zustand/vanilla';\n\nimport { ok } from '@/core/result';\nimport { notesReducer } from '@/stores/notes-reducer';\n\nimport type { Result } from '@/core/result';\nimport type { NotesState } from '@/stores/notes-reducer';\nimport type { StoreApi } from 'zustand/vanilla';\n\nexport type NotesStoreState = NotesState & { readonly rename: (title: string) => Result<void, string> };\n\nexport type NotesStoreDeps = {\n  readonly notes: { readonly title: () => string; readonly saveTitle: (title: string) => Result<void, string> };\n};\n\nexport const createNotesStore = ({ notes }: NotesStoreDeps): StoreApi<NotesStoreState> =>\n  createStore<NotesStoreState>()((set, get) => ({\n    title: notes.title(),\n    rename: (title) => {\n      const current = get();\n      const next = notesReducer(current, { type: 'set-title', title });\n      if (next === current) return ok(undefined);\n      set(next);\n      const saved = notes.saveTitle(title);\n      if (!saved.ok) return saved;\n      return saved;\n    },\n  }));\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/notes-store.test.ts",
+          "content": "// src/stores/notes-store.test.ts\nimport { createNotesStore } from '@/stores/notes-store';\n\nit('shows a title only after it is saved', () => {\n  const store = createNotesStore({ notes: { title: () => 'a', saveTitle: () => ({ ok: true, value: undefined }) } });\n  store.getState().rename('b');\n  expect(store.getState().title).toBe('b');\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-async": {
+    "expect": ["[store-async]", "src/stores/lists-store.ts:45"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/lists-store.ts",
+          "find": "    reload: () => {\n      const action = readLists(tasks);",
+          "with": "    reload: async () => {\n      const action = await Promise.resolve(readLists(tasks));"
+        }
+      }
+    ]
+  },
+  "bad-contract-invalid": {
+    "expect": ["[contract]", "crossStoreWrites must be a list of strings", "unknown key \"stores\""],
+    "ops": [
+      { "json": { "file": "contracts/stores.json", "path": ["crossStoreWrites"], "value": "removeList" } },
+      { "json": { "file": "contracts/stores.json", "path": ["stores"], "value": ["lists"] } }
+    ]
+  },
+  "bad-contract-missing": {
+    "expect": ["[contract]", "contracts/stores.json", "2 stores persist"],
+    "ops": [{ "delete": "contracts/stores.json" }]
+  },
+  "bad-created-in-two-files": {
+    "expect": [
+      "[store-created-twice]",
+      "createTasksStore is called in 2 files",
+      "src/stores/create-stores.ts:21",
+      "src/services/create-widget-stores.ts:5"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/create-widget-stores.ts",
+          "content": "// src/services/create-widget-stores.ts\nimport { createTasksStore } from '@/stores/tasks-store';\nimport type { TaskRepository } from '@/data/tasks/task-repository';\n\nexport const createWidgetStores = (tasks: TaskRepository) => ({ tasks: createTasksStore({ tasks }) });\n"
+        }
+      }
+    ]
+  },
+  "bad-created-twice": {
+    "expect": [
+      "[store-created-twice]",
+      "src/features/lists/use-list-picker.ts:7",
+      "calls createListsStore in feature or UI code"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/lists/use-list-picker.ts",
+          "content": "// src/features/lists/use-list-picker.ts\nimport { useAppData } from '@/data/app-data-context';\nimport { createListsStore } from '@/stores/lists-store';\n\nexport function useListPicker(): number {\n  const data = useAppData();\n  const store = createListsStore({ tasks: data.tasks });\n  return store.getState().lists.length;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-cross-store-method": {
+    "expect": ["[cross-store-write]", "src/stores/lists-store.ts:48", "calls removeList(...) outside updateAndPublish"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/lists-store.ts",
+          "find": "export type ListsStoreDeps = { readonly tasks: Pick<TaskRepository, 'lists' | 'addList'> };",
+          "with": "export type ListsStoreDeps = {\n  readonly tasks: Pick<TaskRepository, 'lists' | 'addList' | 'removeList'>;\n};"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/stores/lists-store.ts",
+          "find": "    reload: () => {\n",
+          "with": "    removeList: (listId: number) => {\n      const removed = tasks.removeList(listId);\n      if (!removed.ok) return removed;\n      set(listsReducer(get(), readLists(tasks)));\n      return removed;\n    },\n    reload: () => {\n"
+        }
+      }
+    ]
+  },
+  "bad-cross-store-write": {
+    "expect": [
+      "[cross-store-write]",
+      "src/features/lists/use-remove-list.ts:9",
+      "calls removeList(...) outside updateAndPublish"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/lists/use-remove-list.ts",
+          "content": "// src/features/lists/use-remove-list.ts\nimport { useAppData } from '@/data/app-data-context';\nimport { useStores } from '@/stores/stores-context';\n\nexport function useRemoveList(): (listId: number) => void {\n  const data = useAppData();\n  const stores = useStores();\n  return (listId) => {\n    const removed = data.tasks.removeList(listId);\n    if (removed.ok) stores.lists.getState().reload();\n  };\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-cross-store-write-variable": {
+    "expect": [
+      "[cross-store-write]",
+      "src/features/lists/use-remove-list.ts:9",
+      "calls removeList(...) outside updateAndPublish"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/lists/use-remove-list.ts",
+          "content": "// src/features/lists/use-remove-list.ts\nimport { useAppData } from '@/data/app-data-context';\nimport { useStores } from '@/stores/stores-context';\n\nexport function useRemoveList(): (listId: number) => boolean {\n  const data = useAppData();\n  const stores = useStores();\n  return (listId) => {\n    const write = () => data.tasks.removeList(listId);\n    const removed = write();\n    stores.lists.getState().reload();\n    return removed.ok;\n  };\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-direct-sql": {
+    "expect": [
+      "[store-bypasses-persistence]",
+      "src/stores/lists-store.ts:2",
+      "imports expo-sqlite",
+      "imports @/data/sql-driver (the raw driver or slot store)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/lists-store.ts",
+          "find": "import { useStore } from 'zustand';\n",
+          "with": "import { openDatabaseSync } from 'expo-sqlite';\nimport { useStore } from 'zustand';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/stores/lists-store.ts",
+          "find": "import type { Result } from '@/core/result';\n",
+          "with": "import type { Result } from '@/core/result';\nimport type { SqlDriver } from '@/data/sql-driver';\n"
+        }
+      }
+    ]
+  },
+  "bad-feature-store-fetch": {
+    "expect": ["[server-state-in-store]", "src/features/tasks/task-sync-store.ts:12", "calls fetch from a store"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/task-sync-store.ts",
+          "content": "// src/features/tasks/task-sync-store.ts: a store created outside the stores folder.\n// memory-only: the last ping is a debugging aid, lost at restart on purpose.\nimport { createStore } from 'zustand/vanilla';\n\nimport type { StoreApi } from 'zustand/vanilla';\n\nexport type TaskSyncState = { readonly ping: () => void };\n\nexport function createTaskSyncStore(): StoreApi<TaskSyncState> {\n  return createStore<TaskSyncState>()(() => ({\n    ping: () => {\n      void fetch('https://example.com/ping');\n    },\n  }));\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-identity-selector": {
+    "expect": [
+      "[selector-missing]",
+      "src/features/tasks/use-task-summary.ts:6",
+      "src/features/tasks/use-task-summary.ts:7",
+      "selects the whole state"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-summary.ts",
+          "content": "// src/features/tasks/use-task-summary.ts\nimport { useListsStore } from '@/stores/lists-store';\nimport { useTasksStore } from '@/stores/tasks-store';\n\nexport function useTaskSummary(): number {\n  const state = useTasksStore((state) => state);\n  const { lists } = useListsStore((s) => s);\n  return state.tasks.length + lists.length;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-impure-reducer": {
+    "expect": ["[reducer-impure]", "src/stores/tasks-reducer.ts:2", "imports react-native", "calls Date.now()"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/tasks-reducer.ts",
+          "find": "import type { Task, TaskFailure } from '@/data/tasks/task-repository';\n",
+          "with": "import { Platform } from 'react-native';\n\nimport type { Task, TaskFailure } from '@/data/tasks/task-repository';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/stores/tasks-reducer.ts",
+          "find": "    tasks: state.tasks.map((item) => (item.id === taskId ? { ...item, isDone } : item)),",
+          "with": "    tasks: state.tasks.map((item) => (item.id === taskId ? { ...item, isDone, doneAtMs: Date.now(), os: Platform.OS } : item)),"
+        }
+      }
+    ]
+  },
+  "bad-local-builder-selector": {
+    "expect": ["[selector-new-object]", "src/features/tasks/use-open-tasks.ts:12", "selectOpen"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-open-tasks.ts",
+          "content": "// src/features/tasks/use-open-tasks.ts\nimport { useTasksStore } from '@/stores/tasks-store';\n\nimport type { Task } from '@/data/tasks/task-repository';\nimport type { TasksStoreState } from '@/stores/tasks-store';\n\nconst selectOpen = (state: TasksStoreState): readonly Task[] => state.tasks.filter((task) => !task.isDone);\n\nconst selectOpenCount = (state: TasksStoreState): number => state.tasks.filter((task) => !task.isDone).length;\n\nexport function useOpenTasks(): { readonly open: readonly Task[]; readonly count: number } {\n  const open = useTasksStore(selectOpen);\n  const count = useTasksStore(selectOpenCount);\n  return { open, count };\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-logic-outside-reducer": {
+    "expect": [
+      "[store-logic-outside-reducer]",
+      "src/stores/tasks-store.ts:50",
+      "addTask publishes a value no reducer produced"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/tasks-store.ts",
+          "find": "      set(tasksReducer(get(), { type: 'add-task', task: saved.value }));",
+          "with": "      set({ tasks: [...get().tasks, saved.value] });"
+        }
+      }
+    ]
+  },
+  "bad-memory-store-unmarked": {
+    "expect": ["[store-persist-order]", "src/stores/task-filter-store.ts:13", "never persists"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/stores/task-filter-store.ts",
+          "content": "// src/stores/task-filter-store.ts\nimport { createStore } from 'zustand/vanilla';\n\nimport { taskFilterReducer } from '@/stores/task-filter-reducer';\n\nimport type { TaskFilterState } from '@/stores/task-filter-reducer';\nimport type { StoreApi } from 'zustand/vanilla';\n\nexport function createTaskFilterStore(): StoreApi<TaskFilterState & { readonly toggle: () => void }> {\n  return createStore<TaskFilterState & { readonly toggle: () => void }>()((set, get) => ({\n    isShowingDone: false,\n    toggle: () => {\n      set(taskFilterReducer(get(), { type: 'toggle-showing-done' }));\n    },\n  }));\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/task-filter-reducer.ts",
+          "content": "// src/stores/task-filter-reducer.ts\nexport type TaskFilterState = { readonly isShowingDone: boolean };\nexport type TaskFilterAction = { readonly type: 'toggle-showing-done' };\n\nexport function taskFilterReducer(state: TaskFilterState, action: TaskFilterAction): TaskFilterState {\n  return action.type === 'toggle-showing-done' ? { isShowingDone: !state.isShowingDone } : state;\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/task-filter-reducer.test.ts",
+          "content": "// src/stores/task-filter-reducer.test.ts\nit('exists', () => {\n  expect(true).toBe(true);\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-missing-file": {
+    "expect": ["[missing-file]", "src/stores/update-and-publish.ts"],
+    "ops": [{ "delete": "src/stores/update-and-publish.ts" }]
+  },
+  "bad-module-store": {
+    "expect": ["[store-singleton]", "src/features/tasks/draft-store.ts:4", "created at module level"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/draft-store.ts",
+          "content": "// src/features/tasks/draft-store.ts\nimport { createStore } from 'zustand/vanilla';\n\nexport const draftStore = createStore<{ readonly text: string }>()(() => ({ text: '' }));\n"
+        }
+      }
+    ]
+  },
+  "bad-nested-callback-selector": {
+    "expect": ["[selector-new-object]", "src/features/tasks/use-task-titles.ts:6"],
+    "ops": [
+      {
+        "$comment": "The inner callback ends in `.length > 0`, but the selector itself returns a new array from .filter.",
+        "write": {
+          "file": "src/features/tasks/use-task-titles.ts",
+          "content": "// src/features/tasks/use-task-titles.ts\nimport { useTasksStore } from '@/stores/tasks-store';\n\nexport function useTaskTitles(): readonly string[] {\n  const titles =\n    useTasksStore((state) => state.tasks.map((task) => task.title).filter((title) => title.length > 0));\n  return titles;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-never-persists": {
+    "expect": ["[store-persist-order]", "src/stores/lists-store.ts:42", "addList publishes a change it never persists"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/lists-store.ts",
+          "find": "      const saved = tasks.addList({ name });\n      if (!saved.ok) return saved;\n",
+          "with": "      const list = { id: get().lists.length + 1, name, createdAtMs: 0 };\n      const saved = { ok: true as const, value: list };\n"
+        }
+      }
+    ]
+  },
+  "bad-no-selector": {
+    "expect": ["[selector-missing]", "src/features/tasks/use-task-count.ts:5", "useTasksStore() without a selector"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-count.ts",
+          "content": "// src/features/tasks/use-task-count.ts\nimport { useTasksStore } from '@/stores/tasks-store';\n\nexport function useTaskCount(): number {\n  const state = useTasksStore();\n  return state.tasks.length;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-object-selector": {
+    "expect": [
+      "[selector-new-object]",
+      "src/features/lists/use-list-header.ts:7",
+      "src/features/lists/use-list-header.ts:11",
+      "selectListsByName"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/lists/use-list-header.ts",
+          "content": "// src/features/lists/use-list-header.ts\nimport { selectListsByName } from '@/stores/lists-selectors';\nimport { useListsStore } from '@/stores/lists-store';\n\nexport function useListHeader(): { readonly count: number; readonly first: string } {\n  const { count, failure } =\n    useListsStore((state) => ({ count: state.lists.length, failure: state.loadFailure }));\n  if (failure !== null) {\n    return { count: 0, first: '' };\n  }\n  const sorted = useListsStore(selectListsByName);\n  return { count, first: sorted[0]?.name ?? '' };\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-os-mirror-unlisted": {
+    "expect": ["[store-singleton]", "src/ui/a11y/system-a11y-store.ts:11"],
+    "ops": [{ "json": { "file": "contracts/stores.json", "path": ["osMirrorStores"], "value": [] } }]
+  },
+  "bad-persist-middleware-outside-stores": {
+    "expect": ["[second-persistence]", "src/features/tasks/draft-storage.ts:2", "zustand's persist middleware"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/draft-storage.ts",
+          "content": "// src/features/tasks/draft-storage.ts\nimport { persist } from 'zustand/middleware';\n\nexport const draftMiddleware = persist;\n"
+        }
+      }
+    ]
+  },
+  "bad-publish-first": {
+    "expect": ["[store-persist-order]", "src/stores/tasks-store.ts:59", "setDone publishes (set) before it persists"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/tasks-store.ts",
+          "find": "      const saved = tasks.setDone(taskId, isDone);\n      if (!saved.ok) return saved;\n      // 3. Publish.\n      set(next);\n",
+          "with": "      set(next);\n      const saved = tasks.setDone(taskId, isDone);\n      if (!saved.ok) return saved;\n"
+        }
+      }
+    ]
+  },
+  "bad-publish-only-entitlement": {
+    "expect": [
+      "[store-persist-order]",
+      "src/stores/premium-store.ts:25",
+      "dispatch publishes a change it never persists"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/stores/premium-reducer.ts",
+          "content": "// src/stores/premium-reducer.ts\nimport type { Entitlement } from '@/data/entitlements/entitlement-repository';\n\nexport type PremiumState = {\n  readonly entitlement: Entitlement | null;\n};\n\nexport type PremiumAction =\n  | { readonly type: 'grant-premium'; readonly entitlement: Entitlement }\n  | { readonly type: 'revoke-premium'; readonly revokedAtMs: number }\n  | { readonly type: 'replace-entitlement'; readonly entitlement: Entitlement | null };\n\nexport const DEFAULT_PREMIUM_STATE: PremiumState = { entitlement: null };\n\nexport function premiumReducer(state: PremiumState, action: PremiumAction): PremiumState {\n  switch (action.type) {\n    case 'grant-premium':\n      return state.entitlement?.productId === action.entitlement.productId && state.entitlement.revokedAtMs === null\n        ? state\n        : { entitlement: action.entitlement };\n    case 'revoke-premium':\n      return state.entitlement === null ? state : { entitlement: { ...state.entitlement, revokedAtMs: action.revokedAtMs } };\n    case 'replace-entitlement':\n      return { entitlement: action.entitlement };\n  }\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/premium-reducer.test.ts",
+          "content": "// src/stores/premium-reducer.test.ts\nimport { DEFAULT_PREMIUM_STATE, premiumReducer } from './premium-reducer';\n\nit('keeps the state when nothing is owned', () => {\n  expect(premiumReducer(DEFAULT_PREMIUM_STATE, { type: 'revoke-premium', revokedAtMs: 1 })).toBe(DEFAULT_PREMIUM_STATE);\n});\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/premium-store.test.ts",
+          "content": "// src/stores/premium-store.test.ts\nit('saves the entitlement before a subscriber sees it', () => {\n  expect(true).toBe(true);\n});\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/premium-store.ts",
+          "content": "// src/stores/premium-store.ts\nimport { useStore } from 'zustand';\nimport { createStore } from 'zustand/vanilla';\n\nimport { DEFAULT_PREMIUM_STATE, premiumReducer } from '@/stores/premium-reducer';\nimport { useStores } from '@/stores/stores-context';\n\nimport type { Entitlement, EntitlementFailure, EntitlementRepository } from '@/data/entitlements/entitlement-repository';\nimport type { PremiumAction, PremiumState } from '@/stores/premium-reducer';\nimport type { StoreApi } from 'zustand/vanilla';\n\nexport type PremiumStoreState = PremiumState & {\n  readonly dispatch: (action: PremiumAction) => void;\n};\n\nexport type PremiumStore = StoreApi<PremiumStoreState>;\n\nexport type PremiumStoreDeps = { readonly entitlements: Pick<EntitlementRepository, 'current' | 'save'> };\n\n/** Publish-only: the purchase service writes the entitlement, then dispatches here. */\nexport function createPremiumStore({ entitlements }: PremiumStoreDeps): PremiumStore {\n  return createStore<PremiumStoreState>()((set, get) => ({\n    ...premiumReducer(DEFAULT_PREMIUM_STATE, { type: 'replace-entitlement', entitlement: entitlements.current() }),\n    dispatch: (action) => {\n      set(premiumReducer(get(), action));\n    },\n  }));\n}\n\nexport function usePremiumStore<TSlice>(selector: (state: PremiumStoreState) => TSlice): TSlice {\n  return useStore(useStores().premium, selector);\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-query-copied": {
+    "expect": ["[query-data-copied]", "src/features/tasks/use-remote-tasks.ts:11"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-remote-tasks.ts",
+          "content": "// src/features/tasks/use-remote-tasks.ts\nimport { useQuery } from '@tanstack/react-query';\nimport { useEffect } from 'react';\n\nimport { fetchTasks } from '@/api/tasks-api';\nimport { useTasksStore } from '@/stores/tasks-store';\n\nexport function useRemoteTasks(): void {\n  const query = useQuery({ queryKey: ['tasks'], queryFn: fetchTasks });\n  const addTask = useTasksStore((state) => state.addTask);\n  useEffect(() => {\n    for (const task of query.data ?? []) addTask(task.listId, task.title);\n  }, [query.data, addTask]);\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-query-copied-alias": {
+    "expect": ["[query-data-copied]", "src/features/tasks/use-remote-tasks.ts:11"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-remote-tasks.ts",
+          "content": "// src/features/tasks/use-remote-tasks.ts\nimport { useQuery } from '@tanstack/react-query';\nimport { useEffect } from 'react';\n\nimport { fetchTasks } from '@/api/tasks-api';\nimport { useTasksStore } from '@/stores/tasks-store';\n\nexport function useRemoteTasks(): void {\n  const { data: remote } = useQuery({ queryKey: ['tasks'], queryFn: fetchTasks });\n  const addTask = useTasksStore((state) => state.addTask);\n  useEffect(() => {\n    for (const task of remote ?? []) addTask(task.listId, task.title);\n  }, [remote, addTask]);\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-second-persistence": {
+    "expect": [
+      "[second-persistence]",
+      "src/stores/draft-persist.ts:2",
+      "zustand's persist middleware",
+      "src/stores/draft-persist.ts:3",
+      "@react-native-async-storage/async-storage in a store",
+      "src/stores/draft-persist.ts:4",
+      "react-native-mmkv in a store"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/stores/draft-persist.ts",
+          "content": "// src/stores/draft-persist.ts\nimport { createJSONStorage, persist } from 'zustand/middleware';\nimport AsyncStorage from '@react-native-async-storage/async-storage';\nimport { createMMKV } from 'react-native-mmkv';\n\nexport const draftStorage = { persist, storage: createJSONStorage(() => AsyncStorage), kv: createMMKV() };\n"
+        }
+      }
+    ]
+  },
+  "bad-server-state": {
+    "expect": ["[server-state-in-store]", "src/stores/tasks-store.ts:2", "imports @tanstack/react-query", "calls fetch"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/tasks-store.ts",
+          "find": "import { useStore } from 'zustand';\n",
+          "with": "import { QueryClient } from '@tanstack/react-query';\nimport { useStore } from 'zustand';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/stores/tasks-store.ts",
+          "find": "/** One store per app start: createStores calls it, never module code. */",
+          "with": "export function remoteTasks(client: QueryClient): Promise<Response> {\n  void client;\n  return fetch('https://example.com/tasks');\n}\n\n/** One store per app start: createStores calls it, never module code. */"
+        }
+      }
+    ]
+  },
+  "bad-session-factory-twice": {
+    "expect": [
+      "[store-created-twice]",
+      "createUserSessionStore is called in 2 files",
+      "src/services/auth/open-account.ts:5",
+      "src/services/auth/create-account-stores.ts:5"
+    ],
+    "ops": [
+      {
+        "$comment": "An auth store whose name carries Session is still a domain store: two composition files each create their own copy.",
+        "write": {
+          "file": "src/stores/auth/user-session-store.ts",
+          "content": "// src/stores/auth/user-session-store.ts\nimport { createStore, type StoreApi } from 'zustand/vanilla';\n\nimport { userSessionReducer, type UserSessionState } from '@/stores/auth/user-session-reducer';\n\n// memory-only: the signed-in flag is read again from secure storage at every launch.\nexport type UserSessionStore = StoreApi<UserSessionState & { readonly signOut: () => void }>;\n\nexport function createUserSessionStore(initial: UserSessionState): UserSessionStore {\n  return createStore<UserSessionState & { readonly signOut: () => void }>()((set, get) => ({\n    ...initial,\n    signOut: () => {\n      set(userSessionReducer(get(), { type: 'sign-out' }));\n    },\n  }));\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/auth/create-account-stores.ts",
+          "content": "// src/services/auth/create-account-stores.ts\nimport { createUserSessionStore } from '@/stores/auth/user-session-store';\nimport type { UserSessionState } from '@/stores/auth/user-session-reducer';\n\nexport const createAccountStores = (initial: UserSessionState) => ({ session: createUserSessionStore(initial) });\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/auth/open-account.ts",
+          "content": "// src/services/auth/open-account.ts\nimport { createUserSessionStore } from '@/stores/auth/user-session-store';\nimport type { UserSessionState } from '@/stores/auth/user-session-reducer';\n\nexport const openAccount = (initial: UserSessionState) => createUserSessionStore(initial);\n"
+        }
+      }
+    ]
+  },
+  "bad-session-hook-no-selector": {
+    "expect": [
+      "[selector-missing]",
+      "src/features/bulk-edit/use-bulk-session.ts:7",
+      "useUndoableSessionStore(store) without a selector returns the whole state"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/bulk-edit/use-bulk-session.ts",
+          "content": "// src/features/bulk-edit/use-bulk-session.ts\nimport { useUndoableSessionStore } from '@/stores/session/undoable-session-store';\nimport type { SessionStore } from '@/stores/session/undoable-session-store';\n\nexport function useBulkSession(store: SessionStore<{ readonly n: number }, number, never>): number {\n  // The whole state: re-renders on every dispatch.\n  const state = useUndoableSessionStore(store);\n  return state.session.revision;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-set-outside": {
+    "expect": ["[store-set-outside]", "src/features/tasks/use-clear-tasks.ts:7"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-clear-tasks.ts",
+          "content": "// src/features/tasks/use-clear-tasks.ts\nimport { useStores } from '@/stores/stores-context';\n\nexport function useClearTasks(): () => void {\n  const stores = useStores();\n  return () => {\n    stores.tasks.setState({ tasks: [] });\n  };\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-shallow-v4": {
+    "expect": [
+      "[shallow-v4]",
+      "src/features/session/use-revision.ts:6",
+      "useUndoableSessionStore with an equality argument"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/session/use-revision.ts",
+          "content": "// src/features/session/use-revision.ts\nimport { useUndoableSessionStore } from '@/stores/session/undoable-session-store';\nimport type { SessionStore } from '@/stores/session/undoable-session-store';\n\nexport function useRevision(store: SessionStore<{ readonly n: number }, number, never>): number {\n  return useUndoableSessionStore(store, (state) => state.session.revision, Object.is);\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-singleton": {
+    "expect": ["[store-singleton]", "src/stores/preferences-store.ts:2", "imports create from 'zustand'"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/stores/preferences-store.ts",
+          "content": "// src/stores/preferences-store.ts\nimport { create } from 'zustand';\n\nexport const usePreferencesStore = create(() => ({ isCompact: false }));\n"
+        }
+      }
+    ]
+  },
+  "bad-stores-in-render": {
+    "expect": [
+      "[store-created-twice]",
+      "src/features/tasks/tasks-panel.tsx:8",
+      "calls createStores in feature or UI code"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/tasks-panel.tsx",
+          "content": "// src/features/tasks/tasks-panel.tsx\nimport { useAppData } from '@/data/app-data-context';\nimport { createStores } from '@/stores/create-stores';\nimport { StoresProvider } from '@/stores/stores-context';\n\nexport function TasksPanel({ children }: { readonly children: React.ReactNode }): React.JSX.Element {\n  const data = useAppData();\n  const stores = createStores({ tasks: data.tasks });\n  return <StoresProvider stores={stores}>{children}</StoresProvider>;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-unchecked-write": {
+    "expect": ["[store-unchecked-write]", "src/stores/tasks-store.ts:59", "setDone ignores the write's result"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/tasks-store.ts",
+          "find": "      const saved = tasks.setDone(taskId, isDone);\n      if (!saved.ok) return saved;\n",
+          "with": "      tasks.setDone(taskId, isDone);\n"
+        }
+      }
+    ]
+  },
+  "bad-untested-reducer": {
+    "expect": ["[reducer-untested]", "src/stores/lists-reducer.ts:1", "lists-reducer.ts has no lists-reducer.test.ts"],
+    "ops": [{ "delete": "src/stores/lists-reducer.test.ts" }]
+  },
+  "bad-untested-store": {
+    "expect": [
+      "[reducer-untested]",
+      "src/stores/tasks-store.ts:1",
+      "tasks-store.ts persists but has no tasks-store.test.ts"
+    ],
+    "ops": [{ "delete": "src/stores/tasks-store.test.tsx" }]
+  },
+  "error-no-src": { "expect": ["ERROR [bad-input]", "nothing to check"], "ops": [{ "delete": "src" }] },
+  "pass-arrow-factory": {
+    "expect": ["check-stores:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/stores/notes-reducer.ts",
+          "content": "// src/stores/notes-reducer.ts\nexport type NotesState = { readonly title: string };\nexport type NotesAction = { readonly type: 'set-title'; readonly title: string };\n\nexport function notesReducer(state: NotesState, action: NotesAction): NotesState {\n  switch (action.type) {\n    case 'set-title':\n      return action.title === state.title ? state : { title: action.title };\n  }\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/notes-reducer.test.ts",
+          "content": "// src/stores/notes-reducer.test.ts\nimport { notesReducer } from '@/stores/notes-reducer';\n\nit('keeps the same object when nothing changes', () => {\n  const state = { title: 'a' };\n  expect(notesReducer(state, { type: 'set-title', title: 'a' })).toBe(state);\n});\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/notes-store.ts",
+          "content": "// src/stores/notes-store.ts: Zustand's documented arrow factory, with no helper function above it.\nimport { createStore } from 'zustand/vanilla';\n\nimport { ok } from '@/core/result';\nimport { notesReducer } from '@/stores/notes-reducer';\n\nimport type { Result } from '@/core/result';\nimport type { NotesState } from '@/stores/notes-reducer';\nimport type { StoreApi } from 'zustand/vanilla';\n\nexport type NotesStoreState = NotesState & { readonly rename: (title: string) => Result<void, string> };\n\nexport type NotesStoreDeps = {\n  readonly notes: { readonly title: () => string; readonly saveTitle: (title: string) => Result<void, string> };\n};\n\nexport const createNotesStore = ({ notes }: NotesStoreDeps): StoreApi<NotesStoreState> =>\n  createStore<NotesStoreState>()((set, get) => ({\n    title: notes.title(),\n    rename: (title) => {\n      const current = get();\n      const next = notesReducer(current, { type: 'set-title', title });\n      if (next === current) return ok(undefined);\n      const saved = notes.saveTitle(title);\n      if (!saved.ok) return saved;\n      set(next);\n      return saved;\n    },\n  }));\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/notes-store.test.ts",
+          "content": "// src/stores/notes-store.test.ts\nimport { createNotesStore } from '@/stores/notes-store';\n\nit('shows a title only after it is saved', () => {\n  const store = createNotesStore({ notes: { title: () => 'a', saveTitle: () => ({ ok: true, value: undefined }) } });\n  store.getState().rename('b');\n  expect(store.getState().title).toBe('b');\n});\n"
+        }
+      }
+    ]
+  },
+  "pass-cross-store-write-variable": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/lists/use-remove-list.ts",
+          "content": "// src/features/lists/use-remove-list.ts\nimport { useAppData } from '@/data/app-data-context';\nimport { useStores } from '@/stores/stores-context';\nimport { updateAndPublish } from '@/stores/update-and-publish';\n\nexport function useRemoveList(): (listId: number) => boolean {\n  const data = useAppData();\n  const stores = useStores();\n  return (listId) => {\n    const write = () => data.tasks.removeList(listId);\n    return updateAndPublish(stores, write).ok;\n  };\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-deps-destructured-in-body": {
+    "expect": ["check-stores:", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/tasks-store.ts",
+          "find": "export function createTasksStore({ tasks }: TasksStoreDeps): TasksStore {\n",
+          "with": "export function createTasksStore(deps: TasksStoreDeps): TasksStore {\n  const { tasks } = deps;\n"
+        }
+      }
+    ]
+  },
+  "pass-entitlement-store": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/stores/premium-reducer.ts",
+          "content": "// src/stores/premium-reducer.ts\nimport type { Entitlement } from '@/data/entitlements/entitlement-repository';\n\nexport type PremiumState = {\n  readonly entitlement: Entitlement | null;\n};\n\nexport type PremiumAction =\n  | { readonly type: 'grant-premium'; readonly entitlement: Entitlement }\n  | { readonly type: 'revoke-premium'; readonly revokedAtMs: number }\n  | { readonly type: 'replace-entitlement'; readonly entitlement: Entitlement | null };\n\nexport const DEFAULT_PREMIUM_STATE: PremiumState = { entitlement: null };\n\nexport function premiumReducer(state: PremiumState, action: PremiumAction): PremiumState {\n  switch (action.type) {\n    case 'grant-premium':\n      return state.entitlement?.productId === action.entitlement.productId && state.entitlement.revokedAtMs === null\n        ? state\n        : { entitlement: action.entitlement };\n    case 'revoke-premium':\n      return state.entitlement === null ? state : { entitlement: { ...state.entitlement, revokedAtMs: action.revokedAtMs } };\n    case 'replace-entitlement':\n      return { entitlement: action.entitlement };\n  }\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/premium-reducer.test.ts",
+          "content": "// src/stores/premium-reducer.test.ts\nimport { DEFAULT_PREMIUM_STATE, premiumReducer } from './premium-reducer';\n\nit('keeps the state when nothing is owned', () => {\n  expect(premiumReducer(DEFAULT_PREMIUM_STATE, { type: 'revoke-premium', revokedAtMs: 1 })).toBe(DEFAULT_PREMIUM_STATE);\n});\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/premium-store.test.ts",
+          "content": "// src/stores/premium-store.test.ts\nit('saves the entitlement before a subscriber sees it', () => {\n  expect(true).toBe(true);\n});\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/premium-store.ts",
+          "content": "// src/stores/premium-store.ts\nimport { useStore } from 'zustand';\nimport { createStore } from 'zustand/vanilla';\n\nimport { ok } from '@/core/result';\nimport { DEFAULT_PREMIUM_STATE, premiumReducer } from '@/stores/premium-reducer';\nimport { useStores } from '@/stores/stores-context';\n\nimport type { Result } from '@/core/result';\nimport type { Entitlement, EntitlementFailure, EntitlementRepository } from '@/data/entitlements/entitlement-repository';\nimport type { PremiumState } from '@/stores/premium-reducer';\nimport type { StoreApi } from 'zustand/vanilla';\n\nexport type PremiumStoreState = PremiumState & {\n  readonly grantPremium: (entitlement: Entitlement) => Result<void, EntitlementFailure>;\n  readonly revokePremium: (revokedAtMs: number) => Result<void, EntitlementFailure>;\n};\n\nexport type PremiumStore = StoreApi<PremiumStoreState>;\n\nexport type PremiumStoreDeps = { readonly entitlements: Pick<EntitlementRepository, 'current' | 'save'> };\n\n/** The purchase service calls grantPremium; the store writes the entitlement, then shows it. */\nexport function createPremiumStore({ entitlements }: PremiumStoreDeps): PremiumStore {\n  return createStore<PremiumStoreState>()((set, get) => ({\n    ...premiumReducer(DEFAULT_PREMIUM_STATE, { type: 'replace-entitlement', entitlement: entitlements.current() }),\n    grantPremium: (entitlement) => {\n      const current = get();\n      const next = premiumReducer(current, { type: 'grant-premium', entitlement });\n      if (next === current) return ok(undefined);\n      const saved = entitlements.save(entitlement);\n      if (!saved.ok) return saved;\n      set(next);\n      return saved;\n    },\n    revokePremium: (revokedAtMs) => {\n      const current = get();\n      const next = premiumReducer(current, { type: 'revoke-premium', revokedAtMs });\n      if (next === current || next.entitlement === null) return ok(undefined);\n      const saved = entitlements.save(next.entitlement);\n      if (!saved.ok) return saved;\n      set(next);\n      return saved;\n    },\n  }));\n}\n\nexport function usePremiumStore<TSlice>(selector: (state: PremiumStoreState) => TSlice): TSlice {\n  return useStore(useStores().premium, selector);\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-legacy-import": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/import-legacy-tasks.ts",
+          "content": "// src/data/import-legacy-tasks.ts\nimport AsyncStorage from '@react-native-async-storage/async-storage';\n\nexport const legacyKeys = (): Promise<readonly string[]> => AsyncStorage.getAllKeys();\n"
+        }
+      },
+      {
+        "write": {
+          "file": "contracts/persistence.json",
+          "content": "{\n  \"mode\": \"tables\",\n  \"legacyImports\": [\n    \"src/data/import-legacy-tasks.ts\"\n  ]\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-memory-only": {
+    "expect": ["check-stores:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/stores/task-filter-reducer.ts",
+          "content": "// src/stores/task-filter-reducer.ts\nexport type TaskFilterState = { readonly isShowingDone: boolean };\nexport type TaskFilterAction = { readonly type: 'toggle-showing-done' };\n\nexport function taskFilterReducer(state: TaskFilterState, action: TaskFilterAction): TaskFilterState {\n  switch (action.type) {\n    case 'toggle-showing-done':\n      return { isShowingDone: !state.isShowingDone };\n  }\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/task-filter-reducer.test.ts",
+          "content": "// src/stores/task-filter-reducer.test.ts\nimport { taskFilterReducer } from '@/stores/task-filter-reducer';\n\nit('flips the flag', () => {\n  expect(taskFilterReducer({ isShowingDone: false }, { type: 'toggle-showing-done' }).isShowingDone).toBe(true);\n});\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/task-filter-store.ts",
+          "content": "// src/stores/task-filter-store.ts\n// memory-only: the filter chip starts at \"open tasks\" on every launch, by design.\nimport { createStore } from 'zustand/vanilla';\n\nimport { taskFilterReducer } from '@/stores/task-filter-reducer';\n\nimport type { TaskFilterState } from '@/stores/task-filter-reducer';\nimport type { StoreApi } from 'zustand/vanilla';\n\nexport type TaskFilterStoreState = TaskFilterState & { readonly toggleShowingDone: () => void };\n\nexport function createTaskFilterStore(): StoreApi<TaskFilterStoreState> {\n  return createStore<TaskFilterStoreState>()((set, get) => ({\n    isShowingDone: false,\n    toggleShowingDone: () => {\n      set(taskFilterReducer(get(), { type: 'toggle-showing-done' }));\n    },\n  }));\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-mmkv-key-value": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/persistence.json",
+          "content": "{\n  \"mode\": \"tables\",\n  \"legacyImports\": [],\n  \"keyValueStore\": \"react-native-mmkv\"\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/key-value/key-value-port.ts",
+          "content": "// src/services/key-value/key-value-port.ts\nexport type KeyValuePort = {\n  readonly getString: (key: string) => string | undefined;\n  readonly setString: (key: string, value: string) => void;\n};\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/key-value/mmkv-key-value-adapter.ts",
+          "content": "// src/services/key-value/mmkv-key-value-adapter.ts\nimport { createMMKV } from 'react-native-mmkv';\n\nimport type { KeyValuePort } from '@/services/key-value/key-value-port';\n\nexport function createMmkvKeyValueAdapter(): KeyValuePort {\n  const storage = createMMKV({ id: 'preferences' });\n  return {\n    getString: (key) => storage.getString(key),\n    setString: (key, value) => {\n      storage.set(key, value);\n    },\n  };\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-no-zustand": {
+    "expect": ["NOT APPLICABLE: zustand is not in package.json"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "zustand"], "delete": true } }]
+  },
+  "pass-participle-actions": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "A command verb followed by a field or flag that ends in -ed is still a command; a failure object outside the action union is not an action.",
+        "replace": {
+          "file": "src/stores/tasks-reducer.ts",
+          "find": "  | { readonly type: 'record-load-failure'; readonly failure: TaskFailure };",
+          "with": "  | { readonly type: 'record-load-failure'; readonly failure: TaskFailure }\n  | { readonly type: 'toggle-pinned'; readonly taskId: number }\n  | { readonly type: 'set-completed'; readonly taskId: number; readonly isCompleted: boolean }\n  | { readonly type: 'set-haptics-enabled'; readonly isEnabled: boolean }\n  | { readonly type: 'show-archived' }\n  | { readonly type: 'copy-selected' }\n  | { readonly type: 'assign-selected'; readonly listId: number }\n  | { readonly type: 'duplicate-selected' }\n  | { readonly type: 'snooze-expired'; readonly ms: number }\n  | { readonly type: 'skip-completed' }\n  | { readonly type: 'purge-archived' }\n  | { readonly type: 'focus-selected' }\n  | { readonly type: 'fill-selected'; readonly title: string }\n  | { readonly type: 'retry-failed-tasks' };\n\n/** Not an action: the shape of a failed write the store reports. */\nexport const WRITE_FAILED = { type: 'write-failed' } as const;"
+        }
+      }
+    ]
+  },
+  "pass-primitive-selectors": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-flags.ts",
+          "content": "// src/features/tasks/use-task-flags.ts\nimport { selectTasksOfList } from '@/stores/tasks-selectors';\nimport { useTasksStore } from '@/stores/tasks-store';\n\nexport function useTaskFlags(listId: number): { readonly hasDone: boolean; readonly count: number } {\n  const hasDone = useTasksStore((state) => state.tasks.filter((task) => task.isDone).length > 0);\n  const count = useTasksStore((state) => selectTasksOfList(state, listId).length);\n  return { hasDone, count };\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-session-store-shapes": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "useSessionStore is an auth store's domain hook (declared outside src/ here): one selector argument, so the (selector) rules apply. The shipped per-session factory stays exempt from store-created-twice because its file declares useUndoableSessionStore(store, selector).",
+        "write": {
+          "file": "src/features/account/use-account-badge.ts",
+          "content": "// src/features/account/use-account-badge.ts\nimport { useShallow } from 'zustand/shallow';\n\nimport { selectIsSignedIn } from '@/stores/auth/session-selectors';\nimport { useSessionStore } from '@/stores/auth/session-store-context';\n\nexport function useAccountBadge(): { readonly isSignedIn: boolean; readonly initials: string } {\n  const isSignedIn = useSessionStore(selectIsSignedIn);\n  const initials = useSessionStore((state) => state.initials);\n  const flags = useSessionStore(useShallow((state) => [state.isSignedIn, state.isVerified]));\n  return { isSignedIn: isSignedIn && flags[0] === true, initials };\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/bulk-edit/use-bulk-edit.ts",
+          "content": "// src/features/bulk-edit/use-bulk-edit.ts\nimport { useState } from 'react';\n\nimport type { SessionRules, UndoableSession } from '@/stores/session/undoable-session-types';\nimport { createSessionStore, useUndoableSessionStore } from '@/stores/session/undoable-session-store';\nimport type { PersistSession } from '@/stores/session/undoable-session-store';\n\ntype Draft = { readonly done: readonly number[] };\n\nexport function useBulkEdit(\n  rules: SessionRules<Draft, number>,\n  initial: UndoableSession<Draft, number>,\n  persist: PersistSession<Draft, number, never>,\n): number {\n  const [store] = useState(() => createSessionStore({ rules, initial, persist }));\n  return useUndoableSessionStore(store, (state) => state.session.revision);\n}\n"
+        }
+      }
+    ]
+  }
+}

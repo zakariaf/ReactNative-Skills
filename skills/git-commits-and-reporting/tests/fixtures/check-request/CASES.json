@@ -1,0 +1,54 @@
+{
+  "bad-no-default": {
+    "expect": ["message.md:5 [request-default]", "gives no default"],
+    "ops": [
+      {
+        "replace": {
+          "file": "message.md",
+          "find": " Until then the build stays unsent and I keep working on the shared lists; I resume from the submit step once you confirm.",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-no-request": {
+    "expect": ["message.md:1 [request-missing] the message asks for nothing"],
+    "ops": [
+      {
+        "replace": {
+          "file": "message.md",
+          "find": "Please give the Play service account the release permission for Tasks in Play Console under Users and permissions (about 5 minutes). Until then the build stays unsent and I keep working on the shared lists; I resume from the submit step once you confirm.\n",
+          "with": "I will look at it again tomorrow.\n"
+        }
+      }
+    ]
+  },
+  "bad-template-left": {
+    "expect": ["[placeholder-left]", "__THE_ONE_ACTION__"],
+    "base": [{ "from": "@skill/templates/reports/request.md", "to": "message.md" }],
+    "extends": null
+  },
+  "bad-two-requests": {
+    "expect": ["message.md:7 [too-many-requests] 2 requests in one message"],
+    "ops": [
+      {
+        "replace": {
+          "file": "message.md",
+          "find": "once you confirm.\n",
+          "with": "once you confirm.\n\nPlease also renew the upload key. Until then I use the old one.\n"
+        }
+      }
+    ]
+  },
+  "pass-requirement-question": {
+    "expect": ["check-report: 7 message lines checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "message.md",
+          "content": "The requirement does not say whether a task completed after midnight still counts for yesterday's streak.\n\nPlease answer A or B. Until then I use option A.\n- TASK-60: \"A day counts when at least one task due that day is completed.\"\n- Option A (my default): a task counts for the day it was due, whenever it is completed.\n- Option B: a task counts for the day it is completed.\n"
+        }
+      }
+    ]
+  }
+}

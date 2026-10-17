@@ -1,0 +1,209 @@
+{
+  "gameId": "arena-chase",
+  "rulesFingerprint": "e56d7c4cd358ca15658fd4ddfac2da9d04431ce85779f0f09b6ca5b86b2417cb",
+  "seedsPerCell": 100,
+  "maxMoves": 12000,
+  "cells": [
+    {
+      "policy": "idle",
+      "difficulty": 34,
+      "runs": 100,
+      "wins": 0,
+      "capHits": 0,
+      "winRate": 0,
+      "medianMoves": 327,
+      "p10Moves": 278,
+      "p90Moves": 351,
+      "medianScore": 0,
+      "payoffPerRun": 0,
+      "twistPerRun": 0,
+      "lossReasons": {
+        "arena-chase.lose.out-of-hearts": 100
+      },
+      "firstPayoffShare": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "policy": "wander",
+      "difficulty": 0,
+      "runs": 100,
+      "wins": 0,
+      "capHits": 0,
+      "winRate": 0,
+      "medianMoves": 782,
+      "p10Moves": 605,
+      "p90Moves": 1000,
+      "medianScore": 0,
+      "payoffPerRun": 0.34,
+      "twistPerRun": 0,
+      "lossReasons": {
+        "arena-chase.lose.out-of-hearts": 100
+      },
+      "firstPayoffShare": [
+        0.13,
+        0.2,
+        0.24,
+        0.28,
+        0.32,
+        0.32,
+        0.33,
+        0.33,
+        0.33,
+        0.33
+      ]
+    },
+    {
+      "policy": "wander",
+      "difficulty": 34,
+      "runs": 100,
+      "wins": 0,
+      "capHits": 0,
+      "winRate": 0,
+      "medianMoves": 413,
+      "p10Moves": 329,
+      "p90Moves": 541,
+      "medianScore": 0,
+      "payoffPerRun": 0.25,
+      "twistPerRun": 0,
+      "lossReasons": {
+        "arena-chase.lose.out-of-hearts": 100
+      },
+      "firstPayoffShare": [
+        0.13,
+        0.2,
+        0.24,
+        0.24,
+        0.24,
+        0.24,
+        0.24,
+        0.24,
+        0.24,
+        0.24
+      ]
+    },
+    {
+      "policy": "wander",
+      "difficulty": 67,
+      "runs": 100,
+      "wins": 0,
+      "capHits": 0,
+      "winRate": 0,
+      "medianMoves": 292,
+      "p10Moves": 233,
+      "p90Moves": 350,
+      "medianScore": 0,
+      "payoffPerRun": 0.21,
+      "twistPerRun": 0,
+      "lossReasons": {
+        "arena-chase.lose.out-of-hearts": 100
+      },
+      "firstPayoffShare": [
+        0.13,
+        0.2,
+        0.21,
+        0.21,
+        0.21,
+        0.21,
+        0.21,
+        0.21,
+        0.21,
+        0.21
+      ]
+    },
+    {
+      "policy": "dodge",
+      "difficulty": 0,
+      "runs": 100,
+      "wins": 100,
+      "capHits": 0,
+      "winRate": 1,
+      "medianMoves": 1545,
+      "p10Moves": 1085,
+      "p90Moves": 2772,
+      "medianScore": 10,
+      "payoffPerRun": 10,
+      "twistPerRun": 1.43,
+      "lossReasons": {},
+      "firstPayoffShare": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "policy": "dodge",
+      "difficulty": 34,
+      "runs": 100,
+      "wins": 70,
+      "capHits": 0,
+      "winRate": 0.7,
+      "medianMoves": 2200,
+      "p10Moves": 1253,
+      "p90Moves": 3551,
+      "medianScore": 12,
+      "payoffPerRun": 10.4,
+      "twistPerRun": 1.98,
+      "lossReasons": {
+        "arena-chase.lose.out-of-hearts": 30
+      },
+      "firstPayoffShare": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "policy": "dodge",
+      "difficulty": 67,
+      "runs": 100,
+      "wins": 33,
+      "capHits": 0,
+      "winRate": 0.33,
+      "medianMoves": 2483,
+      "p10Moves": 505,
+      "p90Moves": 4620,
+      "medianScore": 8,
+      "payoffPerRun": 8.34,
+      "twistPerRun": 1.34,
+      "lossReasons": {
+        "arena-chase.lose.out-of-hearts": 67
+      },
+      "firstPayoffShare": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    }
+  ]
+}

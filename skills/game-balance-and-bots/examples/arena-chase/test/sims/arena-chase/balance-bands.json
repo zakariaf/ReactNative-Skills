@@ -1,0 +1,79 @@
+{
+  "gameId": "arena-chase",
+  "status": "proposed",
+  "approvedOn": null,
+  "seedsPerCell": 100,
+  "maxMoves": 12000,
+  "grid": {
+    "idle": [34],
+    "wander": [0, 34, 67],
+    "dodge": [0, 34, 67]
+  },
+  "bands": [
+    {
+      "policy": "dodge",
+      "difficulty": 0,
+      "metric": "winRate",
+      "min": 0.8,
+      "max": 1,
+      "why": "A reasonable dodger clears the first round almost every time; the bot reacts faster than a thumb."
+    },
+    {
+      "policy": "dodge",
+      "difficulty": 67,
+      "metric": "winRate",
+      "min": 0.2,
+      "max": 0.5,
+      "why": "The hardest round is hard, yet still winnable."
+    },
+    {
+      "policy": "dodge",
+      "difficulty": 34,
+      "metric": "medianMoves",
+      "min": 1200,
+      "max": 4800,
+      "why": "A round lasts about 10 to 40 seconds (ticks: 120 per second)."
+    },
+    {
+      "policy": "idle",
+      "difficulty": 34,
+      "metric": "medianMoves",
+      "min": 120,
+      "max": 600,
+      "why": "Standing still loses within 1 to 5 seconds: the chasers have teeth."
+    },
+    {
+      "policy": "wander",
+      "difficulty": 0,
+      "metric": "winRate",
+      "min": 0,
+      "max": 0.05,
+      "why": "Random steering never collects ten sparks: where the thumb goes must matter."
+    }
+  ],
+  "curve": {
+    "policy": "dodge",
+    "metric": "winRate",
+    "direction": "down",
+    "minStep": 0.15
+  },
+  "skillGap": {
+    "difficulty": 34,
+    "metric": "medianScore",
+    "order": ["wander", "dodge"],
+    "better": "higher",
+    "minStep": 5
+  },
+  "firstPayoff": {
+    "policy": "dodge",
+    "difficulty": 0,
+    "withinMoves": 1,
+    "minShare": 0.9
+  },
+  "twist": {
+    "policy": "dodge",
+    "difficulty": 34,
+    "minPerRun": 1
+  },
+  "notes": "Real-time example (moves are ticks, 120 per second; the first-payoff window counts seconds, payoffStepTicks 120). Three tuning rows on the 0..100 scale, sampled at their lower bounds (0/34/67), 100 seeds. From the first sim run: the dodge player wins 1.0 / 0.7 / 0.33 of the three rounds, collects its first spark within a second in every run (the opening puts it 150 units from the start), and the pulse throws chasers back about twice per round at d34. Standing still loses in under 3 seconds (median 327 ticks) and random steering collects no sparks. Ticks come from the fixed-step loop, never from the display, so the numbers hold on a 60 Hz Android phone and a 120 Hz iPhone alike. Proposed until a person has played it on both."
+}

@@ -1,0 +1,70 @@
+{
+  "bad-sim-baseline-file-regression": {
+    "expect": ["[cold-start]", "median cold start 630 ms is over 600 ms"],
+    "args": "{dir}/report.json {dir} --sim-baseline-file perf-baselines/cold-start-sim-ios.json",
+    "ops": [
+      { "write": { "file": "perf-baselines/cold-start-sim-ios.json", "json": { "medianMs": 500, "launches": 5 } } }
+    ]
+  },
+  "bad-sim-few-launches": {
+    "expect": ["[cold-start-runs]", "5 cold-start runs with a process-start time (need 6)"],
+    "ops": [{ "json": { "file": "report.json", "path": [5], "delete": true } }]
+  },
+  "bad-sim-regression": {
+    "expect": ["[cold-start]", "median cold start 760 ms is over 720 ms"],
+    "ops": [
+      { "json": { "file": "report.json", "path": [1, "data", "totalMs"], "value": 760 } },
+      { "json": { "file": "report.json", "path": [2, "data", "totalMs"], "value": 750 } },
+      { "json": { "file": "report.json", "path": [3, "data", "totalMs"], "value": 770 } },
+      { "json": { "file": "report.json", "path": [4, "data", "totalMs"], "value": 790 } },
+      { "json": { "file": "report.json", "path": [5, "data", "totalMs"], "value": 740 } }
+    ]
+  },
+  "error-sim-baseline-exists": {
+    "expect": ["the baseline perf-baselines/cold-start-sim-ios.json already exists"],
+    "args": "{dir}/report.json {dir} --sim-baseline-file perf-baselines/cold-start-sim-ios.json --write-sim-baseline",
+    "ops": [{ "write": { "file": "perf-baselines/cold-start-sim-ios.json", "json": { "medianMs": 600 } } }]
+  },
+  "error-sim-baseline-missing": {
+    "expect": [
+      "nothing to compare: the baseline perf-baselines/cold-start-sim-ios.json does not exist yet",
+      "--write-sim-baseline"
+    ],
+    "args": "{dir}/report.json {dir} --sim-baseline-file perf-baselines/cold-start-sim-ios.json"
+  },
+  "pass-sim-baseline-file": {
+    "expect": [
+      "baseline: perf-baselines/cold-start-sim-ios.json medianMs 600",
+      "cold start: median 630 ms of 5 launches (limit 720 ms)",
+      "RESULT: PASS"
+    ],
+    "args": "{dir}/report.json {dir} --sim-baseline-file perf-baselines/cold-start-sim-ios.json",
+    "ops": [
+      { "write": { "file": "perf-baselines/cold-start-sim-ios.json", "json": { "medianMs": 600, "launches": 5 } } }
+    ]
+  },
+  "pass-sim-latest-launches": {
+    "expect": [
+      "cold start: median 630 ms of 5 launches (the latest 5 of 7 recorded, first of the run dropped) (limit 720 ms)",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "report.json",
+          "path": [6],
+          "value": {
+            "kind": "cold-start",
+            "label": "tasks",
+            "atEpochMs": 1790429999995,
+            "data": { "nativeMs": 1700, "jsMs": 300, "totalMs": 2000 }
+          }
+        }
+      }
+    ]
+  },
+  "pass-sim-write-baseline": {
+    "expect": ["baseline: wrote perf-baselines/cold-start-sim-ios.json with medianMs 630 (5 launches)", "RESULT: PASS"],
+    "args": "{dir}/report.json {dir} --sim-baseline-file perf-baselines/cold-start-sim-ios.json --write-sim-baseline"
+  }
+}

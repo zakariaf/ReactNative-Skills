@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "knip-ignores.schema.json",
+  "title": "knip ignore reasons",
+  "description": "The written reason for every entry of the ignore lists in knip.json (ignore, ignoreBinaries, ignoreDependencies, ignoreFiles, ignoreMembers, ignoreUnresolved, ignoreWorkspaces, ignoreIssues), at the same key path: a top-level list under its own key, a workspace list under workspaces.<folder>.<key>. Each reason says what the entry covers and why knip cannot see it otherwise (at least 10 characters). Read by the quality-gates skill's check-gate-wiring.mjs (rule knip-ignores). Unknown keys are refused.",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "reasons": {
+      "type": "object",
+      "description": "Ignore entry (exactly as written in knip.json) -> why it is there.",
+      "additionalProperties": { "type": "string", "minLength": 10 }
+    },
+    "lists": {
+      "type": "object",
+      "propertyNames": { "pattern": "^ignore[A-Za-z]*$" },
+      "additionalProperties": { "$ref": "#/$defs/reasons" }
+    }
+  },
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "workspaces": {
+      "type": "object",
+      "description": "Workspace folder (as keyed in knip.json workspaces) -> its lists.",
+      "additionalProperties": { "$ref": "#/$defs/lists" }
+    }
+  },
+  "patternProperties": {
+    "^ignore[A-Za-z]*$": { "$ref": "#/$defs/reasons" }
+  }
+}

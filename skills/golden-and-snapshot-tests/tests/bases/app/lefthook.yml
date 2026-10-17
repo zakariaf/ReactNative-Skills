@@ -1,0 +1,5 @@
+pre-commit:
+  jobs:
+    - name: test-related
+      glob: '*.{ts,tsx,json}'
+      run: npx jest --ci --bail --findRelatedTests --passWithNoTests {staged_files}

@@ -1,0 +1,19 @@
+{
+  "platform": "ios",
+  "device": "tasks-e2e-phone",
+  "deviceId": "0C9E3F8A-51D2-4B7E-9A61-2F4D8C7B1E03",
+  "devices": [
+    {
+      "name": "tasks-e2e-phone",
+      "id": "0C9E3F8A-51D2-4B7E-9A61-2F4D8C7B1E03"
+    },
+    {
+      "name": "tasks-e2e-tablet",
+      "id": "7B2D4E61-9C3A-4F85-B1D0-6E8A2C4F9D17"
+    }
+  ],
+  "appId": "com.example.tasks.preview",
+  "includeTags": null,
+  "largeText": "ran",
+  "networkMode": "offline-only"
+}

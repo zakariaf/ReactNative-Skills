@@ -1,0 +1,3 @@
+[render-impure] new Date() in a component file
+src/features/tasks/components/due-label.tsx:15
+RESULT: FAIL (1 problems)

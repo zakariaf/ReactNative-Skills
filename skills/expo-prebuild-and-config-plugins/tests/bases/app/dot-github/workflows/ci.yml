@@ -1,0 +1,11 @@
+name: ci
+on: [push]
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npx expo prebuild --clean --platform android
+      - run: cd android && ./gradlew bundleRelease
+      - run: mkdir -p dist && cp android/app/build/outputs/bundle/release/app-release.aab dist/

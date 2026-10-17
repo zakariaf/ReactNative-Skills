@@ -1,0 +1,213 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "contracts/settings.json",
+  "description": "The app's settings model for settings-and-preferences' check-settings.mjs. Paths are repo-relative; regexes are JavaScript source strings matched against code with comments masked.",
+  "type": "object",
+  "required": ["schema", "defaults", "reducer", "store", "screenDirs", "fields", "actions"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "$comment": {
+      "type": "string"
+    },
+    "schema": {
+      "description": "Where the strict valibot object of the settings lives. `export` is a name, or a name with <n> (SETTINGS_V<n>): the newest version across every file the glob matches is checked.",
+      "type": "object",
+      "required": ["file", "export"],
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "type": "string"
+        },
+        "export": {
+          "type": "string"
+        }
+      }
+    },
+    "defaults": {
+      "description": "The object literal of first-launch values.",
+      "type": "object",
+      "required": ["file", "export"],
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "type": "string"
+        },
+        "export": {
+          "type": "string"
+        }
+      }
+    },
+    "reducer": {
+      "description": "The pure reducer file: one `case '<action>'` per action.",
+      "type": "string"
+    },
+    "store": {
+      "description": "The store file: the first `persist` match must come before the first `publish` match.",
+      "type": "object",
+      "required": ["file", "persist", "publish"],
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "type": "string"
+        },
+        "persist": {
+          "type": "string"
+        },
+        "publish": {
+          "type": "string"
+        }
+      }
+    },
+    "storage": {
+      "description": "The only files that may write the settings to a storage SDK, and the key they use.",
+      "type": "object",
+      "required": ["adapters"],
+      "additionalProperties": false,
+      "properties": {
+        "adapters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "key": {
+          "type": "string"
+        }
+      }
+    },
+    "screenDirs": {
+      "description": "Folders whose code dispatches the row actions (the settings screen, an onboarding language step).",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "entries": {
+      "description": "Globs of the files the app starts from. A field's effect, and the screen code that dispatches its action, count only when one of these imports them, directly or through other files (type-only imports do not count). Default: every file under the routes folder (the root layout and the routes) and <servicesDir>/create-device-services.ts (the composition root). A React Navigation app lists its App.tsx or navigator file.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "effectExclude": {
+      "description": "Globs where a read never counts as the setting's effect (the model, its storage, the screen). Tests never count.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "fields": {
+      "description": "Every saved field, in schema order.",
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": ["schema", "default", "action", "effect"],
+        "additionalProperties": false,
+        "properties": {
+          "schema": {
+            "description": "The validator source, compared without whitespace.",
+            "type": "string"
+          },
+          "default": {
+            "description": "The first-launch value source.",
+            "type": "string"
+          },
+          "action": {
+            "description": "The action that changes it (listed in actions).",
+            "type": "string"
+          },
+          "effect": {
+            "description": "Regex of the read that applies it, outside effectExclude.",
+            "type": "string"
+          },
+          "unit": {
+            "description": "'percent': every effect file that reads it converts at the edge.",
+            "enum": ["percent"]
+          },
+          "scale": {
+            "description": "Regex of that conversion (default: a division by 100).",
+            "type": "string"
+          },
+          "clamp": {
+            "description": "The function the reducer calls to keep the value in range.",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "actions": {
+      "description": "Every reducer action.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z]+(-[a-z0-9]+)*$"
+      }
+    },
+    "rowExempt": {
+      "description": "Actions no screen dispatches (sent by code, such as a migration helper).",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "accountPreferences": {
+      "description": "Names of preferences the server owns (an email opt-in, an account's notification categories, profile visibility). They are server state (a query and an optimistic mutation through the ApiClient), never a settings field: the checker fails when one appears in fields or the schema.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "resets": {
+      "description": "Data resets that must keep the settings.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["file", "function", "keeps"],
+        "additionalProperties": false,
+        "properties": {
+          "file": {
+            "type": "string"
+          },
+          "function": {
+            "type": "string"
+          },
+          "owner": {
+            "description": "The skill that creates the file (for the not-yet-created SKIP).",
+            "type": "string"
+          },
+          "keeps": {
+            "description": "Identifiers the reset body never names: the settings, their storage, a whole-store clear.",
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "publishWith": {
+            "description": "Document mode only: the function every caller wraps the reset in, so every store re-reads (state-management-zustand's updateAndPublish). The document write sits inside its write callback: updateAndPublish(stores, () => ...documents.update(resetAllProgress, { refreshBackup: true })...). Leave it out for a key-value app: there state-management-zustand checks its crossStoreWrites.",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "toggleFeedback": {
+      "description": "Regex of the switch feedback call the screen code makes after a dispatch (default: audio-and-haptics-feedback's playUiFeedback(services, 'toggle'), wired as the model input onToggled); null when the app plays none.",
+      "type": ["string", "null"]
+    },
+    "restartCall": {
+      "description": "Regex of the call that restarts the app to apply a layout direction (default: rtl-and-direction's restartForDirection call). In screen code it must sit in a handler whose name says restart (onRestartNow) or after the restart decision (restartDecision) in the same handler.",
+      "type": "string"
+    },
+    "restartDecision": {
+      "description": "Regex of the restart decision (default: isRestartNeeded, or a comparison with readLayoutDirection()).",
+      "type": "string"
+    }
+  }
+}

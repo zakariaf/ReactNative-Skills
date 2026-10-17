@@ -1,0 +1,6 @@
+[
+  { "from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs" },
+  { "from": "scripts/lib/source-scan.mjs", "to": "scripts/lib/source-scan.mjs" },
+  { "from": "repo-templates/src/hooks/use-window-class.ts", "to": "templates/src/hooks/use-window-class.ts" },
+  { "from": "repo-templates/src/hooks/use-window-class.test.ts", "to": "templates/src/hooks/use-window-class.test.ts" }
+]

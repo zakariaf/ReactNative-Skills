@@ -1,0 +1,5 @@
+{
+  "$comment": "Values verify-templates and the self-test fill into the templates: the Tasks app's progress grid (the template surface of skia-canvas-rendering). Replace them with the feature and surface you build.",
+  "__FEATURE__": "tasks",
+  "__SURFACE__": "progress-grid"
+}

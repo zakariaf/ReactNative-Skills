@@ -1,0 +1,2 @@
+src/ui/form/email-field.tsx:5 [input-preset] <TextInput> has the email keyboard but no autoCapitalize
+RESULT: FAIL (1 problems)

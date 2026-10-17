@@ -1,0 +1,12 @@
+{
+  "reviewLanguages": [
+    "ar"
+  ],
+  "catalogs": [
+    {
+      "dir": "packages/billing/src/i18n",
+      "keyPrefix": "billing",
+      "sourceDir": "packages/billing/src"
+    }
+  ]
+}

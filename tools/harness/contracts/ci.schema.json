@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CI contract",
+  "description": "contracts/ci.json: the app's CI facts for the ci-pipeline-and-gates checkers.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "laneOptOuts": {
+      "description": "Device lanes the app has an npm script for but deliberately does not run in CI, each with its reason (at least 20 characters, so it says why).",
+      "type": "object",
+      "propertyNames": { "enum": ["android-build", "android-e2e", "ios-build", "ios-e2e"] },
+      "additionalProperties": { "type": "string", "minLength": 20 }
+    }
+  },
+  "required": ["laneOptOuts"]
+}

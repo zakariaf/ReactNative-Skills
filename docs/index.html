@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>React Native Agent Skills</title>
+<meta name="description" content="Deep, self-verifying engineering skills for React Native apps built with Expo. Every skill ends in a checker that prints RESULT: PASS; every checker is proven against planted bugs; every template compiles in a reference Expo app.">
+<meta property="og:title" content="React Native Agent Skills">
+<meta property="og:description" content="79 self-verifying skills for Expo apps: rules with reasons, compiling templates, and a checker that proves the work.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://zakaria.dev/ReactNative-Skills/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%233f7cf4'/%3E%3Cpath d='M9 16.5l4.5 4.5L23 11.5' stroke='white' stroke-width='3.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#f7f9fc; --bg-soft:#eef2f8; --panel:#ffffff; --panel-2:#f3f6fb;
+    --border:#dfe5ee; --border-soft:#e8edf4;
+    --text:#111826; --muted:#4f5c73; --faint:#7b879b;
+    --accent:#2457d6; --accent-soft:rgba(36,87,214,.10);
+    --ok:#137a4b; --ok-soft:rgba(19,122,75,.12); --warn:#9a5b00; --warn-soft:rgba(154,91,0,.12);
+    --games:#7a3fd1; --games-soft:rgba(122,63,209,.12);
+    --radius:14px; --maxw:1140px;
+    --shadow:0 1px 2px rgba(16,24,40,.05),0 10px 28px rgba(16,24,40,.07);
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0b0e13; --bg-soft:#10141b; --panel:#141a23; --panel-2:#19202b;
+      --border:#253042; --border-soft:#1d2532;
+      --text:#e7ecf3; --muted:#a3b0c2; --faint:#7a8799;
+      --accent:#7aa5ff; --accent-soft:rgba(122,165,255,.14);
+      --ok:#4fd39a; --ok-soft:rgba(79,211,154,.13); --warn:#f0b43c; --warn-soft:rgba(240,180,60,.14);
+      --games:#b892ff; --games-soft:rgba(184,146,255,.14);
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 30px rgba(0,0,0,.3);
+      color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0b0e13; --bg-soft:#10141b; --panel:#141a23; --panel-2:#19202b;
+    --border:#253042; --border-soft:#1d2532;
+    --text:#e7ecf3; --muted:#a3b0c2; --faint:#7a8799;
+    --accent:#7aa5ff; --accent-soft:rgba(122,165,255,.14);
+    --ok:#4fd39a; --ok-soft:rgba(79,211,154,.13); --warn:#f0b43c; --warn-soft:rgba(240,180,60,.14);
+    --games:#b892ff; --games-soft:rgba(184,146,255,.14);
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 30px rgba(0,0,0,.3);
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{transition:none!important}}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:var(--accent)}
+  code,.mono{font-family:var(--mono)}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 16px}
+  @media (min-width:720px){.wrap{padding:0 24px}}
+  .skip{position:absolute;left:-999px;top:8px;background:var(--panel);padding:8px 12px;border-radius:8px;z-index:100}
+  .skip:focus{left:8px}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  /* nav */
+  header.nav{position:sticky;top:0;z-index:50;backdrop-filter:saturate(140%) blur(10px);background:color-mix(in srgb,var(--bg) 85%,transparent);border-bottom:1px solid var(--border-soft)}
+  .nav-in{display:flex;align-items:center;gap:12px;height:58px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--text);text-decoration:none;white-space:nowrap}
+  .logo{width:26px;height:26px;border-radius:7px;background:var(--accent);display:grid;place-items:center;flex:none}
+  .nav-links{margin-left:auto;display:flex;align-items:center;gap:4px}
+  .nav-links a{padding:8px 10px;border-radius:9px;color:var(--muted);font-size:14px;font-weight:500;text-decoration:none}
+  .nav-links a:hover{color:var(--text);background:var(--panel-2)}
+  .icon-btn{display:inline-grid;place-items:center;min-width:36px;height:36px;padding:0 8px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--muted);cursor:pointer;font-size:13px;font-family:var(--sans)}
+  .icon-btn:hover{color:var(--text);border-color:var(--accent)}
+  @media (max-width:640px){.nav-links a.hide-sm{display:none}}
+  /* hero */
+  .hero{padding:56px 0 28px}
+  .pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+  .pill{padding:4px 11px;border:1px solid var(--border);background:var(--panel);border-radius:999px;font-size:12.5px;color:var(--muted);font-weight:500}
+  h1{font-size:clamp(30px,5.4vw,52px);line-height:1.08;letter-spacing:-.025em;margin:0 0 16px;font-weight:800}
+  h1 em{font-style:normal;color:var(--accent)}
+  .lede{font-size:clamp(16px,2vw,19px);color:var(--muted);max-width:680px;margin:0 0 24px}
+  .result{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:13px;background:var(--ok-soft);color:var(--ok);padding:3px 9px;border-radius:7px;font-weight:600}
+  .cmd{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px 10px 10px 14px;font-family:var(--mono);font-size:13.5px;box-shadow:var(--shadow);max-width:620px;margin-top:10px}
+  .cmd code{overflow-x:auto;white-space:nowrap;flex:1;min-width:0}
+  .cmd .pr{color:var(--accent);font-weight:700;flex:none}
+  .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:36px 0 0}
+  .stat{background:var(--panel);border:1px solid var(--border-soft);border-radius:var(--radius);padding:16px 18px}
+  .stat .n{font-size:24px;font-weight:800;letter-spacing:-.02em}
+  .stat .l{color:var(--muted);font-size:13px}
+  @media (max-width:720px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  /* sections */
+  section{padding:44px 0}
+  .kicker{color:var(--accent);font-weight:700;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase}
+  h2{font-size:clamp(22px,3.2vw,30px);letter-spacing:-.02em;margin:6px 0 6px;font-weight:800}
+  .sub{color:var(--muted);max-width:680px;margin:0 0 20px}
+  .feat{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+  .fcard{background:var(--panel);border:1px solid var(--border-soft);border-radius:var(--radius);padding:20px}
+  .fcard h3{margin:0 0 6px;font-size:16px}
+  .fcard p{margin:0;color:var(--muted);font-size:14px}
+  /* install */
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .tab{padding:7px 13px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--muted);cursor:pointer;font-size:13.5px;font-weight:600;font-family:var(--sans)}
+  .tab[aria-selected="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .panel-code{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow)}
+  .panel-code pre{margin:0;font-family:var(--mono);font-size:13.5px;white-space:pre-wrap;word-break:break-word;line-height:1.7}
+  .panel-code .c{color:var(--faint)}
+  .panel-code p{margin:10px 0 0;color:var(--muted);font-size:14px}
+  /* catalogue */
+  .controls{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+  .search{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px 14px}
+  .search input{border:0;outline:0;background:transparent;color:var(--text);font-size:15px;width:100%;font-family:var(--sans)}
+  .search:focus-within{border-color:var(--accent)}
+  .filter-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .filter-row .lbl{font-size:12.5px;color:var(--faint);font-weight:600;margin-right:4px}
+  .chip{padding:6px 12px;border-radius:999px;border:1px solid var(--border);background:var(--panel);color:var(--muted);cursor:pointer;font-size:13px;font-weight:600;font-family:var(--sans)}
+  .chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .chip .c{opacity:.65;font-weight:500;margin-left:3px}
+  .count-line{color:var(--faint);font-size:13px;margin:0 0 14px}
+  .group{margin-bottom:30px}
+  .group-h{display:flex;align-items:baseline;gap:10px;margin:0 0 14px;padding-bottom:8px;border-bottom:1px solid var(--border-soft)}
+  .group-h h3{margin:0;font-size:17px}
+  .group-h .cnt{color:var(--faint);font-size:13px;font-family:var(--mono)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:14px}
+  .card{background:var(--panel);border:1px solid var(--border-soft);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+  .card:hover{border-color:var(--accent)}
+  .card .top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .card h4{margin:0;font-family:var(--mono);font-size:14.5px;font-weight:600;word-break:break-word}
+  .card h4 a{color:var(--text);text-decoration:none}
+  .card h4 a:hover{color:var(--accent);text-decoration:underline}
+  .desc{color:var(--muted);font-size:13.8px;line-height:1.55;flex:1;margin:0}
+  .desc .when{display:block;margin-top:6px;color:var(--faint);font-size:13px}
+  .tag{font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px;letter-spacing:.02em;text-transform:uppercase}
+  .tag.games{background:var(--games-soft);color:var(--games)}
+  .tag.manual{background:var(--warn-soft);color:var(--warn)}
+  .tag.checker{background:var(--ok-soft);color:var(--ok)}
+  .inst{display:flex;align-items:center;gap:8px;background:var(--panel-2);border:1px solid var(--border-soft);border-radius:9px;padding:6px 6px 6px 10px;font-family:var(--mono);font-size:12.3px;min-width:0}
+  .inst code{overflow-x:auto;white-space:nowrap;flex:1;min-width:0;color:var(--text)}
+  .inst .k{color:var(--faint);flex:none}
+  .inst button{flex:none;height:28px;min-width:0;font-size:12px}
+  .empty{text-align:center;color:var(--muted);padding:48px 0}
+  footer{border-top:1px solid var(--border-soft);padding:32px 0;margin-top:20px;color:var(--muted);font-size:14px}
+  .foot-in{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+  .foot-in a{color:var(--muted)}
+  .foot-in .sp{margin-left:auto}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);opacity:0;background:var(--text);color:var(--bg);padding:9px 16px;border-radius:10px;font-size:13.5px;font-weight:600;transition:opacity .2s;pointer-events:none;z-index:100}
+  .toast.show{opacity:1}
+</style>
+</head>
+<body>
+<a class="skip" href="#skills">Skip to the skills</a>
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="#top"><span class="logo" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>React Native Agent Skills</a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="#why" class="hide-sm">Why</a>
+      <a href="#install" class="hide-sm">Install</a>
+      <a href="#skills" class="hide-sm">Skills</a>
+      <a href="https://github.com/zakariaf/ReactNative-Skills" rel="noopener">GitHub</a>
+      <button class="icon-btn" id="themeBtn" type="button" aria-label="Switch colour theme">Theme</button>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <div class="pills">
+        <span class="pill" id="pill-count">79 skills</span>
+        <span class="pill">Expo SDK 57 · React Native 0.86</span>
+        <span class="pill">iOS + Android</span>
+        <span class="pill">Agent Skills standard</span>
+        <span class="pill">MIT</span>
+      </div>
+      <h1>Agent skills for Expo apps that <em>prove their work</em>.</h1>
+      <p class="lede">Rules with their reasons, a workflow, templates that compile in a real Expo app, and a definition of done that ends in a checker printing <span class="result">RESULT: PASS</span>. Every checker is tested against planted bugs.</p>
+      <div class="cmd"><span class="pr">/</span><code>plugin marketplace add zakariaf/ReactNative-Skills</code><button class="icon-btn" type="button" data-copy="/plugin marketplace add zakariaf/ReactNative-Skills" aria-label="Copy the marketplace command">Copy</button></div>
+      <div class="cmd"><span class="pr">/</span><code>plugin install react-native@react-native-skills</code><button class="icon-btn" type="button" data-copy="/plugin install react-native@react-native-skills" aria-label="Copy the install command">Copy</button></div>
+      <div class="stats">
+        <div class="stat"><div class="n" id="s-skills">79</div><div class="l">skills</div></div>
+        <div class="stat"><div class="n" id="s-cats">13</div><div class="l">categories</div></div>
+        <div class="stat"><div class="n" id="s-checkers">0</div><div class="l">skills with self-tested checkers</div></div>
+        <div class="stat"><div class="n">2</div><div class="l">plugins: core and games</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="why" style="background:var(--bg-soft);border-top:1px solid var(--border-soft);border-bottom:1px solid var(--border-soft)">
+    <div class="wrap">
+      <div class="kicker">Why it is different</div>
+      <h2>Not advice: work an agent can prove</h2>
+      <div class="feat">
+        <div class="fcard"><h3>A checker ends every skill</h3><p>A zero-dependency Node script reads your repo and prints <code>RESULT: PASS</code> or each problem with a file, line, rule and fix.</p></div>
+        <div class="fcard"><h3>Checkers tested on planted bugs</h3><p>Each skill's self-test plants one bug per case that must fail for exactly its rule, and clean cases that must pass.</p></div>
+        <div class="fcard"><h3>Templates that compile</h3><p>Templates are complete files proven in a reference Expo SDK 57 app: strict TypeScript, ESLint with zero warnings, Jest and Prettier.</p></div>
+        <div class="fcard"><h3>One stack, both platforms</h3><p>Expo Router, Zustand, TanStack Query, expo-sqlite, react-intl, Reanimated, Skia and EAS, with iOS and Android stated side by side.</p></div>
+        <div class="fcard"><h3>Self-contained</h3><p>A skill works installed alone, never points outside its folder, names every device it uses and stops to ask before anything outward-facing.</p></div>
+        <div class="fcard"><h3>Any agent</h3><p>Claude Code plugins, a Codex manifest, <code>AGENTS.md</code> with an intent map, and a machine-readable <code>skills.json</code>.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="install">
+    <div class="wrap">
+      <div class="kicker">Install</div>
+      <h2>Add the skills to your agent</h2>
+      <p class="sub">Start every task with <code>react-native-conventions-index</code>: it routes the task to the skills that apply and gives the build order.</p>
+      <div class="tabs" role="tablist" aria-label="Install options">
+        <button class="tab" type="button" role="tab" id="tab-claude" aria-controls="panel-claude" aria-selected="true">Claude Code</button>
+        <button class="tab" type="button" role="tab" id="tab-codex" aria-controls="panel-codex" aria-selected="false">Codex</button>
+        <button class="tab" type="button" role="tab" id="tab-any" aria-controls="panel-any" aria-selected="false">Any agent</button>
+      </div>
+      <div class="panel-code">
+        <div role="tabpanel" id="panel-claude" aria-labelledby="tab-claude"><pre><span class="c"># the marketplace, the core plugin, and the optional game skills</span>
+/plugin marketplace add zakariaf/ReactNative-Skills
+/plugin install react-native@react-native-skills
+/plugin install react-native-games@react-native-skills</pre><p>Skills load on their own when a task matches; run one by name as <code>/react-native:&lt;skill&gt;</code> or <code>/react-native-games:&lt;skill&gt;</code>.</p></div>
+        <div role="tabpanel" id="panel-codex" aria-labelledby="tab-codex" hidden><pre><span class="c"># the repository is a Codex plugin: .codex-plugin/plugin.json, skills in ./skills/</span>
+git clone https://github.com/zakariaf/ReactNative-Skills</pre><p>Install it the way your Codex version adds plugins from a Git repository. The Codex manifest ships all 79 skills; the game skills load only for game tasks.</p></div>
+        <div role="tabpanel" id="panel-any" aria-labelledby="tab-any" hidden><pre><span class="c"># the open skills CLI places skills where your agent reads them</span>
+npx skills add zakariaf/ReactNative-Skills
+npx skills add zakariaf/ReactNative-Skills --skill forms-and-input</pre><p>Then give your agent <a href="https://github.com/zakariaf/ReactNative-Skills/blob/main/AGENTS.md">AGENTS.md</a>: how to pick, load and report, plus the intent map.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="skills">
+    <div class="wrap">
+      <div class="kicker">Catalogue</div>
+      <h2>The skills</h2>
+      <p class="sub">Search by task, file, error or tool. Each card says what the skill does, when to load it, and how to install it on its own.</p>
+      <div class="controls">
+        <label class="search"><span class="sr" style="color:var(--faint)" aria-hidden="true">Search</span><input id="q" type="search" placeholder="forms, sqlite, testflight, maestro, rtl, white screen..." autocomplete="off" aria-label="Search skills"></label>
+        <div class="filter-row" id="plugins" aria-label="Filter by plugin"></div>
+        <div class="filter-row" id="chips" aria-label="Filter by category"></div>
+      </div>
+      <p class="count-line" id="count-line" aria-live="polite"></p>
+      <div id="catalog"></div>
+      <div class="empty" id="empty" hidden>No skill matches "<span id="empty-q"></span>". Try a broader word, or clear the filters.</div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot-in">
+    <span>React Native Agent Skills</span>
+    <a href="https://github.com/zakariaf/ReactNative-Skills" rel="noopener">GitHub</a>
+    <a href="https://github.com/zakariaf/ReactNative-Skills/blob/main/CONTRIBUTING.md" rel="noopener">Contributing</a>
+    <a href="https://github.com/zakariaf/ReactNative-Skills/blob/main/skills.json" rel="noopener">skills.json</a>
+    <a href="https://agentskills.io" rel="noopener">Agent Skills standard</a>
+    <span class="sp">MIT © 2026 Zakaria Fatahi</span>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="skills-data.js"></script>
+<script>
+(function () {
+  'use strict';
+  var REPO = 'zakariaf/ReactNative-Skills';
+  var GH = 'https://github.com/' + REPO + '/blob/main/';
+  var SKILLS = window.SKILLS || [];
+  var CATS = window.SKILL_CATEGORIES || [];
+  var PLUGINS = [
+    { key: 'all', label: 'All plugins' },
+    { key: 'react-native', label: 'react-native (core)' },
+    { key: 'react-native-games', label: 'react-native-games (optional)' }
+  ];
+
+  // Theme: follows the system until the visitor picks one.
+  var root = document.documentElement;
+  var themeBtn = document.getElementById('themeBtn');
+  function systemDark() { return !!(window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches); }
+  function currentDark() { var t = root.getAttribute('data-theme'); return t ? t === 'dark' : systemDark(); }
+  function paintThemeButton() { themeBtn.textContent = currentDark() ? 'Light' : 'Dark'; }
+  try { var saved = localStorage.getItem('rns-theme'); if (saved === 'dark' || saved === 'light') root.setAttribute('data-theme', saved); } catch (e) {}
+  paintThemeButton();
+  themeBtn.addEventListener('click', function () {
+    var next = currentDark() ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('rns-theme', next); } catch (e) {}
+    paintThemeButton();
+  });
+
+  // Copy buttons.
+  var toast = document.getElementById('toast');
+  var toastTimer;
+  function showToast(text) { toast.textContent = text; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 1400); }
+  document.addEventListener('click', function (event) {
+    var button = event.target.closest('[data-copy]');
+    if (!button) return;
+    var text = button.getAttribute('data-copy');
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { showToast('Copied: ' + text); }, function () { showToast('Copy failed'); });
+    else showToast('Copy is not available here');
+  });
+
+  // Install tabs (arrow keys move between them).
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+  function selectTab(tab) {
+    tabs.forEach(function (t) {
+      var on = t === tab;
+      t.setAttribute('aria-selected', String(on));
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+    });
+  }
+  tabs.forEach(function (tab, i) {
+    tab.tabIndex = tab.getAttribute('aria-selected') === 'true' ? 0 : -1;
+    tab.addEventListener('click', function () { selectTab(tab); });
+    tab.addEventListener('keydown', function (event) {
+      var step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
+      if (!step) return;
+      var next = tabs[(i + step + tabs.length) % tabs.length];
+      selectTab(next); next.focus();
+    });
+  });
+
+  // Stats.
+  document.getElementById('s-skills').textContent = SKILLS.length;
+  document.getElementById('pill-count').textContent = SKILLS.length + ' skills';
+  document.getElementById('s-cats').textContent = CATS.length;
+  document.getElementById('s-checkers').textContent = SKILLS.filter(function (s) { return s.checker; }).length;
+
+  // State, kept in the URL hash so a filtered view can be shared: #q=sqlite&cat=data&plugin=react-native
+  var state = { q: '', cat: 'all', plugin: 'all' };
+  function readHash() {
+    var params = new URLSearchParams(location.hash.replace(/^#/, ''));
+    if (!params.has('q') && !params.has('cat') && !params.has('plugin')) return;
+    state.q = params.get('q') || '';
+    state.cat = params.get('cat') || 'all';
+    state.plugin = params.get('plugin') || 'all';
+  }
+  function writeHash() {
+    var params = new URLSearchParams();
+    if (state.q) params.set('q', state.q);
+    if (state.cat !== 'all') params.set('cat', state.cat);
+    if (state.plugin !== 'all') params.set('plugin', state.plugin);
+    var text = params.toString();
+    history.replaceState(null, '', text ? '#' + text : location.pathname + location.search);
+  }
+
+  function esc(text) { return String(text == null ? '' : text).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function splitDescription(description) {
+    var at = description.indexOf('Use when');
+    if (at < 0) return { lead: description, when: '' };
+    return { lead: description.slice(0, at).trim(), when: description.slice(at).trim() };
+  }
+  function inPlugin(skill) { return state.plugin === 'all' || skill.plugin === state.plugin; }
+  function inCategory(skill) { return state.cat === 'all' || skill.category === state.cat; }
+  function matchesQuery(skill) {
+    if (!state.q) return true;
+    var hay = (skill.name + ' ' + skill.description + ' ' + skill.categoryLabel + ' ' + skill.plugin).toLowerCase();
+    return state.q.toLowerCase().split(/\s+/).filter(Boolean).every(function (word) { return hay.indexOf(word) >= 0; });
+  }
+
+  var pluginsEl = document.getElementById('plugins');
+  var chipsEl = document.getElementById('chips');
+  function renderFilters() {
+    var byPlugin = SKILLS.filter(function (s) { return matchesQuery(s); });
+    pluginsEl.innerHTML = '<span class="lbl">Plugin</span>' + PLUGINS.map(function (p) {
+      var n = p.key === 'all' ? byPlugin.length : byPlugin.filter(function (s) { return s.plugin === p.key; }).length;
+      return '<button type="button" class="chip" data-plugin="' + p.key + '" aria-pressed="' + (state.plugin === p.key) + '">' + esc(p.label) + '<span class="c">' + n + '</span></button>';
+    }).join('');
+    var base = SKILLS.filter(function (s) { return matchesQuery(s) && inPlugin(s); });
+    var html = '<span class="lbl">Category</span><button type="button" class="chip" data-cat="all" aria-pressed="' + (state.cat === 'all') + '">All<span class="c">' + base.length + '</span></button>';
+    CATS.forEach(function (c) {
+      var n = base.filter(function (s) { return s.category === c.key; }).length;
+      if (!n && state.cat !== c.key) return;
+      html += '<button type="button" class="chip" data-cat="' + esc(c.key) + '" aria-pressed="' + (state.cat === c.key) + '">' + esc(c.label) + '<span class="c">' + n + '</span></button>';
+    });
+    chipsEl.innerHTML = html;
+  }
+  pluginsEl.addEventListener('click', function (event) { var b = event.target.closest('[data-plugin]'); if (!b) return; state.plugin = b.getAttribute('data-plugin'); update(); });
+  chipsEl.addEventListener('click', function (event) { var b = event.target.closest('[data-cat]'); if (!b) return; state.cat = b.getAttribute('data-cat'); update(); });
+  var input = document.getElementById('q');
+  input.addEventListener('input', function () { state.q = input.value.trim(); update(); });
+
+  function card(skill) {
+    var parts = splitDescription(skill.description);
+    var tags = '';
+    if (skill.plugin === 'react-native-games') tags += '<span class="tag games">games</span>';
+    if (skill.manual) tags += '<span class="tag manual" title="Side-effecting runbook: runs only when invoked by name">runbook</span>';
+    if (skill.checker) tags += '<span class="tag checker" title="Ends in a checker that prints RESULT: PASS, proven by its own planted-bug self-test">checker</span>';
+    var invoke = '/' + skill.plugin + ':' + skill.name;
+    var install = 'npx skills add ' + REPO + ' --skill ' + skill.name;
+    return '<article class="card">' +
+      '<div class="top"><h4><a href="' + GH + esc(skill.path) + '/SKILL.md" rel="noopener">' + esc(skill.name) + '</a></h4>' + tags + '</div>' +
+      '<p class="desc">' + esc(parts.lead) + (parts.when ? '<span class="when">' + esc(parts.when) + '</span>' : '') + '</p>' +
+      '<div class="inst"><span class="k">Claude</span><code>' + esc(invoke) + '</code><button class="icon-btn" type="button" data-copy="' + esc(invoke) + '" aria-label="Copy ' + esc(invoke) + '">Copy</button></div>' +
+      '<div class="inst"><span class="k">Any</span><code>' + esc(install) + '</code><button class="icon-btn" type="button" data-copy="' + esc(install) + '" aria-label="Copy the install line for ' + esc(skill.name) + '">Copy</button></div>' +
+      '</article>';
+  }
+
+  var catalogEl = document.getElementById('catalog');
+  var emptyEl = document.getElementById('empty');
+  var countEl = document.getElementById('count-line');
+  function renderCatalog() {
+    var shown = SKILLS.filter(function (s) { return matchesQuery(s) && inPlugin(s) && inCategory(s); });
+    countEl.textContent = shown.length === SKILLS.length ? 'Showing all ' + shown.length + ' skills' : 'Showing ' + shown.length + ' of ' + SKILLS.length + ' skills';
+    if (!shown.length) { catalogEl.innerHTML = ''; emptyEl.hidden = false; document.getElementById('empty-q').textContent = state.q || 'these filters'; return; }
+    emptyEl.hidden = true;
+    var html = '';
+    CATS.forEach(function (c) {
+      var group = shown.filter(function (s) { return s.category === c.key; });
+      if (!group.length) return;
+      html += '<div class="group"><div class="group-h"><h3>' + esc(c.label) + '</h3><span class="cnt">' + group.length + '</span></div><div class="grid">' + group.map(card).join('') + '</div></div>';
+    });
+    catalogEl.innerHTML = html;
+  }
+  function update() { renderFilters(); renderCatalog(); writeHash(); }
+
+  readHash();
+  input.value = state.q;
+  renderFilters();
+  renderCatalog();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+{
+  "area": "build",
+  "entries": [
+    {
+      "id": "build-metro-cache-variant",
+      "topic": "Variants",
+      "symptom": "A production bundle still contains test-only code",
+      "cause": "Metro does not key its cache on EXPO_PUBLIC_* values",
+      "fix": "Key config.cacheVersion on the public values",
+      "match": [
+        "production bundle (still )?contains test"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "app-variants-and-environment"
+    },
+    {
+      "id": "build-variant-mismatch",
+      "topic": "Variants",
+      "symptom": "EXPO_PUBLIC_APP_VARIANT=x must equal APP_VARIANT=y",
+      "cause": "Only one variable was exported",
+      "fix": "Export both with the same value",
+      "match": [
+        "must equal APP_VARIANT"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "app-variants-and-environment",
+      "appliesTo": {
+        "expo": "57.x"
+      }
+    }
+  ]
+}

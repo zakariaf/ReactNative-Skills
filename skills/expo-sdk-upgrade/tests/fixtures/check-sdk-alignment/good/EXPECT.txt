@@ -1,0 +1,3 @@
+sdk      app on Expo SDK 57; module map: the skill's expo-sdk-57-module-map.json
+xcode    EAS picks the image for SDK 57
+RESULT: PASS

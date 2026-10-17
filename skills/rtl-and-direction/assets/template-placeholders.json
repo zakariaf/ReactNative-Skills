@@ -1,0 +1,13 @@
+{
+  "$comment": "Values verify-templates uses to fill the language-switch flow: the testIDs of a Tasks app's home screen, add-task button, task title field, save button, settings entry, language row, the Arabic option and the restart confirmation, the id pattern of a task row (a regular expression: a row's testID ends in its task id), plus the title of the task the flow creates and expects back after the restart. An app puts its own testIDs here.",
+  "__HOME_SCREEN_ID__": "tasks.screen",
+  "__ADD_ITEM_BUTTON_ID__": "tasks.add-button",
+  "__ITEM_TITLE_INPUT_ID__": "task-editor.title-input",
+  "__KEPT_ITEM_TITLE__": "Water the plants",
+  "__ITEM_ROW_ID_PATTERN__": "tasks\\.task-row\\.[^.]+",
+  "__SAVE_ITEM_BUTTON_ID__": "task-editor.save-button",
+  "__SETTINGS_BUTTON_ID__": "tasks.settings-button",
+  "__LANGUAGE_ROW_ID__": "settings.language-row",
+  "__RTL_LANGUAGE_OPTION_ID__": "settings-language.option.ar",
+  "__RESTART_CONFIRM_ID__": "direction-restart-dialog.restart-button"
+}

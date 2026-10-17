@@ -1,0 +1,12 @@
+{
+  "name": "tasks",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.ts",
+  "dependencies": {
+    "expo": "~57.0.26",
+    "expo-sqlite": "~57.0.3",
+    "valibot": "1.5.0",
+    "zustand": "5.0.15"
+  }
+}

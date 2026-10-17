@@ -1,0 +1,992 @@
+{
+  "bad-adapter-missing": {
+    "expect": ["src/services/crash-reporter/sentry-crash-reporter-adapter.ts:1 [adapter-single]"],
+    "ops": [{ "delete": "src/services/crash-reporter/sentry-crash-reporter-adapter.ts" }]
+  },
+  "bad-adapter-single": {
+    "expect": ["src/services/telemetry/sentry-telemetry-adapter.ts:1 [adapter-single]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/telemetry/sentry-telemetry-adapter.ts",
+          "lines": [
+            "// src/services/telemetry/sentry-telemetry-adapter.ts",
+            "import * as Sentry from '@sentry/react-native';",
+            "",
+            "export const captureTelemetry = Sentry.captureMessage;"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-capture-unrecorded": {
+    "expect": [
+      "src/data/migrations/run-task-migrations.ts:5 [capture-recorded]",
+      "without recording to the error log first"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/migrations/run-task-migrations.ts",
+          "lines": [
+            "// src/data/migrations/run-task-migrations.ts",
+            "import type { CrashReporterPort } from '@/services/crash-reporter/crash-reporter-port';",
+            "",
+            "export function reportMigrationDefect(crashReporter: Pick<CrashReporterPort, 'captureException'>, error: unknown): void {",
+            "  crashReporter.captureException(error, { source: 'storage', isFatal: false });",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-config-plugin": {
+    "expect": ["app.config.ts:33 [config-plugin]", "no project"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "{ organization: 'tasks-org', project: 'tasks-app' }",
+          "with": "{ organization: 'tasks-org' }"
+        }
+      }
+    ]
+  },
+  "bad-config-plugin-missing": {
+    "expect": ["app.config.ts:1 [config-plugin]", "lists no @sentry/react-native/expo plugin"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "      ['@sentry/react-native/expo', { organization: 'tasks-org', project: 'tasks-app' }],\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-consent-applied": {
+    "expect": ["src/services/crash-reporter/crash-reporting-root-kit.tsx:1 [consent-applied]", "nothing hands"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/crash-reporter/crash-reporting-root-kit.tsx",
+          "find": "  useCrashReportingConsent(crashReporter, { isReady: true, isGranted });\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-consent-applied-early": {
+    "expect": ["src/app/_layout.tsx:9 [consent-applied]", "before the first frame"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/_layout.tsx",
+          "lines": [
+            "// src/app/_layout.tsx",
+            "import { useState } from 'react';",
+            "",
+            "import { createDeviceServices } from '@/services/create-device-services';",
+            "",
+            "export default function RootLayout(): null {",
+            "  const [services] = useState(() => {",
+            "    const created = createDeviceServices();",
+            "    created.crashReporter.setConsent(true);",
+            "    return created;",
+            "  });",
+            "  void services;",
+            "  return null;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-consent-default": {
+    "expect": ["src/stores/settings/settings-schema.ts:48 [consent-default]", "consentModel is opt-in"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/settings/settings-schema.ts",
+          "find": "  crashReportsEnabled: false,\n};",
+          "with": "  crashReportsEnabled: true,\n};"
+        }
+      }
+    ]
+  },
+  "bad-consent-hardcoded": {
+    "expect": [
+      "src/services/create-root-kits.ts:",
+      "[consent-applied] the crash reporting kit gets a hard-coded grant",
+      "src/features/settings/use-crash-row-model.ts:6 [consent-applied] the crash reporter gets a hard-coded grant"
+    ],
+    "ops": [
+      {
+        "$comment": "The registry hands the kit a fixed yes, and a model grants it in a handler with a literal.",
+        "replace": {
+          "file": "src/services/create-root-kits.ts",
+          "find": "consent: settingsCrashConsent(settings)",
+          "with": "consent: fixedCrashConsent(true)"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/create-root-kits.ts",
+          "find": "import { createCrashReportingKit } from '@/services/crash-reporter/crash-reporting-root-kit';",
+          "with": "import {\n  createCrashReportingKit,\n  fixedCrashConsent,\n} from '@/services/crash-reporter/crash-reporting-root-kit';"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/settings/use-crash-row-model.ts",
+          "lines": [
+            "// src/features/settings/use-crash-row-model.ts",
+            "import type { CrashReporterPort } from '@/services/crash-reporter/crash-reporter-port';",
+            "",
+            "export function useCrashRowModel(crashReporter: CrashReporterPort): () => void {",
+            "  return () => {",
+            "    crashReporter.setConsent(true);",
+            "  };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-consent-other-port": {
+    "expect": ["src/services/crash-reporter/crash-reporting-root-kit.tsx:1 [consent-applied]", "nothing hands"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/crash-reporter/crash-reporting-root-kit.tsx",
+          "find": "  useCrashReportingConsent(crashReporter, { isReady: true, isGranted });\n",
+          "with": ""
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/settings/use-privacy-model.ts",
+          "lines": [
+            "// src/features/settings/use-privacy-model.ts",
+            "type AnalyticsLike = { readonly setConsent: (choice: 'granted' | 'denied') => void };",
+            "",
+            "/** The usage-data toggle: analytics-and-consent's port, not the crash reporter. */",
+            "export function usePrivacyModel(analytics: AnalyticsLike): { readonly allow: () => void } {",
+            "  return { allow: () => analytics.setConsent('granted') };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-contract": {
+    "expect": ["contracts/crash-reporting.json:1 [contract]", "does not exist"],
+    "ops": [{ "delete": ["contracts/crash-reporting.json"] }]
+  },
+  "bad-contract-linked": {
+    "expect": ["contracts/crash-reporting.json:17 [contract]", "linkedToUser must be false"],
+    "ops": [
+      { "json": { "file": "contracts/crash-reporting.json", "path": ["declarations", "linkedToUser"], "value": true } }
+    ]
+  },
+  "bad-declaration": {
+    "expect": ["FAIL contracts/crash-reporting.json:", "[declaration]", "does not declare performance-data"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/crash-reporting-config.ts",
+          "find": "export const TRACES_SAMPLE_RATE = 0;",
+          "with": "export const TRACES_SAMPLE_RATE = 0.1;"
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/crash-reporting.json",
+          "path": ["declarations", "collects"],
+          "value": ["crash-data", "other-diagnostic-data"]
+        }
+      }
+    ]
+  },
+  "bad-environment-set": {
+    "expect": ["FAIL src/services/crash-reporter/sentry-crash-reporter-adapter.ts:", "[environment-set]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/crash-reporter/sentry-crash-reporter-adapter.ts",
+          "find": "    environment: config.environment,\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-init-options": {
+    "expect": ["FAIL src/services/crash-reporter/sentry-crash-reporter-adapter.ts:", "[init-options]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/crash-reporter/sentry-crash-reporter-adapter.ts",
+          "find": "Sentry.init(sentryOptions(dsn, config));",
+          "with": "Sentry.init(Object.assign({}, sentryOptions(dsn, config)));"
+        }
+      }
+    ]
+  },
+  "bad-init-scope": {
+    "expect": ["src/services/crash-reporter/sentry-crash-reporter-adapter.ts:60 [init-scope]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/crash-reporter/sentry-crash-reporter-adapter.ts",
+          "find": "/** Sends one queued item; an SDK failure goes to onError. */",
+          "with": "Sentry.init({ dsn: 'https://0@o0.ingest.sentry.io/0' });\n\n/** Sends one queued item; an SDK failure goes to onError. */"
+        }
+      }
+    ]
+  },
+  "bad-init-scope-factory": {
+    "expect": ["[init-scope]", "in the body of createSentryCrashReporterAdapter"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/crash-reporter/sentry-crash-reporter-adapter.ts",
+          "find": "  const { dsn } = config;\n",
+          "with": "  const { dsn } = config;\n  if (dsn !== null) Sentry.init(sentryOptions(dsn, config));\n"
+        }
+      }
+    ]
+  },
+  "bad-init-scope-missing": {
+    "expect": [
+      "src/services/crash-reporter/sentry-crash-reporter-adapter.ts:1 [init-scope]",
+      "the adapter never calls Sentry.init"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/crash-reporter/sentry-crash-reporter-adapter.ts",
+          "find": "Sentry.init(sentryOptions(dsn, config));",
+          "with": "void sentryOptions(dsn, config);"
+        }
+      }
+    ]
+  },
+  "bad-metro-debug-ids": {
+    "expect": [
+      "scripts/metro/metro-kits.ts:1 [metro-debug-ids]",
+      "no Metro kit builds the config with getSentryExpoConfig"
+    ],
+    "ops": [
+      {
+        "$comment": "The Metro slot lists a kit that does not build with Sentry's config.",
+        "replace": {
+          "file": "scripts/metro/metro-kits.ts",
+          "find": "  { name: 'crash-reporting', baseConfig: (projectRoot) => getSentryExpoConfig(projectRoot) },",
+          "with": "  { name: 'crash-reporting', transform: (config) => config },"
+        }
+      }
+    ]
+  },
+  "bad-metro-kits-missing": {
+    "expect": ["scripts/metro/metro-kits.ts:1 [metro-debug-ids]", "metro.config composes the Metro slot"],
+    "ops": [
+      {
+        "$comment": "metro.config composes the slot, but the app lists no Metro kit.",
+        "delete": "scripts/metro/metro-kits.ts"
+      }
+    ]
+  },
+  "bad-metro-missing": {
+    "expect": ["metro.config.js:1 [metro-debug-ids]", "no Metro config"],
+    "ops": [{ "delete": "metro.config.js" }]
+  },
+  "bad-no-user-identity": {
+    "expect": ["src/services/crash-reporter/sentry-crash-reporter-adapter.ts:62 [no-user-identity]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/crash-reporter/sentry-crash-reporter-adapter.ts",
+          "find": "/** Sends one queued item; an SDK failure goes to onError. */",
+          "with": "/** Names the signed-in account on every report. */\nexport function identify(email: string): void {\n  Sentry.setUser({ email });\n}\n\n/** Sends one queued item; an SDK failure goes to onError. */"
+        }
+      }
+    ]
+  },
+  "bad-no-user-identity-port": {
+    "expect": [
+      "FAIL src/services/crash-reporter/crash-reporter-port.ts:",
+      "[no-user-identity]",
+      "CrashReporterPort has a setUser member"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/crash-reporter/crash-reporter-port.ts",
+          "find": "  readonly status: () => CrashReporterStatus;",
+          "with": "  readonly status: () => CrashReporterStatus;\n  readonly setUser: (id: string) => void;"
+        }
+      }
+    ]
+  },
+  "bad-no-wrap": {
+    "expect": ["src/services/crash-reporter/sentry-crash-reporter-adapter.ts:61 [no-wrap]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/crash-reporter/sentry-crash-reporter-adapter.ts",
+          "find": "/** Sends one queued item; an SDK failure goes to onError. */",
+          "with": "/** Wraps the root component (touch breadcrumbs, profiler). */\nexport const wrapRoot = (root: React.ComponentType): React.ComponentType => Sentry.wrap(root);\n\n/** Sends one queued item; an SDK failure goes to onError. */"
+        }
+      }
+    ]
+  },
+  "bad-no-wrap-entry": {
+    "expect": ["App.tsx:9 [no-wrap]"],
+    "ops": [
+      {
+        "write": {
+          "file": "App.tsx",
+          "lines": [
+            "// App.tsx",
+            "import * as Sentry from '@sentry/react-native';",
+            "import { ExpoRoot } from 'expo-router';",
+            "",
+            "function App(): React.JSX.Element {",
+            "  return <ExpoRoot context={require.context('./src/app')} />;",
+            "}",
+            "",
+            "export default Sentry.wrap(App);"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-optional-deps": {
+    "expect": [".npmrc:3 [optional-deps]"],
+    "ops": [{ "write": { "file": ".npmrc", "lines": ["engine-strict=true", "save-exact=true", "omit=optional"] } }]
+  },
+  "bad-ota-sourcemaps": {
+    "expect": ["FAIL package.json:", "[ota-sourcemaps]", "script \"update:production\""],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "update:production"],
+          "value": "eas update --channel production --environment production --message release"
+        }
+      }
+    ]
+  },
+  "bad-ota-sourcemaps-eas-workflow": {
+    "expect": [".eas/workflows/preview-update.yml:8 [ota-sourcemaps]", "leaves out upload_sentry_sourcemaps"],
+    "ops": [
+      {
+        "write": {
+          "file": ".eas/workflows/preview-update.yml",
+          "lines": [
+            "# .eas/workflows/preview-update.yml",
+            "name: Preview update",
+            "on:",
+            "  push:",
+            "    branches: ['main']",
+            "jobs:",
+            "  publish_preview:",
+            "    type: update",
+            "    environment: preview",
+            "    params:",
+            "      channel: preview",
+            "      message: Preview of main",
+            "  publish_production:",
+            "    type: update",
+            "    environment: production",
+            "    params:",
+            "      channel: production",
+            "      upload_sentry_sourcemaps: true"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-ota-sourcemaps-workflow": {
+    "expect": [".github/workflows/update.yml:8 [ota-sourcemaps]"],
+    "ops": [
+      {
+        "write": {
+          "file": ".github/workflows/update.yml",
+          "lines": [
+            "name: update",
+            "on: workflow_dispatch",
+            "jobs:",
+            "  update:",
+            "    runs-on: ubuntu-24.04",
+            "    steps:",
+            "      - uses: actions/checkout@v5",
+            "      - run: npx eas-cli update --channel production --environment production --non-interactive"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-pii-default": {
+    "expect": ["src/services/crash-reporter/sentry-crash-reporter-adapter.ts:45 [pii-default]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/crash-reporter/sentry-crash-reporter-adapter.ts",
+          "find": "sendDefaultPii: false,",
+          "with": "sendDefaultPii: true,"
+        }
+      }
+    ]
+  },
+  "bad-plugin-auth-token": {
+    "expect": ["app.config.ts:33 [plugin-auth-token]", "holds authToken", "reads SENTRY_AUTH_TOKEN"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "{ organization: 'tasks-org', project: 'tasks-app' }",
+          "with": "{ organization: 'tasks-org', project: 'tasks-app', authToken: process.env.SENTRY_AUTH_TOKEN }"
+        }
+      }
+    ]
+  },
+  "bad-privacy-sync-drift": {
+    "expect": [
+      "contracts/privacy.json:4 [privacy-sync] sdks[\"@sentry/react-native\"].collects lists crash-data, but the crash reporting contract declares crash-data, other-diagnostic-data, performance-data",
+      "contracts/privacy.json:4 [privacy-sync] sdks[\"@sentry/react-native\"].collects marks crash-data as linked or tracking"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/privacy.json",
+          "lines": [
+            "{",
+            "  \"profile\": \"api-port\",",
+            "  \"sdks\": {",
+            "    \"@sentry/react-native\": {",
+            "      \"family\": \"crash reporting\",",
+            "      \"pods\": [\"Sentry\"],",
+            "      \"collects\": [",
+            "        { \"type\": \"crash-data\", \"linked\": true, \"tracking\": false, \"purposes\": [\"app-functionality\"] }",
+            "      ]",
+            "    }",
+            "  }",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-privacy-sync-missing": {
+    "expect": ["contracts/privacy.json:1 [privacy-sync] @sentry/react-native is not declared in sdks"],
+    "ops": [{ "write": { "file": "contracts/privacy.json", "lines": ["{ \"profile\": \"api-port\", \"sdks\": {} }"] } }]
+  },
+  "bad-rejection-tracker": {
+    "expect": ["src/services/crash-reporter/sentry-crash-reporter-adapter.ts:53 [rejection-tracker]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/crash-reporter/sentry-crash-reporter-adapter.ts",
+          "find": "reactNativeErrorHandlersIntegration({ onunhandledrejection: false })",
+          "with": "reactNativeErrorHandlersIntegration()"
+        }
+      }
+    ]
+  },
+  "bad-release-native": {
+    "expect": ["src/services/crash-reporter/sentry-crash-reporter-adapter.ts:41 [release-native]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/crash-reporter/sentry-crash-reporter-adapter.ts",
+          "find": "    dsn,\n",
+          "with": "    dsn,\n    release: 'tasks@1.0.0',\n"
+        }
+      }
+    ]
+  },
+  "bad-route-breadcrumbs": {
+    "expect": ["src/hooks/use-path-breadcrumbs.ts:2 [route-breadcrumbs]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/hooks/use-path-breadcrumbs.ts",
+          "lines": [
+            "// src/hooks/use-path-breadcrumbs.ts",
+            "import { usePathname } from 'expo-router';",
+            "import { useEffect } from 'react';",
+            "",
+            "import type { CrashReporterPort } from '@/services/crash-reporter/crash-reporter-port';",
+            "",
+            "export function usePathBreadcrumbs(crashReporter: Pick<CrashReporterPort, 'addBreadcrumb'>): void {",
+            "  const pathname = usePathname();",
+            "  useEffect(() => {",
+            "    crashReporter.addBreadcrumb({ category: 'navigation', message: pathname });",
+            "  }, [crashReporter, pathname]);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-screen-capture": {
+    "expect": ["src/services/crash-reporter/sentry-crash-reporter-adapter.ts:46 [screen-capture]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/crash-reporter/sentry-crash-reporter-adapter.ts",
+          "find": "attachScreenshot: false,",
+          "with": "attachScreenshot: true,"
+        }
+      }
+    ]
+  },
+  "bad-screen-capture-replay": {
+    "expect": ["src/services/crash-reporter/sentry-crash-reporter-adapter.ts:50 [screen-capture]", "Session Replay"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/crash-reporter/sentry-crash-reporter-adapter.ts",
+          "find": "maxBreadcrumbs: MAX_BREADCRUMBS,",
+          "with": "maxBreadcrumbs: MAX_BREADCRUMBS,\n    replaysOnErrorSampleRate: 1,"
+        }
+      }
+    ]
+  },
+  "bad-scrub-hooks": {
+    "expect": [
+      "src/services/crash-reporter/sentry-crash-reporter-adapter.ts:54 [scrub-hooks]",
+      "beforeSend does not call the scrubber"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/crash-reporter/sentry-crash-reporter-adapter.ts",
+          "find": "beforeSend: (event) => scrubEvent(event),",
+          "with": "beforeSend: (event) => event,"
+        }
+      }
+    ]
+  },
+  "bad-scrub-hooks-transaction": {
+    "expect": [
+      "src/services/crash-reporter/sentry-crash-reporter-adapter.ts:55 [scrub-hooks]",
+      "beforeSendTransaction does not call the scrubber"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/crash-reporter/sentry-crash-reporter-adapter.ts",
+          "find": "beforeSendTransaction: (event) => scrubEvent(event),",
+          "with": "beforeSendTransaction: (event) => event,"
+        }
+      }
+    ]
+  },
+  "bad-sdk-import": {
+    "expect": ["src/features/tasks/use-tasks-model.ts:2 [sdk-import]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "lines": [
+            "// src/features/tasks/use-tasks-model.ts",
+            "import * as Sentry from '@sentry/react-native';",
+            "",
+            "export function useTasksModel(): void {",
+            "  Sentry.captureMessage('tasks opened');",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-sdk-import-entry": {
+    "expect": ["index.ts:2 [sdk-import]", "entry file runs before the first frame"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["main"], "value": "index.ts" } },
+      {
+        "write": {
+          "file": "index.ts",
+          "lines": [
+            "// index.ts",
+            "import * as Sentry from '@sentry/react-native';",
+            "",
+            "import 'expo-router/entry';",
+            "",
+            "Sentry.init({ dsn: process.env.EXPO_PUBLIC_CRASH_REPORTER_DSN, sendDefaultPii: true });"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-sdk-import-subpath": {
+    "expect": ["src/config/sentry-metro.ts:2 [sdk-import]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/config/sentry-metro.ts",
+          "lines": [
+            "// src/config/sentry-metro.ts",
+            "export { getSentryExpoConfig } from '@sentry/react-native/metro';"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-sdk-package": {
+    "expect": ["FAIL package.json:", "[sdk-package]"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "sentry-expo"], "value": "~5.0.0" } }]
+  },
+  "bad-sink-connected": {
+    "expect": ["src/services/crash-reporter/crash-reporting-root-kit.tsx:1 [sink-connected]", "no root kit forwards"],
+    "ops": [
+      {
+        "$comment": "The kit no longer forwards the error net's reports.",
+        "replace": {
+          "file": "src/services/crash-reporter/crash-reporting-root-kit.tsx",
+          "find": "    forward: createCrashForwarder(input.crashReporter),\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-sink-connected-unregistered": {
+    "expect": ["src/services/create-root-kits.ts:1 [sink-connected]", "the crash reporting kit is never registered"],
+    "ops": [
+      {
+        "$comment": "The kit exists but the registry never creates it.",
+        "replace": {
+          "file": "src/services/create-root-kits.ts",
+          "find": "  return [createCrashReportingKit({ crashReporter, consent: settingsCrashConsent(settings) })];",
+          "with": "  void crashReporter;\n  void settingsCrashConsent;\n  return [];"
+        }
+      }
+    ]
+  },
+  "bad-sink-forwarding": {
+    "expect": ["src/services/crash-reporter/crash-forwarder.ts:13 [sink-forwarding]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/crash-reporter/crash-forwarder.ts",
+          "find": "['render', 'unhandled-rejection']",
+          "with": "['render', 'unhandled-rejection', 'global-handler']"
+        }
+      }
+    ]
+  },
+  "bad-sink-forwarding-missing": {
+    "expect": [
+      "src/services/crash-reporter/crash-forwarder.ts:1 [sink-forwarding]",
+      "no forwarder declares FORWARDED_SOURCES"
+    ],
+    "ops": [
+      {
+        "delete": [
+          "src/services/crash-reporter/crash-forwarder.ts",
+          "src/services/crash-reporter/crash-forwarder.test.ts"
+        ]
+      }
+    ]
+  },
+  "bad-token-files": {
+    "expect": [".sentryclirc:2 [token-files]"],
+    "ops": [{ "write": { "file": ".sentryclirc", "lines": ["[auth]", "token=defused-planted-value"] } }]
+  },
+  "bad-token-files-env": {
+    "expect": [".env.sentry-build-plugin:1 [token-files]"],
+    "ops": [
+      { "replace": { "file": ".gitignore", "find": ".env.sentry-build-plugin\n", "with": "" } },
+      { "write": { "file": ".env.sentry-build-plugin", "lines": ["SENTRY_ORG=tasks-org"] } }
+    ]
+  },
+  "bad-trace-rate": {
+    "expect": ["src/config/crash-reporting-config.ts:12 [trace-rate]", "above the contract maxTracesSampleRate 0.2"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/crash-reporting-config.ts",
+          "find": "export const TRACES_SAMPLE_RATE = 0;",
+          "with": "export const TRACES_SAMPLE_RATE = 0.5;"
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/crash-reporting.json",
+          "path": ["declarations", "collects"],
+          "value": ["crash-data", "other-diagnostic-data", "performance-data"]
+        }
+      }
+    ]
+  },
+  "bad-trace-sampler": {
+    "expect": ["src/services/crash-reporter/sentry-crash-reporter-adapter.ts:50 [trace-rate]", "tracesSampler"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/crash-reporter/sentry-crash-reporter-adapter.ts",
+          "find": "maxBreadcrumbs: MAX_BREADCRUMBS,",
+          "with": "maxBreadcrumbs: MAX_BREADCRUMBS,\n    tracesSampler: () => 1,"
+        }
+      }
+    ]
+  },
+  "bad-upload-not-disabled": {
+    "expect": [
+      "FAIL eas.json:",
+      "[upload-not-disabled]",
+      "build profile \"production\" sets SENTRY_DISABLE_AUTO_UPLOAD=true"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "eas.json",
+          "path": ["build", "production", "env", "SENTRY_DISABLE_AUTO_UPLOAD"],
+          "value": "true"
+        }
+      }
+    ]
+  },
+  "bad-upload-not-disabled-extends": {
+    "expect": [
+      "FAIL eas.json:",
+      "[upload-not-disabled]",
+      "build profile \"preview\" sets SENTRY_ALLOW_FAILURE=true",
+      "build profile \"production\" sets SENTRY_ALLOW_FAILURE=true"
+    ],
+    "ops": [
+      { "json": { "file": "eas.json", "path": ["build", "base", "env"], "value": { "SENTRY_ALLOW_FAILURE": "true" } } }
+    ]
+  },
+  "error-no-package-json": {
+    "expect": ["ERROR [bad-input] nothing to check: no package.json"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "pass-capture-after-record": {
+    "expect": ["check-crash-reporting:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/migrations/run-task-migrations.ts",
+          "lines": [
+            "// src/data/migrations/run-task-migrations.ts",
+            "import type { CrashReporterPort } from '@/services/crash-reporter/crash-reporter-port';",
+            "import type { ErrorLogPort } from '@/services/error-log/error-log-port';",
+            "",
+            "export function reportMigrationDefect(",
+            "  errorLog: Pick<ErrorLogPort, 'record'>,",
+            "  crashReporter: Pick<CrashReporterPort, 'captureException'>,",
+            "  error: unknown,",
+            "): void {",
+            "  errorLog.record('storage', error);",
+            "  crashReporter.captureException(error, { source: 'storage', isFatal: false });",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-eas-update-subcommand": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "updates:list"],
+          "value": "eas update:list --branch production"
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "updates:rollback"],
+          "value": "npx eas-cli@18 update:rollback"
+        }
+      }
+    ]
+  },
+  "pass-installed-skills-silent": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/decoy/src/services/decoy/decoy.ts",
+          "lines": [
+            "import * as Sentry from '@sentry/react-native';",
+            "Sentry.init({ dsn: 'x', sendDefaultPii: true });",
+            "Sentry.setUser({ email: 'a@b.co' });"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/decoy/src/decoy.ts",
+          "lines": ["import * as Sentry from '@sentry/react-native';", "Sentry.setUser({ email: 'a@b.co' });"]
+        }
+      },
+      { "write": { "file": "src/vendor/decoy-skill/SKILL.md", "lines": ["---", "name: decoy", "---"] } },
+      {
+        "write": {
+          "file": "src/vendor/decoy-skill/decoy.ts",
+          "lines": [
+            "import * as Sentry from '@sentry/react-native';",
+            "Sentry.wrap(null);",
+            "Sentry.setUser({ email: 'a@b.co' });"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-installed-unused": {
+    "expect": [
+      "NOT APPLICABLE: @sentry/react-native is installed, but no app code, config plugin, Metro config or crash reporting contract uses it yet"
+    ],
+    "base": ["@tests/bases/app"],
+    "extends": null,
+    "ops": []
+  },
+  "pass-metro-direct": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "An app that keeps its own metro.config.js (no Metro slot) and builds it with Sentry's config.",
+        "delete": "scripts/metro/metro-kits.ts"
+      },
+      {
+        "write": {
+          "file": "metro.config.js",
+          "lines": [
+            "// metro.config.js",
+            "const { getSentryExpoConfig } = require('@sentry/react-native/metro');",
+            "",
+            "const { publicEnvCacheVersion } = require('./scripts/metro/public-env-cache-version.ts');",
+            "",
+            "const config = getSentryExpoConfig(__dirname);",
+            "config.cacheVersion = publicEnvCacheVersion(process.env);",
+            "",
+            "module.exports = config;"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-no-eas": {
+    "expect": ["SKIP eas.json [upload-not-disabled] not yet created (eas-build-and-submit creates it)", "RESULT: PASS"],
+    "ops": [{ "delete": "eas.json" }]
+  },
+  "pass-not-installed": {
+    "expect": ["NOT APPLICABLE: @sentry/react-native is not in package.json"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "@sentry/react-native"], "delete": true } }]
+  },
+  "pass-ota-eas-workflow": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": ".eas/workflows/publish-update.yml",
+          "lines": [
+            "# .eas/workflows/publish-update.yml",
+            "name: Publish update",
+            "on:",
+            "  push:",
+            "    branches: ['main']",
+            "jobs:",
+            "  publish_preview:",
+            "    type: update",
+            "    environment: preview",
+            "    params:",
+            "      channel: preview",
+            "      upload_sentry_sourcemaps: true",
+            "  publish_production:",
+            "    type: update",
+            "    environment: production",
+            "    params:",
+            "      channel: production",
+            "    hooks:",
+            "      after_update:",
+            "        - run: npx sentry-expo-upload-sourcemaps dist"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-privacy-sync": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/privacy.json",
+          "lines": [
+            "{",
+            "  \"profile\": \"api-port\",",
+            "  \"sdks\": {",
+            "    \"@sentry/react-native\": {",
+            "      \"family\": \"crash reporting\",",
+            "      \"pods\": [",
+            "        \"Sentry\"",
+            "      ],",
+            "      \"maven\": [",
+            "        \"io.sentry:\"",
+            "      ],",
+            "      \"collects\": [",
+            "        {",
+            "          \"type\": \"crash-data\",",
+            "          \"linked\": false,",
+            "          \"tracking\": false,",
+            "          \"purposes\": [",
+            "            \"app-functionality\"",
+            "          ]",
+            "        },",
+            "        {",
+            "          \"type\": \"other-diagnostic-data\",",
+            "          \"linked\": false,",
+            "          \"tracking\": false,",
+            "          \"purposes\": [",
+            "            \"app-functionality\"",
+            "          ]",
+            "        },",
+            "        {",
+            "          \"type\": \"performance-data\",",
+            "          \"linked\": false,",
+            "          \"tracking\": false,",
+            "          \"purposes\": [",
+            "            \"app-functionality\"",
+            "          ]",
+            "        }",
+            "      ]",
+            "    }",
+            "  }",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-setuser-state": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/account/use-account.ts",
+          "lines": [
+            "// src/features/account/use-account.ts",
+            "import { useState } from 'react';",
+            "",
+            "export type Account = { readonly id: string; readonly name: string };",
+            "",
+            "/** The signed-in account in local state; setUser is a React state setter, not the SDK's. */",
+            "export function useAccount(): { readonly user: Account | null; readonly signIn: (account: Account) => void } {",
+            "  const [user, setUser] = useState<Account | null>(null);",
+            "  const signIn = (account: Account): void => {",
+            "    setUser(account);",
+            "  };",
+            "  return { user, signIn };",
+            "}"
+          ]
+        }
+      }
+    ]
+  }
+}

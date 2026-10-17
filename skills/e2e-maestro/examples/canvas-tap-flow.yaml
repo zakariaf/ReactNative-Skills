@@ -1,0 +1,31 @@
+# Example (a shape, not a template): tapping a cell of a Skia canvas in a Lights Out board.
+# A canvas has no accessibility nodes, so its cells have no testIDs. With probe=1 the test build draws
+# skia-canvas-rendering's probe, lights-out.canvas-layout: a small text holding
+# JSON.stringify({ x, y, layout }), the canvas origin in window points and its layout (regions in
+# canvas points, unmirrored, isMirrored). The flow computes a cell centre and taps that point.
+# iOS point taps use window points as they are. On Android Maestro's coordinates are physical
+# pixels: multiply by density / 160 (adb -s <serial> shell wm density). Not a template: the board
+# region id, the cell and the ids below are this example's.
+appId: ${APP_ID}
+name: Tapping the centre cell toggles it and its neighbours
+tags: [journeys]
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: ../../subflows/debug-setup.yaml
+    env:
+      QUERY: 'motion=still&probe=1&open=game'
+      WAIT_FOR: 'lights-out.canvas-layout'
+- copyTextFrom:
+    id: 'lights-out.canvas-layout'
+- evalScript: ${output.probe = JSON.parse(maestro.copiedText)}
+- evalScript: ${output.board = output.probe.layout.regions.find((region) => region.id === 'board')}
+# Cell centre = canvas origin + region origin + (col + 0.5) * cell; this board is never mirrored.
+# No ": " inside evalScript (YAML would read a mapping): plain arithmetic only.
+- evalScript: ${output.centre = Math.round(output.probe.x + output.board.x + 2.5 * output.board.cell) + ',' + Math.round(output.probe.y + output.board.y + 2.5 * output.board.cell)}
+- tapOn:
+    point: ${output.centre}
+- assertVisible:
+    id: 'lights-out.moves-label'
+    text: '.*1.*'

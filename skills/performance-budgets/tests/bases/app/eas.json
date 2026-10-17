@@ -1,0 +1,10 @@
+{
+  "build": {
+    "preview": {
+      "distribution": "internal",
+      "env": {
+        "APP_VARIANT": "preview"
+      }
+    }
+  }
+}

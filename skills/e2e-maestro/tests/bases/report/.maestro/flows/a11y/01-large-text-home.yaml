@@ -1,0 +1,8 @@
+appId: ${APP_ID}
+name: The home screen grows with the largest text size
+tags: [a11y]
+---
+- launchApp:
+    clearState: true
+- assertVisible:
+    id: 'tasks.list'

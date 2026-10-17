@@ -1,0 +1,10 @@
+{
+  "$comment": "Facts check-ota compares against. Verified 2026-10-14: expo-updates 57.0.24 (build/Updates.d.ts, utils/build/resolveRuntimeVersionAsync.js), @expo/config-types 57.0.2 (ExpoConfig.updates), @expo/fingerprint 0.20.13 (Options.js, sourcer/Expo.js, sourcer/Bare.js), EAS CLI source (commands/update, build/list, env/exec) read in 24.12.1 and re-read in 25.0.0 on 2026-10-16, docs.expo.dev/eas-update/* and /eas/workflows/pre-packaged-jobs. Re-verify: npm view expo-updates@~57.0.24 version; read node_modules/expo-updates/build/Updates.d.ts; npm pack eas-cli and read build/commands/update/index.js.",
+  "verified": "2026-10-14",
+  "expoUpdates": "57.0.24",
+  "expoFingerprint": "0.20.13",
+  "easCliSourceRead": "24.12.1, still true in 25.0.0 (2026-10-16)",
+  "updateHost": "https://u.expo.dev",
+  "maxFirstRolloutPercent": 25,
+  "maxFirstRolloutSource": "Expo's own EAS Workflows rollout example publishes to 25% first; the deployment guide uses 10%."
+}

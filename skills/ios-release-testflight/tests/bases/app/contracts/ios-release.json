@@ -1,0 +1,7 @@
+{
+  "appId": "com.acme.tasks",
+  "usageStrings": ["NSCameraUsageDescription"],
+  "usesNonExemptEncryption": false,
+  "forbiddenBundleStrings": ["placeholder.screen"],
+  "unfinishedMarkers": ["docs/unfinished-screens.md"]
+}

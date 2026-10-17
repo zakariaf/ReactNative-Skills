@@ -1,0 +1,3 @@
+{
+  "base": [{ "from": "@skill/templates/scripts/git/commit-message-samples.json", "to": "commit-message-samples.json" }]
+}

@@ -1,0 +1,29 @@
+{
+  "base": [{ "templates": true, "firstLinePath": true }, "@tests/bases/app"],
+  "ops": [
+    {
+      "write": {
+        "file": ".agents/skills/kit/src/planted-input.tsx",
+        "content": "// An installed skill's fixture: its planted findings stay silent.\nimport { ScrollView, TextInput } from 'react-native';\nimport { useForm } from 'react-hook-form';\n\nexport function Planted(): React.JSX.Element {\n  useForm({ mode: 'all' });\n  return <ScrollView><TextInput placeholder=\"Name\" secureTextEntry /></ScrollView>;\n}\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/kit/src/planted-input.tsx",
+        "content": "import { TextInput } from 'react-native';\n\nexport const Planted = (): React.JSX.Element => <TextInput placeholder=\"Name\" />;\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/vendor/kit/SKILL.md",
+        "content": "---\nname: kit\ndescription: A vendored skill folder inside the app; its planted findings stay silent.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/vendor/kit/planted-input.tsx",
+        "content": "// src/vendor/kit/planted-input.tsx (inside a folder that holds a SKILL.md: pruned)\nimport { TextInput } from 'react-native';\n\nexport const Planted = (): React.JSX.Element => <TextInput placeholder=\"Name\" />;\n"
+      }
+    }
+  ]
+}

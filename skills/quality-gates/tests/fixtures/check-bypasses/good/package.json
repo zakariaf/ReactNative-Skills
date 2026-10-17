@@ -1,0 +1,17 @@
+{
+  "name": "tasks-app",
+  "private": true,
+  "scripts": {
+    "prepare": "lefthook install",
+    "verify": "node scripts/quality/run-verify.ts",
+    "check:fast": "prettier --check . --log-level warn && eslint . --max-warnings 0 --cache --cache-strategy content --cache-location node_modules/.cache/eslint/ && npm run -s typecheck && jest --ci --onlyChanged --passWithNoTests",
+    "format:check": "prettier --check . --log-level warn",
+    "lint": "eslint . --max-warnings 0",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p src/tsconfig.json",
+    "test": "jest --ci",
+    "test:golden": "jest --ci --selectProjects golden",
+    "test:coverage": "jest --ci --coverage --randomize",
+    "check:unused": "knip",
+    "check:deps": "node scripts/deps/check-deps.ts"
+  }
+}

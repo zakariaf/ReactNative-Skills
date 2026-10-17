@@ -1,0 +1,8 @@
+appId: ${APP_ID}
+name: A fresh install opens the home screen with its content
+tags: [smoke]
+---
+- launchApp:
+    clearState: true
+- assertVisible:
+    id: 'tasks.list'

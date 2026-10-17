@@ -1,0 +1,54 @@
+{
+  "base": [
+    "@tests/bases/app",
+    {
+      "templates": true,
+      "firstLinePath": true
+    },
+    {
+      "from": "@skill/examples/use-tasks-model.ts",
+      "to": "src/features/tasks/use-tasks-model.ts"
+    },
+    {
+      "from": "@skill/examples/app-root.tsx",
+      "to": "src/features/root-navigator/app-root.tsx"
+    },
+    {
+      "from": "@skill/examples/app-providers.tsx",
+      "to": "src/features/root-navigator/app-providers.tsx"
+    }
+  ],
+  "ops": [
+    {
+      "$comment": "Installed and vendored skills hold planted bugs: walkRepo must keep every one of them out.",
+      "write": {
+        "file": ".agents/skills/demo/src/stores/planted-store.ts",
+        "content": "import { create } from 'zustand';\nimport AsyncStorage from '@react-native-async-storage/async-storage';\n\nexport const usePlantedStore = create(() => ({ count: 0 }));\nexport const planted = usePlantedStore();\nvoid AsyncStorage;\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/demo/src/stores/planted-store.ts",
+        "content": "import { create } from 'zustand';\nimport AsyncStorage from '@react-native-async-storage/async-storage';\n\nexport const usePlantedStore = create(() => ({ count: 0 }));\nexport const planted = usePlantedStore();\nvoid AsyncStorage;\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/vendor/kit/SKILL.md",
+        "content": "---\nname: vendored-kit\ndescription: A vendored skill folder whose fixtures plant bugs on purpose.\n---\n\n# Vendored kit\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/vendor/kit/planted-store.ts",
+        "content": "import { create } from 'zustand';\nimport AsyncStorage from '@react-native-async-storage/async-storage';\n\nexport const usePlantedStore = create(() => ({ count: 0 }));\nexport const planted = usePlantedStore();\nvoid AsyncStorage;\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/vendor/kit/planted-reducer.ts",
+        "content": "import { Platform } from 'react-native';\n\nexport function plantedReducer(state: number): number {\n  return Platform.OS === 'ios' ? Date.now() : state;\n}\n"
+      }
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "packages": {
+    "zustand": { "companions": [{ "package": "use-sync-external-store", "via": "install" }, { "package": "react", "via": "overrides" }] }
+  }
+}

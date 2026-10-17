@@ -1,0 +1,13 @@
+{
+  "$schema": "./crash-reporting.schema.json",
+  "$comment": "Crash reporting facts read by crash-reporting-and-observability's check-crash-reporting.mjs. Change a fact here first, then the code.",
+  "provider": "sentry",
+  "consentModel": "opt-in",
+  "maxTracesSampleRate": 0.2,
+  "uploadProfiles": ["preview", "production"],
+  "declarations": {
+    "collects": ["crash-data", "other-diagnostic-data", "performance-data"],
+    "linkedToUser": false,
+    "usedForTracking": false
+  }
+}

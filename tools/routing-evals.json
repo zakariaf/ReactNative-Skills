@@ -1,0 +1,4358 @@
+{
+  "$comment": "Routing evals for the library: realistic prompts and the skill each should load (expect: a skill folder name, or null when no skill in this library should load). near names the skill whose words a near miss shares while it belongs to expect. Checked by node tools/check-routing-evals.mjs (structure and coverage: at least 3 prompts per skill and a near miss for every model-invocable skill); ranked offline or live by skill-maintenance: node skills/skill-maintenance/scripts/check-routing.mjs . --evals tools/routing-evals.json [--live --runs 3].",
+  "evals": [
+    {
+      "prompt": "We have the React Compiler on - should I wrap this onPress handler in useCallback and the sorted list in useMemo?",
+      "expect": "react-components-and-hooks"
+    },
+    {
+      "prompt": "Write a TaskRow component with read-only props and a testID, and make the tasks list use stable keys instead of the index",
+      "expect": "react-components-and-hooks"
+    },
+    {
+      "prompt": "This useEffect copies a prop into state and adds an AppState listener that never gets removed; clean it up",
+      "expect": "react-components-and-hooks"
+    },
+    {
+      "prompt": "There is a double gap at the top of my screen under the Stack header on iPhone, and on Android the last row hides under the gesture bar",
+      "expect": "react-components-and-hooks"
+    },
+    {
+      "prompt": "Add a hook that tells my chart whether the app is in the foreground so it can pause its animation",
+      "expect": "react-components-and-hooks"
+    },
+    {
+      "prompt": "Add a danger colour token for destructive buttons with a dark-mode value",
+      "expect": "design-system-structure",
+      "near": "react-components-and-hooks"
+    },
+    {
+      "prompt": "Create a Zustand store for tasks with a pure reducer and persist it to SQLite",
+      "expect": "state-management-zustand",
+      "near": "react-components-and-hooks"
+    },
+    {
+      "prompt": "Expo SDK 58 just came out - should we upgrade the app now or wait?",
+      "expect": "expo-sdk-upgrade"
+    },
+    {
+      "prompt": "Move our Expo app from SDK 57 to 58: run expo install --fix and fix whatever breaks in Jest and the gestures",
+      "expect": "expo-sdk-upgrade"
+    },
+    {
+      "prompt": "We want to build with Xcode 27 but we're still on Expo SDK 57. What has to change first?",
+      "expect": "expo-sdk-upgrade"
+    },
+    {
+      "prompt": "Google Play says apps must target API level 36; check whether our Expo config and eas.json meet it",
+      "expect": "expo-sdk-upgrade"
+    },
+    {
+      "prompt": "After bumping the Expo SDK, expo-doctor reports duplicate react-native-reanimated and jest-expo fails with ERESOLVE",
+      "expect": "expo-sdk-upgrade"
+    },
+    {
+      "prompt": "Add expo-haptics to the app at the version our policy allows",
+      "expect": "dependency-management",
+      "near": "expo-sdk-upgrade"
+    },
+    {
+      "prompt": "Set up EAS build profiles for preview and production and submit to TestFlight",
+      "expect": "eas-build-and-submit",
+      "near": "expo-sdk-upgrade"
+    },
+    {
+      "prompt": "Add a dark mode option to the settings screen that is still there after the app restarts",
+      "expect": "settings-and-preferences"
+    },
+    {
+      "prompt": "The Haptics switch in settings does nothing, the phone still buzzes on every tap",
+      "expect": "settings-and-preferences"
+    },
+    {
+      "prompt": "Users lose their chosen language every time they relaunch the app",
+      "expect": "settings-and-preferences"
+    },
+    {
+      "prompt": "Add a Delete all data row to settings, but keep the user's preferences when it runs",
+      "expect": "settings-and-preferences"
+    },
+    {
+      "prompt": "Define the light and dark colour tokens and the theme provider for the design system",
+      "expect": "design-system-structure",
+      "near": "settings-and-preferences"
+    },
+    {
+      "prompt": "Create a Zustand store for the task list with selectors and useShallow",
+      "expect": "state-management-zustand",
+      "near": "settings-and-preferences"
+    },
+    {
+      "prompt": "Add a little confetti burst when the user completes the last task in a list",
+      "expect": "motion-and-animation"
+    },
+    {
+      "prompt": "The syncing dot keeps pulsing even after I turn on Reduce Motion in iOS settings",
+      "expect": "motion-and-animation"
+    },
+    {
+      "prompt": "Make the task sheet draggable so a flick down closes it with a spring",
+      "expect": "motion-and-animation"
+    },
+    {
+      "prompt": "Screen push animations should cross-fade when reduce motion is on, and new rows should fade in",
+      "expect": "motion-and-animation"
+    },
+    {
+      "prompt": "Our Reanimated animation stutters and calls runOnJS in onUpdate, fix it",
+      "expect": "motion-and-animation"
+    },
+    {
+      "prompt": "Change the standard duration token from 240 ms to 200 ms and update the spring tokens",
+      "expect": "design-system-structure",
+      "near": "motion-and-animation"
+    },
+    {
+      "prompt": "Animate the chart bars on the Skia canvas when the week changes",
+      "expect": "skia-canvas-rendering",
+      "near": "motion-and-animation"
+    },
+    {
+      "prompt": "Tapping a day on our Skia progress grid toggles the day next to it on wider phones; how should hit-testing on the canvas work?",
+      "expect": "canvas-gestures-and-hit-testing"
+    },
+    {
+      "prompt": "Add drag and drop from the inbox tray onto the week planner canvas; the dragged task is hidden under my thumb and the bottom row can't be reached",
+      "expect": "canvas-gestures-and-hit-testing"
+    },
+    {
+      "prompt": "The sliding puzzle board should slide tiles on swipe. Where do the swipe gestures go, and how do I test them with fireGestureHandler?",
+      "expect": "canvas-gestures-and-hit-testing"
+    },
+    {
+      "prompt": "On iOS 26, swiping right on our drawing canvas goes back to the previous screen instead of moving the piece",
+      "expect": "canvas-gestures-and-hit-testing"
+    },
+    {
+      "prompt": "The progress grid's toggle animation freezes after the second change and the canvas corners are black on Android",
+      "expect": "skia-canvas-rendering",
+      "near": "canvas-gestures-and-hit-testing"
+    },
+    {
+      "prompt": "Make the settings volume slider adjustable with VoiceOver and TalkBack",
+      "expect": "accessibility-as-code",
+      "near": "canvas-gestures-and-hit-testing"
+    },
+    {
+      "prompt": "npm run verify fails at the guardrail step after I changed eslint.config.mjs - what do I do?",
+      "expect": "quality-gates"
+    },
+    {
+      "prompt": "set up a lefthook pre-commit that runs lint and typecheck for our Expo app",
+      "expect": "quality-gates"
+    },
+    {
+      "prompt": "the Claude Code Stop hook keeps blocking me with check:fast errors",
+      "expect": "quality-gates"
+    },
+    {
+      "prompt": "add our contrast check as a step of npm run verify",
+      "expect": "quality-gates"
+    },
+    {
+      "prompt": "the pre-commit hook is slow, can I commit with --no-verify just this once?",
+      "expect": "quality-gates"
+    },
+    {
+      "prompt": "ESLint says max-lines-per-function on my screen component",
+      "expect": "typescript-and-lint-rules",
+      "near": "quality-gates"
+    },
+    {
+      "prompt": "write the commit message with a Gate-Change trailer for this config change",
+      "expect": "git-commits-and-reporting",
+      "near": "quality-gates"
+    },
+    {
+      "prompt": "Add a Zustand store for the lists screen and make sure a new list is still there after the app is killed",
+      "expect": "state-management-zustand"
+    },
+    {
+      "prompt": "My hook crashes with 'Maximum update depth exceeded' since I started selecting { count, failure } from the store",
+      "expect": "state-management-zustand"
+    },
+    {
+      "prompt": "persist a zustand store between launches",
+      "expect": "state-management-zustand"
+    },
+    {
+      "prompt": "Deleting a list leaves its tasks visible on the home screen until I restart the app",
+      "expect": "state-management-zustand"
+    },
+    {
+      "prompt": "Add undo to the bulk-edit screen and keep the edits if the app is closed mid-way",
+      "expect": "state-management-zustand"
+    },
+    {
+      "prompt": "Cache the server's task list and refetch it when the phone comes back online",
+      "expect": "networking-and-server-state",
+      "near": "state-management-zustand"
+    },
+    {
+      "prompt": "add a due date column to the tasks table",
+      "expect": "persistence-and-migrations",
+      "near": "state-management-zustand"
+    },
+    {
+      "prompt": "Add a reusable Button to src/ui with primary, secondary and danger variants plus disabled and busy states",
+      "expect": "ui-component-library"
+    },
+    {
+      "prompt": "Our settings screen needs a switch row and a radio row as shared components with testIDs Maestro can find",
+      "expect": "ui-component-library"
+    },
+    {
+      "prompt": "Build a delete-task confirmation dialog component that VoiceOver stays inside and that closes on Android back",
+      "expect": "ui-component-library"
+    },
+    {
+      "prompt": "In Maestro the chip's testID only covers its text and the badge clips at large text sizes; fix the shared components",
+      "expect": "ui-component-library"
+    },
+    {
+      "prompt": "check-components says part-not-derived on src/ui/list-row.tsx, what do I change?",
+      "expect": "ui-component-library"
+    },
+    {
+      "prompt": "Change the primary colour and tune the dark palette in the theme tokens",
+      "expect": "design-system-structure",
+      "near": "ui-component-library"
+    },
+    {
+      "prompt": "Add a sign-up form with email validation and inline error messages",
+      "expect": "forms-and-input",
+      "near": "ui-component-library"
+    },
+    {
+      "prompt": "Add a satisfying little sound and a haptic tap when the user checks off a task in our Expo app",
+      "expect": "audio-and-haptics-feedback"
+    },
+    {
+      "prompt": "Our sound effects click at the start and on Android they pause my Spotify when they play - fix the SFX setup",
+      "expect": "audio-and-haptics-feedback"
+    },
+    {
+      "prompt": "Wire expo-haptics so switches vibrate on iOS and Android, throttled, and never on iPad",
+      "expect": "audio-and-haptics-feedback"
+    },
+    {
+      "prompt": "Which react-native-audio-api config plugin options should we set so App Review stops asking about background audio?",
+      "expect": "audio-and-haptics-feedback"
+    },
+    {
+      "prompt": "Add Sound effects and Haptics switches to the settings screen and persist them across launches",
+      "expect": "settings-and-preferences",
+      "near": "audio-and-haptics-feedback"
+    },
+    {
+      "prompt": "Animate the weekly progress grid when a day is completed and schedule its tracks on a scene clock",
+      "expect": "skia-canvas-rendering",
+      "near": "audio-and-haptics-feedback"
+    },
+    {
+      "prompt": "Write a config plugin that marks android.hardware.camera as not required in the AndroidManifest so Play doesn't hide the Tasks app on Chromebooks",
+      "expect": "expo-prebuild-and-config-plugins"
+    },
+    {
+      "prompt": "Our CI step runs PlistBuddy on ios/Tasks/Info.plist after expo prebuild to set a key. What's the right way to do this?",
+      "expect": "expo-prebuild-and-config-plugins"
+    },
+    {
+      "prompt": "Should we commit the ios and android folders or keep generating them with expo prebuild? The native team wants to edit Xcode directly.",
+      "expect": "expo-prebuild-and-config-plugins"
+    },
+    {
+      "prompt": "npx expo config fails with ERR_MODULE_NOT_FOUND for expo/config-plugins imported from plugins/with-share-target.ts",
+      "expect": "expo-prebuild-and-config-plugins"
+    },
+    {
+      "prompt": "Why does our iOS build have an aps-environment entitlement and a microphone permission string we never added to app.config.ts?",
+      "expect": "expo-prebuild-and-config-plugins"
+    },
+    {
+      "prompt": "Write a Swift Expo module that exposes the battery level to JavaScript behind a port",
+      "expect": "native-modules-and-new-architecture",
+      "near": "expo-prebuild-and-config-plugins"
+    },
+    {
+      "prompt": "Add a preview build variant with its own bundle id, name and icon",
+      "expect": "app-variants-and-environment",
+      "near": "expo-prebuild-and-config-plugins"
+    },
+    {
+      "prompt": "The streak counter resets to zero for users in Australia even though they completed a task yesterday evening",
+      "expect": "dates-streaks-and-statistics"
+    },
+    {
+      "prompt": "Add a 'days in a row' badge and a seven-day completion chart to the Tasks home screen",
+      "expect": "dates-streaks-and-statistics"
+    },
+    {
+      "prompt": "Our 'Due today' list still shows yesterday's tasks after midnight until the app is restarted",
+      "expect": "dates-streaks-and-statistics"
+    },
+    {
+      "prompt": "Show 'New day in 3 h 5 min' on the daily focus card once today's task is done",
+      "expect": "dates-streaks-and-statistics"
+    },
+    {
+      "prompt": "Build a statistics screen with tasks completed, on-time rate and best day, and keep the totals after old days are pruned",
+      "expect": "dates-streaks-and-statistics"
+    },
+    {
+      "prompt": "Pick the same daily focus task for every user each day from a seed, with golden vectors",
+      "expect": "seeded-determinism-and-golden-vectors",
+      "near": "dates-streaks-and-statistics"
+    },
+    {
+      "prompt": "Format the due date as '26 Sep' in Arabic with Arabic-Indic digits",
+      "expect": "i18n-strings-and-catalogs",
+      "near": "dates-streaks-and-statistics"
+    },
+    {
+      "prompt": "Add a golden test that pins the task digest text for a few dates",
+      "expect": "golden-and-snapshot-tests"
+    },
+    {
+      "prompt": "A .snap.ios diff showed up after my refactor, can I just run jest -u to make CI green?",
+      "expect": "golden-and-snapshot-tests"
+    },
+    {
+      "prompt": "update the snapshot after restyling the task row",
+      "expect": "golden-and-snapshot-tests"
+    },
+    {
+      "prompt": "Freeze the backup file format so a future version can never silently change it",
+      "expect": "golden-and-snapshot-tests"
+    },
+    {
+      "prompt": "The weekly chart pixel golden is 0.3% off on CI, should I raise failureThreshold?",
+      "expect": "golden-and-snapshot-tests"
+    },
+    {
+      "prompt": "Re-bless every golden image after we switched the app font",
+      "expect": "run-goldens-rebaseline",
+      "near": "golden-and-snapshot-tests"
+    },
+    {
+      "prompt": "add a golden vector for the 29 February",
+      "expect": "seeded-determinism-and-golden-vectors",
+      "near": "golden-and-snapshot-tests"
+    },
+    {
+      "prompt": "We just added Arabic to the Tasks app and the rows don't mirror; the back arrow also points the wrong way",
+      "expect": "rtl-and-direction"
+    },
+    {
+      "prompt": "When someone picks Hebrew in Settings the layout stays left to right until they kill the app, and sometimes it keeps restarting",
+      "expect": "rtl-and-direction"
+    },
+    {
+      "prompt": "A Latin task title inside the Arabic list shows its exclamation mark on the wrong side",
+      "expect": "rtl-and-direction"
+    },
+    {
+      "prompt": "Counts on the badges still show 1 2 3 in the Arabic UI instead of Arabic-Indic digits",
+      "expect": "rtl-and-direction"
+    },
+    {
+      "prompt": "How do I test the right-to-left layout on the Android emulator and the iOS simulator?",
+      "expect": "rtl-and-direction"
+    },
+    {
+      "prompt": "Add the Arabic translation for the new empty-state message with the right plural forms",
+      "expect": "i18n-strings-and-catalogs",
+      "near": "rtl-and-direction"
+    },
+    {
+      "prompt": "Bundle an Arabic font and fix the line heights so the diacritics don't get clipped",
+      "expect": "design-system-structure",
+      "near": "rtl-and-direction"
+    },
+    {
+      "prompt": "The task details screen sometimes shows the previous task's data when I switch quickly between tasks. How do I cancel the old request in my useEffect?",
+      "expect": "async-safety"
+    },
+    {
+      "prompt": "My search-as-you-type field shows results for an older query when responses come back out of order",
+      "expect": "async-safety"
+    },
+    {
+      "prompt": "signal.throwIfAborted is not a function on the iPhone but my Jest tests pass",
+      "expect": "async-safety"
+    },
+    {
+      "prompt": "Make sure every AppState and Keyboard listener and every setInterval in the app gets cleaned up",
+      "expect": "async-safety"
+    },
+    {
+      "prompt": "onPress={retry} where retry is async: is the rejection handled? ESLint says nothing",
+      "expect": "async-safety"
+    },
+    {
+      "prompt": "Set up TanStack Query with a typed ApiClient and query keys for the tasks endpoint",
+      "expect": "networking-and-server-state",
+      "near": "async-safety"
+    },
+    {
+      "prompt": "Turn on no-floating-promises and fix the ESLint config so warnings fail the build",
+      "expect": "typescript-and-lint-rules",
+      "near": "async-safety"
+    },
+    {
+      "prompt": "Build the app as a Release build on the iOS simulator and send me a screenshot of the first screen",
+      "expect": "ios-simulator-build"
+    },
+    {
+      "prompt": "npm run build:ios:sim fails with \"missing required module 'SwiftShims'\" after I copied the repo to a new folder",
+      "expect": "ios-simulator-build"
+    },
+    {
+      "prompt": "Prove that the production simulator build no longer contains our debug menu after the Metro config change",
+      "expect": "ios-simulator-build"
+    },
+    {
+      "prompt": "xcodebuild picked Xcode 27 and the app launches to a black screen on the simulator",
+      "expect": "ios-simulator-build"
+    },
+    {
+      "prompt": "Upload this build to TestFlight for the internal testers",
+      "expect": "ios-release-testflight",
+      "near": "ios-simulator-build"
+    },
+    {
+      "prompt": "Run the release build on the Android emulator and take a screenshot",
+      "expect": "android-emulator-build",
+      "near": "ios-simulator-build"
+    },
+    {
+      "prompt": "Write a Maestro flow that adds a task and checks the list",
+      "expect": "e2e-maestro",
+      "near": "ios-simulator-build"
+    },
+    {
+      "prompt": "Add a Settings tab screen; on iPhone there's an empty strip between the content and the tab bar",
+      "expect": "react-components-and-hooks"
+    },
+    {
+      "prompt": "Write a useKeyboardHeight hook that subscribes to keyboard show/hide and cleans up properly",
+      "expect": "react-components-and-hooks"
+    },
+    {
+      "prompt": "Our task list renders in a ScrollView with tasks.map and gets slow at 500 items; switch it to a proper list with stable keys",
+      "expect": "react-components-and-hooks"
+    },
+    {
+      "prompt": "React Compiler is on now - remove the useMemo and useCallback calls from the components",
+      "expect": "react-components-and-hooks"
+    },
+    {
+      "prompt": "Wrap the chart in an error boundary so a render crash doesn't take down the whole screen",
+      "expect": "react-components-and-hooks"
+    },
+    {
+      "prompt": "Add an overdue-tasks selector to the tasks store and fix the Maximum update depth exceeded error",
+      "expect": "state-management-zustand",
+      "near": "react-components-and-hooks"
+    },
+    {
+      "prompt": "Build a shared PrimaryButton with loading and disabled states that every screen uses",
+      "expect": "ui-component-library",
+      "near": "react-components-and-hooks"
+    },
+    {
+      "prompt": "Load the task list from our REST API with React Query and show a spinner while it loads",
+      "expect": "networking-and-server-state"
+    },
+    {
+      "prompt": "After I toggle a task the list still shows the old value until I pull to refresh",
+      "expect": "networking-and-server-state"
+    },
+    {
+      "prompt": "Add an optimistic update with rollback when marking an order as shipped fails on the server",
+      "expect": "networking-and-server-state"
+    },
+    {
+      "prompt": "Requests hang forever on Android when the server stops responding; add a timeout and retries",
+      "expect": "networking-and-server-state"
+    },
+    {
+      "prompt": "Queries should pause when the phone is offline and refetch when the app comes back to the foreground",
+      "expect": "networking-and-server-state"
+    },
+    {
+      "prompt": "Save the user's notes in SQLite so they survive an app update",
+      "expect": "persistence-and-migrations",
+      "near": "networking-and-server-state"
+    },
+    {
+      "prompt": "Add a Zustand store for the selected filter and an undo action",
+      "expect": "state-management-zustand",
+      "near": "networking-and-server-state"
+    },
+    {
+      "prompt": "Write a hook that refreshes the task list whenever the app comes back to the foreground",
+      "expect": "react-components-and-hooks"
+    },
+    {
+      "prompt": "My useEffect adds a BackHandler listener; is this cleanup right, and should I wrap the handler in useCallback?",
+      "expect": "react-components-and-hooks"
+    },
+    {
+      "prompt": "Build the TasksScreen view and its use-tasks-model hook with a FlatList of tasks",
+      "expect": "react-components-and-hooks"
+    },
+    {
+      "prompt": "This component re-renders a lot; should I add React.memo and useMemo around the filtered list?",
+      "expect": "react-components-and-hooks"
+    },
+    {
+      "prompt": "Add a new zustand store for reminders with a selector and undo action",
+      "expect": "state-management-zustand",
+      "near": "react-components-and-hooks"
+    },
+    {
+      "prompt": "Restyle the shared HoldButton and add a destructive variant",
+      "expect": "ui-component-library",
+      "near": "react-components-and-hooks"
+    },
+    {
+      "prompt": "Expo SDK 58 is out, should we upgrade the app now?",
+      "expect": "expo-sdk-upgrade"
+    },
+    {
+      "prompt": "Move the repo from Expo SDK 57 to 58 and fix whatever breaks",
+      "expect": "expo-sdk-upgrade"
+    },
+    {
+      "prompt": "Xcode 27 is installed now; what do I need to change for our SDK 57 builds?",
+      "expect": "expo-sdk-upgrade"
+    },
+    {
+      "prompt": "After npx expo install the tests fail with Cannot find module expo/config-plugins.js.js",
+      "expect": "expo-sdk-upgrade"
+    },
+    {
+      "prompt": "Bump date-fns to the latest version",
+      "expect": "dependency-management",
+      "near": "expo-sdk-upgrade"
+    },
+    {
+      "prompt": "Write a config plugin that adds a key to Info.plist",
+      "expect": "expo-prebuild-and-config-plugins",
+      "near": "expo-sdk-upgrade"
+    },
+    {
+      "prompt": "Add a config plugin that inserts a pod into the Podfile and make sure it doesn't duplicate on rebuild",
+      "expect": "expo-prebuild-and-config-plugins"
+    },
+    {
+      "prompt": "Our CI script runs PlistBuddy to bump the build number in ios/ - is that okay with prebuild?",
+      "expect": "expo-prebuild-and-config-plugins"
+    },
+    {
+      "prompt": "Should we commit the ios and android folders or keep them generated with npx expo prebuild?",
+      "expect": "expo-prebuild-and-config-plugins"
+    },
+    {
+      "prompt": "expo-notifications added an aps-environment entitlement I never asked for; how do I control it in app.config.ts?",
+      "expect": "expo-prebuild-and-config-plugins"
+    },
+    {
+      "prompt": "Build the app on the iOS simulator and run a smoke test",
+      "expect": "ios-simulator-build",
+      "near": "expo-prebuild-and-config-plugins"
+    },
+    {
+      "prompt": "Add a new APP_VARIANT for staging with its own bundle id and env vars",
+      "expect": "app-variants-and-environment",
+      "near": "expo-prebuild-and-config-plugins"
+    },
+    {
+      "prompt": "Taps on my Skia progress grid land on the wrong cell near the edges",
+      "expect": "canvas-gestures-and-hit-testing"
+    },
+    {
+      "prompt": "Add drag-and-drop of tasks onto days in the planner canvas",
+      "expect": "canvas-gestures-and-hit-testing"
+    },
+    {
+      "prompt": "check-canvas-input fails with canvas-rn-touch on my stats card that wraps a sparkline in a Pressable",
+      "expect": "canvas-gestures-and-hit-testing"
+    },
+    {
+      "prompt": "Add pull-back-and-release aiming to the arena game board",
+      "expect": "canvas-gestures-and-hit-testing"
+    },
+    {
+      "prompt": "Draw a weekly bar chart with Skia that animates when data changes",
+      "expect": "skia-canvas-rendering",
+      "near": "canvas-gestures-and-hit-testing"
+    },
+    {
+      "prompt": "Make the task row's swipe-to-delete action accessible to VoiceOver",
+      "expect": "accessibility-as-code",
+      "near": "canvas-gestures-and-hit-testing"
+    },
+    {
+      "prompt": "npm run verify fails at the guardrail step saying max-params expected 3 got 5. How do I fix it?",
+      "expect": "quality-gates"
+    },
+    {
+      "prompt": "Set up lefthook, the Claude Code Stop hook and check:fast for our Expo app",
+      "expect": "quality-gates"
+    },
+    {
+      "prompt": "check:unused started failing with unlisted dependencies from files under .claude/skills after we installed some agent skills",
+      "expect": "quality-gates"
+    },
+    {
+      "prompt": "Can I commit with --no-verify just this once? The pre-commit hook is blocking me",
+      "expect": "quality-gates"
+    },
+    {
+      "prompt": "ESLint reports complexity 14 in task-list.ts, how should I split this function?",
+      "expect": "typescript-and-lint-rules",
+      "near": "quality-gates"
+    },
+    {
+      "prompt": "Write the commit message with the Gate-Change trailer for this tsconfig change",
+      "expect": "git-commits-and-reporting",
+      "near": "quality-gates"
+    },
+    {
+      "prompt": "Migrate our Redux Toolkit slices for tasks and lists to Zustand",
+      "expect": "state-management-zustand"
+    },
+    {
+      "prompt": "Should the selected list filter live in a store, in React Query, or in route params?",
+      "expect": "state-management-zustand"
+    },
+    {
+      "prompt": "The task list screen re-renders on every keystroke anywhere in the app; we call useTasksStore() at the top",
+      "expect": "state-management-zustand"
+    },
+    {
+      "prompt": "Getting 'Maximum update depth exceeded' after adding a selector that returns an object",
+      "expect": "state-management-zustand"
+    },
+    {
+      "prompt": "Replace our zustand persist middleware with AsyncStorage by something with migrations",
+      "expect": "state-management-zustand"
+    },
+    {
+      "prompt": "Add a useQuery hook with caching and refetch on focus for the remote tasks endpoint",
+      "expect": "networking-and-server-state",
+      "near": "state-management-zustand"
+    },
+    {
+      "prompt": "Add a new SQLite table for reminders with a forward-only migration",
+      "expect": "persistence-and-migrations",
+      "near": "state-management-zustand"
+    },
+    {
+      "prompt": "Add a spring animation when the task sheet is dragged down and let go",
+      "expect": "motion-and-animation"
+    },
+    {
+      "prompt": "Our confetti keeps replaying every time the list screen remounts, and it ignores Reduce Motion",
+      "expect": "motion-and-animation"
+    },
+    {
+      "prompt": "Make the stack screen push cross-fade instead of slide when the user has reduced motion on",
+      "expect": "motion-and-animation"
+    },
+    {
+      "prompt": "Add a pulsing sync indicator that loops while a list is syncing",
+      "expect": "motion-and-animation"
+    },
+    {
+      "prompt": "Change the standard animation duration token from 240 ms to 200 ms in the theme",
+      "expect": "design-system-structure",
+      "near": "motion-and-animation"
+    },
+    {
+      "prompt": "Animate the score chart bars on the Skia canvas",
+      "expect": "skia-canvas-rendering",
+      "near": "motion-and-animation"
+    },
+    {
+      "prompt": "The 'due in N days' label says 2 days for something due tomorrow after the clocks changed. Fix it.",
+      "expect": "dates-streaks-and-statistics"
+    },
+    {
+      "prompt": "Add a daily streak card to the home screen that shows the current streak, the best streak and the last seven days.",
+      "expect": "dates-streaks-and-statistics"
+    },
+    {
+      "prompt": "The header still shows yesterday's date when I reopen the app after midnight.",
+      "expect": "dates-streaks-and-statistics"
+    },
+    {
+      "prompt": "Add a statistics screen with total completions, on-time rate and best day.",
+      "expect": "dates-streaks-and-statistics"
+    },
+    {
+      "prompt": "Pick today's puzzle deterministically from a seed so every user gets the same one.",
+      "expect": "seeded-determinism-and-golden-vectors",
+      "near": "dates-streaks-and-statistics"
+    },
+    {
+      "prompt": "Add a column for completed_at to the tasks table and migrate existing rows.",
+      "expect": "persistence-and-migrations",
+      "near": "dates-streaks-and-statistics"
+    },
+    {
+      "prompt": "Add a 'confirm before deleting a task' toggle to the settings screen and make sure it survives an app restart",
+      "expect": "settings-and-preferences"
+    },
+    {
+      "prompt": "The dark theme choice is lost every time I kill and relaunch the app",
+      "expect": "settings-and-preferences"
+    },
+    {
+      "prompt": "Our Delete all data button also wipes the user's language and sound settings, fix it",
+      "expect": "settings-and-preferences"
+    },
+    {
+      "prompt": "Switching the app language to Arabic should ask to restart only when the layout direction flips",
+      "expect": "settings-and-preferences"
+    },
+    {
+      "prompt": "Add a new colour token for the dark palette and wire it into the theme files",
+      "expect": "design-system-structure",
+      "near": "settings-and-preferences"
+    },
+    {
+      "prompt": "Write a migration that adds a due_date column to the tasks table",
+      "expect": "persistence-and-migrations",
+      "near": "settings-and-preferences"
+    },
+    {
+      "prompt": "My task details screen sometimes shows the previous task after I switch quickly; the effect loads from the SQLite repository. Fix the race.",
+      "expect": "async-safety"
+    },
+    {
+      "prompt": "Add a debounced search over the tasks stored on the device and make sure a slow answer never overwrites a newer one",
+      "expect": "async-safety"
+    },
+    {
+      "prompt": "AppState listener and a setInterval keep firing after the screen is closed, clean them up",
+      "expect": "async-safety"
+    },
+    {
+      "prompt": "signal.throwIfAborted works in Jest but crashes on the phone, how should cancellation be handled?",
+      "expect": "async-safety"
+    },
+    {
+      "prompt": "Fetch the tasks list from our API with caching and refetch on focus",
+      "expect": "networking-and-server-state",
+      "near": "async-safety"
+    },
+    {
+      "prompt": "Add a Zustand store for the selected task with a selector",
+      "expect": "state-management-zustand",
+      "near": "async-safety"
+    },
+    {
+      "prompt": "Add a shared segmented control to src/ui for the theme picker with a testID per segment",
+      "expect": "ui-component-library"
+    },
+    {
+      "prompt": "check-components says component-unlisted for my new src/ui/task-count.tsx, what do I do?",
+      "expect": "ui-component-library"
+    },
+    {
+      "prompt": "Restyle the shared Button so the danger variant has a bold edge and regenerate component-specs.json",
+      "expect": "ui-component-library"
+    },
+    {
+      "prompt": "Build a reusable dialog with a scrim that closes on Android back",
+      "expect": "ui-component-library"
+    },
+    {
+      "prompt": "Change the primary colour token and the dark palette",
+      "expect": "design-system-structure",
+      "near": "ui-component-library"
+    },
+    {
+      "prompt": "Add a confetti burst from the checkbox when a task is completed, respecting reduce motion moments",
+      "expect": "motion-and-animation",
+      "near": "ui-component-library"
+    },
+    {
+      "prompt": "Write a hook that refetches when the screen regains focus using navigation.addListener",
+      "expect": "react-components-and-hooks"
+    },
+    {
+      "prompt": "My useEffect subscribes to AppState but the listener keeps firing after unmount",
+      "expect": "react-components-and-hooks"
+    },
+    {
+      "prompt": "Add a reusable ScreenFrame component that handles safe-area edges",
+      "expect": "react-components-and-hooks"
+    },
+    {
+      "prompt": "Should this component use useMemo or useCallback with React Compiler on?",
+      "expect": "react-components-and-hooks"
+    },
+    {
+      "prompt": "Add a selector to the tasks store and fix Maximum update depth exceeded",
+      "expect": "state-management-zustand",
+      "near": "react-components-and-hooks"
+    },
+    {
+      "prompt": "Add a soft chime and a light haptic when a task is checked off in the tasks list",
+      "expect": "audio-and-haptics-feedback"
+    },
+    {
+      "prompt": "Our app's tap sounds keep playing even when the iPhone is on silent, and they pause my Spotify",
+      "expect": "audio-and-haptics-feedback"
+    },
+    {
+      "prompt": "The success haptic does nothing on my Android 12 phone; fix the vibration mapping",
+      "expect": "audio-and-haptics-feedback"
+    },
+    {
+      "prompt": "Tune the goal-reached sound effect, it clicks at the end and is too loud",
+      "expect": "audio-and-haptics-feedback"
+    },
+    {
+      "prompt": "Add a Sound effects switch and a volume slider row to the Settings screen",
+      "expect": "settings-and-preferences",
+      "near": "audio-and-haptics-feedback"
+    },
+    {
+      "prompt": "Schedule a daily reminder notification with a custom sound",
+      "expect": "local-notifications",
+      "near": "audio-and-haptics-feedback"
+    },
+    {
+      "prompt": "Build a Release simulator build of the preview variant and check it launches on my own simulator",
+      "expect": "ios-simulator-build"
+    },
+    {
+      "prompt": "check-sim-setup says scene-support failed after I bumped XCODE_VERSION to 27.0",
+      "expect": "ios-simulator-build"
+    },
+    {
+      "prompt": "The simulator build shows DTXcode 2661 but the checker expected 2660, what is wrong?",
+      "expect": "ios-simulator-build"
+    },
+    {
+      "prompt": "Smoke-test the production variant on an iPhone 17 Pro Max simulator and take a screenshot",
+      "expect": "ios-simulator-build"
+    },
+    {
+      "prompt": "Upload this build to TestFlight and fix the signing error",
+      "expect": "ios-release-testflight",
+      "near": "ios-simulator-build"
+    },
+    {
+      "prompt": "Add a Maestro flow that checks the settings screen",
+      "expect": "e2e-maestro",
+      "near": "ios-simulator-build"
+    },
+    {
+      "prompt": "Add Arabic to the app and make the task rows mirror correctly",
+      "expect": "rtl-and-direction"
+    },
+    {
+      "prompt": "The slider thumb moves the wrong way when the phone is in Hebrew",
+      "expect": "rtl-and-direction"
+    },
+    {
+      "prompt": "Switching the language to Arabic in Settings should flip the layout without a restart loop",
+      "expect": "rtl-and-direction"
+    },
+    {
+      "prompt": "Counts on the badge show Latin digits in Arabic",
+      "expect": "rtl-and-direction"
+    },
+    {
+      "prompt": "Translate the onboarding strings into Arabic and add the plural forms",
+      "expect": "i18n-strings-and-catalogs",
+      "near": "rtl-and-direction"
+    },
+    {
+      "prompt": "Text clips at 200% font size and VoiceOver reads the row in the wrong order",
+      "expect": "accessibility-as-code",
+      "near": "rtl-and-direction"
+    },
+    {
+      "prompt": "Add a query that loads the task lists from our API and refetches when the app comes back to the foreground",
+      "expect": "networking-and-server-state"
+    },
+    {
+      "prompt": "Queries stay paused forever on some Android phones on corporate Wi-Fi, the screen says we'll load when back online",
+      "expect": "networking-and-server-state"
+    },
+    {
+      "prompt": "After creating a task the list still shows old data, the mutation doesn't refresh the cache",
+      "expect": "networking-and-server-state"
+    },
+    {
+      "prompt": "Our fetch call to the server never times out on Android and the response isn't validated",
+      "expect": "networking-and-server-state"
+    },
+    {
+      "prompt": "Add a new SQLite table and migration for reminders saved on the device",
+      "expect": "persistence-and-migrations",
+      "near": "networking-and-server-state"
+    },
+    {
+      "prompt": "Add a Zustand store for the selected filter and a selector for it",
+      "expect": "state-management-zustand",
+      "near": "networking-and-server-state"
+    },
+    {
+      "prompt": "Add a config plugin that writes android/app/src/main/res/xml/data_extraction_rules.xml during prebuild",
+      "expect": "expo-prebuild-and-config-plugins"
+    },
+    {
+      "prompt": "check-native-generation says my withAppBuildGradle mod has no guard but the mergeContents call is in plugins/lib",
+      "expect": "expo-prebuild-and-config-plugins"
+    },
+    {
+      "prompt": "Our eas.json preview profile has prebuildCommand set, is that a problem with committed ios and android folders?",
+      "expect": "expo-prebuild-and-config-plugins"
+    },
+    {
+      "prompt": "Why does my Android build request storage permissions even though I never installed expo-file-system? I need to fix it in app.config.ts",
+      "expect": "expo-prebuild-and-config-plugins"
+    },
+    {
+      "prompt": "Upload the production build to TestFlight",
+      "expect": "ios-release-testflight",
+      "near": "expo-prebuild-and-config-plugins"
+    },
+    {
+      "prompt": "Bump Expo from SDK 57 to SDK 58 and fix what breaks",
+      "expect": "expo-sdk-upgrade",
+      "near": "expo-prebuild-and-config-plugins"
+    },
+    {
+      "prompt": "The 'due today' badge still shows yesterday's tasks when the app is left open overnight; fix how we read today.",
+      "expect": "dates-streaks-and-statistics"
+    },
+    {
+      "prompt": "Add a streak counter and a 7-day week strip to the Today screen of our tasks app.",
+      "expect": "dates-streaks-and-statistics"
+    },
+    {
+      "prompt": "Users in Sydney say 'due in 1 day' is off by one around the DST change; we compute it from milliseconds.",
+      "expect": "dates-streaks-and-statistics"
+    },
+    {
+      "prompt": "Build a statistics screen with total completions, success rate, best day and a seven-day bar chart.",
+      "expect": "dates-streaks-and-statistics"
+    },
+    {
+      "prompt": "Pick the daily puzzle from a seed so every player gets the same one each day, with golden vectors.",
+      "expect": "seeded-determinism-and-golden-vectors",
+      "near": "dates-streaks-and-statistics"
+    },
+    {
+      "prompt": "Add a new column for completedAt to the tasks table with a migration.",
+      "expect": "persistence-and-migrations",
+      "near": "dates-streaks-and-statistics"
+    },
+    {
+      "prompt": "animate the bottom sheet so it springs back when dragged",
+      "expect": "motion-and-animation"
+    },
+    {
+      "prompt": "add a fade-in animation to new task rows",
+      "expect": "motion-and-animation"
+    },
+    {
+      "prompt": "the screen push still slides with Reduce Motion on",
+      "expect": "motion-and-animation"
+    },
+    {
+      "prompt": "a celebration animation when the list is cleared",
+      "expect": "motion-and-animation"
+    },
+    {
+      "prompt": "the loop animation blocks taps on the button",
+      "expect": "motion-and-animation"
+    },
+    {
+      "prompt": "add an accessibility label to the delete button",
+      "expect": "accessibility-as-code",
+      "near": "motion-and-animation"
+    },
+    {
+      "prompt": "change the standard duration token to 200ms",
+      "expect": "design-system-structure",
+      "near": "motion-and-animation"
+    },
+    {
+      "prompt": "npm run verify fails at the quality-gates guardrail step saying jest.collectCoverageFrom differs, how do I fix it?",
+      "expect": "quality-gates"
+    },
+    {
+      "prompt": "The Stop hook keeps failing with check:fast errors; can I add || true so the agent can finish?",
+      "expect": "quality-gates"
+    },
+    {
+      "prompt": "Set up lefthook, the verify script and the Claude Code hooks in our Expo app",
+      "expect": "quality-gates"
+    },
+    {
+      "prompt": "Coverage on src/stores is below the threshold, can I just exclude that folder in jest.config.js?",
+      "expect": "quality-gates"
+    },
+    {
+      "prompt": "ESLint reports max-lines-per-function on use-tasks-model.ts, how should I split it?",
+      "expect": "typescript-and-lint-rules",
+      "near": "quality-gates"
+    },
+    {
+      "prompt": "Write the commit message with the Gate-Change trailer for this threshold change",
+      "expect": "git-commits-and-reporting",
+      "near": "quality-gates"
+    },
+    {
+      "prompt": "Arabic text in my settings screen is aligned to the left and the chevrons point the wrong way",
+      "expect": "rtl-and-direction"
+    },
+    {
+      "prompt": "When the user picks Arabic in the language picker the layout doesn't mirror until they kill the app",
+      "expect": "rtl-and-direction"
+    },
+    {
+      "prompt": "Replace marginLeft/paddingRight with logical styles across the task list so it works in RTL",
+      "expect": "rtl-and-direction"
+    },
+    {
+      "prompt": "Our crash fallback screen shows Arabic copy laid out left to right",
+      "expect": "rtl-and-direction"
+    },
+    {
+      "prompt": "Add a German translation catalog and a plural message for the task count",
+      "expect": "i18n-strings-and-catalogs",
+      "near": "rtl-and-direction"
+    },
+    {
+      "prompt": "VoiceOver reads the task row checkbox without a label",
+      "expect": "accessibility-as-code",
+      "near": "rtl-and-direction"
+    },
+    {
+      "prompt": "Add a shared OptionCard-style radio card to src/ui with every state and a test",
+      "expect": "ui-component-library"
+    },
+    {
+      "prompt": "Our ToggleTile only shows on/off by colour, make the state visible another way and test it",
+      "expect": "ui-component-library"
+    },
+    {
+      "prompt": "check-components says press-outside-host: Button is a second press implementation in my settings screen",
+      "expect": "ui-component-library"
+    },
+    {
+      "prompt": "Build a reusable toast and dialog with testIDs for our Expo app's shared components",
+      "expect": "ui-component-library"
+    },
+    {
+      "prompt": "Declare a moment for the loading wave and make it stop under Reduce Motion",
+      "expect": "motion-and-animation",
+      "near": "ui-component-library"
+    },
+    {
+      "prompt": "Change the primary colour token and add a dark-mode palette",
+      "expect": "design-system-structure",
+      "near": "ui-component-library"
+    },
+    {
+      "prompt": "Add a function that decides whether a task is overdue, test-first please",
+      "expect": "tdd-workflow"
+    },
+    {
+      "prompt": "My new test fails because the code returns 'soon' - can I just change the expected value in the test?",
+      "expect": "tdd-workflow"
+    },
+    {
+      "prompt": "What tests does this reminders feature need before I build the screen, and in what order?",
+      "expect": "tdd-workflow"
+    },
+    {
+      "prompt": "Implement the snooze button for reminders; I want to see the red run before any code",
+      "expect": "tdd-workflow"
+    },
+    {
+      "prompt": "Set up Jest projects and renderWithProviders in our Expo app",
+      "expect": "unit-and-component-tests",
+      "near": "tdd-workflow"
+    },
+    {
+      "prompt": "The commit-msg hook rejects my Gate-Change trailer",
+      "expect": "git-commits-and-reporting",
+      "near": "tdd-workflow"
+    },
+    {
+      "prompt": "Make the tasks screen show the list and the selected task side by side on iPad",
+      "expect": "adaptive-layout"
+    },
+    {
+      "prompt": "Our app looks stretched on tablets in landscape, the text runs across the whole screen",
+      "expect": "adaptive-layout"
+    },
+    {
+      "prompt": "FlatList crashes with 'Changing numColumns on the fly is not supported' when I rotate the device",
+      "expect": "adaptive-layout"
+    },
+    {
+      "prompt": "Should we keep orientation portrait and requireFullScreen for iPad, or support split view and foldables?",
+      "expect": "adaptive-layout"
+    },
+    {
+      "prompt": "Replace Platform.isPad checks with something that works in Split View",
+      "expect": "adaptive-layout"
+    },
+    {
+      "prompt": "Add a bottom tab bar with Tasks and Settings tabs",
+      "expect": "navigation-and-routing",
+      "near": "adaptive-layout"
+    },
+    {
+      "prompt": "The home indicator area shows an empty band above the tab bar, fix the safe area edges",
+      "expect": "react-components-and-hooks",
+      "near": "adaptive-layout"
+    },
+    {
+      "prompt": "Write the commit message for the draft-saving change I just staged and make sure the Gate-Change trailer is right",
+      "expect": "git-commits-and-reporting"
+    },
+    {
+      "prompt": "The commit-msg hook rejected my commit with [header-scope], what scope should I use?",
+      "expect": "git-commits-and-reporting"
+    },
+    {
+      "prompt": "We just uploaded build 31 to Play internal testing, tag the release",
+      "expect": "git-commits-and-reporting"
+    },
+    {
+      "prompt": "Summarize this slice for the reviewer with the test and coverage numbers",
+      "expect": "git-commits-and-reporting"
+    },
+    {
+      "prompt": "The upload failed with 403 from the Play API, tell the developer what they need to do",
+      "expect": "git-commits-and-reporting"
+    },
+    {
+      "prompt": "npm run verify fails on the coverage gate, how do I fix it?",
+      "expect": "quality-gates",
+      "near": "git-commits-and-reporting"
+    },
+    {
+      "prompt": "Set up EAS submit so builds go to TestFlight automatically",
+      "expect": "eas-build-and-submit",
+      "near": "git-commits-and-reporting"
+    },
+    {
+      "prompt": "The app shows a white flash between the splash screen and the home screen on a cold start; fix the startup",
+      "expect": "app-startup-and-bootstrap"
+    },
+    {
+      "prompt": "Our release build is stuck on the splash screen forever after I added preventAutoHideAsync",
+      "expect": "app-startup-and-bootstrap"
+    },
+    {
+      "prompt": "Where in _layout.tsx should I create the QueryClient and the settings store, and in what order do the providers go?",
+      "expect": "app-startup-and-bootstrap"
+    },
+    {
+      "prompt": "The task draft is lost when I swipe the app away from the app switcher; save pending writes when the app goes to the background",
+      "expect": "app-startup-and-bootstrap"
+    },
+    {
+      "prompt": "We need to read the auth token from secure storage before the first screen renders without hanging the launch",
+      "expect": "app-startup-and-bootstrap"
+    },
+    {
+      "prompt": "Add a task detail route with a typed id param and a modal for editing",
+      "expect": "navigation-and-routing",
+      "near": "app-startup-and-bootstrap"
+    },
+    {
+      "prompt": "Generate the splash screen image and app icon for each build variant",
+      "expect": "icons-app-icon-and-splash",
+      "near": "app-startup-and-bootstrap"
+    },
+    {
+      "prompt": "Build the settings screen with all its states and make sure the testIDs match what the design specified",
+      "expect": "screen-contracts"
+    },
+    {
+      "prompt": "Add a confirm dialog before deleting a list; VoiceOver keeps reading the list behind it",
+      "expect": "screen-contracts"
+    },
+    {
+      "prompt": "check-screens says missing-testid lists.retry-button, what do I fix?",
+      "expect": "screen-contracts"
+    },
+    {
+      "prompt": "The design forgot the empty state for the notes screen, add one and its test",
+      "expect": "screen-contracts"
+    },
+    {
+      "prompt": "Add a new shared Button variant with a loading spinner to src/ui",
+      "expect": "ui-component-library",
+      "near": "screen-contracts"
+    },
+    {
+      "prompt": "Compare the built Lists screen pixel by pixel with the design screenshot",
+      "expect": "design-visual-parity",
+      "near": "screen-contracts"
+    },
+    {
+      "prompt": "Add a bell icon for reminders next to the due date row",
+      "expect": "icons-app-icon-and-splash"
+    },
+    {
+      "prompt": "Our Android home screen icon gets its edges cut off on Pixel and the themed icon is missing",
+      "expect": "icons-app-icon-and-splash"
+    },
+    {
+      "prompt": "Make a dark and tinted app icon for iOS 18 and update the splash screen to match dark mode",
+      "expect": "icons-app-icon-and-splash"
+    },
+    {
+      "prompt": "Someone used @expo/vector-icons and an emoji in the empty state, replace them",
+      "expect": "icons-app-icon-and-splash"
+    },
+    {
+      "prompt": "Generate the 512px Play Store icon from our logo",
+      "expect": "icons-app-icon-and-splash"
+    },
+    {
+      "prompt": "Let users pick a profile photo from the camera roll and show it in the header",
+      "expect": "media-images-and-files",
+      "near": "icons-app-icon-and-splash"
+    },
+    {
+      "prompt": "Change the primary brand colour and the dark mode palette",
+      "expect": "design-system-structure",
+      "near": "icons-app-icon-and-splash"
+    },
+    {
+      "prompt": "The tasks list flashes a spinner on every refresh and shows 'No tasks yet' while it is still loading. Fix the loading and empty states.",
+      "expect": "ui-states-and-feedback"
+    },
+    {
+      "prompt": "Show an error banner with retry when the notes request fails, and an offline banner when there is no network",
+      "expect": "ui-states-and-feedback"
+    },
+    {
+      "prompt": "Replace the 'Are you sure?' alert on delete with an undo toast",
+      "expect": "ui-states-and-feedback"
+    },
+    {
+      "prompt": "Add a skeleton placeholder and a filtered-empty message when the search has no results",
+      "expect": "ui-states-and-feedback"
+    },
+    {
+      "prompt": "My catch block just console.warns the error, what should it do instead?",
+      "expect": "error-handling-typed-results",
+      "near": "ui-states-and-feedback"
+    },
+    {
+      "prompt": "Build a reusable Toast component with its testIDs and sizes from tokens",
+      "expect": "ui-component-library",
+      "near": "ui-states-and-feedback"
+    },
+    {
+      "prompt": "Add a task detail screen at /tasks/[taskId] and link to it from the task list",
+      "expect": "navigation-and-routing"
+    },
+    {
+      "prompt": "After signing out I can still press Back and land on my tasks screen",
+      "expect": "navigation-and-routing"
+    },
+    {
+      "prompt": "The Android back button closes the task editor without asking about unsaved changes",
+      "expect": "navigation-and-routing"
+    },
+    {
+      "prompt": "Open the compose screen as a modal sheet over the list",
+      "expect": "navigation-and-routing"
+    },
+    {
+      "prompt": "Opening an old link shows a red Unmatched route page instead of the app",
+      "expect": "navigation-and-routing"
+    },
+    {
+      "prompt": "Set up universal links so https://tasks.example.com/t/12 opens that task in the app",
+      "expect": "deep-links-and-universal-links",
+      "near": "navigation-and-routing"
+    },
+    {
+      "prompt": "Keep the splash screen up until the database is open and the stores are hydrated",
+      "expect": "app-startup-and-bootstrap",
+      "near": "navigation-and-routing"
+    },
+    {
+      "prompt": "Add a New task form with a title, notes and an estimate in minutes, with validation errors under each field",
+      "expect": "forms-and-input"
+    },
+    {
+      "prompt": "The keyboard covers the password field on Android and the first tap on Save only closes the keyboard",
+      "expect": "forms-and-input"
+    },
+    {
+      "prompt": "Check whether a list name is already taken on the server while the user types it",
+      "expect": "forms-and-input"
+    },
+    {
+      "prompt": "Our email field capitalizes the first letter and iOS doesn't offer autofill for the password",
+      "expect": "forms-and-input"
+    },
+    {
+      "prompt": "The number pad on iPhone has no return key, users can't close it on the estimate field",
+      "expect": "forms-and-input"
+    },
+    {
+      "prompt": "Store the auth token after sign-in and refresh the session when it expires",
+      "expect": "auth-and-secure-storage",
+      "near": "forms-and-input"
+    },
+    {
+      "prompt": "Add a reusable Button component with a busy state to src/ui",
+      "expect": "ui-component-library",
+      "near": "forms-and-input"
+    },
+    {
+      "prompt": "Add a price field to the Product model and show it on the product screen",
+      "expect": "value-objects-money-and-units"
+    },
+    {
+      "prompt": "Splitting the order between three people leaves the total one cent short, fix the bill split",
+      "expect": "value-objects-money-and-units"
+    },
+    {
+      "prompt": "Our API sends amounts in KWD and we show them with two decimals, the numbers look 10x wrong",
+      "expect": "value-objects-money-and-units"
+    },
+    {
+      "prompt": "Store the reminder's fire time and the task's estimated duration in SQLite",
+      "expect": "value-objects-money-and-units"
+    },
+    {
+      "prompt": "Let users switch between kilometres and miles for the walking distance",
+      "expect": "value-objects-money-and-units"
+    },
+    {
+      "prompt": "The streak resets at the wrong time for users west of UTC",
+      "expect": "dates-streaks-and-statistics",
+      "near": "value-objects-money-and-units"
+    },
+    {
+      "prompt": "Add a Buy Premium button that runs the purchase and restore flow",
+      "expect": "in-app-purchases",
+      "near": "value-objects-money-and-units"
+    },
+    {
+      "prompt": "cold start takes 1.4 s on our Android phone; measure it from process start and get it under the budget",
+      "expect": "performance-budgets"
+    },
+    {
+      "prompt": "the task list scroll hitches on a 90 Hz Pixel; record frame times and check the hitch rate and p95",
+      "expect": "performance-budgets"
+    },
+    {
+      "prompt": "we want to add a charting library; check how much it grows the iOS and Android bundles before we keep it",
+      "expect": "performance-budgets"
+    },
+    {
+      "prompt": "the stats screen now has eleven Skia canvases and each badge row mounts its own canvas, is that within our perf budget?",
+      "expect": "performance-budgets"
+    },
+    {
+      "prompt": "this task row re-renders whenever the settings store changes; add a Profiler test that pins it",
+      "expect": "react-components-and-hooks",
+      "near": "performance-budgets"
+    },
+    {
+      "prompt": "the progress ring animation keeps looping when Reduce Motion is on",
+      "expect": "motion-and-animation",
+      "near": "performance-budgets"
+    },
+    {
+      "prompt": "Add login with our company's OAuth provider and keep the user signed in between launches",
+      "expect": "auth-and-secure-storage"
+    },
+    {
+      "prompt": "Where should I store the refresh token? Right now it's in AsyncStorage",
+      "expect": "auth-and-secure-storage"
+    },
+    {
+      "prompt": "Ten requests hit 401 at the same time and the app refreshes the token ten times, then gets logged out",
+      "expect": "auth-and-secure-storage"
+    },
+    {
+      "prompt": "Add Sign in with Apple and an account deletion screen before App Review",
+      "expect": "auth-and-secure-storage"
+    },
+    {
+      "prompt": "After logout the next user still sees the previous user's tasks; make sign-out clear everything",
+      "expect": "auth-and-secure-storage"
+    },
+    {
+      "prompt": "Add a TanStack Query mutation that creates a task on the server with retries",
+      "expect": "networking-and-server-state",
+      "near": "auth-and-secure-storage"
+    },
+    {
+      "prompt": "Persist the user's theme preference across launches",
+      "expect": "settings-and-preferences",
+      "near": "auth-and-secure-storage"
+    },
+    {
+      "prompt": "Write the rules for a Lights Out game in our app: tapping a cell toggles it and its neighbours, and the board is won when all lights are off.",
+      "expect": "game-rules-engine"
+    },
+    {
+      "prompt": "Our dice game re-rolls differently after the user resumes a saved run. How should the random state be stored in the game state?",
+      "expect": "game-rules-engine"
+    },
+    {
+      "prompt": "applyMove is mutating the board and undo breaks. Make the game engine pure and add property tests for listMoves and outcome.",
+      "expect": "game-rules-engine"
+    },
+    {
+      "prompt": "Add an endless mode to the puzzle game that can never be won, and score it by the points banked.",
+      "expect": "game-rules-engine"
+    },
+    {
+      "prompt": "Generate 60 solvable levels with par and star thresholds, plus a daily level from the date.",
+      "expect": "level-generation-and-solvers",
+      "near": "game-rules-engine"
+    },
+    {
+      "prompt": "Replace Math.random in the daily tip picker with a seeded generator and pin its golden vectors.",
+      "expect": "seeded-determinism-and-golden-vectors",
+      "near": "game-rules-engine"
+    },
+    {
+      "prompt": "Add a 'Back up my tasks' button that writes a file the user can save to Files or Drive, and a 'Restore from backup' option in settings.",
+      "expect": "data-export-and-restore"
+    },
+    {
+      "prompt": "Users want to export their tasks as a CSV to open in Excel; make sure titles with commas and =formulas don't break the spreadsheet.",
+      "expect": "data-export-and-restore"
+    },
+    {
+      "prompt": "Restoring an old backup file crashes with a schema error after we added a due date column. How should older backup files be upgraded?",
+      "expect": "data-export-and-restore"
+    },
+    {
+      "prompt": "Let users pick a JSON file with the document picker and import it, replacing their current lists safely.",
+      "expect": "data-export-and-restore"
+    },
+    {
+      "prompt": "Share the exported file with expo-sharing; on iPad the share sheet appears in the wrong place.",
+      "expect": "data-export-and-restore"
+    },
+    {
+      "prompt": "Add a due_date column to the tasks table and a migration for existing users.",
+      "expect": "persistence-and-migrations",
+      "near": "data-export-and-restore"
+    },
+    {
+      "prompt": "Let users attach a photo from their camera roll to a task.",
+      "expect": "media-images-and-files",
+      "near": "data-export-and-restore"
+    },
+    {
+      "prompt": "The splash screen flashes and then I see an empty white frame before the home screen on Android release builds",
+      "expect": "app-startup-and-bootstrap"
+    },
+    {
+      "prompt": "Where should I open the SQLite database and connect the error log when the app cold starts? Right now it's an await in the root _layout.tsx",
+      "expect": "app-startup-and-bootstrap"
+    },
+    {
+      "prompt": "Add our auth SDK's session restore to startup so signed-in users don't see the sign-in screen first",
+      "expect": "app-startup-and-bootstrap"
+    },
+    {
+      "prompt": "My task draft is lost when the user swipes the app away from the app switcher; how do I save it on background?",
+      "expect": "app-startup-and-bootstrap"
+    },
+    {
+      "prompt": "Add a new (tabs) group with its own _layout.tsx and a settings tab",
+      "expect": "navigation-and-routing",
+      "near": "app-startup-and-bootstrap"
+    },
+    {
+      "prompt": "Replace the splash image and background colour for dark mode",
+      "expect": "icons-app-icon-and-splash",
+      "near": "app-startup-and-bootstrap"
+    },
+    {
+      "prompt": "Commit the draft-saving slice with a proper message; I also re-accepted the task-row golden.",
+      "expect": "git-commits-and-reporting"
+    },
+    {
+      "prompt": "Write the evidence report for the 1.4.0 release with the coverage and e2e numbers.",
+      "expect": "git-commits-and-reporting"
+    },
+    {
+      "prompt": "The Play upload returned 403 caller does not have permission. Tell me what you need from me.",
+      "expect": "git-commits-and-reporting"
+    },
+    {
+      "prompt": "Tag the TestFlight build 14 we just uploaded and check the tags are in order.",
+      "expect": "git-commits-and-reporting"
+    },
+    {
+      "prompt": "The commit-msg hook in lefthook isn't running at all after npm install; fix the gate wiring.",
+      "expect": "quality-gates",
+      "near": "git-commits-and-reporting"
+    },
+    {
+      "prompt": "Upload build 15 to TestFlight with the local xcodebuild lane.",
+      "expect": "ios-release-testflight",
+      "near": "git-commits-and-reporting"
+    },
+    {
+      "prompt": "Add a 'snooze until tomorrow' action to tasks - do it TDD, test first.",
+      "expect": "tdd-workflow"
+    },
+    {
+      "prompt": "Implement the overdue badge for tasks; write the failing test before the code and commit test and code together.",
+      "expect": "tdd-workflow"
+    },
+    {
+      "prompt": "Which tests should I write for the new reminders feature, and in what order do I build the layers?",
+      "expect": "tdd-workflow"
+    },
+    {
+      "prompt": "check-test-edits says assertion-changed on my fix commit - I only updated the expected value to match the code.",
+      "expect": "tdd-workflow"
+    },
+    {
+      "prompt": "Jest can't find renderWithProviders and the expo-sqlite mock is missing - set up the test environment.",
+      "expect": "unit-and-component-tests",
+      "near": "tdd-workflow"
+    },
+    {
+      "prompt": "A golden snapshot diff appeared after I changed the board generator; how do I rebaseline it?",
+      "expect": "golden-and-snapshot-tests",
+      "near": "tdd-workflow"
+    },
+    {
+      "prompt": "Add a hidden debug screen to our preview builds where QA can fake the date and toggle offline mode, but make sure it never ends up in the App Store build.",
+      "expect": "debug-menu-and-test-hooks"
+    },
+    {
+      "prompt": "Our Maestro flow needs the app to start offline on 2030-03-01. Add a deep link that sets that state up in test builds only.",
+      "expect": "debug-menu-and-test-hooks"
+    },
+    {
+      "prompt": "knip says every export in test-only-entry.ts is unused, and in the preview build TEST_ONLY.createTestHooks is not a function.",
+      "expect": "debug-menu-and-test-hooks"
+    },
+    {
+      "prompt": "Add a simulate-offline switch for testers that TanStack Query, the offline banner and the purchase screen all respect.",
+      "expect": "debug-menu-and-test-hooks"
+    },
+    {
+      "prompt": "Write a Maestro flow that adds a task and checks the list on the iOS simulator and the Android emulator.",
+      "expect": "e2e-maestro",
+      "near": "debug-menu-and-test-hooks"
+    },
+    {
+      "prompt": "After switching EAS profiles, prove the production export has no secrets and no test-only sentinel in it.",
+      "expect": "app-variants-and-environment",
+      "near": "debug-menu-and-test-hooks"
+    },
+    {
+      "prompt": "Add an empty state and an error state to the Lists screen and make sure the testIDs match contracts/screens.json",
+      "expect": "screen-contracts"
+    },
+    {
+      "prompt": "Build a confirm-delete dialog for a list; it has to close on Android back and keep TalkBack inside",
+      "expect": "screen-contracts"
+    },
+    {
+      "prompt": "check-screens says unknown-testid lists.list-rows on my lists screen, what do I fix?",
+      "expect": "screen-contracts"
+    },
+    {
+      "prompt": "Write the contract entry and view test for the new task detail screen before building it",
+      "expect": "screen-contracts"
+    },
+    {
+      "prompt": "Add a new variant to the shared Button component in src/ui and list its parts in the catalogue",
+      "expect": "ui-component-library",
+      "near": "screen-contracts"
+    },
+    {
+      "prompt": "Add a new route group with a protected tab layout and deep links",
+      "expect": "navigation-and-routing",
+      "near": "screen-contracts"
+    },
+    {
+      "prompt": "Add a one-time 'Remove ads' Premium purchase with expo-iap, with a Restore button on the paywall and in Settings",
+      "expect": "in-app-purchases"
+    },
+    {
+      "prompt": "A user got a refund from Apple but still has Premium in our app. How should the app revoke it?",
+      "expect": "in-app-purchases"
+    },
+    {
+      "prompt": "When the phone is offline our paywall says 'No purchase to restore'. Fix the restore flow",
+      "expect": "in-app-purchases"
+    },
+    {
+      "prompt": "Set up StoreKit configuration testing for the Premium unlock on the iOS simulator, and test it with license testers on Android",
+      "expect": "in-app-purchases"
+    },
+    {
+      "prompt": "finishTransaction runs before we save the entitlement and purchases get lost after a crash",
+      "expect": "in-app-purchases"
+    },
+    {
+      "prompt": "Show a rewarded ad and hide banner ads for users who paid",
+      "expect": "admob-ads-and-consent",
+      "near": "in-app-purchases"
+    },
+    {
+      "prompt": "Upload the build with the new in-app purchase to TestFlight",
+      "expect": "ios-release-testflight",
+      "near": "in-app-purchases"
+    },
+    {
+      "prompt": "Make the tasks screen responsive so it looks right on an iPad and in landscape",
+      "expect": "adaptive-layout"
+    },
+    {
+      "prompt": "On tablets show the notes list next to the selected note, master-detail style",
+      "expect": "adaptive-layout"
+    },
+    {
+      "prompt": "Should we lock the app to portrait? Android 16 tablets seem to ignore it",
+      "expect": "adaptive-layout"
+    },
+    {
+      "prompt": "The product grid shows two cramped columns in iPad Split View; fix the column count",
+      "expect": "adaptive-layout"
+    },
+    {
+      "prompt": "Our FlatList crashes with 'Changing numColumns on the fly is not supported' after rotation",
+      "expect": "adaptive-layout"
+    },
+    {
+      "prompt": "Move the bottom tab bar to a side bar on wide windows",
+      "expect": "navigation-and-routing",
+      "near": "adaptive-layout"
+    },
+    {
+      "prompt": "Text clips when the user sets the largest accessibility font size",
+      "expect": "accessibility-as-code",
+      "near": "adaptive-layout"
+    },
+    {
+      "prompt": "Add a bell icon to the reminders row and make it flip correctly in Arabic",
+      "expect": "icons-app-icon-and-splash"
+    },
+    {
+      "prompt": "Generate the app icon and splash screen from our logo for iOS dark/tinted and Android themed icons",
+      "expect": "icons-app-icon-and-splash"
+    },
+    {
+      "prompt": "Someone put an emoji and a PNG in the empty-state screen; replace them the right way",
+      "expect": "icons-app-icon-and-splash"
+    },
+    {
+      "prompt": "The Android 12 splash cuts off the edges of our logo",
+      "expect": "icons-app-icon-and-splash"
+    },
+    {
+      "prompt": "Let users attach photos from their camera roll to a task",
+      "expect": "media-images-and-files",
+      "near": "icons-app-icon-and-splash"
+    },
+    {
+      "prompt": "Draw a progress chart for completed tasks per week on a Skia canvas",
+      "expect": "skia-canvas-rendering",
+      "near": "icons-app-icon-and-splash"
+    },
+    {
+      "prompt": "Add an AdMob banner to the bottom of the task list screen and make sure it only shows after consent.",
+      "expect": "admob-ads-and-consent"
+    },
+    {
+      "prompt": "Our iOS build crashes at launch with 'missing NSUserTrackingUsageDescription' after adding the App Tracking Transparency prompt for ads.",
+      "expect": "admob-ads-and-consent"
+    },
+    {
+      "prompt": "Show an interstitial after the user finishes reviewing their tasks, but not too often.",
+      "expect": "admob-ads-and-consent"
+    },
+    {
+      "prompt": "Set up a 'watch an ad to unlock a theme' rewarded ad and make sure test builds never use real ad unit IDs.",
+      "expect": "admob-ads-and-consent"
+    },
+    {
+      "prompt": "Where do the GDPR consent form and the 'Ad privacy choices' setting go in our Expo app with react-native-google-mobile-ads?",
+      "expect": "admob-ads-and-consent"
+    },
+    {
+      "prompt": "Add a Premium purchase that removes ads, with restore purchases on iOS and Android.",
+      "expect": "in-app-purchases",
+      "near": "admob-ads-and-consent"
+    },
+    {
+      "prompt": "Fill in the App Privacy and Google Play Data safety answers before we submit.",
+      "expect": "privacy-and-store-declarations",
+      "near": "admob-ads-and-consent"
+    },
+    {
+      "prompt": "The tasks list shows 'No tasks yet' for a second before the data loads, and also when the request fails. Fix the screen states.",
+      "expect": "ui-states-and-feedback"
+    },
+    {
+      "prompt": "Add an Undo toast after deleting a note instead of the 'Are you sure?' alert.",
+      "expect": "ui-states-and-feedback"
+    },
+    {
+      "prompt": "The pull-to-refresh spinner keeps appearing after every save even though nobody pulled the list.",
+      "expect": "ui-states-and-feedback"
+    },
+    {
+      "prompt": "Show an offline banner and a skeleton placeholder while the orders screen loads.",
+      "expect": "ui-states-and-feedback"
+    },
+    {
+      "prompt": "Our fetch wrapper throws raw errors; turn API failures into typed Result values with kinds.",
+      "expect": "error-handling-typed-results",
+      "near": "ui-states-and-feedback"
+    },
+    {
+      "prompt": "Set up TanStack Query with a QueryClient, query keys and the ApiClient port for the tasks endpoint.",
+      "expect": "networking-and-server-state",
+      "near": "ui-states-and-feedback"
+    },
+    {
+      "prompt": "Splitting a 100 EUR order between three accounts gives 33.33 each and the receipt is a cent short. Fix the split.",
+      "expect": "value-objects-money-and-units"
+    },
+    {
+      "prompt": "Add a price field to the Product type and store it in SQLite; prices come from our API as decimal strings with a currency code.",
+      "expect": "value-objects-money-and-units"
+    },
+    {
+      "prompt": "German users typing 12.50 into the amount field end up with 1250 euros. Fix the amount input parsing.",
+      "expect": "value-objects-money-and-units"
+    },
+    {
+      "prompt": "Our API sends created_at as ISO text and some timestamps are in seconds; store them properly in the reminders table.",
+      "expect": "value-objects-money-and-units"
+    },
+    {
+      "prompt": "Count the user's daily streak across midnight in their own time zone.",
+      "expect": "dates-streaks-and-statistics",
+      "near": "value-objects-money-and-units"
+    },
+    {
+      "prompt": "Wire the restore purchases button and the Premium entitlement check with expo-iap.",
+      "expect": "in-app-purchases",
+      "near": "value-objects-money-and-units"
+    },
+    {
+      "prompt": "Add a New task form with a title, notes and an estimate in minutes, with validation messages in every language",
+      "expect": "forms-and-input"
+    },
+    {
+      "prompt": "The keyboard covers the last text field on Android and the Done button hides the estimate field",
+      "expect": "forms-and-input"
+    },
+    {
+      "prompt": "Our email field capitalizes the first letter and the password field gets no password manager suggestions",
+      "expect": "forms-and-input"
+    },
+    {
+      "prompt": "Check asynchronously whether a list name is already taken while the user types, without flooding the server",
+      "expect": "forms-and-input"
+    },
+    {
+      "prompt": "Build the sign-in screen with Apple sign-in and store the session token securely",
+      "expect": "auth-and-secure-storage",
+      "near": "forms-and-input"
+    },
+    {
+      "prompt": "Parse a typed price like 1.234,50 into integer cents with the right currency digits",
+      "expect": "value-objects-money-and-units",
+      "near": "forms-and-input"
+    },
+    {
+      "prompt": "The app launches slowly on Android phones; measure cold start and tell me if we are within budget",
+      "expect": "performance-budgets"
+    },
+    {
+      "prompt": "Here is the perf report the tester shared from the debug menu, check it against our budgets before the release",
+      "expect": "performance-budgets"
+    },
+    {
+      "prompt": "I'm adding react-native-skia charts with a useFrameCallback animation to the stats screen, make sure it won't hurt frame rate",
+      "expect": "performance-budgets"
+    },
+    {
+      "prompt": "Before adding date-fns and lottie, check how much they grow the JS bundle on iOS and Android",
+      "expect": "performance-budgets"
+    },
+    {
+      "prompt": "The task row re-renders every time the parent list updates; stop the extra renders",
+      "expect": "react-components-and-hooks",
+      "near": "performance-budgets"
+    },
+    {
+      "prompt": "Set up Sentry crash reporting with consent for production builds",
+      "expect": "crash-reporting-and-observability",
+      "near": "performance-budgets"
+    },
+    {
+      "prompt": "Add a Backup screen that exports all tasks to a file the user can save, and lets them restore it later on a new phone",
+      "expect": "data-export-and-restore"
+    },
+    {
+      "prompt": "Users want to export their orders as a CSV they can open in Excel; make sure formulas in notes don't execute",
+      "expect": "data-export-and-restore"
+    },
+    {
+      "prompt": "Restoring a backup picked from Files fails halfway and leaves some lists missing; make restore all-or-nothing",
+      "expect": "data-export-and-restore"
+    },
+    {
+      "prompt": "I added a due_on column to tasks; what do I need to change so old backup files still import?",
+      "expect": "data-export-and-restore"
+    },
+    {
+      "prompt": "Add a migration that adds a priority column to the tasks table and update the repository",
+      "expect": "persistence-and-migrations",
+      "near": "data-export-and-restore"
+    },
+    {
+      "prompt": "Let the user attach photos from their library to a note and store them on the device",
+      "expect": "media-images-and-files",
+      "near": "data-export-and-restore"
+    },
+    {
+      "prompt": "Add a Remove Ads one-time purchase with expo-iap and a restore button",
+      "expect": "in-app-purchases"
+    },
+    {
+      "prompt": "Our paywall shows 'No purchase to restore' when the user is offline, fix the restore flow",
+      "expect": "in-app-purchases"
+    },
+    {
+      "prompt": "Premium got turned off after a refund check found nothing in getAvailablePurchases",
+      "expect": "in-app-purchases"
+    },
+    {
+      "prompt": "Set up the StoreKit configuration file and test the Ask to Buy pending state on the simulator",
+      "expect": "in-app-purchases"
+    },
+    {
+      "prompt": "Show a rewarded ad that unlocks a hint, and turn ads off for Premium users",
+      "expect": "admob-ads-and-consent",
+      "near": "in-app-purchases"
+    },
+    {
+      "prompt": "Store order totals as minor units and split a bill between three accounts",
+      "expect": "value-objects-money-and-units",
+      "near": "in-app-purchases"
+    },
+    {
+      "prompt": "Add login with our OAuth provider and keep the refresh token somewhere safe on the phone",
+      "expect": "auth-and-secure-storage"
+    },
+    {
+      "prompt": "After logout the next user still gets the previous user's push notifications and cached tasks",
+      "expect": "auth-and-secure-storage"
+    },
+    {
+      "prompt": "We get ten token refreshes at once when the access token expires and the server revokes the session",
+      "expect": "auth-and-secure-storage"
+    },
+    {
+      "prompt": "Add Sign in with Apple and an in-app delete account screen for App Review",
+      "expect": "auth-and-secure-storage"
+    },
+    {
+      "prompt": "The app is stuck on the splash screen on some Android phones when reading the stored session",
+      "expect": "auth-and-secure-storage"
+    },
+    {
+      "prompt": "Add a TanStack Query hook that fetches the task list from our API with retries",
+      "expect": "networking-and-server-state",
+      "near": "auth-and-secure-storage"
+    },
+    {
+      "prompt": "Ask for notification permission and register the Expo push token on first launch",
+      "expect": "push-notifications",
+      "near": "auth-and-secure-storage"
+    },
+    {
+      "prompt": "Add a hidden debug screen to our preview builds where QA can fake today's date and turn on offline mode, and make sure none of it ships to the App Store.",
+      "expect": "debug-menu-and-test-hooks"
+    },
+    {
+      "prompt": "Our Maestro flow needs to start the app on a specific day with the network off; add a deep link that sets that up in test builds.",
+      "expect": "debug-menu-and-test-hooks"
+    },
+    {
+      "prompt": "TEST_ONLY.createTestHooks is not a function in the preview build, what's wrong with our test-only gate?",
+      "expect": "debug-menu-and-test-hooks"
+    },
+    {
+      "prompt": "The simulate-offline switch in the debug menu doesn't pause TanStack Query, fix the test hook wiring.",
+      "expect": "debug-menu-and-test-hooks"
+    },
+    {
+      "prompt": "Write a Maestro flow that logs in and checks the task list renders on Android.",
+      "expect": "e2e-maestro",
+      "near": "debug-menu-and-test-hooks"
+    },
+    {
+      "prompt": "Add a preview variant with its own bundle id and EXPO_PUBLIC_API_URL.",
+      "expect": "app-variants-and-environment",
+      "near": "debug-menu-and-test-hooks"
+    },
+    {
+      "prompt": "Add a banner ad at the bottom of the task list, but only after the user has accepted Google's consent form",
+      "expect": "admob-ads-and-consent"
+    },
+    {
+      "prompt": "Our kids app shows ads; App Review rejected it for the App Tracking Transparency prompt. Fix the ads setup.",
+      "expect": "admob-ads-and-consent"
+    },
+    {
+      "prompt": "Show a rewarded video so users can unlock a theme for today, and make sure the reward is only granted when they finish it",
+      "expect": "admob-ads-and-consent"
+    },
+    {
+      "prompt": "Testers on the preview channel are seeing real AdMob ads after we pushed an EAS update",
+      "expect": "admob-ads-and-consent"
+    },
+    {
+      "prompt": "The ATT tracking prompt pops up over the task editor screen; it should only appear on the list",
+      "expect": "admob-ads-and-consent"
+    },
+    {
+      "prompt": "Add a 'Remove ads' purchase and a restore purchases button",
+      "expect": "in-app-purchases",
+      "near": "admob-ads-and-consent"
+    },
+    {
+      "prompt": "Fill in the App Privacy nutrition labels and the privacy manifest before release",
+      "expect": "privacy-and-store-declarations",
+      "near": "admob-ads-and-consent"
+    },
+    {
+      "prompt": "What does REQ-4.1 say exactly? I need to quote it in the first test for the reminder permission flow.",
+      "expect": "spec-traceability"
+    },
+    {
+      "prompt": "The spec doesn't say what the empty task list should show on Android vs iOS - what do I do before building it?",
+      "expect": "spec-traceability"
+    },
+    {
+      "prompt": "Add a docs/spec folder with requirement IDs to our Expo app and a check that no commit or test cites an ID that doesn't exist.",
+      "expect": "spec-traceability"
+    },
+    {
+      "prompt": "check-spec-refs says untraced-requirement for SCR-2, how do I fix it?",
+      "expect": "spec-traceability"
+    },
+    {
+      "prompt": "Which screens and features are required for the Settings screen (SCR-3)? List the open decisions too.",
+      "expect": "spec-traceability"
+    },
+    {
+      "prompt": "Write the failing test first for the complete-task behaviour and walk me through red-green-refactor.",
+      "expect": "tdd-workflow",
+      "near": "spec-traceability"
+    },
+    {
+      "prompt": "My commit-msg hook rejects the Spec-Change trailer, what format does it want?",
+      "expect": "git-commits-and-reporting",
+      "near": "spec-traceability"
+    },
+    {
+      "prompt": "/run-migration we're about to ship v3 of the database in the 1.6.0 build",
+      "expect": "run-migration"
+    },
+    {
+      "prompt": "Run the migration release ritual for the pending add-list-sort-order step and record it in the schema ledger once the TestFlight build is out",
+      "expect": "run-migration"
+    },
+    {
+      "prompt": "Use run-migration to restore app.db.v2.bak on my rnskills simulator after the bad step wiped the tasks table",
+      "expect": "run-migration"
+    },
+    {
+      "prompt": "Adopt the schema ledger with run-migration for our app that already shipped three database versions",
+      "expect": "run-migration"
+    },
+    {
+      "prompt": "Add a due_date column to the tasks table and write the migration step",
+      "expect": "persistence-and-migrations",
+      "near": "run-migration"
+    },
+    {
+      "prompt": "Users lose their saved lists after updating the app, why?",
+      "expect": "persistence-and-migrations",
+      "near": "run-migration"
+    },
+    {
+      "prompt": "Add a new Notes screen at /notes with its route, model hook and tests",
+      "expect": "scaffold-feature-screen"
+    },
+    {
+      "prompt": "Create a detail page for a list at /lists/[listId] that parses the id and shows an error when the link is bad",
+      "expect": "scaffold-feature-screen"
+    },
+    {
+      "prompt": "Scaffold a settings feature folder the same way as the others",
+      "expect": "scaffold-feature-screen"
+    },
+    {
+      "prompt": "Check that the note-detail feature is complete: route test, catalog keys, contracts",
+      "expect": "scaffold-feature-screen"
+    },
+    {
+      "prompt": "Which testIDs and states does the Lists screen need? Make the code match the contract",
+      "expect": "screen-contracts",
+      "near": "scaffold-feature-screen"
+    },
+    {
+      "prompt": "Back on Android leaves the editor without asking to discard changes",
+      "expect": "navigation-and-routing",
+      "near": "scaffold-feature-screen"
+    },
+    {
+      "prompt": "add a new skill that checks our store listing texts, with a checker and planted-bug fixtures",
+      "expect": "skill-maintenance"
+    },
+    {
+      "prompt": "the persistence skill never loads when I ask about saving data; its description must be wrong",
+      "expect": "skill-maintenance"
+    },
+    {
+      "prompt": "validate-skill says fixture-budget and no-project-ref on my skill folder, fix it",
+      "expect": "skill-maintenance"
+    },
+    {
+      "prompt": "write routing evals for the new skill and check none of the other skills steal its prompts",
+      "expect": "skill-maintenance"
+    },
+    {
+      "prompt": "the app crashes on launch with a red error screen, explain this log",
+      "expect": "troubleshooting-playbook",
+      "near": "skill-maintenance"
+    },
+    {
+      "prompt": "lefthook pre-commit hook fails on verify after my change",
+      "expect": "quality-gates",
+      "near": "skill-maintenance"
+    },
+    {
+      "prompt": "All the build tasks for 1.2.0 are done and CI is green. Run the final design and QA pass before we tag the release.",
+      "expect": "design-review-workflow"
+    },
+    {
+      "prompt": "Capture every screen in light and dark, Arabic, and the largest text size on the small iPhone and the Android tablet, and grade what's wrong.",
+      "expect": "design-review-workflow"
+    },
+    {
+      "prompt": "Write the dated sign-off for this release review and make sure the release is blocked if someone changed a screen afterwards.",
+      "expect": "design-review-workflow"
+    },
+    {
+      "prompt": "What can't be tested automatically before shipping? Set up the on-device checklist with VoiceOver, upgrade in place and the crash log.",
+      "expect": "design-review-workflow"
+    },
+    {
+      "prompt": "The new Settings screen doesn't match the approved design screenshot; compare it element by element and fix it.",
+      "expect": "design-visual-parity",
+      "near": "design-review-workflow"
+    },
+    {
+      "prompt": "Add a Maestro flow that opens the task list and checks the add button works.",
+      "expect": "e2e-maestro",
+      "near": "design-review-workflow"
+    },
+    {
+      "prompt": "Add a daily reminder for a task that fires at 9:00 local time, even across daylight saving changes",
+      "expect": "local-notifications"
+    },
+    {
+      "prompt": "Our iPhone users say task reminders stop firing after a few days; we schedule them with expo-notifications",
+      "expect": "local-notifications"
+    },
+    {
+      "prompt": "Implement 'snooze for one hour' and 'done for today' on task reminders",
+      "expect": "local-notifications"
+    },
+    {
+      "prompt": "Tapping a reminder notification should open that task, even when the app was killed",
+      "expect": "local-notifications"
+    },
+    {
+      "prompt": "Android shows our reminders under 'Miscellaneous' in notification settings; create proper channels",
+      "expect": "local-notifications"
+    },
+    {
+      "prompt": "Register the device push token with our backend and handle token refresh",
+      "expect": "push-notifications",
+      "near": "local-notifications"
+    },
+    {
+      "prompt": "Show the user's streak and a countdown until it resets at midnight",
+      "expect": "dates-streaks-and-statistics",
+      "near": "local-notifications"
+    },
+    {
+      "prompt": "Set up a new Expo app in this empty repo with all the lint, test, git hook and Claude settings configs",
+      "expect": "expo-project-bootstrap"
+    },
+    {
+      "prompt": "Scaffold a React Native project from scratch with Expo Router, strict TypeScript and our quality gates",
+      "expect": "expo-project-bootstrap"
+    },
+    {
+      "prompt": "I ran create-expo-app; bring the repo up to the standard skeleton and remove the demo stuff",
+      "expect": "expo-project-bootstrap"
+    },
+    {
+      "prompt": "Bootstrap the repo: package.json, .npmrc, eslint, jest, lefthook, app.config.ts with dev/preview/production variants",
+      "expect": "expo-project-bootstrap"
+    },
+    {
+      "prompt": "Add zustand and react-hook-form to the app at the right versions",
+      "expect": "dependency-management",
+      "near": "expo-project-bootstrap"
+    },
+    {
+      "prompt": "Add a new tasks screen with its route, model hook and tests",
+      "expect": "scaffold-feature-screen",
+      "near": "expo-project-bootstrap"
+    },
+    {
+      "prompt": "Add push notifications so users get notified when someone assigns them a task",
+      "expect": "push-notifications"
+    },
+    {
+      "prompt": "Our Expo push token changes and the server keeps sending to the old one, how do we keep registrations current?",
+      "expect": "push-notifications"
+    },
+    {
+      "prompt": "Tapping a notification opens the app but not the task screen, fix the notification tap handling",
+      "expect": "push-notifications"
+    },
+    {
+      "prompt": "Set up FCM and APNs for expo-notifications and the google-services.json for each variant",
+      "expect": "push-notifications"
+    },
+    {
+      "prompt": "Notifications that arrive while the app is open don't show a banner",
+      "expect": "push-notifications"
+    },
+    {
+      "prompt": "Schedule a daily reminder notification at 9am that survives DST changes",
+      "expect": "local-notifications",
+      "near": "push-notifications"
+    },
+    {
+      "prompt": "Show a pre-prompt screen explaining why we need camera access before the system dialog",
+      "expect": "permissions-and-system-prompts",
+      "near": "push-notifications"
+    },
+    {
+      "prompt": "Add a Take photo button to the task details screen that asks for camera permission and handles the user saying no",
+      "expect": "permissions-and-system-prompts"
+    },
+    {
+      "prompt": "Users who denied location access are stuck; the button does nothing. Add a way to send them to Settings",
+      "expect": "permissions-and-system-prompts"
+    },
+    {
+      "prompt": "App Review rejected us for our pre-permission screen and the vague NSCameraUsageDescription, fix both",
+      "expect": "permissions-and-system-prompts"
+    },
+    {
+      "prompt": "On Android the contacts permission dialog stops appearing after the second refusal; handle denied vs don't-ask-again properly",
+      "expect": "permissions-and-system-prompts"
+    },
+    {
+      "prompt": "Show the App Tracking Transparency prompt before the first ad request",
+      "expect": "admob-ads-and-consent",
+      "near": "permissions-and-system-prompts"
+    },
+    {
+      "prompt": "Schedule a daily reminder notification with an Android channel and DST-safe times",
+      "expect": "local-notifications",
+      "near": "permissions-and-system-prompts"
+    },
+    {
+      "prompt": "Make tasks://tasks/123 links open the task detail screen, and ignore links to screens we don't want reachable",
+      "expect": "deep-links-and-universal-links"
+    },
+    {
+      "prompt": "Set up universal links for tasks.example.com on iOS and App Links on Android, including the apple-app-site-association and assetlinks.json files",
+      "expect": "deep-links-and-universal-links"
+    },
+    {
+      "prompt": "Our password reset email link opens the browser instead of the app on Android 13",
+      "expect": "deep-links-and-universal-links"
+    },
+    {
+      "prompt": "A shared list link tapped while signed out is lost after the user logs in",
+      "expect": "deep-links-and-universal-links"
+    },
+    {
+      "prompt": "Write a Jest test that a deep link on cold start and on warm start lands on the right screen",
+      "expect": "deep-links-and-universal-links"
+    },
+    {
+      "prompt": "Add a task detail route with a typed href and a params parser",
+      "expect": "navigation-and-routing",
+      "near": "deep-links-and-universal-links"
+    },
+    {
+      "prompt": "Tapping a push notification should open the assigned task",
+      "expect": "push-notifications",
+      "near": "deep-links-and-universal-links"
+    },
+    {
+      "prompt": "Let users attach photos from their library to a task and show them as thumbnails",
+      "expect": "media-images-and-files"
+    },
+    {
+      "prompt": "Photos in the list flash the wrong image while scrolling the FlashList",
+      "expect": "media-images-and-files"
+    },
+    {
+      "prompt": "After the app update all the saved pictures are blank on iOS",
+      "expect": "media-images-and-files"
+    },
+    {
+      "prompt": "Add a take-a-photo button using the camera and store the picture with the note",
+      "expect": "media-images-and-files"
+    },
+    {
+      "prompt": "readAsStringAsync from expo-file-system throws after upgrading to SDK 57",
+      "expect": "media-images-and-files"
+    },
+    {
+      "prompt": "Add a new settings icon and update the app icon and splash",
+      "expect": "icons-app-icon-and-splash",
+      "near": "media-images-and-files"
+    },
+    {
+      "prompt": "Export all tasks to a backup file the user can restore later",
+      "expect": "data-export-and-restore",
+      "near": "media-images-and-files"
+    },
+    {
+      "prompt": "Sync the offline task changes to the server every few hours even when the app is closed",
+      "expect": "background-tasks"
+    },
+    {
+      "prompt": "My TaskManager.defineTask task never runs on Android after I renamed it in the last release",
+      "expect": "background-tasks"
+    },
+    {
+      "prompt": "Add a background job that purges completed tasks older than 30 days using expo-background-task",
+      "expect": "background-tasks"
+    },
+    {
+      "prompt": "Background task registration fails on my iPhone with 'Background tasks are not configured'",
+      "expect": "background-tasks"
+    },
+    {
+      "prompt": "Remind the user at 9am about tasks due today",
+      "expect": "local-notifications",
+      "near": "background-tasks"
+    },
+    {
+      "prompt": "Send a push when another user shares a list with me",
+      "expect": "push-notifications",
+      "near": "background-tasks"
+    },
+    {
+      "prompt": "I need to read the device's automatic time setting, no Expo package exposes it - write a small Swift and Kotlin module for it",
+      "expect": "native-modules-and-new-architecture"
+    },
+    {
+      "prompt": "Add a native module that tells JS when the user changes the time zone, behind a port so we can fake it in tests",
+      "expect": "native-modules-and-new-architecture"
+    },
+    {
+      "prompt": "Is react-native-legacy-picker compatible with the New Architecture? expo-doctor flags it",
+      "expect": "native-modules-and-new-architecture"
+    },
+    {
+      "prompt": "Write a Turbo Module with codegen that shares one C++ checksum between iOS and Android",
+      "expect": "native-modules-and-new-architecture"
+    },
+    {
+      "prompt": "requireNativeModule crashes with Cannot find native module 'TimeChange' in Jest and in Expo Go",
+      "expect": "native-modules-and-new-architecture"
+    },
+    {
+      "prompt": "Add an NSCameraUsageDescription to Info.plist and an Android permission through a config plugin",
+      "expect": "expo-prebuild-and-config-plugins",
+      "near": "native-modules-and-new-architecture"
+    },
+    {
+      "prompt": "Upgrade the app from Expo SDK 57 to SDK 58 and remove newArchEnabled from the config",
+      "expect": "expo-sdk-upgrade",
+      "near": "native-modules-and-new-architecture"
+    },
+    {
+      "prompt": "/run-goldens-rebaseline we bumped react-native-skia and twelve chart goldens are red, re-accept them properly",
+      "expect": "run-goldens-rebaseline"
+    },
+    {
+      "prompt": "Run the golden rebaseline ritual for the progress ring redesign: assertions first, then re-accept the affected pixel goldens one file at a time",
+      "expect": "run-goldens-rebaseline"
+    },
+    {
+      "prompt": "Use run-goldens-rebaseline: after moving to Jest 30 every .snap.ios fails on the header, rebaseline them",
+      "expect": "run-goldens-rebaseline"
+    },
+    {
+      "prompt": "run-goldens-rebaseline for the new design tokens; the badge and ring snapshots all changed and orphan PNGs are left over",
+      "expect": "run-goldens-rebaseline"
+    },
+    {
+      "prompt": "Add a golden test that pins the tasks digest output and its notification id",
+      "expect": "golden-and-snapshot-tests",
+      "near": "run-goldens-rebaseline"
+    },
+    {
+      "prompt": "The iPad screenshot baseline differs by 0.4% in the Maestro screenshot run",
+      "expect": "e2e-maestro",
+      "near": "run-goldens-rebaseline"
+    },
+    {
+      "prompt": "Add PostHog analytics to the app and track when a task is created",
+      "expect": "analytics-and-consent"
+    },
+    {
+      "prompt": "We need a 'Share usage data' toggle in settings and must not send any events before the user agrees",
+      "expect": "analytics-and-consent"
+    },
+    {
+      "prompt": "Log screen views to our analytics with expo-router",
+      "expect": "analytics-and-consent"
+    },
+    {
+      "prompt": "What do we put in App Store Connect's App Privacy section for our product analytics events?",
+      "expect": "analytics-and-consent"
+    },
+    {
+      "prompt": "Add an AppsFlyer attribution SDK and ask for App Tracking Transparency before it reads the IDFA",
+      "expect": "analytics-and-consent"
+    },
+    {
+      "prompt": "Set up Sentry crash reporting with source maps for each EAS build",
+      "expect": "crash-reporting-and-observability",
+      "near": "analytics-and-consent"
+    },
+    {
+      "prompt": "Show the Google consent form before the first banner ad loads",
+      "expect": "admob-ads-and-consent",
+      "near": "analytics-and-consent"
+    },
+    {
+      "prompt": "Add Sentry to the app so we get crash reports from TestFlight and Play internal testing builds",
+      "expect": "crash-reporting-and-observability"
+    },
+    {
+      "prompt": "Our Sentry issues show minified frames like index.android.bundle:1:23456 after the last OTA update, how do we get readable stacks?",
+      "expect": "crash-reporting-and-observability"
+    },
+    {
+      "prompt": "Make sure crash reports never include the user's email or task titles, and only send them if the user agreed",
+      "expect": "crash-reporting-and-observability"
+    },
+    {
+      "prompt": "Where should EXPO_PUBLIC_SENTRY_DSN and the Sentry auth token go, and what release name should builds use?",
+      "expect": "crash-reporting-and-observability"
+    },
+    {
+      "prompt": "Track screen views and a task_completed event in our product analytics after the user accepts tracking",
+      "expect": "analytics-and-consent",
+      "near": "crash-reporting-and-observability"
+    },
+    {
+      "prompt": "The app shows a white screen after an unhandled promise rejection; add an error boundary with a reload button",
+      "expect": "error-handling-typed-results",
+      "near": "crash-reporting-and-observability"
+    },
+    {
+      "prompt": "npx expo start --web opens a page that crashes with 'SharedArrayBuffer is not defined' — make the Tasks app work in the browser",
+      "expect": "web-support"
+    },
+    {
+      "prompt": "Add a .web.tsx version of the share button so the web build uses navigator.share instead of the native share sheet",
+      "expect": "web-support"
+    },
+    {
+      "prompt": "npx expo export --platform web fails with Unable to resolve module ./wa-sqlite/wa-sqlite.wasm",
+      "expect": "web-support"
+    },
+    {
+      "prompt": "Our static web export shows the crash screen in Chrome; check the exported site renders before we deploy it",
+      "expect": "web-support"
+    },
+    {
+      "prompt": "Do we even ship a web build? react-dom is installed but nobody tests the web target",
+      "expect": "web-support"
+    },
+    {
+      "prompt": "Make the task list show two columns on tablets and wide browser windows",
+      "expect": "adaptive-layout",
+      "near": "web-support"
+    },
+    {
+      "prompt": "A link to /tasks/42 should open that task in the iOS and Android app",
+      "expect": "deep-links-and-universal-links",
+      "near": "web-support"
+    },
+    {
+      "prompt": "Set up eas.json for our Expo app with development, preview and production profiles and remote build numbers",
+      "expect": "eas-build-and-submit"
+    },
+    {
+      "prompt": "eas build failed on the worker with npm error EBADENGINE during install dependencies",
+      "expect": "eas-build-and-submit"
+    },
+    {
+      "prompt": "Submit the production build to TestFlight and Google Play internal testing with eas submit",
+      "expect": "eas-build-and-submit"
+    },
+    {
+      "prompt": "App Store Connect rejected the upload because the build number was already used; how do we fix our EAS versioning?",
+      "expect": "eas-build-and-submit"
+    },
+    {
+      "prompt": "Do we need a new store build or can this change go out as an update? Compare the fingerprint with the last build",
+      "expect": "eas-build-and-submit"
+    },
+    {
+      "prompt": "Archive with xcodebuild and upload to TestFlight with altool without EAS",
+      "expect": "ios-release-testflight",
+      "near": "eas-build-and-submit"
+    },
+    {
+      "prompt": "Publish an OTA update to the production channel with eas update",
+      "expect": "ota-updates",
+      "near": "eas-build-and-submit"
+    },
+    {
+      "prompt": "We added Sentry; what do I need to change in the App Store privacy label and the Play Data safety form?",
+      "expect": "privacy-and-store-declarations"
+    },
+    {
+      "prompt": "App Store Connect rejected the upload with ITMS-91053 missing API declaration for NSPrivacyAccessedAPICategoryDiskSpace",
+      "expect": "privacy-and-store-declarations"
+    },
+    {
+      "prompt": "Prove our app makes no network calls outside the API client before the release, including what the SDKs ship",
+      "expect": "privacy-and-store-declarations"
+    },
+    {
+      "prompt": "audit:network fails with NEW react-native-webview: webView (not in the baseline)",
+      "expect": "privacy-and-store-declarations"
+    },
+    {
+      "prompt": "Is there any keystore or AuthKey .p8 file left in the repo? check before we open-source it",
+      "expect": "privacy-and-store-declarations"
+    },
+    {
+      "prompt": "Add a TanStack Query mutation to create a task on the server",
+      "expect": "networking-and-server-state",
+      "near": "privacy-and-store-declarations"
+    },
+    {
+      "prompt": "Install posthog-react-native with the right pinned version",
+      "expect": "dependency-management",
+      "near": "privacy-and-store-declarations"
+    },
+    {
+      "prompt": "I just finished the Lists screen, check it matches the design mockup on iPhone and Android in dark mode and Arabic",
+      "expect": "design-visual-parity"
+    },
+    {
+      "prompt": "Compare screenshots of the tasks screen against the approved design references and tell me what's off",
+      "expect": "design-visual-parity"
+    },
+    {
+      "prompt": "check-parity.mjs says bounds FAIL on tasks.summary, what do I do",
+      "expect": "design-visual-parity"
+    },
+    {
+      "prompt": "The designer updated the mockup; re-render the references and log the change",
+      "expect": "design-visual-parity"
+    },
+    {
+      "prompt": "Sign off the delete-list dialog for visual parity: fill the ledger after looking at the sheets",
+      "expect": "design-visual-parity"
+    },
+    {
+      "prompt": "Build the new Settings screen with its testIDs and loading/empty states from the spec",
+      "expect": "screen-contracts",
+      "near": "design-visual-parity"
+    },
+    {
+      "prompt": "Add a Jest snapshot test for the TaskRow component",
+      "expect": "golden-and-snapshot-tests",
+      "near": "design-visual-parity"
+    },
+    {
+      "prompt": "Build a release APK of the app and run it on an Android emulator to check the preview build starts",
+      "expect": "android-emulator-build"
+    },
+    {
+      "prompt": "gradlew assembleRelease fails with Unsupported class file major version, which Java should the Android build use?",
+      "expect": "android-emulator-build"
+    },
+    {
+      "prompt": "adb says more than one device/emulator when our smoke script installs the APK",
+      "expect": "android-emulator-build"
+    },
+    {
+      "prompt": "Prove the production APK doesn't contain the debug menu and only requests the permissions we declared",
+      "expect": "android-emulator-build"
+    },
+    {
+      "prompt": "INSTALL_FAILED_NO_MATCHING_ABIS when installing our APK on the AVD",
+      "expect": "android-emulator-build"
+    },
+    {
+      "prompt": "Upload the signed app bundle to Google Play internal testing",
+      "expect": "android-release-play",
+      "near": "android-emulator-build"
+    },
+    {
+      "prompt": "Build the app for the iOS simulator and take a screenshot",
+      "expect": "ios-simulator-build",
+      "near": "android-emulator-build"
+    },
+    {
+      "prompt": "Set up GitHub Actions so every pull request runs our verify gate",
+      "expect": "ci-pipeline-and-gates"
+    },
+    {
+      "prompt": "Our CI workflow fails on npm ci with EBADENGINE but it works locally",
+      "expect": "ci-pipeline-and-gates"
+    },
+    {
+      "prompt": "Add a nightly job that builds the Android emulator app and runs the Maestro flows on GitHub Actions",
+      "expect": "ci-pipeline-and-gates"
+    },
+    {
+      "prompt": "Pin the actions in .github/workflows to commit SHAs and add Dependabot",
+      "expect": "ci-pipeline-and-gates"
+    },
+    {
+      "prompt": "Add a manual workflow that starts the production EAS build from CI with the EXPO_TOKEN secret",
+      "expect": "ci-pipeline-and-gates"
+    },
+    {
+      "prompt": "The lefthook pre-push hook fails on npm run verify, how do I fix it",
+      "expect": "quality-gates",
+      "near": "ci-pipeline-and-gates"
+    },
+    {
+      "prompt": "Configure eas.json build profiles for preview and production",
+      "expect": "eas-build-and-submit",
+      "near": "ci-pipeline-and-gates"
+    },
+    {
+      "prompt": "Ship version 1.4.0 of the app to the Play Store internal testing track",
+      "expect": "android-release-play"
+    },
+    {
+      "prompt": "Google Play rejected our upload: 'You uploaded an APK or Android App Bundle that was signed in debug mode'",
+      "expect": "android-release-play"
+    },
+    {
+      "prompt": "Play Console says our app must support 16 KB page sizes, can you check the bundle?",
+      "expect": "android-release-play"
+    },
+    {
+      "prompt": "Start a staged rollout to 5% of production users on Google Play, then halt it if crashes spike",
+      "expect": "android-release-play"
+    },
+    {
+      "prompt": "Set up a keystore and upload key so release builds are signed for Google Play",
+      "expect": "android-release-play"
+    },
+    {
+      "prompt": "Build a Release APK and run it on the Android emulator for a smoke test",
+      "expect": "android-emulator-build",
+      "near": "android-release-play"
+    },
+    {
+      "prompt": "Add a preview profile to eas.json and fix why eas build fails on the build server",
+      "expect": "eas-build-and-submit",
+      "near": "android-release-play"
+    },
+    {
+      "prompt": "Set up EAS Update so we can ship JS fixes without a new store build",
+      "expect": "ota-updates"
+    },
+    {
+      "prompt": "I published an eas update to production but none of our users got it, the build is on the production channel",
+      "expect": "ota-updates"
+    },
+    {
+      "prompt": "Which runtimeVersion policy should app.config.ts use, appVersion or fingerprint?",
+      "expect": "ota-updates"
+    },
+    {
+      "prompt": "We pushed a broken OTA update, how do we roll it back or stop it spreading?",
+      "expect": "ota-updates"
+    },
+    {
+      "prompt": "Roll the hotfix update out to 10% of production users first",
+      "expect": "ota-updates"
+    },
+    {
+      "prompt": "Add the production build profile to eas.json and submit the build to TestFlight",
+      "expect": "eas-build-and-submit",
+      "near": "ota-updates"
+    },
+    {
+      "prompt": "Upgrade the app from Expo SDK 57 to SDK 58",
+      "expect": "expo-sdk-upgrade",
+      "near": "ota-updates"
+    },
+    {
+      "prompt": "Add a real-time arena where the player steers with a thumb stick and enemies chase them at 120 Hz",
+      "expect": "realtime-game-loop"
+    },
+    {
+      "prompt": "My bouncing balls move faster on the iPad Pro than on my Android phone, how do I make the simulation frame-rate independent?",
+      "expect": "realtime-game-loop"
+    },
+    {
+      "prompt": "Write a replay test that records (tick, command) inputs and proves the run is identical",
+      "expect": "realtime-game-loop"
+    },
+    {
+      "prompt": "The shot should ricochet off walls and bricks, then animate the path after the player releases",
+      "expect": "realtime-game-loop"
+    },
+    {
+      "prompt": "Animate the task progress grid when a day is completed",
+      "expect": "skia-canvas-rendering",
+      "near": "realtime-game-loop"
+    },
+    {
+      "prompt": "Add a drag gesture that moves a tile to another cell on the board",
+      "expect": "canvas-gestures-and-hit-testing",
+      "near": "realtime-game-loop"
+    },
+    {
+      "prompt": "Add 90 generated levels in three packs to the sliding-tiles game and prove each one is solvable",
+      "expect": "level-generation-and-solvers"
+    },
+    {
+      "prompt": "Write an IDA* solver with a Manhattan heuristic so we can compute par for every puzzle",
+      "expect": "level-generation-and-solvers"
+    },
+    {
+      "prompt": "Players say level 37 changed after the update; pack-2.json differs from what the plan generates",
+      "expect": "level-generation-and-solvers"
+    },
+    {
+      "prompt": "Give the dice game a daily level from today's date that is the same on every phone, with three stars by score",
+      "expect": "level-generation-and-solvers"
+    },
+    {
+      "prompt": "Unlock the second pack after 45 stars and show how many stars are missing",
+      "expect": "level-generation-and-solvers"
+    },
+    {
+      "prompt": "Write applyMove and listMoves for the new puzzle game and throw on illegal moves",
+      "expect": "game-rules-engine",
+      "near": "level-generation-and-solvers"
+    },
+    {
+      "prompt": "Pick a daily focus task from the list with a seeded shuffle that every user gets on the same date",
+      "expect": "seeded-determinism-and-golden-vectors",
+      "near": "level-generation-and-solvers"
+    },
+    {
+      "prompt": "Our new puzzle game feels way too hard after level 20 — can you set up bots to measure the difficulty curve and tune it?",
+      "expect": "game-balance-and-bots"
+    },
+    {
+      "prompt": "Add a headless bot simulation for the dice game and write balance bands so CI fails if the win rate drifts",
+      "expect": "game-balance-and-bots"
+    },
+    {
+      "prompt": "check-balance says report-stale after I changed the tuning file, what do I do?",
+      "expect": "game-balance-and-bots"
+    },
+    {
+      "prompt": "Before we build art for this game idea, run the fun-within-seconds kill test with random, greedy and lookahead players",
+      "expect": "game-balance-and-bots"
+    },
+    {
+      "prompt": "Tune the chaser speed and spawn rate of the real-time arena game so the first round is winnable but the third is hard",
+      "expect": "game-balance-and-bots"
+    },
+    {
+      "prompt": "Write a BFS solver that proves every generated level is winnable and computes par and stars",
+      "expect": "level-generation-and-solvers",
+      "near": "game-balance-and-bots"
+    },
+    {
+      "prompt": "Implement the rules of the new card game as a pure engine with listMoves, applyMove and property tests",
+      "expect": "game-rules-engine",
+      "near": "game-balance-and-bots"
+    },
+    {
+      "prompt": "Set up a new game called Sliding Puzzle in our app: folders, catalog keys and whatever the games need to start",
+      "expect": "new-game-scaffold"
+    },
+    {
+      "prompt": "Is the arena-chase game actually complete? Check that every part exists before we call it done",
+      "expect": "new-game-scaffold"
+    },
+    {
+      "prompt": "We ship each game as its own store app in the monorepo; create the app for a new Lights Out game",
+      "expect": "new-game-scaffold"
+    },
+    {
+      "prompt": "npm run new-game fails with 'generator is not installed', how do I start the next game",
+      "expect": "new-game-scaffold"
+    },
+    {
+      "prompt": "Write the applyMove and outcome functions for the new Lights Out game with property tests",
+      "expect": "game-rules-engine",
+      "near": "new-game-scaffold"
+    },
+    {
+      "prompt": "Generate the level packs and the daily level for the sliding puzzle",
+      "expect": "level-generation-and-solvers",
+      "near": "new-game-scaffold"
+    },
+    {
+      "prompt": "Add a Maestro flow that checks completing a task survives killing the app",
+      "expect": "e2e-maestro"
+    },
+    {
+      "prompt": "npm run e2e:android fails with 'Maestro Android driver did not start up in time'",
+      "expect": "e2e-maestro"
+    },
+    {
+      "prompt": "Our screenshots:ios run says 3 screenshots changed, how do I update the baselines properly?",
+      "expect": "e2e-maestro"
+    },
+    {
+      "prompt": "network.txt from the e2e run lists a socket to 34.120.1.1, what does that mean?",
+      "expect": "e2e-maestro"
+    },
+    {
+      "prompt": "Set up end-to-end tests on the iOS simulator and Android emulator for this Expo app",
+      "expect": "e2e-maestro"
+    },
+    {
+      "prompt": "Write a Jest test for the task list component with React Native Testing Library",
+      "expect": "unit-and-component-tests",
+      "near": "e2e-maestro"
+    },
+    {
+      "prompt": "Add a new debug deep-link parameter that fakes today's date in test builds",
+      "expect": "debug-menu-and-test-hooks",
+      "near": "e2e-maestro"
+    },
+    {
+      "prompt": "Wire the new lights-out game into the app so the Game screen can play it, with pause, undo and a result screen",
+      "expect": "game-session-host"
+    },
+    {
+      "prompt": "If the app is killed mid-move the level reopens in the wrong state; the run should be saved before the board animates",
+      "expect": "game-session-host"
+    },
+    {
+      "prompt": "Add a continue-after-loss option and two free hints a day to our puzzle game screen",
+      "expect": "game-session-host"
+    },
+    {
+      "prompt": "The endless run never shows its result in builds with ads turned off",
+      "expect": "game-session-host"
+    },
+    {
+      "prompt": "Register a second game in the game registry and give it its own host options",
+      "expect": "game-session-host"
+    },
+    {
+      "prompt": "Write the rules and legal moves for a sliding puzzle game engine",
+      "expect": "game-rules-engine",
+      "near": "game-session-host"
+    },
+    {
+      "prompt": "Generate 60 solvable levels with par and stars for lights-out",
+      "expect": "level-generation-and-solvers",
+      "near": "game-session-host"
+    },
+    {
+      "prompt": "Implement REQ-4 from the spec and make sure the first test cites it",
+      "expect": "spec-traceability"
+    },
+    {
+      "prompt": "What does the spec require for SCR-2? Quote the entry before I start",
+      "expect": "spec-traceability"
+    },
+    {
+      "prompt": "Is offline sync in scope for this version, or is it listed as out of scope in the spec?",
+      "expect": "spec-traceability"
+    },
+    {
+      "prompt": "The spec does not say what happens when a second task is completed during Undo; write the requirement question",
+      "expect": "spec-traceability"
+    },
+    {
+      "prompt": "check-spec-refs reports dangling-id for REQ-22 in a test title",
+      "expect": "spec-traceability"
+    },
+    {
+      "prompt": "Build the settings screen with its loading and empty states and testIDs",
+      "expect": "screen-contracts",
+      "near": "spec-traceability"
+    },
+    {
+      "prompt": "Write the failing test first for the new task filter, then the code",
+      "expect": "tdd-workflow",
+      "near": "spec-traceability"
+    },
+    {
+      "prompt": "Upload build 15 of the app to TestFlight for internal testers",
+      "expect": "ios-release-testflight"
+    },
+    {
+      "prompt": "The archive failed with errSecInternalComponent during codesign, what now?",
+      "expect": "ios-release-testflight"
+    },
+    {
+      "prompt": "Check that the exported .ipa has no debug entitlement or StoreKit test files before we submit it",
+      "expect": "ios-release-testflight"
+    },
+    {
+      "prompt": "App Store Connect rejected the upload with ITMS-90189 redundant binary upload",
+      "expect": "ios-release-testflight"
+    },
+    {
+      "prompt": "Set up our App Store Connect API key signing so releases run without Xcode",
+      "expect": "ios-release-testflight"
+    },
+    {
+      "prompt": "Add a production profile with autoIncrement to eas.json",
+      "expect": "eas-build-and-submit",
+      "near": "ios-release-testflight"
+    },
+    {
+      "prompt": "Build a Release app for the iOS simulator and screenshot the home screen",
+      "expect": "ios-simulator-build",
+      "near": "ios-release-testflight"
+    },
+    {
+      "prompt": "We're about to ship 1.5.0 with schema version 4. Run the migration release ritual before I upload to TestFlight.",
+      "expect": "run-migration"
+    },
+    {
+      "prompt": "The v3 step is in the release. Record it in the schema ledger now that the build is on the Play internal track.",
+      "expect": "run-migration"
+    },
+    {
+      "prompt": "My pending migration wiped the tasks table on the QA simulator. Put the database back from the .bak snapshot.",
+      "expect": "run-migration"
+    },
+    {
+      "prompt": "check-migration says shipped-frozen failed after I ran prettier on the repo; what now?",
+      "expect": "run-migration"
+    },
+    {
+      "prompt": "Add a sort_order column to the lists table with a new migration step and its fixture.",
+      "expect": "persistence-and-migrations",
+      "near": "run-migration"
+    },
+    {
+      "prompt": "Add a user-facing backup and restore screen that exports the database to a file.",
+      "expect": "data-export-and-restore",
+      "near": "run-migration"
+    },
+    {
+      "prompt": "Add a new Notes screen at /notes with its route, view, model hook and tests",
+      "expect": "scaffold-feature-screen"
+    },
+    {
+      "prompt": "I just bootstrapped the app; replace the starter home screen with the first real Tasks feature",
+      "expect": "scaffold-feature-screen"
+    },
+    {
+      "prompt": "Create a detail page for one list at /lists/[listId] with a typed params parser",
+      "expect": "scaffold-feature-screen"
+    },
+    {
+      "prompt": "Check that the note-detail feature folder is complete before I hand it over",
+      "expect": "scaffold-feature-screen"
+    },
+    {
+      "prompt": "Define the states, testIDs and copy keys of the settings screen in screens.json",
+      "expect": "screen-contracts",
+      "near": "scaffold-feature-screen"
+    },
+    {
+      "prompt": "Add an auth guard and a protected (app) group layout to the router",
+      "expect": "navigation-and-routing",
+      "near": "scaffold-feature-screen"
+    },
+    {
+      "prompt": "Add a 'Take photo' button to the task screen that asks for camera permission and handles when the user has denied it",
+      "expect": "permissions-and-system-prompts"
+    },
+    {
+      "prompt": "Our location prompt shows up right at app launch and Apple rejected us. Move it so it asks at the right moment",
+      "expect": "permissions-and-system-prompts"
+    },
+    {
+      "prompt": "The camera permission stays 'denied' after the user turns it on in Settings, until they restart the app",
+      "expect": "permissions-and-system-prompts"
+    },
+    {
+      "prompt": "Translate the NSCameraUsageDescription purpose string and stop expo-image-picker from blocking CAMERA on Android",
+      "expect": "permissions-and-system-prompts"
+    },
+    {
+      "prompt": "Let users save a task photo into their photo library with add-only access",
+      "expect": "permissions-and-system-prompts"
+    },
+    {
+      "prompt": "Show the App Tracking Transparency prompt after the UMP consent form before ads load",
+      "expect": "admob-ads-and-consent",
+      "near": "permissions-and-system-prompts"
+    },
+    {
+      "prompt": "Schedule a local reminder notification when a task is due",
+      "expect": "local-notifications",
+      "near": "permissions-and-system-prompts"
+    },
+    {
+      "prompt": "Add a daily 'remind me at 9' option to tasks that fires a local notification",
+      "expect": "local-notifications"
+    },
+    {
+      "prompt": "Add a snooze-one-hour button for task reminders",
+      "expect": "local-notifications"
+    },
+    {
+      "prompt": "My reminder fires an hour late after the DST change, fix the scheduling",
+      "expect": "local-notifications"
+    },
+    {
+      "prompt": "Reminders stop after a few days on iOS if the user doesn't open the app",
+      "expect": "local-notifications"
+    },
+    {
+      "prompt": "Register for Expo push tokens and send remote notifications from our server",
+      "expect": "push-notifications",
+      "near": "local-notifications"
+    },
+    {
+      "prompt": "add a project skill that checks our App Store listing texts for prices before release",
+      "expect": "skill-maintenance"
+    },
+    {
+      "prompt": "the new store-listing skill never loads when I ask about release notes, fix its description",
+      "expect": "skill-maintenance"
+    },
+    {
+      "prompt": "the SKILL.md validator says files-listed and the self-test of my checker has no bad case for one rule",
+      "expect": "skill-maintenance"
+    },
+    {
+      "prompt": "check-skill-set says the listing budget is over and two descriptions overlap",
+      "expect": "skill-maintenance"
+    },
+    {
+      "prompt": "the app crashes on launch with a red screen after the last npm install",
+      "expect": "troubleshooting-playbook",
+      "near": "skill-maintenance"
+    },
+    {
+      "prompt": "the pre-commit hook rejects my change because a gate file changed",
+      "expect": "quality-gates",
+      "near": "skill-maintenance"
+    },
+    {
+      "prompt": "Add a universal link so https://tasks.example.com/tasks/42 opens the task screen in the app",
+      "expect": "deep-links-and-universal-links"
+    },
+    {
+      "prompt": "Our +native-intent returns event.path unchanged — make incoming links safe",
+      "expect": "deep-links-and-universal-links"
+    },
+    {
+      "prompt": "Android App Links stopped verifying after we changed the signing key; fix assetlinks.json",
+      "expect": "deep-links-and-universal-links"
+    },
+    {
+      "prompt": "A link to a list should wait until the user signs in and then open the list",
+      "expect": "deep-links-and-universal-links"
+    },
+    {
+      "prompt": "Add a new tab to the bottom navigator and make Back work on Android",
+      "expect": "navigation-and-routing",
+      "near": "deep-links-and-universal-links"
+    },
+    {
+      "prompt": "Add Google sign-in with PKCE and store the refresh token securely",
+      "expect": "auth-and-secure-storage",
+      "near": "deep-links-and-universal-links"
+    },
+    {
+      "prompt": "Add push notifications so users get notified when a task is assigned to them",
+      "expect": "push-notifications"
+    },
+    {
+      "prompt": "Our Expo push token never reaches the server after the user turns notifications back on in Settings",
+      "expect": "push-notifications"
+    },
+    {
+      "prompt": "Set up FCM and APNs credentials for remote notifications in our Expo app",
+      "expect": "push-notifications"
+    },
+    {
+      "prompt": "Tapping a push notification at cold start opens the home screen instead of the task",
+      "expect": "push-notifications"
+    },
+    {
+      "prompt": "Schedule a daily local reminder at 9am for unfinished tasks",
+      "expect": "local-notifications",
+      "near": "push-notifications"
+    },
+    {
+      "prompt": "Set up a brand-new Expo app in this empty repo with Expo Router, all the lint/test gates and dev/preview/production variants.",
+      "expect": "expo-project-bootstrap"
+    },
+    {
+      "prompt": "Scaffold the React Native project from scratch here; the folder only has a docs/ directory so far.",
+      "expect": "expo-project-bootstrap"
+    },
+    {
+      "prompt": "I ran create-expo-app and want to turn it into the canonical skeleton without the demo tabs and app.json.",
+      "expect": "expo-project-bootstrap"
+    },
+    {
+      "prompt": "Bootstrap the repo: package.json pins, .npmrc policy, tsconfig set, AGENTS.md and the first commit with the gates.",
+      "expect": "expo-project-bootstrap"
+    },
+    {
+      "prompt": "Add zustand to the app at the right pinned version and update the dependency policy.",
+      "expect": "dependency-management",
+      "near": "expo-project-bootstrap"
+    },
+    {
+      "prompt": "The release is next week. Run the full design review sweep: every screen in light and dark, Arabic, largest text, iPad and Android tablet, then sign it off.",
+      "expect": "design-review-workflow"
+    },
+    {
+      "prompt": "We need a QA sign-off before we upload 1.2.0 — check-signoff says package-lock.json changed after the signed commit, what do I do?",
+      "expect": "design-review-workflow"
+    },
+    {
+      "prompt": "Set up contracts/design-review.json for our app and make check-review-plan pass; it says the iOS tablet must be swept in landscape.",
+      "expect": "design-review-workflow"
+    },
+    {
+      "prompt": "Grade the findings from yesterday's end-of-build review and record the one fix round.",
+      "expect": "design-review-workflow"
+    },
+    {
+      "prompt": "Compare the new settings screen against the approved design screenshot while I build it.",
+      "expect": "design-visual-parity",
+      "near": "design-review-workflow"
+    },
+    {
+      "prompt": "Make the task list switch to two panes on iPad landscape and foldables.",
+      "expect": "adaptive-layout",
+      "near": "design-review-workflow"
+    },
+    {
+      "prompt": "Add Sentry crash reporting to my Expo app, but only after the user opts in",
+      "expect": "crash-reporting-and-observability"
+    },
+    {
+      "prompt": "Our crash reports from the last OTA update show minified stack frames, how do we fix symbolication?",
+      "expect": "crash-reporting-and-observability"
+    },
+    {
+      "prompt": "check-crash-reporting fails with [init-scope] in sentry-crash-reporter-adapter.ts",
+      "expect": "crash-reporting-and-observability"
+    },
+    {
+      "prompt": "Add a 'Send crash reports' toggle and make sure no PII or screenshots go to Sentry",
+      "expect": "crash-reporting-and-observability"
+    },
+    {
+      "prompt": "Publish an OTA update to the preview channel with EAS Update",
+      "expect": "ota-updates",
+      "near": "crash-reporting-and-observability"
+    },
+    {
+      "prompt": "My try/catch swallows errors and I get unhandled promise rejections",
+      "expect": "error-handling-typed-results",
+      "near": "crash-reporting-and-observability"
+    },
+    {
+      "prompt": "Add a periodic background sync that pushes the offline task changes to the server every few hours",
+      "expect": "background-tasks"
+    },
+    {
+      "prompt": "We still use expo-background-fetch; migrate our task to the new API",
+      "expect": "background-tasks"
+    },
+    {
+      "prompt": "My TaskManager.defineTask background task never runs on Android after the app is killed",
+      "expect": "background-tasks"
+    },
+    {
+      "prompt": "Set up a WorkManager / BGTaskScheduler job that purges old rows once a day",
+      "expect": "background-tasks"
+    },
+    {
+      "prompt": "Remind the user at 9am every day to review their tasks",
+      "expect": "local-notifications",
+      "near": "background-tasks"
+    },
+    {
+      "prompt": "Show a notification when the server assigns a new task to the user",
+      "expect": "push-notifications",
+      "near": "background-tasks"
+    },
+    {
+      "prompt": "Add a small Swift and Kotlin module that tells the app when the device time zone changes",
+      "expect": "native-modules-and-new-architecture"
+    },
+    {
+      "prompt": "Is react-native-legacy-picker compatible with the New Architecture, or is it running through the interop layer?",
+      "expect": "native-modules-and-new-architecture"
+    },
+    {
+      "prompt": "I need a Turbo Module with codegen so iOS and Android share one C++ parser",
+      "expect": "native-modules-and-new-architecture"
+    },
+    {
+      "prompt": "Jest fails with Cannot find native module 'TimeChange' after I added the local Expo module",
+      "expect": "native-modules-and-new-architecture"
+    },
+    {
+      "prompt": "Add NSCameraUsageDescription to Info.plist with a config plugin",
+      "expect": "expo-prebuild-and-config-plugins",
+      "near": "native-modules-and-new-architecture"
+    },
+    {
+      "prompt": "Install and pin a new version of react-native-svg",
+      "expect": "dependency-management",
+      "near": "native-modules-and-new-architecture"
+    },
+    {
+      "prompt": "Add PostHog analytics to the app, but only after the user agrees in a usage-data prompt",
+      "expect": "analytics-and-consent"
+    },
+    {
+      "prompt": "Track a task_created event when the user saves a task, without sending the title",
+      "expect": "analytics-and-consent"
+    },
+    {
+      "prompt": "Our settings screen needs a 'Share usage data' toggle that stops analytics and forgets the id",
+      "expect": "analytics-and-consent"
+    },
+    {
+      "prompt": "Report screen views from Expo Router to our analytics without leaking record ids",
+      "expect": "analytics-and-consent"
+    },
+    {
+      "prompt": "Set up Sentry crash reporting with a consent switch",
+      "expect": "crash-reporting-and-observability",
+      "near": "analytics-and-consent"
+    },
+    {
+      "prompt": "Show Google's UMP consent form before loading banner ads",
+      "expect": "admob-ads-and-consent",
+      "near": "analytics-and-consent"
+    },
+    {
+      "prompt": "We bumped @shopify/react-native-skia and now 14 pixel goldens fail on edge anti-aliasing. Run the rebaseline ritual and re-accept them properly.",
+      "expect": "run-goldens-rebaseline"
+    },
+    {
+      "prompt": "After moving to Jest 30 every snapshot fails with 'Outdated guide link'; rebaseline the golden headers.",
+      "expect": "run-goldens-rebaseline"
+    },
+    {
+      "prompt": "The progress ring redesign changed many goldens; walk me through re-accepting them with triage, one-file -u runs and a proof.",
+      "expect": "run-goldens-rebaseline"
+    },
+    {
+      "prompt": "/run-goldens-rebaseline the design-token change moved all chart goldens",
+      "expect": "run-goldens-rebaseline"
+    },
+    {
+      "prompt": "Add a new golden test for the weekly chart and accept its first snapshot.",
+      "expect": "golden-and-snapshot-tests",
+      "near": "run-goldens-rebaseline"
+    },
+    {
+      "prompt": "One snapshot changed because of my fix in tasks-digest; update it.",
+      "expect": "golden-and-snapshot-tests",
+      "near": "run-goldens-rebaseline"
+    },
+    {
+      "prompt": "Add a GitHub Actions workflow so every pull request runs our lint, typecheck and tests",
+      "expect": "ci-pipeline-and-gates"
+    },
+    {
+      "prompt": "CI is red on the PR but npm run verify passes on my Mac, can you figure out why the workflow fails?",
+      "expect": "ci-pipeline-and-gates"
+    },
+    {
+      "prompt": "Pin our actions/checkout and setup-node to commit SHAs and set up Dependabot for the workflows",
+      "expect": "ci-pipeline-and-gates"
+    },
+    {
+      "prompt": "Run the Android emulator E2E flows nightly on GitHub Actions",
+      "expect": "ci-pipeline-and-gates"
+    },
+    {
+      "prompt": "The pre-push hook is too slow, which checks should npm run verify include?",
+      "expect": "quality-gates",
+      "near": "ci-pipeline-and-gates"
+    },
+    {
+      "prompt": "Upload the release build to TestFlight from my machine",
+      "expect": "ios-release-testflight",
+      "near": "ci-pipeline-and-gates"
+    },
+    {
+      "prompt": "Set up eas.json for our Expo app so we can build production and submit to TestFlight and Play internal testing",
+      "expect": "eas-build-and-submit"
+    },
+    {
+      "prompt": "Our EAS build failed with npm ci EBADENGINE on the worker, can you fix the profile?",
+      "expect": "eas-build-and-submit"
+    },
+    {
+      "prompt": "Run the release preflight and give me the eas build and eas submit commands for version 1.4.0",
+      "expect": "eas-build-and-submit"
+    },
+    {
+      "prompt": "check-eas-build says the build fingerprint differs from the preflight's, what now?",
+      "expect": "eas-build-and-submit"
+    },
+    {
+      "prompt": "Archive the iOS app locally with xcodebuild and upload it to TestFlight with altool, no EAS",
+      "expect": "ios-release-testflight",
+      "near": "eas-build-and-submit"
+    },
+    {
+      "prompt": "Publish an over-the-air update to the production channel",
+      "expect": "ota-updates",
+      "near": "eas-build-and-submit"
+    },
+    {
+      "prompt": "Build a release APK of the app and check it runs on an Android emulator",
+      "expect": "android-emulator-build"
+    },
+    {
+      "prompt": "check-apk says the production APK requests com.acme.tasks.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION, what do I do?",
+      "expect": "android-emulator-build"
+    },
+    {
+      "prompt": "Gradle picked JDK 21 and the emulator build fails with an unsupported class file version",
+      "expect": "android-emulator-build"
+    },
+    {
+      "prompt": "adb says more than one device/emulator when the build script installs the APK",
+      "expect": "android-emulator-build"
+    },
+    {
+      "prompt": "Upload the signed App Bundle to the Play Console internal track",
+      "expect": "android-release-play",
+      "near": "android-emulator-build"
+    },
+    {
+      "prompt": "Run the Maestro flows on the Android emulator",
+      "expect": "e2e-maestro",
+      "near": "android-emulator-build"
+    },
+    {
+      "prompt": "Let users attach photos from their library or camera to a task and keep them after app updates",
+      "expect": "media-images-and-files"
+    },
+    {
+      "prompt": "Thumbnails in my FlashList show the wrong photo for a split second while scrolling",
+      "expect": "media-images-and-files"
+    },
+    {
+      "prompt": "Add a 'Save to Photos' button for task images without triggering Google Play's photo permission declaration",
+      "expect": "media-images-and-files"
+    },
+    {
+      "prompt": "Upload the stored task photo to our API as multipart and download attachments for offline use",
+      "expect": "media-images-and-files"
+    },
+    {
+      "prompt": "Replace readAsStringAsync and documentDirectory, which crash after the SDK 57 upgrade, in our photo code",
+      "expect": "media-images-and-files"
+    },
+    {
+      "prompt": "Design the app icon and splash screen for both platforms",
+      "expect": "icons-app-icon-and-splash",
+      "near": "media-images-and-files"
+    },
+    {
+      "prompt": "Add a backup export of all tasks to a JSON file the user can share",
+      "expect": "data-export-and-restore",
+      "near": "media-images-and-files"
+    },
+    {
+      "prompt": "Generate 3 packs of 30 levels for my lights-out puzzle with a solver that proves par",
+      "expect": "level-generation-and-solvers"
+    },
+    {
+      "prompt": "Add a daily level to the game that is the same for everyone on the same date",
+      "expect": "level-generation-and-solvers"
+    },
+    {
+      "prompt": "The generate-levels --check step says pack-2.json differs after I changed the tuning",
+      "expect": "level-generation-and-solvers"
+    },
+    {
+      "prompt": "Write an IDA* solver to compute the minimum moves for each board and rate stars against it",
+      "expect": "level-generation-and-solvers"
+    },
+    {
+      "prompt": "Write the move and scoring rules for a new sliding-tile game",
+      "expect": "game-rules-engine",
+      "near": "level-generation-and-solvers"
+    },
+    {
+      "prompt": "Tune the bot difficulty so the AI opponent wins about 40% of games",
+      "expect": "game-balance-and-bots",
+      "near": "level-generation-and-solvers"
+    },
+    {
+      "prompt": "Ship this bug fix to production phones over the air without a new store build",
+      "expect": "ota-updates"
+    },
+    {
+      "prompt": "Our EAS update never shows up on the TestFlight build, what's wrong with the runtime version?",
+      "expect": "ota-updates"
+    },
+    {
+      "prompt": "Set up eas update channels for preview and production and a GitHub Action that publishes them",
+      "expect": "ota-updates"
+    },
+    {
+      "prompt": "Roll back the last eas update on the production channel, it crashes on Android",
+      "expect": "ota-updates"
+    },
+    {
+      "prompt": "Configure eas.json build profiles and submit the production build to the App Store",
+      "expect": "eas-build-and-submit",
+      "near": "ota-updates"
+    },
+    {
+      "prompt": "Add a new staging variant with its own bundle id and env vars",
+      "expect": "app-variants-and-environment",
+      "near": "ota-updates"
+    },
+    {
+      "prompt": "Implement REQ-4 from docs/spec and make sure the test quotes it",
+      "expect": "spec-traceability"
+    },
+    {
+      "prompt": "What does the spec actually require for the Task list screen (SCR-1)? Quote it.",
+      "expect": "spec-traceability"
+    },
+    {
+      "prompt": "The spec doesn't say what happens when a list is deleted with tasks in it - what should I do?",
+      "expect": "spec-traceability"
+    },
+    {
+      "prompt": "Is sharing lists in scope for this version?",
+      "expect": "spec-traceability"
+    },
+    {
+      "prompt": "Build the settings screen",
+      "expect": "screen-contracts",
+      "near": "spec-traceability"
+    },
+    {
+      "prompt": "Write the first failing test for the new sort feature",
+      "expect": "tdd-workflow",
+      "near": "spec-traceability"
+    },
+    {
+      "prompt": "Add a Swift and Kotlin module that tells JS when the device time zone changes",
+      "expect": "native-modules-and-new-architecture"
+    },
+    {
+      "prompt": "Is react-native-foo safe on the New Architecture or does it run through interop?",
+      "expect": "native-modules-and-new-architecture"
+    },
+    {
+      "prompt": "I need a Turbo Module with shared C++ for a checksum; set up codegenConfig",
+      "expect": "native-modules-and-new-architecture"
+    },
+    {
+      "prompt": "My OnStartObserving receiver keeps firing after the screen closes on Android",
+      "expect": "native-modules-and-new-architecture"
+    },
+    {
+      "prompt": "Add an Info.plist usage description and an AndroidManifest permission via a config plugin",
+      "expect": "expo-prebuild-and-config-plugins",
+      "near": "native-modules-and-new-architecture"
+    },
+    {
+      "prompt": "Bump expo to the next SDK and fix the upgrade warnings",
+      "expect": "expo-sdk-upgrade",
+      "near": "native-modules-and-new-architecture"
+    },
+    {
+      "prompt": "We're about to ship 1.3.0. Run the full design review sweep and get it signed off.",
+      "expect": "design-review-workflow"
+    },
+    {
+      "prompt": "check-signoff fails with signoff-ui-changed on app.config.ts after I bumped the build number. Is the sign-off really gone?",
+      "expect": "design-review-workflow"
+    },
+    {
+      "prompt": "Set up the end-of-release QA screenshot matrix: every screen in dark mode, Arabic and the largest text on the smallest phone.",
+      "expect": "design-review-workflow"
+    },
+    {
+      "prompt": "How do I record the fix round and the dated sign-off in design-review/<id>/review.json?",
+      "expect": "design-review-workflow"
+    },
+    {
+      "prompt": "Compare the new settings screen I just built with the approved design screenshot.",
+      "expect": "design-visual-parity",
+      "near": "design-review-workflow"
+    },
+    {
+      "prompt": "Upload build 15 to TestFlight.",
+      "expect": "ios-release-testflight",
+      "near": "design-review-workflow"
+    },
+    {
+      "prompt": "v2 of the tasks database is ready, help me ship this migration in the 1.1.0 release",
+      "expect": "run-migration"
+    },
+    {
+      "prompt": "The 1.1.0 build with the new schema went out to TestFlight yesterday, record it in the schema ledger",
+      "expect": "run-migration"
+    },
+    {
+      "prompt": "Run the migration release ritual: prove every from-to path and the restore drill before we ship",
+      "expect": "run-migration"
+    },
+    {
+      "prompt": "A pending schema step broke the database on my QA simulator, restore the snapshot",
+      "expect": "run-migration"
+    },
+    {
+      "prompt": "Add a sort_order column to the lists table with a new migration step",
+      "expect": "persistence-and-migrations",
+      "near": "run-migration"
+    },
+    {
+      "prompt": "Publish an EAS Update to the production channel with the copy fix",
+      "expect": "ota-updates",
+      "near": "run-migration"
+    },
+    {
+      "prompt": "Add a universal link so https://tasks.example.com/tasks/123 opens the task screen on iOS and Android",
+      "expect": "deep-links-and-universal-links"
+    },
+    {
+      "prompt": "Our password reset email link opens the app through the custom scheme; make it safe",
+      "expect": "deep-links-and-universal-links"
+    },
+    {
+      "prompt": "Generate the apple-app-site-association and assetlinks.json files for our preview and production domains",
+      "expect": "deep-links-and-universal-links"
+    },
+    {
+      "prompt": "A link opened while the app is running sends the user back to the home screen and they lose their draft",
+      "expect": "deep-links-and-universal-links"
+    },
+    {
+      "prompt": "Add a new settings route with a typed href and a back button that works",
+      "expect": "navigation-and-routing",
+      "near": "deep-links-and-universal-links"
+    },
+    {
+      "prompt": "Add an Info.plist entry and an AndroidManifest permission through a config plugin",
+      "expect": "expo-prebuild-and-config-plugins",
+      "near": "deep-links-and-universal-links"
+    },
+    {
+      "prompt": "Add push notifications so users get notified when someone assigns them a task; we use Expo and need the token sent to our backend",
+      "expect": "push-notifications"
+    },
+    {
+      "prompt": "Tapping a notification while the app is closed doesn't open the task screen",
+      "expect": "push-notifications"
+    },
+    {
+      "prompt": "Set up FCM and APNs credentials for expo-notifications and the Android notification channels",
+      "expect": "push-notifications"
+    },
+    {
+      "prompt": "After sign-out the old user still gets push notifications on this phone",
+      "expect": "push-notifications"
+    },
+    {
+      "prompt": "Schedule a daily reminder notification at 9am on the device",
+      "expect": "local-notifications",
+      "near": "push-notifications"
+    },
+    {
+      "prompt": "Add a 401 retry and token refresh to our API client",
+      "expect": "auth-and-secure-storage",
+      "near": "push-notifications"
+    },
+    {
+      "prompt": "scaffold a new skill that checks our push notification payloads and give it a self-test",
+      "expect": "skill-maintenance"
+    },
+    {
+      "prompt": "my SKILL.md never triggers when I ask about release notes, tighten its description",
+      "expect": "skill-maintenance"
+    },
+    {
+      "prompt": "the checker in our accessibility skill has a rule with no planted-bug fixture, add one",
+      "expect": "skill-maintenance"
+    },
+    {
+      "prompt": "validate-skill says the frontmatter has a folded description and the DoD sits too low, fix the skill",
+      "expect": "skill-maintenance"
+    },
+    {
+      "prompt": "the app crashes on launch after the last pod install, figure out why",
+      "expect": "troubleshooting-playbook",
+      "near": "skill-maintenance"
+    },
+    {
+      "prompt": "the pre-commit hook that runs our gates fails on every commit",
+      "expect": "quality-gates",
+      "near": "skill-maintenance"
+    },
+    {
+      "prompt": "Add a daily 9am reminder for each task that still fires at 9 after the clocks change",
+      "expect": "local-notifications"
+    },
+    {
+      "prompt": "Our snooze button should remind the user again in an hour with a local notification",
+      "expect": "local-notifications"
+    },
+    {
+      "prompt": "Reminders stopped firing on iPhone after the user created about 80 of them",
+      "expect": "local-notifications"
+    },
+    {
+      "prompt": "Tapping a task reminder on a cold start opens the home screen instead of the task",
+      "expect": "local-notifications"
+    },
+    {
+      "prompt": "Register the device for remote push with an Expo push token and send it to our server",
+      "expect": "push-notifications",
+      "near": "local-notifications"
+    },
+    {
+      "prompt": "Show a streak count that resets when the user misses a day",
+      "expect": "dates-streaks-and-statistics",
+      "near": "local-notifications"
+    },
+    {
+      "prompt": "Set up a new Expo app in this empty repo with Expo Router, the lint and test configs, and git hooks",
+      "expect": "expo-project-bootstrap"
+    },
+    {
+      "prompt": "Scaffold the project for a Tasks app, bundle id com.acme.tasks, with dev, preview and production variants",
+      "expect": "expo-project-bootstrap"
+    },
+    {
+      "prompt": "I ran create-expo-app and want to replace the demo with a proper skeleton and quality gates",
+      "expect": "expo-project-bootstrap"
+    },
+    {
+      "prompt": "Bootstrap the repo: we only have a docs folder so far, create the app around it without touching docs",
+      "expect": "expo-project-bootstrap"
+    },
+    {
+      "prompt": "Add zustand to the project at the right pinned version",
+      "expect": "dependency-management",
+      "near": "expo-project-bootstrap"
+    },
+    {
+      "prompt": "Move the app from Expo SDK 57 to SDK 58",
+      "expect": "expo-sdk-upgrade",
+      "near": "expo-project-bootstrap"
+    },
+    {
+      "prompt": "Add Sentry crash reporting to our Expo app, but only after the user opts in",
+      "expect": "crash-reporting-and-observability"
+    },
+    {
+      "prompt": "Our production crash stack traces in Sentry are minified after the last OTA update",
+      "expect": "crash-reporting-and-observability"
+    },
+    {
+      "prompt": "Where do I put the Sentry DSN and the auth token for EAS builds?",
+      "expect": "crash-reporting-and-observability"
+    },
+    {
+      "prompt": "Make sure crash reports don't contain user emails or phone numbers",
+      "expect": "crash-reporting-and-observability"
+    },
+    {
+      "prompt": "Add analytics events for screen views with a consent toggle",
+      "expect": "analytics-and-consent",
+      "near": "crash-reporting-and-observability"
+    },
+    {
+      "prompt": "The app crashes on launch in the simulator, help me read this stack trace",
+      "expect": "troubleshooting-playbook",
+      "near": "crash-reporting-and-observability"
+    },
+    {
+      "prompt": "Set up GitHub Actions so every PR runs our verify script and the iOS simulator E2E runs nightly",
+      "expect": "ci-pipeline-and-gates"
+    },
+    {
+      "prompt": "Our CI job is red on npm ci with EBADENGINE but it works locally, can you fix the workflow?",
+      "expect": "ci-pipeline-and-gates"
+    },
+    {
+      "prompt": "Pin all the actions in .github/workflows to commit SHAs and add Dependabot for them",
+      "expect": "ci-pipeline-and-gates"
+    },
+    {
+      "prompt": "Wire the migration ledger check into CI so it compares against main on every pull request",
+      "expect": "ci-pipeline-and-gates"
+    },
+    {
+      "prompt": "The pre-push hook is too slow, which gates should run locally before push?",
+      "expect": "quality-gates",
+      "near": "ci-pipeline-and-gates"
+    },
+    {
+      "prompt": "Set up eas.json with production and preview profiles and make store builds use remote build numbers",
+      "expect": "eas-build-and-submit"
+    },
+    {
+      "prompt": "Our EAS workflow in .eas/workflows/release.yml builds and submits to TestFlight; check the jobs are gated and name their profile",
+      "expect": "eas-build-and-submit"
+    },
+    {
+      "prompt": "eas build failed on the worker with EBADENGINE during npm ci",
+      "expect": "eas-build-and-submit"
+    },
+    {
+      "prompt": "Submit the finished EAS build to Google Play internal testing after checking its record",
+      "expect": "eas-build-and-submit"
+    },
+    {
+      "prompt": "Archive the app with xcodebuild and upload it to TestFlight with altool, we don't use EAS",
+      "expect": "ios-release-testflight",
+      "near": "eas-build-and-submit"
+    },
+    {
+      "prompt": "Publish an over-the-air update to the preview channel with eas update",
+      "expect": "ota-updates",
+      "near": "eas-build-and-submit"
+    },
+    {
+      "prompt": "Add a background job that syncs the offline task outbox every few hours, even when the app is closed",
+      "expect": "background-tasks"
+    },
+    {
+      "prompt": "We still use expo-background-fetch; move our periodic refresh to the supported API",
+      "expect": "background-tasks"
+    },
+    {
+      "prompt": "My TaskManager.defineTask task never runs on Android after the app is killed",
+      "expect": "background-tasks"
+    },
+    {
+      "prompt": "The background sync works in the simulator but iOS rejects registerTaskAsync on a device",
+      "expect": "background-tasks"
+    },
+    {
+      "prompt": "Refetch the task list whenever the app comes back to the foreground",
+      "expect": "networking-and-server-state",
+      "near": "background-tasks"
+    },
+    {
+      "prompt": "Add a 'Take photo' button that opens the camera and stores the picture with the note",
+      "expect": "media-images-and-files"
+    },
+    {
+      "prompt": "Task photos disappear after an app update; the record stores the picker's file:// uri",
+      "expect": "media-images-and-files"
+    },
+    {
+      "prompt": "Images flicker and show the wrong photo while scrolling the attachments list",
+      "expect": "media-images-and-files"
+    },
+    {
+      "prompt": "Upload the stored task photo to our API and add a save-to-Photos action",
+      "expect": "media-images-and-files"
+    },
+    {
+      "prompt": "Add a new settings icon and regenerate the app icon and splash screen",
+      "expect": "icons-app-icon-and-splash",
+      "near": "media-images-and-files"
+    },
+    {
+      "prompt": "Export all tasks with their attachments to a backup file and restore it later",
+      "expect": "data-export-and-restore",
+      "near": "media-images-and-files"
+    },
+    {
+      "prompt": "Add PostHog analytics to the app, but only after the user opts in",
+      "expect": "analytics-and-consent"
+    },
+    {
+      "prompt": "Track a task_created event when the user adds a task",
+      "expect": "analytics-and-consent"
+    },
+    {
+      "prompt": "Add a 'Share usage data' toggle to settings that turns analytics off",
+      "expect": "analytics-and-consent"
+    },
+    {
+      "prompt": "Send screen views to our analytics for every Expo Router screen",
+      "expect": "analytics-and-consent"
+    },
+    {
+      "prompt": "Report crashes and JS errors to Sentry",
+      "expect": "crash-reporting-and-observability",
+      "near": "analytics-and-consent"
+    },
+    {
+      "prompt": "Upload build 15 of the Tasks app to TestFlight with the local release script; we don't use EAS.",
+      "expect": "ios-release-testflight"
+    },
+    {
+      "prompt": "altool says ITMS-90189 redundant binary upload after my retry, what now?",
+      "expect": "ios-release-testflight"
+    },
+    {
+      "prompt": "Check the exported .ipa before we submit it: no debug menu, right bundle id, usage strings in Arabic too.",
+      "expect": "ios-release-testflight"
+    },
+    {
+      "prompt": "errSecInternalComponent during xcodebuild archive with the App Store Connect API key",
+      "expect": "ios-release-testflight"
+    },
+    {
+      "prompt": "Set up eas.json profiles with remote build numbers and autoIncrement for production.",
+      "expect": "eas-build-and-submit",
+      "near": "ios-release-testflight"
+    },
+    {
+      "prompt": "Build a Release simulator build and smoke-test it on a named simulator.",
+      "expect": "ios-simulator-build",
+      "near": "ios-release-testflight"
+    },
+    {
+      "prompt": "I just finished the lists screen, check it matches the approved design in dark mode and Arabic on iOS and Android",
+      "expect": "design-visual-parity"
+    },
+    {
+      "prompt": "run-parity says text-ink failed on tasks.summary, what do I fix?",
+      "expect": "design-visual-parity"
+    },
+    {
+      "prompt": "set up screenshot comparison against our HTML mockup so we can prove visual parity",
+      "expect": "design-visual-parity"
+    },
+    {
+      "prompt": "the design changed, re-render the reference images for the delete dialog",
+      "expect": "design-visual-parity"
+    },
+    {
+      "prompt": "build the settings screen with its testIDs and states from the spec",
+      "expect": "screen-contracts",
+      "near": "design-visual-parity"
+    },
+    {
+      "prompt": "add a pixel golden test for the chart canvas",
+      "expect": "golden-and-snapshot-tests",
+      "near": "design-visual-parity"
+    },
+    {
+      "prompt": "Upload the new Android build to the Play Console internal track and start a 5% staged rollout",
+      "expect": "android-release-play"
+    },
+    {
+      "prompt": "Play says 'Changes cannot be sent for review automatically' when I commit the edit; what now?",
+      "expect": "android-release-play"
+    },
+    {
+      "prompt": "Our release AAB is signed with the debug key and Google Play rejects it",
+      "expect": "android-release-play"
+    },
+    {
+      "prompt": "Google Play refuses the bundle: version code 42 has already been used",
+      "expect": "android-release-play"
+    },
+    {
+      "prompt": "Add a preview build profile with channel preview to eas.json",
+      "expect": "eas-build-and-submit",
+      "near": "android-release-play"
+    },
+    {
+      "prompt": "Upload the iOS build to TestFlight",
+      "expect": "ios-release-testflight",
+      "near": "android-release-play"
+    },
+    {
+      "prompt": "Add 3 packs of 30 levels to our lights-out game and prove each one is solvable",
+      "expect": "level-generation-and-solvers"
+    },
+    {
+      "prompt": "The daily puzzle is different on Android and iOS for the same date, make the daily level deterministic",
+      "expect": "level-generation-and-solvers"
+    },
+    {
+      "prompt": "Write an IDA* solver to compute par for every level and award stars",
+      "expect": "level-generation-and-solvers"
+    },
+    {
+      "prompt": "Unlock the second pack when the player has 45 stars",
+      "expect": "level-generation-and-solvers"
+    },
+    {
+      "prompt": "Write the applyMove and outcome rules for a new sliding puzzle game",
+      "expect": "game-rules-engine",
+      "near": "level-generation-and-solvers"
+    },
+    {
+      "prompt": "Tune the bot sims so Pig is not too easy at medium difficulty",
+      "expect": "game-balance-and-bots",
+      "near": "level-generation-and-solvers"
+    },
+    {
+      "prompt": "Publish a hotfix to production phones over the air with eas update",
+      "expect": "ota-updates"
+    },
+    {
+      "prompt": "Our preview builds never pick up the updates we publish, what's wrong with the channel setup?",
+      "expect": "ota-updates"
+    },
+    {
+      "prompt": "Set runtimeVersion to the fingerprint policy and stop lint script edits from changing it",
+      "expect": "ota-updates"
+    },
+    {
+      "prompt": "Roll back the bad OTA update we shipped to 10% of production users",
+      "expect": "ota-updates"
+    },
+    {
+      "prompt": "Build the production binary and submit it to the App Store and Play Store with EAS",
+      "expect": "eas-build-and-submit",
+      "near": "ota-updates"
+    },
+    {
+      "prompt": "Add a staging variant with its own APP_VARIANT and bundle id",
+      "expect": "app-variants-and-environment",
+      "near": "ota-updates"
+    },
+    {
+      "prompt": "We just added Sentry and AdMob. What do I put in App Store Connect's App Privacy and Play's Data safety form?",
+      "expect": "privacy-and-store-declarations"
+    },
+    {
+      "prompt": "npm run audit:network fails with NEW expo-sharing: httpClient, urlSession, what should I do?",
+      "expect": "privacy-and-store-declarations"
+    },
+    {
+      "prompt": "Play Console says our release manifest has the AD_ID permission and asks about the advertising ID; check our privacy declarations before the release",
+      "expect": "privacy-and-store-declarations"
+    },
+    {
+      "prompt": "Add the UMP consent form and the ATT prompt before the first ad loads",
+      "expect": "admob-ads-and-consent",
+      "near": "privacy-and-store-declarations"
+    },
+    {
+      "prompt": "Install react-native-webview with an exact pin and check its install scripts",
+      "expect": "dependency-management",
+      "near": "privacy-and-store-declarations"
+    },
+    {
+      "prompt": "Let's add a new game to the app: a sliding puzzle with 3 packs of 20 levels and a daily.",
+      "expect": "new-game-scaffold"
+    },
+    {
+      "prompt": "Is the lights-out game complete? Run whatever proves every part exists before we ship it.",
+      "expect": "new-game-scaffold"
+    },
+    {
+      "prompt": "Start a new white-label app for our arena chase game in the monorepo, same deps as the other apps.",
+      "expect": "new-game-scaffold"
+    },
+    {
+      "prompt": "npm run new-game can't find the generator, how do I scaffold the game?",
+      "expect": "new-game-scaffold"
+    },
+    {
+      "prompt": "Wire the Game screen so it hosts lights-out with pause, undo and continue.",
+      "expect": "game-session-host",
+      "near": "new-game-scaffold"
+    },
+    {
+      "prompt": "Write the moves and scoring rules for the lights-out game, test-first.",
+      "expect": "game-rules-engine",
+      "near": "new-game-scaffold"
+    },
+    {
+      "prompt": "Add a Maestro flow that completes a task offline and checks it survives an app kill",
+      "expect": "e2e-maestro"
+    },
+    {
+      "prompt": "npm run e2e:android failed: network-samplers.json says the sampler never found the app",
+      "expect": "e2e-maestro"
+    },
+    {
+      "prompt": "screenshots:ios shows 3 changed screens and one capture failed in the gallery, what do I do?",
+      "expect": "e2e-maestro"
+    },
+    {
+      "prompt": "Our Maestro run keeps hitting another session's simulator on port 7001, make every run use its own device",
+      "expect": "e2e-maestro"
+    },
+    {
+      "prompt": "Jest component test for the task row flakes with act() warnings",
+      "expect": "unit-and-component-tests",
+      "near": "e2e-maestro"
+    },
+    {
+      "prompt": "Add a debug deep link parameter that sets the simulated date for QA",
+      "expect": "debug-menu-and-test-hooks",
+      "near": "e2e-maestro"
+    },
+    {
+      "prompt": "Our Expo app exports fine with npx expo export --platform web but shows a blank crash screen in Chrome",
+      "expect": "web-support"
+    },
+    {
+      "prompt": "Add a .web.ts version of the share adapter so the web build stops throwing",
+      "expect": "web-support"
+    },
+    {
+      "prompt": "Set the COOP and COEP headers on EAS Hosting so expo-sqlite works in the browser and on iPhone Safari",
+      "expect": "web-support"
+    },
+    {
+      "prompt": "Alert.alert does nothing on the web build, how should delete confirmations work there?",
+      "expect": "web-support"
+    },
+    {
+      "prompt": "Make the tasks screen show two panes on tablets and wide windows",
+      "expect": "adaptive-layout",
+      "near": "web-support"
+    },
+    {
+      "prompt": "Add Arabic and flip the whole layout to right-to-left on iOS and Android",
+      "expect": "rtl-and-direction",
+      "near": "web-support"
+    },
+    {
+      "prompt": "Wire the Lights Out game into the app: registry, Game screen, pause and resume, and saving the run so a kill restores it",
+      "expect": "game-session-host"
+    },
+    {
+      "prompt": "When the player loses and leaves without tapping Continue, then opens another level, the loss never shows up in statistics. Fix the game host",
+      "expect": "game-session-host"
+    },
+    {
+      "prompt": "Add a scripted tutorial run to our puzzle game that only accepts the taught move at each step and doesn't overwrite the player's saved level",
+      "expect": "game-session-host"
+    },
+    {
+      "prompt": "Our arena game saves at wave ends; hook its save points into the game session so the run is written and the result recorded",
+      "expect": "game-session-host"
+    },
+    {
+      "prompt": "Write the pure applyMove and outcome rules for a sliding puzzle game module",
+      "expect": "game-rules-engine",
+      "near": "game-session-host"
+    },
+    {
+      "prompt": "Build the fixed-step loop and Skia arena for a bouncing-balls real-time game",
+      "expect": "realtime-game-loop",
+      "near": "game-session-host"
+    },
+    {
+      "prompt": "Where should I put a hook that two features both use, and is a src/hooks folder allowed?",
+      "expect": "architecture-and-boundaries"
+    },
+    {
+      "prompt": "My route file in src/app has useState and useEffect and fetches its own data; how should I restructure it?",
+      "expect": "architecture-and-boundaries"
+    },
+    {
+      "prompt": "Jest says Could not locate module @/assets/images/icon.png mapped as <rootDir>/src/$1",
+      "expect": "architecture-and-boundaries"
+    },
+    {
+      "prompt": "My debug menu require() still ships in the production bundle even though I gate it with IS_TEST_BUILD",
+      "expect": "app-variants-and-environment",
+      "near": "architecture-and-boundaries"
+    },
+    {
+      "prompt": "My Expo Router route file fetches with useQuery inline and now check-boundaries says route-thin; where should that code go?",
+      "expect": "architecture-and-boundaries"
+    },
+    {
+      "prompt": "Add a debug screen route that only exists in development and preview builds without shipping the fake clock to the App Store",
+      "expect": "architecture-and-boundaries"
+    },
+    {
+      "prompt": "this file is 400 lines, how do I split it?",
+      "expect": "typescript-and-lint-rules"
+    },
+    {
+      "prompt": "eslint says 'Event handlers return nothing: use a block body' on my onPress, what do I write instead?",
+      "expect": "typescript-and-lint-rules"
+    },
+    {
+      "prompt": "check-configs reports [canonical-block] after I added a rule to eslint.config.mjs",
+      "expect": "typescript-and-lint-rules"
+    },
+    {
+      "prompt": "tsc fails with TS2688 cannot find type definition file for jest",
+      "expect": "typescript-and-lint-rules"
+    },
+    {
+      "prompt": "what should I call the hook file for the tasks screen model?",
+      "expect": "naming-conventions",
+      "near": "typescript-and-lint-rules"
+    },
+    {
+      "prompt": "can src/core import from src/services?",
+      "expect": "architecture-and-boundaries",
+      "near": "typescript-and-lint-rules"
+    },
+    {
+      "prompt": "check-code-names says my testID `tasks.row-${task.id}` glues a value into a segment. What shape should repeated rows use?",
+      "expect": "naming-conventions"
+    },
+    {
+      "prompt": "Our app id is com.acmecorporation.taskplanner and the yearly subscription id is over Google Play's 40-character limit. How should I name the product id?",
+      "expect": "naming-conventions"
+    },
+    {
+      "prompt": "The app-id check flagged ADMOB_IOS_APP_ID in app.config.ts. Is the AdMob app id supposed to be a bundle id?",
+      "expect": "naming-conventions"
+    },
+    {
+      "prompt": "Set up AdMob consent and the UMP form before showing the first banner",
+      "expect": "admob-ads-and-consent",
+      "near": "naming-conventions"
+    },
+    {
+      "prompt": "Our EAS build fails with ERESOLVE; can I just add NPM_CONFIG_LEGACY_PEER_DEPS=true to the env in eas.json?",
+      "expect": "dependency-management"
+    },
+    {
+      "prompt": "npm approve-scripts wrote \"fsevents\": true into package.json allowScripts, is that fine to commit?",
+      "expect": "dependency-management"
+    },
+    {
+      "prompt": "A library we vendored ships an .npmrc with package-lock=false; should we keep it?",
+      "expect": "dependency-management"
+    },
+    {
+      "prompt": "Install react-native-mmkv in the app",
+      "expect": "dependency-management"
+    },
+    {
+      "prompt": "Our EAS build fails in Install dependencies with npm error code EUSAGE saying npm ci can only install packages when package.json and package-lock.json are in sync. Should I set EAS_NO_FROZEN_LOCKFILE?",
+      "expect": "dependency-management"
+    },
+    {
+      "prompt": "Add an eas.json build profile that produces a simulator build for iOS so QA can run it locally",
+      "expect": "eas-build-and-submit",
+      "near": "dependency-management"
+    },
+    {
+      "prompt": "Our preview build replaced the App Store version on a tester's phone; give each build its own bundle id and app icon",
+      "expect": "app-variants-and-environment"
+    },
+    {
+      "prompt": "Is it OK to put EXPO_PUBLIC_DATABASE_URL with the postgres password in .env so the app can query directly?",
+      "expect": "app-variants-and-environment"
+    },
+    {
+      "prompt": "Set up the iOS distribution certificate and provisioning profile for eas build --profile production",
+      "expect": "eas-build-and-submit",
+      "near": "app-variants-and-environment"
+    },
+    {
+      "prompt": "We started from create-expo-app and still have src/constants/theme.ts and a useTheme hook; move those colours into our token-based theme with dark mode",
+      "expect": "design-system-structure"
+    },
+    {
+      "prompt": "Our ActivityIndicator, Switch thumb and TextInput placeholder stay white or gray in dark mode; find every hard-coded colour",
+      "expect": "design-system-structure"
+    },
+    {
+      "prompt": "In dark mode the Expo Router headers and tab bar are still light while the screens are dark",
+      "expect": "design-system-structure"
+    },
+    {
+      "prompt": "My Skia gradient behind an animated button fails canvas-outside-surface and the checker tells me to build a whole surface - is that right?",
+      "expect": "skia-canvas-rendering"
+    },
+    {
+      "prompt": "VoiceOver skips our chart canvas even though it has an accessibilityLabel and accessibilityRole image",
+      "expect": "skia-canvas-rendering"
+    },
+    {
+      "prompt": "Check that the colours in our board's canvas-palettes.json have enough contrast in dark mode",
+      "expect": "skia-canvas-rendering"
+    },
+    {
+      "prompt": "check-canvas-code flags my card backdrop gradient that sizes itself with onSize as canvas-outside-surface",
+      "expect": "skia-canvas-rendering"
+    },
+    {
+      "prompt": "my bar chart canvas maps over an AnimatedBar component that animates Skia Rects with useSharedValue; where should that code live?",
+      "expect": "skia-canvas-rendering"
+    },
+    {
+      "prompt": "check-contrast says my canvas-palettes.json looks like a colour table with no palette in contracts/contrast.json",
+      "expect": "skia-canvas-rendering"
+    },
+    {
+      "prompt": "After our last update users say their task lists disappeared. We added a due_date column. How do we ship schema changes without losing data?",
+      "expect": "persistence-and-migrations"
+    },
+    {
+      "prompt": "We want the app to show the last fetched feed when offline. Where should the TanStack Query cache be persisted?",
+      "expect": "networking-and-server-state",
+      "near": "persistence-and-migrations"
+    },
+    {
+      "prompt": "A feature hook needs to delete all completed tasks. Can I grab the SQLite driver from useAppData and run a DELETE?",
+      "expect": "persistence-and-migrations"
+    },
+    {
+      "prompt": "my catch block just console.warns the error and returns an empty array, what should it do instead?",
+      "expect": "error-handling-typed-results"
+    },
+    {
+      "prompt": "add a global handler so unhandled promise rejections are recorded in release builds",
+      "expect": "error-handling-typed-results"
+    },
+    {
+      "prompt": "our app shows a white screen after a render crash; add an error boundary with a restart button",
+      "expect": "error-handling-typed-results"
+    },
+    {
+      "prompt": "type the failures of the task repository so the screen can show the right message for each one",
+      "expect": "error-handling-typed-results"
+    },
+    {
+      "prompt": "show an error banner with a retry button when loading tasks fails",
+      "expect": "ui-states-and-feedback",
+      "near": "error-handling-typed-results"
+    },
+    {
+      "prompt": "send crashes to Sentry with source maps",
+      "expect": "crash-reporting-and-observability",
+      "near": "error-handling-typed-results"
+    },
+    {
+      "prompt": "Our CI regenerated the daily content vectors and now every row changed after I fixed a typo in the catalog; how do I ship the fix without breaking what users saw?",
+      "expect": "seeded-determinism-and-golden-vectors"
+    },
+    {
+      "prompt": "We are removing the daily challenge feature; what do I do with its seeded generator entry and the stored outcomes?",
+      "expect": "seeded-determinism-and-golden-vectors"
+    },
+    {
+      "prompt": "My streak count is off by one around midnight in a different time zone",
+      "expect": "dates-streaks-and-statistics",
+      "near": "seeded-determinism-and-golden-vectors"
+    },
+    {
+      "prompt": "The crash screen shows in English even though I picked Arabic in settings. How do I translate text in the error boundary fallback where useT() throws?",
+      "expect": "i18n-strings-and-catalogs"
+    },
+    {
+      "prompt": "Our toast says 'Task saved' and VoiceOver announces 'Task deleted' in English for every user. Make them localized.",
+      "expect": "i18n-strings-and-catalogs"
+    },
+    {
+      "prompt": "We have `count === 1 ? t('tasks.one') : t('tasks.many')` all over the code; make the plurals right for Arabic and Polish.",
+      "expect": "i18n-strings-and-catalogs"
+    },
+    {
+      "prompt": "Add Brazilian Portuguese (pt-BR) to the app: catalog file, plural data, digits.",
+      "expect": "i18n-strings-and-catalogs"
+    },
+    {
+      "prompt": "Flip the layout to right-to-left for Arabic and mirror the back arrow.",
+      "expect": "rtl-and-direction",
+      "near": "i18n-strings-and-catalogs"
+    },
+    {
+      "prompt": "Swipe-to-delete on the task rows can't be used with VoiceOver or TalkBack, make it accessible",
+      "expect": "accessibility-as-code"
+    },
+    {
+      "prompt": "Tapping the title text on a task card does nothing on the phone, but the RNTL test that presses the card passes",
+      "expect": "accessibility-as-code"
+    },
+    {
+      "prompt": "Our success toast announcement gets cut off by VoiceOver right after navigating back to the list",
+      "expect": "accessibility-as-code"
+    },
+    {
+      "prompt": "Add a pan gesture so the user can drag tiles on the sliding-puzzle Skia board and hit-test the cell under the finger",
+      "expect": "canvas-gestures-and-hit-testing",
+      "near": "accessibility-as-code"
+    },
+    {
+      "prompt": "Add swipe-to-delete to the task row so VoiceOver and TalkBack users can still delete a task",
+      "expect": "accessibility-as-code"
+    },
+    {
+      "prompt": "npx expo export fails with 'Unable to resolve module src/app/index.test.tsx (require.context)' but all my Jest tests pass",
+      "expect": "unit-and-component-tests"
+    },
+    {
+      "prompt": "My component test needs a fake clock: how do I pass it through renderWithProviders?",
+      "expect": "unit-and-component-tests"
+    },
+    {
+      "prompt": "Our Playwright tests for the Expo web build in e2e-web/ get reported as Jest tests that never run",
+      "expect": "unit-and-component-tests"
+    },
+    {
+      "prompt": "I'm starting a brand-new Expo app in an empty repo; which skills do I load and in what order?",
+      "expect": "react-native-conventions-index"
+    },
+    {
+      "prompt": "Plan the work for adding a reminders feature to our tasks app: which skills apply?",
+      "expect": "react-native-conventions-index"
+    },
+    {
+      "prompt": "Not sure which skill covers this: the settings screen needs a new toggle that persists.",
+      "expect": "react-native-conventions-index"
+    },
+    {
+      "prompt": "What is the release order from a green main branch to TestFlight and Play internal testing?",
+      "expect": "react-native-conventions-index"
+    },
+    {
+      "prompt": "Add a new skill to the library and fix its frontmatter so it loads.",
+      "expect": "skill-maintenance",
+      "near": "react-native-conventions-index"
+    },
+    {
+      "prompt": "The app crashes on launch with 'Maximum update depth exceeded'; explain this log.",
+      "expect": "troubleshooting-playbook",
+      "near": "react-native-conventions-index"
+    },
+    {
+      "prompt": "eas submit for Android fails with 403 The caller does not have permission, what do I do?",
+      "expect": "troubleshooting-playbook"
+    },
+    {
+      "prompt": "The app shows a white screen on launch in the Android emulator and nothing in Metro, help me figure out why",
+      "expect": "troubleshooting-playbook"
+    },
+    {
+      "prompt": "I'm getting Maximum update depth exceeded after adding a selector, can you explain this error?",
+      "expect": "troubleshooting-playbook"
+    },
+    {
+      "prompt": "adb says device offline right after I start the emulator",
+      "expect": "troubleshooting-playbook"
+    },
+    {
+      "prompt": "Set up the Play Console service account and the upload script for our first Android release",
+      "expect": "android-release-play",
+      "near": "troubleshooting-playbook"
+    },
+    {
+      "prompt": "Add a pre-commit hook that runs typecheck and lint on staged files",
+      "expect": "quality-gates",
+      "near": "troubleshooting-playbook"
+    },
+    {
+      "prompt": "Add a primary button variant with pressed and disabled states to our shared components, with a test",
+      "expect": "ui-component-library",
+      "near": "design-system-structure"
+    },
+    {
+      "prompt": "Dragging on the Skia board selects the cell next to the one under my finger",
+      "expect": "canvas-gestures-and-hit-testing",
+      "near": "skia-canvas-rendering"
+    },
+    {
+      "prompt": "Write the failing test first for the overdue-task rule, then make it pass in small steps",
+      "expect": "tdd-workflow",
+      "near": "unit-and-component-tests"
+    },
+    {
+      "prompt": "Write a haiku about autumn leaves",
+      "expect": null
+    },
+    {
+      "prompt": "What is the capital of Portugal?",
+      "expect": null
+    },
+    {
+      "prompt": "Summarise this meeting transcript into three bullet points",
+      "expect": null
+    },
+    {
+      "prompt": "Convert 72 degrees Fahrenheit to Celsius",
+      "expect": null
+    }
+  ]
+}

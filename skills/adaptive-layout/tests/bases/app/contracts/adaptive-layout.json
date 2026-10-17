@@ -1,0 +1,8 @@
+{
+  "$comment": "Fixture app: the Tasks list and its detail share one list-detail screen; the photo capture screen locks the orientation while the camera runs.",
+  "appOrientation": "portrait",
+  "tablets": true,
+  "listDetailScreens": ["src/features/tasks/tasks-screen.tsx"],
+  "fullBleedScreens": [{ "file": "src/features/attachments/capture-screen.tsx", "reason": "The camera preview fills the window." }],
+  "orientationLocks": [{ "file": "src/features/attachments/capture-screen.tsx", "reason": "The capture keeps one orientation while the shutter is open." }]
+}

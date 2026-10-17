@@ -1,0 +1,11 @@
+[
+  {
+    "$comment": "rate() returns a score rule: thresholds [0, par * 10, par * 12], written on one line by Prettier.",
+    "replace": {
+      "file": "src/games/lights-out/levels/lights-out-level-plan.ts",
+      "find": "rate: ({ level, par }) => (par >= minParFor(level) ? { kind: 'par', par } : null),",
+      "with": "rate: ({ level, par }) =>\n    par >= minParFor(level) ? { kind: 'score', thresholds: [0, par * 10, par * 12] } : null,"
+    }
+  },
+  { "json": { "file": "contracts/levels.json", "path": ["games", 0, "starRule"], "value": "score" } }
+]

@@ -1,0 +1,7 @@
+[
+  { "from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs" },
+  { "from": "scripts/lib/app-modules.mjs", "to": "scripts/lib/app-modules.mjs" },
+  { "from": "scripts/lib/source-scan.mjs", "to": "scripts/lib/source-scan.mjs" },
+  { "from": "repo-templates/src/core/result.ts", "to": "templates/src/core/result.ts" },
+  { "from": "repo-templates/src/core/result.test.ts", "to": "templates/src/core/result.test.ts" }
+]

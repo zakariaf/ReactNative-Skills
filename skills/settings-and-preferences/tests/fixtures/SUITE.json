@@ -1,0 +1,48 @@
+{
+  "base": [{ "templates": true, "firstLinePath": true }, "@tests/bases/app"],
+  "extends": "good",
+  "ops": [
+    {
+      "write": {
+        "file": "src/vendor/kit/SKILL.md",
+        "content": "---\nname: kit\ndescription: A vendored skill folder inside the app; its planted findings stay silent.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/vendor/kit/theme-cache.ts",
+        "lines": [
+          "import AsyncStorage from '@react-native-async-storage/async-storage';",
+          "export const saveTheme = (theme: string) => AsyncStorage.setItem('theme', theme);"
+        ]
+      }
+    },
+    {
+      "write": {
+        "file": ".agents/skills/kit/SKILL.md",
+        "content": "---\nname: kit\ndescription: An installed skill; its planted findings stay silent.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": ".agents/skills/kit/src/features/settings/restart.ts",
+        "lines": [
+          "import { reloadAppAsync } from 'expo';",
+          "export const restart = () => reloadAppAsync('language');"
+        ]
+      }
+    },
+    {
+      "write": {
+        "file": "skills/kit/SKILL.md",
+        "content": "---\nname: kit\ndescription: A skill checked out next to the app; its planted findings stay silent.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/kit/src/stores/settings/settings-store.ts",
+        "lines": ["import { persist } from 'zustand/middleware';", "export const store = persist;"]
+      }
+    }
+  ]
+}

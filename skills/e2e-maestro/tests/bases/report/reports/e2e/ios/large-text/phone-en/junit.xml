@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<testsuites>
+  <testsuite name="Test Suite" device="tasks-e2e-phone" tests="1" failures="0" time="24.0" timestamp="2026-10-14T09:00:00">
+    <testcase id="The home screen grows with the largest text size" name="The home screen grows with the largest text size" classname="The home screen grows with the largest text size" file=".maestro/flows/a11y/01-large-text-home.yaml" time="12.0" timestamp="2026-10-14T09:00:00" status="SUCCESS">
+      <properties>
+        <property name="tags" value="a11y"/>
+      </properties>
+    </testcase>
+  </testsuite>
+</testsuites>

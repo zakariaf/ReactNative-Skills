@@ -1,0 +1,316 @@
+{
+  "$comment": "What each package and React Native API does in a react-native-web build. Read by check-web-support.mjs (web-module-support, web-rn-api). Verified on 2026-10-14 by bundling every package for the web with Expo SDK 57 (npx expo export --platform web) and calling one API of each in headless Chrome (references/module-support.md has the method and re-verify steps), and by comparing react-native 0.86.3's exports and typings with react-native-web 0.21.3's sources (dist/exports/Alert has only alert, so Alert.prompt is undefined; dist/exports/I18nManager is { allowRTL() {}, forceRTL() {}, getConstants() { return { isRTL: false } } }). support: none = the import or its calls fail on the web (the checker fails a web-bundled import); partial = it loads and answers, but does nothing or less (documented, not failed); supported = works. Add an app's own packages under packages with the same fields.",
+  "verified": "2026-10-14",
+  "versions": {
+    "expo": "~57.0.26",
+    "react-native": "0.86.3",
+    "react-native-web": "0.21.3"
+  },
+  "packages": {
+    "react-native-google-mobile-ads": {
+      "support": "none",
+      "behaviour": "the web bundle fails: Importing native-only module \"react-native/Libraries/Utilities/codegenNativeComponent\" on web",
+      "fix": "import it only from a .native.ts adapter (or give the adapter a .web.ts sibling that serves no ads)"
+    },
+    "expo-tracking-transparency": {
+      "support": "none",
+      "behaviour": "the import throws in the browser: Cannot find native module 'ExpoTrackingTransparency'",
+      "fix": "give the consent adapter a .web.ts sibling (there is no tracking prompt on the web)"
+    },
+    "expo-iap": {
+      "support": "none",
+      "behaviour": "calls throw: Cannot find native module 'ExpoIap'",
+      "fix": "give the purchase adapter a .web.ts sibling that reports purchases as unavailable"
+    },
+    "expo-secure-store": {
+      "support": "none",
+      "behaviour": "calls throw (getValueWithKeyAsync is not a function); isAvailableAsync() is false",
+      "fix": "give the secure-storage adapter a .web.ts sibling: a session the server keeps in an httpOnly cookie, or memory only; never localStorage"
+    },
+    "expo-file-system": {
+      "support": "none",
+      "behaviour": "calls throw (this.validatePath is not a function) after the warning \"expo-file-system is not supported on web\"",
+      "fix": "give the file adapter a .web.ts sibling (downloads through a link, uploads through expo-document-picker) or hide the feature on the web"
+    },
+    "expo-notifications": {
+      "support": "none",
+      "behaviour": "getPermissionsAsync answers, but scheduleNotificationAsync throws (not available on web) and push-token listeners do nothing",
+      "fix": "give the notification adapter a .web.ts sibling that reports reminders as unsupported"
+    },
+    "expo-apple-authentication": {
+      "support": "partial",
+      "behaviour": "isAvailableAsync() is false; the button and sign-in exist only on iOS",
+      "fix": "show Apple sign-in only when isAvailableAsync() is true; offer the OAuth web flow elsewhere"
+    },
+    "expo-store-review": {
+      "support": "partial",
+      "behaviour": "isAvailableAsync() is false; requestReview() warns and does nothing",
+      "fix": "ask for a review only on iOS and Android"
+    },
+    "expo-splash-screen": {
+      "support": "partial",
+      "behaviour": "preventAutoHideAsync() resolves false and hide() does nothing: there is no native splash on the web",
+      "fix": "nothing to do; the static HTML ground colour stands in for the splash"
+    },
+    "expo-haptics": {
+      "support": "partial",
+      "behaviour": "calls navigator.vibrate, which Chrome blocks until the person has tapped the page and Safari does not have",
+      "fix": "treat haptics as decoration that may not happen; never the only feedback"
+    },
+    "expo-background-task": {
+      "support": "partial",
+      "behaviour": "getStatusAsync() is 1 (Restricted); no task ever runs",
+      "fix": "schedule nothing on the web"
+    },
+    "expo-task-manager": {
+      "support": "partial",
+      "behaviour": "isAvailableAsync() is false",
+      "fix": "register no task on the web"
+    },
+    "expo-updates": {
+      "support": "partial",
+      "behaviour": "a stub: isEnabled is true and checkForUpdateAsync() reports noUpdateAvailableOnServer; a web deploy is the update",
+      "fix": "never decide on isEnabled alone on the web; skip the update flow there"
+    },
+    "expo-clipboard": {
+      "support": "partial",
+      "behaviour": "works through the async Clipboard API, which needs a focused page and the person's permission (a call from a background tab is denied)",
+      "fix": "copy only from a press handler and handle the rejection"
+    },
+    "expo-sharing": {
+      "support": "partial",
+      "behaviour": "uses the Web Share API: needs a press, https, and a browser that has it; files support varies",
+      "fix": "fall back to copying a link when isAvailableAsync() is false or the share rejects"
+    },
+    "expo-network": {
+      "support": "partial",
+      "behaviour": "getNetworkStateAsync() answers type UNKNOWN with isConnected from navigator.onLine",
+      "fix": "never branch on the connection type on the web"
+    },
+    "react-native-audio-api": {
+      "support": "partial",
+      "behaviour": "an AudioContext starts suspended until the person interacts with the page (autoplay policy)",
+      "fix": "resume the context from a press handler"
+    },
+    "@shopify/react-native-skia": {
+      "support": "partial",
+      "behaviour": "the module loads, but drawing needs CanvasKit (WebAssembly) loaded first with LoadSkiaWeb or WithSkiaWeb; only the import was verified",
+      "fix": "load CanvasKit before the first canvas renders (skia-canvas-rendering owns the canvas kit)"
+    },
+    "expo-sqlite": {
+      "support": "partial",
+      "behaviour": "alpha on the web: needs wasm in Metro's assetExts, cross-origin isolation headers, an asynchronous warm-up before any synchronous call, and one tab at a time",
+      "fix": "follow web-sqlite-setup and web-sqlite-warm-up"
+    },
+    "expo-image-picker": {
+      "support": "supported",
+      "behaviour": "a file input; permissions answer granted",
+      "fix": ""
+    },
+    "expo-document-picker": {
+      "support": "supported",
+      "behaviour": "a file input",
+      "fix": ""
+    },
+    "expo-crypto": {
+      "support": "supported",
+      "behaviour": "Web Crypto; digests need a secure context (https or localhost)",
+      "fix": ""
+    },
+    "expo-localization": {
+      "support": "supported",
+      "behaviour": "from the browser; measurementSystem, currencyCode, uses24hourClock and firstWeekday are null",
+      "fix": ""
+    },
+    "expo-linking": {
+      "support": "supported",
+      "behaviour": "createURL builds an https URL on the site's origin",
+      "fix": ""
+    },
+    "expo-constants": {
+      "support": "supported",
+      "behaviour": "expoConfig comes from the app config at export time",
+      "fix": ""
+    },
+    "expo-web-browser": {
+      "support": "supported",
+      "behaviour": "opens a new window or tab",
+      "fix": ""
+    },
+    "expo-auth-session": {
+      "support": "supported",
+      "behaviour": "redirect flow in a popup",
+      "fix": ""
+    },
+    "expo-font": {
+      "support": "supported",
+      "behaviour": "@font-face; static rendering preloads fonts loaded synchronously",
+      "fix": ""
+    },
+    "expo-image": {
+      "support": "supported",
+      "behaviour": "an img element",
+      "fix": ""
+    },
+    "expo-system-ui": {
+      "support": "supported",
+      "behaviour": "setBackgroundColorAsync paints the document background",
+      "fix": ""
+    },
+    "expo-router": {
+      "support": "supported",
+      "behaviour": "URLs are routes",
+      "fix": ""
+    },
+    "react-native-reanimated": {
+      "support": "supported",
+      "behaviour": "runs on the JS thread",
+      "fix": ""
+    },
+    "react-native-gesture-handler": {
+      "support": "supported",
+      "behaviour": "pointer events",
+      "fix": ""
+    },
+    "react-native-safe-area-context": {
+      "support": "supported",
+      "behaviour": "env(safe-area-inset-*), non-zero only with viewport-fit=cover",
+      "fix": ""
+    },
+    "react-native-screens": {
+      "support": "supported",
+      "behaviour": "plain views",
+      "fix": ""
+    },
+    "react-native-keyboard-controller": {
+      "support": "partial",
+      "behaviour": "loads; KeyboardController.dismiss() does nothing; the browser moves focused fields into view itself",
+      "fix": ""
+    },
+    "@shopify/flash-list": {
+      "support": "supported",
+      "behaviour": "loads",
+      "fix": ""
+    },
+    "@sentry/react-native": {
+      "support": "partial",
+      "behaviour": "loads; only the import was verified (crash-reporting-and-observability owns the web set-up)",
+      "fix": ""
+    },
+    "expo-dev-client": {
+      "support": "partial",
+      "behaviour": "loads and does nothing",
+      "fix": ""
+    }
+  },
+  "specPatterns": [
+    {
+      "pattern": "^react-native/Libraries/",
+      "support": "none",
+      "behaviour": "the web bundle refuses React Native internals: Importing native-only module on web",
+      "fix": "import from 'react-native' only, or move the file to a .native.ts variant"
+    }
+  ],
+  "reactNative": {
+    "missingExports": {
+      "$comment": "Exported by react-native 0.86.3, absent from react-native-web 0.21.3: the import is undefined in the browser and the first use throws.",
+      "names": [
+        "ActionSheetIOS",
+        "DevMenu",
+        "DevSettings",
+        "DeviceInfo",
+        "DrawerLayoutAndroid",
+        "DynamicColorIOS",
+        "NativeAppEventEmitter",
+        "NativeComponentRegistry",
+        "NativeDialogManagerAndroid",
+        "Networking",
+        "PermissionsAndroid",
+        "PlatformColor",
+        "ProgressBarAndroid",
+        "PushNotificationIOS",
+        "ReactNativeVersion",
+        "RootTagContext",
+        "Settings",
+        "Systrace",
+        "ToastAndroid",
+        "TurboModuleRegistry",
+        "UTFSequence",
+        "VirtualizedSectionList",
+        "codegenNativeCommands",
+        "codegenNativeComponent",
+        "registerCallableModule",
+        "requireNativeComponent",
+        "useAnimatedColor",
+        "useAnimatedValue",
+        "useAnimatedValueXY",
+        "usePressability"
+      ]
+    },
+    "missingMembers": {
+      "$comment": "Members react-native 0.86.3 types and react-native-web 0.21.3 leaves undefined: calling one throws TypeError in the browser.",
+      "AccessibilityInfo": [
+        "announceForAccessibilityWithOptions",
+        "getRecommendedTimeoutMillis",
+        "isAccessibilityServiceEnabled",
+        "isBoldTextEnabled",
+        "isDarkerSystemColorsEnabled",
+        "isGrayscaleEnabled",
+        "isHighTextContrastEnabled",
+        "isInvertColorsEnabled",
+        "isReduceTransparencyEnabled",
+        "prefersCrossFadeTransitions",
+        "sendAccessibilityEvent"
+      ],
+      "Appearance": [
+        "setColorScheme"
+      ],
+      "I18nManager": [
+        "doLeftAndRightSwapInRTL",
+        "swapLeftAndRightInRTL"
+      ],
+      "Keyboard": [
+        "metrics",
+        "scheduleLayoutAnimation"
+      ],
+      "Linking": [
+        "openSettings",
+        "sendIntent"
+      ],
+      "Alert": [
+        "prompt"
+      ]
+    },
+    "silentMembers": {
+      "$comment": "Present on the web but doing nothing, so the feature silently disappears there: the checker fails them like missing members.",
+      "Alert": [
+        "alert"
+      ],
+      "AccessibilityInfo": [
+        "announceForAccessibility",
+        "setAccessibilityFocus"
+      ]
+    },
+    "wrongMembers": {
+      "$comment": "Present on the web but answering wrongly for every visitor, so code that decides on them takes the wrong branch: the checker fails them like missing members unless a Platform.OS check keeps them off the web or a .web sibling replaces the file. Each value says what the browser answers.",
+      "AccessibilityInfo": {
+        "isScreenReaderEnabled": "always resolves true (react-native-web 0.21.3 cannot ask the browser), so every visitor counts as a screen-reader user"
+      },
+      "I18nManager": {
+        "isRTL": "is undefined, so the layout direction reads as left-to-right for every language",
+        "getConstants": "answers isRTL: false for every language",
+        "forceRTL": "does nothing (the page direction comes from the dir attribute of <html>)",
+        "allowRTL": "does nothing (the page direction comes from the dir attribute of <html>)"
+      }
+    },
+    "differentBehaviour": {
+      "$comment": "Present on the web but answering differently (references/rn-api-gaps.md); documented, not failed.",
+      "AccessibilityInfo.isReduceMotionEnabled": "the prefers-reduced-motion media query; true when there is no matchMedia",
+      "AccessibilityInfo.addEventListener": "only reduceMotionChanged ever fires",
+      "Vibration.vibrate": "blocked until the person taps the page; missing in Safari",
+      "BackHandler": "no hardware back: the browser's back button walks the history",
+      "StatusBar": "renders nothing; its static setters do nothing",
+      "Platform.OS": "'web'; Platform.Version is '0.0.0'"
+    }
+  }
+}

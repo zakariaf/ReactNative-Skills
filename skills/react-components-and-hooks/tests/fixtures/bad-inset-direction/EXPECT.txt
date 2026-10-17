@@ -1,0 +1,3 @@
+[inset-direction] paddingStart takes insets.left
+src/features/tasks/components/tasks-footer.tsx:12
+RESULT: FAIL (2 problems)

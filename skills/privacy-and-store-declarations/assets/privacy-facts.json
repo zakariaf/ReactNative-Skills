@@ -1,0 +1,452 @@
+{
+  "$comment": "Facts the checkers read (never the app's own decisions: those live in the app's contracts/privacy.json). networkSdks names the packages that open connections by themselves, so the app must declare each one it installs (scope direct: a direct dependency; anywhere: also when another package pulls it in). podFamilies and mavenFamilies name the usual native SDKs behind an unexpected trunk pod or Gradle dependency (the first matching family wins; a strict family is covered only by a declared maven entry that names the artifact, never by a bare group such as com.google.firebase:, so push through firebase-messaging cannot hide Firebase Analytics). requiredReasons are the required-reason API declarations each package's own iOS privacy manifest makes (read from the installed packages on 2026-10-14: react-native 0.86.3, expo-file-system 57.0.7, expo-constants 57.0.20, expo-localization 57.0.2, expo-notifications 57.0.21, expo-system-ui 57.0.4, expo-task-manager 57.0.21, expo-application 57.0.3; Google Mobile Ads 13.6.0 and UMP 3.1.0 from their prebuilt pods on 2026-09-26, re-read from a real SDK 57 prebuild on 2026-10-14; tests/bases/pods carries verbatim copies of those two manifests). Re-verify: find node_modules -name PrivacyInfo.xcprivacy -not -path '*/Pods/*' and plutil -p each file.",
+  "verified": "2026-10-14",
+  "networkSdks": [
+    {
+      "pattern": "^react-native-google-mobile-ads$",
+      "family": "ads",
+      "scope": "direct",
+      "pods": [
+        "Google-Mobile-Ads-SDK",
+        "GoogleUserMessagingPlatform"
+      ],
+      "tracking": true
+    },
+    {
+      "pattern": "^expo-iap$",
+      "family": "in-app purchases (store servers)",
+      "scope": "direct",
+      "pods": [
+        "openiap"
+      ]
+    },
+    {
+      "pattern": "^(react-native-purchases|react-native-purchases-ui)$",
+      "family": "purchase server (RevenueCat)",
+      "scope": "anywhere",
+      "pods": [
+        "RevenueCat",
+        "PurchasesHybridCommon"
+      ]
+    },
+    {
+      "pattern": "^(@sentry/react-native|sentry-expo|@bugsnag/react-native|@datadog/mobile-react-native)$",
+      "family": "crash reporting",
+      "scope": "direct",
+      "pods": [
+        "Sentry",
+        "Bugsnag",
+        "DatadogCore"
+      ]
+    },
+    {
+      "pattern": "^(@react-native-firebase/.+|firebase)$",
+      "family": "backend and analytics (Firebase)",
+      "scope": "direct"
+    },
+    {
+      "pattern": "^(@amplitude/analytics-react-native|@segment/analytics-react-native|posthog-react-native|mixpanel-react-native|expo-insights|expo-observe|expo-app-metrics)$",
+      "family": "product analytics or telemetry",
+      "scope": "direct"
+    },
+    {
+      "pattern": "^(react-native-appsflyer|react-native-branch|react-native-adjust)$",
+      "family": "attribution",
+      "scope": "direct",
+      "tracking": true
+    },
+    {
+      "pattern": "^react-native-fbsdk-next$",
+      "family": "Facebook SDK",
+      "scope": "direct",
+      "tracking": true
+    },
+    {
+      "pattern": "^(expo-notifications|react-native-onesignal|onesignal-expo-plugin)$",
+      "family": "push notifications",
+      "scope": "direct"
+    },
+    {
+      "pattern": "^expo-updates$",
+      "family": "over-the-air updates",
+      "scope": "anywhere"
+    },
+    {
+      "pattern": "^(react-native-webview|expo-web-browser)$",
+      "family": "web views and browsers",
+      "scope": "anywhere"
+    },
+    {
+      "pattern": "^(expo-auth-session|@react-native-google-signin/google-signin)$",
+      "family": "sign-in with an identity provider",
+      "scope": "direct",
+      "signIn": true
+    },
+    {
+      "pattern": "^@react-native-community/netinfo$",
+      "family": "online detection (its default reachability check requests a Google URL from the app)",
+      "scope": "anywhere"
+    },
+    {
+      "pattern": "^(axios|ky|got|node-fetch|cross-fetch)$",
+      "family": "HTTP client",
+      "scope": "direct"
+    }
+  ],
+  "signInPackages": {
+    "$comment": "Installed sign-in packages that are no network SDK of their own (a system sheet signs in); each still means the app probably has accounts, so audit-repo asks for account deletion or createsAccounts: false.",
+    "names": [
+      "expo-apple-authentication"
+    ]
+  },
+  "podFamilies": [
+    {
+      "pattern": "^(Firebase|GoogleAppMeasurement)",
+      "family": "Firebase / Google Analytics"
+    },
+    {
+      "pattern": "^(Sentry|Bugsnag|Crashlytics|Datadog)",
+      "family": "crash reporting"
+    },
+    {
+      "pattern": "^(Adjust|AppsFlyerFramework|Branch|Amplitude|Mixpanel|Segment|PostHog)",
+      "family": "attribution or analytics"
+    },
+    {
+      "pattern": "^(RevenueCat|PurchasesHybridCommon)",
+      "family": "purchase server"
+    },
+    {
+      "pattern": "^OneSignal",
+      "family": "push"
+    },
+    {
+      "pattern": "^OnsideKit",
+      "family": "alternative billing (expo-iap's Onside switches)"
+    },
+    {
+      "pattern": "^(FBSDK|FBAudienceNetwork)",
+      "family": "Facebook"
+    },
+    {
+      "pattern": "^GoogleMobileAdsMediation",
+      "family": "ad mediation (another ad network's SDK)"
+    }
+  ],
+  "mavenFamilies": [
+    {
+      "pattern": "^com\\.google\\.firebase:firebase-(analytics|crashlytics|perf|config|inappmessaging|dynamic-links|sessions)",
+      "family": "Firebase Analytics, Crashlytics or Performance",
+      "strict": true
+    },
+    {
+      "pattern": "^com\\.google\\.android\\.gms:play-services-measurement",
+      "family": "Google Analytics for Firebase",
+      "strict": true
+    },
+    {
+      "pattern": "^com\\.google\\.firebase:",
+      "family": "Firebase"
+    },
+    {
+      "pattern": "^io\\.sentry:",
+      "family": "crash reporting (Sentry)"
+    },
+    {
+      "pattern": "^com\\.bugsnag:",
+      "family": "crash reporting (Bugsnag)"
+    },
+    {
+      "pattern": "^com\\.facebook\\.android:",
+      "family": "Facebook SDK"
+    },
+    {
+      "pattern": "^(com\\.appsflyer|com\\.adjust\\.sdk|io\\.branch\\.sdk\\.android):",
+      "family": "attribution"
+    },
+    {
+      "pattern": "^(com\\.amplitude|com\\.mixpanel\\.android|com\\.segment\\.analytics\\.kotlin|com\\.posthog):",
+      "family": "analytics"
+    },
+    {
+      "pattern": "^com\\.onesignal:",
+      "family": "push (OneSignal)"
+    },
+    {
+      "pattern": "^com\\.revenuecat\\.purchases:",
+      "family": "purchase server"
+    },
+    {
+      "pattern": "^com\\.google\\.ads\\.mediation:",
+      "family": "ad mediation"
+    }
+  ],
+  "requiredReasons": {
+    "react-native": {
+      "NSPrivacyAccessedAPICategoryFileTimestamp": [
+        "C617.1"
+      ],
+      "NSPrivacyAccessedAPICategoryUserDefaults": [
+        "CA92.1"
+      ],
+      "NSPrivacyAccessedAPICategorySystemBootTime": [
+        "35F9.1"
+      ]
+    },
+    "expo-file-system": {
+      "NSPrivacyAccessedAPICategoryFileTimestamp": [
+        "0A2A.1",
+        "3B52.1"
+      ],
+      "NSPrivacyAccessedAPICategoryDiskSpace": [
+        "E174.1",
+        "85F4.1"
+      ]
+    },
+    "expo-constants": {
+      "NSPrivacyAccessedAPICategoryUserDefaults": [
+        "CA92.1"
+      ]
+    },
+    "expo-localization": {
+      "NSPrivacyAccessedAPICategoryUserDefaults": [
+        "CA92.1"
+      ]
+    },
+    "expo-notifications": {
+      "NSPrivacyAccessedAPICategoryUserDefaults": [
+        "CA92.1"
+      ]
+    },
+    "expo-system-ui": {
+      "NSPrivacyAccessedAPICategoryUserDefaults": [
+        "CA92.1"
+      ]
+    },
+    "expo-task-manager": {
+      "NSPrivacyAccessedAPICategoryUserDefaults": [
+        "CA92.1"
+      ]
+    },
+    "expo-application": {
+      "NSPrivacyAccessedAPICategoryFileTimestamp": [
+        "C617.1"
+      ]
+    },
+    "react-native-google-mobile-ads": {
+      "NSPrivacyAccessedAPICategorySystemBootTime": [
+        "35F9.1"
+      ],
+      "NSPrivacyAccessedAPICategoryUserDefaults": [
+        "CA92.1"
+      ],
+      "NSPrivacyAccessedAPICategoryDiskSpace": [
+        "E174.1"
+      ]
+    }
+  },
+  "nativeReasonSymbols": {
+    "$comment": "Required-reason API symbols in a local Expo module's iOS sources (modules/*/ios/**/*.swift|m|mm). A local module is a development pod without a manifest of its own, so the app's manifest declares the category; audit-repo fails a category the module uses that privacy-manifest.ts does not declare at all (it cannot tell which reason fits: the developer picks it from Apple's list). A heuristic: a symbol in a comment or a string counts; a call through another name does not.",
+    "NSPrivacyAccessedAPICategoryUserDefaults": "\\b(?:UserDefaults|NSUserDefaults)\\b",
+    "NSPrivacyAccessedAPICategoryFileTimestamp": "\\b(?:creationDate|modificationDate|NSFileCreationDate|NSFileModificationDate|contentModificationDateKey|creationDateKey|getattrlist|fstat|lstat)\\b",
+    "NSPrivacyAccessedAPICategorySystemBootTime": "\\b(?:systemUptime|mach_absolute_time)\\b",
+    "NSPrivacyAccessedAPICategoryDiskSpace": "\\b(?:volumeAvailableCapacity\\w*|volumeTotalCapacity|NSFileSystemFreeSize|NSFileSystemSize|statfs|statvfs)\\b",
+    "NSPrivacyAccessedAPICategoryActiveKeyboards": "\\bactiveInputModes\\b"
+  },
+  "permissionKinds": {
+    "camera": {
+      "ios": [
+        "NSCameraUsageDescription"
+      ],
+      "android": [
+        "android.permission.CAMERA"
+      ]
+    },
+    "microphone": {
+      "ios": [
+        "NSMicrophoneUsageDescription"
+      ],
+      "android": [
+        "android.permission.RECORD_AUDIO"
+      ]
+    },
+    "photos": {
+      "ios": [
+        "NSPhotoLibraryUsageDescription"
+      ],
+      "android": [
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO",
+        "android.permission.READ_MEDIA_VISUAL_USER_SELECTED"
+      ]
+    },
+    "photos-add": {
+      "ios": [
+        "NSPhotoLibraryAddUsageDescription"
+      ],
+      "android": []
+    },
+    "storage": {
+      "ios": [],
+      "android": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.READ_MEDIA_AUDIO"
+      ]
+    },
+    "location": {
+      "ios": [
+        "NSLocationWhenInUseUsageDescription"
+      ],
+      "android": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
+    },
+    "location-background": {
+      "ios": [
+        "NSLocationAlwaysAndWhenInUseUsageDescription",
+        "NSLocationAlwaysUsageDescription"
+      ],
+      "android": [
+        "android.permission.ACCESS_BACKGROUND_LOCATION"
+      ]
+    },
+    "contacts": {
+      "ios": [
+        "NSContactsUsageDescription"
+      ],
+      "android": [
+        "android.permission.READ_CONTACTS",
+        "android.permission.WRITE_CONTACTS",
+        "android.permission.GET_ACCOUNTS"
+      ]
+    },
+    "calendar": {
+      "ios": [
+        "NSCalendarsFullAccessUsageDescription",
+        "NSCalendarsWriteOnlyAccessUsageDescription",
+        "NSCalendarsUsageDescription"
+      ],
+      "android": [
+        "android.permission.READ_CALENDAR",
+        "android.permission.WRITE_CALENDAR"
+      ]
+    },
+    "reminders": {
+      "ios": [
+        "NSRemindersFullAccessUsageDescription",
+        "NSRemindersUsageDescription"
+      ],
+      "android": []
+    },
+    "motion": {
+      "ios": [
+        "NSMotionUsageDescription"
+      ],
+      "android": [
+        "android.permission.ACTIVITY_RECOGNITION",
+        "android.permission.BODY_SENSORS"
+      ]
+    },
+    "notifications": {
+      "ios": [],
+      "android": [
+        "android.permission.POST_NOTIFICATIONS"
+      ]
+    },
+    "bluetooth": {
+      "ios": [
+        "NSBluetoothAlwaysUsageDescription"
+      ],
+      "android": [
+        "android.permission.BLUETOOTH_CONNECT",
+        "android.permission.BLUETOOTH_SCAN",
+        "android.permission.NEARBY_WIFI_DEVICES"
+      ]
+    },
+    "face-id": {
+      "ios": [
+        "NSFaceIDUsageDescription"
+      ],
+      "android": []
+    },
+    "speech": {
+      "ios": [
+        "NSSpeechRecognitionUsageDescription"
+      ],
+      "android": []
+    },
+    "local-network": {
+      "ios": [
+        "NSLocalNetworkUsageDescription"
+      ],
+      "android": []
+    },
+    "tracking": {
+      "ios": [
+        "NSUserTrackingUsageDescription"
+      ],
+      "android": [
+        "com.google.android.gms.permission.AD_ID"
+      ]
+    },
+    "phone": {
+      "ios": [],
+      "android": [
+        "android.permission.READ_PHONE_STATE",
+        "android.permission.READ_PHONE_NUMBERS",
+        "android.permission.CALL_PHONE"
+      ]
+    },
+    "overlay": {
+      "ios": [],
+      "android": [
+        "android.permission.SYSTEM_ALERT_WINDOW"
+      ]
+    }
+  },
+  "secrets": {
+    "gitignorePatterns": [
+      "*.p8",
+      "*.p12",
+      "*.mobileprovision",
+      "*.keystore",
+      "*.jks",
+      "AuthKey_*",
+      "ApiKey_*",
+      "credentials.json",
+      "*.xcarchive",
+      "*.ipa",
+      "*.aab",
+      "*.apk"
+    ],
+    "secretFilePattern": "(\\.(p8|p12|mobileprovision|keystore|jks)$)|(^|/)(AuthKey|ApiKey)_[^/]*$|(^|/)credentials\\.json$|(^|/)[^/]*service-account[^/]*\\.json$|(^|/)(key|keystore)\\.properties$",
+    "denyRules": [
+      "Read(**/*.p8)",
+      "Read(**/AuthKey_*)",
+      "Read(**/*.p12)",
+      "Read(**/*.mobileprovision)",
+      "Read(**/*.keystore)",
+      "Read(**/*.jks)",
+      "Read(**/credentials.json)",
+      "Read(**/*service-account*.json)",
+      "Read(**/key.properties)",
+      "Read(**/keystore.properties)"
+    ]
+  },
+  "jsPatterns": {
+    "fetch": "\\bfetch\\(",
+    "xhr": "new XMLHttpRequest\\b",
+    "webSocket": "new WebSocket\\(",
+    "eventSource": "new EventSource\\(",
+    "beacon": "\\bsendBeacon\\(",
+    "fileTransfer": "\\b(?:downloadFileAsync|uploadAsync|createDownloadResumable|createUploadTask)\\s*\\(|\\bdownloadAsync\\s*\\(\\s*[^\\s)]",
+    "remoteUrl": "['\"`](?:https?|wss?)://(?!localhost\\b|127\\.0\\.0\\.1\\b|10\\.0\\.2\\.2\\b|www\\.w3\\.org/|json-schema\\.org/)[^'\"`\\s]+"
+  },
+  "release": {
+    "samplePublisher": "3940256099942544",
+    "sampleAllowedPackage": "react-native-google-mobile-ads",
+    "storekitTest": "StoreKitTest|SKTestSession"
+  }
+}

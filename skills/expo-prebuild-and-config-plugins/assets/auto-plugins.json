@@ -1,0 +1,54 @@
+{
+  "$comment": "Packages whose config plugin npx expo prebuild applies on its own, with default options, when the package is installed (autolinked) and app.config.ts does not list it. Verified on 2026-10-04 in @expo/prebuild-config 57.0.16 (build/plugins/withDefaultPlugins.js: versionedExpoSDKPackages, legacyExpoPlugins, expoManagedVersionedPlugins). \"defaults\" lists what a default application adds, as seen in npx expo config --type introspect of an SDK 57 app on 2026-10-04 (only packages checked there are listed). \"blockable\" lists permissions a plugin adds whatever its options, so only android.blockedPermissions removes them (read in the plugin source). Re-verify: grep -n \"versionedExpoSDKPackages =\\|legacyExpoPlugins =\\|expoManagedVersionedPlugins =\" node_modules/@expo/prebuild-config/build/plugins/withDefaultPlugins.js",
+  "verifiedOn": "2026-10-04",
+  "source": "@expo/prebuild-config 57.0.16",
+  "list": [
+    "react-native-maps",
+    "expo-apple-authentication",
+    "expo-contacts",
+    "expo-notifications",
+    "expo-document-picker",
+    "expo-av",
+    "expo-background-fetch",
+    "expo-brightness",
+    "expo-calendar",
+    "expo-camera",
+    "expo-cellular",
+    "expo-dev-client",
+    "expo-dev-launcher",
+    "expo-dev-menu",
+    "expo-image-picker",
+    "expo-file-system",
+    "expo-location",
+    "expo-media-library",
+    "expo-screen-orientation",
+    "expo-sensors",
+    "expo-task-manager",
+    "expo-local-authentication"
+  ],
+  "exempt": {
+    "expo-system-ui": "its plugin only mirrors the top-level userInterfaceStyle and backgroundColor keys",
+    "expo-updates": "its plugin only mirrors the top-level updates and runtimeVersion keys",
+    "expo-navigation-bar": "its plugin only mirrors the top-level androidNavigationBar key",
+    "expo-ads-admob": "removed from the SDK; listed by prebuild for old projects only",
+    "expo-app-auth": "removed from the SDK; listed by prebuild for old projects only",
+    "expo-firebase-analytics": "removed from the SDK; listed by prebuild for old projects only",
+    "expo-firebase-core": "removed from the SDK; listed by prebuild for old projects only",
+    "expo-google-sign-in": "removed from the SDK; listed by prebuild for old projects only",
+    "expo-inline-modules": "not an installable package's defaults: prebuild-config's own unversioned withInlineModules plugin, which runs for every app and acts only on experiments.inlineModules"
+  },
+  "blockable": {
+    "expo-file-system": {
+      "permissions": ["android.permission.READ_EXTERNAL_STORAGE", "android.permission.WRITE_EXTERNAL_STORAGE"],
+      "why": "withFileSystem (expo-file-system 57 plugin/build/withFileSystem.js) adds these and INTERNET whatever its options; only android.blockedPermissions removes them. INTERNET is left out: every React Native app needs it. Blocking both storage permissions silences the transitive note."
+    }
+  },
+  "defaults": {
+    "expo-apple-authentication": "the Sign in with Apple entitlement (com.apple.developer.applesignin), which every signing profile must then allow",
+    "expo-notifications": "the aps-environment push entitlement, which every signing profile must then allow",
+    "expo-image-picker": "generic English camera, microphone and photo-library purpose strings and the Android RECORD_AUDIO permission (microphonePermission: false removes both microphone parts)",
+    "expo-file-system": "the Android READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE and INTERNET permissions",
+    "expo-task-manager": "UIBackgroundModes fetch on iOS",
+    "expo-dev-client": "the exp+<slug> scheme, a local-network purpose string and the _expo._tcp Bonjour service (an Xcode build phase strips those two from non-Debug builds)"
+  }
+}

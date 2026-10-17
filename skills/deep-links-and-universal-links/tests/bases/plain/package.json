@@ -1,0 +1,1 @@
+{ "name": "plain-fixture", "private": true, "dependencies": { "expo": "~57.0.26", "expo-router": "~57.0.24" } }

@@ -1,0 +1,143 @@
+{
+  "area": "perf",
+  "entries": [
+    {
+      "id": "perf-js-cold-start",
+      "topic": "Cold start",
+      "symptom": "A JS-only cold-start timing looks fast but launch feels slow",
+      "cause": "JS timing misses most of the launch (process start, native init, bundle load)",
+      "fix": "Measure from process start to the first frame (a native process-start timestamp), over many launches",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "performance-budgets"
+    },
+    {
+      "id": "perf-cold-start-old-launches",
+      "topic": "Cold start",
+      "symptom": "The perf report check fails on cold starts recorded by an older build",
+      "cause": "The perf log survives app updates, so earlier builds were mixed in",
+      "fix": "Judge only the latest launches of the current build (the checker drops older entries)",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "performance-budgets"
+    },
+    {
+      "id": "perf-polyfill-cold-start",
+      "topic": "Cold start",
+      "symptom": "Cold start over budget on an older phone",
+      "cause": "The forced Intl polyfills and their locale data cost time and bundle size",
+      "fix": "Measure on a device before changing the polyfill policy; load only the locales the app ships",
+      "match": [],
+      "status": "open",
+      "needsHuman": false,
+      "skill": "performance-budgets"
+    },
+    {
+      "id": "perf-budgets-without-device",
+      "topic": "Budgets",
+      "symptom": "A budget fails on a real device that passed on the simulator or emulator",
+      "cause": "Bundle, memory and draw budgets were first estimates from simulator probes",
+      "fix": "Re-baseline from device runs with a Gate-Change trailer; never loosen a budget to pass one run",
+      "match": [],
+      "status": "open",
+      "needsHuman": false,
+      "skill": "performance-budgets"
+    },
+    {
+      "id": "perf-text-scale-values",
+      "topic": "Accessibility",
+      "symptom": "Large-text screenshots look unscaled",
+      "cause": "Each content-size category maps to a font scale (large 1.0, accessibility-medium 1.786, accessibility-extra-extra-extra-large 3.571)",
+      "fix": "iOS: xcrun simctl ui <udid> content_size accessibility-extra-extra-extra-large; Android: adb -s <serial> shell settings put system font_scale 2.0; cap with maxFontSizeMultiplier where the design needs it",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "accessibility-as-code"
+    },
+    {
+      "id": "perf-adjustable-no-actions",
+      "topic": "Accessibility",
+      "symptom": "VoiceOver swipe up or down (or the TalkBack adjust gesture) does nothing on a slider",
+      "cause": "accessibilityRole 'adjustable' without accessibilityActions increment and decrement",
+      "fix": "Add both actions and onAccessibilityAction; the a11y checker requires them",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "accessibility-as-code"
+    },
+    {
+      "id": "perf-reduce-motion-springs",
+      "topic": "Accessibility",
+      "symptom": "Reduce Motion is on, but presses still sink and spring",
+      "cause": "No root motion config applies the reduce-motion setting to Reanimated's layout and spring animations",
+      "fix": "Wrap the app root in the motion config fed by useReduceMotion",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "motion-and-animation"
+    },
+    {
+      "id": "perf-smart-invert",
+      "topic": "Accessibility",
+      "symptom": "Smart Invert changes the colours of a canvas or photo",
+      "cause": "The view is inverted like other content",
+      "fix": "Set accessibilityIgnoresInvertColors on canvases and images (the palette has a dark variant)",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "accessibility-as-code",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "perf-hit-region-size",
+      "topic": "Accessibility",
+      "symptom": "Canvas cells or small controls are below 44 pt (48 dp on Android) and nothing fails",
+      "cause": "The layout does not expose the smallest hit region",
+      "fix": "Expose the hit size from the layout and assert at least 44 pt / 48 dp in tests",
+      "match": [],
+      "status": "open",
+      "needsHuman": false,
+      "skill": "canvas-gestures-and-hit-testing"
+    },
+    {
+      "id": "perf-contrast-state-fill",
+      "topic": "Accessibility",
+      "symptom": "Text contrast drops below 4.5:1 during a pressed or held state",
+      "cause": "The state fill was never listed as a contrast pair",
+      "fix": "List every text-on-fill pair (states included) in contracts/contrast.json and fix the token, never the threshold",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "accessibility-as-code"
+    },
+    {
+      "id": "perf-modal-android-background",
+      "topic": "Accessibility",
+      "symptom": "TalkBack still reaches the screen behind a custom modal or dialog, while VoiceOver stays inside it",
+      "cause": "accessibilityViewIsModal is iOS-only",
+      "fix": "On Android hide the content behind the dialog with importantForAccessibility='no-hide-descendants' while it is open (the shared dialog root does both)",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "accessibility-as-code",
+      "platforms": [
+        "android"
+      ]
+    },
+    {
+      "id": "perf-box-shadow-device",
+      "topic": "Rendering",
+      "symptom": "boxShadow or outline looks different on a device",
+      "cause": "Not verified on every platform version",
+      "fix": "Check in the first device build of each platform; keep a fallback shadow view",
+      "match": [],
+      "status": "open",
+      "needsHuman": false,
+      "skill": "design-system-structure"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+# .maestro/ads-smoke/06-geo-other.yaml
+# Step 6, on a new fresh install (see step 1). geo=other: Google's GDPR form never opens. On iOS
+# Apple's prompt carries the app's purpose text. In a test build the app runs on Google's sample
+# AdMob app, whose console may publish an IDFA explainer for this region, so the primer and that
+# explainer can appear first; the developer's own app publishes none, so its users see Apple's
+# prompt alone. On Android nothing is asked at all.
+appId: ${APP_ID}
+name: Ads smoke 6 - outside the EEA no Google form; Apple's prompt on iOS; a banner
+tags: [ads-smoke]
+---
+- runFlow:
+    file: ../subflows/debug-setup.yaml
+    env:
+      QUERY: 'geo=other&onboarding=done&open=tasks'
+      WAIT_FOR: 'tasks.list'
+- runFlow:
+    when:
+      visible:
+        id: 'consent.primer-continue-button'
+    commands:
+      - tapOn:
+          id: 'consent.primer-continue-button'
+# system-ui: the sample app's IDFA explainer button, when Google shows it (test builds only).
+- runFlow:
+    when:
+      visible: 'Continue'
+    commands:
+      - tapOn: 'Continue'
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      # system-ui: Apple's tracking alert, with the app's purpose text.
+      - extendedWaitUntil:
+          visible: 'Ask App Not to Track'
+          timeout: 30000
+      - tapOn: 'Ask App Not to Track'
+# system-ui: Google's GDPR form button; it never opens outside the EEA.
+- assertNotVisible: 'Consent'
+- extendedWaitUntil:
+    visible:
+      id: 'tasks.banner-ad'
+    timeout: 60000

@@ -1,0 +1,102 @@
+# Example: .github/workflows/ota-update.yml, in the shape of ci-pipeline-and-gates' release.yml (which
+# owns SHA pins, runners, caches, secrets and concurrency). A person starts it under Actions >
+# ota-update > Run workflow, picks the channel and writes the message. One job per channel, each
+# naming its channel literally and running in the protected GitHub environment of the same name
+# (Settings > Environments: required reviewers, main only), which holds EXPO_TOKEN. Each job installs,
+# runs every gate and the update preflight, then publishes. Preview reaches every tester's phone (no
+# rollout); production always starts as a staged rollout. Raising it, rolling back and pausing stay
+# manual. Linux runners are enough: eas update and the preflight bundle JS and call EAS.
+# The message reaches the shell only through env (never ${{ }} inside run:), so a quote or a backtick
+# in it cannot run as a command. No cache is restored in a job that holds a secret.
+name: ota-update
+
+on:
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: preview or production
+        type: choice
+        options: [preview, production]
+      message:
+        description: What the update fixes
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ inputs.channel }}
+  cancel-in-progress: false
+
+env:
+  LEFTHOOK: '0'
+  EXPO_NO_TELEMETRY: '1'
+
+jobs:
+  preview:
+    name: eas update (preview)
+    if: inputs.channel == 'preview'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: preview
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node from .nvmrc (no cache in a job with secrets)
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - name: Install the locked dependencies
+        run: npm ci
+      - name: Install the pinned EAS CLI with the dependency policy
+        run: npm install -g --min-release-age=7 --ignore-scripts eas-cli@24.10.0
+      - name: Update preflight (gates, runtime is live on the channel)
+        run: node scripts/ota/update-preflight.ts --channel preview --message "$MESSAGE"
+        env:
+          MESSAGE: ${{ inputs.message }}
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      - name: Publish the update
+        # With crash-reporting-and-observability: append && npx sentry-expo-upload-sourcemaps dist
+        run: >-
+          eas update --channel preview --environment preview
+          --message "$MESSAGE" --non-interactive
+        env:
+          MESSAGE: ${{ inputs.message }}
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+  production:
+    name: eas update (production, staged)
+    if: inputs.channel == 'production'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: production
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node from .nvmrc (no cache in a job with secrets)
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - name: Install the locked dependencies
+        run: npm ci
+      - name: Install the pinned EAS CLI with the dependency policy
+        run: npm install -g --min-release-age=7 --ignore-scripts eas-cli@24.10.0
+      - name: Update preflight (gates, runtime is live on the channel)
+        run: node scripts/ota/update-preflight.ts --channel production --message "$MESSAGE" --rollout 10
+        env:
+          MESSAGE: ${{ inputs.message }}
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      - name: Publish the update to 10% of the channel
+        # With crash-reporting-and-observability: append && npx sentry-expo-upload-sourcemaps dist
+        run: >-
+          eas update --channel production --environment production
+          --message "$MESSAGE" --rollout-percentage 10 --non-interactive
+        env:
+          MESSAGE: ${{ inputs.message }}
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}

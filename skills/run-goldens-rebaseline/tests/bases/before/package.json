@@ -1,0 +1,8 @@
+{
+  "name": "tasks-app",
+  "private": true,
+  "devDependencies": {
+    "jest": "29.7.0",
+    "jest-image-snapshot": "6.5.2"
+  }
+}

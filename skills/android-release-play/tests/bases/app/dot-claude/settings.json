@@ -1,0 +1,5 @@
+{
+  "permissions": {
+    "deny": ["Read(**/*.keystore)", "Read(**/*.jks)", "Read(**/*service-account*.json)", "Read(**/credentials.json)"]
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "$comment": "Saved npm facts for the self-test (no network): an illustrative SDK 58 release judged on 2026-11-02. The shape --online --save-facts writes.",
+  "distTags": {
+    "latest": "58.0.2",
+    "next": "59.0.0-preview.1",
+    "sdk-57": "57.0.27"
+  },
+  "expoTimes": {
+    "57.0.27": "2026-10-10T10:00:00.000Z",
+    "58.0.0": "2026-10-16T10:00:00.000Z",
+    "58.0.2": "2026-10-22T10:00:00.000Z"
+  },
+  "moduleMap": {
+    "@shopify/react-native-skia": "2.11.2",
+    "eslint-config-expo": "~58.0.3",
+    "expo-build-properties": "~58.0.7",
+    "expo-router": "~58.0.8",
+    "expo-system-ui": "~58.0.3",
+    "jest-expo": "~58.0.4",
+    "react": "19.3.0",
+    "react-native": "0.88.2",
+    "react-native-gesture-handler": "~3.2.1",
+    "react-native-reanimated": "4.7.0",
+    "react-native-screens": "~4.28.0",
+    "react-native-worklets": "0.13.0"
+  },
+  "packageTimes": {
+    "@shopify/react-native-skia": {
+      "2.11.2": "2026-10-15T10:00:00.000Z"
+    },
+    "eslint-config-expo": {
+      "58.0.3": "2026-10-15T10:00:00.000Z"
+    },
+    "expo-system-ui": {
+      "58.0.3": "2026-10-15T10:00:00.000Z"
+    },
+    "jest-expo": {
+      "58.0.4": "2026-10-15T10:00:00.000Z"
+    },
+    "react": {
+      "19.3.0": "2026-10-15T10:00:00.000Z"
+    },
+    "react-native": {
+      "0.88.2": "2026-10-15T10:00:00.000Z"
+    },
+    "react-native-gesture-handler": {
+      "3.2.1": "2026-10-15T10:00:00.000Z"
+    },
+    "react-native-reanimated": {
+      "4.7.0": "2026-10-15T10:00:00.000Z"
+    },
+    "react-native-worklets": {
+      "0.13.0": "2026-10-15T10:00:00.000Z"
+    },
+    "@react-native/jest-preset": {
+      "0.88.2": "2026-10-15T10:00:00.000Z"
+    },
+    "@react-native/eslint-plugin": {
+      "0.88.2": "2026-10-15T10:00:00.000Z"
+    },
+    "expo-build-properties": {
+      "58.0.7": "2026-10-15T10:00:00.000Z"
+    },
+    "expo-router": {
+      "58.0.8": "2026-10-15T10:00:00.000Z"
+    },
+    "react-native-screens": {
+      "4.28.0": "2026-10-15T10:00:00.000Z"
+    }
+  }
+}

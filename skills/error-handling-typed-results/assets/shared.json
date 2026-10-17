@@ -1,0 +1,9 @@
+[
+  { "from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs" },
+  { "from": "scripts/lib/source-scan.mjs", "to": "scripts/lib/source-scan.mjs" },
+  { "from": "repo-templates/src/core/result.ts", "to": "templates/src/core/result.ts" },
+  { "from": "repo-templates/src/core/result.test.ts", "to": "templates/src/core/result.test.ts" },
+  { "from": "repo-templates/src/services/error-log/error-log-port.ts", "to": "tests/bases/app/src/services/error-log/error-log-port.ts" },
+  { "from": "repo-templates/src/services/error-log/memory-error-log-adapter.ts", "to": "tests/bases/canonical-error-log/src/services/error-log/memory-error-log-adapter.ts" },
+  { "from": "repo-templates/src/i18n/translate-now.ts", "to": "tests/bases/app/src/i18n/translate-now.ts" }
+]

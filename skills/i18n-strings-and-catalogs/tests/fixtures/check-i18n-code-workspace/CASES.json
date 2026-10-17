@@ -1,0 +1,46 @@
+{
+  "bad-app-entry": {
+    "expect": ["[polyfill-first]", "apps/mobile/package.json:5", "the app entry is \"expo-router/entry\""],
+    "ops": [{ "json": { "file": "apps/mobile/package.json", "path": ["main"], "value": "expo-router/entry" } }]
+  },
+  "bad-app-jest": {
+    "expect": ["[jest-polyfills]", "apps/mobile/jest.config.js:10", "does not load intl-polyfills.ts"],
+    "ops": [
+      {
+        "replace": {
+          "file": "apps/mobile/jest.config.js",
+          "find": "setupFiles: POLYFILL_SETUP",
+          "with": "setupFiles: []"
+        }
+      }
+    ]
+  },
+  "bad-app-locales": {
+    "expect": ["[system-text-locales]", "apps/mobile/app.config.ts:1", "sets no \"locales\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "apps/mobile/app.config.ts",
+          "find": "    locales: nativeLocales(projectRoot, NATIVE_TEXT_KEYS),\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-app-text": {
+    "expect": ["[jsx-literal-text]", "apps/mobile/src/features/tasks/tasks-screen.tsx:19", "My tasks"],
+    "ops": [
+      {
+        "replace": {
+          "file": "apps/mobile/src/features/tasks/tasks-screen.tsx",
+          "find": "<T id=\"tasks.list.title\" testID=\"tasks.title\" />",
+          "with": "<AppText testID=\"tasks.title\">My tasks</AppText>"
+        }
+      }
+    ]
+  },
+  "error-no-app-dir": {
+    "expect": ["ERROR [bad-input] nothing to check: no .ts/.tsx files under src", "--app-dir apps/mobile"],
+    "args": "{dir}"
+  }
+}

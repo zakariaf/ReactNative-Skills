@@ -1,0 +1,7 @@
+{
+  "base": [
+    { "templates": true, "firstLinePath": true, "fill": { "__FEATURE__": "tasks", "__SURFACE__": "progress-grid" } },
+    { "from": "@skill/examples", "firstLinePath": true },
+    "@tests/bases/app"
+  ]
+}

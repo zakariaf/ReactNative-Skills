@@ -1,0 +1,25 @@
+{
+ "base": [
+  "@tests/bases/app",
+  "@tests/bases/scenes"
+ ],
+ "argsFile": "append",
+ "ops": [
+  {
+   "delete": [
+    "scenes/tasks-default.json",
+    "scenes/tasks-menu-open.json",
+    "scenes/lists-default.json",
+    "scenes/premium-loading.json",
+    "scenes/map-default.json",
+    "scenes/onboarding-default.json"
+   ]
+  },
+  {
+   "write": {
+    "file": "fake-avd/tasks-parity.avd/config.ini",
+    "content": "AvdId=tasks-parity\nhw.device.name=pixel_7\nimage.sysdir.1=system-images/android-36/google_apis/arm64-v8a/\n"
+   }
+  }
+ ]
+}

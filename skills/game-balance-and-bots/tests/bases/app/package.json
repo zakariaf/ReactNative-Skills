@@ -1,0 +1,15 @@
+{
+  "name": "balance-fixture",
+  "private": true,
+  "main": "expo-router/entry",
+  "scripts": {
+    "test": "jest --ci",
+    "test:sim": "jest --ci --config jest.sim.config.js"
+  },
+  "dependencies": {
+    "expo": "~57.0.26"
+  },
+  "devDependencies": {
+    "fast-check": "4.10.2"
+  }
+}

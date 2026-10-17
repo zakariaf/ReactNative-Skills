@@ -1,0 +1,16 @@
+{
+  "name": "tasks-web",
+  "private": true,
+  "main": "expo-router/entry",
+  "dependencies": {
+    "expo": "~57.0.26",
+    "expo-router": "~57.0.24",
+    "expo-secure-store": "~57.0.4",
+    "expo-sqlite": "~57.0.3",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-google-mobile-ads": "17.2.0",
+    "react-native-web": "~0.21.0"
+  }
+}

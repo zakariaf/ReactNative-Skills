@@ -1,0 +1,136 @@
+{
+  "bad-capture-size": {
+    "expect": ["[capture-size] app.png is 450 x 900 px"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [{ "theme": "light", "lang": "en", "patch": { "size": { "w": 150, "h": 300 } } }]
+        }
+      }
+    ]
+  },
+  "bad-old-report": {
+    "expect": ["[stale-report] report.json was written by an older check-parity.mjs"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [{ "theme": "light", "lang": "en", "patch": { "elements": { "tasks.summary": { "dy": 3 } } } }]
+        }
+      },
+      {
+        "write": {
+          "file": "post.json",
+          "json": [
+            {
+              "json": {
+                "file": ".parity/test-phone/tasks-default/light-en/report.json",
+                "path": ["problems", 0, "viewRect"],
+                "delete": true
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-reference-mismatch": {
+    "expect": ["[reference-mismatch] run.json names the device \"ghost-phone\", which the contract does not list"],
+    "ops": [
+      {
+        "write": {
+          "file": "post.json",
+          "json": [
+            {
+              "json": {
+                "file": ".parity/test-phone/tasks-default/light-en/run.json",
+                "path": ["device"],
+                "value": "ghost-phone"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-reference-missing": {
+    "expect": ["[reference-missing] no design reference"],
+    "ops": [
+      {
+        "write": { "file": "post.json", "json": [{ "delete": "design/parity/test-phone/light-en/tasks-default.png" }] }
+      }
+    ]
+  },
+  "bad-stale-report": {
+    "expect": [
+      ".parity/test-phone/tasks-default/light-en/report.json [stale-report] report.json was made from a different app.png"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "post.json",
+          "json": [
+            {
+              "png": {
+                "files": [".parity/test-phone/tasks-default/light-en/app.png"],
+                "width": 480,
+                "height": 900,
+                "fill": "#FFFFFF"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "error-no-runs": { "expect": ["ERROR [bad-input] nothing to draw"], "ops": [{ "delete": "scenes" }] },
+  "pass-crops": {
+    "expect": ["crops/tasks.summary.png: design 12,52 | app 12,55"],
+    "args": "--frame tasks-default",
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [{ "theme": "light", "lang": "en", "patch": { "elements": { "tasks.summary": { "dy": 3 } } } }]
+        }
+      }
+    ]
+  },
+  "pass-eye-pages": {
+    "expect": ["eye-1.png, top to bottom (design | app): tasks.add-button.icon, tasks.task-row.milk.check"],
+    "args": "--frame tasks-default"
+  },
+  "pass-no-contract": {
+    "expect": ["NOT APPLICABLE: contracts/visual-parity.json does not exist"],
+    "ops": [{ "delete": "contracts/visual-parity.json" }]
+  },
+  "pass-no-report": {
+    "expect": ["no report.json yet, so nothing is outlined"],
+    "args": "--frame tasks-default",
+    "ops": [
+      {
+        "write": {
+          "file": "post.json",
+          "json": [{ "delete": ".parity/test-phone/tasks-default/light-en/report.json" }]
+        }
+      }
+    ]
+  },
+  "pass-tall-window": {
+    "expect": ["sheet .parity/test-phone/lists-default/light-en-y120/sheet.png"],
+    "args": "--frame lists-default",
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/lists-default.json",
+          "path": ["captures"],
+          "value": [{ "theme": "light", "lang": "en", "patch": {}, "scrollY": 120 }]
+        }
+      }
+    ]
+  }
+}

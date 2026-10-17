@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "contracts/reporting.schema.json",
+  "title": "Reporting contract",
+  "description": "What check-report.mjs (git-commits-and-reporting) requires of an evidence report in this app. Every key is optional; a missing or null key takes the default.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "locales": {
+      "description": "The app's locale codes. null: the file names of <i18n>/catalogs/*.json.",
+      "oneOf": [{ "type": "null" }, { "type": "array", "items": { "type": "string" } }]
+    },
+    "sliceChecks": {
+      "description": "Checks lines every slice report needs besides 'Types, lint, format' and 'Tests'. Each must name its evidence file.",
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "releaseChecks": {
+      "description": "Checks lines a release report also needs. Default: Coverage, Mutation, End-to-end. Each must name its evidence file.",
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "humanChecks": {
+      "description": "Checks a person does by hand; each is named in the 'Human checks (not blocking)' block of every slice and release report.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "match"],
+        "properties": {
+          "name": { "type": "string" },
+          "match": {
+            "type": "string",
+            "description": "A case-insensitive regular expression a line of the block must match."
+          },
+          "example": { "type": "string" },
+          "minLocales": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "nonEvidenceMarkers": {
+      "description": "Words that mark a result which is not evidence (a rehearsal, a dry run, a placeholder FAIL); allowed only under 'Not tested or not verified', 'Details' and 'Human checks'.",
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

@@ -1,0 +1,234 @@
+<!doctype html>
+<!--
+  design/parity/mockup/index.html: the approved design mockup the references are rendered from
+  (shoot-design.mjs). Filled for the demo Tasks app: the tasks, lists and delete-list-dialog screens of
+  screen-contracts' contract, with the testIDs that contract gives them (examples/screens.json adds the
+  references and checks); replace it with the app's own approved design.
+  Conventions the scripts read (check-mockup.mjs proves them without a browser):
+  - one element per design frame with data-frame="<frame key>" (the screen-contract state's
+    "reference" without .png); it is the device screen: shoot-design pins it at (0,0) and sizes it to
+    the device profile (--parity-width, --parity-height, --parity-safe-top, --parity-safe-bottom);
+  - what the app draws without a testID of its own (the navigation header the Stack draws, a
+    checkbox inside a row) is drawn too, untagged: the references show the whole screen;
+  - every element of the frame carries data-testid="<testID>" with its keys filled in;
+  - the theme, the language and the direction arrive as attributes on <html> (contract
+    mockup.htmlAttributes: data-theme, lang, dir) and prefers-color-scheme;
+  - static HTML and CSS: one span per language where texts differ, so check-mockup can read it;
+  - nothing from the network: fonts are @font-face rules pointing at the exact font files the app
+    bundles, copied next to this file (the demo uses the system font and needs none).
+-->
+<html lang="en" dir="ltr" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <title>Tasks design</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --surface: #f2f4f7;
+        --line: #c9d1dc;
+        --text: #1a1d23;
+        --muted: #4a5160;
+        --faint: #6b7280;
+        --accent: #2f6fed;
+        --accent-edge: #1b3f8a;
+        --on-accent: #ffffff;
+        --scrim: #0b0d1299;
+        --danger: #c62828;
+        color-scheme: light;
+      }
+      html[data-theme='dark'] {
+        --bg: #111418;
+        --surface: #1e232b;
+        --line: #3a4250;
+        --text: #f2f4f7;
+        --muted: #b8bfcc;
+        --faint: #9aa3b2;
+        --accent: #5b8df6;
+        --accent-edge: #9db8f9;
+        --on-accent: #0b0d12;
+        --scrim: #000000b3;
+        --danger: #ff8a80;
+        color-scheme: dark;
+      }
+      html[lang='en'] [data-lang]:not([data-lang='en']),
+      html[lang='ar'] [data-lang]:not([data-lang='ar']) {
+        display: none;
+      }
+      body {
+        margin: 0;
+        padding: 24px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 24px;
+        background: #e5e7eb;
+        font-family: system-ui, sans-serif;
+      }
+      .screen {
+        position: relative;
+        width: var(--parity-width, 402px);
+        height: var(--parity-height, 874px);
+        box-sizing: border-box;
+        padding-top: var(--parity-safe-top, 62px);
+        background: var(--bg);
+        color: var(--text);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      .screen.tall {
+        height: auto;
+        min-height: var(--parity-height, 874px);
+        overflow: visible;
+      }
+      .bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 56px;
+        padding: 0 16px;
+        box-sizing: border-box;
+      }
+      .title {
+        margin: 0;
+        font-size: 22px;
+        line-height: 28px;
+        font-weight: 700;
+      }
+      .summary {
+        margin: 16px 16px 10px;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 20px;
+      }
+      .list {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: var(--bg);
+      }
+      .rows {
+        list-style: none;
+        margin: 0;
+        padding: 0 16px calc(var(--parity-safe-bottom, 34px) + 16px);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-height: 52px;
+        padding: 0 14px;
+        border: 2px solid var(--line);
+        background: var(--surface);
+        font-size: 17px;
+        line-height: 22px;
+      }
+      .check {
+        width: 18px;
+        height: 18px;
+        border: 2px solid var(--accent);
+        background: var(--bg);
+      }
+      .delete {
+        margin-inline-start: auto;
+        border: 0;
+        background: none;
+        color: var(--danger);
+        font: 600 15px/20px system-ui, sans-serif;
+      }
+      .scrim {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--scrim);
+      }
+      .card {
+        width: calc(100% - 64px);
+        padding: 20px;
+        box-sizing: border-box;
+        border: 2px solid var(--line);
+        background: var(--bg);
+        box-shadow: var(--line) 0 6px 0 0;
+      }
+      .card h2 {
+        margin: 0 0 8px;
+        font-size: 20px;
+        line-height: 26px;
+      }
+      .card p {
+        margin: 0 0 20px;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 20px;
+      }
+      .actions {
+        display: flex;
+        gap: 12px;
+      }
+      .actions button {
+        flex: 1;
+        height: 44px;
+        border: 2px solid var(--line);
+        background: var(--surface);
+        color: var(--text);
+        font: 600 15px/20px system-ui, sans-serif;
+      }
+      .actions .confirm {
+        border-color: var(--danger);
+        color: var(--danger);
+      }
+    </style>
+  </head>
+  <body>
+    <section class="screen" data-frame="tasks-default">
+      <header class="bar">
+        <h1 class="title"><span data-lang="en">Tasks</span><span data-lang="ar">المهام</span></h1>
+      </header>
+      <div class="list" data-testid="tasks.list">
+        <p class="summary" data-testid="tasks.summary"><span data-lang="en">3 open tasks</span><span data-lang="ar">٣ مهام مفتوحة</span></p>
+        <ul class="rows">
+          <li class="row" data-testid="tasks.task-row.milk"><span class="check"></span><span data-lang="en">Buy milk</span><span data-lang="ar">شراء الحليب</span></li>
+          <li class="row" data-testid="tasks.task-row.bread"><span class="check"></span><span data-lang="en">Bake bread</span><span data-lang="ar">خبز الخبز</span></li>
+          <li class="row" data-testid="tasks.task-row.mail"><span class="check"></span><span data-lang="en">Send mail</span><span data-lang="ar">إرسال البريد</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="screen tall" data-frame="lists-default" data-testid="lists.screen">
+      <header class="bar">
+        <h1 class="title"><span data-lang="en">Lists</span><span data-lang="ar">القوائم</span></h1>
+      </header>
+      <ul class="rows" data-testid="lists.list">
+        <li class="row" data-testid="lists.list-row.home"><span data-lang="en">Home</span><span data-lang="ar">المنزل</span><button class="delete" data-testid="lists.list-row.home.delete-button"><span data-lang="en">Delete</span><span data-lang="ar">حذف</span></button></li>
+        <li class="row" data-testid="lists.list-row.work"><span data-lang="en">Work</span><span data-lang="ar">العمل</span><button class="delete" data-testid="lists.list-row.work.delete-button"><span data-lang="en">Delete</span><span data-lang="ar">حذف</span></button></li>
+        <li class="row" data-testid="lists.list-row.garden"><span data-lang="en">Garden</span><span data-lang="ar">الحديقة</span><button class="delete" data-testid="lists.list-row.garden.delete-button"><span data-lang="en">Delete</span><span data-lang="ar">حذف</span></button></li>
+        <li class="row" data-testid="lists.list-row.travel"><span data-lang="en">Travel</span><span data-lang="ar">السفر</span><button class="delete" data-testid="lists.list-row.travel.delete-button"><span data-lang="en">Delete</span><span data-lang="ar">حذف</span></button></li>
+        <li class="row" data-testid="lists.list-row.books"><span data-lang="en">Books</span><span data-lang="ar">الكتب</span><button class="delete" data-testid="lists.list-row.books.delete-button"><span data-lang="en">Delete</span><span data-lang="ar">حذف</span></button></li>
+        <li class="row" data-testid="lists.list-row.gifts"><span data-lang="en">Gifts</span><span data-lang="ar">الهدايا</span><button class="delete" data-testid="lists.list-row.gifts.delete-button"><span data-lang="en">Delete</span><span data-lang="ar">حذف</span></button></li>
+        <li class="row" data-testid="lists.list-row.music"><span data-lang="en">Music</span><span data-lang="ar">الموسيقى</span><button class="delete" data-testid="lists.list-row.music.delete-button"><span data-lang="en">Delete</span><span data-lang="ar">حذف</span></button></li>
+        <li class="row" data-testid="lists.list-row.films"><span data-lang="en">Films</span><span data-lang="ar">الأفلام</span><button class="delete" data-testid="lists.list-row.films.delete-button"><span data-lang="en">Delete</span><span data-lang="ar">حذف</span></button></li>
+        <li class="row" data-testid="lists.list-row.health"><span data-lang="en">Health</span><span data-lang="ar">الصحة</span><button class="delete" data-testid="lists.list-row.health.delete-button"><span data-lang="en">Delete</span><span data-lang="ar">حذف</span></button></li>
+        <li class="row" data-testid="lists.list-row.ideas"><span data-lang="en">Ideas</span><span data-lang="ar">الأفكار</span><button class="delete" data-testid="lists.list-row.ideas.delete-button"><span data-lang="en">Delete</span><span data-lang="ar">حذف</span></button></li>
+        <li class="row" data-testid="lists.list-row.shop"><span data-lang="en">Shop</span><span data-lang="ar">المتجر</span><button class="delete" data-testid="lists.list-row.shop.delete-button"><span data-lang="en">Delete</span><span data-lang="ar">حذف</span></button></li>
+        <li class="row" data-testid="lists.list-row.later"><span data-lang="en">Later</span><span data-lang="ar">لاحقا</span><button class="delete" data-testid="lists.list-row.later.delete-button"><span data-lang="en">Delete</span><span data-lang="ar">حذف</span></button></li>
+      </ul>
+    </section>
+
+    <section class="screen" data-frame="delete-list-dialog-default" data-testid="delete-list-dialog.scrim">
+      <div class="scrim">
+        <div class="card" data-testid="delete-list-dialog.card">
+          <h2 data-testid="delete-list-dialog.title"><span data-lang="en">Delete Home?</span><span data-lang="ar">حذف المنزل؟</span></h2>
+          <p data-testid="delete-list-dialog.body"><span data-lang="en">Its tasks are deleted too.</span><span data-lang="ar">ستُحذف مهامها أيضًا.</span></p>
+          <div class="actions">
+            <button data-testid="delete-list-dialog.cancel-button"><span data-lang="en">Cancel</span><span data-lang="ar">إلغاء</span></button>
+            <button class="confirm" data-testid="delete-list-dialog.confirm-button"><span data-lang="en">Delete</span><span data-lang="ar">حذف</span></button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

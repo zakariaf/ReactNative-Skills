@@ -1,0 +1,22 @@
+[
+  {"from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs"},
+  {"from": "scripts/lib/app-modules.mjs", "to": "scripts/lib/app-modules.mjs"},
+  {"from": "repo-templates/src/core/result.ts", "to": "templates/src/core/result.ts"},
+  {"from": "repo-templates/src/core/result.test.ts", "to": "templates/src/core/result.test.ts"},
+  {"from": "repo-templates/__mocks__/react-native-google-mobile-ads.ts", "to": "templates/__mocks__/react-native-google-mobile-ads.ts"},
+  {"from": "repo-templates/__mocks__/expo-tracking-transparency.ts", "to": "templates/__mocks__/expo-tracking-transparency.ts"},
+  {"from": "repo-templates/src/config/app-variant.ts", "to": "templates/src/config/app-variant.ts"},
+  {"from": "repo-templates/src/config/app-variant.test.ts", "to": "templates/src/config/app-variant.test.ts"},
+  {"from": "repo-templates/src/services/connectivity/", "to": "templates/src/services/connectivity/"},
+  {"from": "repo-templates/src/services/consent/consent-port.ts", "to": "templates/src/services/consent/consent-port.ts"},
+  {"from": "repo-templates/src/services/consent/admob-consent-adapter.ts", "to": "templates/src/services/consent/admob-consent-adapter.ts"},
+  {"from": "repo-templates/src/services/consent/admob-consent-adapter.test.ts", "to": "templates/src/services/consent/admob-consent-adapter.test.ts"},
+  {"from": "repo-templates/src/services/consent/admob-consent-adapter.android.test.ts", "to": "templates/src/services/consent/admob-consent-adapter.android.test.ts"},
+  {"from": "repo-templates/src/services/consent/expo-tracking-consent-adapter.ts", "to": "templates/src/services/consent/expo-tracking-consent-adapter.ts"},
+  {"from": "repo-templates/src/services/consent/expo-tracking-consent-adapter.test.ts", "to": "templates/src/services/consent/expo-tracking-consent-adapter.test.ts"},
+  {"from": "repo-templates/src/services/consent/expo-tracking-consent-adapter.android.test.ts", "to": "templates/src/services/consent/expo-tracking-consent-adapter.android.test.ts"},
+  {"from": "repo-templates/src/services/consent/consent-factory.ts", "to": "templates/src/services/consent/consent-factory.ts"},
+  {"from": "repo-templates/src/services/consent/consent-factory.test.ts", "to": "templates/src/services/consent/consent-factory.test.ts"},
+  {"from": "repo-templates/src/services/consent/fake-consent.ts", "to": "templates/src/services/consent/fake-consent.ts"},
+  {"from": "repo-templates/src/services/consent/fake-consent.test.ts", "to": "templates/src/services/consent/fake-consent.test.ts"}
+]

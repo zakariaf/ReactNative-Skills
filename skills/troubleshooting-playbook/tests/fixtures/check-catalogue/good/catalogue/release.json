@@ -1,0 +1,48 @@
+{
+  "area": "release",
+  "entries": [
+    {
+      "id": "release-keychain-locked",
+      "topic": "Signing",
+      "symptom": "errSecInternalComponent from codesign",
+      "cause": "The login keychain is locked",
+      "fix": "Stop: the developer unlocks the keychain",
+      "match": [
+        "errSecInternalComponent"
+      ],
+      "status": "documented",
+      "needsHuman": true,
+      "skill": "ios-release-testflight",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "release-version-code-used",
+      "topic": "Upload",
+      "symptom": "Version code 14 has already been used",
+      "cause": "The version code was reused",
+      "fix": "Build again with the next number",
+      "match": [
+        "Version code \\d+ has already been used"
+      ],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "android-release-play",
+      "platforms": [
+        "android"
+      ]
+    },
+    {
+      "id": "release-store-slow",
+      "topic": "Upload",
+      "symptom": "Processing takes longer than an hour",
+      "cause": "The store is slow",
+      "fix": "Wait, then resume the processing step",
+      "match": [],
+      "status": "open",
+      "needsHuman": false,
+      "skill": null
+    }
+  ]
+}

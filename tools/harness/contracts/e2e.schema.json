@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "contracts/e2e.json",
+  "description": "The app's end-to-end facts: which builds may be tested, the network policy the runtime sampler proves, the devices, the screenshot matrix, folders of flows run by hand, and testIDs that are not in contracts/screens.json. Read by scripts/e2e/ and by the e2e-maestro skill's check-flows, check-e2e-setup and check-e2e-report.",
+  "type": "object",
+  "required": ["productionAppIds", "network"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "productionAppIds": {
+      "description": "The store app ids (iOS bundle id, Android package). A build with one of them is the production variant: it has no test-only code and no debug link, so the runner refuses it.",
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "buildExtra": {
+      "description": "Values the build's embedded expo.extra must hold, or the runner and the capture refuse the build. An app with react-native-google-mobile-ads sets { \"adsMode\": \"off\" } (admob-ads-and-consent's ADS_MODE=off build: no consent form, no tracking prompt, no ad sockets; ads flows run by hand in a manual folder). An app without ads removes the key.",
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "devicePrefix": {
+      "description": "Devices are named <devicePrefix>-<purpose> (tasks-e2e-phone). Default: contracts/ios-sim-build.json simulatorPrefix, else the package name in kebab case.",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "maestroBin": {
+      "description": "The Maestro binary. Default tools/maestro/bin/maestro (scripts/e2e/install-maestro.sh puts the pinned version there).",
+      "type": "string"
+    },
+    "ios": {
+      "description": "Simulator models and where the Release simulator build lands.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "phone": { "description": "Default iPhone 17 Pro Max.", "type": "string" },
+        "tablet": { "description": "Default iPad Pro 13-inch (M5).", "type": "string" },
+        "appPath": {
+          "description": "The folder that holds the .app. Default build/ios-sim/dd/Build/Products/Release-iphonesimulator (ios-simulator-build).",
+          "type": "string"
+        }
+      }
+    },
+    "android": {
+      "description": "The Android virtual devices: the system image they are created from, their hardware profiles and the release APK.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "systemImage": {
+          "description": "Default system-images;android-36;google_apis;arm64-v8a.",
+          "type": "string"
+        },
+        "phoneDevice": {
+          "description": "Default pixel_8 (avdmanager list device).",
+          "type": "string"
+        },
+        "tabletDevice": { "description": "Default pixel_tablet.", "type": "string" },
+        "apkPath": {
+          "description": "Default build/android-emu/app-preview.apk (android-emulator-build keeps each variant's Release APK there, because the next clean prebuild deletes android/; pass --app-path for an EAS artifact).",
+          "type": "string"
+        }
+      }
+    },
+    "network": {
+      "description": "What the runtime socket sampler proves: offline-only (no socket to another host at all), allowlist (only allowHosts), or off (no runtime proof; needs why).",
+      "type": "object",
+      "required": ["mode"],
+      "additionalProperties": false,
+      "properties": {
+        "mode": { "enum": ["offline-only", "allowlist", "off"] },
+        "allowHosts": {
+          "description": "The hosts the test build may reach (allowlist mode): the API host, a crash or analytics host when the test build enables it.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "why": {
+          "description": "Why there is no runtime network proof (mode off).",
+          "type": "string"
+        }
+      }
+    },
+    "largeText": {
+      "description": "The locales the a11y flows run in at the largest text size: one left-to-right and, when the app has one, one right-to-left locale.",
+      "type": "object",
+      "required": ["locales"],
+      "additionalProperties": false,
+      "properties": { "locales": { "type": "array", "minItems": 1, "items": { "type": "string" } } }
+    },
+    "screenshots": {
+      "description": "The screenshot matrix: every device x light/dark x locale, captured by the matrix flow.",
+      "type": "object",
+      "required": ["locales"],
+      "additionalProperties": false,
+      "properties": {
+        "flow": { "description": "Default .maestro/screenshots/matrix.yaml.", "type": "string" },
+        "locales": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "devices": {
+          "description": "Default phone and tablet.",
+          "type": "array",
+          "items": { "enum": ["phone", "tablet"] }
+        },
+        "platforms": {
+          "description": "The platforms whose baselines check-e2e-setup --baselines requires. Default ios and android.",
+          "type": "array",
+          "items": { "enum": ["ios", "android"] }
+        }
+      }
+    },
+    "manualFolders": {
+      "description": "Folders of .maestro/ that hold flows the runner never lists (production SDK behaviour, real system prompts, store sandboxes). check-flows still checks them. Declare each in contracts/naming.json extraE2eFolders too.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["folder", "why"],
+        "additionalProperties": false,
+        "properties": {
+          "folder": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+          "why": { "type": "string" },
+          "startsOutside": {
+            "description": "The app is started outside Maestro (xcrun simctl launch <udid> <id> / adb -s <serial> shell monkey -p <id> 1) because launchApp grants every permission and would hide the system prompt under test: its flows never call launchApp.",
+            "type": "boolean"
+          },
+          "requiredParams": {
+            "description": "Debug-link parameters the folder's first setup link must set (a consent geography, a store environment).",
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "tags": {
+      "description": "Flow tags besides smoke, journeys, offline, rtl, a11y, quarantine and screenshots.",
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" }
+    },
+    "extraTestIDs": {
+      "description": "testIDs a flow may use that contracts/screens.json does not list (test-only screens, probes), each with why. check-flows fails any other unknown id.",
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    }
+  }
+}

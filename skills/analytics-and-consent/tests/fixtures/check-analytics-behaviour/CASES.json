@@ -1,0 +1,242 @@
+{
+  "bad-clear-constructs-sdk": {
+    "expect": [
+      "src/services/analytics/create-analytics.ts:1 [clear-without-sdk] a no after the question changed created the SDK just to stop it",
+      "src/services/analytics/create-analytics.ts:1 [clear-without-sdk] forget() created the SDK"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/analytics/create-analytics.ts",
+          "find": "      await stopSdk(sdk ?? (starting === null ? null : await starting), options);",
+          "with": "      await stopSdk(sdk ?? (await ready()), options);"
+        }
+      }
+    ]
+  },
+  "bad-clear-without-sdk": {
+    "expect": [
+      "src/services/analytics/create-analytics.ts:1 [clear-without-sdk] a no with no SDK in the session left the stored SDK state",
+      "src/services/analytics/create-analytics.ts:1 [clear-without-sdk] forget() with no SDK in the session left the stored SDK state"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/analytics/create-analytics.ts",
+          "find": "    options.clearSdkStorage?.();\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-consent-unknown-starts": {
+    "expect": [
+      "src/services/analytics/create-analytics.ts:1 [consent-before-sdk] the SDK was created before the user answered"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/analytics/create-analytics.ts",
+          "find": "consent.current() === 'granted';",
+          "with": "consent.current() !== 'denied';"
+        }
+      }
+    ]
+  },
+  "bad-extra-foreign-app": {
+    "expect": ["src/config/analytics-config.ts:1 [extra-reader] an extra built for another app id is not off"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/analytics-config.ts",
+          "find": "if (!isMode(mode) || mode === 'off' || appId !== applicationId) return OFF;",
+          "with": "if (!isMode(mode) || mode === 'off' || typeof appId !== 'string' || applicationId === undefined) return OFF;"
+        }
+      }
+    ]
+  },
+  "bad-forget-keeps-record": {
+    "expect": ["src/services/analytics/create-analytics.ts:1 [forget] forget() kept the saved answer"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/analytics/create-analytics.ts",
+          "find": "      report(store.clear());\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-manifest-linked": {
+    "expect": [
+      "scripts/analytics/analytics-manifest.ts:1 [manifest-mapping] product-interaction: linked or tracking changed on the way to the manifest"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/analytics/analytics-manifest.ts",
+          "find": "NSPrivacyCollectedDataTypeLinked: entry.linked,",
+          "with": "NSPrivacyCollectedDataTypeLinked: false,"
+        }
+      }
+    ]
+  },
+  "bad-mode-live-in-preview": {
+    "expect": ["src/config/analytics-config.ts:1 [mode-matrix] preview builds may send to the live project"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/analytics-config.ts",
+          "find": "preview: ['off', 'test'],",
+          "with": "preview: ['off', 'test', 'live'],"
+        }
+      }
+    ]
+  },
+  "bad-mode-off-starts": {
+    "expect": ["src/services/analytics/create-analytics.ts:1 [mode-off] an off build created the SDK"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/analytics/create-analytics.ts",
+          "find": "options.mode !== 'off' && consent.current()",
+          "with": "consent.current()"
+        }
+      }
+    ]
+  },
+  "bad-module-missing": {
+    "expect": ["src/services/analytics/screen-name.ts:1 [modules] missing"],
+    "ops": [{ "delete": "src/services/analytics/screen-name.ts" }]
+  },
+  "bad-module-native-import": {
+    "expect": ["src/services/analytics/analytics-sanitize.ts:1 [modules] does not load"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/analytics/analytics-sanitize.ts",
+          "find": "import { ANALYTICS_EVENTS, isAnalyticsEventName } from './analytics-events';",
+          "with": "import { Platform } from 'react-native';\n\nimport { ANALYTICS_EVENTS, isAnalyticsEventName } from './analytics-events';\n\nexport const OS = Platform.OS;"
+        }
+      }
+    ]
+  },
+  "bad-no-wrong-order": {
+    "expect": ["src/services/analytics/create-analytics.ts:1 [consent-no-stops] optOut ran before reset"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/analytics/create-analytics.ts",
+          "find": "  running.reset();\n  await running.optOut();",
+          "with": "  await running.optOut();\n  running.reset();"
+        }
+      }
+    ]
+  },
+  "bad-pending-unbounded": {
+    "expect": ["src/services/analytics/create-analytics.ts:1 [pending-cap]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/analytics/create-analytics.ts",
+          "find": "else if (pending.length < MAX_PENDING_EVENTS) pending.push(event);",
+          "with": "else pending.push(event);"
+        }
+      }
+    ]
+  },
+  "bad-sanitize-skipped": {
+    "expect": ["src/services/analytics/analytics-sanitize.ts:1 [sanitize] an event outside the catalog reached the SDK"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/analytics/create-analytics.ts",
+          "find": "      const checked = sanitizeEvent(event);",
+          "with": "      const checked = { ok: true as const, name: event.name, props: event.props, reason: String(sanitizeEvent.name) };"
+        }
+      }
+    ]
+  },
+  "bad-screen-groups": {
+    "expect": ["src/services/analytics/screen-name.ts:1 [screen-name] segments (app)/tasks/[id] give (app)/tasks/[id]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/analytics/screen-name.ts",
+          "find": "const visible = segments.filter((segment) => !/^\\(.*\\)$/.test(segment));",
+          "with": "const visible = [...segments];"
+        }
+      }
+    ]
+  },
+  "bad-tracking-always": {
+    "expect": ["src/services/analytics/create-analytics.ts:1 [tracking-gate] ATT denied gave isTrackingAllowed true"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/analytics/create-analytics.ts",
+          "find": "tracking !== undefined && (await tracking.requestTracking()) === 'authorized'",
+          "with": "tracking === undefined ? false : (await tracking.requestTracking()) !== 'unavailable'"
+        }
+      }
+    ]
+  },
+  "bad-unhandled-rejection": {
+    "expect": [
+      "src/services/analytics/create-analytics.ts:1 [never-throws] an SDK failure became an unhandled rejection"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/analytics/create-analytics.ts",
+          "find": "if (choice === 'denied') quietly(runner.stop, onError).catch(onError);",
+          "with": "if (choice === 'denied') void runner.stop();"
+        }
+      }
+    ]
+  },
+  "bad-version-ignored": {
+    "expect": [
+      "src/services/analytics/analytics-consent.ts:1 [consent-version] an answer to an older question still counts as a yes"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/analytics/analytics-consent.ts",
+          "find": "record.version < currentVersion",
+          "with": "record.version < 0"
+        }
+      }
+    ]
+  },
+  "bad-yes-no-optin": {
+    "expect": ["src/services/analytics/create-analytics.ts:1 [consent-yes-starts] the SDK was not opted in first"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/analytics/create-analytics.ts",
+          "find": "      if (isAllowed()) await sdk.optIn(); // else the user said no while it was starting\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "error-missing-root": {
+    "expect": ["ERROR [bad-input] nothing to check: repo root"],
+    "args": "{dir}/does-not-exist",
+    "ops": []
+  },
+  "error-no-package-json": {
+    "expect": ["ERROR [bad-input] nothing to check: the app's package.json"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "error-unknown-option": { "expect": ["ERROR [bad-input]"], "args": "{dir} --bogus", "ops": [] },
+  "pass-not-applicable": {
+    "expect": [
+      "NOT APPLICABLE: no src/services/analytics/, no contracts/analytics.json and no analytics SDK in package.json"
+    ],
+    "base": ["@tests/bases/app"],
+    "extends": null,
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "posthog-react-native"], "delete": true } }]
+  }
+}

@@ -1,0 +1,4 @@
+{
+  "$comment": "Values for the template placeholders when the templates are checked in the reference app (verify-templates) and assembled for the self-test.",
+  "__APP_ID__": "com.acme.tasks"
+}

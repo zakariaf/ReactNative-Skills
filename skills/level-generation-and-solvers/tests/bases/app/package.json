@@ -1,0 +1,11 @@
+{
+  "name": "levels-fixture",
+  "private": true,
+  "main": "expo-router/entry",
+  "dependencies": {
+    "expo": "~57.0.26"
+  },
+  "devDependencies": {
+    "fast-check": "4.10.2"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "tasks",
+  "private": true,
+  "scripts": {
+    "verify": "node scripts/quality/run-verify.ts",
+    "audit:privacy": "node scripts/audit/audit-privacy.ts",
+    "audit:network": "node scripts/audit/audit-network.ts",
+    "release:ios": "node scripts/release/release-ios.ts"
+  },
+  "dependencies": {
+    "expo": "~57.0.26",
+    "react-native-google-mobile-ads": "17.2.0"
+  }
+}

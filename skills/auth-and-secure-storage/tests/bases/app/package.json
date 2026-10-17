@@ -1,0 +1,18 @@
+{
+  "name": "tasks",
+  "private": true,
+  "main": "index.ts",
+  "dependencies": {
+    "@tanstack/react-query": "5.104.0",
+    "expo": "~57.0.26",
+    "expo-apple-authentication": "~57.0.2",
+    "expo-auth-session": "~57.0.13",
+    "expo-crypto": "~57.0.3",
+    "expo-router": "~57.0.24",
+    "expo-secure-store": "~57.0.4",
+    "expo-sqlite": "~57.0.3",
+    "react": "19.2.3",
+    "react-native": "0.86.3",
+    "zustand": "5.0.15"
+  }
+}

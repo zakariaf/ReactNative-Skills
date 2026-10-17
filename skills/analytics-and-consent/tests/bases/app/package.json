@@ -1,0 +1,16 @@
+{
+  "name": "tasks",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "dependencies": {
+    "expo": "~57.0.26",
+    "expo-application": "~57.0.3",
+    "expo-constants": "~57.0.20",
+    "expo-router": "~57.0.24",
+    "expo-sqlite": "~57.0.3",
+    "expo-tracking-transparency": "~57.0.2",
+    "posthog-react-native": "4.79.1",
+    "react": "19.2.3",
+    "react-native": "0.86.3"
+  }
+}

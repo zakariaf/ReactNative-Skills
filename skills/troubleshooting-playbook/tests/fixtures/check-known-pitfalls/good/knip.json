@@ -1,0 +1,10 @@
+{
+  "entry": [
+    "src/app/**/*.{ts,tsx}"
+  ],
+  "ignore": [
+    "skills/**",
+    ".agents/**",
+    ".claude/**"
+  ]
+}

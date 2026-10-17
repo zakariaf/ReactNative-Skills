@@ -1,0 +1,23 @@
+# .maestro/subflows/open-deep-link.yaml
+appId: ${APP_ID}
+---
+- extendedWaitUntil:
+    visible:
+      id: '[a-z0-9]+(-[a-z0-9]+)*\.(screen|title)'
+    timeout: 15000
+- openLink: '${APP_SCHEME}://tasks/${TASK_ID}'
+# system-ui: iOS asks "Open in “<app name>”?" for the link; the title and 'Open' are Apple's, not app text.
+- runFlow:
+    when:
+      visible: 'Open in .*\?'
+    commands:
+      - waitForAnimationToEnd
+      # system-ui: Apple's Open button, the nearest one below the alert title.
+      - tapOn:
+          text: 'Open'
+          below: 'Open in .*\?'
+          optional: true
+- extendedWaitUntil:
+    visible:
+      id: '${WAIT_FOR}'
+    timeout: 15000

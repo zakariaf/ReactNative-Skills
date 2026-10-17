@@ -1,0 +1,339 @@
+{
+  "bad-build": {
+    "expect": ["[plan-build] the sweep runs on variant \"development\""],
+    "ops": [
+      { "json": { "file": "contracts/design-review.json", "path": ["build", "variant"], "value": "development" } }
+    ]
+  },
+  "bad-build-production": {
+    "expect": [
+      "[plan-build] the sweep runs on a production build, which strips the debug link every combination is set through"
+    ],
+    "ops": [{ "json": { "file": "contracts/design-review.json", "path": ["build", "variant"], "value": "production" } }]
+  },
+  "bad-device-pass-core": {
+    "expect": ["[plan-device-pass] core step \"crash-log\" is missing"],
+    "ops": [{ "json": { "file": "contracts/design-review.json", "path": ["devicePass", "steps", 9], "delete": true } }]
+  },
+  "bad-device-pass-hardware": {
+    "expect": ["[plan-device-pass] no real android hardware for the on-device pass"],
+    "ops": [
+      { "json": { "file": "contracts/design-review.json", "path": ["devicePass", "hardware", 1], "delete": true } }
+    ]
+  },
+  "bad-device-pass-order": {
+    "expect": ["[plan-device-pass] step \"real-state\" comes after the destructive step \"fresh-install\""],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/design-review.json",
+          "path": ["devicePass", "steps", 0],
+          "value": { "id": "fresh-install", "destructive": true }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/design-review.json",
+          "path": ["devicePass", "steps", 10],
+          "value": { "id": "real-state", "destructive": false }
+        }
+      }
+    ]
+  },
+  "bad-devices-android-portrait": {
+    "expect": ["[plan-devices] android: the plan needs a large-screen device in landscape"],
+    "ops": [
+      { "json": { "file": "contracts/design-review.json", "path": ["devices", 3, "orientation"], "delete": true } }
+    ]
+  },
+  "bad-devices-booted": {
+    "expect": ["[plan-devices] device \"ios-phone-small\" needs \"name\": its own simulator or emulator"],
+    "ops": [{ "json": { "file": "contracts/design-review.json", "path": ["devices", 0, "name"], "value": "booted" } }]
+  },
+  "bad-devices-ipad-portrait": {
+    "expect": ["[plan-devices] ios: the plan needs an iOS tablet in landscape"],
+    "ops": [
+      { "json": { "file": "contracts/design-review.json", "path": ["devices", 1, "orientation"], "delete": true } }
+    ]
+  },
+  "bad-devices-no-tablet": {
+    "expect": ["[plan-devices] ios: the plan needs a \"tablet\" device (ios.supportsTablet is true)"],
+    "ops": [{ "json": { "file": "contracts/design-review.json", "path": ["devices", 1], "delete": true } }]
+  },
+  "bad-devices-unlocked": {
+    "expect": ["[plan-devices] app.config.ts does not lock the orientation, but no device is swept in landscape"],
+    "ops": [
+      { "replace": { "file": "app.config.ts", "find": "orientation: 'portrait'", "with": "orientation: 'default'" } },
+      { "json": { "file": "contracts/design-review.json", "path": ["devices", 1, "orientation"], "delete": true } },
+      { "json": { "file": "contracts/design-review.json", "path": ["devices", 3, "orientation"], "delete": true } },
+      { "json": { "file": "contracts/design-review.json", "path": ["devices", 3, "role"], "value": "foldable" } }
+    ]
+  },
+  "bad-invalid": {
+    "expect": ["[plan-invalid] \"version\" must be 1"],
+    "ops": [{ "json": { "file": "contracts/design-review.json", "path": ["version"], "value": 2 } }]
+  },
+  "bad-locales-direction": {
+    "expect": ["[plan-locales] locale \"ar\" is rtl, the plan says ltr"],
+    "ops": [{ "json": { "file": "contracts/design-review.json", "path": ["locales", 1, "direction"], "value": "ltr" } }]
+  },
+  "bad-locales-no-rtl": {
+    "expect": ["[plan-locales] the app ships a right-to-left language (ar) but the plan sweeps no rtl locale"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/design-review.json",
+          "path": ["locales"],
+          "value": [{ "tag": "en", "direction": "ltr" }]
+        }
+      }
+    ]
+  },
+  "bad-locales-unreadable": {
+    "expect": ["src/i18n/languages.ts:1 [plan-locales]"],
+    "ops": [
+      {
+        "$comment": "a computed list: the checker cannot read the languages, so it cannot prove both directions are swept",
+        "replace": {
+          "file": "src/i18n/languages.ts",
+          "find": "export const LANGUAGES = ['en', 'ar'] as const;",
+          "with": "export const LANGUAGES = [...SOURCE_LANGUAGES, ...EXTRA_LANGUAGES] as const;"
+        }
+      }
+    ]
+  },
+  "bad-motion": {
+    "expect": [
+      "[plan-motion] moment \"screenPush\" of src/ui/motion/motion-moments.ts is neither recorded nor listed in notRecorded"
+    ],
+    "ops": [{ "json": { "file": "contracts/design-review.json", "path": ["motion", "record"], "value": ["press"] } }]
+  },
+  "bad-motion-why": {
+    "expect": ["[plan-motion] moment \"pressRelease\" is not recorded and gives no reason"],
+    "ops": [
+      {
+        "json": { "file": "contracts/design-review.json", "path": ["motion", "notRecorded", 0, "why"], "value": "same" }
+      }
+    ]
+  },
+  "bad-open-combination-contract": {
+    "expect": [
+      "FAIL contracts/debug-links.json:1 [plan-open] the sweep sets \"lang=ar\" on its combinations, but contracts/debug-links.json allows only en",
+      "[plan-open] the sweep sets \"motion\" on every combination (animations held still for the stills, and back to the system setting for the motion videos), but contracts/debug-links.json does not declare it"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/debug-links.json", "path": ["params", "lang", "values"], "value": ["en"] } },
+      { "json": { "file": "contracts/debug-links.json", "path": ["params", "motion"], "delete": true } }
+    ]
+  },
+  "bad-open-combination-param": {
+    "expect": ["[plan-open] open link \"tasks.default\" sets \"lang\", which every combination sets itself"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/design-review.json",
+          "path": ["screens", "open", "tasks.default"],
+          "value": "open=tasks&lang=ar"
+        }
+      }
+    ]
+  },
+  "bad-open-contracts-dir": {
+    "expect": [
+      "FAIL config/contracts/debug-links.json:1 [plan-open] the sweep sets \"motion=system\" on its combinations, but config/contracts/debug-links.json allows only still"
+    ],
+    "ops": [
+      { "rename": { "from": "contracts", "to": "config/contracts" } },
+      { "write": { "file": "rn-skills.config.json", "content": "{ \"contractsDir\": \"config/contracts\" }\n" } },
+      {
+        "json": {
+          "file": "config/contracts/design-review.json",
+          "path": ["screens", "contract"],
+          "value": "config/contracts/screens.json"
+        }
+      },
+      {
+        "json": {
+          "file": "config/contracts/debug-links.json",
+          "path": ["params", "motion", "values"],
+          "value": ["still"]
+        }
+      }
+    ]
+  },
+  "bad-open-missing": {
+    "expect": ["[plan-open] state \"not-found.default\" has no open link"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/design-review.json",
+          "path": ["screens", "open", "not-found.default"],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "bad-open-motion-still-only": {
+    "expect": [
+      "FAIL contracts/debug-links.json:1 [plan-open] the sweep sets \"motion=system\" on its combinations, but contracts/debug-links.json allows only still"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/debug-links.json", "path": ["params", "motion", "values"], "value": ["still"] } }
+    ]
+  },
+  "bad-open-stale": {
+    "expect": ["[plan-open] open link \"settings.default\" belongs to no swept screen state"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/design-review.json",
+          "path": ["screens", "open", "settings.default"],
+          "value": "open=tasks"
+        }
+      }
+    ]
+  },
+  "bad-open-unknown-value": {
+    "expect": ["[plan-open] open link \"tasks.default\": \"open=settings\" is not one of tasks, debug"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/design-review.json",
+          "path": ["screens", "open", "tasks.default"],
+          "value": "open=settings"
+        }
+      }
+    ]
+  },
+  "bad-screens-exclude": {
+    "expect": ["[plan-screens] excluded screen \"settings\" is not in contracts/screens.json"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/design-review.json",
+          "path": ["screens", "exclude"],
+          "value": [{ "id": "settings", "why": "A screen the contract dropped long ago." }]
+        }
+      }
+    ]
+  },
+  "bad-screens-exclude-why": {
+    "expect": ["[plan-screens] excluded screen \"not-found\" has no reason"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/design-review.json",
+          "path": ["screens", "exclude"],
+          "value": [{ "id": "not-found", "why": "never" }]
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/design-review.json",
+          "path": ["screens", "open", "not-found.default"],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "bad-text-sizes": {
+    "expect": ["[plan-text-sizes] text size \"largest\" leaves out device \"ios-phone-small\""],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/design-review.json",
+          "path": ["textSizes", 1, "devices"],
+          "value": ["android-phone-small"]
+        }
+      }
+    ]
+  },
+  "bad-text-sizes-values": {
+    "expect": [
+      "[plan-text-sizes] text size \"largest\" must be iOS \"accessibility-extra-extra-extra-large\" and Android font_scale 2"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/design-review.json",
+          "path": ["textSizes", 1, "ios"],
+          "value": "extra-extra-extra-large"
+        }
+      }
+    ]
+  },
+  "bad-themes": {
+    "expect": ["[plan-themes] app.config.ts sets userInterfaceStyle automatic, but the plan leaves out dark"],
+    "ops": [{ "json": { "file": "contracts/design-review.json", "path": ["themes"], "value": ["light"] } }]
+  },
+  "bad-themes-extra": {
+    "expect": ["[plan-themes] the plan sweeps dark, which userInterfaceStyle light in app.config.ts never shows"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "userInterfaceStyle: 'automatic'",
+          "with": "userInterfaceStyle: 'light'"
+        }
+      }
+    ]
+  },
+  "error-no-app-config": {
+    "expect": ["ERROR [bad-input] nothing to check: no app.config.ts, app.config.js or app.json"],
+    "ops": [{ "delete": "app.config.ts" }]
+  },
+  "error-no-plan": {
+    "expect": ["ERROR [bad-input] nothing to check: contracts/design-review.json not found"],
+    "ops": [{ "delete": "contracts/design-review.json" }]
+  },
+  "pass-ipad-full-screen": {
+    "expect": ["plan: 2 screens, 48 cells, 8 motion videos", "RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "requireFullScreen keeps the iPad on the phone orientations (deprecated from iPadOS 26), so a portrait iPad is enough",
+        "replace": {
+          "file": "app.config.ts",
+          "find": "supportsTablet: true",
+          "with": "supportsTablet: true, requireFullScreen: true"
+        }
+      },
+      { "json": { "file": "contracts/design-review.json", "path": ["devices", 1, "orientation"], "delete": true } }
+    ]
+  },
+  "pass-list": {
+    "expect": [
+      "cell tasks.default--light--en--default--ios-phone-small.png",
+      "video motion/screenPush--android--reduced.mp4",
+      "RESULT: PASS"
+    ],
+    "args": "{dir} --list"
+  },
+  "pass-no-debug-links": {
+    "expect": [
+      "SKIP contracts/debug-links.json [plan-open] not yet created (debug-menu-and-test-hooks creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "contracts/debug-links.json" }]
+  },
+  "pass-no-languages": {
+    "expect": [
+      "SKIP src/i18n/languages.ts [plan-locales] not yet created (i18n-strings-and-catalogs creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "src/i18n/languages.ts" }]
+  },
+  "pass-no-motion-catalog": {
+    "expect": [
+      "SKIP src/ui/motion/motion-moments.ts [plan-motion] not yet created (motion-and-animation creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "src/ui/motion/motion-moments.ts" }]
+  },
+  "pass-no-screen-contract": {
+    "expect": [
+      "SKIP contracts/screens.json [plan-screens] not yet created (screen-contracts creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "contracts/screens.json" }]
+  }
+}

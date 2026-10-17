@@ -1,0 +1,1256 @@
+{
+  "bad-abort-signal": {
+    "expect": [
+      "FAIL src/services/tasks-api/tasks-api-adapter.ts:3 [abort-signal] signal.throwIfAborted() does not exist on the device: React Native 0.86 polyfills AbortSignal with abort-controller 3.0.0, while Jest on Node has it",
+      "FAIL src/services/tasks-api/tasks-api-adapter.ts:8 [abort-signal] cancellation decided by the error name: on iOS and Android expo/fetch (the global fetch in SDK 57) rejects most aborted requests (aborted before or during the request) with a FetchError (\"fetch failed: ...\"), not an AbortError",
+      "FAIL src/services/tasks-api/tasks-api-adapter.ts:9 [abort-signal] cancellation decided by instanceof DOMException: on iOS and Android expo/fetch rejects most aborted requests (aborted before or during the request) with a FetchError, not a DOMException",
+      "FAIL src/services/tasks-api/tasks-api-adapter.ts:10 [abort-signal] signal.reason is undefined on the device for a plain AbortController (abort-controller 3.0.0 drops the reason); Jest on Node keeps it",
+      "FAIL src/services/tasks-api/tasks-api-adapter.ts:15 [abort-signal] AbortSignal.abort() does not exist on the device (abort-controller 3.0.0; Expo adds only timeout and any)",
+      "FAIL src/services/tasks-api/tasks-api-adapter.ts:19 [abort-signal] addEventListener(..., { signal }) never removes the listener on the device: the polyfilled EventTarget (event-target-shim 5) ignores the signal option",
+      "FAIL src/services/tasks-api/tasks-api-adapter.ts:19 [subscription-released] the handle addEventListener() returns is dropped, so nothing can ever remove this listener",
+      "RESULT: FAIL (7 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/tasks-api/tasks-api-adapter.ts",
+          "lines": [
+            "// src/services/tasks-api/tasks-api-adapter.ts",
+            "export async function loadTasks(signal: AbortSignal): Promise<string> {",
+            "  signal.throwIfAborted();",
+            "  try {",
+            "    const response = await fetch('https://api.tasks.test/v1/tasks', { signal });",
+            "    return await response.text();",
+            "  } catch (error) {",
+            "    if (error instanceof Error && error.name === 'AbortError') return 'cancelled';",
+            "    if (error instanceof DOMException) return 'cancelled';",
+            "    throw new Error('tasks request failed', { cause: signal.reason });",
+            "  }",
+            "}",
+            "",
+            "export function cancelledSignal(): AbortSignal {",
+            "  return AbortSignal.abort();",
+            "}",
+            "",
+            "export function onCancel(signal: AbortSignal, target: EventTarget, done: () => void): void {",
+            "  target.addEventListener('done', done, { signal });",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-app-lifetime-in-tsx": {
+    "expect": [
+      "FAIL src/features/tasks/tasks-banner.tsx:6 [subscription-released] the handle addEventListener() returns is dropped, so nothing can ever remove this listener",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/tasks-banner.tsx",
+          "lines": [
+            "// src/features/tasks/tasks-banner.tsx",
+            "import { AppState } from 'react-native';",
+            "",
+            "export function TasksBanner(): React.JSX.Element | null {",
+            "  // app-lifetime: the banner is always on screen, so it never needs to stop listening",
+            "  AppState.addEventListener('change', () => undefined);",
+            "  return null;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-async-by-reference": {
+    "expect": [
+      "FAIL src/features/tasks/tasks-toolbar.tsx:20 [async-by-reference] saveDraft returns a promise and goes by reference into the listener of addListener(), which ignores what it returns, so a rejection is lost",
+      "FAIL src/features/tasks/tasks-toolbar.tsx:27 [async-by-reference] retry returns a promise and goes by reference into onPress (a JSX prop), which ignores what it returns, so a rejection is lost",
+      "FAIL src/features/tasks/tasks-toolbar.tsx:28 [async-by-reference] launchImageLibraryAsync returns a promise and goes by reference into onPress (a JSX prop), which ignores what it returns, so a rejection is lost",
+      "FAIL src/features/tasks/tasks-toolbar.tsx:29 [async-by-reference] model.reload returns a promise and goes by reference into onRefresh (a JSX prop), which ignores what it returns, so a rejection is lost",
+      "FAIL src/features/tasks/use-tasks-actions.ts:13 [async-by-reference] sync returns a promise and goes by reference into onSync (an object property), which ignores what it returns, so a rejection is lost",
+      "FAIL src/features/tasks/use-tasks-actions.ts:13 [async-by-reference] onArchive returns a promise and goes by reference into onArchive (an object property), which ignores what it returns, so a rejection is lost",
+      "FAIL src/features/tasks/use-archive-task.ts:12 [async-by-reference] invalidateAll returns a promise and goes by reference into onError (an object property)",
+      "FAIL src/features/tasks/use-archive-task.ts:17 [async-by-reference] invalidateAll returns a promise and goes by reference into onSuccess (an object property)",
+      "FAIL src/features/tasks/task-save-button.tsx:9 [async-by-reference] handleSave returns a promise and goes by reference into onPress (a JSX prop), which ignores what it returns, so a rejection is lost",
+      "FAIL src/features/tasks/task-save-screen.tsx:10 [async-by-reference] saveTask returns a promise and goes by reference into onPress (a JSX prop)",
+      "FAIL src/features/tasks/task-save-screen.tsx:11 [async-by-reference] refresh returns a promise and goes by reference into onPress (a JSX prop)",
+      "RESULT: FAIL (11 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/tasks-toolbar.tsx",
+          "lines": [
+            "// src/features/tasks/tasks-toolbar.tsx",
+            "import { launchImageLibraryAsync } from 'expo-image-picker';",
+            "import { useEffect } from 'react';",
+            "import { Keyboard, Pressable, RefreshControl } from 'react-native';",
+            "",
+            "import type { TasksModel } from './tasks-model-types';",
+            "",
+            "async function retry(): Promise<void> {",
+            "  await Promise.resolve();",
+            "}",
+            "",
+            "const saveDraft = async (): Promise<void> => {",
+            "  await Promise.resolve();",
+            "};",
+            "",
+            "export type TasksToolbarProps = { readonly model: TasksModel };",
+            "",
+            "export function TasksToolbar({ model }: TasksToolbarProps): React.JSX.Element {",
+            "  useEffect(() => {",
+            "    const hidden = Keyboard.addListener('keyboardDidHide', saveDraft);",
+            "    return () => {",
+            "      hidden.remove();",
+            "    };",
+            "  }, []);",
+            "  return (",
+            "    <>",
+            "      <Pressable accessibilityRole=\"button\" testID=\"tasks.retry\" onPress={retry} />",
+            "      <Pressable accessibilityRole=\"button\" testID=\"tasks.photo\" onPress={launchImageLibraryAsync} />",
+            "      <RefreshControl refreshing={false} onRefresh={model.reload} />",
+            "    </>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/tasks-model-types.ts",
+          "lines": [
+            "// src/features/tasks/tasks-model-types.ts",
+            "export type TasksModel = {",
+            "  readonly reload: () => Promise<void>;",
+            "};"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/use-tasks-actions.ts",
+          "lines": [
+            "// src/features/tasks/use-tasks-actions.ts",
+            "async function onArchive(): Promise<void> {",
+            "  await Promise.resolve();",
+            "}",
+            "",
+            "async function sync(): Promise<void> {",
+            "  await Promise.resolve();",
+            "}",
+            "",
+            "export type TasksActions = { readonly onSync: () => void; readonly onArchive: () => void };",
+            "",
+            "export function useTasksActions(): TasksActions {",
+            "  return { onSync: sync, onArchive };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/use-archive-task.ts",
+          "lines": [
+            "// src/features/tasks/use-archive-task.ts",
+            "import { QueryCache, useMutation } from '@tanstack/react-query';",
+            "",
+            "async function invalidateAll(): Promise<void> {",
+            "  await Promise.resolve();",
+            "}",
+            "",
+            "async function archive(taskId: string): Promise<void> {",
+            "  await Promise.resolve(taskId);",
+            "}",
+            "",
+            "export const queryCache = new QueryCache({ onError: invalidateAll });",
+            "",
+            "export function useArchiveTask(): (taskId: string) => void {",
+            "  const mutation = useMutation({ mutationFn: archive, onSettled: invalidateAll });",
+            "  return (taskId) => {",
+            "    mutation.mutate(taskId, { onSuccess: invalidateAll });",
+            "  };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/task-save-button.tsx",
+          "lines": [
+            "// src/features/tasks/task-save-button.tsx",
+            "import { useCallback } from 'react';",
+            "import { Pressable } from 'react-native';",
+            "",
+            "export function TaskSaveButton({ save }: { readonly save: () => Promise<void> }): React.JSX.Element {",
+            "  const handleSave = useCallback(async () => {",
+            "    await save();",
+            "  }, [save]);",
+            "  return <Pressable accessibilityRole=\"button\" testID=\"task.save\" onPress={handleSave} />;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-save-model.ts",
+          "lines": [
+            "// src/features/tasks/use-task-save-model.ts",
+            "export type TaskSaveModel = {",
+            "  readonly saveTask: () => Promise<void>;",
+            "  readonly reload: () => Promise<void>;",
+            "};",
+            "",
+            "export function useTaskSaveModel(): TaskSaveModel {",
+            "  return { saveTask: () => Promise.resolve(), reload: () => Promise.resolve() };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/task-save-screen.tsx",
+          "lines": [
+            "// src/features/tasks/task-save-screen.tsx",
+            "import { Pressable } from 'react-native';",
+            "",
+            "import { useTaskSaveModel } from './use-task-save-model';",
+            "",
+            "export function TaskSaveScreen(): React.JSX.Element {",
+            "  const { saveTask, reload: refresh } = useTaskSaveModel();",
+            "  return (",
+            "    <>",
+            "      <Pressable accessibilityRole=\"button\" testID=\"task.save\" onPress={saveTask} />",
+            "      <Pressable accessibilityRole=\"button\" testID=\"task.refresh\" onPress={refresh} />",
+            "    </>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-async-by-reference-config": {
+    "expect": [
+      "FAIL src/features/tasks/tasks-refresh.tsx:7 [async-by-reference] refreshTasks returns a promise and goes by reference into onRefresh (a JSX prop), which ignores what it returns, so a rejection is lost",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "rn-skills.config.json",
+          "lines": [
+            "{",
+            "  \"asyncSafety\": {",
+            "    \"promiseFunctions\": [",
+            "      \"refreshTasks\"",
+            "    ]",
+            "  }",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/tasks-refresh.tsx",
+          "lines": [
+            "// src/features/tasks/tasks-refresh.tsx",
+            "import { RefreshControl } from 'react-native';",
+            "",
+            "import { refreshTasks } from '@/stores/tasks/tasks-store';",
+            "",
+            "export function TasksRefresh(): React.JSX.Element {",
+            "  return <RefreshControl refreshing={false} onRefresh={refreshTasks} />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-effect-stale-result": {
+    "expect": [
+      "FAIL src/features/tasks/use-task-list-model.ts:19 [effect-stale-result] the useEffect sets state, dispatches or navigates after async work, and its cleanup neither aborts that work nor marks it stale",
+      "FAIL src/features/tasks/use-task-list-model.ts:22 [effect-stale-result] the useEffect sets state, dispatches or navigates after async work, and its cleanup neither aborts that work nor marks it stale",
+      "FAIL src/features/tasks/use-task-list-model.ts:33 [effect-stale-result] the useEffect cleanup sets isCurrent, which the async continuation does not check before every write (each await needs its own check), so a late result still writes",
+      "FAIL src/features/tasks/use-task-list-model.ts:45 [effect-stale-result] the useEffect sets state, dispatches or navigates after async work, and its cleanup neither aborts that work nor marks it stale",
+      "FAIL src/features/tasks/use-task-list-model.ts:48 [effect-stale-result] the useEffect sets state, dispatches or navigates after async work, and its cleanup neither aborts that work nor marks it stale",
+      "FAIL src/features/tasks/use-task-list-model.ts:56 [effect-stale-result] the useEffect cleanup aborts a controller whose signal the async continuation does not check before every write (each await needs its own check), so a late result still writes",
+      "FAIL src/features/tasks/use-task-selection.ts:12 [effect-stale-result] the useEffect sets state, dispatches or navigates after async work, and its cleanup neither aborts that work nor marks it stale",
+      "FAIL src/features/tasks/use-task-selection.ts:20 [effect-stale-result] the useEffect sets state, dispatches or navigates after async work, and its cleanup neither aborts that work nor marks it stale",
+      "FAIL src/features/tasks/use-task-selection.ts:28 [effect-stale-result] the useEffect sets state, dispatches or navigates after async work, and its cleanup neither aborts that work nor marks it stale",
+      "FAIL src/features/tasks/use-task-legacy-model.ts:18 [effect-stale-result] the useEffect cleanup aborts a controller whose signal the async continuation does not check before every write (each await needs its own check), so a late result still writes",
+      "FAIL src/features/tasks/use-task-legacy-model.ts:33 [effect-stale-result] the useEffect sets state, dispatches or navigates after async work, and its cleanup neither aborts that work nor marks it stale",
+      "FAIL src/features/tasks/use-task-legacy-model.ts:38 [effect-stale-result] setRelated(await ...) in the useEffect writes the moment the await resolves, so no guard can run between the answer and the write",
+      "FAIL src/features/tasks/use-task-legacy-model.ts:47 [effect-stale-result] the useEffect cleanup sets isMounted.current, a mounted ref, which covers unmount only; a dependency change (or a refocus) still lets the older answer write",
+      "FAIL src/features/tasks/use-task-legacy-model.ts:59 [effect-stale-result] the useEffect sets state, dispatches or navigates after async work, and its cleanup neither aborts that work nor marks it stale",
+      "FAIL src/features/notes/use-note-title.ts:17 [effect-stale-result] the useEffect sets state, dispatches or navigates after async work, and its cleanup neither aborts that work nor marks it stale",
+      "FAIL src/features/notes/use-note-title.ts:32 [effect-stale-result] the useEffect sets state, dispatches or navigates after async work, and its cleanup neither aborts that work nor marks it stale",
+      "RESULT: FAIL (16 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-list-model.ts",
+          "lines": [
+            "// src/features/tasks/use-task-list-model.ts",
+            "import { useRouter } from 'expo-router';",
+            "import { useEffect, useState } from 'react';",
+            "import { AppState } from 'react-native';",
+            "",
+            "type Task = { readonly id: string; readonly title: string };",
+            "type Source = {",
+            "  readonly list: (listId: string, signal?: AbortSignal) => Promise<readonly Task[]>;",
+            "  readonly count: () => Promise<number>;",
+            "};",
+            "",
+            "export function useTaskListModel(listId: string, source: Source): readonly Task[] {",
+            "  const router = useRouter();",
+            "  const [tasks, setTasks] = useState<readonly Task[]>([]);",
+            "  const [count, setCount] = useState(0);",
+            "  const load = async (): Promise<void> => {",
+            "    setCount(await source.count());",
+            "  };",
+            "  useEffect(() => {",
+            "    source.list(listId).then(setTasks).catch(() => undefined);",
+            "  }, [listId, source]);",
+            "  useEffect(() => {",
+            "    const subscription = AppState.addEventListener('change', () => undefined);",
+            "    const run = async (): Promise<void> => {",
+            "      const next = await source.list(listId);",
+            "      setTasks(next);",
+            "    };",
+            "    run().catch(() => undefined);",
+            "    return () => {",
+            "      subscription.remove();",
+            "    };",
+            "  }, [listId, source]);",
+            "  useEffect(() => {",
+            "    let isCurrent = true;",
+            "    source",
+            "      .count()",
+            "      .then((value) => {",
+            "        setCount(value);",
+            "      })",
+            "      .catch(() => undefined);",
+            "    return () => {",
+            "      isCurrent = false;",
+            "    };",
+            "  }, [source]);",
+            "  useEffect(() => {",
+            "    load().catch(() => undefined);",
+            "  }, [listId]);",
+            "  useEffect(() => {",
+            "    source",
+            "      .count()",
+            "      .then((value) => {",
+            "        if (value === 0) router.replace('/');",
+            "      })",
+            "      .catch(() => undefined);",
+            "  }, [router, source]);",
+            "  useEffect(() => {",
+            "    const controller = new AbortController();",
+            "    source",
+            "      .list(listId, controller.signal)",
+            "      .then((next) => {",
+            "        setTasks(next);",
+            "      })",
+            "      .catch(() => undefined);",
+            "    return () => {",
+            "      controller.abort();",
+            "    };",
+            "  }, [listId, source]);",
+            "  return count > 0 ? tasks : [];",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-selection.ts",
+          "lines": [
+            "// src/features/tasks/use-task-selection.ts",
+            "import { useEffect } from 'react';",
+            "import { useShallow } from 'zustand/react/shallow';",
+            "",
+            "import { useTaskStore } from '@/stores/tasks/task-store';",
+            "",
+            "type Repo = { readonly load: (id: string) => Promise<string> };",
+            "",
+            "export function useTaskSelection(id: string, repo: Repo): void {",
+            "  const { select } = useTaskStore(useShallow((state) => ({ select: state.select })));",
+            "  const clear = useTaskStore((state) => state.clear);",
+            "  useEffect(() => {",
+            "    repo",
+            "      .load(id)",
+            "      .then((value) => {",
+            "        useTaskStore.getState().select(value);",
+            "      })",
+            "      .catch(() => undefined);",
+            "  }, [id, repo]);",
+            "  useEffect(() => {",
+            "    repo",
+            "      .load(id)",
+            "      .then((value) => {",
+            "        select(value);",
+            "      })",
+            "      .catch(() => undefined);",
+            "  }, [id, repo, select]);",
+            "  useEffect(() => {",
+            "    const run = async (): Promise<void> => {",
+            "      await repo.load(id);",
+            "      clear();",
+            "    };",
+            "    run().catch(() => undefined);",
+            "  }, [id, repo, clear]);",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-legacy-model.ts",
+          "lines": [
+            "// src/features/tasks/use-task-legacy-model.ts",
+            "// Shapes an existing app brings along: one abort check for two awaits, a write whose argument awaits,",
+            "// a mounted ref that covers unmount only, and an effect that runs a useCallback(async) loader.",
+            "import { useCallback, useEffect, useRef, useState } from 'react';",
+            "",
+            "type Repo = {",
+            "  readonly get: (id: string, signal?: AbortSignal) => Promise<string>;",
+            "  readonly related: (id: string, signal?: AbortSignal) => Promise<number>;",
+            "};",
+            "",
+            "export function useTaskLegacyModel(id: string, repo: Repo): string {",
+            "  const [title, setTitle] = useState('');",
+            "  const [related, setRelated] = useState(0);",
+            "  const isMounted = useRef(true);",
+            "  const reload = useCallback(async () => {",
+            "    setTitle(await repo.get(id));",
+            "  }, [id, repo]);",
+            "  useEffect(() => {",
+            "    const controller = new AbortController();",
+            "    const { signal } = controller;",
+            "    const run = async (): Promise<void> => {",
+            "      const value = await repo.get(id, signal);",
+            "      if (signal.aborted) return;",
+            "      setTitle(value);",
+            "      const count = await repo.related(id, signal);",
+            "      setRelated(count);",
+            "    };",
+            "    run().catch(() => undefined);",
+            "    return () => {",
+            "      controller.abort();",
+            "    };",
+            "  }, [id, repo]);",
+            "  useEffect(() => {",
+            "    void (async () => {",
+            "      setTitle(await repo.get(id));",
+            "    })();",
+            "  }, [id, repo]);",
+            "  useEffect(() => {",
+            "    const controller = new AbortController();",
+            "    void (async () => {",
+            "      setRelated(await repo.related(id, controller.signal));",
+            "    })();",
+            "    return () => {",
+            "      controller.abort();",
+            "    };",
+            "  }, [id, repo]);",
+            "  useEffect(() => {",
+            "    isMounted.current = true;",
+            "    repo",
+            "      .get(id)",
+            "      .then((value) => {",
+            "        if (isMounted.current) setTitle(value);",
+            "      })",
+            "      .catch(() => undefined);",
+            "    return () => {",
+            "      isMounted.current = false;",
+            "    };",
+            "  }, [id, repo]);",
+            "  useEffect(() => {",
+            "    reload().catch(() => undefined);",
+            "  }, [reload]);",
+            "  return `${title}${String(related)}`;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/notes/use-note-title.ts",
+          "lines": [
+            "// src/features/notes/use-note-title.ts",
+            "// Planted: a guard-clause return followed by a write with no cleanup at all, and an effect that",
+            "// calls a latest-wins-looking action whose holder the file never cancels.",
+            "import { useEffect, useState } from 'react';",
+            "",
+            "import { createLatestRequest } from '@/core/async/latest-request';",
+            "",
+            "type NoteRepo = {",
+            "  readonly title: (id: string, signal?: AbortSignal) => Promise<string>;",
+            "  readonly search: (text: string, signal: AbortSignal) => Promise<readonly string[]>;",
+            "};",
+            "",
+            "export function useNoteTitle(repo: NoteRepo, noteId: string | null, initialText: string): string {",
+            "  const [title, setTitle] = useState('');",
+            "  const [hits, setHits] = useState<readonly string[]>([]);",
+            "  const [latest] = useState(createLatestRequest);",
+            "  useEffect(() => {",
+            "    if (noteId === null) return;",
+            "    repo",
+            "      .title(noteId)",
+            "      .then((value) => {",
+            "        setTitle(value);",
+            "      })",
+            "      .catch(() => undefined);",
+            "  }, [repo, noteId]);",
+            "  const search = async (text: string): Promise<void> => {",
+            "    const signal = latest.start();",
+            "    const next = await repo.search(text, signal);",
+            "    if (signal.aborted) return;",
+            "    setHits(next);",
+            "  };",
+            "  useEffect(() => {",
+            "    search(initialText).catch(() => undefined);",
+            "  }, [initialText]);",
+            "  return `${title}${String(hits.length)}`;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-effect-watch-async": {
+    "expect": [
+      "FAIL src/services/location/use-current-place.ts:10 [effect-stale-result] the useEffect awaits a watch*Async() subscription; if its cleanup runs first, the subscription arrives afterwards and is never removed",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/location/use-current-place.ts",
+          "lines": [
+            "// src/services/location/use-current-place.ts",
+            "import { useEffect } from 'react';",
+            "",
+            "type Subscription = { readonly remove: () => void };",
+            "type Location = {",
+            "  readonly watchPositionAsync: (onPosition: (where: string) => void) => Promise<Subscription>;",
+            "};",
+            "",
+            "export function useCurrentPlace(location: Location, onPlace: (where: string) => void): void {",
+            "  useEffect(() => {",
+            "    let subscription: Subscription | undefined;",
+            "    location",
+            "      .watchPositionAsync(onPlace)",
+            "      .then((created) => {",
+            "        subscription = created;",
+            "      })",
+            "      .catch(() => undefined);",
+            "    return () => {",
+            "      subscription?.remove();",
+            "    };",
+            "  }, [location, onPlace]);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-focus-scoped-work": {
+    "expect": [
+      "FAIL src/features/tasks/use-tasks-poll-model.ts:6 [focus-scoped-work] useEffect in a screen runs an interval; stack and tab screens stay mounted when another screen covers them, so it keeps running unseen",
+      "FAIL src/features/tasks/use-tasks-poll-model.ts:12 [focus-scoped-work] useEffect in a screen runs a sensor listener; stack and tab screens stay mounted when another screen covers them, so it keeps running unseen",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-tasks-poll-model.ts",
+          "lines": [
+            "// src/features/tasks/use-tasks-poll-model.ts",
+            "import { Accelerometer } from 'expo-sensors';",
+            "import { useEffect } from 'react';",
+            "",
+            "export function useTasksPollModel(refresh: () => void, onShake: () => void): void {",
+            "  useEffect(() => {",
+            "    const id = setInterval(refresh, 60_000);",
+            "    return () => {",
+            "      clearInterval(id);",
+            "    };",
+            "  }, [refresh]);",
+            "  useEffect(() => {",
+            "    const subscription = Accelerometer.addListener(onShake);",
+            "    return () => {",
+            "      subscription.remove();",
+            "    };",
+            "  }, [onShake]);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-shared-emitter": {
+    "expect": [
+      "FAIL src/features/tasks/use-keyboard-reset.ts:10 [subscription-released] Keyboard.removeAllListeners() also removes the listeners other modules registered",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-keyboard-reset.ts",
+          "lines": [
+            "// src/features/tasks/use-keyboard-reset.ts",
+            "import { useEffect } from 'react';",
+            "import { Keyboard } from 'react-native';",
+            "",
+            "export function useKeyboardReset(onShow: () => void): void {",
+            "  useEffect(() => {",
+            "    const subscription = Keyboard.addListener('keyboardDidShow', onShow);",
+            "    return () => {",
+            "      subscription.remove();",
+            "      Keyboard.removeAllListeners('keyboardDidShow');",
+            "    };",
+            "  }, [onShow]);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-subscription-dropped": {
+    "expect": [
+      "FAIL src/features/tasks/use-reminder-listeners.ts:8 [subscription-released] the handle addEventListener() returns is dropped, so nothing can ever remove this listener",
+      "FAIL src/features/tasks/use-reminder-listeners.ts:9 [subscription-released] the handle addNotificationReceivedListener() returns is dropped, so nothing can ever remove this listener",
+      "FAIL src/features/tasks/use-reminder-listeners.ts:10 [subscription-released] the handle addEventListener() returns is dropped, so nothing can ever remove this listener",
+      "RESULT: FAIL (3 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-reminder-listeners.ts",
+          "lines": [
+            "// src/features/tasks/use-reminder-listeners.ts",
+            "import { addNotificationReceivedListener } from 'expo-notifications';",
+            "import { useEffect } from 'react';",
+            "import { AppState } from 'react-native';",
+            "",
+            "export function useReminderListeners(onChange: () => void, signal: AbortSignal): void {",
+            "  useEffect(() => {",
+            "    AppState.addEventListener('change', onChange);",
+            "    addNotificationReceivedListener(onChange);",
+            "    signal.addEventListener('abort', onChange);",
+            "    return () => {",
+            "      onChange();",
+            "    };",
+            "  }, [onChange, signal]);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-subscription-never-released": {
+    "expect": [
+      "FAIL src/services/keyboard/watch-keyboard.ts:8 [subscription-released] hidden holds the addListener() handle but is never removed, called, returned or handed over",
+      "FAIL src/services/keyboard/watch-keyboard.ts:9 [subscription-released] unsubscribe holds the subscribe() handle but is never removed, called, returned or handed over",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/keyboard/watch-keyboard.ts",
+          "lines": [
+            "// src/services/keyboard/watch-keyboard.ts",
+            "import { Keyboard } from 'react-native';",
+            "",
+            "type Store = { readonly subscribe: (listener: () => void) => () => void };",
+            "",
+            "export function watchKeyboard(store: Store, onChange: () => void): () => void {",
+            "  const shown = Keyboard.addListener('keyboardDidShow', onChange);",
+            "  const hidden = Keyboard.addListener('keyboardDidHide', onChange);",
+            "  const unsubscribe = store.subscribe(onChange);",
+            "  return () => {",
+            "    shown.remove();",
+            "  };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-timer-dropped": {
+    "expect": [
+      "FAIL src/services/sync/sync-loop.ts:5 [timer-cleared] the id setTimeout() returns is dropped, so the timer cannot be cleared and fires after its owner is gone",
+      "FAIL src/services/sync/sync-loop.ts:11 [timer-cleared] the id setTimeout() returns is dropped, so the timer cannot be cleared and fires after its owner is gone",
+      "FAIL src/services/sync/sync-loop.ts:18 [timer-cleared] the id requestAnimationFrame() returns is dropped, so the timer cannot be cleared and fires after its owner is gone",
+      "RESULT: FAIL (3 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/sync/sync-loop.ts",
+          "lines": [
+            "// src/services/sync/sync-loop.ts",
+            "export async function pushWithRetry(push: () => Promise<boolean>): Promise<void> {",
+            "  for (let attempt = 0; attempt < 3; attempt += 1) {",
+            "    if (await push()) return;",
+            "    await new Promise((resolve) => setTimeout(resolve, 1000 * (attempt + 1)));",
+            "  }",
+            "}",
+            "",
+            "export function flashSaved(show: (isOn: boolean) => void): void {",
+            "  show(true);",
+            "  setTimeout(() => {",
+            "    show(false);",
+            "  }, 1500);",
+            "}",
+            "",
+            "export function animate(step: () => boolean): void {",
+            "  const tick = (): void => {",
+            "    if (step()) requestAnimationFrame(tick);",
+            "  };",
+            "  tick();",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-timer-never-cleared": {
+    "expect": [
+      "FAIL src/services/sync/sync-poller.ts:7 [timer-cleared] interval holds a setInterval() id that is never passed to clearInterval()",
+      "FAIL src/services/sync/sync-poller.ts:8 [timer-cleared] hide.current holds a setTimeout() id that is never passed to clearTimeout()",
+      "FAIL src/services/sync/sync-poller.ts:10 [timer-cleared] setTimeout() ids are collected but this file never calls clearTimeout()",
+      "RESULT: FAIL (3 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/sync/sync-poller.ts",
+          "lines": [
+            "// src/services/sync/sync-poller.ts",
+            "type Ref<T> = { current: T };",
+            "",
+            "export type SyncPoller = { readonly stop: () => void };",
+            "",
+            "export function startSyncPoller(poll: () => void, hide: Ref<ReturnType<typeof setTimeout> | null>): SyncPoller {",
+            "  const interval = setInterval(poll, 30_000);",
+            "  hide.current = setTimeout(poll, 5000);",
+            "  const pending: ReturnType<typeof setTimeout>[] = [];",
+            "  pending.push(setTimeout(poll, 100));",
+            "  return {",
+            "    stop: () => {",
+            "      pending.length = 0;",
+            "      poll();",
+            "    },",
+            "  };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-void-callback-type": {
+    "expect": [
+      "FAIL src/ui/task-row.tsx:6 [void-callback-type] onToggle is typed to return a promise, so an async function passes into it silently",
+      "FAIL src/ui/task-row.tsx:7 [void-callback-type] onLongPress is typed to return unknown, so an async function passes into it silently",
+      "FAIL src/ui/task-row.tsx:11 [void-callback-type] handleDelete is typed to return a promise, so an async function passes into it silently",
+      "RESULT: FAIL (3 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/task-row.tsx",
+          "lines": [
+            "// src/ui/task-row.tsx",
+            "import type { GestureResponderEvent } from 'react-native';",
+            "",
+            "export type TaskRowProps = {",
+            "  readonly title: string;",
+            "  readonly onToggle: () => Promise<void>;",
+            "  readonly onLongPress?: (event: GestureResponderEvent) => unknown;",
+            "};",
+            "",
+            "export type TaskRowActions = {",
+            "  handleDelete: (taskId: string) => PromiseLike<boolean>;",
+            "};"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-workspace-app": {
+    "expect": [
+      "FAIL apps/mobile/src/features/sync/use-sync-banner-model.ts:7 [timer-cleared] the id setTimeout() returns is dropped",
+      "check-async-safety: 1 source files checked, 1 problems",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "args": "{dir} --src-dir apps/mobile/src",
+    "ops": [
+      {
+        "write": {
+          "file": "package.json",
+          "json": { "name": "tasks-monorepo", "private": true, "workspaces": ["apps/*"] }
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/package.json",
+          "json": {
+            "name": "@acme/mobile",
+            "private": true,
+            "main": "expo-router/entry",
+            "dependencies": {
+              "expo": "~57.0.26",
+              "expo-router": "~57.0.24",
+              "react": "19.2.3",
+              "react-native": "0.86.3"
+            }
+          }
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/src/features/sync/use-sync-banner-model.ts",
+          "lines": [
+            "// apps/mobile/src/features/sync/use-sync-banner-model.ts",
+            "import { useEffect, useState } from 'react';",
+            "",
+            "export function useSyncBannerModel(): boolean {",
+            "  const [isShown, setIsShown] = useState(true);",
+            "  useEffect(() => {",
+            "    setTimeout(() => {",
+            "      setIsShown(false);",
+            "    }, 4000);",
+            "  }, []);",
+            "  return isShown;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "error-bad-config": {
+    "expect": ["ERROR [bad-input] \"asyncSafety.promiseFunctions\" is not a list of names", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "write": { "file": "rn-skills.config.json", "json": { "asyncSafety": { "promiseFunctions": "refreshTasks" } } }
+      }
+    ]
+  },
+  "error-no-package-json": {
+    "expect": ["ERROR [bad-input] no package.json in", "RESULT: FAIL (1 problems)"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "error-no-source-folder": {
+    "expect": ["ERROR [bad-input] nothing to check: app-src/ does not exist", "RESULT: FAIL (1 problems)"],
+    "args": "{dir} --src-dir app-src"
+  },
+  "pass-app-lifetime": {
+    "expect": ["source files checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/connectivity/network-watch-adapter.ts",
+          "lines": [
+            "// src/services/connectivity/network-watch-adapter.ts",
+            "import { addNetworkStateListener } from 'expo-network';",
+            "",
+            "export function createNetworkWatchAdapter(onChange: (isOnline: boolean) => void): void {",
+            "  // app-lifetime: one native listener for the app's whole life; the native monitor cannot restart",
+            "  addNetworkStateListener((state) => {",
+            "    onChange(state.isConnected === true);",
+            "  });",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-installed-skills-silent": {
+    "expect": ["check-async-safety:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/demo/src/leak.ts",
+          "lines": [
+            "// planted: a dropped subscription and a dropped timer, which check-async-safety must not see in a skill folder",
+            "import { AppState } from 'react-native';",
+            "",
+            "export function leak(onChange: () => void): void {",
+            "  AppState.addEventListener('change', onChange);",
+            "  setTimeout(onChange, 1000);",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/demo/src/leak.ts",
+          "lines": [
+            "// planted: a dropped subscription and a dropped timer, which check-async-safety must not see in a skill folder",
+            "import { AppState } from 'react-native';",
+            "",
+            "export function leak(onChange: () => void): void {",
+            "  AppState.addEventListener('change', onChange);",
+            "  setTimeout(onChange, 1000);",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/kit/leak.ts",
+          "lines": [
+            "// planted: a dropped subscription and a dropped timer, which check-async-safety must not see in a skill folder",
+            "import { AppState } from 'react-native';",
+            "",
+            "export function leak(onChange: () => void): void {",
+            "  AppState.addEventListener('change', onChange);",
+            "  setTimeout(onChange, 1000);",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/kit/SKILL.md",
+          "lines": [
+            "---",
+            "name: kit",
+            "description: Planted skill folder inside src/; check-async-safety prunes it.",
+            "---",
+            "",
+            "# Kit"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-no-router": {
+    "expect": [
+      "focus-scoped-work not applied: neither expo-router nor @react-navigation/native is a dependency",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-router"], "delete": true } },
+      {
+        "write": {
+          "file": "src/features/tasks/use-tasks-clock-model.ts",
+          "lines": [
+            "// src/features/tasks/use-tasks-clock-model.ts",
+            "import { useEffect } from 'react';",
+            "",
+            "export function useTasksClockModel(tick: () => void): void {",
+            "  useEffect(() => {",
+            "    const id = setInterval(tick, 1000);",
+            "    return () => {",
+            "      clearInterval(id);",
+            "    };",
+            "  }, [tick]);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-not-react-native": {
+    "expect": ["NOT APPLICABLE: react-native is not in package.json", "RESULT: PASS"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "react-native"], "delete": true } }]
+  },
+  "pass-patterns": {
+    "expect": ["source files checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-tasks-patterns.ts",
+          "lines": [
+            "// src/features/tasks/use-tasks-patterns.ts",
+            "// Shapes that must stay silent: every handle kept and released, every timer cleared, every effect",
+            "// that writes after async work guarded, focus-scoped intervals.",
+            "import { useFocusEffect, useNavigation } from 'expo-router';",
+            "import { useEffect, useState } from 'react';",
+            "import { AppState, BackHandler, Keyboard } from 'react-native';",
+            "",
+            "type Source = { readonly count: (signal?: AbortSignal) => Promise<number> };",
+            "type Store = { readonly subscribe: (listener: () => void) => () => void };",
+            "",
+            "function watchTasks(store: Store, onChange: () => void): () => void {",
+            "  return store.subscribe(onChange);",
+            "}",
+            "",
+            "export function scheduleReminder(fire: () => void, delayMs: number): ReturnType<typeof setTimeout> {",
+            "  return setTimeout(fire, delayMs);",
+            "}",
+            "",
+            "export function useTasksPatterns(source: Source, store: Store, onBack: () => boolean): number {",
+            "  const navigation = useNavigation();",
+            "  const [count, setCount] = useState(0);",
+            "  useEffect(() => watchTasks(store, () => undefined), [store]);",
+            "  useEffect(() => {",
+            "    let isCurrent = true;",
+            "    source",
+            "      .count()",
+            "      .then((value) => {",
+            "        if (isCurrent) setCount(value);",
+            "      })",
+            "      .catch(() => undefined);",
+            "    return () => {",
+            "      isCurrent = false;",
+            "    };",
+            "  }, [source]);",
+            "  useEffect(() => {",
+            "    const controller = new AbortController();",
+            "    source",
+            "      .count(controller.signal)",
+            "      .then((value) => {",
+            "        if (!controller.signal.aborted) setCount(value);",
+            "      })",
+            "      .catch(() => undefined);",
+            "    return () => {",
+            "      controller.abort();",
+            "    };",
+            "  }, [source]);",
+            "  useEffect(() => {",
+            "    const subscriptions = [",
+            "      Keyboard.addListener('keyboardDidShow', () => undefined),",
+            "      Keyboard.addListener('keyboardDidHide', () => undefined),",
+            "    ];",
+            "    const back = BackHandler.addEventListener('hardwareBackPress', onBack);",
+            "    return () => {",
+            "      for (const subscription of subscriptions) subscription.remove();",
+            "      back.remove();",
+            "    };",
+            "  }, [onBack]);",
+            "  useEffect(() => navigation.addListener('focus', () => undefined), [navigation]);",
+            "  useEffect(() => {",
+            "    const subscription = AppState.addEventListener('change', (next) => {",
+            "      setCount(next === 'active' ? 1 : 0);",
+            "    });",
+            "    source.count().catch(() => undefined);",
+            "    return () => {",
+            "      subscription.remove();",
+            "    };",
+            "  }, [source]);",
+            "  useFocusEffect(() => {",
+            "    const id = setInterval(() => undefined, 30_000);",
+            "    const frames: number[] = [];",
+            "    frames.push(requestAnimationFrame(() => undefined));",
+            "    return () => {",
+            "      clearInterval(id);",
+            "      for (const frame of frames) cancelAnimationFrame(frame);",
+            "    };",
+            "  });",
+            "  useEffect(() => {",
+            "    const subscription = AppState.addEventListener('change', () => undefined);",
+            "    const onAbort = (): void => undefined;",
+            "    const controller = new AbortController();",
+            "    controller.signal.addEventListener('abort', onAbort, { once: true });",
+            "    controller.signal.addEventListener('timeout', onAbort);",
+            "    return () => {",
+            "      controller.signal.removeEventListener('timeout', onAbort);",
+            "      subscription.remove();",
+            "      controller.abort();",
+            "    };",
+            "  }, []);",
+            "  return count;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-mutations.ts",
+          "lines": [
+            "// src/features/tasks/use-task-mutations.ts",
+            "// TanStack Query awaits what a mutation's callbacks return, so async functions by reference stay silent",
+            "// there; a Zustand action after an abort-checked await is guarded.",
+            "import { MutationCache, mutationOptions } from '@tanstack/react-query';",
+            "import { useEffect } from 'react';",
+            "",
+            "import { useTaskStore } from '@/stores/tasks/task-store';",
+            "",
+            "async function invalidateAll(): Promise<void> {",
+            "  await Promise.resolve();",
+            "}",
+            "",
+            "async function archive(taskId: string): Promise<void> {",
+            "  await Promise.resolve(taskId);",
+            "}",
+            "",
+            "export const mutationCache = new MutationCache({ onSuccess: invalidateAll });",
+            "",
+            "export const archiveOptions = mutationOptions({",
+            "  mutationFn: archive,",
+            "  onMutate: invalidateAll,",
+            "  onSettled: invalidateAll,",
+            "});",
+            "",
+            "export function useSelectedTask(load: (signal: AbortSignal) => Promise<string>): void {",
+            "  useEffect(() => {",
+            "    const controller = new AbortController();",
+            "    load(controller.signal)",
+            "      .then((value) => {",
+            "        if (!controller.signal.aborted) useTaskStore.getState().select(value);",
+            "      })",
+            "      .catch(() => undefined);",
+            "    return () => {",
+            "      controller.abort();",
+            "    };",
+            "  }, [load]);",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-guards.ts",
+          "lines": [
+            "// src/features/tasks/use-task-guards.ts",
+            "// Must stay silent: a promise RETURNED by a mutation callback or a notification handler (values, not",
+            "// callback types), an abort check after every await, and a mounted ref in a mount-only effect.",
+            "import { useMutation, useQueryClient } from '@tanstack/react-query';",
+            "import * as Notifications from 'expo-notifications';",
+            "import { useEffect, useRef, useState } from 'react';",
+            "",
+            "type Repo = {",
+            "  readonly get: (id: string, signal?: AbortSignal) => Promise<string>;",
+            "  readonly related: (id: string, signal?: AbortSignal) => Promise<number>;",
+            "  readonly archive: (id: string) => Promise<void>;",
+            "};",
+            "",
+            "Notifications.setNotificationHandler({",
+            "  handleNotification: () =>",
+            "    Promise.resolve({ shouldPlaySound: false, shouldSetBadge: false, shouldShowBanner: true, shouldShowList: true }),",
+            "});",
+            "",
+            "export function useArchive(repo: Repo): (id: string) => void {",
+            "  const queryClient = useQueryClient();",
+            "  const mutation = useMutation({",
+            "    mutationFn: repo.archive,",
+            "    onSuccess: () =>",
+            "      Promise.all([",
+            "        queryClient.invalidateQueries({ queryKey: ['tasks'] }),",
+            "        queryClient.invalidateQueries({ queryKey: ['lists'] }),",
+            "      ]),",
+            "  });",
+            "  return (id) => {",
+            "    mutation.mutate(id);",
+            "  };",
+            "}",
+            "",
+            "export function useTaskGuards(id: string, repo: Repo): string {",
+            "  const [title, setTitle] = useState('');",
+            "  const [related, setRelated] = useState(0);",
+            "  const isMounted = useRef(true);",
+            "  useEffect(() => {",
+            "    const controller = new AbortController();",
+            "    const { signal } = controller;",
+            "    const run = async (): Promise<void> => {",
+            "      const value = await repo.get(id, signal);",
+            "      if (signal.aborted) return;",
+            "      setTitle(value);",
+            "      const count = await repo.related(id, signal);",
+            "      if (signal.aborted) return;",
+            "      setRelated(count);",
+            "    };",
+            "    run().catch(() => undefined);",
+            "    return () => {",
+            "      controller.abort();",
+            "    };",
+            "  }, [id, repo]);",
+            "  useEffect(() => {",
+            "    isMounted.current = true;",
+            "    repo",
+            "      .get('inbox')",
+            "      .then((value) => {",
+            "        if (isMounted.current) setTitle(value);",
+            "      })",
+            "      .catch(() => undefined);",
+            "    return () => {",
+            "      isMounted.current = false;",
+            "    };",
+            "  }, []);",
+            "  return `${title}${String(related)}`;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/notes/use-note-model.ts",
+          "lines": [
+            "// src/features/notes/use-note-model.ts",
+            "// Must stay silent: a braceless guard-clause return before an abortable effect (useEffect and",
+            "// useFocusEffect), and an effect that only starts a latest-wins action the file cancels on unmount.",
+            "import { useFocusEffect } from 'expo-router';",
+            "import { useEffect, useState } from 'react';",
+            "",
+            "import { createLatestRequest } from '@/core/async/latest-request';",
+            "",
+            "type NoteRepo = {",
+            "  readonly title: (id: string, signal: AbortSignal) => Promise<string>;",
+            "  readonly search: (text: string, signal: AbortSignal) => Promise<readonly string[]>;",
+            "};",
+            "",
+            "export type NoteModel = { readonly title: string; readonly hits: readonly string[] };",
+            "",
+            "export function useNoteModel(repo: NoteRepo, noteId: string | null, initialText: string): NoteModel {",
+            "  const [title, setTitle] = useState('');",
+            "  const [hits, setHits] = useState<readonly string[]>([]);",
+            "  const [latest] = useState(createLatestRequest);",
+            "  useEffect(",
+            "    () => () => {",
+            "      latest.cancel();",
+            "    },",
+            "    [latest],",
+            "  );",
+            "  useEffect(() => {",
+            "    if (noteId === null) return;",
+            "    const controller = new AbortController();",
+            "    repo",
+            "      .title(noteId, controller.signal)",
+            "      .then((value) => {",
+            "        if (controller.signal.aborted) return;",
+            "        setTitle(value);",
+            "      })",
+            "      .catch(() => undefined);",
+            "    return () => {",
+            "      controller.abort();",
+            "    };",
+            "  }, [repo, noteId]);",
+            "  useFocusEffect(() => {",
+            "    if (noteId === null) return undefined;",
+            "    const controller = new AbortController();",
+            "    const refresh = async (): Promise<void> => {",
+            "      const value = await repo.title(noteId, controller.signal);",
+            "      if (controller.signal.aborted) return;",
+            "      setTitle(value);",
+            "    };",
+            "    refresh().catch(() => undefined);",
+            "    return () => {",
+            "      controller.abort();",
+            "    };",
+            "  });",
+            "  const search = async (text: string): Promise<void> => {",
+            "    const signal = latest.start();",
+            "    const next = await repo.search(text, signal);",
+            "    if (signal.aborted) return;",
+            "    setHits(next);",
+            "  };",
+            "  useEffect(() => {",
+            "    search(initialText).catch(() => undefined);",
+            "  }, [initialText]);",
+            "  return { title, hits };",
+            "}"
+          ]
+        }
+      }
+    ]
+  }
+}

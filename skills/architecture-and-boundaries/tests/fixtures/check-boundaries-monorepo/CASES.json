@@ -1,0 +1,73 @@
+{
+  "bad-workspace-direction": {
+    "expect": [
+      "apps/tablet/src/features/lists/lists-screen.tsx:1 [app-to-app] app apps/tablet imports app apps/mobile (apps/mobile/src/features/tasks/task-title.ts)",
+      "packages/ui/src/button.tsx:1 [package-direction] package packages/ui imports the app file apps/mobile/src/features/tasks/task-title.ts",
+      "packages/core/src/money/price-badge.ts:1 [core-pure] imports react",
+      "packages/core/src/money/price-badge.ts:2 [core-pure] imports packages/ui/src/button.tsx",
+      "apps/mobile/src/features/tasks/tasks-screen.tsx:1 [no-tooling-import] imports packages/tooling/src/report/write-report.ts",
+      "packages/ui/src/haptic-button.tsx:1 [vendor-sdk] imports the vendor SDK expo-haptics outside its adapter",
+      "apps/mobile/src/app/index.tsx:1 [route-thin] the route imports apps/mobile/src/stores/tasks-store.ts",
+      "check-boundaries: 15 TypeScript and JavaScript files checked, 7 problems"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "apps/mobile/src/features/tasks/task-title.ts",
+          "lines": ["export const taskTitle = (title: string): string => title.trim();"]
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/src/stores/tasks-store.ts",
+          "lines": ["export const tasksStore = { tasks: [] };"]
+        }
+      },
+      {
+        "write": {
+          "file": "packages/core/src/money/price-badge.ts",
+          "lines": [
+            "import { useState } from 'react';",
+            "import { Button } from '@acme/ui/button';",
+            "",
+            "export const priceBadge = { useState, Button };"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "packages/ui/src/haptic-button.tsx",
+          "lines": ["import { impactAsync } from 'expo-haptics';", "", "export const pressFeedback = impactAsync;"]
+        }
+      },
+      {
+        "replace": {
+          "file": "apps/tablet/src/features/lists/lists-screen.tsx",
+          "find": "import { Button } from '@acme/ui/button';\n",
+          "with": "import { taskTitle } from '@acme/mobile/src/features/tasks/task-title';\nimport { Button } from '@acme/ui/button';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "packages/ui/src/button.tsx",
+          "find": "import { Pressable, Text } from 'react-native';\n",
+          "with": "import { taskTitle } from '@acme/mobile/src/features/tasks/task-title';\nimport { Pressable, Text } from 'react-native';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "apps/mobile/src/features/tasks/tasks-screen.tsx",
+          "find": "import { formatPrice } from '@acme/core/money/format-price';\n",
+          "with": "import { writeReport } from '@acme/tooling/report/write-report';\nimport { formatPrice } from '@acme/core/money/format-price';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "apps/mobile/src/app/index.tsx",
+          "find": "import { TasksScreen } from '@/features/tasks/tasks-screen';\n",
+          "with": "import { tasksStore } from '@/stores/tasks-store';\nimport { TasksScreen } from '@/features/tasks/tasks-screen';\n"
+        }
+      }
+    ]
+  }
+}

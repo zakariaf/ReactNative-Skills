@@ -1,0 +1,25 @@
+{
+ "js": {
+  "react-native": {
+   "categories": [
+    "webSocket",
+    "remoteUrl"
+   ],
+   "reason": "RN core WebSocket module and documentation links"
+  },
+  "whatwg-fetch": {
+   "categories": [
+    "fetch",
+    "xhr"
+   ],
+   "reason": "the fetch polyfill React Native installs"
+  },
+  "expo": {
+   "categories": [
+    "fetch"
+   ],
+   "reason": "Expo's fetch implementation; the app requests only through the ApiClient"
+  }
+ },
+ "native": {}
+}

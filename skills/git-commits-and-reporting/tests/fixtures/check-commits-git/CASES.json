@@ -1,0 +1,41 @@
+{
+  "bad-non-ascii-range": {
+    "expect": ["[gate-change-missing]", ".maestro/baselines/tâche-ar.png"],
+    "args": "{dir} --range HEAD~1..HEAD"
+  },
+  "bad-non-ascii-staged": {
+    "expect": ["[gate-change-missing]", ".maestro/baselines/tâche-ar.png"],
+    "ops": [
+      {
+        "write": {
+          "file": "message.txt",
+          "content": "test(tasks): add the arabic task list baseline\n\nThe list now has an Arabic baseline, so a right-to-left layout\nregression shows up in the e2e run.\n"
+        }
+      }
+    ]
+  },
+  "bad-nothing-staged-without-trailer": {
+    "expect": ["[gate-change-missing]", ".maestro/baselines/tâche-ar.png"],
+    "args": "{dir} --message {dir}/message.txt --staged",
+    "ops": [
+      {
+        "write": {
+          "file": "message.txt",
+          "content": "test(tasks): add the arabic task list baseline\n\nThe list now has an Arabic baseline, so a right-to-left layout\nregression shows up in the e2e run.\n"
+        }
+      }
+    ]
+  },
+  "pass-nothing-staged-judges-head": {
+    "expect": ["RESULT: PASS"],
+    "args": "{dir} --message {dir}/message.txt --staged",
+    "ops": [
+      {
+        "write": {
+          "file": "message.txt",
+          "content": "test(tasks): add the arabic task list baseline\n\nThe list now has an Arabic baseline, so a right-to-left layout\nregression shows up in the e2e run.\n\nGate-Change: new baseline of the arabic task list\n"
+        }
+      }
+    ]
+  }
+}

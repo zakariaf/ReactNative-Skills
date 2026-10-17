@@ -1,0 +1,63 @@
+{
+  "base": [
+    "@tests/bases/app",
+    {
+      "templates": true,
+      "firstLinePath": true
+    }
+  ],
+  "renames": {
+    "dot-github": ".github",
+    "dot-easignore": ".easignore"
+  },
+  "ops": [
+    {
+      "write": {
+        "file": "node_modules/expo/package.json",
+        "content": "{ \"name\": \"expo\", \"version\": \"57.0.26\", \"main\": \"index.js\" }\n"
+      }
+    },
+    {
+      "write": {
+        "file": "node_modules/expo/config-plugins.js",
+        "content": "'use strict';\n// A stand-in for expo/config-plugins.js: fixtures have no real node_modules.\nconst same = (config) => config;\nexports.withAndroidManifest = same;\nexports.withInfoPlist = same;\nexports.withDangerousMod = same;\nexports.withAppBuildGradle = same;\nexports.withPlugins = same;\nexports.CodeGenerator = { mergeContents: () => ({ contents: '', didMerge: false, didClear: false }) };\n"
+      }
+    },
+    {
+      "write": {
+        "file": ".agents/skills/decoy/SKILL.md",
+        "content": "---\nname: decoy\ndescription: Planted findings that every scan must skip.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": ".agents/skills/decoy/modules/kit/ios/KitModule.swift",
+        "content": "// planted: an installed skill's native fixture\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/decoy/SKILL.md",
+        "content": "---\nname: decoy\ndescription: Planted findings that every scan must skip.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/decoy/modules/kit/android/build.gradle",
+        "content": "// planted\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/vendor/kit/SKILL.md",
+        "content": "---\nname: decoy\ndescription: Planted findings that every scan must skip.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/vendor/kit/ios/VendorKit.swift",
+        "content": "// planted: a vendored folder that holds a SKILL.md\n"
+      }
+    }
+  ]
+}

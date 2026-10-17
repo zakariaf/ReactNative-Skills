@@ -1,0 +1,47 @@
+{
+  "base": [{ "templates": true, "firstLinePath": true }, "@tests/bases/app"],
+  "extends": "good",
+  "ops": [
+    {
+      "write": {
+        "file": "src/vendor/kit/SKILL.md",
+        "content": "---\nname: kit\ndescription: A vendored skill folder inside the app; its planted findings stay silent.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/vendor/kit/kit-link.tsx",
+        "lines": [
+          "import { NavigationContainer } from '@react-navigation/native';",
+          "import type { Href } from 'expo-router';",
+          "export const home = '/settings' as Href;",
+          "export const Root = () => <NavigationContainer />;"
+        ]
+      }
+    },
+    {
+      "write": {
+        "file": ".agents/skills/kit/SKILL.md",
+        "content": "---\nname: kit\ndescription: An installed skill; its planted findings stay silent.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": ".agents/skills/kit/src/ui/kit-row.tsx",
+        "lines": ["import { router } from 'expo-router';", "export const goHome = () => router.navigate('/');"]
+      }
+    },
+    {
+      "write": {
+        "file": "skills/kit/SKILL.md",
+        "content": "---\nname: kit\ndescription: A skill checked out next to the app; its planted findings stay silent.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/kit/src/stores/kit-store.ts",
+        "lines": ["import { useRouter } from 'expo-router';", "export const useKit = useRouter;"]
+      }
+    }
+  ]
+}

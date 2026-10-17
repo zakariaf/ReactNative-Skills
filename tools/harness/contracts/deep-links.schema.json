@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "contracts/deep-links.json",
+  "description": "The app's verified links (iOS universal links, Android App Links) for deep-links-and-universal-links. One contract feeds app.config.ts (through scripts/deep-links/link-native-config.ts), the incoming-link gate (through the embedded config) and the apple-app-site-association and assetlinks.json files written by write-well-known.mjs.",
+  "type": "object",
+  "required": ["hosts", "webPaths"],
+  "additionalProperties": false,
+  "$defs": {
+    "hostList": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "description": "A bare lowercase host: no scheme, path or port. '*.example.com' covers every subdomain (not example.com itself).",
+        "type": "string",
+        "pattern": "^(\\*\\.)?([a-z0-9]([a-z0-9-]*[a-z0-9])?\\.)+[a-z]{2,}$"
+      }
+    },
+    "fingerprintList": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "description": "SHA-256 of a signing certificate, upper-case hex pairs: keytool -list -v, eas credentials -p android, or Play Console > App signing (with Play App Signing, Google's key signs what people install).",
+        "type": "string",
+        "pattern": "^([0-9A-F]{2}:){31}[0-9A-F]{2}$"
+      }
+    }
+  },
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "hosts": {
+      "description": "Verified link hosts per build variant. A variant without hosts gets no applinks entitlement and no App Links filter.",
+      "type": "object",
+      "required": ["development", "preview", "production"],
+      "additionalProperties": false,
+      "properties": {
+        "development": { "$ref": "#/$defs/hostList" },
+        "preview": { "$ref": "#/$defs/hostList" },
+        "production": { "$ref": "#/$defs/hostList" }
+      }
+    },
+    "webPaths": {
+      "description": "The web paths that open the app instead of the browser, in AASA form: '/tasks/*' (a trailing * for any rest) or an exact '/verify-email'. Every link route reachable from the web is covered; nothing else is listed, or the app opens for pages it then refuses.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^/(([a-z0-9-]+/)*([a-z0-9-]+|\\*))?$" }
+    },
+    "wellKnownDir": {
+      "description": "Repo folder write-well-known.mjs writes <host>/apple-app-site-association and <host>/assetlinks.json into; each host's pair is deployed to https://<host>/.well-known/. Default 'well-known'.",
+      "type": "string",
+      "pattern": "^[a-z0-9._-]+(/[a-z0-9._-]+)*$"
+    },
+    "appleTeamId": {
+      "description": "The Apple Developer Team ID (the App ID prefix) of the bundle ids; required once any variant has hosts.",
+      "type": "string",
+      "pattern": "^[A-Z0-9]{10}$"
+    },
+    "androidCertFingerprints": {
+      "description": "SHA-256 signing certificate fingerprints per variant; required for every variant with hosts.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "development": { "$ref": "#/$defs/fingerprintList" },
+        "preview": { "$ref": "#/$defs/fingerprintList" },
+        "production": { "$ref": "#/$defs/fingerprintList" }
+      }
+    }
+  }
+}

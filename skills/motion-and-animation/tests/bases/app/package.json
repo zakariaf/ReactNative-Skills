@@ -1,0 +1,13 @@
+{
+  "name": "tasks-app",
+  "private": true,
+  "main": "expo-router/entry",
+  "dependencies": {
+    "expo-router": "~57.0.24",
+    "react-native": "0.86.3",
+    "react-native-gesture-handler": "~2.32.0",
+    "react-native-reanimated": "4.5.1",
+    "react-native-screens": "~4.26.0",
+    "react-native-worklets": "0.10.1"
+  }
+}

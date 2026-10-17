@@ -1,0 +1,5 @@
+{
+  "base": "@tests/bases/export",
+  "ops": [{ "write": { "file": "dist/assets/wa-sqlite.7ca566fb.wasm", "content": "(stand-in for the wa-sqlite WebAssembly module)\n" } }],
+  "extends": "good"
+}

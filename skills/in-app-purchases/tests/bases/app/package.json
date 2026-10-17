@@ -1,0 +1,7 @@
+{
+  "name": "tasks",
+  "private": true,
+  "main": "index.ts",
+  "scripts": { "test": "jest" },
+  "dependencies": { "expo": "~57.0.26", "expo-iap": "5.8.0", "zustand": "5.0.15" }
+}

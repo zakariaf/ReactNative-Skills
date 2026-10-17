@@ -1,0 +1,25 @@
+{
+  "$schema": "./navigation.schema.json",
+  "$comment": "The app's route table, read by navigation-and-routing's check-navigation.mjs. A route change starts here, then the code follows. Route ids are route file paths under the routes folder (src/app) without the extension; home is the href of the first screen. Filled for this harness: the Tasks screen in the (app) group, the not-found route, and the test build's (debug) group (the debug menu, the debug link and the parity launch), which the canonical AppStack keeps in Stack.Protected until the test build's debug kit opens it.",
+  "router": "expo-router",
+  "home": "/",
+  "routes": [
+    "(app)/index",
+    "(debug)/debug/index",
+    "(debug)/debug/parity",
+    "(debug)/debug/setup",
+    "+not-found"
+  ],
+  "protected": [
+    {
+      "file": "src/features/root-navigator/app-stack.tsx",
+      "guard": "isTestBuild",
+      "screens": ["(debug)"]
+    }
+  ],
+  "guarded": [],
+  "modals": [],
+  "paramParsers": {},
+  "debugRoutes": ["(debug)/debug/index", "(debug)/debug/parity", "(debug)/debug/setup"],
+  "placeholders": []
+}

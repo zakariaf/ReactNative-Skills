@@ -1,0 +1,12 @@
+{
+  "base": [
+    { "from": "@skill/templates/src/i18n", "to": "apps/mobile/src/i18n" },
+    { "from": "@skill/templates/src/core", "to": "apps/mobile/src/core" },
+    { "from": "@skill/templates/scripts", "to": "apps/mobile/scripts" },
+    { "from": "@skill/templates/index.ts", "to": "apps/mobile/index.ts" },
+    { "from": "@tests/bases/app", "to": "apps/mobile" }
+  ],
+  "ops": [
+    { "write": { "file": "package.json", "json": { "name": "tasks-monorepo", "private": true, "workspaces": ["apps/*"] } } }
+  ]
+}

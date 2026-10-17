@@ -1,0 +1,11 @@
+[
+  { "from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs" },
+  { "from": "scripts/lib/source-scan.mjs", "to": "scripts/lib/source-scan.mjs" },
+  { "from": "scripts/lib/object-literal.mjs", "to": "scripts/lib/object-literal.mjs" },
+  { "from": "repo-templates/src/ui/a11y/", "to": "templates/src/ui/a11y/" },
+  { "from": "repo-templates/src/theme/contrast.ts", "to": "templates/src/theme/contrast.ts" },
+  { "from": "repo-templates/src/theme/palette.ts", "to": "templates/src/theme/palette.ts" },
+  { "from": "repo-templates/src/theme/theme-types.ts", "to": "templates/src/theme/theme-types.ts" },
+  { "from": "repo-templates/contracts/contrast.json", "to": "templates/contracts/contrast.json" },
+  { "from": "repo-templates/contracts/contrast.schema.json", "to": "templates/contracts/contrast.schema.json" }
+]

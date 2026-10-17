@@ -1,0 +1,652 @@
+{
+  "bad-baseline-missing": {
+    "expect": [
+      "test/goldens/canvas/weekly-chart.golden.test.ts:42 [baseline-missing] no baseline PNG starting with \"weekly-chart-\" in test/goldens/canvas/__image_snapshots__/"
+    ],
+    "ops": [
+      {
+        "rename": {
+          "from": "test/goldens/canvas/__image_snapshots__/weekly-chart-small-0.png",
+          "to": "test/goldens/canvas/__image_snapshots__/progress-grid-small-0.png"
+        }
+      }
+    ]
+  },
+  "bad-baseline-orphan": {
+    "expect": [
+      "FAIL test/goldens/canvas/__image_snapshots__/removed-chart-small-0.png:1 [baseline-orphan] no pixel golden in test/goldens/canvas/ claims it"
+    ],
+    "ops": [
+      {
+        "png": {
+          "files": ["test/goldens/canvas/__image_snapshots__/removed-chart-small-0.png"],
+          "width": 32,
+          "height": 40,
+          "fill": "#14161cff"
+        }
+      }
+    ]
+  },
+  "bad-component-snapshot": {
+    "expect": [
+      "src/ui/task-row/__snapshots__/task-row.test.tsx.snap:1 [snapshot-not-golden] is a snapshot of task-row.test.tsx, which is not a *.golden.test.ts"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/task-row/task-row.test.tsx",
+          "content": "// src/ui/task-row/task-row.test.tsx\ndescribe('TaskRow', () => {\n  it('renders', () => undefined);\n});\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/ui/task-row/__snapshots__/task-row.test.tsx.snap",
+          "content": "// Jest Snapshot v1, https://goo.gl/fbAQLP\n\nexports[`TaskRow renders 1`] = `\n<View\n  accessibilityRole=\"checkbox\"\n>\n  <Text>Water the plants</Text>\n</View>\n`;\n"
+        }
+      }
+    ]
+  },
+  "bad-contract-few-keys": {
+    "expect": [
+      "src/features/tasks/tasks-digest.golden.test.ts.snap.ios:3 [contract-golden-keys] pins 2 contract entries (at least 3)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-digest.golden.test.ts",
+          "find": "it.each(['2026-10-03', '2026-12-31', '2027-01-01', '2028-02-29'])",
+          "with": "it.each(['2026-12-31', '2027-01-01'])"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-digest.golden.test.ts.snap.ios",
+          "find": "exports[`[contract] digestNotificationId goldens names the digest of the inbox list on 2026-10-03 1`] = `\"digest:inbox:2026-10-03\"`;\n\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-digest.golden.test.ts.snap.ios",
+          "find": "exports[`[contract] digestNotificationId goldens names the digest of the inbox list on 2028-02-29 1`] = `\"digest:inbox:2028-02-29\"`;\n\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-contract-no-boundary": {
+    "expect": [
+      "src/features/tasks/tasks-digest.golden.test.ts.snap.ios:3 [contract-golden-keys] has date keys but no Dec 31 / Jan 1 year-boundary pair"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-digest.golden.test.ts",
+          "find": "'2027-01-01'",
+          "with": "'2027-01-02'"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-digest.golden.test.ts.snap.ios",
+          "find": "2027-01-01",
+          "with": "2027-01-02",
+          "count": 2
+        }
+      }
+    ]
+  },
+  "bad-contract-register-missing": {
+    "expect": [
+      "src/features/tasks/tasks-digest.golden.test.ts:49 [contract-unregistered]",
+      "but contracts/goldens.json does not exist",
+      "Copy this skill's templates/contracts/goldens.json (and goldens.schema.json) to contracts/goldens.json, replace its sample entry with",
+      "add \"contracts/goldens.json\" to quality-gates.json gatedPaths"
+    ],
+    "ops": [{ "delete": "contracts/goldens.json" }]
+  },
+  "bad-contract-test-missing": {
+    "expect": [
+      "contracts/goldens.json:12 [contract-golden-missing] contract \"backup-format\" names src/data/backup/backup-envelope.golden.test.ts, which does not exist"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/goldens.json",
+          "path": ["contracts", 1],
+          "value": { "id": "backup-format", "test": "src/data/backup/backup-envelope.golden.test.ts" }
+        }
+      }
+    ]
+  },
+  "bad-contract-unmarked": {
+    "expect": [
+      "src/features/tasks/tasks-digest.golden.test.ts:1 [contract-golden-missing] pins contract \"digest-notification-id\" but no describe title carries \"[contract]\""
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-digest.golden.test.ts",
+          "find": "describe('[contract] digestNotificationId goldens'",
+          "with": "describe('digestNotificationId goldens'"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-digest.golden.test.ts.snap.ios",
+          "find": "exports[`[contract] digestNotificationId goldens",
+          "with": "exports[`digestNotificationId goldens",
+          "all": true
+        }
+      }
+    ]
+  },
+  "bad-contract-unregistered": {
+    "expect": [
+      "src/features/tasks/tasks-digest.golden.test.ts:49 [contract-unregistered] has a contract describe \"[contract] digestNotificationId goldens\" but contracts/goldens.json does not list it"
+    ],
+    "ops": [{ "json": { "file": "contracts/goldens.json", "path": ["contracts"], "value": [] } }]
+  },
+  "bad-diff-output-committed": {
+    "expect": [
+      ".gitignore:1 [diff-output-ignored] does not list reports/",
+      ".gitignore:1 [diff-output-ignored] does not list **/__image_snapshots__/__diff_output__/"
+    ],
+    "ops": [{ "write": { "file": ".gitignore", "content": "node_modules/\nios/\nandroid/\n" } }]
+  },
+  "bad-entry-too-long": {
+    "expect": [
+      "src/features/tasks/tasks-digest.golden.test.ts.snap.ios:39 [snapshot-unreadable] entry \"planDigest goldens lists a long week 1\" is 11 lines (limit 10)"
+    ],
+    "args": "{dir} --max-entry-lines 10",
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-digest.golden.test.ts.snap.ios",
+          "find": "upcoming: -\"\n`;\n",
+          "with": "upcoming: -\"\n`;\n\nexports[`planDigest goldens lists a long week 1`] = `\n\"today 2026-10-03 tasks 10 done 0\nt01\nt02\nt03\nt04\nt05\nt06\nt07\nt08\nt09\nt10\"\n`;\n"
+        }
+      }
+    ]
+  },
+  "bad-gated-paths": {
+    "expect": ["quality-gates.json:1 [gated-path-missing] gatedPaths lacks **/__image_snapshots__/**"],
+    "ops": [{ "replace": { "file": "quality-gates.json", "find": "    \"**/__image_snapshots__/**\",\n", "with": "" } }]
+  },
+  "bad-gated-paths-register": {
+    "expect": ["quality-gates.json:1 [gated-path-missing] gatedPaths lacks contracts/goldens.json"],
+    "ops": [
+      {
+        "$comment": "The register is a golden path: without it in gatedPaths the commit-msg hook lets a register edit through without a trailer.",
+        "replace": { "file": "quality-gates.json", "find": "    \"contracts/goldens.json\",\n", "with": "" }
+      }
+    ]
+  },
+  "bad-golden-ambient": {
+    "expect": [
+      "src/features/tasks/tasks-digest.golden.test.ts:47 [golden-ambient] reads new Date()",
+      "src/features/tasks/tasks-digest.golden.test.ts:23 [golden-ambient] reads an Intl formatter with an undefined locale",
+      "src/features/tasks/tasks-digest.golden.test.ts:24 [golden-ambient] reads toLocaleString() with an undefined locale"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-digest.golden.test.ts",
+          "find": "expect(describeDigest([], '2026-10-03')).toMatchSnapshot();",
+          "with": "expect(describeDigest([], new Date().toISOString().slice(0, 10))).toMatchSnapshot();"
+        }
+      },
+      {
+        "$comment": "An undefined locale is the machine locale, just like an empty argument list.",
+        "replace": {
+          "file": "src/features/tasks/tasks-digest.golden.test.ts",
+          "find": "  return `${label}: ${items.length === 0 ? '-' : items.join(', ')}`;",
+          "with": "  const count = new Intl.NumberFormat(undefined).format(items.length);\n  const day = new Date(Date.UTC(2026, 9, 3)).toLocaleDateString(undefined, { weekday: 'long' });\n  return `${label} ${count} ${day}: ${items.length === 0 ? '-' : items.join(', ')}`;"
+        }
+      }
+    ]
+  },
+  "bad-golden-renders-ui": {
+    "expect": [
+      "src/features/tasks/tasks-digest.golden.test.ts:6 [golden-renders-ui] imports @testing-library/react-native"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-digest.golden.test.ts",
+          "find": "import { goldenText, headerLine } from '@test/goldens/golden-text';\n",
+          "with": "import { render } from '@testing-library/react-native';\nimport { goldenText, headerLine } from '@test/goldens/golden-text';\n"
+        }
+      }
+    ]
+  },
+  "bad-golden-tsx": {
+    "expect": ["src/features/tasks/tasks-week.golden.test.tsx:1 [golden-never-runs] no Jest project runs this file"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/tasks-week.golden.test.tsx",
+          "content": "describe('week goldens', () => {\n  it('pins the week strip', () => {\n    expect('#.#....').toMatchSnapshot();\n  });\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-inline-snapshot": {
+    "expect": ["src/features/tasks/tasks-digest.golden.test.ts:45 [inline-snapshot] uses an inline snapshot"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-digest.golden.test.ts",
+          "find": "expect(describeDigest([], '2026-10-03')).toMatchSnapshot();",
+          "with": "expect(describeDigest([], '2026-10-03')).toMatchInlineSnapshot();"
+        }
+      }
+    ]
+  },
+  "bad-jest-without-ci": {
+    "expect": [
+      "lefthook.yml:5 [jest-without-ci] \"npx jest --bail --findRelatedTests --passWithNoTests {staged_files}\" runs jest without --ci",
+      "package.json:8 [jest-without-ci] \"jest --onlyChanged\" runs jest without --ci",
+      ".claude/settings.json:4 [jest-without-ci] \"npx jest --findRelatedTests --passWithNoTests\" runs jest without --ci",
+      ".github/workflows/ci.yml:8 [jest-without-ci] \"npx jest --selectProjects unit\" runs jest without --ci"
+    ],
+    "ops": [
+      {
+        "$comment": "A hook that runs related tests without --ci writes the snapshot of a new golden, which the commit then stages unreviewed.",
+        "replace": {
+          "file": "lefthook.yml",
+          "find": "npx jest --ci --bail --findRelatedTests",
+          "with": "npx jest --bail --findRelatedTests"
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "test:changed"],
+          "value": "tsc --noEmit && jest --onlyChanged"
+        }
+      },
+      {
+        "$comment": "An agent hook that runs jest without --ci writes snapshots after every edit.",
+        "write": {
+          "file": ".claude/settings.json",
+          "content": "{\n  \"hooks\": {\n    \"PostToolUse\": [\n      { \"matcher\": \"Edit|Write\", \"hooks\": [{ \"type\": \"command\", \"command\": \"npx jest --findRelatedTests --passWithNoTests\" }] }\n    ]\n  }\n}\n"
+        }
+      },
+      {
+        "$comment": "A trailing comment does not hide a jest run on a run: line.",
+        "write": {
+          "file": ".github/workflows/ci.yml",
+          "content": "name: CI\non: [push]\njobs:\n  test:\n    runs-on: macos-15\n    steps:\n      - name: Unit tests\n        run: npx jest --selectProjects unit # fast\n"
+        }
+      }
+    ]
+  },
+  "bad-matcher-loosened": {
+    "expect": ["test/goldens/skia-golden.ts:11 [golden-tolerance] tolerance is 0.01 percent, not at most 0.001 percent"],
+    "ops": [
+      {
+        "replace": {
+          "file": "test/goldens/skia-golden.ts",
+          "find": "  failureThreshold: 0.001,\n",
+          "with": "  failureThreshold: 0.01,\n"
+        }
+      }
+    ]
+  },
+  "bad-matcher-missing": {
+    "expect": ["test/goldens/skia-golden.ts:1 [matcher-missing] pixel goldens exist but the shared matcher does not"],
+    "ops": [{ "delete": "test/goldens/skia-golden.ts" }]
+  },
+  "bad-orphan-snapshot": {
+    "expect": [
+      "src/features/tasks/tasks-summary.golden.test.ts.snap.ios:1 [snapshot-orphan] belongs to src/features/tasks/tasks-summary.golden.test.ts, which does not exist"
+    ],
+    "ops": [
+      {
+        "copy": {
+          "from": "src/features/tasks/tasks-digest.golden.test.ts.snap.ios",
+          "to": "src/features/tasks/tasks-summary.golden.test.ts.snap.ios"
+        }
+      }
+    ]
+  },
+  "bad-pixel-deps": {
+    "expect": [
+      "package.json:1 [pixel-deps] pixel goldens exist but devDependencies lack jest-image-snapshot",
+      "package.json:1 [pixel-deps] @types/jest-image-snapshot is \"^6.4.2\", not an exact version"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["devDependencies", "jest-image-snapshot"], "delete": true } },
+      {
+        "json": { "file": "package.json", "path": ["devDependencies", "@types/jest-image-snapshot"], "value": "^6.4.2" }
+      }
+    ]
+  },
+  "bad-pixel-matcher": {
+    "expect": [
+      "test/goldens/canvas/weekly-chart.golden.test.ts:41 [pixel-matcher] does not use toMatchPixelGolden from test/goldens/skia-golden.ts"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "test/goldens/canvas/weekly-chart.golden.test.ts",
+          "find": "expect.extend({ toMatchImageSnapshot: toMatchPixelGolden });\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-pixel-outside": {
+    "expect": [
+      "src/features/insights/canvas/weekly-chart.golden.test.ts:42 [pixel-golden-place] a pixel golden outside test/goldens/"
+    ],
+    "ops": [
+      {
+        "rename": {
+          "from": "test/goldens/canvas/weekly-chart.golden.test.ts",
+          "to": "src/features/insights/canvas/weekly-chart.golden.test.ts"
+        }
+      },
+      {
+        "rename": {
+          "from": "test/goldens/canvas/__image_snapshots__",
+          "to": "src/features/insights/canvas/__image_snapshots__"
+        }
+      }
+    ]
+  },
+  "bad-pixel-own-threshold": {
+    "expect": [
+      "test/goldens/canvas/weekly-chart.golden.test.ts:44 [golden-tolerance] sets failureThreshold in the test"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "test/goldens/canvas/weekly-chart.golden.test.ts",
+          "find": "      customSnapshotIdentifier: `weekly-chart-${name}-${String(moment)}`,\n",
+          "with": "      customSnapshotIdentifier: `weekly-chart-${name}-${String(moment)}`,\n      failureThreshold: 0.05,\n"
+        }
+      }
+    ]
+  },
+  "bad-pixel-two-sizes": {
+    "expect": [
+      "test/goldens/canvas/weekly-chart.golden.test.ts:41 [pixel-golden-cases] renders 2 canvas size(s) and animates but does not render the moments [0, 0.5, 1]"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "test/goldens/canvas/weekly-chart.golden.test.ts",
+          "find": "  { name: 'small', width: 320, height: 400 },\n] as const;\nconst MOMENTS = [0, 0.5, 1] as const;\n",
+          "with": "] as const;\nconst MOMENTS = [0.5] as const;\n"
+        }
+      }
+    ]
+  },
+  "bad-snapshot-missing": {
+    "expect": ["src/features/tasks/tasks-digest.golden.test.ts:40 [snapshot-missing] has no snapshot file next to it"],
+    "ops": [{ "delete": "src/features/tasks/tasks-digest.golden.test.ts.snap.ios" }]
+  },
+  "bad-snapshot-not-text": {
+    "expect": ["[snapshot-not-text] entry \"planDigest goldens returns the plan object 1\" is not a string"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-digest.golden.test.ts.snap.ios",
+          "find": "upcoming: -\"\n`;\n",
+          "with": "upcoming: -\"\n`;\n\nexports[`planDigest goldens returns the plan object 1`] = `\n{\n  \"doneCount\": 1,\n  \"dueToday\": [],\n}\n`;\n"
+        }
+      }
+    ]
+  },
+  "bad-unreadable-entry": {
+    "expect": ["[snapshot-unreadable] entry \"planDigest goldens renders the digest card 1\" holds a component tree"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-digest.golden.test.ts.snap.ios",
+          "find": "upcoming: -\"\n`;\n",
+          "with": "upcoming: -\"\n`;\n\nexports[`planDigest goldens renders the digest card 1`] = `\n<View\n  style={\n    {\n      \"flex\": 1,\n    }\n  }\n/>\n`;\n"
+        }
+      }
+    ]
+  },
+  "bad-update-in-automation": {
+    "expect": [
+      "package.json:8 [update-in-automation] \"jest --selectProjects golden -u\" updates goldens automatically",
+      "package.json:9 [update-in-automation] \"jest --ci --updateSnapshot\" updates goldens automatically",
+      "lefthook.yml:5 [update-in-automation] \"jest --ci=false\" updates goldens automatically",
+      ".eas/workflows/goldens.yml:8 [update-in-automation]",
+      ".husky/pre-push:1 [update-in-automation] \"CI=false npm test\"",
+      ".github/workflows/ci.yml:10 [update-in-automation] \"screenshots -- --update\"",
+      ".github/workflows/nightly.yml:9 [update-in-automation] \"CI: false\" updates goldens automatically"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "test:golden:update"],
+          "value": "jest --selectProjects golden -u"
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "test:golden:refresh"],
+          "value": "jest --ci --updateSnapshot"
+        }
+      },
+      {
+        "replace": {
+          "file": "lefthook.yml",
+          "find": "npx jest --ci --bail --findRelatedTests",
+          "with": "npx jest --ci=false --bail --findRelatedTests"
+        }
+      },
+      {
+        "write": {
+          "file": ".eas/workflows/goldens.yml",
+          "content": "name: goldens\non:\n  push:\n    branches: ['main']\njobs:\n  goldens:\n    steps:\n      - run: npx jest --selectProjects golden -u\n"
+        }
+      },
+      { "write": { "file": ".husky/pre-push", "content": "CI=false npm test\n" } },
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "      - run: npx jest --ci --maxWorkers=2\n",
+          "with": "      - run: npx jest --ci --maxWorkers=2\n      - run: npm run screenshots -- --update\n"
+        }
+      },
+      {
+        "$comment": "CI: false in a workflow env turns Jest's CI mode off for every step, even without -u.",
+        "write": {
+          "file": ".github/workflows/nightly.yml",
+          "content": "name: nightly\non:\n  schedule:\n    - cron: '0 3 * * *'\njobs:\n  test:\n    runs-on: ubuntu-latest\n    env:\n      CI: false\n    steps:\n      - uses: actions/checkout@v5\n      - run: npm test\n"
+        }
+      }
+    ]
+  },
+  "error-bad-contract": {
+    "expect": ["ERROR [bad-input] contracts/goldens.json has unknown key(s): contract"],
+    "ops": [{ "json": { "file": "contracts/goldens.json", "path": ["contract"], "value": [] } }]
+  },
+  "error-max-entry-lines": {
+    "expect": ["ERROR [bad-input] --max-entry-lines must be a whole number of at least 10, got \"two\""],
+    "args": "{dir} --max-entry-lines two"
+  },
+  "error-no-app": {
+    "expect": ["ERROR [bad-input] nothing to check: empty-folder has no package.json"],
+    "args": "empty-folder",
+    "ops": [{ "mkdir": "empty-folder" }]
+  },
+  "pass-adoption": {
+    "expect": [
+      "SKIP quality-gates.json [gated-path-missing] not yet created (quality-gates creates it)",
+      "SKIP .gitignore [diff-output-ignored] not yet created (typescript-and-lint-rules creates it)",
+      "check-goldens: 6 golden tests, snapshots and policy files checked, 0 problems, 2 skipped"
+    ],
+    "ops": [
+      { "delete": ["contracts/goldens.json", "quality-gates.json", ".gitignore"] },
+      {
+        "$comment": "An app adopting the policy before it pins any contract output: no register needed yet.",
+        "replace": {
+          "file": "src/features/tasks/tasks-digest.golden.test.ts",
+          "find": "describe('[contract] digestNotificationId goldens'",
+          "with": "describe('digestNotificationId goldens'"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-digest.golden.test.ts.snap.ios",
+          "find": "exports[`[contract] digestNotificationId goldens",
+          "with": "exports[`digestNotificationId goldens",
+          "all": true
+        }
+      }
+    ]
+  },
+  "pass-approved-tolerance": {
+    "expect": ["check-goldens: 8 golden tests, snapshots and policy files checked, 0 problems"],
+    "ops": [
+      {
+        "$comment": "The reviewer approved 0.2% for the new font: the matcher and the contract's limit moved together.",
+        "replace": {
+          "file": "test/goldens/skia-golden.ts",
+          "find": "  failureThreshold: 0.001,\n",
+          "with": "  failureThreshold: 0.002,\n"
+        }
+      },
+      { "json": { "file": "contracts/goldens.json", "path": ["maxPixelTolerance"], "value": 0.002 } }
+    ]
+  },
+  "pass-fixed-size": {
+    "expect": ["check-goldens: 9 golden tests, snapshots and policy files checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "test/goldens/app-badge.golden.test.ts",
+          "content": "// test/goldens/app-badge.golden.test.ts\n// PIXEL GOLDEN: the unread badge, drawn once at its only size.\n// fixed-size: the badge is always 64x64 points; it never lays out to its container.\nimport { Skia } from '@shopify/react-native-skia';\n\nimport { paintBadgePng } from '@/ui/badge/paint-badge-png';\nimport { toMatchPixelGolden } from '@test/goldens/skia-golden';\n\nexpect.extend({ toMatchImageSnapshot: toMatchPixelGolden });\n\nconst SIZE = 64;\n\ndescribe('app badge golden', () => {\n  it('draws the badge with three unread tasks', () => {\n    const png = paintBadgePng(Skia, { count: 3, width: SIZE, height: SIZE, elapsedMs: 0 });\n    expect(Buffer.from(png)).toMatchImageSnapshot({ customSnapshotIdentifier: 'app-badge' });\n  });\n});\n"
+        }
+      },
+      {
+        "png": {
+          "files": ["test/goldens/__image_snapshots__/app-badge.png"],
+          "width": 8,
+          "height": 8,
+          "fill": "#208aefff"
+        }
+      }
+    ]
+  },
+  "pass-jest-in-comment": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "Comments, step names and trailing comments that say jest run nothing; the run: values are correct.",
+        "write": {
+          "file": ".github/workflows/ci.yml",
+          "content": "# Unit tests run with jest in CI mode\nname: CI\non: [push]\njobs:\n  test:\n    runs-on: macos-15\n    steps:\n      - uses: actions/checkout@v4\n      - name: Run jest\n        run: npm test\n      - name: Golden tests (jest)\n        run: npm run test:golden # the golden project of jest, in CI mode\n      - name: \"Unit\"\n        run: npx jest --ci --selectProjects unit # never jest -u or jest --watch here\n"
+        }
+      },
+      {
+        "write": {
+          "file": ".husky/pre-commit",
+          "content": "# runs jest through the npm script, which passes --ci\nnpm test\n"
+        }
+      }
+    ]
+  },
+  "pass-jest-read-only": {
+    "expect": ["check-goldens: 10 golden tests, snapshots and policy files checked, 0 problems"],
+    "ops": [
+      {
+        "$comment": "Read-only runs, CI mode set by the environment, a continued line with --ci, a jest dependency and an agent permission rule never write a snapshot.",
+        "json": { "file": "package.json", "path": ["scripts", "test:watch"], "value": "jest --watch" }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "test:list"],
+          "value": "jest --selectProjects golden --listTests"
+        }
+      },
+      { "json": { "file": "package.json", "path": ["scripts", "test:env-ci"], "value": "CI=1 jest --bail" } },
+      { "json": { "file": "package.json", "path": ["devDependencies", "jest"], "value": "29.7.0" } },
+      { "json": { "file": "package.json", "path": ["devDependencies", "babel-jest"], "value": "29.7.0" } },
+      { "write": { "file": ".husky/pre-push", "content": "npx jest \\\n  --ci --selectProjects golden\n" } },
+      { "json": { "file": "package.json", "path": ["keywords"], "value": ["jest", "expo"] } },
+      {
+        "write": {
+          "file": ".claude/settings.json",
+          "content": "{\n  \"permissions\": {\n    \"allow\": [\"Bash(npx jest *)\", \"Edit(/jest.config.js)\"]\n  },\n  \"hooks\": {\n    \"PostToolUse\": [{ \"matcher\": \"Edit|Write\", \"hooks\": [{ \"type\": \"command\", \"command\": \"npx jest --ci --findRelatedTests --passWithNoTests\" }] }]\n  }\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-multi-package": {
+    "expect": ["check-goldens: 9 golden tests, snapshots and policy files checked, 0 problems"],
+    "ops": [
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      { "rename": { "from": "test", "to": "apps/mobile/test" } },
+      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["apps/*"] } },
+      {
+        "write": {
+          "file": "apps/mobile/package.json",
+          "json": {
+            "name": "@acme/mobile",
+            "private": true,
+            "devDependencies": { "@types/jest-image-snapshot": "6.4.2", "jest-image-snapshot": "6.5.2" }
+          }
+        }
+      },
+      { "write": { "file": "rn-skills.config.json", "json": { "goldensDir": "apps/mobile/test/goldens" } } },
+      {
+        "json": {
+          "file": "contracts/goldens.json",
+          "path": ["contracts", 0, "test"],
+          "value": "apps/mobile/src/features/tasks/tasks-digest.golden.test.ts"
+        }
+      },
+      {
+        "replace": {
+          "file": "quality-gates.json",
+          "find": "\"test/goldens/skia-golden.ts\"",
+          "with": "\"apps/mobile/test/goldens/skia-golden.ts\""
+        }
+      },
+      {
+        "$comment": "Generated output of the workspace (prebuild, build): never scanned.",
+        "write": {
+          "file": "apps/mobile/ios/build/stale.golden.test.ts.snap.ios",
+          "content": "exports[`stale 1`] = `\n<View />\n`;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/build/old.golden.test.ts",
+          "content": "expect(png).toMatchImageSnapshot({ failureThreshold: 0.5 });\n"
+        }
+      }
+    ]
+  },
+  "pass-pipeline-golden": {
+    "expect": ["check-goldens: 9 golden tests, snapshots and policy files checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "test/goldens/pipeline.golden.test.ts",
+          "content": "// test/goldens/pipeline.golden.test.ts\n// PIXEL GOLDEN: proves the golden project draws real pixels with CanvasKit, through a drawing\n// defined here (not a production surface), at one size.\nimport { Skia } from '@shopify/react-native-skia';\n\nimport { toMatchPixelGolden } from '@test/goldens/skia-golden';\n\nimport type { SkCanvas } from '@shopify/react-native-skia';\n\nexpect.extend({ toMatchImageSnapshot: toMatchPixelGolden });\n\nfunction drawDot(canvas: SkCanvas): void {\n  const paint = Skia.Paint();\n  canvas.drawCircle(16, 16, 8, paint);\n}\n\ndescribe('pipeline golden', () => {\n  it('draws one dot', () => {\n    const png = renderOffscreen(Skia, { draw: drawDot, width: 32, height: 32, elapsedMs: 0 });\n    expect(Buffer.from(png)).toMatchImageSnapshot({ customSnapshotIdentifier: 'pipeline-dot' });\n  });\n});\n"
+        }
+      },
+      {
+        "png": {
+          "files": ["test/goldens/__image_snapshots__/pipeline-dot.png"],
+          "width": 4,
+          "height": 4,
+          "fill": "#000000ff"
+        }
+      }
+    ]
+  }
+}

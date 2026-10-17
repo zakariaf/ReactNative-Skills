@@ -1,0 +1,610 @@
+{
+  "area": "release",
+  "entries": [
+    {
+      "id": "release-keychain-locked",
+      "topic": "Signing",
+      "symptom": "errSecInternalComponent from codesign during the archive",
+      "cause": "The login keychain is locked (an SSH or other non-GUI session)",
+      "fix": "Stop: the developer unlocks the keychain or starts the run from the desktop; never retry; then rerun with --resume build (same build number, nothing uploaded)",
+      "match": [
+        "errSecInternalComponent"
+      ],
+      "status": "documented",
+      "needsHuman": true,
+      "skill": "ios-release-testflight",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "release-codesign-access-dialog",
+      "topic": "Signing",
+      "symptom": "A macOS dialog: \"codesign wants to access key ...\"",
+      "cause": "The key's access list does not include codesign yet",
+      "fix": "Stop: the developer clicks Always Allow once",
+      "match": [
+        "codesign wants to access"
+      ],
+      "status": "documented",
+      "needsHuman": true,
+      "skill": "ios-release-testflight",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "release-no-profiles",
+      "topic": "Signing",
+      "symptom": "No profiles for '<bundle id>' were found, or Automatic signing is disabled",
+      "cause": "-allowProvisioningUpdates or the three -authenticationKey* flags are missing, or DEVELOPMENT_TEAM is empty",
+      "fix": "Pass the API-key flags to xcodebuild; export APPLE_TEAM_ID before prebuild so app.config.ts writes ios.appleTeamId",
+      "match": [
+        "No profiles for '.+' were found",
+        "Automatic signing is disabled"
+      ],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "ios-release-testflight",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "release-api-key-dev-cert",
+      "topic": "Signing",
+      "symptom": "The first archive with the API key cannot create the Apple Development certificate",
+      "cause": "Not verified whether an API key alone can create it on a new machine",
+      "fix": "Human step: the developer signs in once in Xcode > Settings > Accounts, then rerun",
+      "match": [],
+      "status": "open",
+      "needsHuman": true,
+      "skill": "ios-release-testflight",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "release-agreement",
+      "topic": "Account",
+      "symptom": "An error that mentions an agreement (altool, App Store Connect API) or \"PLA Update available\" (xcodebuild)",
+      "cause": "A new or expired Apple agreement",
+      "fix": "Stop: the developer accepts it in App Store Connect; then rerun with --resume build if the stop came before the upload, otherwise a plain rerun",
+      "match": [
+        "PLA Update available",
+        "(?<!license )[Aa]greement(?!s)"
+      ],
+      "status": "documented",
+      "needsHuman": true,
+      "skill": "ios-release-testflight",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "release-no-app-record",
+      "topic": "Account",
+      "symptom": "The upload cannot determine the Apple ID for the bundle ID, or no App Store Connect app record exists",
+      "cause": "The app record does not exist, and the public API cannot create apps",
+      "fix": "Stop: the developer creates it (My Apps > + > New App), then rerun",
+      "match": [
+        "No App Store Connect app record",
+        "cannot determine the Apple ID"
+      ],
+      "status": "documented",
+      "needsHuman": true,
+      "skill": "ios-release-testflight",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "release-not-authorized",
+      "topic": "Account",
+      "symptom": "NOT_AUTHORIZED (401) from altool or the App Store Connect REST API",
+      "cause": "A wrong key or issuer id, a revoked key, or clock skew (a token issued in the future)",
+      "fix": "Stop: check the key and issuer ids against the key file name without reading the key, and that the clock is on network time; a revoked key needs a new team key from the developer",
+      "match": [
+        "NOT_AUTHORIZED",
+        "answered 401",
+        "(?<!auth \\()HTTP 401"
+      ],
+      "status": "verified",
+      "needsHuman": true,
+      "skill": "ios-release-testflight",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "release-forbidden",
+      "topic": "Account",
+      "symptom": "FORBIDDEN_ERROR (403), or \"not allowed to create distribution certificates\"",
+      "cause": "The API key role is below Admin, or it is an individual key",
+      "fix": "Stop: the developer creates a team key with the Admin role",
+      "match": [
+        "FORBIDDEN_ERROR",
+        "not allowed to create distribution"
+      ],
+      "status": "documented",
+      "needsHuman": true,
+      "skill": "ios-release-testflight",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "release-jwt-lifetime",
+      "topic": "Account",
+      "symptom": "App Store Connect rejects a token that looks valid",
+      "cause": "A token that expires more than 20 minutes after its issue time is invalid; a stale clock also breaks the issue time",
+      "fix": "Sign tokens for 15 minutes and create a fresh one per request during long waits",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "ios-release-testflight",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "release-processing-invalid",
+      "topic": "Upload",
+      "symptom": "Build processing state INVALID or FAILED",
+      "cause": "Apple rejected the binary during processing",
+      "fix": "Stop: ask the developer to forward Apple's email; fix the cause, then rebuild with a new build number",
+      "match": [
+        "processingState.{0,4}(INVALID|FAILED)",
+        "build status:? (INVALID|FAILED)"
+      ],
+      "status": "documented",
+      "needsHuman": true,
+      "skill": "ios-release-testflight",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "release-itms-90189",
+      "topic": "Upload",
+      "symptom": "ITMS-90189: Redundant Binary Upload",
+      "cause": "The build number was reused",
+      "fix": "Never reuse or roll back a number: bump and rebuild (check the earlier upload's processing first)",
+      "match": [
+        "ITMS-90189"
+      ],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "ios-release-testflight",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "release-itms-90062",
+      "topic": "Upload",
+      "symptom": "ITMS-90062: version must be higher than the previously approved version",
+      "cause": "The version was not raised after an approval",
+      "fix": "Raise the version in app.config.ts and rebuild",
+      "match": [
+        "ITMS-90062"
+      ],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "ios-release-testflight",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "release-itms-90683",
+      "topic": "Upload",
+      "symptom": "ITMS-90683: Missing purpose string in Info.plist (for example NSMicrophoneUsageDescription)",
+      "cause": "A linked library references a protected API (an audio library's record-permission API), so Apple requires the usage string even if the app never asks",
+      "fix": "Add a neutral, translated usage string through the library's config plugin option, or block the API in the plugin when the app never uses it; rebuild with a new build number",
+      "match": [
+        "ITMS-90683"
+      ],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "privacy-and-store-declarations",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "release-itms-privacy",
+      "topic": "Upload",
+      "symptom": "ITMS-91053 (missing API declaration), ITMS-91061 (missing privacy manifest for an SDK) or ITMS-91056 (invalid manifest)",
+      "cause": "The aggregated required-reason APIs are incomplete; Apple does not reliably read the manifests of static pods",
+      "fix": "Aggregate every pod manifest into ios.privacyManifests (the privacy audit fails on a gap), prebuild, rebuild with a new build number",
+      "match": [
+        "ITMS-9105[36]",
+        "ITMS-91061"
+      ],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "privacy-and-store-declarations",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "release-upload-not-done",
+      "topic": "Upload",
+      "symptom": "altool --upload-package --wait (or eas submit) returned, but the build is not in TestFlight",
+      "cause": "They return once the build is PROCESSING, not VALID",
+      "fix": "Poll the processing state (REST) every 60 s for up to 60 minutes; done only at VALID",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "ios-release-testflight",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "release-processing-timeout",
+      "topic": "Upload",
+      "symptom": "Processing did not reach VALID within 60 minutes",
+      "cause": "Apple is slow, or the build is stuck",
+      "fix": "Check the TestFlight tab, then rerun with --resume processing (the upload is done; a plain rerun would upload a second build)",
+      "match": [
+        "did not reach VALID"
+      ],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "ios-release-testflight",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "release-processing-rest-error",
+      "topic": "Upload",
+      "symptom": "The release stops after the upload while waiting for processing, or reading the processing state failed",
+      "cause": "A REST error (401/403 or no network) while polling; the build is already at Apple",
+      "fix": "A 401 or 403 is a stop for the developer; otherwise restore the network. Then rerun with --resume processing",
+      "match": [
+        "while waiting for processing",
+        "reading the processing state failed"
+      ],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "ios-release-testflight",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "release-cannot-resume",
+      "topic": "Upload",
+      "symptom": "release --resume stops: cannot resume (HEAD is not the build-number commit, or that build is already tagged)",
+      "cause": "A commit came after the build-number bump (usually the fix itself), or that build already finished",
+      "fix": "Rerun without --resume; it takes a new build number (gaps are harmless, Apple rejects only duplicates)",
+      "match": [
+        "cannot resume: "
+      ],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "ios-release-testflight",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "release-no-internal-group",
+      "topic": "App Store Connect",
+      "symptom": "The build is VALID but does not appear in TestFlight on a tester's phone",
+      "cause": "TestFlight shows a build only to testers in a group that has it; the app has no internal group with automatic distribution",
+      "fix": "Human step: the developer creates an internal testing group with automatic distribution and adds the testers; later builds then appear without another step",
+      "match": [],
+      "status": "documented",
+      "needsHuman": true,
+      "skill": "ios-release-testflight",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "release-first-iap-with-version",
+      "topic": "App Store Connect",
+      "symptom": "A first in-app purchase cannot be submitted on its own",
+      "cause": "The first in-app purchase must be submitted together with a new app version",
+      "fix": "Human step: the developer selects the purchase on the version page before Submit for Review; later purchases can be submitted alone",
+      "match": [],
+      "status": "documented",
+      "needsHuman": true,
+      "skill": "in-app-purchases",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "release-store-locale-missing",
+      "topic": "App Store Connect",
+      "symptom": "App Store Connect offers no store localization for one of the app's languages",
+      "cause": "Apple's store localization list does not cover every language an app can ship",
+      "fix": "Store texts use the closest supported store languages; the in-app languages are unaffected",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "i18n-strings-and-catalogs",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "release-manage-version-default",
+      "topic": "Export",
+      "symptom": "The exported build has other version or build numbers than app.config.ts",
+      "cause": "manageAppVersionAndBuildNumber defaults to YES in ExportOptions",
+      "fix": "Set manageAppVersionAndBuildNumber to false in every export-options plist",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "ios-release-testflight",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "release-app-store-method",
+      "topic": "Export",
+      "symptom": "xcodebuild warns that the export method app-store is deprecated",
+      "cause": "The ExportOptions method was renamed",
+      "fix": "Use method app-store-connect (destination export, signingStyle automatic)",
+      "match": [
+        "app-store.{0,20}deprecated"
+      ],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "ios-release-testflight",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "release-gate-failed",
+      "topic": "Store gate",
+      "symptom": "The store-artifact gate fails on the exported .ipa or .aab",
+      "cause": "The artifact holds test-only code, a test artefact (StoreKit configuration, harness), a sample ad id, a placeholder, a stale build number or a debug entitlement",
+      "fix": "Fix the cause the gate names and rebuild with a new build number; never skip the gate or upload the artifact anyway",
+      "match": [
+        "store-artifact gate failed"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "ios-release-testflight"
+    },
+    {
+      "id": "release-test-ids-in-bundle",
+      "topic": "Store gate",
+      "symptom": "grep finds Google's sample publisher id 3940256099942544 in every production bundle",
+      "cause": "react-native-google-mobile-ads ships its TestIds module in every bundle",
+      "fix": "Check the sample id on the source-mapped export with node_modules excluded; the binary gate checks the native app id and the test-only sentinel instead",
+      "match": [
+        "3940256099942544"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "admob-ads-and-consent"
+    },
+    {
+      "id": "release-ship-placeholder",
+      "topic": "Store gate",
+      "symptom": "A ship gate prints [ship-placeholder] lines: a com.example.* id, a Google sample AdMob app or unit id, example.com or an @example.com address, or an unfilled `__UPPER_SNAKE__` token",
+      "cause": "The real identifiers (bundle id, ad ids, privacy-policy URL, support address) were never supplied; every ship gate refuses each placeholder by name",
+      "fix": "Stop: the developer supplies the real values, then write them into app.config.ts and the contracts; never edit a gate or the placeholder list to pass, and never type a stand-in value",
+      "match": [
+        "\\[ship-placeholder\\]",
+        "com\\.example\\.",
+        "support@example\\.com"
+      ],
+      "status": "verified",
+      "needsHuman": true,
+      "skill": "ios-release-testflight"
+    },
+    {
+      "id": "release-rehearsal-unsigned",
+      "topic": "Store gate",
+      "symptom": "The store gate fails its signing rule (the app is not signed, codesign -d failed) on an archive built with CODE_SIGNING_ALLOWED=NO",
+      "cause": "Ship gates require a signed export; a keyless rehearsal archive has none",
+      "fix": "For a rehearsal only pass --rehearsal: the gate prints REHEARSAL: not a release gate and skips only the signing rule. A rehearsal is never release evidence",
+      "match": [
+        "the app is not signed",
+        "REHEARSAL: not a release gate"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "ios-release-testflight"
+    },
+    {
+      "id": "release-secrets-printed",
+      "topic": "Secrets",
+      "symptom": "A JWT, an Authorization header or private key text appears in a log, a report or a commit",
+      "cause": "Debug output or a copy of the key",
+      "fix": "Stop: the developer revokes the key, creates a new one and replaces the file; search git log -p -S for the key header and the reports folder",
+      "match": [],
+      "status": "documented",
+      "needsHuman": true,
+      "skill": "ios-release-testflight"
+    },
+    {
+      "id": "release-eas-auto-submit",
+      "topic": "EAS",
+      "symptom": "A build reached TestFlight or Play without the store gate having read it (eas build --auto-submit, eas submit --latest)",
+      "cause": "The submit took whatever EAS built last instead of the artifact the gate passed",
+      "fix": "Download the artifact, run the gate on it, then eas submit --path <that file>; --auto-submit only for iOS when the gate runs on the EAS record",
+      "match": [
+        "--auto-submit",
+        "submit --latest"
+      ],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "eas-build-and-submit"
+    },
+    {
+      "id": "release-eas-new-keystore",
+      "topic": "EAS",
+      "symptom": "eas build offers to generate a new keystore (or certificate) for an app that is already in the store",
+      "cause": "The EAS project lost its credentials (another account or project)",
+      "fix": "Stop: restore the original credentials into EAS (eas credentials); build with --freeze-credentials so a non-interactive build never replaces them",
+      "match": [
+        "[Gg]enerate a new (Android )?[Kk]eystore"
+      ],
+      "status": "documented",
+      "needsHuman": true,
+      "skill": "eas-build-and-submit"
+    },
+    {
+      "id": "release-play-target-sdk-low",
+      "topic": "Google Play gate",
+      "symptom": "The AAB gate or the release setup check fails target-sdk: targetSdkVersion (or compileSdkVersion) is <n>, below <Play floor>",
+      "cause": "An expo-build-properties override (android.targetSdkVersion or compileSdkVersion) or a config plugin lowered the level the Expo SDK sets",
+      "fix": "Remove the override and prebuild with --clean; keep compileSdk and targetSdk from the Expo SDK (36). Play refuses new apps and updates below its floor, so never ship the lower level",
+      "match": [
+        "(?:targetSdkVersion|compileSdkVersion) is \\S+, below \\d+"
+      ],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "android-release-play",
+      "platforms": [
+        "android"
+      ]
+    },
+    {
+      "id": "release-play-api-not-enabled",
+      "topic": "Google Play upload",
+      "symptom": "The Play upload stops: api-not-enabled (HTTP 403); Google says SERVICE_DISABLED or \"Google Play Android Developer API has not been used in project <n> before or it is disabled\"",
+      "cause": "The Google Play Android Developer API is off in the Google Cloud project that owns the service account",
+      "fix": "Stop: the developer enables the API in that Cloud project (it takes a few minutes to apply); never retry before they confirm, then rerun the same upload command",
+      "match": [
+        "stopped: api-not-enabled",
+        "SERVICE_DISABLED",
+        "Android Developer API has not been used in project"
+      ],
+      "status": "documented",
+      "needsHuman": true,
+      "skill": "android-release-play",
+      "platforms": [
+        "android"
+      ]
+    },
+    {
+      "id": "release-play-auth",
+      "topic": "Google Play upload",
+      "symptom": "The Play upload (or eas submit) stops: auth (HTTP 401 or 403): \"The caller does not have permission\", \"Permission ... denied by IAM policy\" or \"Request had invalid authentication credentials\"",
+      "cause": "The service account is not invited to this app in Play Console (Users and permissions), lacks the release permission for the track, or its JSON key was deleted or revoked",
+      "fix": "Stop: the developer grants the service account access to this app with release rights for the track, or makes a new JSON key; never retry, never open or print the key file",
+      "match": [
+        "stopped: auth \\(HTTP 40[13]\\)",
+        "The caller does not have permission",
+        "denied by IAM policy",
+        "invalid authentication credentials"
+      ],
+      "status": "documented",
+      "needsHuman": true,
+      "skill": "android-release-play",
+      "platforms": [
+        "android"
+      ]
+    },
+    {
+      "id": "release-play-app-not-found",
+      "topic": "Google Play upload",
+      "symptom": "The Play upload stops: app-not-found (HTTP 404), or eas submit says \"Package not found: <package>\"",
+      "cause": "No app with this package name exists in Play Console yet, or its first build was never uploaded by hand: the Play API can neither create an app nor make its first upload",
+      "fix": "Stop: the developer creates the app in Play Console and uploads the first .aab to internal testing by hand (the release skill names the bundle); automated uploads work from the second build on",
+      "match": [
+        "stopped: app-not-found",
+        "Package not found: "
+      ],
+      "status": "documented",
+      "needsHuman": true,
+      "skill": "android-release-play",
+      "platforms": [
+        "android"
+      ]
+    },
+    {
+      "id": "release-play-draft-app",
+      "topic": "Google Play upload",
+      "symptom": "Only releases with status draft may be created on draft app (the upload stops: draft-app)",
+      "cause": "The Play app is still a draft (store listing or App content never completed), so Play accepts only draft releases",
+      "fix": "Stop and ask: with the developer's word upload as a draft (--draft-app, or releaseStatus \"draft\" in eas.json submit) and the developer rolls it out in Play Console; or the developer finishes the store setup first",
+      "match": [
+        "Only releases with status draft may be created on draft app",
+        "stopped: draft-app"
+      ],
+      "status": "documented",
+      "needsHuman": true,
+      "skill": "android-release-play",
+      "platforms": [
+        "android"
+      ]
+    },
+    {
+      "id": "release-play-policy-declarations",
+      "topic": "Google Play upload",
+      "symptom": "The Play upload stops: policy-declarations; Google names a declaration (\"You must complete the advertising ID declaration\", Data safety, content rating, target audience, privacy policy)",
+      "cause": "App content in Play Console is incomplete; Play answers some of these with 403, which is not a permission problem",
+      "fix": "Stop: the developer completes the declaration Google names in App content (privacy-and-store-declarations keeps the answers); rerun the same upload once it is done",
+      "match": [
+        "stopped: policy-declarations",
+        "must complete the .{0,40}declaration"
+      ],
+      "status": "documented",
+      "needsHuman": true,
+      "skill": "android-release-play",
+      "platforms": [
+        "android"
+      ]
+    },
+    {
+      "id": "release-play-changes-not-sent-for-review",
+      "topic": "Google Play upload",
+      "symptom": "Changes cannot be sent for review automatically. Please set the query parameter changesNotSentForReview to true",
+      "cause": "An earlier update was rejected, or the app's changes are held for review by hand, so Play will not send this edit for review by itself",
+      "fix": "Stop: the developer decides. With their word, run the same command again with --changes-not-sent-for-review (eas.json submit: changesNotSentForReview true), then the developer sends the changes for review in Play Console (Publishing overview)",
+      "match": [
+        "Changes cannot be sent for review automatically",
+        "stopped: changes-not-sent-for-review"
+      ],
+      "status": "documented",
+      "needsHuman": true,
+      "skill": "android-release-play",
+      "platforms": [
+        "android"
+      ]
+    },
+    {
+      "id": "release-play-network",
+      "topic": "Google Play upload",
+      "symptom": "The Play upload stops on a network error or a timeout",
+      "cause": "The machine is offline, or Google answered too slowly",
+      "fix": "Ask before one retry; a half-done Play edit expires by itself and the gated bundle is unchanged, so the retry uploads the same file",
+      "match": [],
+      "status": "documented",
+      "needsHuman": true,
+      "skill": "android-release-play",
+      "platforms": [
+        "android"
+      ]
+    },
+    {
+      "id": "release-play-testers-no-build",
+      "topic": "After the Play upload",
+      "symptom": "Internal or closed testers do not see the build on Google Play",
+      "cause": "They are not on the track's testers list, have not opted in through the track's link, or are signed in to Play with another Google account than the one on the list",
+      "fix": "Human step: the developer adds the tester's Google account to the list and shares the opt-in link; the tester opens it signed in with that same account. Nothing in the build changes",
+      "match": [],
+      "status": "documented",
+      "needsHuman": true,
+      "skill": "android-release-play",
+      "platforms": [
+        "android"
+      ]
+    }
+  ]
+}

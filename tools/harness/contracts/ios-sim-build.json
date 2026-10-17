@@ -1,0 +1,13 @@
+{
+  "$schema": "./ios-sim-build.schema.json",
+  "$comment": "The app's facts for Release simulator builds: read by scripts/build/build-ios-sim.ts and by the ios-simulator-build skill's check-sim-setup and check-sim-app. Every key is optional; the schema says what each does and its default.",
+  "simulatorPrefix": "harness",
+  "deviceType": "iPhone 17 Pro Max",
+  "appId": "com.example.harness",
+  "postPrebuild": [],
+  "usageStrings": ["NSCameraUsageDescription", "NSUserTrackingUsageDescription"],
+  "infoPlist": {},
+  "usesNonExemptEncryption": false,
+  "readyMarker": null,
+  "linkFlow": ".maestro/subflows/open-link.yaml"
+}

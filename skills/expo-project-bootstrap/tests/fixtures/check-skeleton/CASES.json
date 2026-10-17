@@ -1,0 +1,511 @@
+{
+  "bad-agents-missing": { "expect": ["FAIL AGENTS.md [agents] is missing"], "ops": [{ "delete": "AGENTS.md" }] },
+  "bad-app-config-extension": {
+    "expect": ["FAIL app.config.ts:9 [app-config] imports ./src/config/app-variant without its .ts extension"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "} from './src/config/app-variant.ts';\n",
+          "with": "} from './src/config/app-variant';\n",
+          "occurrence": 1
+        }
+      }
+    ]
+  },
+  "bad-app-config-json": {
+    "expect": [
+      "FAIL app.config.json:1 [app-config] sits next to app.config.ts; Expo reads app.config.json as the static base"
+    ],
+    "ops": [
+      {
+        "$comment": "A static app.config.json next to app.config.ts: Expo passes it into the dynamic config as its base, so its values reach the app unseen.",
+        "write": { "file": "app.config.json", "content": "{ \"expo\": { \"orientation\": \"landscape\" } }\n" }
+      }
+    ]
+  },
+  "bad-app-env": {
+    "expect": ["FAIL src/app-env.d.ts:1 [app-env] does not `declare const process`"],
+    "ops": [{ "write": { "file": "src/app-env.d.ts", "content": "// src/app-env.d.ts\nexport {};\n" } }]
+  },
+  "bad-app-id": {
+    "expect": ["FAIL app.config.ts:16 [app-id] appId: com.acme.my-tasks is not a valid Android package"],
+    "ops": [
+      {
+        "replace": { "file": "app.config.ts", "find": "appId: 'com.acme.tasks'", "with": "appId: 'com.acme.my-tasks'" }
+      }
+    ]
+  },
+  "bad-app-id-keyword": {
+    "expect": ["FAIL app.config.ts:16 [app-id] appId com.acme.class: id part \"class\" is a Kotlin or Java keyword"],
+    "ops": [
+      { "replace": { "file": "app.config.ts", "find": "appId: 'com.acme.tasks'", "with": "appId: 'com.acme.class'" } }
+    ]
+  },
+  "bad-app-types-include": {
+    "expect": ["FAIL src/tsconfig.json:12 [tsconfig-program] include lacks the typed-routes declarations"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/tsconfig.json",
+          "find": "\"include\": [\"**/*\", \"../.expo/types/**/*.ts\"]",
+          "with": "\"include\": [\"**/*\"]"
+        }
+      }
+    ]
+  },
+  "bad-ask-wildcard": {
+    "expect": ["FAIL .claude/settings.json:1 [gate-scope] permissions.ask has Edit(**/tsconfig*.json)"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".claude/settings.json",
+          "find": "\"Edit(/tsconfig*.json)\"",
+          "with": "\"Edit(**/tsconfig*.json)\""
+        }
+      }
+    ]
+  },
+  "bad-banned-package": {
+    "expect": ["FAIL package.json:1 [banned] expo-cli is banned: deprecated"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["devDependencies", "expo-cli"], "value": "6.3.12" } },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "", "devDependencies", "expo-cli"],
+          "value": "6.3.12"
+        }
+      }
+    ]
+  },
+  "bad-caret-pin": {
+    "expect": ["FAIL package.json:1 [pin-exact] devDependency prettier is \"^3.9.9\", not an exact version"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["devDependencies", "prettier"], "value": "^3.9.9" } },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "", "devDependencies", "prettier"],
+          "value": "^3.9.9"
+        }
+      }
+    ]
+  },
+  "bad-claude-md": {
+    "expect": ["FAIL CLAUDE.md:1 [agents] must import AGENTS.md with the line @AGENTS.md"],
+    "ops": [{ "write": { "file": "CLAUDE.md", "content": "Project notes for Claude Code.\n" } }]
+  },
+  "bad-claude-md-symlink-elsewhere": {
+    "expect": ["FAIL CLAUDE.md:1 [agents] must import AGENTS.md with the line @AGENTS.md"],
+    "ops": [
+      {
+        "$comment": "Only a symlink that resolves to AGENTS.md counts as one source; a link to another file is read like any CLAUDE.md.",
+        "write": { "file": "NOTES.md", "content": "Project notes for Claude Code.\n" }
+      },
+      { "delete": "CLAUDE.md" },
+      { "symlink": { "path": "CLAUDE.md", "target": "NOTES.md" } },
+      { "write": { "file": "rn-skills.config.json", "content": "{ \"layoutEntries\": [\"NOTES.md\"] }\n" } }
+    ]
+  },
+  "bad-contracts-dir-missing": {
+    "expect": ["FAIL qa/contracts/knip-ignores.json [root-file] is missing"],
+    "ops": [
+      {
+        "$comment": "contractsDir moved, but the knip ignores contract was left behind in contracts/.",
+        "rename": { "from": "contracts/dependency-policy.json", "to": "qa/contracts/dependency-policy.json" }
+      },
+      {
+        "write": {
+          "file": "rn-skills.config.json",
+          "content": "{ \"contractsDir\": \"qa/contracts\", \"layoutEntries\": [\"qa\"] }\n"
+        }
+      }
+    ]
+  },
+  "bad-exclude-spelling": {
+    "expect": [
+      "[npmrc-exclude] exclude expo is not inside a dated \"# exclude-block expires=YYYY-MM-DD reason=...\" block"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".npmrc",
+          "find": "package-lock=true\n",
+          "with": "package-lock=true\nmin-release-age-exclude = expo\n"
+        }
+      }
+    ]
+  },
+  "bad-expired-exclude": {
+    "expect": ["[npmrc-exclude] exclude expo-router is in a block that expired on 2026-10-01"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".npmrc",
+          "find": "package-lock=true\n",
+          "with": "package-lock=true\n\n# exclude-block expires=2026-10-01 reason=expo-router patch for a router crash\nmin-release-age-exclude[]=expo-router\n"
+        }
+      }
+    ]
+  },
+  "bad-gate-scope-rules": {
+    "expect": [
+      "[gate-scope] gated-path matching does not keep wildcard patterns out of the agent folders",
+      "scripts/quality/gated-paths.ts:"
+    ],
+    "ops": [{ "replace": { "file": "scripts/quality/gated-paths.ts", "find": "  'skills/',\n", "with": "" } }]
+  },
+  "bad-gates-drift": {
+    "expect": ["FAIL quality-gates.json:1 [quality-gates] npmScripts.lint differs from package.json"],
+    "ops": [{ "json": { "file": "quality-gates.json", "path": ["npmScripts", "lint"], "value": "eslint ." } }]
+  },
+  "bad-gitignore-key": {
+    "expect": ["FAIL .gitignore:1 [gitignore] lacks \"*.p8\""],
+    "ops": [{ "replace": { "file": ".gitignore", "find": "*.p8\n", "with": "" } }]
+  },
+  "bad-inline-config": {
+    "expect": ["[lint-ignore] does not switch inline eslint-disable comments off (noInlineConfig: true)"],
+    "ops": [
+      { "replace": { "file": "eslint.config.mjs", "find": "noInlineConfig: true", "with": "noInlineConfig: false" } }
+    ]
+  },
+  "bad-knip-scans-skills": {
+    "expect": ["[knip-config] \"ignore\" lacks \"skills/**\""],
+    "ops": [{ "replace": { "file": "knip.json", "find": "    \"skills/**\",\n", "with": "" } }]
+  },
+  "bad-knip-wide-ignore": {
+    "expect": ["[knip-config] \"ignore\" lists src/legacy/**"],
+    "ops": [
+      {
+        "replace": {
+          "file": "knip.json",
+          "find": "    \"skills/**\",\n",
+          "with": "    \"skills/**\",\n    \"src/legacy/**\",\n"
+        }
+      }
+    ]
+  },
+  "bad-lefthook-verify": {
+    "expect": ["FAIL lefthook.yml:1 [lefthook] lacks \"run: npm run verify\""],
+    "ops": [{ "replace": { "file": "lefthook.yml", "find": "run: npm run verify", "with": "run: npm run lint" } }]
+  },
+  "bad-long-pre-existing-line": {
+    "expect": ["FAIL eslint.config.mjs:498 [format-width] the PRE_EXISTING line is"],
+    "ops": [
+      { "write": { "file": "design-exports-from-the-agency/readme.md", "content": "# exports\n" } },
+      { "write": { "file": "handbook-for-the-whole-team/readme.md", "content": "# handbook\n" } },
+      {
+        "replace": {
+          "file": ".prettierignore",
+          "find": "\ndocs/\n",
+          "with": "\ndesign-exports-from-the-agency/\ndocs/\nhandbook-for-the-whole-team/\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "const PRE_EXISTING = ['docs/**'];",
+          "with": "const PRE_EXISTING = ['design-exports-from-the-agency/**', 'docs/**', 'handbook-for-the-whole-team/**'];"
+        }
+      }
+    ]
+  },
+  "bad-metro-cache": {
+    "expect": ["[metro-cache] Metro's cacheVersion is not keyed on the EXPO_PUBLIC_* values"],
+    "ops": [
+      {
+        "replace": {
+          "file": "metro.config.js",
+          "find": "config.cacheVersion = publicEnvCacheVersion(process.env);\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-missing-dep-gate": {
+    "expect": ["FAIL scripts/deps/check-deps.ts [tooling-files] is missing"],
+    "ops": [{ "delete": "scripts/deps/check-deps.ts" }]
+  },
+  "bad-missing-icon": {
+    "expect": [
+      "FAIL assets/icons/preview/android-foreground.png [app-files] is an icon app.config.ts names for a variant but does not exist"
+    ],
+    "ops": [{ "delete": "assets/icons/preview/android-foreground.png" }]
+  },
+  "bad-missing-root-file": {
+    "expect": ["FAIL jest.setup.ts [root-file] is missing"],
+    "ops": [{ "delete": "jest.setup.ts" }]
+  },
+  "bad-missing-router": {
+    "expect": ["FAIL package.json:1 [app-manifest] lacks the dependency expo-router"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-router"], "delete": true } },
+      {
+        "json": { "file": "package-lock.json", "path": ["packages", "", "dependencies", "expo-router"], "delete": true }
+      }
+    ]
+  },
+  "bad-missing-typescript-eslint-override": {
+    "expect": ["FAIL package.json:1 [root-overrides] overrides.@typescript-eslint/parser is missing"],
+    "ops": [{ "json": { "file": "package.json", "path": ["overrides", "@typescript-eslint/parser"], "delete": true } }]
+  },
+  "bad-module-type": {
+    "expect": ["FAIL package.json:1 [root-manifest] sets \"type\": \"module\""],
+    "ops": [{ "json": { "file": "package.json", "path": ["type"], "value": "module" } }]
+  },
+  "bad-nested-typescript-eslint": {
+    "expect": [
+      "FAIL package-lock.json:1 [root-overrides] @typescript-eslint/eslint-plugin is installed as 8.70.1, 8.71.0"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/eslint-config-expo/node_modules/@typescript-eslint/eslint-plugin"],
+          "value": { "version": "8.71.0", "dev": true }
+        }
+      }
+    ]
+  },
+  "bad-no-node-pin": {
+    "expect": ["FAIL .nvmrc [node-pin] no file pins the Node version"],
+    "ops": [{ "delete": ".nvmrc" }]
+  },
+  "bad-off-policy-exact": {
+    "expect": [
+      "FAIL package.json:1 [pin-exact] expo is pinned at 57.0.10, but the dependency policy says \"~57.0.27\" (57.0.27)"
+    ],
+    "ops": [
+      {
+        "$comment": "An exact pin that is not the policy's version (the policy says ~57.0.27): exact, so only the policy comparison catches it.",
+        "json": { "file": "package.json", "path": ["dependencies", "expo"], "value": "57.0.10" }
+      },
+      { "json": { "file": "package-lock.json", "path": ["packages", "", "dependencies", "expo"], "value": "57.0.10" } }
+    ]
+  },
+  "bad-off-policy-exact-dev": {
+    "expect": [
+      "FAIL package.json:1 [pin-exact] typescript is pinned at 5.9.3, but the dependency policy says \"6.0.3\" (6.0.3)"
+    ],
+    "ops": [
+      {
+        "$comment": "A devDependency pinned exactly, but not at the policy's version (6.0.3).",
+        "json": { "file": "package.json", "path": ["devDependencies", "typescript"], "value": "5.9.3" }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "", "devDependencies", "typescript"],
+          "value": "5.9.3"
+        }
+      }
+    ]
+  },
+  "bad-old-node": {
+    "expect": ["FAIL .nvmrc:1 [node-pin] pins Node \"20.19.0\", below 22.18"],
+    "ops": [{ "write": { "file": ".nvmrc", "content": "20.19.0\n" } }]
+  },
+  "bad-placeholder": {
+    "expect": ["FAIL app.config.ts:17 [placeholder] holds the unfilled template placeholder __APP_NAME__"],
+    "ops": [
+      { "replace": { "file": "app.config.ts", "find": "  name: 'Tasks',\n", "with": "  name: '__APP_NAME__',\n" } }
+    ]
+  },
+  "bad-platforms": {
+    "expect": ["FAIL app.config.ts:1 [platforms] does not set both ios.bundleIdentifier and android.package"],
+    "ops": [{ "replace": { "file": "app.config.ts", "find": "      package: identity.appId,\n", "with": "" } }]
+  },
+  "bad-policy-line-missing": {
+    "expect": ["FAIL .npmrc:1 [npmrc-policy] lacks the line strict-allow-scripts=true"],
+    "ops": [{ "replace": { "file": ".npmrc", "find": "strict-allow-scripts=true\n", "with": "" } }]
+  },
+  "bad-policy-override": {
+    "expect": ["[npmrc-policy] sets min-release-age=0; npm keeps the last value of a key", ".npmrc:"],
+    "ops": [
+      {
+        "replace": { "file": ".npmrc", "find": "package-lock=true\n", "with": "package-lock=true\nmin-release-age=0\n" }
+      }
+    ]
+  },
+  "bad-pre-existing-typescript": {
+    "expect": [
+      "FAIL tsconfig.json:1 [tsconfig-program] the pre-existing folder docs holds .ts files but is not in \"exclude\""
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "tsconfig.json",
+          "find": "\"src/app-env.d.ts\",\n    \"docs\"\n",
+          "with": "\"src/app-env.d.ts\"\n"
+        }
+      }
+    ]
+  },
+  "bad-prettier-width": {
+    "expect": ["FAIL .prettierrc.json:3 [prettier-config] printWidth must be 100"],
+    "ops": [{ "json": { "file": ".prettierrc.json", "path": ["printWidth"], "value": 120 } }]
+  },
+  "bad-range-dependency": {
+    "expect": ["FAIL package.json:1 [pin-exact] expo-router is \"^57.0.25\"", "the policy says \"~57.0.25\""],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-router"], "value": "^57.0.25" } },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "", "dependencies", "expo-router"],
+          "value": "^57.0.25"
+        }
+      }
+    ]
+  },
+  "bad-stale-lockfile": {
+    "expect": [
+      "FAIL package-lock.json:1 [lockfile] the root dependencies differ from package.json (the lockfile is stale)"
+    ],
+    "ops": [{ "json": { "file": "package.json", "path": ["devDependencies", "knip"], "value": "6.39.0" } }]
+  },
+  "bad-stop-hook-removed": {
+    "expect": [
+      "FAIL .claude/settings.json:1 [claude-settings] the Stop hook must run npm run -s check:fast and exit 2 on failure"
+    ],
+    "ops": [{ "json": { "file": ".claude/settings.json", "path": ["hooks", "Stop"], "delete": true } }]
+  },
+  "bad-stray-eslint-config": {
+    "expect": [
+      "FAIL eslint.config.js [template-leftover] is a template leftover: a second ESLint config; ESLint 9 loads eslint.config.js (and .eslintrc*) before eslint.config.mjs",
+      "FAIL prettier.config.js [template-leftover] is a template leftover: a second Prettier config",
+      "Fix: Move any rule the team needs into eslint.config.mjs (typescript-and-lint-rules), then delete eslint.config.js."
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "eslint.config.js",
+          "content": "// written by npx expo lint\nconst expoConfig = require('eslint-config-expo/flat');\n\nmodule.exports = [...expoConfig];\n"
+        }
+      },
+      { "write": { "file": "prettier.config.js", "content": "module.exports = { printWidth: 80 };\n" } }
+    ]
+  },
+  "bad-stryker-scans-skills": {
+    "expect": ["[stryker-config] ignorePatterns lacks \"skills\"", "stryker.config.json:"],
+    "ops": [{ "replace": { "file": "stryker.config.json", "find": "    \"skills\",\n", "with": "" } }]
+  },
+  "bad-template-leftover": {
+    "expect": [
+      "FAIL app.json [template-leftover] is a template leftover",
+      "FAIL src/components/ [template-leftover] is a template leftover",
+      "FAIL assets/images/tabIcons/ [template-leftover] is a template leftover: the template's demo art"
+    ],
+    "ops": [
+      { "write": { "file": "app.json", "content": "{ \"expo\": { \"name\": \"HelloWorld\" } }\n" } },
+      { "write": { "file": "src/components/themed-text.tsx", "content": "export const themed = 1;\n" } },
+      { "png": { "files": ["assets/images/tabIcons/home.png"], "width": 24, "height": 24, "fill": "#000000" } }
+    ]
+  },
+  "bad-two-reacts": {
+    "expect": [
+      "FAIL package-lock.json:1 [one-react] react is installed as 19.2.3, 19.3.0; the tree must hold exactly 19.2.3"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/some-dev-tool/node_modules/react"],
+          "value": { "version": "19.3.0", "dev": true }
+        }
+      }
+    ]
+  },
+  "bad-unapproved-script": {
+    "expect": [
+      "FAIL package.json:1 [install-scripts] esbuild@0.25.10 has an install script that allowScripts does not cover"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/esbuild"],
+          "value": { "version": "0.25.10", "dev": true, "hasInstallScript": true }
+        }
+      }
+    ]
+  },
+  "bad-unignored-folder": {
+    "expect": [
+      "FAIL .prettierignore:1 [format-ignore] the pre-existing folder notes/ is not ignored",
+      "[lint-ignore] the pre-existing folder notes is not in PRE_EXISTING"
+    ],
+    "ops": [{ "write": { "file": "notes/todo.md", "content": "# todo\n" } }]
+  },
+  "bad-weak-tsconfig": {
+    "expect": ["FAIL tsconfig.base.json:5 [tsconfig-base] compilerOptions.strict must be true"],
+    "ops": [{ "replace": { "file": "tsconfig.base.json", "find": "\"strict\": true", "with": "\"strict\": false" } }]
+  },
+  "bad-weakened-lint-script": {
+    "expect": ["[root-scripts] script \"lint\" differs from the canonical command", "package.json:"],
+    "ops": [{ "json": { "file": "package.json", "path": ["scripts", "lint"], "value": "eslint ." } }]
+  },
+  "error-no-manifest": { "expect": ["ERROR [bad-input] nothing to check"], "ops": [{ "delete": "package.json" }] },
+  "pass-agent-skills-silent": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "write": { "file": ".agents/skills/demo/SKILL.md", "content": "---\nname: demo\n---\n" } },
+      {
+        "write": {
+          "file": ".agents/skills/demo/templates/app.config.ts",
+          "content": "export const id = '__APP_ID__';\n"
+        }
+      },
+      { "write": { "file": "skills/old/SKILL.md", "content": "---\nname: old\n---\n" } },
+      { "write": { "file": "skills/old/app.json", "content": "{ \"expo\": {} }\n" } },
+      { "write": { "file": "src/vendored/SKILL.md", "content": "---\nname: vendored\n---\n" } },
+      { "write": { "file": "src/vendored/templates/x.ts", "content": "export const name = '__APP_NAME__';\n" } }
+    ]
+  },
+  "pass-claude-md-symlink": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "CLAUDE.md as a symlink to AGENTS.md is one source too, so the agents rule accepts it (the import line stays the default: symlinks break on Windows checkouts).",
+        "delete": "CLAUDE.md"
+      },
+      { "symlink": { "path": "CLAUDE.md", "target": "AGENTS.md" } }
+    ]
+  },
+  "pass-contracts-dir": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "The contracts live in qa/contracts (rn-skills.config.json contractsDir): the root-file rule and the policy follow it.",
+        "rename": { "from": "contracts", "to": "qa/contracts" }
+      },
+      {
+        "write": {
+          "file": "rn-skills.config.json",
+          "content": "{ \"contractsDir\": \"qa/contracts\", \"layoutEntries\": [\"qa\"] }\n"
+        }
+      }
+    ]
+  },
+  "pass-fingerprint-config": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "ota-updates writes fingerprint.config.js at the repo root: an app file the tooling runs, so it stays linted and formatted and is never asked into the ignore lists.",
+        "write": {
+          "file": "fingerprint.config.js",
+          "content": "// fingerprint.config.js\n/** @type {import('expo/fingerprint').Config} */\nconst config = { sourceSkips: ['ExpoConfigVersions'] };\n\nmodule.exports = config;\n"
+        }
+      }
+    ]
+  },
+  "pass-template-app-id": {
+    "expect": ["NOTE app.config.ts:16 [app-id] com.example.tasks is the template id", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": { "file": "app.config.ts", "find": "appId: 'com.acme.tasks'", "with": "appId: 'com.example.tasks'" }
+      }
+    ]
+  }
+}

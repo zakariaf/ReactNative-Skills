@@ -1,0 +1,2 @@
+src/features/task-editor/task-editor-schema.ts:31 [schema-message-key] maxLength(...) message 'task-editor.title.long' is not a key of src/i18n/catalogs/en.json
+RESULT: FAIL (1 problems)

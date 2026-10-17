@@ -1,0 +1,25 @@
+# .maestro/screenshots/matrix.yaml — run only by the screenshot capture (it is not under flows/; the
+# folder is declared in contracts/naming.json extraE2eFolders). The capture passes LANG and THEME
+# and sets the device appearance (light, then dark) itself, so the app follows theme=system.
+# A still, deterministic screen: animations held (motion=still), a fixed day and no network.
+# One runFlow per screen: SCREEN is a debug-link open value, ROOT that screen's root testID.
+appId: ${APP_ID}
+name: Screenshot matrix
+tags: [screenshots]
+---
+- launchApp:
+    clearState: true
+# 1. The language alone (it may flip the layout direction, which restarts the app): set-language
+#    returns on the debug menu once the app runs in that direction.
+- runFlow:
+    file: ../subflows/set-language.yaml
+# 2. Everything else, ending on a screen the app is not on yet (the debug menu is showing), so the
+#    wait for its root proves this link arrived.
+- runFlow:
+    file: ../subflows/debug-setup.yaml
+    env:
+      QUERY: 'theme=system&motion=still&date=2030-03-01&offline=1&open=__HOME_OPEN__'
+      WAIT_FOR: '__HOME_SCREEN_ID__'
+- runFlow:
+    file: ../subflows/shoot-screen.yaml
+    env: { SCREEN: __HOME_OPEN__, ROOT: __HOME_SCREEN_ID__ }

@@ -1,0 +1,103 @@
+{
+  "base": [
+    "@tests/bases/app",
+    "@tests/bases/decoys",
+    {
+      "templates": true,
+      "firstLinePath": true,
+      "fill": {
+        "__APP_ID__": "com.example.tasks",
+        "__APP_NAME__": "Tasks",
+        "__APP_SLUG__": "tasks",
+        "__APP_SCHEME__": "tasks"
+      }
+    }
+  ],
+  "renames": {
+    "dot-env.example": ".env.example"
+  },
+  "ops": [
+    {
+      "write": {
+        "file": ".agents/skills/decoy/SKILL.md",
+        "content": "---\nname: decoy\ndescription: Planted findings that every scan must skip.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/decoy/SKILL.md",
+        "content": "---\nname: decoy\ndescription: Planted findings that every scan must skip.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/vendor/kit/SKILL.md",
+        "content": "---\nname: decoy\ndescription: Planted findings that every scan must skip.\n---\n"
+      }
+    },
+    {
+      "png": {
+        "files": [
+          "assets/icons/production/icon.png",
+          "assets/icons/production/android-foreground.png",
+          "assets/icons/production/android-background.png",
+          "assets/icons/production/android-monochrome.png",
+          "assets/icons/production/expo.icon/Assets/glyph.png"
+        ],
+        "width": 8,
+        "height": 8,
+        "fill": "#1F6FEB"
+      }
+    },
+    {
+      "write": {
+        "file": "assets/icons/production/expo.icon/icon.json",
+        "content": "{\n  \"groups\": [{ \"layers\": [{ \"image-name\": \"glyph.png\", \"name\": \"glyph\" }] }],\n  \"supported-platforms\": { \"squares\": \"shared\" }\n}\n"
+      }
+    },
+    {
+      "png": {
+        "files": [
+          "assets/icons/development/icon.png",
+          "assets/icons/development/android-foreground.png",
+          "assets/icons/development/android-background.png",
+          "assets/icons/development/android-monochrome.png"
+        ],
+        "width": 8,
+        "height": 8,
+        "fill": "#1F6FEB",
+        "rects": [
+          {
+            "x": 0,
+            "y": 5,
+            "width": 8,
+            "height": 3,
+            "fill": "#D97706"
+          }
+        ]
+      }
+    },
+    {
+      "png": {
+        "files": [
+          "assets/icons/preview/icon.png",
+          "assets/icons/preview/android-foreground.png",
+          "assets/icons/preview/android-background.png",
+          "assets/icons/preview/android-monochrome.png"
+        ],
+        "width": 8,
+        "height": 8,
+        "fill": "#1F6FEB",
+        "rects": [
+          {
+            "x": 0,
+            "y": 5,
+            "width": 8,
+            "height": 3,
+            "fill": "#7C3AED"
+          }
+        ]
+      }
+    }
+  ]
+}

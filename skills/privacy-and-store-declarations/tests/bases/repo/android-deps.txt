@@ -1,0 +1,20 @@
+releaseRuntimeClasspath - Runtime classpath of /release.
++--- project :react-native-google-mobile-ads
+|    +--- com.google.android.gms:play-services-ads:25.4.0
+|    |    +--- com.google.android.gms:play-services-ads-api:25.4.0
+|    |    |    +--- com.google.android.gms:play-services-basement:18.5.0
+|    |    |    \--- com.google.android.gms:play-services-measurement-sdk-api:22.1.2
+|    |    \--- androidx.work:work-runtime:2.10.0
+|    \--- com.google.android.ump:user-messaging-platform:4.0.0
+|         \--- com.google.android.gms:play-services-basement:18.5.0 (*)
++--- project :expo-notifications
+|    +--- androidx.core:core:1.17.0
+|    +--- com.google.firebase:firebase-messaging:25.0.1
+|    |    +--- com.google.firebase:firebase-common:21.0.0
+|    |    +--- com.google.firebase:firebase-installations:18.0.0
+|    |    +--- com.google.firebase:firebase-iid-interop:17.1.0
+|    |    +--- com.google.firebase:firebase-datatransport:19.0.0
+|    |    \--- com.google.android.gms:play-services-cloud-messaging:17.2.0
+|    \--- me.leolin:ShortcutBadger:1.1.22
+\--- project :expo-iap
+     \--- io.github.hyochan.openiap:openiap-google:1.1.0

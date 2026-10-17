@@ -1,0 +1,265 @@
+{
+  "$schema": "./screens.schema.json",
+  "$comment": "Shape, not a template: screen-contracts' contracts/screens.json for the demo Tasks app (its tasks, lists and delete-list-dialog entries, unchanged) with the two things design-visual-parity adds: a \"reference\" on each state the approved design draws (the frame key is the file name without .png; shoot-design.mjs --update-reference writes this image into the \"references\" folder: the first device of the parity contract, 1 pt = 1 px, light theme, the source language; shoot-design.mjs --check proves it) and \"checks\" on the elements the gates compare (bounds is the default). The demo mockup and templates/contracts/visual-parity.json draw exactly these frames.",
+  "version": 1,
+  "references": "design/screens",
+  "policies": {
+    "primaryAction": {
+      "max": 1,
+      "match": [
+        {
+          "component": "Button",
+          "prop": "variant",
+          "value": "primary"
+        }
+      ]
+    },
+    "adSlot": {
+      "components": [
+        "AdBannerSlot"
+      ],
+      "screens": [
+        "tasks"
+      ]
+    },
+    "modalRoots": [
+      "Modal",
+      "Scrim"
+    ],
+    "retiredKeys": {}
+  },
+  "screens": [
+    {
+      "id": "tasks",
+      "name": "Tasks",
+      "presentation": "route",
+      "route": "src/app/(app)/index.tsx",
+      "model": "src/features/tasks/use-tasks-model.ts",
+      "view": "src/features/tasks/tasks-screen.tsx",
+      "states": [
+        {
+          "id": "default",
+          "reference": "tasks-default.png"
+        }
+      ],
+      "elements": [
+        {
+          "testID": "tasks.list",
+          "role": "list",
+          "component": "FlatList",
+          "checks": [
+            "bounds",
+            "fill"
+          ]
+        },
+        {
+          "testID": "tasks.summary",
+          "role": "text",
+          "component": "AppText",
+          "text": "tasks.summary.open",
+          "checks": [
+            "bounds",
+            "text"
+          ]
+        },
+        {
+          "testID": "tasks.task-row.{taskId}",
+          "role": "checkbox",
+          "component": "PressableSurface",
+          "note": "One row per task, keyed by the task id; the row is the checkbox.",
+          "checks": [
+            "bounds",
+            "text",
+            "fill"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lists",
+      "name": "Lists",
+      "presentation": "route",
+      "route": "src/app/(app)/lists.tsx",
+      "model": "src/features/lists/use-lists-model.ts",
+      "view": "src/features/lists/lists-screen.tsx",
+      "states": [
+        {
+          "id": "default",
+          "reference": "lists-default.png"
+        },
+        {
+          "id": "empty",
+          "drawn": false,
+          "why": "Chosen: a first launch has no lists; a title and one line, no picture."
+        },
+        {
+          "id": "error",
+          "drawn": false,
+          "why": "Chosen: the lists could not be read; the message and one Try again action at the bottom."
+        }
+      ],
+      "elements": [
+        {
+          "testID": "lists.screen",
+          "role": "none",
+          "component": "View",
+          "checks": [
+            "bounds",
+            "fill"
+          ]
+        },
+        {
+          "testID": "lists.list",
+          "role": "list",
+          "component": "FlatList",
+          "states": [
+            "default"
+          ],
+          "checks": [
+            "bounds"
+          ]
+        },
+        {
+          "testID": "lists.list-row.{listId}",
+          "role": "none",
+          "component": "View",
+          "states": [
+            "default"
+          ],
+          "note": "One row per list, keyed by the list id; the list's name is data text. Not accessible itself, so its delete button stays reachable.",
+          "checks": [
+            "bounds"
+          ]
+        },
+        {
+          "testID": "lists.list-row.{listId}.delete-button",
+          "role": "button",
+          "component": "PressableSurface",
+          "text": "lists.list-row.delete-button.text",
+          "a11yLabel": "lists.list-row.delete-button.label",
+          "states": [
+            "default"
+          ],
+          "checks": [
+            "bounds",
+            "text"
+          ]
+        },
+        {
+          "testID": "lists.empty-title",
+          "role": "header",
+          "component": "AppText",
+          "text": "lists.empty.title",
+          "states": [
+            "empty"
+          ]
+        },
+        {
+          "testID": "lists.empty-body",
+          "role": "text",
+          "component": "AppText",
+          "text": "lists.empty.body",
+          "states": [
+            "empty"
+          ]
+        },
+        {
+          "testID": "lists.error-note",
+          "role": "text",
+          "component": "AppText",
+          "text": "lists.error.body",
+          "states": [
+            "error"
+          ]
+        },
+        {
+          "testID": "lists.retry-button",
+          "role": "button",
+          "component": "PressableSurface",
+          "text": "lists.retry-button.label",
+          "states": [
+            "error"
+          ]
+        }
+      ],
+      "notes": "The navigation title (lists.title) is set by the route through the Stack header. The delete dialog is its own screen (delete-list-dialog)."
+    },
+    {
+      "id": "delete-list-dialog",
+      "name": "Delete list",
+      "presentation": "dialog",
+      "model": "src/features/lists/use-lists-model.ts",
+      "view": "src/features/lists/delete-list-dialog/delete-list-dialog.tsx",
+      "states": [
+        {
+          "id": "default",
+          "reference": "delete-list-dialog-default.png"
+        }
+      ],
+      "elements": [
+        {
+          "testID": "delete-list-dialog.scrim",
+          "role": "none",
+          "component": "View",
+          "note": "The modal root: accessibilityViewIsModal sits here, never on the card.",
+          "checks": [
+            "bounds",
+            "fill"
+          ]
+        },
+        {
+          "testID": "delete-list-dialog.card",
+          "role": "none",
+          "component": "View",
+          "checks": [
+            "bounds",
+            "fill"
+          ]
+        },
+        {
+          "testID": "delete-list-dialog.title",
+          "role": "header",
+          "component": "AppText",
+          "text": "lists.delete-dialog.title",
+          "checks": [
+            "bounds",
+            "text"
+          ]
+        },
+        {
+          "testID": "delete-list-dialog.body",
+          "role": "text",
+          "component": "AppText",
+          "text": "lists.delete-dialog.body",
+          "checks": [
+            "bounds",
+            "text"
+          ]
+        },
+        {
+          "testID": "delete-list-dialog.cancel-button",
+          "role": "button",
+          "component": "PressableSurface",
+          "text": "lists.delete-dialog.cancel",
+          "checks": [
+            "bounds",
+            "text",
+            "fill"
+          ]
+        },
+        {
+          "testID": "delete-list-dialog.confirm-button",
+          "role": "button",
+          "component": "PressableSurface",
+          "text": "lists.delete-dialog.confirm",
+          "checks": [
+            "bounds",
+            "text",
+            "fill"
+          ]
+        }
+      ],
+      "notes": "Opened by the Lists model (onAskDelete) and drawn by the Lists screen while a delete is pending; its copy is translated in that model, so \"model\" names it."
+    }
+  ]
+}

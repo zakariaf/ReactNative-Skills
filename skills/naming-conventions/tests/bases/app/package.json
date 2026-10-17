@@ -1,0 +1,17 @@
+{
+  "name": "tasks",
+  "private": true,
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "check:fast": "eslint . --max-warnings 0 && npm run -s typecheck",
+    "lint": "eslint . --max-warnings 0",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p src/tsconfig.json",
+    "test": "jest --ci",
+    "test:golden": "jest --ci --selectProjects golden",
+    "check:unused": "knip",
+    "build:android:emulator": "node scripts/build/build-android-emulator.ts"
+  }
+}

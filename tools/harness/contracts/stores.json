@@ -1,0 +1,5 @@
+{
+  "$schema": "./stores.schema.json",
+  "crossStoreWrites": [],
+  "osMirrorStores": ["src/ui/a11y/system-a11y-store.ts"]
+}

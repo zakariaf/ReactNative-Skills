@@ -1,0 +1,53 @@
+{
+  "$schema": "./in-app-purchases.schema.json",
+  "productId": "__PRODUCT_ID__",
+  "familyShareable": false,
+  "price": { "amount": "__PRICE__", "currency": "USD", "baseTerritory": "USA" },
+  "storeTexts": [
+    { "locale": "en-US", "name": "Premium", "description": "Unlock Premium. One-time purchase." }
+  ],
+  "reviewNote": "Unlocks Premium. Restore purchase is on the paywall and in Settings.",
+  "paywallScreenDir": "src/features/paywall",
+  "catalogKeys": [
+    "paywall.title",
+    "paywall.subtitle",
+    "paywall.buy-button",
+    "paywall.loading",
+    "paywall.purchasing",
+    "paywall.store-unavailable",
+    "paywall.pending",
+    "paywall.error",
+    "paywall.try-again",
+    "paywall.save-failed",
+    "paywall.success.title",
+    "paywall.owned",
+    "paywall.restore-button",
+    "paywall.restoring",
+    "paywall.restore-success",
+    "paywall.restore-empty",
+    "paywall.restore-failed",
+    "settings.premium.buy",
+    "settings.premium.no-price"
+  ],
+  "priceKeys": ["paywall.buy-button", "settings.premium.buy"],
+  "stateTestIds": [
+    "paywall.state.loading",
+    "paywall.state.unavailable",
+    "paywall.state.purchasing",
+    "paywall.state.pending",
+    "paywall.state.success",
+    "paywall.state.error",
+    "paywall.state.save-failed",
+    "paywall.state.owned",
+    "paywall.buy-button",
+    "paywall.restore-button",
+    "paywall.try-again-button",
+    "paywall.restoring-notice",
+    "paywall.restore-success-notice",
+    "paywall.restore-empty-notice",
+    "paywall.restore-failed-notice"
+  ],
+  "allowedApis": [],
+  "allowedConfigWords": [],
+  "entitlementWritersAllowedIn": ["src/services/test-hooks/", "src/features/debug/"]
+}

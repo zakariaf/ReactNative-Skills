@@ -1,0 +1,491 @@
+{
+  "bad-active-only": {
+    "expect": ["[adapter-facts] reads only active entitlements", "src/services/purchase/expo-iap-purchase-adapter.ts"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/expo-iap-purchase-adapter.ts",
+          "find": "getAvailablePurchases({ onlyIncludeActiveItemsIOS: false })",
+          "with": "getAvailablePurchases({ onlyIncludeActiveItemsIOS: true })"
+        }
+      }
+    ]
+  },
+  "bad-auto-finish": {
+    "expect": [
+      "[banned-api] andDangerouslyFinishTransactionAutomatically is used",
+      "src/services/purchase/premium-store-flow.ts"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/premium-store-flow.ts",
+          "find": "  await deps.port.requestPurchase(deps.productId);",
+          "with": "  const andDangerouslyFinishTransactionAutomatically = true;\n  await deps.port.requestPurchase(deps.productId);\n  return andDangerouslyFinishTransactionAutomatically ? undefined : undefined;"
+        }
+      }
+    ]
+  },
+  "bad-catalog-missing-key": {
+    "expect": ["[catalog-keys] no \"paywall.pending\"", "src/i18n/catalogs/ar.json"],
+    "ops": [{ "json": { "file": "src/i18n/catalogs/ar.json", "path": ["paywall.pending"], "delete": true } }]
+  },
+  "bad-catalog-typed-price": {
+    "expect": [
+      "[typed-price] \"paywall.buy-button\" has no {priceText} placeholder",
+      "[typed-price] \"paywall.buy-button\" contains a typed price",
+      "src/i18n/catalogs/en.json"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "src/i18n/catalogs/en.json",
+          "path": ["paywall.buy-button"],
+          "value": "Buy Premium for $2.99"
+        }
+      }
+    ]
+  },
+  "bad-consumable": {
+    "expect": ["[adapter-facts] missing \"isConsumable: false\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/expo-iap-purchase-adapter.ts",
+          "find": "isConsumable: false",
+          "with": "isConsumable: true"
+        }
+      }
+    ]
+  },
+  "bad-contract-allows-useiap": {
+    "expect": ["contracts/in-app-purchases.json [contract] allowedApis lists \"useIAP\", which can never be allowed"],
+    "ops": [{ "json": { "file": "contracts/in-app-purchases.json", "path": ["allowedApis"], "value": ["useIAP"] } }]
+  },
+  "bad-contract-missing": {
+    "expect": ["contracts/in-app-purchases.json [contract] the purchase contract is missing"],
+    "ops": [{ "delete": "contracts/in-app-purchases.json" }]
+  },
+  "bad-family-sharing": {
+    "expect": ["scripts/asc/premium-iap-payloads.ts", "[family-sharing] familySharable is the literal true"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/asc/premium-iap-payloads.ts",
+          "find": "familySharable: contract.familyShareable,",
+          "with": "familySharable: true,"
+        }
+      }
+    ]
+  },
+  "bad-flow-in-flows": {
+    "expect": [".maestro/flows/premium/01-buy.yaml [harness-isolation] a StoreKit flow outside .maestro/storekit/"],
+    "ops": [{ "copy": { "from": ".maestro/storekit/01-buy.yaml", "to": ".maestro/flows/premium/01-buy.yaml" } }]
+  },
+  "bad-generated-storekit-family-sharing": {
+    "expect": ["ios/Premium.storekit [family-sharing] familyShareable is true"],
+    "ops": [
+      { "copy": { "from": "scripts/storekit/Premium.storekit", "to": "ios/Premium.storekit" } },
+      {
+        "replace": {
+          "file": "ios/Premium.storekit",
+          "find": "\"familyShareable\" : false",
+          "with": "\"familyShareable\" : true"
+        }
+      }
+    ]
+  },
+  "bad-get-task-allow": {
+    "expect": ["ios-config/app.entitlements [harness-isolation] mentions get-task-allow"],
+    "ops": [
+      {
+        "write": {
+          "file": "ios-config/app.entitlements",
+          "content": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<plist version=\"1.0\"><dict><key>get-task-allow</key><true/></dict></plist>\n"
+        }
+      }
+    ]
+  },
+  "bad-gradle-legacy-store-switch": {
+    "expect": ["android/gradle.properties:2 [plugin-options] fireOsEnabled in the build config"],
+    "ops": [
+      {
+        "write": {
+          "file": "android/gradle.properties",
+          "content": "org.gradle.jvmargs=-Xmx2048m\nfireOsEnabled=true\n"
+        }
+      }
+    ]
+  },
+  "bad-grant-outside-service": {
+    "expect": [
+      "src/features/tasks/unlock-premium.ts:5 [entitlement-writers] grantPremium() called outside the purchase service"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/unlock-premium.ts",
+          "content": "// src/features/tasks/unlock-premium.ts\nimport type { PremiumStore } from '@/stores/premium/premium-store';\n\nexport function unlockForReview(store: PremiumStore): boolean {\n  return store.getState().grantPremium({ ownedSinceMs: 1 }).ok;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-harness-maestro-udid": {
+    "expect": ["scripts/storekit/storekit-harness.ts", "[harness-maestro] passes Maestro's per-command --udid"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/storekit/storekit-harness.ts",
+          "find": "const command = ['test', join(FLOWS_DIR, flow), ...vars];",
+          "with": "const command = ['test', '--udid', h.udid, join(FLOWS_DIR, flow), ...vars];"
+        }
+      }
+    ]
+  },
+  "bad-harness-relaunch-wait": {
+    "expect": [
+      ".maestro/storekit/02-refund-relaunch.yaml:18 [harness-relaunch-wait] waits 15000 ms for paywall.buy-button after a relaunch",
+      ".maestro/storekit/04-approval-relaunch.yaml:15 [harness-relaunch-wait] waits the default ms for paywall.state.owned after a relaunch",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/storekit/02-refund-relaunch.yaml",
+          "find": "    timeout: 60000",
+          "with": "    timeout: 15000"
+        }
+      },
+      {
+        "replace": { "file": ".maestro/storekit/04-approval-relaunch.yaml", "find": "    timeout: 60000\n", "with": "" }
+      }
+    ]
+  },
+  "bad-harness-shared-port": {
+    "expect": ["scripts/storekit/storekit-harness.ts", "[harness-maestro] every flow reuses one driver port"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/storekit/storekit-harness.ts",
+          "find": "  const target: MaestroTarget = { udid: h.udid, driverPort: await driverPortFor(givenPort) };",
+          "with": "  const target: MaestroTarget = { udid: h.udid, driverPort: Number(givenPort ?? '7001') };"
+        }
+      }
+    ]
+  },
+  "bad-horizon-env": {
+    "expect": ["eas.json:1 [plugin-options] EXPO_IAP_HORIZON in the build config"],
+    "ops": [
+      {
+        "write": {
+          "file": "eas.json",
+          "content": "{ \"build\": { \"production\": { \"env\": { \"EXPO_IAP_HORIZON\": \"1\" } } } }\n"
+        }
+      }
+    ]
+  },
+  "bad-import-outside": {
+    "expect": ["src/services/purchase/premium-service.ts:2 [sdk-import] imports expo-iap outside the adapter"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/premium-service.ts",
+          "find": "import { entitlementEvidence",
+          "with": "import { finishTransaction } from 'expo-iap';\nimport { entitlementEvidence"
+        }
+      }
+    ]
+  },
+  "bad-kitapi": {
+    "expect": ["[banned-api] kitApi is used", "[sdk-api] imports kitApi from expo-iap"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/expo-iap-purchase-adapter.ts",
+          "find": "  initConnection,\n",
+          "with": "  initConnection,\n  kitApi,\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/purchase/expo-iap-purchase-adapter.ts",
+          "find": "    connect: () => attemptAsync(() => initConnection(), storeFailure),",
+          "with": "    connect: () => attemptAsync(async () => Boolean(kitApi) && (await initConnection()), storeFailure),"
+        }
+      }
+    ]
+  },
+  "bad-missing-notice": {
+    "expect": ["src/stores/paywall/paywall-notice.ts [required-file] missing"],
+    "ops": [{ "delete": "src/stores/paywall/paywall-notice.ts" }]
+  },
+  "bad-no-plugin": {
+    "expect": ["app.config.ts [plugin-entry] no 'expo-iap' plugin entry"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "plugins: ['expo-router', 'expo-iap'],",
+          "with": "plugins: ['expo-router'],"
+        }
+      }
+    ]
+  },
+  "bad-onside-env": {
+    "expect": ["package.json [plugin-options] a script sets EXPO_IAP_ONSIDE"],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "prebuild:ios"],
+          "value": "EXPO_IAP_ONSIDE=1 expo prebuild --platform ios"
+        }
+      }
+    ]
+  },
+  "bad-openiap-store-pin": {
+    "expect": [
+      "eas.json:1 [plugin-options] ORG_GRADLE_PROJECT_openiapStore pins the Android store to \"amazon\", not Play"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "eas.json",
+          "content": "{ \"build\": { \"production\": { \"env\": { \"ORG_GRADLE_PROJECT_openiapStore\": \"amazon\" } } } }\n"
+        }
+      }
+    ]
+  },
+  "bad-plugin-options": {
+    "expect": [
+      "app.config.ts:10 [plugin-options] the expo-iap plugin gets an options object",
+      "[plugin-options] iapkitApiKey in the build config"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "plugins: ['expo-router', 'expo-iap'],",
+          "with": "plugins: ['expo-router', ['expo-iap', { iapkitApiKey: 'key' }]],"
+        }
+      }
+    ]
+  },
+  "bad-price-target": {
+    "expect": ["scripts/asc/create-premium-iap.ts", "[price-target] the price or territory is written into the script"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/asc/create-premium-iap.ts",
+          "find": "const NEAREST_SHOWN = 3;",
+          "with": "const NEAREST_SHOWN = 3;\nconst TARGET_PRICE = 1.99;"
+        }
+      }
+    ]
+  },
+  "bad-product-id": {
+    "expect": [
+      "src/config/purchase-products.ts:6 [product-id] PREMIUM_PRODUCT_ID is \"com.example.tasks.pro\", the contract says \"com.example.tasks.premium\""
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/purchase-products.ts",
+          "find": "export const PREMIUM_PRODUCT_ID = 'com.example.tasks.premium';",
+          "with": "export const PREMIUM_PRODUCT_ID = 'com.example.tasks.pro';"
+        }
+      }
+    ]
+  },
+  "bad-product-id-grammar": {
+    "expect": [
+      "contracts/in-app-purchases.json [product-id] productId \"com.example.tasks-premium\" is not valid on both stores"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/in-app-purchases.json",
+          "path": ["productId"],
+          "value": "com.example.tasks-premium"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/config/purchase-products.ts",
+          "find": "com.example.tasks.premium",
+          "with": "com.example.tasks-premium"
+        }
+      },
+      {
+        "replace": {
+          "file": "scripts/storekit/Premium.storekit",
+          "find": "com.example.tasks.premium",
+          "with": "com.example.tasks-premium"
+        }
+      }
+    ]
+  },
+  "bad-sdk-caret": {
+    "expect": ["package.json [sdk-pin] dependencies.expo-iap is \"^5.8.0\", not exactly \"5.8.0\""],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo-iap"], "value": "^5.8.0" } }]
+  },
+  "bad-sktestsession-in-app": {
+    "expect": ["src/features/tasks/storekit-hook.ts:2 [harness-isolation] SKTestSession in app code"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/storekit-hook.ts",
+          "content": "// src/features/tasks/storekit-hook.ts\nexport const SESSION = 'SKTestSession';\nexport const armed = SKTestSession;\n"
+        }
+      }
+    ]
+  },
+  "bad-state-testid": {
+    "expect": ["src/features/paywall [state-testids] no element with testID \"paywall.state.pending\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/paywall/paywall-test-ids.ts",
+          "find": "  'state-pending': 'paywall.state.pending',\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-store-not-gated": {
+    "expect": [
+      "src/services/create-device-services.ts:28 [store-offline] the expo-iap adapter is used without withConnectivity()"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/create-device-services.ts",
+          "find": "purchase: withConnectivity(createExpoIapPurchaseAdapter(), connectivity.isOnline),",
+          "with": "purchase: createExpoIapPurchaseAdapter(),"
+        }
+      }
+    ]
+  },
+  "bad-storekit-consumable": {
+    "expect": [
+      "scripts/storekit/Premium.storekit [storekit-config] expects exactly one NonConsumable product \"com.example.tasks.premium\""
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/storekit/Premium.storekit",
+          "find": "\"type\" : \"NonConsumable\"",
+          "with": "\"type\" : \"Consumable\""
+        }
+      }
+    ]
+  },
+  "bad-storekit-display-price": {
+    "expect": [
+      "scripts/storekit/Premium.storekit [price-target] displayPrice is 3.99, the contract's price point is 2.99"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/storekit/Premium.storekit",
+          "find": "\"displayPrice\" : \"2.99\"",
+          "with": "\"displayPrice\" : \"3.99\""
+        }
+      }
+    ]
+  },
+  "bad-storekit-file-in-app": {
+    "expect": ["src/Premium.storekit [harness-isolation] StoreKit test artefact outside scripts/storekit/"],
+    "ops": [{ "copy": { "from": "scripts/storekit/Premium.storekit", "to": "src/Premium.storekit" } }]
+  },
+  "bad-storekit-storefront": {
+    "expect": [
+      "scripts/storekit/Premium.storekit [price-target] _storefront is DEU, the contract's base territory is USA"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/storekit/Premium.storekit",
+          "find": "\"_storefront\" : \"USA\"",
+          "with": "\"_storefront\" : \"DEU\""
+        }
+      }
+    ]
+  },
+  "bad-typed-price": {
+    "expect": ["src/services/purchase/premium-store-flow.ts", "[typed-price] price-like text '$2.99' in code"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/premium-store-flow.ts",
+          "find": "    dispatch({ type: 'mark-store-unavailable' }); // nothing to sell, or no price to show\n    return;",
+          "with": "    dispatch({ type: 'mark-store-unavailable' });\n    deps.onError(new Error('$2.99'));\n    return;"
+        }
+      }
+    ]
+  },
+  "bad-ui-calls-port": {
+    "expect": [
+      "src/features/settings/use-premium-row-model.ts:9 [port-callers] calls the purchase port's requestPurchase() outside the purchase service"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/settings/use-premium-row-model.ts",
+          "content": "// src/features/settings/use-premium-row-model.ts\nimport { PREMIUM_PRODUCT_ID } from '@/config/purchase-products';\nimport { useServices } from '@/services/services-context';\n\nexport function usePremiumRowModel(): { readonly onBuy: () => void } {\n  const services = useServices();\n  return {\n    onBuy: () => {\n      void services.purchase.requestPurchase(PREMIUM_PRODUCT_ID);\n    },\n  };\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-unadopted-caret": {
+    "expect": ["package.json [sdk-pin] dependencies.expo-iap is \"~5.8.0\"", "RESULT: FAIL (1 problems)"],
+    "base": ["@tests/bases/bare"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo-iap"], "value": "~5.8.0" } }]
+  },
+  "error-no-package": {
+    "expect": ["ERROR [bad-input] nothing to check: no package.json"],
+    "base": ["@tests/bases/bare"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "pass-no-expo-iap": {
+    "expect": ["NOT APPLICABLE: expo-iap is not in package.json", "RESULT: PASS"],
+    "base": ["@tests/bases/bare"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo-iap"], "delete": true } }]
+  },
+  "pass-not-adopted": {
+    "expect": ["NOT APPLICABLE: expo-iap is installed but no code uses it yet", "RESULT: PASS"],
+    "base": ["@tests/bases/bare"]
+  },
+  "pass-not-yet-created": {
+    "expect": [
+      "SKIP src/i18n/catalogs [catalog-keys] not yet created (i18n-strings-and-catalogs creates it)",
+      "SKIP src/features/paywall [state-testids] not yet created (screen-contracts creates it)",
+      "SKIP .maestro/subflows/debug-setup.yaml [harness-subflow] not yet created (e2e-maestro creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": ["src/i18n/catalogs", "src/features/paywall", ".maestro/subflows"] }]
+  },
+  "pass-openiap-store-play": {
+    "expect": ["RESULT: PASS"],
+    "ops": [{ "write": { "file": "gradle.properties", "content": "openiapStore=play\n" } }]
+  },
+  "pass-server-profile": {
+    "expect": ["check-purchases:", "RESULT: PASS"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/in-app-purchases.json",
+          "path": ["allowedApis"],
+          "value": ["verifyPurchaseWithProvider"]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/purchase/premium-service.ts",
+          "find": "/** Built once by the composition root",
+          "with": "/** Opted in (contracts/in-app-purchases.json allowedApis): the app verifies on its server. */\nexport const VERIFY_WITH = 'verifyPurchaseWithProvider';\nexport const verifier = { verifyPurchaseWithProvider: VERIFY_WITH };\n\n/** Built once by the composition root"
+        }
+      }
+    ]
+  }
+}

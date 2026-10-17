@@ -1,0 +1,8 @@
+note: assets/icons/production/expo.icon (Icon Composer) stays the production iOS icon; development and preview use their badged icon.png on iOS
+wrote assets/icons/development/icon.png (development badge, 1024 x 1024, the fallback icon and the iOS icon of development and preview)
+wrote assets/icons/preview/icon.png (preview badge, 1024 x 1024
+wrote assets/icons/development/android-foreground.png (development badge, 108 x 108, the adaptive icon foreground)
+wrote assets/icons/preview/android-background.png (preview badge
+wrote assets/icons/development/android-monochrome.png (development badge
+make-variant-icons: 4 source icons checked, 0 problems
+note: assets/icons/development/android-monochrome.png and assets/icons/preview/android-monochrome.png differ in their alpha mask (Android 13+ themed icons draw only alpha)

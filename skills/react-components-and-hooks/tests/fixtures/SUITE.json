@@ -1,0 +1,17 @@
+{
+  "base": [{ "templates": true, "firstLinePath": true }, "@tests/bases/app"],
+  "ops": [
+    {
+      "write": {
+        "file": "src/vendor/kit/SKILL.md",
+        "content": "---\nname: kit\ndescription: A vendored skill folder inside the app; its planted findings stay silent.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/vendor/kit/use-planted.ts",
+        "content": "// src/vendor/kit/use-planted.ts (inside a folder that holds a SKILL.md: pruned)\nimport { useMemo } from 'react';\n\nexport const usePlanted = (): number => useMemo(() => 1, []);\n"
+      }
+    }
+  ]
+}

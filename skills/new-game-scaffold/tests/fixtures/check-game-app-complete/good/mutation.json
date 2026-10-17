@@ -1,0 +1,56 @@
+[
+  {
+    "json": {
+      "file": "contracts/games.json",
+      "path": [
+        "apps",
+        "bundlePrefix"
+      ],
+      "value": "com.acme"
+    }
+  },
+  {
+    "replace": {
+      "file": "apps/lights-out/app-settings.ts",
+      "find": "'com.example.lightsout'",
+      "with": "'com.acme.lightsout'"
+    }
+  },
+  {
+    "replace": {
+      "file": "apps/lights-out/app-settings.ts",
+      "find": "'com.example.lightsout.premium'",
+      "with": "'com.acme.lightsout.premium'"
+    }
+  },
+  {
+    "replace": {
+      "file": "apps/lights-out/app-settings.ts",
+      "find": "host: 'example.com'",
+      "with": "host: 'acme.games'"
+    }
+  },
+  {
+    "replace": {
+      "file": "apps/lights-out/app-settings.ts",
+      "find": "'support@example.com'",
+      "with": "'support@acme.games'"
+    }
+  },
+  {
+    "replace": {
+      "file": "apps/lights-out/app-settings.ts",
+      "find": "ca-app-pub-3940256099942544~",
+      "with": "ca-app-pub-5555666677778888~",
+      "all": true
+    }
+  },
+  {
+    "replace": {
+      "file": "apps/lights-out/app-settings.ts",
+      "find": "ca-app-pub-3940256099942544/",
+      "with": "ca-app-pub-5555666677778888/",
+      "all": true
+    }
+  }
+]

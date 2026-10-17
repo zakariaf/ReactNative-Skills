@@ -1,0 +1,137 @@
+{
+ "frame": "onboarding-default",
+ "device": "test-phone",
+ "kind": "phone",
+ "size": {
+  "w": 160,
+  "h": 300
+ },
+ "background": "#FFFFFF",
+ "palettes": {
+  "dark": {
+   "#FFFFFF": "#111418",
+   "#1A1D23": "#F2F4F7",
+   "#F2F4F7": "#1E232B",
+   "#C9D1DC": "#3A4250",
+   "#4A5160": "#B8BFCC",
+   "#6B7280": "#9AA3B2",
+   "#2F6FED": "#5B8DF6",
+   "#1B3F8A": "#9DB8F9",
+   "#0B0D12": "#000000",
+   "#E8EEF9": "#202A3A",
+   "#C62828": "#FF8A80",
+   "#7A8599": "#5A6577"
+  }
+ },
+ "renders": [
+  {
+   "theme": "light",
+   "lang": "en"
+  }
+ ],
+ "elements": [
+  {
+   "testID": "onboarding.screen",
+   "rect": [
+    0,
+    0,
+    160,
+    300
+   ]
+  },
+  {
+   "testID": "onboarding.picture",
+   "rect": [
+    30,
+    40,
+    100,
+    100
+   ],
+   "fill": "#E8EEF9"
+  },
+  {
+   "testID": "onboarding.title",
+   "rect": [
+    12,
+    160,
+    136,
+    18
+   ],
+   "runs": [
+    {
+     "text": "Plan your day",
+     "box": [
+      30,
+      160,
+      100,
+      18
+     ],
+     "color": "#1A1D23",
+     "font": "700 14px Demo Sans",
+     "ink": [
+      30,
+      163,
+      98,
+      12
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "onboarding.next-button",
+   "rect": [
+    12,
+    230,
+    136,
+    30
+   ],
+   "fill": "#2F6FED",
+   "label": "Next",
+   "runs": [
+    {
+     "text": "Next",
+     "box": [
+      66,
+      238,
+      28,
+      14
+     ],
+     "color": "#FFFFFF",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      66,
+      241,
+      26,
+      9
+     ]
+    }
+   ]
+  }
+ ],
+ "captures": [
+  {
+   "theme": "light",
+   "lang": "en",
+   "patch": {
+    "elements": {
+     "onboarding.picture": {
+      "fill": "#C9E4C5"
+     }
+    },
+    "add": [
+     {
+      "testID": "onboarding.picture-sun",
+      "rect": [
+       90,
+       50,
+       20,
+       20
+      ],
+      "fill": "#F2B705",
+      "unlisted": true
+     }
+    ]
+   }
+  }
+ ]
+}

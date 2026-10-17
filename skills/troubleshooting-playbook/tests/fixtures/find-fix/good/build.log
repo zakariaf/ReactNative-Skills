@@ -1,0 +1,5 @@
+▸ Archiving TasksApp
+/usr/bin/codesign --force --sign 7F3A TasksApp.app
+TasksApp.app: errSecInternalComponent
+Command CodeSign failed with a nonzero exit code
+** ARCHIVE FAILED **

@@ -1,0 +1,34 @@
+{
+  "$schema": "./visual-parity.schema.json",
+  "$comment": "The app's visual-parity contract, read by design-visual-parity's scripts. The design frames themselves are the screen-contract states with a \"reference\" (contracts/screens.json, screen-contracts); this file adds the done set (themes x languages x devices), where the references, waivers, sign-off ledger, runs and summary live, the mockup adapter, the layout facts the gates need, the measured type-role floors, the app's facts, the harness folder and per-frame settings. Filled for this harness: the capture wiring is adopted (the parity kit in the test build's registry, the launch route, the launch screen), but no screen state has an approved design reference yet, so \"frames\" is empty and the launch identifiers are the harness preview build's. A change here is a reviewed change: it decides what a screen is compared with.",
+  "version": 1,
+  "referencesDir": "design/parity",
+  "runsDir": ".parity",
+  "summary": "reports/parity/summary.json",
+  "mockup": {
+    "file": "design/parity/mockup/index.html",
+    "htmlAttributes": {
+      "data-theme": "{theme}",
+      "lang": "{lang}",
+      "dir": "{dir}"
+    }
+  },
+  "themes": ["light", "dark"],
+  "languages": ["en", "ar"],
+  "rtlLanguages": ["ar"],
+  "devices": ["iphone-16-pro", "android-parity"],
+  "launch": {
+    "scheme": "harness-preview",
+    "ios": "com.example.harness.preview",
+    "android": "com.example.harness.preview"
+  },
+  "harness": {
+    "dir": "src/features/parity",
+    "fixture": "src/features/parity/parity-fixture.json"
+  },
+  "layout": {
+    "fixedHeaderPt": 56
+  },
+  "textRoleFloors": {},
+  "frames": {}
+}

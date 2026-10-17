@@ -1,0 +1,209 @@
+{
+  "gameId": "lights-out",
+  "rulesFingerprint": "3f9e1fbee58a3458ff32a2f0f36f8250c3ee0208be4ea3ce66d5b6bc7d647134",
+  "seedsPerCell": 100,
+  "maxMoves": 400,
+  "cells": [
+    {
+      "policy": "random",
+      "difficulty": 0,
+      "runs": 100,
+      "wins": 9,
+      "capHits": 0,
+      "winRate": 0.09,
+      "medianMoves": 6,
+      "p10Moves": 6,
+      "p90Moves": 6,
+      "medianScore": 0,
+      "payoffPerRun": 0.09,
+      "twistPerRun": 3.15,
+      "lossReasons": {
+        "lights-out.lose.out-of-moves": 91
+      },
+      "firstPayoffShare": [
+        0.04,
+        0.07,
+        0.08,
+        0.09,
+        0.09,
+        0.09,
+        0.09,
+        0.09,
+        0.09,
+        0.09
+      ]
+    },
+    {
+      "policy": "random",
+      "difficulty": 34,
+      "runs": 100,
+      "wins": 0,
+      "capHits": 0,
+      "winRate": 0,
+      "medianMoves": 15,
+      "p10Moves": 15,
+      "p90Moves": 15,
+      "medianScore": 0,
+      "payoffPerRun": 0,
+      "twistPerRun": 11.12,
+      "lossReasons": {
+        "lights-out.lose.out-of-moves": 100
+      },
+      "firstPayoffShare": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "policy": "random",
+      "difficulty": 67,
+      "runs": 100,
+      "wins": 0,
+      "capHits": 0,
+      "winRate": 0,
+      "medianMoves": 24,
+      "p10Moves": 24,
+      "p90Moves": 24,
+      "medianScore": 0,
+      "payoffPerRun": 0,
+      "twistPerRun": 20.08,
+      "lossReasons": {
+        "lights-out.lose.out-of-moves": 100
+      },
+      "firstPayoffShare": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "policy": "greedy",
+      "difficulty": 0,
+      "runs": 100,
+      "wins": 100,
+      "capHits": 0,
+      "winRate": 1,
+      "medianMoves": 2,
+      "p10Moves": 1,
+      "p90Moves": 2,
+      "medianScore": 40,
+      "payoffPerRun": 1,
+      "twistPerRun": 1.1,
+      "lossReasons": {},
+      "firstPayoffShare": [
+        0.12,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "policy": "greedy",
+      "difficulty": 34,
+      "runs": 100,
+      "wins": 57,
+      "capHits": 0,
+      "winRate": 0.57,
+      "medianMoves": 5,
+      "p10Moves": 3,
+      "p90Moves": 15,
+      "medianScore": 100,
+      "payoffPerRun": 0.57,
+      "twistPerRun": 3.54,
+      "lossReasons": {
+        "lights-out.lose.out-of-moves": 43
+      },
+      "firstPayoffShare": [
+        0.05,
+        0.05,
+        0.45,
+        0.45,
+        0.55,
+        0.55,
+        0.56,
+        0.56,
+        0.56,
+        0.56
+      ]
+    },
+    {
+      "policy": "greedy",
+      "difficulty": 67,
+      "runs": 100,
+      "wins": 31,
+      "capHits": 0,
+      "winRate": 0.31,
+      "medianMoves": 24,
+      "p10Moves": 4,
+      "p90Moves": 24,
+      "medianScore": 0,
+      "payoffPerRun": 0.31,
+      "twistPerRun": 11.65,
+      "lossReasons": {
+        "lights-out.lose.out-of-moves": 69
+      },
+      "firstPayoffShare": [
+        0,
+        0.01,
+        0.01,
+        0.21,
+        0.21,
+        0.27,
+        0.27,
+        0.29,
+        0.29,
+        0.3
+      ]
+    },
+    {
+      "policy": "lookahead",
+      "difficulty": 34,
+      "runs": 100,
+      "wins": 93,
+      "capHits": 0,
+      "winRate": 0.93,
+      "medianMoves": 3,
+      "p10Moves": 3,
+      "p90Moves": 13,
+      "medianScore": 120,
+      "payoffPerRun": 0.93,
+      "twistPerRun": 3.84,
+      "lossReasons": {
+        "lights-out.lose.out-of-moves": 7
+      },
+      "firstPayoffShare": [
+        0.05,
+        0.05,
+        0.61,
+        0.61,
+        0.78,
+        0.78,
+        0.82,
+        0.82,
+        0.84,
+        0.84
+      ]
+    }
+  ]
+}

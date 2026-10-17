@@ -1,0 +1,86 @@
+{
+  "bad-app-in-workspace": {
+    "expect": [
+      "apps/mobile/src/helpers/ [folders] \"helpers\" is not a src/ folder",
+      "apps/mobile/src/app/index.test.tsx [route-file] a test inside the routes folder",
+      "goes to apps/mobile/src/features/<feature>/<feature>-navigation.test.tsx and renders the route files' default exports"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "apps/mobile/src/app/index.test.tsx",
+          "lines": [
+            "describe('tasks route', () => {",
+            "  it('renders', () => {",
+            "    expect(true).toBe(true);",
+            "  });",
+            "});"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/src/helpers/clamp-count.ts",
+          "lines": ["export const clampCount = (count: number): number => Math.max(0, count);"]
+        }
+      }
+    ]
+  },
+  "bad-dependencies": {
+    "expect": [
+      "package.json:1 [one-react] overrides.react-native is undefined",
+      "apps/tablet/package.json:1 [native-deps] lacks the package peer dependency expo-haptics",
+      "package.json:1 [native-deps] expo has different versions across apps"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["overrides", "react-native"], "delete": true } },
+      { "json": { "file": "apps/tablet/package.json", "path": ["dependencies", "expo-haptics"], "delete": true } },
+      { "json": { "file": "apps/tablet/package.json", "path": ["dependencies", "expo"], "value": "~57.0.20" } }
+    ]
+  },
+  "bad-no-contract": {
+    "expect": ["contracts/architecture.json [workspaces] a multi-package repo has no architecture contract"],
+    "ops": [{ "delete": "contracts/architecture.json" }]
+  },
+  "bad-workspaces": {
+    "expect": [
+      "package.json:1 [workspaces] workspaces is [\"apps/*\",\"packages/*\",\"libs/*\"]",
+      "packages/utils/ [workspaces] unexpected package \"utils\"",
+      "packages/core/package.json:1 [manifest] no \"type\": \"module\"",
+      "packages/core/package.json:1 [manifest] exports is undefined",
+      "packages/core/package.json:1 [manifest] \"main\": \"src/index.ts\" (a barrel entry)",
+      "apps/tablet/package.json:1 [manifest] main is undefined",
+      "apps/tablet/package.json:1 [manifest] \"type\": \"module\" next to a CommonJS metro.config.js"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "packages/utils/package.json",
+          "lines": [
+            "{",
+            "  \"name\": \"@acme/utils\",",
+            "  \"version\": \"1.0.0\",",
+            "  \"private\": true,",
+            "  \"type\": \"module\",",
+            "  \"exports\": {",
+            "    \"./*\": \"./src/*\"",
+            "  }",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "packages/utils/src/clamp.ts",
+          "lines": ["export const clamp = (value: number): number => Math.max(0, value);"]
+        }
+      },
+      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["apps/*", "packages/*", "libs/*"] } },
+      { "json": { "file": "packages/core/package.json", "path": ["type"], "delete": true } },
+      { "json": { "file": "packages/core/package.json", "path": ["exports"], "delete": true } },
+      { "json": { "file": "packages/core/package.json", "path": ["main"], "value": "src/index.ts" } },
+      { "json": { "file": "apps/tablet/package.json", "path": ["main"], "delete": true } },
+      { "json": { "file": "apps/tablet/package.json", "path": ["type"], "value": "module" } }
+    ]
+  }
+}

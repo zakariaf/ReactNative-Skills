@@ -1,0 +1,21 @@
+{
+  "$schema": "./native-libraries.schema.json",
+  "$comment": "An example contracts/native-libraries.json: one library kept on the interop layer, one being replaced.",
+  "libraries": {
+    "react-native-legacy-picker": {
+      "architecture": "interop",
+      "decision": "keep",
+      "reason": "The due-date wheel picker; no New Architecture picker matches its accessibility yet",
+      "evidence": "React Native Directory: newArchitecture false (2026-10-14). Due-date screen tested on the iOS 26.5 simulator and an Android 16 emulator: VoiceOver and TalkBack read every wheel; no interop warning in Metro",
+      "recheckBy": "2027-01-14"
+    },
+    "react-native-old-share": {
+      "architecture": "interop",
+      "decision": "replace",
+      "reason": "Shares the exported task list file (a local CSV file URI) through the system share sheet; expo-sharing covers it (plain text would go through React Native's built-in Share API)",
+      "evidence": "Library archived on GitHub (2026-08); no release since the New Architecture became the only one",
+      "recheckBy": "2026-12-01",
+      "replaceWith": "expo-sharing"
+    }
+  }
+}

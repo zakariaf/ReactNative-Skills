@@ -1,0 +1,47 @@
+{
+  "bad-border-not-floored": {
+    "expect": [
+      "[specs-mismatch] differs: chip.border is 2.5, the derived spec is 2 (a CSS border: the token's 2.5 renders as 2 (specs.asRenderedBorders))",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [{ "json": { "file": "src/ui/component-specs.json", "path": ["chip", "border"], "value": 2.5 } }]
+  },
+  "bad-icon-stroke-floored": {
+    "expect": ["[specs-mismatch] differs: row.iconStroke is 2, the derived spec is 2.5", "RESULT: FAIL (1 problems)"],
+    "ops": [{ "json": { "file": "src/ui/component-specs.json", "path": ["row", "iconStroke"], "value": 2 } }]
+  },
+  "bad-override-not-applied": {
+    "expect": [
+      "[specs-mismatch] differs: chip.radius is 6, the derived spec is 8 (override: The approved design draws chips",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [{ "json": { "file": "src/ui/component-specs.json", "path": ["chip", "radius"], "value": 6 } }]
+  },
+  "bad-reference-unresolved": {
+    "expect": [
+      "[specs-mismatch] differs: chip.gap is missing, the derived spec is 12 (the token file says {spacing.md})",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [{ "json": { "file": "src/ui/component-specs.json", "path": ["chip", "gap"], "delete": true } }]
+  },
+  "bad-ring-floored": {
+    "expect": ["[specs-mismatch] differs: chip.ring is 3, the derived spec is 3.5", "RESULT: FAIL (1 problems)"],
+    "ops": [{ "json": { "file": "src/ui/component-specs.json", "path": ["chip", "ring"], "value": 3 } }]
+  },
+  "bad-subpixel-floored": {
+    "expect": ["[specs-mismatch] differs: row.borderHair is 0, the derived spec is 0.5", "RESULT: FAIL (1 problems)"],
+    "ops": [{ "json": { "file": "src/ui/component-specs.json", "path": ["row", "borderHair"], "value": 0 } }]
+  },
+  "pass-borders-as-designed": {
+    "expect": ["write-component-specs: 1 files checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "contracts/component-library.json", "path": ["specs", "asRenderedBorders"], "value": false } },
+      {
+        "write": {
+          "file": "src/ui/component-specs.json",
+          "content": "{\n  \"chip\": {\n    \"border\": 2.5,\n    \"radius\": 8,\n    \"gap\": 12,\n    \"ring\": 3.5,\n    \"padding\": [4, 12, 5]\n  },\n  \"row\": {\n    \"separatorBorder\": 1.5,\n    \"borderHair\": 0.5,\n    \"iconStroke\": 2.5,\n    \"fillEdge\": 2.5,\n    \"minHeight\": 52\n  }\n}\n"
+        }
+      }
+    ]
+  }
+}

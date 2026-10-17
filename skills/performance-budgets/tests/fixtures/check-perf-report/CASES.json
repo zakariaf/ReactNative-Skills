@@ -1,0 +1,349 @@
+{
+  "bad-cold-start": {
+    "expect": ["[cold-start]", "median cold start 1250 ms is over 1000 ms"],
+    "ops": [
+      { "json": { "file": "report.json", "path": ["entries", 0, "data", "totalMs"], "value": 1250 } },
+      { "json": { "file": "report.json", "path": ["entries", 1, "data", "totalMs"], "value": 1190 } },
+      { "json": { "file": "report.json", "path": ["entries", 2, "data", "totalMs"], "value": 1300 } },
+      { "json": { "file": "report.json", "path": ["entries", 3, "data", "totalMs"], "value": 1260 } },
+      { "json": { "file": "report.json", "path": ["entries", 4, "data", "totalMs"], "value": 1240 } }
+    ]
+  },
+  "bad-few-launches": {
+    "expect": ["[cold-start-runs]", "3 cold-start runs with a process-start time (need 5)"],
+    "ops": [
+      { "json": { "file": "report.json", "path": ["entries", 4], "delete": true } },
+      { "json": { "file": "report.json", "path": ["entries", 3], "delete": true } }
+    ]
+  },
+  "bad-frame-p95": {
+    "expect": ["[frame-p95]", "tasks/list-scroll: p95 frame time up to 25 ms is over 17 ms"],
+    "ops": [{ "json": { "file": "report.json", "path": ["entries", 5, "data", "p95UpToMs"], "value": 25 } }]
+  },
+  "bad-hitch-not-number": {
+    "expect": ["[report-shape]", "tasks/list-scroll: hitchMsPerS is \"3.2\", not a number"],
+    "ops": [{ "json": { "file": "report.json", "path": ["entries", 5, "data", "hitchMsPerS"], "value": "3.2" } }]
+  },
+  "bad-hitch-rate": {
+    "expect": ["[hitch-rate]", "tasks/complete-animation: hitch rate 14.2 ms/s is over 10 ms/s"],
+    "ops": [{ "json": { "file": "report.json", "path": ["entries", 6, "data", "hitchMsPerS"], "value": 14.2 } }]
+  },
+  "bad-memory-android-pss": {
+    "expect": ["[memory-footprint]", "TOTAL PSS 172.0 MB is over 150 MB"],
+    "args": "{dir}/report.json {dir} --memory {dir}/meminfo.txt",
+    "ops": [
+      {
+        "write": {
+          "file": "meminfo.txt",
+          "lines": [
+            "Applications Memory Usage (in Kilobytes):",
+            "Uptime: 912345 Realtime: 912345",
+            "",
+            "** MEMINFO in pid 4321 [com.example.tasks.preview] **",
+            "                   Pss  Private  Private  SwapPss      Rss     Heap     Heap     Heap",
+            "                 Total    Dirty    Clean    Dirty    Total     Size    Alloc     Free",
+            "                ------   ------   ------   ------   ------   ------   ------   ------",
+            "  Native Heap    30112    30040        0       12    31200    41984    36120     5863",
+            "        TOTAL   176128    90000    10000       12   190000    41984    36120     5863",
+            "",
+            " App Summary",
+            "                       Pss(KB)                        Rss(KB)",
+            "                        ------                         ------",
+            "           TOTAL PSS:   176128            TOTAL RSS:   190000       TOTAL SWAP PSS:       12"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-memory-footprint": {
+    "expect": ["[memory-footprint]", "phys_footprint of Tasks 182.0 MB is over 150 MB"],
+    "args": "{dir}/report.json {dir} --memory {dir}/footprint.json",
+    "ops": [
+      {
+        "write": {
+          "file": "footprint.json",
+          "json": {
+            "unit": "byte",
+            "bytes per unit": 1,
+            "processes": [
+              {
+                "name": "Tasks",
+                "pid": 4321,
+                "page size": 16384,
+                "footprint": 192840832,
+                "auxiliary": { "phys_footprint_peak": 191840832, "phys_footprint": 190840832 }
+              }
+            ],
+            "total footprint": 192840832
+          }
+        }
+      }
+    ]
+  },
+  "bad-no-benchmark": {
+    "expect": ["[storage-write-runs]", "no storage benchmark in the report"],
+    "ops": [
+      {
+        "$comment": "The developer skipped Run storage benchmark: the device lane never measured real I/O.",
+        "json": { "file": "report.json", "path": ["entries", 7], "delete": true }
+      }
+    ]
+  },
+  "bad-no-cold-start": {
+    "expect": [
+      "[cold-start-runs]",
+      "0 cold-start runs with a process-start time (need 5)",
+      "Wire the first-screen mark"
+    ],
+    "ops": [
+      {
+        "$comment": "A device report with no cold start at all: the first-screen mark was never wired, or the relaunches were skipped.",
+        "json": { "file": "report.json", "path": ["entries", 4], "delete": true }
+      },
+      { "json": { "file": "report.json", "path": ["entries", 3], "delete": true } },
+      { "json": { "file": "report.json", "path": ["entries", 2], "delete": true } },
+      { "json": { "file": "report.json", "path": ["entries", 1], "delete": true } },
+      { "json": { "file": "report.json", "path": ["entries", 0], "delete": true } }
+    ]
+  },
+  "bad-no-frames": {
+    "expect": ["[frame-data]", "no frame-time recording in the report"],
+    "ops": [
+      { "json": { "file": "report.json", "path": ["entries", 6], "delete": true } },
+      { "json": { "file": "report.json", "path": ["entries", 5], "delete": true } }
+    ]
+  },
+  "bad-old-build-only": {
+    "expect": [
+      "build 14: left out 8 entries from earlier builds (12)",
+      "[cold-start-runs]",
+      "0 cold-start runs with a process-start time (need 5)",
+      "[frame-data]",
+      "[storage-write-runs]"
+    ],
+    "ops": [{ "json": { "file": "report.json", "path": ["buildNumber"], "value": "14" } }]
+  },
+  "bad-p95-slowest-bucket": {
+    "expect": ["[frame-p95]", "above 100 ms (null = the slowest bucket)"],
+    "ops": [{ "json": { "file": "report.json", "path": ["entries", 5, "data", "p95UpToMs"], "literalNull": true } }]
+  },
+  "bad-prewarmed-too-few": {
+    "expect": [
+      "cold start: left out 2 launches whose process started before the launch",
+      "[cold-start-runs]",
+      "3 cold-start runs with a process-start time (need 5)"
+    ],
+    "ops": [
+      {
+        "$comment": "One launch the OS prewarmed and one whose process started 45 s early leave 3 counted launches.",
+        "json": { "file": "report.json", "path": ["entries", 1, "data", "prewarmed"], "value": true }
+      },
+      { "json": { "file": "report.json", "path": ["entries", 3, "data", "nativeMs"], "value": 45000 } },
+      { "json": { "file": "report.json", "path": ["entries", 3, "data", "totalMs"], "value": 45300 } }
+    ]
+  },
+  "bad-shape": {
+    "expect": ["[report-shape]", "entry 8 is not { kind, label, atEpochMs, data }"],
+    "ops": [{ "json": { "file": "report.json", "path": ["entries", 8], "value": { "kind": "frames" } } }]
+  },
+  "bad-storage-write": {
+    "expect": ["[storage-write-p95]", "storage write p95 6.5 ms is not under 5 ms"],
+    "ops": [{ "json": { "file": "report.json", "path": ["entries", 7, "data", "p95"], "value": 6.5 } }]
+  },
+  "bad-storage-writes-unrecorded": {
+    "expect": ["[storage-write-runs]", "the storage benchmark timed an unrecorded number of writes, not at least 300"],
+    "ops": [{ "json": { "file": "report.json", "path": ["entries", 7, "data", "writes"], "delete": true } }]
+  },
+  "error-memory-missing": {
+    "expect": ["nothing to check: memory reading"],
+    "args": "{dir}/report.json {dir} --memory {dir}/footprint.json"
+  },
+  "error-no-report": { "expect": ["ERROR [bad-input] nothing to check: report"], "args": "{dir}/missing.json {dir}" },
+  "error-not-json": {
+    "expect": ["ERROR [bad-input] the report is not valid JSON"],
+    "ops": [{ "write": { "file": "report.json", "content": "{ \"entries\": [" } }]
+  },
+  "error-report-is-folder": {
+    "expect": ["ERROR [bad-input] nothing to check:", "is a folder, pass the exported report JSON"],
+    "args": "{dir} {dir}"
+  },
+  "pass-android-90hz": {
+    "expect": [
+      "report: com.example.tasks 1.0.0 (12) on Google Pixel 9 (android 36)",
+      "frames tasks/list-scroll: 1440 frames at 90 Hz",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      { "json": { "file": "report.json", "path": ["platform"], "value": "android" } },
+      { "json": { "file": "report.json", "path": ["osVersion"], "value": "36" } },
+      { "json": { "file": "report.json", "path": ["deviceModel"], "value": "Google Pixel 9" } },
+      { "json": { "file": "report.json", "path": ["entries", 5, "data", "refreshHz"], "value": 90 } }
+    ]
+  },
+  "pass-memory-ios": {
+    "expect": ["memory: phys_footprint of Tasks 98.5 MB (limit 150 MB)", "RESULT: PASS"],
+    "args": "{dir}/report.json {dir} --memory {dir}/footprint.json",
+    "ops": [
+      {
+        "write": {
+          "file": "footprint.json",
+          "json": {
+            "unit": "byte",
+            "bytes per unit": 1,
+            "processes": [
+              {
+                "name": "Tasks",
+                "pid": 4321,
+                "page size": 16384,
+                "footprint": 105284736,
+                "auxiliary": { "phys_footprint_peak": 104284736, "phys_footprint": 103284736 }
+              }
+            ],
+            "total footprint": 105284736
+          }
+        }
+      }
+    ]
+  },
+  "pass-old-build-frames-ignored": {
+    "expect": [
+      "build 12: left out 6 entries from earlier builds (11)",
+      "cold start: median 820 ms of 5 launches (limit 1000 ms)",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "report.json",
+          "path": ["entries", 8],
+          "value": {
+            "kind": "frames",
+            "label": "tasks/list-scroll",
+            "atEpochMs": 1790420100000,
+            "build": "11",
+            "data": {
+              "frames": 1440,
+              "seconds": 12.1,
+              "refreshHz": 120,
+              "p50UpToMs": 9,
+              "p95UpToMs": 33,
+              "maxMs": 90,
+              "hitchMsPerS": 18,
+              "buckets": [1000, 200, 100, 80, 40, 20, 0]
+            }
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "report.json",
+          "path": ["entries", 9],
+          "value": {
+            "kind": "cold-start",
+            "label": "tasks",
+            "atEpochMs": 1790420000000,
+            "build": "11",
+            "data": { "nativeMs": 900, "jsMs": 600, "totalMs": 1500, "prewarmed": false }
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "report.json",
+          "path": ["entries", 10],
+          "value": {
+            "kind": "cold-start",
+            "label": "tasks",
+            "atEpochMs": 1790420000001,
+            "build": "11",
+            "data": { "nativeMs": 900, "jsMs": 600, "totalMs": 1500, "prewarmed": false }
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "report.json",
+          "path": ["entries", 11],
+          "value": {
+            "kind": "cold-start",
+            "label": "tasks",
+            "atEpochMs": 1790420000002,
+            "build": "11",
+            "data": { "nativeMs": 900, "jsMs": 600, "totalMs": 1500, "prewarmed": false }
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "report.json",
+          "path": ["entries", 12],
+          "value": {
+            "kind": "cold-start",
+            "label": "tasks",
+            "atEpochMs": 1790420000003,
+            "build": "11",
+            "data": { "nativeMs": 900, "jsMs": 600, "totalMs": 1500, "prewarmed": false }
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "report.json",
+          "path": ["entries", 13],
+          "value": {
+            "kind": "cold-start",
+            "label": "tasks",
+            "atEpochMs": 1790420000004,
+            "build": "11",
+            "data": { "nativeMs": 900, "jsMs": 600, "totalMs": 1500, "prewarmed": false }
+          }
+        }
+      }
+    ]
+  },
+  "pass-prewarmed-left-out": {
+    "expect": [
+      "cold start: left out 2 launches whose process started before the launch",
+      "cold start: median 820 ms of 5 launches (limit 1000 ms)",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "$comment": "The two latest launches resumed an older process (iOS prewarm; an Android push start on an old version): left out, the median stays on the 5 real launches.",
+        "json": {
+          "file": "report.json",
+          "path": ["entries", 8],
+          "value": {
+            "kind": "cold-start",
+            "label": "tasks",
+            "atEpochMs": 1790430200000,
+            "data": { "nativeMs": 3600000, "jsMs": 300, "totalMs": 3600300, "prewarmed": true }
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "report.json",
+          "path": ["entries", 9],
+          "value": {
+            "kind": "cold-start",
+            "label": "tasks",
+            "atEpochMs": 1790430200001,
+            "data": { "nativeMs": 60000, "jsMs": 300, "totalMs": 60300, "prewarmed": false }
+          }
+        }
+      }
+    ]
+  },
+  "pass-tighter-budget-file": {
+    "expect": ["cold start: median 820 ms of 5 launches (limit 900 ms)", "RESULT: PASS"],
+    "ops": [{ "write": { "file": "quality-gates.json", "json": { "perf": { "coldStartHomeMsMax": 900 } } } }]
+  },
+  "pass-unstamped-entry-noted": {
+    "expect": [
+      "note: 1 entry carries no build stamp (written before entries were stamped) and is judged as build 12's",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "json": { "file": "report.json", "path": ["entries", 7, "build"], "delete": true } }]
+  }
+}

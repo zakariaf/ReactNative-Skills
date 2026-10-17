@@ -1,0 +1,9 @@
+{
+  "avdPrefix": "tasks",
+  "device": "pixel_8",
+  "appId": "com.acme.tasks",
+  "targetSdk": 36,
+  "minSdk": 24,
+  "permissions": ["android.permission.INTERNET", "android.permission.VIBRATE"],
+  "readyLog": null
+}

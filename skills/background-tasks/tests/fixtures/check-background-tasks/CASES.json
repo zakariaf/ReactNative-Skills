@@ -1,0 +1,461 @@
+{
+  "bad-background-plist": {
+    "expect": [
+      "contracts/native-config.json:8 [background-plist]",
+      "UIBackgroundModes \"processing\"",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/native-config.json",
+          "path": ["ios", "infoPlist", "UIBackgroundModes"],
+          "value": ["fetch"]
+        }
+      }
+    ]
+  },
+  "bad-background-plugin": {
+    "expect": ["app.config.ts:10 [background-plugin]", "RESULT: FAIL (1 problems)"],
+    "ops": [{ "replace": { "file": "app.config.ts", "find": "    'expo-background-task',\n", "with": "" } }]
+  },
+  "bad-define-task-entry": {
+    "expect": [
+      "src/services/background-tasks/define-background-tasks.ts:17 [define-task-entry]",
+      "import '@/services/background-tasks/define-background-tasks';",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "index.ts",
+          "find": "import '@/services/background-tasks/define-background-tasks';\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-define-task-entry-router-main": {
+    "expect": ["package.json:4 [define-task-entry]", "\"expo-router/entry\"", "RESULT: FAIL (1 problems)"],
+    "ops": [{ "json": { "file": "package.json", "path": ["main"], "value": "expo-router/entry" } }]
+  },
+  "bad-define-task-top-level": {
+    "expect": [
+      "src/services/background-tasks/define-background-tasks.ts:18 [define-task-top-level]",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/background-tasks/define-background-tasks.ts",
+          "find": "for (const job of BACKGROUND_JOBS) {\n  TaskManager.defineTask(job.name, toTaskExecutor(job, createBackgroundEnvironment));\n}",
+          "with": "export function defineBackgroundTasks(): void {\n  for (const job of BACKGROUND_JOBS) {\n    TaskManager.defineTask(job.name, toTaskExecutor(job, createBackgroundEnvironment));\n  }\n}"
+        }
+      }
+    ]
+  },
+  "bad-executor-through-runner": {
+    "expect": [
+      "src/services/background-tasks/define-background-tasks.ts:17 [executor-through-runner]",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/background-tasks/define-background-tasks.ts",
+          "find": "toTaskExecutor(job, createBackgroundEnvironment)",
+          "with": "async () => {\n    await job.run({ deps: createBackgroundEnvironment().deps, input: undefined, signal: new AbortController().signal, shouldStop: () => false });\n    return 1;\n  }"
+        }
+      }
+    ]
+  },
+  "bad-job-budget": {
+    "expect": [
+      "src/services/background-tasks/jobs/sync-outbox-job.ts:92 [job-budget]",
+      "budgetMs 60000",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/background-tasks/jobs/sync-outbox-job.ts",
+          "find": "budgetMs: 20_000,",
+          "with": "budgetMs: 60_000,"
+        }
+      }
+    ]
+  },
+  "bad-job-foreground-bypass": {
+    "expect": [
+      "src/services/background-tasks/jobs/sync-outbox-job.ts:90 [job-foreground-path]",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/hooks/use-sync-outbox-on-foreground.ts",
+          "find": "import { runBackgroundJob } from '@/services/background-tasks/background-job';\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/hooks/use-sync-outbox-on-foreground.ts",
+          "find": "runBackgroundJob(syncOutboxJob, environment, { trigger: 'foreground' })",
+          "with": "syncOutboxJob.run({ deps: environment.deps, shouldStop: () => false })"
+        }
+      }
+    ]
+  },
+  "bad-job-foreground-path": {
+    "expect": [
+      "src/services/background-tasks/jobs/sync-outbox-job.ts:90 [job-foreground-path]",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [{ "delete": "src/hooks/use-sync-outbox-on-foreground.ts" }]
+  },
+  "bad-job-name": {
+    "expect": [
+      "src/services/background-tasks/jobs/sync-outbox-job.ts:91 [job-name]",
+      "\"syncOutbox\"",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/background-tasks/jobs/sync-outbox-job.ts",
+          "find": "name: 'tasks.sync-outbox',",
+          "with": "name: 'syncOutbox',"
+        }
+      }
+    ]
+  },
+  "bad-job-name-duplicate": {
+    "expect": [
+      "src/services/background-tasks/jobs/sync-outbox-job.ts:91 [job-name]",
+      "is also declared in src/services/background-tasks/jobs/sync-outbox-again-job.ts:4",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/background-tasks/jobs/sync-outbox-again-job.ts",
+          "lines": [
+            "// src/services/background-tasks/jobs/sync-outbox-again-job.ts",
+            "import { defineBackgroundJob } from '@/services/background-tasks/background-job';",
+            "",
+            "export const syncOutboxAgainJob = defineBackgroundJob<Record<string, never>>({",
+            "  name: 'tasks.sync-outbox',",
+            "  budgetMs: 5_000,",
+            "  run: () => Promise.resolve({ kind: 'done', processed: 0 }),",
+            "});"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/background-tasks/jobs/sync-outbox-again-job.test.ts",
+          "lines": ["// runJobTwice( runJobUntilAborted( are called in the real test"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/hooks/use-sync-again.ts",
+          "lines": [
+            "import { runBackgroundJob } from '@/services/background-tasks/background-job';",
+            "import { syncOutboxAgainJob } from '@/services/background-tasks/jobs/sync-outbox-again-job';",
+            "",
+            "export const runAgain = (environment: never): unknown => runBackgroundJob(syncOutboxAgainJob, environment, { trigger: 'foreground' });"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-job-no-migrate": {
+    "expect": [
+      "src/services/background-tasks/background-environment.ts:15 [job-no-migrate]",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/background-tasks/background-environment.ts",
+          "find": "import { openBackgroundData } from '@/data/open-background-data';\n",
+          "with": "import { migrateDatabase } from '@/data/migrations/migration-runner';\nimport { openBackgroundData } from '@/data/open-background-data';\n"
+        }
+      }
+    ]
+  },
+  "bad-job-no-migrate-data-open": {
+    "expect": ["src/data/open-background-data.ts:55 [job-no-migrate]", "migrateDatabase in background code"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/open-background-data.ts",
+          "find": "import { readUserVersion } from '@/data/migrations/migration-runner';",
+          "with": "import { migrateDatabase, readUserVersion } from '@/data/migrations/migration-runner';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/open-background-data.ts",
+          "find": "    if (readUserVersion(driver) !== LATEST_DB_VERSION) {\n      closeQuietly(driver, deps.fallback);\n      return null;\n    }",
+          "with": "    if (readUserVersion(driver) !== LATEST_DB_VERSION) migrateDatabase(driver);"
+        }
+      }
+    ]
+  },
+  "bad-job-no-react": {
+    "expect": ["src/services/background-tasks/jobs/sync-outbox-job.ts:12 [job-no-react]", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/background-tasks/jobs/sync-outbox-job.ts",
+          "find": "import { defineBackgroundJob } from '@/services/background-tasks/background-job';\n",
+          "with": "import { Platform } from 'react-native';\n\nimport { defineBackgroundJob } from '@/services/background-tasks/background-job';\n\nexport const PLATFORM = Platform.OS;\n"
+        }
+      }
+    ]
+  },
+  "bad-job-tested": {
+    "expect": [
+      "src/services/background-tasks/jobs/sync-outbox-job.ts:90 [job-tested]",
+      "runJobUntilAborted(",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/background-tasks/jobs/sync-outbox-job.test.ts",
+          "find": "await runJobUntilAborted(syncOutboxJob, app.deps, 1)",
+          "with": "{ outcome: await runJobOnce(syncOutboxJob, app.deps), sawStop: true }"
+        }
+      }
+    ]
+  },
+  "bad-minimum-interval": {
+    "expect": [
+      "src/services/background-tasks/expo-background-tasks-adapter.ts:84 [minimum-interval]",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/background-tasks/expo-background-tasks-adapter.ts",
+          "find": "BackgroundTask.registerTaskAsync(name, { minimumInterval: intervalMinutes })",
+          "with": "BackgroundTask.registerTaskAsync(name)"
+        }
+      }
+    ]
+  },
+  "bad-minimum-interval-literal": {
+    "expect": [
+      "src/services/background-tasks/background-jobs.ts:16 [minimum-interval]",
+      "BACKGROUND_INTERVAL_MINUTES is 5 minutes: below the documented 15-minute minimum",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/background-tasks/background-jobs.ts",
+          "find": "export const BACKGROUND_INTERVAL_MINUTES = 12 * 60;",
+          "with": "export const BACKGROUND_INTERVAL_MINUTES = 5;"
+        }
+      }
+    ]
+  },
+  "bad-no-background-fetch": {
+    "expect": [
+      "package.json:11 [no-background-fetch]",
+      "npm uninstall expo-background-fetch",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-background-fetch"], "value": "~57.0.21" } }
+    ]
+  },
+  "bad-task-name-literal": {
+    "expect": [
+      "src/services/background-tasks/expo-background-tasks-adapter.ts:89 [task-name-literal]",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/background-tasks/expo-background-tasks-adapter.ts",
+          "find": "BackgroundTask.unregisterTaskAsync(name)",
+          "with": "BackgroundTask.unregisterTaskAsync('tasks.sync-outbox')"
+        }
+      }
+    ]
+  },
+  "bad-trigger-dev-only": {
+    "expect": [
+      "src/services/background-tasks/expo-background-tasks-adapter.ts:113 [trigger-dev-only]",
+      "a release build does nothing (the SDK resolves false outside __DEV__)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/background-tasks/expo-background-tasks-adapter.ts",
+          "find": "  if (!__DEV__) return false;\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-vendor-import-confined": {
+    "expect": ["src/features/settings/use-background-status.ts:2 [vendor-import-confined]", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/settings/use-background-status.ts",
+          "lines": [
+            "// src/features/settings/use-background-status.ts",
+            "import * as TaskManager from 'expo-task-manager';",
+            "",
+            "export function backgroundTaskCount(): Promise<number> {",
+            "  return TaskManager.getRegisteredTasksAsync().then((tasks) => tasks.length);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "error-budget-config": {
+    "expect": ["ERROR [bad-input] \"backgroundTasks.maxBudgetMs\" must be a whole number 1..25000"],
+    "ops": [{ "write": { "file": "rn-skills.config.json", "json": { "backgroundTasks": { "maxBudgetMs": 60000 } } } }]
+  },
+  "error-no-package-json": { "expect": ["ERROR [bad-input] no package.json"], "ops": [{ "delete": "package.json" }] },
+  "pass-foreground-job-list": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/hooks/use-sync-outbox-on-foreground.ts",
+          "content": "// src/hooks/use-sync-outbox-on-foreground.ts\n// Every job of the build on app active, through the job list: the job file's only importer is\n// background-jobs.ts (inside the background folder), and this hook calls runBackgroundJob itself.\nimport { useEffect } from 'react';\n\nimport { useIsAppActive } from '@/hooks/use-is-app-active';\nimport { runBackgroundJob } from '@/services/background-tasks/background-job';\nimport { BACKGROUND_JOBS } from '@/services/background-tasks/background-jobs';\n\nimport type { JobEnvironment } from '@/services/background-tasks/background-job';\nimport type { BackgroundDeps } from '@/services/background-tasks/background-jobs';\n\nexport function useBackgroundJobsOnForeground(environment: JobEnvironment<BackgroundDeps>): void {\n  const isActive = useIsAppActive();\n  useEffect(() => {\n    if (!isActive) return;\n    for (const job of BACKGROUND_JOBS) {\n      runBackgroundJob(job, environment, { trigger: 'foreground' }).catch((thrown: unknown) => {\n        environment.errorLog.record('service', thrown);\n      });\n    }\n  }, [isActive, environment]);\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-installed-skills-silent": {
+    "expect": ["check-background-tasks: 33 files checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/demo/src/planted.ts",
+          "lines": [
+            "import * as TaskManager from 'expo-task-manager';",
+            "",
+            "export function defineLater(): void {",
+            "  TaskManager.defineTask('planted.task', async () => Promise.resolve(1));",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/demo/src/planted.ts",
+          "lines": [
+            "import * as TaskManager from 'expo-task-manager';",
+            "",
+            "export function defineLater(): void {",
+            "  TaskManager.defineTask('planted.task', async () => Promise.resolve(1));",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/demo-kit/planted.ts",
+          "lines": [
+            "import * as TaskManager from 'expo-task-manager';",
+            "",
+            "export function defineLater(): void {",
+            "  TaskManager.defineTask('planted.task', async () => Promise.resolve(1));",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/demo-kit/SKILL.md",
+          "lines": ["---", "name: demo-kit", "description: Planted. Its folder must be pruned by the repo walk.", "---"]
+        }
+      }
+    ]
+  },
+  "pass-location-task-foreground": {
+    "expect": ["check-background-tasks: 37 files checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/background-tasks/jobs/record-location-job.ts",
+          "content": "// src/services/background-tasks/jobs/record-location-job.ts\n// A location task's job: the task body's { locations } arrive as context.input, a TaskManagerError as\n// context.error. Each point is stored on its own (one commit per step), keyed by its timestamp.\nimport * as v from 'valibot';\n\nimport { defineBackgroundJob } from '@/services/background-tasks/background-job';\n\nconst INPUT = v.object({\n  locations: v.array(v.object({ timestamp: v.number(), coords: v.object({ latitude: v.number(), longitude: v.number() }) })),\n});\n\nexport type RecordLocationDeps = {\n  readonly track: { readonly savePoint: (timestamp: number, latitude: number, longitude: number) => boolean };\n};\n\nexport const recordLocationJob = defineBackgroundJob<RecordLocationDeps>({\n  name: 'tracks.record-location',\n  budgetMs: 5_000,\n  run: ({ deps, input, error, shouldStop }) => {\n    if (error !== null) return Promise.resolve({ kind: 'failed', reason: 'location-error' });\n    const parsed = v.safeParse(INPUT, input);\n    if (!parsed.success) return Promise.resolve({ kind: 'failed', reason: 'location-input-invalid' });\n    let processed = 0;\n    for (const point of parsed.output.locations) {\n      if (shouldStop()) return Promise.resolve({ kind: 'partial', processed });\n      if (!deps.track.savePoint(point.timestamp, point.coords.latitude, point.coords.longitude)) {\n        return Promise.resolve({ kind: 'failed', reason: 'track-unwritable' });\n      }\n      processed += 1;\n    }\n    return Promise.resolve({ kind: 'done', processed });\n  },\n});\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/background-tasks/jobs/record-location-job.test.ts",
+          "content": "// src/services/background-tasks/jobs/record-location-job.test.ts\nimport { runJobTwice, runJobUntilAborted } from '@test/background/job-test-kit';\n\nimport { recordLocationJob } from './record-location-job';\n\nconst input = { locations: [{ timestamp: 1, coords: { latitude: 0, longitude: 0 } }, { timestamp: 2, coords: { latitude: 1, longitude: 1 } }] };\n\nfunction track(): { readonly saved: Map<number, string>; readonly deps: Parameters<typeof recordLocationJob.run>[0]['deps'] } {\n  const saved = new Map<number, string>();\n  return { saved, deps: { track: { savePoint: (at, lat, lon) => { saved.set(at, `${String(lat)},${String(lon)}`); return true; } } } };\n}\n\ndescribe('recordLocationJob', () => {\n  it('stores each point once, however often the same payload runs', async () => {\n    const app = track();\n    await runJobTwice(recordLocationJob, app.deps, { input });\n    expect([...app.saved.keys()]).toStrictEqual([1, 2]);\n  });\n\n  it('keeps the points stored before a stop', async () => {\n    const app = track();\n    const stopped = await runJobUntilAborted(recordLocationJob, app.deps, { stopAfterChecks: 1, input });\n    expect([stopped.outcome, [...app.saved.keys()]]).toStrictEqual([{ kind: 'partial', processed: 1 }, [1]]);\n  });\n});\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/background-tasks/define-location-tasks.ts",
+          "content": "// src/services/background-tasks/define-location-tasks.ts\n// The location task registry: the entry imports it next to define-background-tasks.ts. The task is\n// registered by expo-location (startLocationUpdatesAsync(recordLocationJob.name, ...)), not by the\n// background-task reconcile, so the job stays out of BACKGROUND_JOBS.\nimport * as TaskManager from 'expo-task-manager';\n\nimport { createBackgroundEnvironment } from './background-environment';\nimport { recordLocationJob } from './jobs/record-location-job';\nimport { toTaskExecutor } from './task-executor';\n\nTaskManager.defineTask(recordLocationJob.name, toTaskExecutor(recordLocationJob, createBackgroundEnvironment));\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tracking/use-record-location-while-open.ts",
+          "content": "// src/features/tracking/use-record-location-while-open.ts\n// The location job's foreground path: while the app is open, the position watch (through the app's\n// location port) hands each update to the same job, through the same runner, as a foreground run.\nimport { useEffect } from 'react';\n\nimport { runBackgroundJob } from '@/services/background-tasks/background-job';\nimport { recordLocationJob } from '@/services/background-tasks/jobs/record-location-job';\n\nimport type { JobEnvironment } from '@/services/background-tasks/background-job';\nimport type { RecordLocationDeps } from '@/services/background-tasks/jobs/record-location-job';\nimport type { LocationPort } from '@/services/location/location-port';\n\nexport function useRecordLocationWhileOpen(location: LocationPort, environment: JobEnvironment<RecordLocationDeps>): void {\n  useEffect(\n    () =>\n      location.watchPosition((update) => {\n        runBackgroundJob(recordLocationJob, environment, { trigger: 'foreground', input: { locations: [update] } }).catch((thrown: unknown) => {\n          environment.errorLog.record('service', thrown);\n        });\n      }),\n    [location, environment],\n  );\n}\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "index.ts",
+          "find": "import '@/services/background-tasks/define-background-tasks';\n",
+          "with": "import '@/services/background-tasks/define-background-tasks';\nimport '@/services/background-tasks/define-location-tasks';\n"
+        }
+      }
+    ]
+  },
+  "pass-no-app-config": {
+    "expect": [
+      "SKIP app.config.ts [background-plugin] not yet created (expo-project-bootstrap creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "app.config.ts" }]
+  },
+  "pass-no-background-packages": {
+    "expect": [
+      "NOT APPLICABLE: package.json lists none of expo-background-task, expo-task-manager and expo-background-fetch"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-background-task"], "delete": true } },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-task-manager"], "delete": true } }
+    ]
+  },
+  "pass-no-native-snapshot": {
+    "expect": ["background-plist not applied: no contracts/native-config.json", "RESULT: PASS"],
+    "ops": [{ "delete": "contracts/native-config.json" }]
+  },
+  "pass-unrelated-interval-constant": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/tasks-refresh.ts",
+          "lines": [
+            "// src/features/tasks/tasks-refresh.ts",
+            "// A refetch interval of the app's own: not a background-task interval, so the 15-minute floor does not apply.",
+            "export const REFETCH_INTERVAL_MINUTES = 5;",
+            "export const REMINDER_SNOOZE_INTERVAL_MINUTES = 10;"
+          ]
+        }
+      }
+    ]
+  }
+}

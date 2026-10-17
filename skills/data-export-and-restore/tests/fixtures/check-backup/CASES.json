@@ -1,0 +1,580 @@
+{
+  "bad-atomic-legacy": {
+    "expect": [
+      "FAIL src/services/report-files/expo-file-system-report-files-adapter.ts:6 [atomic-write] writes the export straight to its published name"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/report-files/expo-file-system-report-files-adapter.ts",
+          "lines": [
+            "// src/services/report-files/expo-file-system-report-files-adapter.ts",
+            "import * as FileSystem from 'expo-file-system/legacy';",
+            "",
+            "export async function writeReport(name: string, text: string): Promise<string> {",
+            "  const uri = `${FileSystem.cacheDirectory ?? ''}${name}`;",
+            "  await FileSystem.writeAsStringAsync(uri, text);",
+            "  return uri;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-atomic-no-discard": {
+    "expect": ["[atomic-write] a failed write leaves its temp file behind"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/export-files/expo-file-system-export-files-adapter.ts",
+          "find": "    discardPartial(temp);\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-atomic-write": {
+    "expect": ["[atomic-write] writes the export straight to its published name"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/export-files/expo-file-system-export-files-adapter.ts",
+          "find": "    temp.moveSync(target, { overwrite: true });",
+          "with": "    target.write(text);"
+        }
+      }
+    ]
+  },
+  "bad-backup-coverage": {
+    "expect": ["[backup-coverage] the table reminders is neither backed up nor excluded"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/migrations/v0001-create-lists-and-tasks.ts",
+          "find": "CREATE TABLE entitlements (",
+          "with": "CREATE TABLE reminders (\n  id INTEGER PRIMARY KEY\n) STRICT;\nCREATE TABLE entitlements ("
+        }
+      }
+    ]
+  },
+  "bad-backup-fixture": {
+    "expect": ["FAIL src/data/backup/fixtures/backup-v1.json [backup-fixture] the fixture is damaged: payloadSha256"],
+    "ops": [
+      {
+        "json": {
+          "file": "src/data/backup/fixtures/backup-v1.json",
+          "path": ["payload", "tasks", 0, "title"],
+          "value": "Edited by hand"
+        }
+      }
+    ]
+  },
+  "bad-canonical-values": {
+    "expect": ["[canonical-values] a backup or CSV value is localized (.toLocaleDateString)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/backup/tasks-csv.ts",
+          "find": "    new Date(task.created_at_ms).toISOString(),",
+          "with": "    new Date(task.created_at_ms).toLocaleDateString(),"
+        }
+      }
+    ]
+  },
+  "bad-checksum-order": {
+    "expect": ["[checksum-first] the payload rows are parsed before checkEnvelope() verified the envelope"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/backup/read-backup.ts",
+          "find": "  const envelope = checkEnvelope(text);",
+          "with": "  const early = v.safeParse(BACKUP_PAYLOAD, JSON.parse(text));\n  if (!early.success) return err({ kind: 'invalid-row', path: '(payload)' });\n  const envelope = checkEnvelope(text);"
+        }
+      }
+    ]
+  },
+  "bad-checksum-skipped": {
+    "expect": ["[checksum-first] nothing compares the payload checksum (payloadSha256) on read"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/backup/backup-envelope.ts",
+          "find": "  if (sha256Hex(canonicalJson(payload)) !== header.payloadSha256) return err(DAMAGED);\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-csv-guard": {
+    "expect": ["[csv-guard] the CSV encoder does not neutralize the formula leaders @"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/portable/csv.ts",
+          "find": "['=', '+', '-', '@', '\\t', '\\r']",
+          "with": "['=', '+', '-', '\\t', '\\r']"
+        }
+      }
+    ]
+  },
+  "bad-csv-hand-rolled": {
+    "expect": ["FAIL src/features/reports/report-csv.ts:5 [csv-hand-rolled] builds CSV rows by hand"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/reports/report-csv.ts",
+          "lines": [
+            "// src/features/reports/report-csv.ts",
+            "export const REPORT_MIME = 'text/csv';",
+            "",
+            "export function reportCsv(rows: readonly (readonly string[])[]): string {",
+            "  return rows.map((row) => row.join(',')).join('\\r\\n');",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-csv-template-row": {
+    "expect": ["FAIL src/features/reports/orders-export.ts:9 [csv-hand-rolled] builds CSV rows by hand"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/reports/orders-export.ts",
+          "lines": [
+            "// src/features/reports/orders-export.ts",
+            "export const ORDERS_FILE = 'orders.csv';",
+            "",
+            "type Order = { readonly id: number; readonly note: string };",
+            "",
+            "export function ordersCsv(orders: readonly Order[]): string {",
+            "  return orders",
+            "    .map(",
+            "      (order) => `${String(order.id)},\"${order.note}\"`,",
+            "    )",
+            "    .join('\\n');",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-envelope-header": {
+    "expect": [
+      "[envelope-header] the header keys are [format, formatVersion, appVersion, schemaVersion, exportedAt, payloadSha256]"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/backup/backup-envelope.ts",
+          "find": "    schemaVersion: BACKUP_SCHEMA_VERSION,\n    appVersion: meta.appVersion,",
+          "with": "    appVersion: meta.appVersion,\n    schemaVersion: BACKUP_SCHEMA_VERSION,"
+        }
+      }
+    ]
+  },
+  "bad-fixture-untested": {
+    "expect": ["[backup-fixture] backup-v1 is not in the round-trip test's FIXTURES"],
+    "ops": [
+      {
+        "replace": {
+          "file": "test/sqlite/backup-round-trip.test.ts",
+          "find": "const FIXTURES = [{ name: 'backup-v1', version: 1 }] as const;",
+          "with": "const FIXTURES = [] as const;"
+        }
+      }
+    ]
+  },
+  "bad-newer-refused": {
+    "expect": ["[newer-refused] a file from a newer schema is not refused"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/backup/backup-envelope.ts",
+          "find": "  if (found > BACKUP_SCHEMA_VERSION) {",
+          "with": "  if (found > Number.MAX_SAFE_INTEGER) {"
+        }
+      }
+    ]
+  },
+  "bad-protected-sql": {
+    "expect": ["[restore-protected] backup SQL touches the protected table entitlements"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/backup/sqlite-backup-repository.ts",
+          "find": "const DELETE_LISTS_SQL = 'DELETE FROM lists';",
+          "with": "const DELETE_LISTS_SQL = 'DELETE FROM lists';\nconst DELETE_OWNED_SQL = 'DELETE FROM entitlements';"
+        }
+      }
+    ]
+  },
+  "bad-reader-outside-backup": {
+    "expect": [
+      "FAIL src/features/backup/import-rows.ts:8 [checksum-first] the payload rows are parsed before checkEnvelope() verified the envelope"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/backup/import-rows.ts",
+          "lines": [
+            "// src/features/backup/import-rows.ts",
+            "import * as v from 'valibot';",
+            "",
+            "import { BACKUP_PAYLOAD } from '@/data/backup/backup-schema';",
+            "",
+            "export function rowsOf(text: string): unknown {",
+            "  const parsed: unknown = JSON.parse(text);",
+            "  return v.parse(BACKUP_PAYLOAD, (parsed as { payload: unknown }).payload);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-restore-kinds": {
+    "expect": ["[typed-failures] RestoreFailure has no kind for: damaged"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/backup/backup-failures.ts",
+          "find": "  | { readonly kind: 'damaged' }\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-restore-protected": {
+    "expect": ["[restore-protected] the backup payload holds the protected table entitlements"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/backup/backup-schema.ts",
+          "find": "  lists: v.array(BACKUP_LIST),",
+          "with": "  entitlements: v.array(BACKUP_LIST),\n  lists: v.array(BACKUP_LIST),"
+        }
+      }
+    ]
+  },
+  "bad-restore-transaction": {
+    "expect": ["[restore-transaction] INSERT of the restore runs in another transaction than the DELETEs"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/backup/sqlite-backup-repository.ts",
+          "find": "          driver.run(DELETE_LISTS_SQL, []);\n          insertRows(driver, parsed.output);\n        });",
+          "with": "          driver.run(DELETE_LISTS_SQL, []);\n        });\n        driver.transaction(() => {\n          insertRows(driver, parsed.output);\n        });"
+        }
+      }
+    ]
+  },
+  "bad-round-trip-test": {
+    "expect": ["FAIL test/sqlite/backup-round-trip.test.ts [round-trip-test] no round-trip test"],
+    "ops": [{ "delete": "test/sqlite/backup-round-trip.test.ts" }]
+  },
+  "bad-safety-copy-first": {
+    "expect": [
+      "[safety-copy-first] the restore replaces the tables without writing a safety copy of the current data first"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/backup/backup-service.ts",
+          "find": "  const safetyCopy = deps.files.write({ folder: 'private', name: SAFETY_COPY_NAME, text });\n  if (!safetyCopy.ok) return err({ kind: 'safety-copy-failed' });\n",
+          "with": "  const safetyCopy = { value: { uri: '', name: SAFETY_COPY_NAME, bytes: text.length } };\n"
+        }
+      }
+    ]
+  },
+  "bad-safety-copy-outside-backup": {
+    "expect": [
+      "FAIL src/features/backup/quick-restore.ts:10 [safety-copy-first] the restore replaces the tables without writing a safety copy of the current data first"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/backup/quick-restore.ts",
+          "lines": [
+            "// src/features/backup/quick-restore.ts",
+            "import { readBackup } from '@/data/backup/read-backup';",
+            "",
+            "import type { BackupRepository } from '@/data/backup/backup-repository';",
+            "",
+            "/** Restores without a preview or a safety copy: the bypass check-backup must catch. */",
+            "export function quickRestore(repository: BackupRepository, text: string): boolean {",
+            "  const backup = readBackup(text);",
+            "  if (!backup.ok) return false;",
+            "  return repository.replaceAll(backup.value.payload).ok;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-schema-version": {
+    "expect": ["[schema-version] BACKUP_SCHEMA_VERSION is 1, not derived from the database version"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/backup/backup-envelope.ts",
+          "find": "export const BACKUP_SCHEMA_VERSION = LATEST_DB_VERSION;",
+          "with": "export const BACKUP_SCHEMA_VERSION = 1;"
+        }
+      }
+    ]
+  },
+  "bad-sdk-behind-port": {
+    "expect": ["FAIL src/features/backup/share-now.ts:2 [sdk-behind-port] imports expo-sharing outside an adapter"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/backup/share-now.ts",
+          "lines": [
+            "// src/features/backup/share-now.ts",
+            "import { shareAsync } from 'expo-sharing';",
+            "",
+            "export function shareNow(uri: string): Promise<void> {",
+            "  return shareAsync(uri);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-typed-failures": {
+    "expect": ["[typed-failures] backup code throws"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/backup/read-backup.ts",
+          "find": "  if (inconsistent !== null) return err(inconsistent);",
+          "with": "  if (inconsistent !== null) throw new Error(inconsistent.reason);"
+        }
+      }
+    ]
+  },
+  "bad-upgrade-chain": {
+    "expect": ["[upgrade-chain] upgrade step 2 has no matching migration (expected none)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/backup/backup-upgrades.ts",
+          "find": "export const BACKUP_UPGRADES: readonly BackupUpgrade[] = [];",
+          "with": "export const BACKUP_UPGRADES: readonly BackupUpgrade[] = [\n  { version: 2, name: 'add-task-due-on', up: (payload) => payload },\n];"
+        }
+      }
+    ]
+  },
+  "bad-user-action-only": {
+    "expect": ["FAIL src/features/backup/use-auto-backup.ts:9 [user-action-only] exportBackup() runs inside useEffect"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/backup/use-auto-backup.ts",
+          "lines": [
+            "// src/features/backup/use-auto-backup.ts",
+            "import { useEffect } from 'react';",
+            "",
+            "import { useAppData } from '@/data/app-data-context';",
+            "",
+            "export function useAutoBackup(): void {",
+            "  const { backup } = useAppData();",
+            "  useEffect(() => {",
+            "    backup.exportBackup();",
+            "  }, [backup]);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-v2-missing-step": {
+    "expect": [
+      "src/data/backup/backup-upgrades.ts [upgrade-chain] schema version 2 has a migration but no backup upgrade step"
+    ],
+    "base": [
+      "@tests/bases/app",
+      { "templates": true, "firstLinePath": true, "fill": { "__APP_SLUG__": "tasks" } },
+      { "from": "@skill/examples/src", "firstLinePath": true },
+      { "from": "@skill/examples/backup-v2", "firstLinePath": true, "fill": { "__APP_SLUG__": "tasks" } }
+    ],
+    "ops": [{ "delete": "src/data/backup/upgrades/v0002-add-task-due-on.ts" }]
+  },
+  "error-no-package-json": {
+    "expect": ["ERROR [bad-input] nothing to check: no package.json"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "error-no-src": {
+    "expect": ["ERROR [bad-input] nothing to check: no src/"],
+    "base": [{ "from": "@tests/bases/app/package.json", "to": "./" }],
+    "ops": []
+  },
+  "pass-csv-import-only": {
+    "expect": ["note: no src/data/backup/: the backup rules did not run", "RESULT: PASS"],
+    "base": ["@tests/bases/app"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/file-picker/expo-document-picker-file-picker-adapter.ts",
+          "lines": [
+            "// src/services/file-picker/expo-document-picker-file-picker-adapter.ts",
+            "import { getDocumentAsync } from 'expo-document-picker';",
+            "",
+            "/** Picks a spreadsheet to import: reading CSV, not writing it. */",
+            "export function pickSpreadsheet(): Promise<unknown> {",
+            "  return getDocumentAsync({ type: ['text/csv', 'text/plain'], copyToCacheDirectory: true });",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-csv-only": {
+    "expect": ["note: no src/data/backup/: the backup rules did not run", "RESULT: PASS"],
+    "base": ["@tests/bases/app", { "from": "@skill/templates/src/core/portable", "to": "src/core/portable" }],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/reports/report-csv.ts",
+          "lines": [
+            "// src/features/reports/report-csv.ts",
+            "import { toCsv } from '@/core/portable/csv';",
+            "",
+            "export const REPORT_MIME = 'text/csv';",
+            "",
+            "export function reportCsv(rows: readonly (readonly string[])[]): string {",
+            "  return toCsv(['title'], rows);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-first-equals-latest": {
+    "expect": ["check-backup:", "RESULT: PASS"],
+    "base": [
+      "@tests/bases/app",
+      { "templates": true, "firstLinePath": true, "fill": { "__APP_SLUG__": "tasks" } },
+      { "from": "@skill/examples/src", "firstLinePath": true },
+      { "from": "@skill/examples/backup-v2", "firstLinePath": true, "fill": { "__APP_SLUG__": "tasks" } }
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/backup/backup-envelope.ts",
+          "find": "export const FIRST_BACKUP_SCHEMA_VERSION = 1;",
+          "with": "export const FIRST_BACKUP_SCHEMA_VERSION = 2;"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/backup/backup-upgrades.ts",
+          "find": "import { ADD_TASK_DUE_ON } from '@/data/backup/upgrades/v0002-add-task-due-on';\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/backup/backup-upgrades.ts",
+          "find": "export const BACKUP_UPGRADES: readonly BackupUpgrade[] = [ADD_TASK_DUE_ON];",
+          "with": "export const BACKUP_UPGRADES: readonly BackupUpgrade[] = [];"
+        }
+      },
+      { "delete": "src/data/backup/upgrades/v0002-add-task-due-on.ts" },
+      { "delete": "src/data/backup/fixtures/backup-v1.json" },
+      {
+        "replace": {
+          "file": "test/sqlite/backup-round-trip.test.ts",
+          "find": "  { name: 'backup-v1', version: 1 },\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "pass-installed-skills-silent": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/backup-kit/SKILL.md",
+          "lines": ["---", "name: backup-kit", "description: Planted decoy.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": ".agents/skills/backup-kit/src/features/x/auto.ts",
+          "lines": ["import { shareAsync } from 'expo-sharing';", "export const x = shareAsync;"]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/other/SKILL.md",
+          "lines": ["---", "name: other", "description: Planted decoy.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/other/src/report.ts",
+          "lines": ["export const m = 'text/csv';", "export const j = (r: string[]) => r.join(',');"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/kit/SKILL.md",
+          "lines": ["---", "name: kit", "description: Planted decoy.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/kit/share.ts",
+          "lines": ["import { shareAsync } from 'expo-sharing';", "export const s = shareAsync;"]
+        }
+      }
+    ]
+  },
+  "pass-no-migrations": {
+    "expect": [
+      "SKIP src/data/migrations [upgrade-chain] not yet created (persistence-and-migrations creates it)",
+      "SKIP src/data/migrations [backup-fixture] not yet created (persistence-and-migrations creates it)"
+    ],
+    "ops": [{ "delete": "src/data/migrations" }]
+  },
+  "pass-not-applicable": {
+    "expect": [
+      "NOT APPLICABLE: no src/data/backup/, and no source file imports expo-sharing or expo-document-picker or writes text/csv"
+    ],
+    "base": ["@tests/bases/app"],
+    "ops": []
+  },
+  "pass-string-replace-all": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/backup/backup-file-name.ts",
+          "lines": [
+            "// src/features/backup/backup-file-name.ts",
+            "import { BACKUP_FORMAT } from '@/data/backup/backup-envelope';",
+            "",
+            "const SEPARATOR = /[.]/g;",
+            "",
+            "/** String.prototype.replaceAll (two arguments) is not a restore. */",
+            "export function backupFileStem(): string {",
+            "  return BACKUP_FORMAT.replaceAll(SEPARATOR, '-');",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-v2-upgrade": {
+    "expect": ["check-backup:", "RESULT: PASS"],
+    "base": [
+      "@tests/bases/app",
+      { "templates": true, "firstLinePath": true, "fill": { "__APP_SLUG__": "tasks" } },
+      { "from": "@skill/examples/src", "firstLinePath": true },
+      { "from": "@skill/examples/backup-v2", "firstLinePath": true, "fill": { "__APP_SLUG__": "tasks" } }
+    ],
+    "ops": []
+  }
+}

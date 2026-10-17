@@ -1,0 +1,22 @@
+{
+  "paywall.title": "Text for paywall.title",
+  "paywall.subtitle": "Text for paywall.subtitle",
+  "paywall.buy-button": "Buy Premium for {priceText}",
+  "paywall.loading": "Text for paywall.loading",
+  "paywall.purchasing": "Text for paywall.purchasing",
+  "paywall.store-unavailable": "Text for paywall.store-unavailable",
+  "paywall.pending": "Text for paywall.pending",
+  "paywall.error": "Text for paywall.error",
+  "paywall.try-again": "Text for paywall.try-again",
+  "paywall.save-failed": "Text for paywall.save-failed",
+  "paywall.success.title": "Text for paywall.success.title",
+  "paywall.owned": "Text for paywall.owned",
+  "paywall.restore-button": "Text for paywall.restore-button",
+  "paywall.restoring": "Text for paywall.restoring",
+  "paywall.restore-success": "Text for paywall.restore-success",
+  "paywall.restore-empty": "Text for paywall.restore-empty",
+  "paywall.restore-failed": "Text for paywall.restore-failed",
+  "settings.premium.buy": "Buy Premium for {priceText}",
+  "settings.premium.no-price": "Text for settings.premium.no-price",
+  "tasks.title": "Tasks"
+}

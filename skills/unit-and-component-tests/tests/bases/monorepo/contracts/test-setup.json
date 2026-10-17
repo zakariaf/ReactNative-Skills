@@ -1,0 +1,7 @@
+{
+  "$comment": "Multi-package: the logic lives in each workspace's src/.",
+  "logicCoverageKeys": ["./apps/mobile/src/core/", "./packages/core/src/"],
+  "mutateGlobs": ["apps/mobile/src/core/**/*.ts", "packages/core/src/**/*.ts"],
+  "styleContractGlobs": ["apps/mobile/src/ui/**"],
+  "logicTestGlobs": ["apps/mobile/src/core/**", "packages/core/src/**"]
+}

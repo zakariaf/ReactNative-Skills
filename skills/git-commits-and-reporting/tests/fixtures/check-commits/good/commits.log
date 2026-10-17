@@ -1,0 +1,74 @@
+==> commit 46e89942818bd0ebd4e6dbd0f103b2df3adede60
+feat(tasks): keep a draft when the app is killed
+
+An unsaved task title now survives a restart. A repository test
+reopens the database and finds the draft.
+
+==> files
+
+src/features/tasks/task-draft.test.ts
+src/features/tasks/task-draft.ts
+==> commit 7f79f47e87e78cba5a8dba81552548d98150166a
+fix(lists): keep overdue state across time-zone changes
+
+A task due yesterday stayed overdue only in the old time zone. The due
+check now compares date keys; a property over time zones covers it.
+
+==> files
+
+src/features/lists/overdue.test.ts
+src/features/lists/overdue.ts
+==> commit 2e1f1edbddc13a1cb659e83cbfc202c667a68841
+chore(repo): add the lint configuration
+
+The flat config the whole app shares.
+
+Gate-Change: initial quality gates for the new app
+
+==> files
+
+eslint.config.mjs
+==> commit 9ebe2c78f977bf0d97c9e5ac773c2c0fadd5fcc0
+test(tasks): expect weekly repeats to skip holidays
+
+The product decision changed the repeat rule.
+
+Spec-Change: TASK-40 weekly repeats now skip public holidays
+Co-Authored-By: Claude <noreply@anthropic.com>
+
+==> files
+
+src/features/tasks/repeat.test.ts
+==> commit 78295b3314a85cf0b194f595bbed0e75c87e5f01
+refactor(tasks): name the draft storage key
+
+==> files
+
+src/features/tasks/task-draft.ts
+==> commit e5e8821b2451a4583506342f5cc6bbe6c13b6c09
+test(ui): record the task row golden
+
+The row shows the due date under the title.
+
+Gate-Change: new golden for the task row with a due date
+
+==> files
+
+src/ui/__snapshots__/task-row.golden.test.ts.snap
+==> commit d3de79666d63224ffafc35c64a8ed4eb9048ce30
+chore(release): build 14
+
+The local lane bumps ios.buildNumber and android.versionCode.
+
+==> files
+
+app.config.ts
+==> commit 12a03b153c141e28021bbdb4de1e3a6e27ed9254
+docs(skills): add a golden fixture to the vendored skill
+
+The fixture proves the skill checker; agent folders are not gates.
+
+==> files
+
+.agents/skills/demo/tests/x.golden.test.ts.snap
+skills/demo/templates/tsconfig.json

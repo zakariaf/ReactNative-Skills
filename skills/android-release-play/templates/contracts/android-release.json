@@ -1,0 +1,17 @@
+{
+  "$schema": "./android-release.schema.json",
+  "$comment": "The app's Google Play release facts (android-release-play): the lane, the package Play knows the app by, the registered upload key's certificate fingerprint (public, safe to commit; null until the first upload), the target SDK floor, the testing track uploads go to, the staged rollout steps, the local lane's release branch and release-notes language, and every permission the release bundle holds with why. check-store-aab compares the bundle with it; check-play-release-setup checks it against the repo. Change it in the same commit as the code or package that changes a permission.",
+  "lane": "eas",
+  "applicationId": "__APP_ID__",
+  "uploadCertificateSha256": null,
+  "minTargetSdk": 36,
+  "uploadTrack": "internal",
+  "rollout": [0.05, 0.2, 0.5, 1],
+  "releaseBranch": "main",
+  "releaseNotesLanguage": "en-US",
+  "permissions": {
+    "android.permission.INTERNET": {
+      "reason": "Requests through the ApiClient port (src/api), and the network SDKs the app ships"
+    }
+  }
+}

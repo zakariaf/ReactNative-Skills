@@ -1,0 +1,22 @@
+{
+  "$comment": "The same single-app tree as check-deps-policy; every case names its request in ARGS.txt (the case folder is the working directory, so \".\" is the repo root and npm view samples sit next to it).",
+  "base": [
+    "@tests/bases/single-app",
+    {
+      "templates": true,
+      "firstLinePath": true
+    }
+  ],
+  "renames": {
+    "dot-npmrc": ".npmrc"
+  },
+  "ops": [
+    {
+      "replace": {
+        "file": ".npmrc",
+        "find": "# min-release-age-exclude[]=<package>\n",
+        "with": "# min-release-age-exclude[]=<package>\n\n# exclude-block expires=2026-10-10 reason=Expo SDK 57.0.26 pins module patches younger than 7 days\nmin-release-age-exclude[]=expo\nmin-release-age-exclude[]=expo-*\nmin-release-age-exclude[]=@expo/*\n"
+      }
+    }
+  ]
+}

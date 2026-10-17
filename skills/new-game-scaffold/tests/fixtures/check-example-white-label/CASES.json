@@ -1,0 +1,17 @@
+{
+  "bad-zero-packs": {
+    "expect": [
+      "[declaration] arena-chase: levels must be null (no level packs, also for a daily- or endless-only game) or { \"packs\": n >= 1, \"levelsPerPack\": n >= 1 }",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/games.json",
+          "path": ["games", 0, "levels"],
+          "value": { "packs": 0, "levelsPerPack": 0 }
+        }
+      }
+    ]
+  }
+}

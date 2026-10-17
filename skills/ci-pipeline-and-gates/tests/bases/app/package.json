@@ -1,0 +1,13 @@
+{
+  "name": "tasks-app",
+  "version": "1.0.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "scripts": {
+    "verify": "node scripts/quality/run-verify.ts",
+    "build:ios:sim": "node scripts/build/build-ios-sim.ts",
+    "build:android:emu": "node scripts/build/build-android-emu.ts",
+    "e2e:ios": "node scripts/e2e/run-e2e.ts --platform ios",
+    "e2e:android": "node scripts/e2e/run-e2e.ts --platform android"
+  }
+}

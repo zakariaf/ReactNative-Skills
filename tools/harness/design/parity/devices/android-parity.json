@@ -1,0 +1,22 @@
+{
+  "id": "android-parity",
+  "platform": "android",
+  "name": "Pixel 7 emulator pinned to 1080 x 2400 at 480 dpi (360 x 800 dp @3x)",
+  "avd": {
+    "name": "tasks-parity",
+    "device": "pixel_7",
+    "systemImage": "system-images;android-36;google_apis;arm64-v8a",
+    "density": 480,
+    "navigation": "gestural"
+  },
+  "points": { "width": 360, "height": 800 },
+  "scale": 3,
+  "pixels": { "width": 1080, "height": 2400 },
+  "safeArea": { "top": 48, "bottom": 24 },
+  "masks": [
+    { "x": 0, "y": 0, "width": 360, "height": 48 },
+    { "x": 0, "y": 776, "width": 360, "height": 24 }
+  ],
+  "fontScale": "1.0",
+  "demoMode": { "clock": "0941" }
+}

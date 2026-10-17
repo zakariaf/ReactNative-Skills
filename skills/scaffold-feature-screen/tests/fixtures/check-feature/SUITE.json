@@ -1,0 +1,24 @@
+{
+  "base": [
+    "@tests/bases/app",
+    {
+      "templates": true,
+      "firstLinePath": true,
+      "fill": {
+        "__FEATURE__": "notes",
+        "__FEATURE_PASCAL__": "Notes",
+        "__ROUTE_ID__": "(app)/notes",
+        "__ROUTE_HREF__": "/notes",
+        "__TITLE__": "Notes",
+        "__BODY__": "Nothing here yet.",
+        "__DETAIL__": "note-detail",
+        "__DETAIL_PASCAL__": "NoteDetail",
+        "__DETAIL_ROUTE_ID__": "(app)/notes/[noteId]",
+        "__DETAIL_HREF_BASE__": "/notes",
+        "__PARAM__": "noteId",
+        "__DETAIL_TITLE__": "Note",
+        "__DETAIL_BODY__": "Nothing here yet."
+      }
+    }
+  ]
+}

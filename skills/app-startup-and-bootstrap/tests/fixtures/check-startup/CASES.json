@@ -1,0 +1,922 @@
+{
+  "bad-blank-frame": {
+    "expect": [
+      "FAIL src/features/root-navigator/app-root.tsx",
+      "[blank-frame] a startup component renders nothing while the splash is not held"
+    ],
+    "ops": [
+      {
+        "$comment": "No splash package at all, so the splash rules do not apply, yet the app root still renders null for a frame.",
+        "json": { "file": "package.json", "path": ["dependencies", "expo-splash-screen"], "delete": true }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "import '@/features/root-navigator/hold-splash';\n",
+          "with": ""
+        }
+      },
+      { "delete": ["src/features/root-navigator/hold-splash.ts", "src/features/root-navigator/hold-splash.test.ts"] },
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "import { hide as hideSplash } from 'expo-splash-screen';\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "useStartupReady(app.gate, hideSplash)",
+          "with": "useStartupReady(app.gate, () => undefined)"
+        }
+      }
+    ]
+  },
+  "bad-entry-router-last": {
+    "expect": ["[entry-router-last] \"@/services/error-net/install-error-net\" is imported after expo-router/entry"],
+    "ops": [
+      {
+        "replace": {
+          "file": "index.ts",
+          "find": "import 'expo-router/entry';\n",
+          "with": "import 'expo-router/entry';\nimport '@/services/error-net/install-error-net';\n"
+        }
+      }
+    ]
+  },
+  "bad-flush-root-order": {
+    "expect": ["[flush-root] useFlushOnBackground is called after useCheckpointOnBackground"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "  useFlushOnBackground(app.flushers, app.data.errorLog);\n  useCheckpointOnBackground(app.data.database);\n",
+          "with": "  useCheckpointOnBackground(app.data.database);\n  useFlushOnBackground(app.flushers, app.data.errorLog);\n"
+        }
+      }
+    ]
+  },
+  "bad-flush-root-outside": {
+    "expect": [
+      "FAIL src/features/tasks/use-task-drafts.ts:5 [flush-root] useFlushOnBackground is called outside the app root"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-drafts.ts",
+          "lines": [
+            "// src/features/tasks/use-task-drafts.ts",
+            "import { useFlushOnBackground } from '@/features/root-navigator/use-flush-on-background';",
+            "",
+            "export function useTaskDrafts(errorLog: { record: (source: 'storage', error: unknown) => void }): void {",
+            "  useFlushOnBackground([], errorLog);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-flush-root-unmounted": {
+    "expect": [
+      "FAIL src/features/root-navigator/use-flush-on-background.ts:1 [flush-root] useFlushOnBackground is defined but never called"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "  useFlushOnBackground(app.flushers, app.data.errorLog);\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-interaction-manager": {
+    "expect": ["FAIL src/features/tasks/prefetch-tasks.ts:5 [interaction-manager]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/prefetch-tasks.ts",
+          "lines": [
+            "// src/features/tasks/prefetch-tasks.ts",
+            "import { InteractionManager } from 'react-native';",
+            "",
+            "export function prefetchLater(run: () => void): void {",
+            "  InteractionManager.runAfterInteractions(run);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-lifecycle-write": {
+    "expect": [
+      "FAIL src/stores/drafts/draft-autosave.ts:6 [lifecycle-write] an AppState listener writes (saveNow) on its own"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/stores/drafts/draft-autosave.ts",
+          "lines": [
+            "// src/stores/drafts/draft-autosave.ts",
+            "import { AppState } from 'react-native';",
+            "",
+            "export function watchDraft(draft: { saveNow: () => void }): () => void {",
+            "  const subscription = AppState.addEventListener('change', (next) => {",
+            "    if (next === 'background') draft.saveNow();",
+            "  });",
+            "  return () => {",
+            "    subscription.remove();",
+            "  };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-lifecycle-write-named-handler": {
+    "expect": [
+      "FAIL src/features/task-editor/use-draft-autosave.ts:10 [lifecycle-write] an AppState listener writes (saveDraft) on its own through its handler onChange",
+      "FAIL src/stores/drafts/watch-note-draft.ts:9 [lifecycle-write] an AppState listener writes (persistNow) on its own through its handler handleChange",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/task-editor/use-draft-autosave.ts",
+          "lines": [
+            "// src/features/task-editor/use-draft-autosave.ts",
+            "import { useEffect } from 'react';",
+            "import { AppState } from 'react-native';",
+            "",
+            "import type { AppStateStatus } from 'react-native';",
+            "",
+            "export function useDraftAutosave(saveDraft: () => void): void {",
+            "  useEffect(() => {",
+            "    const onChange = (next: AppStateStatus): void => {",
+            "      if (next !== 'active') saveDraft();",
+            "    };",
+            "    const subscription = AppState.addEventListener('change', onChange);",
+            "    return () => {",
+            "      subscription.remove();",
+            "    };",
+            "  }, [saveDraft]);",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/drafts/watch-note-draft.ts",
+          "lines": [
+            "// src/stores/drafts/watch-note-draft.ts",
+            "import { AppState } from 'react-native';",
+            "",
+            "import type { AppStateStatus } from 'react-native';",
+            "",
+            "export function watchNoteDraft(draft: { persistNow: () => void }): () => void {",
+            "  const subscription = AppState.addEventListener('change', handleChange);",
+            "  function handleChange(next: AppStateStatus): void {",
+            "    if (next === 'background') draft.persistNow();",
+            "  }",
+            "  return () => {",
+            "    subscription.remove();",
+            "  };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-provider-order": {
+    "expect": ["[provider-order] <AppThemeProvider> is not inside <I18nProvider>"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "        <I18nProvider language={language} digits=\"automatic\" onError={handleI18nError}>\n          <AppThemeProvider preference=\"system\">",
+          "with": "        <AppThemeProvider preference=\"system\">\n          <I18nProvider language={language} digits=\"automatic\" onError={handleI18nError}>"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "          </AppThemeProvider>\n        </I18nProvider>",
+          "with": "          </I18nProvider>\n        </AppThemeProvider>"
+        }
+      }
+    ]
+  },
+  "bad-provider-order-root-motion": {
+    "expect": ["[provider-order] <NavigationThemeProvider> is not inside <RootMotion>"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/root-stack.tsx",
+          "find": "      <KeyboardProvider>\n        <RootMotion kits={kits}>\n          <NavigationThemeProvider>",
+          "with": "      <KeyboardProvider>\n        <NavigationThemeProvider>\n          <RootMotion kits={kits}>"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/root-navigator/root-stack.tsx",
+          "find": "          </NavigationThemeProvider>\n        </RootMotion>",
+          "with": "          </RootMotion>\n        </NavigationThemeProvider>"
+        }
+      }
+    ]
+  },
+  "bad-provider-order-root-stack": {
+    "expect": ["[provider-order] <KeyboardProvider> is not inside <GestureHandlerRootView>"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/root-stack.tsx",
+          "find": "    <GestureHandlerRootView style={styles.root}>\n      <KeyboardProvider>",
+          "with": "    <KeyboardProvider>\n      <GestureHandlerRootView style={styles.root}>"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/root-navigator/root-stack.tsx",
+          "find": "      </KeyboardProvider>\n    </GestureHandlerRootView>",
+          "with": "      </GestureHandlerRootView>\n    </KeyboardProvider>"
+        }
+      }
+    ]
+  },
+  "bad-provider-twice": {
+    "expect": [
+      "FAIL src/features/root-navigator/root-stack.tsx:38 [provider-once] <RootMotion> is mounted a second time on the root path (first <MotionConfig> in src/features/settings-effects/preferences-root.tsx:13)"
+    ],
+    "extends": "pass-preferences-root",
+    "ops": [
+      {
+        "$comment": "PreferencesRoot mounts a MotionConfig of its own while the root stack's RootMotion mounts the app's one.",
+        "replace": {
+          "file": "src/features/settings-effects/preferences-root.tsx",
+          "find": "        <ReduceMotionPreferenceContext value=\"system\">",
+          "with": "        <MotionConfig preference=\"system\">"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/settings-effects/preferences-root.tsx",
+          "find": "        </ReduceMotionPreferenceContext>",
+          "with": "        </MotionConfig>"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/settings-effects/preferences-root.tsx",
+          "find": "import { ReduceMotionPreferenceContext } from '@/ui/a11y/use-reduce-motion';",
+          "with": "import { MotionConfig } from '@/ui/a11y/motion-config';"
+        }
+      }
+    ]
+  },
+  "bad-root-import-order": {
+    "expect": ["[root-import-order] the splash hold is imported after \"expo\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "import '@/features/root-navigator/hold-splash';\n\nimport { reloadAppAsync } from 'expo';\n",
+          "with": "import { reloadAppAsync } from 'expo';\nimport '@/features/root-navigator/hold-splash';\n"
+        }
+      }
+    ]
+  },
+  "bad-root-import-order-net": {
+    "expect": ["[root-import-order] the splash hold is imported before the error net installer"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "import '@/services/error-net/install-error-net';\nimport '@/features/root-navigator/hold-splash';\n",
+          "with": "import '@/features/root-navigator/hold-splash';\nimport '@/services/error-net/install-error-net';\n"
+        }
+      }
+    ]
+  },
+  "bad-root-kits-effect": {
+    "expect": [
+      "FAIL src/features/root-navigator/app-root.tsx:97 [root-kits] createRootKits() runs inside useEffect(...)",
+      "FAIL src/features/tasks/use-task-kits.ts:5 [root-kits] createRootKits() is called outside the app root"
+    ],
+    "ops": [
+      {
+        "$comment": "The kits are created in an effect, after the first frame, and twice.",
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "  const kits = createRootKits({ services, data, language, prepared });\n  errors.attach(kits);\n",
+          "with": "  const kits: readonly RootKit[] = [];\n  errors.attach(kits);\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "  useCheckpointOnBackground(app.data.database);\n",
+          "with": "  useCheckpointOnBackground(app.data.database);\n  useEffect(() => {\n    createRootKits({ services, data: app.data, language });\n  }, [app, services, language]);\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-kits.ts",
+          "lines": [
+            "// src/features/tasks/use-task-kits.ts",
+            "import { createRootKits } from '@/services/create-root-kits';",
+            "",
+            "export const taskKits = createRootKits;",
+            "export const kitsTwice = (): unknown => createRootKits({} as never);"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-root-kits-import": {
+    "expect": [
+      "FAIL src/features/root-navigator/app-root.tsx:31 [root-kits] the root file imports the kit factory createCrashReportingKit"
+    ],
+    "ops": [
+      {
+        "$comment": "A kit wired straight into a root file instead of the registry.",
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "import { RootStack } from './root-stack';\n",
+          "with": "import { createCrashReportingKit } from '@/services/crash-reporter/crash-reporting-root-kit';\n\nimport { RootStack } from './root-stack';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "  errors.attach(kits);\n",
+          "with": "  errors.attach([...kits, createCrashReportingKit(services)]);\n"
+        }
+      }
+    ]
+  },
+  "bad-root-kits-order": {
+    "expect": [
+      "[root-kits] createRootKits() runs before the data layer opens",
+      "[root-kits] createRootKits() runs before the error net's sink connects"
+    ],
+    "ops": [
+      {
+        "$comment": "The kits are created before the data layer opens and before the sink connects.",
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "  const kits = createRootKits({ services, data, language, prepared });\n  errors.attach(kits);\n",
+          "with": "  errors.attach(kits);\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "  const data = openDeviceData(services);\n",
+          "with": "  const kits = createRootKits({ services, data: null as never, language, prepared });\n  const data = openDeviceData(services);\n"
+        }
+      }
+    ]
+  },
+  "bad-root-kits-prepare-late": {
+    "expect": ["[root-kits] prepareRootKits() runs after the data layer opens"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "  const prepared = prepareRootKits(device);\n  const { services } = prepared;\n  const data = openDeviceData(services);",
+          "with": "  const data = openDeviceData(device);\n  const prepared = prepareRootKits(device);\n  const { services } = prepared;"
+        }
+      }
+    ]
+  },
+  "bad-root-kits-prepare-unused": {
+    "expect": ["[root-kits] src/services/create-root-kits.ts exports prepareRootKits but startApp never calls it"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "  const prepared = prepareRootKits(device);",
+          "with": "  const prepared = { services: device };"
+        }
+      }
+    ]
+  },
+  "bad-root-kits-slots": {
+    "expect": [
+      "[root-kits] the app root creates kits but never hands them to a slot: the kits never receive error reports",
+      "[root-kits] the app root creates kits but never hands them to a slot: the kits' blocking tasks never join the startup gate",
+      "[root-kits] the app root creates kits but never hands them to a slot: the kits' buffered writers never flush",
+      "[root-kits] the app root creates kits but nothing renders <RootKits kits={...}>"
+    ],
+    "ops": [
+      {
+        "$comment": "The kits are created but no slot receives them: no attach, no tasks, no flushers, no RootKits.",
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "  errors.attach(kits);\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "blocking: kitBlocking(kits),",
+          "with": "blocking: [],"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "flushers: kitFlushers(kits) };",
+          "with": "flushers: [] };"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-stack.tsx",
+          "find": "    <RootKits kits={kits}>\n      <Stack screenOptions={{ headerShown: false, animation }}>\n        <Stack.Protected guard={isTestBuild}>\n          <Stack.Screen name=\"(debug)\" />\n        </Stack.Protected>\n      </Stack>\n    </RootKits>",
+          "with": "    <Stack screenOptions={{ headerShown: false, animation }}>\n      <Stack.Protected guard={isTestBuild}>\n        <Stack.Screen name=\"(debug)\" />\n      </Stack.Protected>\n    </Stack>"
+        }
+      }
+    ]
+  },
+  "bad-root-kits-unused": {
+    "expect": [
+      "FAIL src/services/create-root-kits.ts:1 [root-kits] createRootKits is defined but the app root never calls it"
+    ],
+    "ops": [
+      {
+        "$comment": "A registry no startApp calls: no kit ever starts.",
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "  const kits = createRootKits({ services, data, language, prepared });\n",
+          "with": "  const kits: readonly RootKit[] = [];\n"
+        }
+      }
+    ]
+  },
+  "bad-root-stack-missing": {
+    "expect": ["FAIL src/features/root-navigator/root-stack.tsx:1 [provider-order] the root stack does not exist"],
+    "ops": [{ "delete": "src/features/root-navigator/root-stack.tsx" }]
+  },
+  "bad-runtime-font-load": {
+    "expect": ["FAIL src/features/tasks/use-app-fonts.ts:5 [runtime-font-load]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-app-fonts.ts",
+          "lines": [
+            "// src/features/tasks/use-app-fonts.ts",
+            "import { useFonts } from 'expo-font';",
+            "",
+            "export function useAppFonts(): boolean {",
+            "  const [isLoaded] = useFonts({});",
+            "  return isLoaded;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-runtime-font-load-google": {
+    "expect": [
+      "FAIL src/features/tasks/use-app-fonts.ts:5 [runtime-font-load]",
+      "FAIL src/features/tasks/load-fonts.ts:5 [runtime-font-load]",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-app-fonts.ts",
+          "lines": [
+            "// src/features/tasks/use-app-fonts.ts",
+            "import { Inter_400Regular, useFonts } from '@expo-google-fonts/inter';",
+            "",
+            "export function useAppFonts(): boolean {",
+            "  const [isLoaded] = useFonts({ Inter_400Regular });",
+            "  return isLoaded;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/load-fonts.ts",
+          "lines": [
+            "// src/features/tasks/load-fonts.ts",
+            "import * as Font from 'expo-font';",
+            "",
+            "export function useBrandFont(): boolean {",
+            "  const [isLoaded] = Font.useFonts({});",
+            "  return isLoaded;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-sink-in-effect": {
+    "expect": ["[sink-before-providers] appErrorNet.connect(...) runs inside useEffect(...)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "  appErrorNet.connect(errors.sink);\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "  useCheckpointOnBackground(app.data.database);\n",
+          "with": "  useCheckpointOnBackground(app.data.database);\n  useEffect(() => {\n    appErrorNet.connect((report) => {\n      app.data.errorLog.record(report.source, report.error);\n    });\n  }, [app]);\n"
+        }
+      }
+    ]
+  },
+  "bad-splash-hold-in-component": {
+    "expect": ["[splash-hold] preventAutoHideAsync() runs inside a function"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/hold-splash.ts",
+          "find": "preventAutoHideAsync().catch((error: unknown) => {\n  appErrorNet.report({ source: 'unhandled-rejection', error, isFatal: false });\n});\n",
+          "with": "export function useHoldSplash(): void {\n  preventAutoHideAsync().catch((error: unknown) => {\n    appErrorNet.report({ source: 'unhandled-rejection', error, isFatal: false });\n  });\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-splash-hold-missing": {
+    "expect": ["FAIL src/app/_layout.tsx:1 [splash-hold] the native splash is never held"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "import '@/features/root-navigator/hold-splash';\n",
+          "with": ""
+        }
+      },
+      { "delete": ["src/features/root-navigator/hold-splash.ts", "src/features/root-navigator/hold-splash.test.ts"] },
+      {
+        "$comment": "Keep the planted bug to the hold alone: the app root renders its tree at once.",
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "  if (!isReady) return null;\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-splash-hold-not-imported": {
+    "expect": ["[splash-hold] the splash hold lives in a module the root layout and the entry do not import"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "import '@/features/root-navigator/hold-splash';\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-splash-hold-twice": {
+    "expect": ["[splash-hold] the splash is held a second time (first in src/app/_layout.tsx"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "import { reloadAppAsync } from 'expo';\n",
+          "with": "import { reloadAppAsync } from 'expo';\nimport { preventAutoHideAsync } from 'expo-splash-screen';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "type Startup =",
+          "with": "void preventAutoHideAsync();\n\ntype Startup ="
+        }
+      }
+    ]
+  },
+  "bad-splash-release-above-gate": {
+    "expect": ["[splash-release] the splash is released in the component that renders DirectionGate"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "import { hide as hideSplash } from 'expo-splash-screen';\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "useStartupReady(app.gate, hideSplash)",
+          "with": "useStartupReady(app.gate, () => undefined)"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "import { useState } from 'react';",
+          "with": "import { hide } from 'expo-splash-screen';\nimport { useEffect, useState } from 'react';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "  const [startup] = useState(decideStartup);\n",
+          "with": "  const [startup] = useState(decideStartup);\n  useEffect(() => {\n    hide();\n  }, []);\n"
+        }
+      }
+    ]
+  },
+  "bad-splash-release-above-gate-and-root": {
+    "expect": [
+      "FAIL src/app/_layout.tsx:54 [splash-release] the splash is released in the component that renders DirectionGate",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "import { useState } from 'react';",
+          "with": "import { hide } from 'expo-splash-screen';\nimport { useEffect, useState } from 'react';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "  const [startup] = useState(decideStartup);\n",
+          "with": "  const [startup] = useState(decideStartup);\n  useEffect(() => {\n    hide();\n  }, []);\n"
+        }
+      }
+    ]
+  },
+  "bad-splash-release-missing": {
+    "expect": ["[splash-release] the splash is held but nothing releases it"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "import { hide as hideSplash } from 'expo-splash-screen';\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "useStartupReady(app.gate, hideSplash)",
+          "with": "useStartupReady(app.gate, () => undefined)"
+        }
+      }
+    ]
+  },
+  "bad-splash-release-module-scope": {
+    "expect": ["[splash-release] the splash is released at module scope"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "const STARTUP_DEADLINE_MS = 2000;\n",
+          "with": "const STARTUP_DEADLINE_MS = 2000;\nhideSplash();\n"
+        }
+      }
+    ]
+  },
+  "bad-splash-release-render": {
+    "expect": ["[splash-release] the splash is released during render of AppRoot"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "  const isReady = useStartupReady(app.gate, hideSplash);\n",
+          "with": "  hideSplash();\n  const isReady = useStartupReady(app.gate, hideSplash);\n"
+        }
+      }
+    ]
+  },
+  "bad-splash-release-twice": {
+    "expect": [
+      "FAIL src/features/tasks/tasks-ready.ts:5 [splash-release] the splash is released in a second file (first: src/features/root-navigator/app-root.tsx)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/tasks-ready.ts",
+          "lines": [
+            "// src/features/tasks/tasks-ready.ts",
+            "import { hide } from 'expo-splash-screen';",
+            "",
+            "export function markTasksReady(): void {",
+            "  hide();",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-startup-await": {
+    "expect": ["[startup-await] async work on the startup path (.then("],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "  gate.start();\n",
+          "with": "  gate.start();\n  Promise.resolve(data).then(() => undefined, () => undefined);\n"
+        }
+      }
+    ]
+  },
+  "bad-startup-deadline": {
+    "expect": ["[startup-deadline] deadlineMs is 8000 ms, over the 3000 ms the splash may wait"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "const STARTUP_DEADLINE_MS = 2000;",
+          "with": "const STARTUP_DEADLINE_MS = 8_000;"
+        }
+      }
+    ]
+  },
+  "bad-startup-deadline-missing": {
+    "expect": ["[startup-deadline] createStartupGate is called without deadlineMs"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "    deadlineMs: STARTUP_DEADLINE_MS,\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-storage-open-in-effect": {
+    "expect": ["[storage-open-once] openDeviceData() runs inside useEffect(...)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "  const isReady = useStartupReady(app.gate, hideSplash);\n",
+          "with": "  const isReady = useStartupReady(app.gate, hideSplash);\n  useEffect(() => {\n    openDeviceData(services);\n  }, [services]);\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "  const data = openDeviceData(services);\n",
+          "with": "  const data = { errorLog: services.errorLog } as unknown as AppData;\n"
+        }
+      }
+    ]
+  },
+  "bad-storage-open-outside": {
+    "expect": [
+      "FAIL src/features/tasks/use-task-database.ts:5 [storage-open-once] openDeviceData() is called outside the app root"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-database.ts",
+          "lines": [
+            "// src/features/tasks/use-task-database.ts",
+            "import { openDeviceData } from '@/data/open-device-database';",
+            "import { useServices } from '@/services/services-context';",
+            "",
+            "export const useTaskDatabase = (): unknown => openDeviceData(useServices());"
+          ]
+        }
+      }
+    ]
+  },
+  "error-bad-contract": {
+    "expect": ["ERROR [bad-input] contracts/startup.json has an unknown key \"rootLayouts\""],
+    "ops": [{ "write": { "file": "contracts/startup.json", "json": { "rootLayouts": "src/app/_layout.tsx" } } }]
+  },
+  "error-no-package-json": {
+    "expect": ["ERROR [bad-input] nothing to check:", "package.json does not exist"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "error-no-root-layout": {
+    "expect": ["ERROR [bad-input] nothing to check: the root layout src/app/_layout.tsx does not exist"],
+    "ops": [{ "delete": "src/app/_layout.tsx" }]
+  },
+  "pass-contract-deadline": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "write": { "file": "contracts/startup.json", "json": { "maxBlockingMs": 10000 } } },
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "const STARTUP_DEADLINE_MS = 2000;",
+          "with": "const STARTUP_DEADLINE_MS = 8_000;"
+        }
+      }
+    ]
+  },
+  "pass-installed-skills": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/demo/SKILL.md",
+          "lines": ["---", "name: demo", "description: Planted findings that must stay silent.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": ".agents/skills/demo/src/prefetch.ts",
+          "lines": [
+            "import { InteractionManager } from 'react-native';",
+            "InteractionManager.runAfterInteractions(() => undefined);"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/demo/SKILL.md",
+          "lines": ["---", "name: demo", "description: Planted findings that must stay silent.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/demo/src/fonts.ts",
+          "lines": ["import { useFonts } from 'expo-font';", "export const load = (): unknown => useFonts({});"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/demo-skill/SKILL.md",
+          "lines": [
+            "---",
+            "name: demo-skill",
+            "description: A vendored skill inside the app's source folder; its planted findings must stay silent.",
+            "---"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/demo-skill/prefetch.ts",
+          "lines": [
+            "import { InteractionManager } from 'react-native';",
+            "InteractionManager.runAfterInteractions(() => undefined);"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-not-applicable": {
+    "expect": ["NOT APPLICABLE: expo is not in package.json"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo"], "delete": true } }]
+  },
+  "pass-preferences-root": {
+    "expect": ["check-startup: 16 files checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "settings-and-preferences' PreferencesRoot takes over I18nProvider, AppThemeProvider and TextLocaleProvider and provides the saved reduce-motion choice to the root stack's RootMotion; the canonical root stack stays unchanged.",
+        "write": {
+          "file": "src/features/settings-effects/preferences-root.tsx",
+          "lines": [
+            "// src/features/settings-effects/preferences-root.tsx",
+            "import { I18nProvider } from '@/i18n/i18n-provider';",
+            "import { TextLocaleProvider } from '@/theme/text-locale';",
+            "import { AppThemeProvider } from '@/theme/theme-provider';",
+            "import { ReduceMotionPreferenceContext } from '@/ui/a11y/use-reduce-motion';",
+            "",
+            "import type { ReactNode } from 'react';",
+            "",
+            "export function PreferencesRoot({ children }: { readonly children: ReactNode }): ReactNode {",
+            "  return (",
+            "    <I18nProvider language=\"en\" digits=\"automatic\" onError={() => undefined}>",
+            "      <AppThemeProvider preference=\"system\">",
+            "        <ReduceMotionPreferenceContext value=\"system\">",
+            "          <TextLocaleProvider value={{ language: 'en', direction: 'ltr' }}>{children}</TextLocaleProvider>",
+            "        </ReduceMotionPreferenceContext>",
+            "      </AppThemeProvider>",
+            "    </I18nProvider>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "        <I18nProvider language={language} digits=\"automatic\" onError={handleI18nError}>\n          <AppThemeProvider preference=\"system\">\n            <TextLocaleProvider value={{ language, direction: directionOf(language) }}>\n              <RootStack kits={app.kits} />\n            </TextLocaleProvider>\n          </AppThemeProvider>\n        </I18nProvider>",
+          "with": "        <PreferencesRoot>\n          <RootStack kits={app.kits} />\n        </PreferencesRoot>"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "import { RootStack } from './root-stack';\n",
+          "with": "import { PreferencesRoot } from '@/features/settings-effects/preferences-root';\n\nimport { RootStack } from './root-stack';\n"
+        }
+      }
+    ]
+  }
+}

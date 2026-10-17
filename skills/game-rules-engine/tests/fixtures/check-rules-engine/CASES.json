@@ -1,0 +1,623 @@
+{
+  "bad-assembled-no-stats": {
+    "expect": ["[stats-missing]", "src/games/lights-out/rules/lights-out-stats.ts"],
+    "ops": [
+      {
+        "delete": [
+          "src/games/lights-out/rules/lights-out-stats.ts",
+          "src/games/lights-out/rules/lights-out-stats.test.ts"
+        ]
+      }
+    ]
+  },
+  "bad-catalog-key-missing": {
+    "expect": [
+      "[catalog-key-missing]",
+      "src/games/lights-out/rules/lights-out-engine.ts",
+      "'lights-out.hud.moves' is not in src/i18n/catalogs/ar.json"
+    ],
+    "ops": [{ "json": { "file": "src/i18n/catalogs/ar.json", "path": ["lights-out.hud.moves"], "delete": true } }]
+  },
+  "bad-create-finished": {
+    "expect": ["[engine-contract]", "create() starts a game whose outcome is won"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/rules/create.ts",
+          "find": "  if (cells.every((cell) => cell === 0)) cells = toggleCells(cells, neighbourhood(side, side, 0));\n  return { cols: side, rows: side, cells, moves: 0,",
+          "with": "  return { cols: side, rows: side, cells: cells.map((): Cell => 0), moves: 0,"
+        }
+      }
+    ]
+  },
+  "bad-endless-won": {
+    "expect": ["[endless-won]", "the endless run (difficulty 100) was won"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/lights-out/levels/lights-out-levels.ts",
+          "content": "// src/games/lights-out/levels/lights-out-levels.ts (fixture excerpt): an endless mode is declared,\n// but the rules can still be won at difficulty 100.\nexport const LIGHTS_OUT_ENDLESS = { kind: 'endless', difficulty: 100 } as const;\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/games/lights-out/rules/create.ts",
+          "find": "const { side, presses } = shapeFor(difficulty);",
+          "with": "const { side, presses } = shapeFor(difficulty >= 100 ? 0 : difficulty);"
+        }
+      }
+    ]
+  },
+  "bad-engine-contract-test": {
+    "expect": ["[engine-contract-test]", "no rules test runs engineContractProblems on the engine"],
+    "ops": [{ "delete": "src/games/lights-out/rules/lights-out-engine.test.ts" }]
+  },
+  "bad-engine-missing": {
+    "expect": ["[engine-missing]", "src/games/lights-out/rules/lights-out-engine.ts"],
+    "ops": [
+      {
+        "delete": [
+          "src/games/lights-out/rules/lights-out-engine.ts",
+          "src/games/lights-out/rules/lights-out-engine.test.ts"
+        ]
+      }
+    ]
+  },
+  "bad-engine-untyped": {
+    "expect": ["[engine-typed]", "are not typed GameEngine<...> and GameRules<...>"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/rules/lights-out-engine.ts",
+          "find": "export const LIGHTS_OUT_ENGINE: GameEngine<\n  LightsOutState,\n  LightsOutMove,\n  LightsOutEvent\n> = { create, listMoves, applyMove, outcome };",
+          "with": "export const LIGHTS_OUT_ENGINE = { create, listMoves, applyMove, outcome };"
+        }
+      }
+    ]
+  },
+  "bad-event-tense": {
+    "expect": ["[event-kind]", "event kind 'clear-board' is not a past-tense kebab-case name"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/rules/lights-out-types.ts",
+          "find": "kind: 'board-cleared'",
+          "with": "kind: 'clear-board'"
+        }
+      }
+    ]
+  },
+  "bad-example-state": {
+    "expect": [
+      "[testing-examples]",
+      "examples.lose() is playing, expected lost",
+      "src/games/lights-out/testing/lights-out-testing.ts"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/testing/lights-out-testing.ts",
+          "find": "lose: () => ({ ...START(), moves: START().maxMoves }),",
+          "with": "lose: () => START(),"
+        }
+      }
+    ]
+  },
+  "bad-fast-check-missing": {
+    "expect": [
+      "[kit-test-dependency]",
+      "package.json:1",
+      "has no fast-check devDependency",
+      "npm install -D -E fast-check@"
+    ],
+    "ops": [{ "json": { "file": "package.json", "path": ["devDependencies", "fast-check"], "delete": true } }]
+  },
+  "bad-fast-check-range": {
+    "expect": ["[kit-test-dependency]", "fast-check is \"latest\", not an exact version"],
+    "ops": [{ "json": { "file": "package.json", "path": ["devDependencies", "fast-check"], "value": "latest" } }]
+  },
+  "bad-fractional-score": {
+    "expect": ["[engine-contract]", "is not a whole number", "[testing-examples]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/rules/outcome.ts",
+          "find": "(state.maxMoves - state.moves) * TUNING.pointsPerSpareMove",
+          "with": "(state.maxMoves - state.moves) * TUNING.pointsPerSpareMove + 0.5"
+        }
+      }
+    ]
+  },
+  "bad-identity-id": {
+    "expect": ["[identity-id]", "identity.id is 'lights', but the game's folder is src/games/lights-out"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/lights-out-game.ts",
+          "find": "identity: { id: 'lights-out',",
+          "with": "identity: { id: 'lights',"
+        }
+      }
+    ]
+  },
+  "bad-impure-alias": {
+    "expect": [
+      "[pure-import]",
+      "src/games/lights-out/rules/outcome.ts:3",
+      "imports @/stores/settings/settings-selectors (src/stores/settings/settings-selectors), app code outside"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/rules/outcome.ts",
+          "find": "import { TUNING } from './lights-out-tuning';",
+          "with": "import { TUNING } from './lights-out-tuning';\nimport { selectTheme } from '@/stores/settings/settings-selectors';\n\nexport const THEME = selectTheme;"
+        }
+      }
+    ]
+  },
+  "bad-impure-import": {
+    "expect": ["[pure-import]", "src/games/lights-out/rules/apply-move.ts:2", "imports react-native (React Native)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/rules/apply-move.ts",
+          "find": "import { isCleared, outcome } from './outcome';",
+          "with": "import { Platform } from 'react-native';\n\nimport { isCleared, outcome } from './outcome';\n\nexport const OS = Platform.OS;"
+        }
+      }
+    ]
+  },
+  "bad-kit-export-missing": {
+    "expect": ["[kit-export-missing]", "src/core/game/testing/json-shape.ts:1", "does not export jsonOf"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/game/testing/json-shape.ts",
+          "find": "export function jsonOf(",
+          "with": "function jsonOf("
+        }
+      }
+    ]
+  },
+  "bad-kit-missing": {
+    "expect": ["[kit-file-missing]", "src/core/game/game-module.ts"],
+    "ops": [{ "delete": "src/core/game/game-module.ts" }]
+  },
+  "bad-kit-old-copy": {
+    "expect": ["[kit-member-missing]", "src/core/game/levels.ts", "is an older copy: it never names final"],
+    "ops": [{ "replace": { "file": "src/core/game/levels.ts", "find": "      readonly final: TState;\n", "with": "" } }]
+  },
+  "bad-list-after-end": {
+    "expect": ["[engine-contract]", "listMoves has"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/rules/list-moves.ts",
+          "find": "  if (outcome(state).kind !== 'playing') return [];\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-locale-compare": {
+    "expect": ["[determinism]", "src/games/lights-out/rules/toggle-cells.ts", "uses localeCompare"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/rules/toggle-cells.ts",
+          "find": "return cells.sort((a, b) => a - b);",
+          "with": "return cells.sort((a, b) => String(a).localeCompare(String(b)));"
+        }
+      }
+    ]
+  },
+  "bad-math-pow": {
+    "expect": ["[determinism]", "src/games/lights-out/rules/outcome.ts", "uses Math.pow"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/rules/outcome.ts",
+          "find": "(state.maxMoves - state.moves) * TUNING.pointsPerSpareMove",
+          "with": "Math.pow(state.maxMoves - state.moves, 2) * TUNING.pointsPerSpareMove"
+        }
+      }
+    ]
+  },
+  "bad-math-random": {
+    "expect": ["[determinism]", "src/games/lights-out/rules/create.ts", "uses Math.random"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/rules/create.ts",
+          "find": "const draw = nextInt(rng, size);",
+          "with": "const draw = { value: Math.floor(Math.random() * size), state: rng };"
+        }
+      }
+    ]
+  },
+  "bad-module-contract-test": {
+    "expect": ["[module-contract-test]", "no test beside the module runs engineContractProblems with the input members"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/lights-out-game.test.ts",
+          "find": "      input: LIGHTS_OUT_GAME.input,\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-module-missing": {
+    "expect": ["[module-missing]", "src/games/lights-out/lights-out-game.ts", "is not assembled into a GameModule"],
+    "ops": [{ "delete": ["src/games/lights-out/lights-out-game.ts", "src/games/lights-out/lights-out-game.test.ts"] }]
+  },
+  "bad-module-typed": {
+    "expect": ["[module-typed]", "the module never names levels"],
+    "ops": [
+      { "replace": { "file": "src/games/lights-out/lights-out-game.ts", "find": "  levels: null,\n", "with": "" } }
+    ]
+  },
+  "bad-mutating-apply": {
+    "expect": ["[engine-contract]", "applyMove changed its input state"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/rules/apply-move.ts",
+          "find": "  return { state: next, events };",
+          "with": "  Reflect.set(state, 'moves', next.moves);\n  return { state: next, events };"
+        }
+      }
+    ]
+  },
+  "bad-no-golden": {
+    "expect": ["[pinned-golden]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/rules/create.test.ts",
+          "find": "GOLDEN_SEED_1_BOARD",
+          "with": "PINNED_BOARD",
+          "all": true
+        }
+      }
+    ]
+  },
+  "bad-no-property-test": {
+    "expect": ["[property-tests]", "no fast-check property test"],
+    "ops": [
+      {
+        "delete": [
+          "src/games/lights-out/rules/create.test.ts",
+          "src/games/lights-out/rules/apply-move.test.ts",
+          "src/games/lights-out/rules/outcome.test.ts",
+          "src/games/lights-out/rules/toggle-cells.test.ts"
+        ]
+      }
+    ]
+  },
+  "bad-no-throw": {
+    "expect": ["[illegal-move-throws]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/rules/apply-move.ts",
+          "find": "throw new RangeError(",
+          "with": "throw new Error("
+        }
+      }
+    ]
+  },
+  "bad-pan-mode": {
+    "expect": [
+      "[pan-mode]",
+      "src/games/lights-out/lights-out-game.ts:30",
+      "panMode 'tilt' is not one of none, swipe, drag, aim"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/lights-out-game.ts",
+          "find": "panMode: 'none',",
+          "with": "panMode: 'tilt',"
+        }
+      }
+    ]
+  },
+  "bad-parse-cast": {
+    "expect": ["[persistence-roundtrip]", "parseState accepts damaged data"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/rules/lights-out-persistence.ts",
+          "find": "  if (!isRecord(json)) return null;\n  const { cols, rows, moves, maxMoves } = json;",
+          "with": "  if (isRecord(json)) return json as unknown as LightsOutState;\n  const { cols, rows, moves, maxMoves } = {} as Record<string, unknown>;"
+        }
+      }
+    ]
+  },
+  "bad-parse-state": {
+    "expect": ["[persistence-roundtrip]", "parseState does not return a saved state unchanged"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/rules/lights-out-persistence.ts",
+          "find": "{ cols, rows, cells, moves, maxMoves }",
+          "with": "{ cols, rows, cells, moves, maxMoves: maxMoves + 1 }"
+        }
+      }
+    ]
+  },
+  "bad-persistence-members": {
+    "expect": ["[persistence-members]", "PersistenceSpec member migrateState is missing"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/rules/lights-out-persistence.ts",
+          "find": "  // Version 1 has no older shape to upgrade from.\n  migrateState: () => null,\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-persistence-missing": {
+    "expect": ["[persistence-missing]", "the game module is assembled but the rules have no persistence file"],
+    "ops": [
+      { "delete": "src/games/lights-out/rules/lights-out-persistence.ts" },
+      { "delete": "src/games/lights-out/rules/lights-out-persistence.test.ts" }
+    ]
+  },
+  "bad-placeholder-left": {
+    "expect": ["[placeholder-left]", "__GAME_PASCAL__"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/rules/outcome.ts",
+          "find": "export function isCleared(",
+          "with": "// __GAME_PASCAL__ scoring\nexport function isCleared("
+        }
+      }
+    ]
+  },
+  "bad-reason-key": {
+    "expect": ["[reason-key]", "src/games/lights-out/rules/outcome.ts", "is not a lights-out.* catalog key"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/rules/outcome.ts",
+          "find": "reasonKey: 'lights-out.lose.out-of-moves'",
+          "with": "reasonKey: 'out-of-moves'"
+        }
+      }
+    ]
+  },
+  "bad-rng-after-create": {
+    "expect": ["[rng-not-in-state]", "rules draw random numbers after create() but the state holds no RngState"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/lights-out/rules/spark.ts",
+          "content": "// src/games/lights-out/rules/spark.ts\nimport { nextInt, seedRng } from '@/core/rng/sfc32';\n\n/** Re-seeds from the move count instead of threading a stream kept in the state. */\nexport function sparkCell(moves: number, size: number): number {\n  return nextInt(seedRng(moves), size).value;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-rng-golden": {
+    "expect": ["[rng-golden]", "src/core/rng/sfc32.ts", "the golden sequence is 1828152527"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/rng/sfc32.ts",
+          "find": "const WARM_UP_DRAWS = 12;",
+          "with": "const WARM_UP_DRAWS = 11;"
+        }
+      }
+    ]
+  },
+  "bad-rng-load": {
+    "expect": ["src/core/rng/sfc32.ts:1 [rng-load] sfc32.ts cannot be loaded"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/rng/sfc32.ts",
+          "find": "export",
+          "with": "export const broken = ;\nexport",
+          "occurrence": 1
+        }
+      }
+    ]
+  },
+  "bad-rng-no-worklet": {
+    "expect": ["[rng-worklet]"],
+    "ops": [{ "replace": { "file": "src/core/rng/sfc32.ts", "find": "'worklet';\n", "with": "" } }]
+  },
+  "bad-rng-test-edited": {
+    "expect": ["[rng-golden-test]", "missing 1828152527"],
+    "ops": [{ "replace": { "file": "src/core/rng/sfc32.test.ts", "find": "1828152527", "with": "1828152528" } }]
+  },
+  "bad-rules-export-missing": {
+    "expect": ["src/games/lights-out/rules/list-moves.ts:1 [rules-export-missing] does not export listMoves"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/rules/list-moves.ts",
+          "find": "export function listMoves(",
+          "with": "export function listLegalMoves("
+        }
+      }
+    ]
+  },
+  "bad-rules-file-missing": {
+    "expect": [
+      "[rules-file-missing]",
+      "src/games/lights-out/rules/list-moves.ts",
+      "listMoves has no file of its own",
+      "[engine-load]"
+    ],
+    "ops": [{ "delete": "src/games/lights-out/rules/list-moves.ts" }]
+  },
+  "bad-scaffolded-game-no-rules": {
+    "expect": ["src/games/sliding-puzzle/rules [rules-file-missing] the game has no rules folder", "[kit-file-missing]"],
+    "ops": [
+      { "delete": ["src/games", "src/core/game"] },
+      {
+        "write": {
+          "file": "src/games/sliding-puzzle/testing/sliding-puzzle-examples.ts",
+          "content": "// src/games/sliding-puzzle/testing/sliding-puzzle-examples.ts\nexport const SLIDING_PUZZLE_EXAMPLE_IDS = ['start', 'middle', 'win', 'lose'] as const;\n"
+        }
+      }
+    ]
+  },
+  "bad-select-regions": {
+    "expect": ["[select-regions]", "src/games/lights-out/lights-out-game.ts", "the module sets no selectRegions"],
+    "ops": [
+      {
+        "replace": { "file": "src/games/lights-out/lights-out-game.ts", "find": "    selectRegions: [],\n", "with": "" }
+      }
+    ]
+  },
+  "bad-state-set": {
+    "expect": ["[state-not-json]", "src/games/lights-out/rules/lights-out-types.ts"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/rules/lights-out-types.ts",
+          "find": "  readonly moves: number;\n",
+          "with": "  readonly moves: number;\n  readonly seen: ReadonlySet<number>;\n"
+        }
+      }
+    ]
+  },
+  "bad-state-typed-array": {
+    "expect": ["[state-not-json]", "src/games/lights-out/rules/lights-out-types.ts", "uses Uint8Array"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/rules/lights-out-types.ts",
+          "find": "  readonly moves: number;\n",
+          "with": "  readonly moves: number;\n  readonly seen?: Uint8Array;\n"
+        }
+      }
+    ]
+  },
+  "bad-stats-counters": {
+    "expect": ["[stats-counters]", "counter id 'cellsToggled' is not kebab-case"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/rules/lights-out-stats.ts",
+          "find": "      id: 'cells-toggled',",
+          "with": "      id: 'cellsToggled',"
+        }
+      }
+    ]
+  },
+  "bad-testing-bot": {
+    "expect": [
+      "[testing-bot]",
+      "src/games/lights-out/testing/lights-out-testing.ts",
+      "which is not one of the moves listMoves offered"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/testing/lights-out-testing.ts",
+          "find": "  return { move: best, rng };",
+          "with": "  return { move: { ...best, col: best.col + 9 }, rng };"
+        }
+      }
+    ]
+  },
+  "error-games-dir-outside": {
+    "expect": ["ERROR [bad-input]", "--games-dir must be a repo-relative folder"],
+    "args": "{dir} --games-dir ../elsewhere",
+    "ops": []
+  },
+  "error-missing-root": { "expect": ["ERROR [bad-input]", "nothing to check"], "args": "{dir}/no-such-app", "ops": [] },
+  "pass-before-the-canvas": {
+    "expect": [
+      "SKIP src/games/lights-out/canvas/intent-to-move.ts [module-missing] not yet created (canvas-gestures-and-hit-testing creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "delete": [
+          "src/games/lights-out/canvas",
+          "src/games/lights-out/lights-out-game.ts",
+          "src/games/lights-out/lights-out-game.test.ts"
+        ]
+      }
+    ]
+  },
+  "pass-before-the-catalogs": {
+    "expect": [
+      "SKIP src/i18n/catalogs [catalog-key-missing] not yet created (i18n-strings-and-catalogs creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "src/i18n" }]
+  },
+  "pass-endless-pig": {
+    "expect": [
+      "SKIP src/games/pig/canvas/intent-to-move.ts [module-missing] not yet created (canvas-gestures-and-hit-testing creates it)",
+      "RESULT: PASS"
+    ],
+    "base": [
+      "@tests/bases/app",
+      {
+        "templates": true,
+        "firstLinePath": true,
+        "fill": { "__GAME_ID__": "lights-out", "__GAME_PASCAL__": "LightsOut", "__GAME_CONST__": "LIGHTS_OUT" }
+      },
+      { "from": "@skill/examples/lights-out-module", "firstLinePath": true },
+      { "from": "@skill/examples/pig", "firstLinePath": true, "include": ["**/*.ts"] }
+    ],
+    "ops": []
+  },
+  "pass-games-dir": {
+    "expect": ["RESULT: PASS"],
+    "args": "{dir} --games-dir src/play",
+    "ops": [
+      { "rename": { "from": "src/games", "to": "src/play" } },
+      {
+        "json": {
+          "file": "tsconfig.json",
+          "path": ["compilerOptions", "paths", "@/games/*"],
+          "value": ["./src/play/*"]
+        }
+      }
+    ]
+  },
+  "pass-installed-skills": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "Planted findings inside installed skill folders and a vendored game folder holding a SKILL.md stay silent.",
+        "write": {
+          "file": ".agents/skills/other-skill/src/games/planted/rules/create.ts",
+          "content": "export const r = Math.random();\n"
+        }
+      },
+      {
+        "write": {
+          "file": "skills/other-skill/src/games/planted/rules/create.ts",
+          "content": "export const t = Date.now();\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/vendored/SKILL.md",
+          "content": "---\nname: vendored\ndescription: A vendored skill folder.\n---\n"
+        }
+      },
+      { "write": { "file": "src/games/vendored/rules/create.ts", "content": "export const s = Math.sin(1) ** 2;\n" } }
+    ]
+  },
+  "pass-kit-only": { "expect": ["check-rules-engine: ", "RESULT: PASS"], "ops": [{ "delete": "src/games" }] },
+  "pass-no-game": {
+    "expect": [
+      "NOT APPLICABLE: the app has no game (no src/games/<game-id>/ folder with rules, testing, canvas or <game-id>-game.ts, and no src/core/game kit)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": ["src/games", "src/core/game"] }]
+  }
+}

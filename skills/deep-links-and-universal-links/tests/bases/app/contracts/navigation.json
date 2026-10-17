@@ -1,0 +1,6 @@
+{
+  "router": "expo-router",
+  "home": "/",
+  "routes": ["(app)/index", "(app)/tasks/[taskId]", "(app)/tasks/new", "(app)/lists/[listId]", "verify-email", "oauth-redirect", "(debug)/debug/setup"],
+  "debugRoutes": ["(debug)/debug/setup"]
+}

@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Canvas input",
+  "description": "The app's canvas surfaces that take touch, read by the canvas-gestures-and-hit-testing checker. Optional: without it, a surface folder (src/features/<feature>/canvas, src/games/<game-id>/canvas, or rn-skills.config.json canvasSurfaceDirs) takes touch when it holds its intent file (intent-to-action.ts; games: intent-to-move.ts) or when a file of its feature folder calls useCanvasGestures or makeStickGesture.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "surfaces": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "dir"],
+        "properties": {
+          "id": {
+            "description": "Kebab-case surface id (the same id as in contracts/canvas-surfaces.json).",
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+          },
+          "dir": {
+            "description": "Repo-relative surface folder (layout-*.ts, <id>-surface.ts).",
+            "type": "string"
+          },
+          "input": {
+            "description": "intents (default): taps, long presses, swipes, drags and aims become CanvasIntents for a pure intent function. stick: continuous input written as integer commands for a simulation (no intent function, no tap targets).",
+            "enum": ["intents", "stick"]
+          },
+          "intentFile": {
+            "description": "Repo-relative file of the pure intent function. Default <dir>/intent-to-action.ts; for a game surface (src/games/<game-id>/canvas) <dir>/intent-to-move.ts.",
+            "type": "string",
+            "pattern": "\\.ts$"
+          },
+          "intentExport": {
+            "description": "Name of the exported intent function. Default intentToAction (intentToMove for the games default).",
+            "type": "string",
+            "pattern": "^[a-z][A-Za-z0-9]*$"
+          },
+          "tappable": {
+            "description": "Whether the surface has tappable regions that need a hit-targets test. Default: true when a layout-*.ts in the folder calls fitGrid or lists regions.",
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "buttonComponents": {
+      "description": "The app's own touchable components that must never sit inside a canvas GestureDetector, besides React Native's Pressable, Touchable* and Button and every component named *Button or Pressable*.",
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[A-Z][A-Za-z0-9]*$" },
+      "uniqueItems": true
+    },
+    "gestureExempt": {
+      "description": "Globs of app source files inside the canvas scope (the canvas kit, a surface folder, a file that renders or feeds a canvas, the feature folder of a surface that takes touch) that legitimately build an ordinary UI gesture (a swipe hook for the rows next to a canvas). A self-contained control (a .tsx file whose own GestureDetector wraps no canvas) needs no entry. The canvas itself never takes a gesture from them.",
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "$schema": "./commits.schema.json",
+  "$comment": "Facts the commit rules read (git-commits-and-reporting): scripts/git/commit-config.ts for the commit-msg hook and check-commits.mjs. scopeFolders: '<folder>/*' makes each sub-folder name a scope, '<folder>' makes the folder's own name one. extraScopes adds names. requirementRef null keeps the requirement rule off; set { pattern, required, exemptScopes } to make every feat or fix body name a requirement.",
+  "scopeFolders": ["src/features/*", "src/*"],
+  "extraScopes": [],
+  "requirementRef": null
+}

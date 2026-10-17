@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "design-system.schema.json",
+  "title": "Design system contract",
+  "description": "The app's design-system facts that check-design-system and check-raw-values read: where the token file is, which theme export copies which token path, the palettes, the text and font facts, and the raw-value policy. Paths are repo-relative.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["tokens", "exports", "palettes", "fonts"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "tokens": {
+      "type": "string",
+      "description": "The token file (two tiers, aliases as {a.b.c})."
+    },
+    "exports": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["file", "name", "token"],
+        "properties": {
+          "file": { "type": "string" },
+          "name": { "type": "string", "description": "The exported const." },
+          "token": { "type": "string", "description": "Dot path into the token file." }
+        }
+      }
+    },
+    "palettes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["file", "export", "token"],
+        "properties": {
+          "file": { "type": "string" },
+          "export": { "type": "string" },
+          "token": {
+            "type": "string",
+            "description": "Dot path to { light, dark, colorBlind? } in the token file."
+          }
+        }
+      }
+    },
+    "invariantFields": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Colour roles that must be identical in every palette (white-label flavours)."
+    },
+    "files": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "description": "Overrides of the default module paths by key: themeTypes, tokens, typeStyles, motion, fonts, palette, contrast, themeSet, themeContext, useTheme, makeStyles, themeProvider, textLocale, textStyle, shadowStyles, appText, balancedWrap, pressSurface, pressFeedback."
+    },
+    "text": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tabularStyles": { "type": "array", "items": { "type": "string" } },
+        "minTallLineHeight": { "type": "object", "additionalProperties": { "type": "number" } }
+      }
+    },
+    "fonts": {
+      "description": "The font decision, always declared. \"system\" (the template default): the platform's own font (San Francisco, Roboto), nothing bundled, and the font-files, font-plugin and no-font-weight rules are off. An object: the bundled font files, pinned by sha256, with their licences; every rule then applies strictly.",
+      "oneOf": [
+        { "const": "system" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["dir", "files", "licences"],
+          "properties": {
+            "dir": { "type": "string" },
+            "files": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["file", "family", "sha256"],
+                "properties": {
+                  "file": { "type": "string" },
+                  "family": { "type": "string" },
+                  "sha256": { "type": "string" }
+                }
+              }
+            },
+            "licences": { "type": "object", "additionalProperties": { "type": "string" } },
+            "weightBy": {
+              "enum": ["family", "fontWeight"],
+              "description": "family (default): a file and a family per weight, never fontWeight. fontWeight: one family name per font plus fontWeight (Expo's android.fonts object syntax)."
+            }
+          }
+        }
+      ]
+    },
+    "rawValues": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "scan": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Folders check-raw-values scans. Default: the src folder minus src/core, src/data, src/api, src/stores, src/services, src/i18n and src/config."
+        },
+        "allowColors": { "type": "array", "items": { "type": "string" } },
+        "policy": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "noGradients": { "type": "boolean" },
+            "maxRadius": { "type": ["number", "null"] }
+          }
+        }
+      }
+    }
+  }
+}

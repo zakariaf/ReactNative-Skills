@@ -1,0 +1,2 @@
+FAIL reports/rebaseline/update-02.json:1 [update-one-file]
+ran without -u

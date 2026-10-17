@@ -1,0 +1,276 @@
+{
+  "$comment": "What each Expo SDK line expects of the packages, tools and toolchain that move with it. Read by check-sdk-alignment.mjs and check-sdk-trigger.mjs; every key is described in references/sdk-lines.md. Version fields ending in a minor (\"19.3\") or a major (\"30\") are line prefixes; full versions are exact. An app that moves before this file knows its SDK adds the entry to its own contracts/expo-sdk-lines.json (same shape), which replaces this file's entry for that SDK.",
+  "$stackPins": "stack-pin-ignore-file: this table describes several Expo SDK lines on purpose",
+  "verified": "2026-10-04",
+  "sdks": {
+    "55": {
+      "status": "stable, older: npm sdk-55 = 55.0.31; verified 2026-10-04 (bundledNativeModules.json of expo 55.0.31, api.expo.dev relatedPackages, react-native 0.83.10 gradle/libs.versions.toml, docs.expo.dev versions table and v55 build-properties page, EAS build infrastructure page). Written after the SDK shipped: removedApis lists nothing for it.",
+      "expo": "55.0.31",
+      "reactNative": "0.83.10",
+      "react": "19.2",
+      "typesReact": "19.2",
+      "testRenderer": "1.2",
+      "typescript": "5.9",
+      "jest": "29.7",
+      "typesJest": "29.5.14",
+      "gestureHandlerMajor": 2,
+      "skiaPostinstallUntil": "2.6.5",
+      "configPluginsImport": "expo/config-plugins.js",
+      "jestConfigMustInclude": [],
+      "xcodeMin": "26.2",
+      "xcodeMax": "26",
+      "xcodeMaxWithoutSceneSupport": "26",
+      "sceneSupportMinExpo": null,
+      "ios": {
+        "deploymentTarget": "15.1"
+      },
+      "android": {
+        "compileSdk": 36,
+        "targetSdk": 36,
+        "minSdk": 24,
+        "buildTools": "36.0.0",
+        "agp": "8.12.0",
+        "kotlin": "2.1.20",
+        "ndk": "27.1.12297006",
+        "jdk": 17
+      },
+      "eas": {
+        "iosImage": "macos-sequoia-15.6-xcode-26.2",
+        "androidImage": "ubuntu-24.04-jdk-17-ndk-r27b-sdk-55"
+      },
+      "removedApis": [],
+      "removedAppConfigKeys": [
+        {
+          "key": "newArchEnabled",
+          "pattern": "\\bnewArchEnabled\\b['\"]?\\s*:",
+          "since": 55,
+          "fix": "Delete newArchEnabled: since SDK 55 the New Architecture is the only architecture and the key is gone from the app config schema."
+        },
+        {
+          "key": "android.edgeToEdgeEnabled",
+          "pattern": "\\bedgeToEdgeEnabled\\b['\"]?\\s*:",
+          "since": 55,
+          "fix": "Delete android.edgeToEdgeEnabled: Android 16 (targetSdk 36) enforces edge to edge, the key left the app config schema in SDK 55; lay content out with safe-area insets."
+        }
+      ]
+    },
+    "56": {
+      "status": "stable, older: npm sdk-56 = 56.0.23; verified 2026-10-04 (bundledNativeModules.json of expo 56.0.23, api.expo.dev relatedPackages, react-native 0.85.3 gradle/libs.versions.toml, docs.expo.dev versions table and v56 build-properties page, EAS build infrastructure page). Every SDK 56 release carries the Hermes V1 memory regression of SDK 57's advisory: move on to SDK 57. Written after the SDK shipped: removedApis lists nothing for it.",
+      "expo": "56.0.23",
+      "reactNative": "0.85.3",
+      "react": "19.2",
+      "typesReact": "19.2",
+      "testRenderer": "1.2",
+      "typescript": "6.0",
+      "jest": "29.7",
+      "typesJest": "29.5.14",
+      "gestureHandlerMajor": 2,
+      "skiaPostinstallUntil": "2.6.5",
+      "configPluginsImport": "expo/config-plugins.js",
+      "jestConfigMustInclude": [],
+      "xcodeMin": "26.4",
+      "xcodeMax": "26",
+      "xcodeMaxWithoutSceneSupport": "26",
+      "sceneSupportMinExpo": null,
+      "ios": {
+        "deploymentTarget": "16.4"
+      },
+      "android": {
+        "compileSdk": 36,
+        "targetSdk": 36,
+        "minSdk": 24,
+        "buildTools": "36.0.0",
+        "agp": "8.12.0",
+        "kotlin": "2.1.20",
+        "ndk": "27.1.12297006",
+        "jdk": 17
+      },
+      "eas": {
+        "iosImage": "macos-tahoe-26.4-xcode-26.4",
+        "androidImage": "ubuntu-26.04-jdk-17-ndk-r27b"
+      },
+      "removedApis": [],
+      "removedAppConfigKeys": [
+        {
+          "key": "newArchEnabled",
+          "pattern": "\\bnewArchEnabled\\b['\"]?\\s*:",
+          "since": 55,
+          "fix": "Delete newArchEnabled: since SDK 55 the New Architecture is the only architecture and the key is gone from the app config schema."
+        },
+        {
+          "key": "android.edgeToEdgeEnabled",
+          "pattern": "\\bedgeToEdgeEnabled\\b['\"]?\\s*:",
+          "since": 55,
+          "fix": "Delete android.edgeToEdgeEnabled: Android 16 (targetSdk 36) enforces edge to edge, the key left the app config schema in SDK 55; lay content out with safe-area insets."
+        }
+      ]
+    },
+    "57": {
+      "status": "stable: npm latest 57.0.26; verified 2026-10-04 (bundledNativeModules.json of expo 57.0.26, api.expo.dev relatedPackages, react-native 0.86.3 gradle/libs.versions.toml, docs.expo.dev versions table (Xcode 26.4+, iOS 16.4+) and v57 app config and build-properties pages, EAS build infrastructure page). Re-read 2026-10-17 against bundledNativeModules.json of expo 57.0.27 (the newest SDK 57 patch past the 7-day release age; npm sdk-57 = 57.0.30): patch specifiers of Expo modules only, React Native 0.86.3 and every key of this entry unchanged. Written as the current SDK: removedApis lists nothing for it.",
+      "expo": "57.0.27",
+      "reactNative": "0.86.3",
+      "react": "19.2",
+      "typesReact": "19.2",
+      "testRenderer": "1.2",
+      "typescript": "6.0",
+      "jest": "29.7",
+      "typesJest": "29.5.14",
+      "gestureHandlerMajor": 2,
+      "skiaPostinstallUntil": "2.6.5",
+      "configPluginsImport": "expo/config-plugins.js",
+      "jestConfigMustInclude": [],
+      "xcodeMin": "26.4",
+      "xcodeMaxWithoutSceneSupport": "26",
+      "sceneSupportMinExpo": "57.0.23",
+      "minExpo": "57.0.9",
+      "skipFrom": [
+        55
+      ],
+      "advisory": "Expo's expo-upgrade skill (expo/skills, read 2026-10-04): SDK 55 with Hermes V1 enabled, every SDK 56 release and SDK 57 before expo 57.0.9 carry a Hermes V1 memory regression that can drastically increase memory use with react-native-worklets or react-native-reanimated; apps on SDK 55 move straight to SDK 57 (57.0.9 or newer), skipping 56",
+      "ios": {
+        "deploymentTarget": "16.4"
+      },
+      "android": {
+        "compileSdk": 36,
+        "targetSdk": 36,
+        "minSdk": 24,
+        "buildTools": "36.0.0",
+        "agp": "8.12.0",
+        "kotlin": "2.1.20",
+        "ndk": "27.1.12297006",
+        "jdk": 17
+      },
+      "eas": {
+        "iosImage": "macos-tahoe-26.5-xcode-26.6",
+        "androidImage": "ubuntu-26.04-jdk-17-ndk-r27b-sdk-57"
+      },
+      "removedApis": [],
+      "removedAppConfigKeys": [
+        {
+          "key": "newArchEnabled",
+          "pattern": "\\bnewArchEnabled\\b['\"]?\\s*:",
+          "since": 55,
+          "fix": "Delete newArchEnabled: since SDK 55 the New Architecture is the only architecture and the key is gone from the app config schema."
+        },
+        {
+          "key": "android.edgeToEdgeEnabled",
+          "pattern": "\\bedgeToEdgeEnabled\\b['\"]?\\s*:",
+          "since": 55,
+          "fix": "Delete android.edgeToEdgeEnabled: Android 16 (targetSdk 36) enforces edge to edge, the key left the app config schema in SDK 55; lay content out with safe-area insets."
+        }
+      ]
+    },
+    "58": {
+      "status": "pre-release: npm next 58.0.3 (published 2026-10-03, React Native 0.88.0-rc.3), not npm latest; read 2026-10-04 (the v58 docs versions table confirms Xcode 26.4+, iOS 16.4+ and compileSdk 37). Re-read every value from the stable release in the move commit.",
+      "expo": "58.0.3",
+      "reactNative": "0.88",
+      "react": "19.3",
+      "typesReact": "19.3",
+      "testRenderer": "1.3",
+      "typescript": "6.0",
+      "jest": "30",
+      "typesJest": "30.0.0",
+      "gestureHandlerMajor": 3,
+      "skiaPostinstallUntil": "2.6.5",
+      "configPluginsImport": "expo/config-plugins",
+      "jestConfigMustInclude": [
+        {
+          "text": "resolver: 'react-native-reanimated/jest/resolver'",
+          "pattern": "['\"]?\\bresolver['\"]?\\s*:\\s*['\"]react-native-reanimated/jest/resolver['\"]",
+          "why": "Reanimated 4.7 and Worklets 0.13 load their native initializers under Jest without it ('[Reanimated] setCSSEventHandler is not available in JSReanimated'); the resolver picks the web implementations (Reanimated's testing guide)",
+          "fix": "Add resolver: 'react-native-reanimated/jest/resolver' to the options every Jest project shares: the top-level config, or each entry of projects (for example the SHARED object of the reference jest.config.js unit-and-component-tests ships)."
+        },
+        {
+          "text": "'^react-native/asset-registry$': '<rootDir>/node_modules/react-native/src/asset-registry.js'",
+          "pattern": "['\"]\\^react-native/asset-registry\\$['\"]\\s*:\\s*['\"]<rootDir>/node_modules/react-native/src/asset-registry\\.js['\"]",
+          "why": "jest-expo 58 maps react-native/asset-registry to react-native/src/asset-registry, which React Native 0.88's exports map hides from that resolver ('Could not locate module react-native/asset-registry mapped as react-native/src/asset-registry')",
+          "fix": "Add '^react-native/asset-registry$': '<rootDir>/node_modules/react-native/src/asset-registry.js' as the first moduleNameMapper entry of every Jest project: the top-level config, or each entry of projects (for example the PATH_ALIASES object of the reference jest.config.js unit-and-component-tests ships)."
+        }
+      ],
+      "xcodeMin": "26.4",
+      "xcodeMaxWithoutSceneSupport": null,
+      "sceneSupportMinExpo": null,
+      "ios": {
+        "deploymentTarget": "16.4"
+      },
+      "android": {
+        "compileSdk": 37,
+        "targetSdk": 36,
+        "minSdk": 24,
+        "buildTools": "37.0.0",
+        "agp": "9.2.1",
+        "kotlin": "2.2.0",
+        "ndk": "27.1.12297006",
+        "jdk": 17
+      },
+      "eas": {
+        "iosImage": "macos-tahoe-26.6-xcode-27.0",
+        "androidImage": "ubuntu-26.04-jdk-17-ndk-r27b-sdk-58"
+      },
+      "removedApis": [
+        {
+          "id": "InteractionManager",
+          "rule": "removed-rn-api",
+          "scope": "app",
+          "from": "React Native 0.88",
+          "pattern": "\\bInteractionManager\\b",
+          "fix": "Split the long task into smaller ones and schedule them with requestIdleCallback (React Native 0.88 throws 'InteractionManager has been removed from react-native core' in development)."
+        },
+        {
+          "id": "Modal animated prop",
+          "rule": "removed-rn-api",
+          "scope": "app",
+          "from": "React Native 0.88",
+          "pattern": "<Modal\\b[^>]*\\banimated\\b",
+          "fix": "Use animationType (\"none\" | \"slide\" | \"fade\"); React Native 0.88's Modal has no animated prop."
+        },
+        {
+          "id": "StatusBar backgroundColor",
+          "rule": "removed-rn-api",
+          "scope": "app",
+          "from": "React Native 0.88",
+          "pattern": "<StatusBar\\b[^>]*\\bbackgroundColor\\s*=|StatusBar\\.setBackgroundColor\\s*\\(",
+          "fix": "Remove it; React Native 0.88's StatusBar has no backgroundColor (edge to edge on Android: colour the view behind the bar)."
+        },
+        {
+          "id": "StatusBar translucent",
+          "rule": "removed-rn-api",
+          "scope": "app",
+          "from": "React Native 0.88",
+          "pattern": "<StatusBar\\b[^>]*\\btranslucent\\b|StatusBar\\.setTranslucent\\s*\\(",
+          "fix": "Remove it; React Native 0.88's StatusBar has no translucent (edge to edge is the only mode; safe-area insets place content)."
+        },
+        {
+          "id": "Jest alias matcher",
+          "rule": "removed-test-api",
+          "scope": "test",
+          "from": "Jest 30",
+          "pattern": "\\.(?:toBeCalled|toBeCalledTimes|toBeCalledWith|lastCalledWith|nthCalledWith|toReturn|toReturnTimes|toReturnWith|lastReturnedWith|nthReturnedWith|toThrowError)\\s*\\(",
+          "fix": "Use the full matcher name (toHaveBeenCalled, toHaveBeenCalledTimes, toHaveBeenCalledWith, toHaveBeenLastCalledWith, toHaveBeenNthCalledWith, toHaveReturned, toHaveReturnedTimes, toHaveReturnedWith, toHaveLastReturnedWith, toHaveNthReturnedWith, toThrow); Jest 29 has them too, so fix it before the move."
+        },
+        {
+          "id": "jest.genMockFromModule",
+          "rule": "removed-test-api",
+          "scope": "test",
+          "from": "Jest 30",
+          "pattern": "\\bjest\\.genMockFromModule\\s*\\(",
+          "fix": "Use jest.createMockFromModule (Jest 29 has it too)."
+        }
+      ],
+      "removedAppConfigKeys": [
+        {
+          "key": "newArchEnabled",
+          "pattern": "\\bnewArchEnabled\\b['\"]?\\s*:",
+          "since": 55,
+          "fix": "Delete newArchEnabled: since SDK 55 the New Architecture is the only architecture and the key is gone from the app config schema."
+        },
+        {
+          "key": "android.edgeToEdgeEnabled",
+          "pattern": "\\bedgeToEdgeEnabled\\b['\"]?\\s*:",
+          "since": 55,
+          "fix": "Delete android.edgeToEdgeEnabled: Android 16 (targetSdk 36) enforces edge to edge, the key left the app config schema in SDK 55; lay content out with safe-area insets."
+        }
+      ]
+    }
+  }
+}

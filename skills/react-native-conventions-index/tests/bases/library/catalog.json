@@ -1,0 +1,11 @@
+{
+  "categories": [
+    { "key": "start", "label": "Start" },
+    { "key": "parts", "label": "Parts" }
+  ],
+  "skills": [
+    { "name": "route-index", "category": "start", "plugin": "core", "manual": false },
+    { "name": "alpha-one", "category": "parts", "plugin": "core", "manual": false },
+    { "name": "beta-two", "category": "parts", "plugin": "extra", "manual": false }
+  ]
+}

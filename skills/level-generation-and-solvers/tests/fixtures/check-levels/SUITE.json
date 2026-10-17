@@ -1,0 +1,15 @@
+{
+  "base": [
+    "@tests/bases/app",
+    {
+      "templates": true,
+      "firstLinePath": true,
+      "fill": {
+        "__GAME_ID__": "lights-out",
+        "__GAME_PASCAL__": "LightsOut",
+        "__GAME_CONST__": "LIGHTS_OUT"
+      }
+    }
+  ],
+  "renames": { "dot-prettierrc.json": ".prettierrc.json" }
+}

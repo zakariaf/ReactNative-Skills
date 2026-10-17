@@ -1,0 +1,3 @@
+[render-impure] Date.now() in a component file
+src/features/tasks/components/due-label.tsx:16
+RESULT: FAIL (1 problems)

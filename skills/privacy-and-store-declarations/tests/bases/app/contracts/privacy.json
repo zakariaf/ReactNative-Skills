@@ -1,0 +1,32 @@
+{
+  "profile": "api-port",
+  "sdks": {
+    "react-native-google-mobile-ads": {
+      "why": "banner ads on the task list",
+      "pods": [
+        "Google-Mobile-Ads-SDK",
+        "GoogleUserMessagingPlatform"
+      ],
+      "tracking": true,
+      "collects": [
+        {
+          "type": "device-id",
+          "linked": true,
+          "tracking": true,
+          "purposes": [
+            "third-party-advertising",
+            "developer-advertising"
+          ]
+        }
+      ]
+    }
+  },
+  "app": {
+    "collects": []
+  },
+  "permissionAnswers": {
+    "camera": "not-collected: task photos stay on the device unless the person shares them",
+    "notifications": "not-collected: reminders are scheduled on the device"
+  },
+  "accountDeletion": null
+}

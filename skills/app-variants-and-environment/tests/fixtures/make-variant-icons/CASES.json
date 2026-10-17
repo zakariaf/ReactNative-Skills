@@ -1,0 +1,105 @@
+{
+  "bad-icon-not-square": {
+    "expect": [
+      "FAIL assets/icons/production/android-foreground.png [icon-source] assets/icons/production/android-foreground.png is 108 x 64: an app icon is square",
+      "wrote assets/icons/development/icon.png",
+      "make-variant-icons: 4 source icons checked, 1 problems"
+    ],
+    "ops": [
+      {
+        "png": {
+          "files": ["assets/icons/production/android-foreground.png"],
+          "width": 108,
+          "height": 64,
+          "fill": "#FFFFFF"
+        }
+      }
+    ]
+  },
+  "bad-icon-too-small": {
+    "expect": [
+      "FAIL assets/icons/production/icon.png [icon-source] assets/icons/production/icon.png is 512 x 512, smaller than 1024 x 1024"
+    ],
+    "ops": [
+      { "png": { "files": ["assets/icons/production/icon.png"], "width": 512, "height": 512, "fill": "#1F6FEB" } }
+    ]
+  },
+  "bad-icon-unreadable": {
+    "expect": [
+      "FAIL assets/icons/production/android-monochrome.png [icon-source] assets/icons/production/android-monochrome.png cannot be read as a PNG (not a PNG file)"
+    ],
+    "ops": [{ "write": { "file": "assets/icons/production/android-monochrome.png", "content": "not an image\n" } }]
+  },
+  "bad-themed-badge-copied": {
+    "expect": [
+      "kept assets/icons/preview/android-monochrome.png (it exists; --force redraws it)",
+      "FAIL assets/icons/preview/android-monochrome.png [icon-badge] assets/icons/development/android-monochrome.png and assets/icons/preview/android-monochrome.png have the same alpha mask"
+    ],
+    "ops": [
+      {
+        "$comment": "preview's themed icon is a copy of the solid development band (alpha mask: the glyph plus rows 64-84)",
+        "png": {
+          "files": ["assets/icons/preview/android-monochrome.png"],
+          "width": 108,
+          "height": 108,
+          "fill": "#00000000",
+          "rects": [
+            { "x": 30, "y": 30, "width": 48, "height": 48, "fill": "#FFFFFF" },
+            { "x": 0, "y": 64, "width": 108, "height": 21, "fill": "#D97706" }
+          ]
+        }
+      }
+    ]
+  },
+  "error-no-store-icon": {
+    "expect": [
+      "ERROR [bad-input] nothing to draw from: assets/icons/production/icon.png does not exist Fix: Move the app's store icons into assets/icons/production/ first"
+    ],
+    "ops": [{ "delete": "assets/icons/production/icon.png" }]
+  },
+  "pass-dry-run": {
+    "expect": [
+      "would write assets/icons/development/icon.png (development badge, 1024 x 1024",
+      "would write assets/icons/preview/android-monochrome.png (preview badge",
+      "make-variant-icons: 4 source icons checked, 0 problems"
+    ],
+    "args": "{dir} --dry-run",
+    "ops": []
+  },
+  "pass-force": {
+    "expect": [
+      "wrote assets/icons/development/icon.png (development badge, 1024 x 1024",
+      "make-variant-icons: 4 source icons checked, 0 problems"
+    ],
+    "args": "{dir} --force",
+    "ops": [
+      { "png": { "files": ["assets/icons/development/icon.png"], "width": 1024, "height": 1024, "fill": "#D97706" } }
+    ]
+  },
+  "pass-kept": {
+    "expect": [
+      "kept assets/icons/development/icon.png (it exists; --force redraws it)",
+      "wrote assets/icons/preview/icon.png (preview badge",
+      "make-variant-icons: 4 source icons checked, 0 problems"
+    ],
+    "ops": [
+      { "png": { "files": ["assets/icons/development/icon.png"], "width": 1024, "height": 1024, "fill": "#D97706" } }
+    ]
+  },
+  "pass-kept-same-themed-mask": {
+    "expect": [
+      "note: the kept assets/icons/development/android-monochrome.png and assets/icons/preview/android-monochrome.png have the same alpha mask, so Android 13+ themed icons show them identically; rerun with --force to redraw them",
+      "make-variant-icons: 4 source icons checked, 0 problems"
+    ],
+    "ops": [
+      {
+        "png": {
+          "files": ["assets/icons/development/android-monochrome.png", "assets/icons/preview/android-monochrome.png"],
+          "width": 108,
+          "height": 108,
+          "fill": "#7C3AED"
+        }
+      }
+    ]
+  }
+}

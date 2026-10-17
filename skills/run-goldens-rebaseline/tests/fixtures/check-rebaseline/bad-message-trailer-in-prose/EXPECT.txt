@@ -1,0 +1,1 @@
+FAIL reports/rebaseline/commit-message.txt:1 [rebaseline-message] has a Gate-Change line, but not in a final paragraph of trailers only

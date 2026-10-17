@@ -1,0 +1,13 @@
+{
+  "permissions.camera.explain.body": "التقط صورة لإيصال أو لسبورة واحفظها مع المهمة. تبقى الصور على هذا الجهاز ما لم تشاركها.",
+  "permissions.camera.explain.title": "أضف صورًا إلى مهامك",
+  "permissions.camera.settings.body": "الوصول إلى الكاميرا متوقف لهذا التطبيق. شغّل الكاميرا في الإعدادات لإضافة صور إلى مهامك.",
+  "permissions.camera.settings.title": "الوصول إلى الكاميرا متوقف",
+  "permissions.camera.unavailable.body": "لا يحتوي هذا الجهاز على كاميرا يمكن لهذا التطبيق استخدامها، لذا لا يمكن التقاط الصور هنا. تعمل المهمة دون صورة.",
+  "permissions.camera.unavailable.title": "لا تتوفر كاميرا",
+  "permissions.camera.usage-description": "يتيح لك هذا إضافة صورة إلى مهمة. تبقى الصور على هذا الجهاز ما لم تشاركها.",
+  "permissions.close": "إغلاق",
+  "permissions.continue": "متابعة",
+  "permissions.not-now": "لا، شكرًا",
+  "permissions.open-settings": "فتح الإعدادات"
+}

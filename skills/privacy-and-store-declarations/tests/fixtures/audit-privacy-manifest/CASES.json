@@ -1,0 +1,269 @@
+{
+  "bad-app-tracking": {
+    "expect": ["[app-tracking]", "src/config/privacy-manifest.ts", "NSPrivacyTracking is true"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/privacy-manifest.ts",
+          "find": "NSPrivacyTracking: false,",
+          "with": "NSPrivacyTracking: true,"
+        }
+      }
+    ]
+  },
+  "bad-app-tracking-domains": {
+    "expect": ["[app-tracking]", "src/config/privacy-manifest.ts", "NSPrivacyTrackingDomains lists domains"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/privacy-manifest.ts",
+          "find": "NSPrivacyTracking: false,",
+          "with": "NSPrivacyTracking: false,\n  NSPrivacyTrackingDomains: ['googleads.g.doubleclick.net'],"
+        }
+      }
+    ]
+  },
+  "bad-built-tracking": {
+    "expect": [
+      "[app-tracking]",
+      "ios/Tasks/PrivacyInfo.xcprivacy",
+      "the prebuilt app manifest declares tracking or tracking domains"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "ios/Tasks/PrivacyInfo.xcprivacy",
+          "find": "\t<key>NSPrivacyTracking</key>\n\t<false/>",
+          "with": "\t<key>NSPrivacyTracking</key>\n\t<true/>"
+        }
+      }
+    ]
+  },
+  "bad-collection-developer-advertising": {
+    "expect": [
+      "[undeclared-collection]",
+      "pod Google-Mobile-Ads-SDK collects device-id for developer-advertising",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["sdks", "react-native-google-mobile-ads", "collects", 0, "purposes"],
+          "value": ["third-party-advertising", "analytics"]
+        }
+      }
+    ]
+  },
+  "bad-collection-pod-unowned": {
+    "expect": [
+      "[undeclared-collection]",
+      "pod GoogleUserMessagingPlatform collects coarse-location, but no SDK in contracts/privacy.json lists GoogleUserMessagingPlatform in \"pods\""
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["sdks", "react-native-google-mobile-ads", "pods"],
+          "value": ["Google-Mobile-Ads-SDK"]
+        }
+      }
+    ]
+  },
+  "bad-collection-purpose-missing": {
+    "expect": [
+      "[undeclared-collection]",
+      "pod GoogleUserMessagingPlatform collects coarse-location for app-functionality",
+      "purposes are third-party-advertising, developer-advertising, analytics",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["sdks", "react-native-google-mobile-ads", "collects", 1, "purposes"],
+          "value": ["third-party-advertising", "developer-advertising", "analytics"]
+        }
+      }
+    ]
+  },
+  "bad-collection-two-slices-once": {
+    "expect": ["[undeclared-collection]", "pod Google-Mobile-Ads-SDK collects crash-data", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "copy": {
+          "from": "ios/Pods/Google-Mobile-Ads-SDK/Frameworks/GoogleMobileAdsFramework/GoogleMobileAds.xcframework/ios-arm64",
+          "to": "ios/Pods/Google-Mobile-Ads-SDK/Frameworks/GoogleMobileAdsFramework/GoogleMobileAds.xcframework/ios-arm64_x86_64-simulator"
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["sdks", "react-native-google-mobile-ads", "collects", 2],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "bad-collection-understated": {
+    "expect": [
+      "[undeclared-collection]",
+      "pod Google-Mobile-Ads-SDK collects device-id linked=true, tracking=true, but sdks[\"react-native-google-mobile-ads\"] answers linked=true, tracking=false"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["sdks", "react-native-google-mobile-ads", "collects", 0, "tracking"],
+          "value": false
+        }
+      }
+    ]
+  },
+  "bad-contract-invalid": {
+    "expect": ["[contract]", "contracts/privacy.json", "sdks[\"react-native-google-mobile-ads\"] has no real \"why\""],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["sdks", "react-native-google-mobile-ads", "why"],
+          "value": "ads"
+        }
+      }
+    ]
+  },
+  "bad-dev-pod-reason": {
+    "expect": [
+      "[missing-reason]",
+      "NSPrivacyAccessedAPICategoryDiskSpace 7D9E.1 is declared by pod ExpoFileSystem but not by the app"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "vendor/expo-file-system/ios/PrivacyInfo.xcprivacy",
+          "find": "<string>85F4.1</string>",
+          "with": "<string>85F4.1</string>\n\t\t\t\t<string>7D9E.1</string>"
+        }
+      }
+    ]
+  },
+  "bad-glob-folder-missing": {
+    "expect": [
+      "[unreadable-manifest]",
+      "pod React-Core: cannot expand the resource pattern \"React/Resources/*.{xcprivacy,bundle}\""
+    ],
+    "ops": [{ "delete": "vendor/react-native" }]
+  },
+  "bad-missing-reason": {
+    "expect": [
+      "[missing-reason]",
+      "src/config/privacy-manifest.ts",
+      "NSPrivacyAccessedAPICategorySystemBootTime 35F9.1 is declared by pod Google-Mobile-Ads-SDK but not by the app"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/privacy-manifest.ts",
+          "find": "NSPrivacyAccessedAPITypeReasons: ['35F9.1'],",
+          "with": "NSPrivacyAccessedAPITypeReasons: [],"
+        }
+      },
+      { "replace": { "file": "ios/Tasks/PrivacyInfo.xcprivacy", "find": "<string>35F9.1</string>\n", "with": "" } }
+    ]
+  },
+  "bad-prebuilt-stale": {
+    "expect": [
+      "[prebuilt-stale]",
+      "ios/Tasks/PrivacyInfo.xcprivacy",
+      "the prebuilt manifest lacks NSPrivacyAccessedAPICategoryDiskSpace 85F4.1"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "ios/Tasks/PrivacyInfo.xcprivacy",
+          "find": "\t\t\t\t<string>85F4.1</string>\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-tracking-pod": {
+    "expect": [
+      "[tracking-outside-declared]",
+      "ios/Pods/SomeAnalytics/SomeAnalytics.bundle/PrivacyInfo.xcprivacy",
+      "pod SomeAnalytics declares tracking (domains: events.someanalytics.test)"
+    ],
+    "ops": [
+      {
+        "copy": {
+          "from": "ios/Pods/GoogleUserMessagingPlatform/Frameworks/Release/UserMessagingPlatform.xcframework/ios-arm64/UserMessagingPlatform.framework/PrivacyInfo.xcprivacy",
+          "to": "ios/Pods/SomeAnalytics/SomeAnalytics.bundle/PrivacyInfo.xcprivacy"
+        }
+      },
+      {
+        "replace": {
+          "file": "ios/Pods/SomeAnalytics/SomeAnalytics.bundle/PrivacyInfo.xcprivacy",
+          "find": "<dict>\n\t<key>NSPrivacyCollectedDataTypes</key>",
+          "with": "<dict>\n\t<key>NSPrivacyTracking</key>\n\t<true/>\n\t<key>NSPrivacyTrackingDomains</key>\n\t<array>\n\t\t<string>events.someanalytics.test</string>\n\t</array>\n\t<key>Unused</key>"
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["sdks", "some-analytics"],
+          "value": { "why": "usage analytics for the task list", "pods": ["SomeAnalytics"], "collects": [] }
+        }
+      }
+    ]
+  },
+  "bad-tracking-undeclared-sdk": {
+    "expect": [
+      "[tracking-outside-declared]",
+      "pod Google-Mobile-Ads-SDK declares tracking (collects device-id for tracking)"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["sdks", "react-native-google-mobile-ads", "tracking"],
+          "value": false
+        }
+      }
+    ]
+  },
+  "bad-undeclared-collection": {
+    "expect": [
+      "[undeclared-collection]",
+      "contracts/privacy.json",
+      "pod Google-Mobile-Ads-SDK collects crash-data (linked=false, tracking=false), but sdks[\"react-native-google-mobile-ads\"].collects does not declare it"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["sdks", "react-native-google-mobile-ads", "collects"],
+          "value": [
+            { "type": "device-id", "linked": true, "tracking": true, "purposes": ["third-party-advertising"] },
+            { "type": "coarse-location", "linked": true, "tracking": false, "purposes": ["analytics"] }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-unreadable-dev-pod": {
+    "expect": [
+      "[unreadable-manifest]",
+      "pod ExpoFileSystem bundles ../vendor/expo-file-system/ios/PrivacyInfo.xcprivacy, which the audit cannot read"
+    ],
+    "ops": [{ "delete": "vendor/expo-file-system/ios/PrivacyInfo.xcprivacy" }]
+  },
+  "error-no-manifest": {
+    "expect": ["ERROR [bad-input]", "src/config/privacy-manifest.ts is missing"],
+    "ops": [{ "delete": "src/config/privacy-manifest.ts" }]
+  },
+  "error-no-pods": { "expect": ["ERROR [bad-input]", "ios/Pods is missing"], "ops": [{ "delete": "ios/Pods" }] },
+  "pass-no-prebuilt-app-manifest": {
+    "expect": ["ios: 4 pod manifests", "RESULT: PASS"],
+    "ops": [{ "delete": "ios/Tasks/PrivacyInfo.xcprivacy" }]
+  }
+}

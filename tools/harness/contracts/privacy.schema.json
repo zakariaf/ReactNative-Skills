@@ -1,0 +1,219 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "privacy.schema.json",
+  "title": "The app's privacy facts and store answers",
+  "type": "object",
+  "required": ["profile", "sdks", "app", "permissionAnswers", "accountDeletion"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "$comment": {
+      "type": "string"
+    },
+    "profile": {
+      "enum": ["api-port", "offline-only"],
+      "description": "api-port: first-party requests only through the ApiClient port in src/api (plus networkModules). offline-only: the app's own code makes no request at all."
+    },
+    "networkModules": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$)).+$"
+      },
+      "uniqueItems": true,
+      "description": "Extra first-party files that may open connections (a second transport such as an upload adapter). api-port only."
+    },
+    "linkFiles": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$)).+$"
+      },
+      "uniqueItems": true,
+      "description": "Files that may hold remote URL literals besides src/config (api-port; never src/api, whose endpoints are paths on the configured base URL): links the OS opens (store page, privacy policy, mailto). Under offline-only the only place for a URL."
+    },
+    "sdks": {
+      "type": "object",
+      "description": "Every network-capable package the app ships, keyed by npm name.",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["why"],
+        "additionalProperties": false,
+        "properties": {
+          "$comment": {
+            "type": "string"
+          },
+          "family": {
+            "type": "string"
+          },
+          "why": {
+            "type": "string",
+            "minLength": 10,
+            "description": "What the app uses it for."
+          },
+          "pods": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true,
+            "description": "CocoaPods trunk pods it brings (Podfile.lock SPEC REPOS)."
+          },
+          "maven": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true,
+            "description": "Gradle group prefixes it brings (com.google.android.gms:play-services-ads)."
+          },
+          "tracking": {
+            "type": "boolean",
+            "description": "It uses data for tracking; only these SDKs' pods may declare tracking."
+          },
+          "collects": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/collect"
+            }
+          }
+        }
+      }
+    },
+    "app": {
+      "type": "object",
+      "required": ["collects"],
+      "additionalProperties": false,
+      "properties": {
+        "collects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/collect"
+          },
+          "description": "What the app itself sends to its own server (empty for offline-only)."
+        }
+      }
+    },
+    "permissionAnswers": {
+      "type": "object",
+      "description": "One answer per permission kind the app or a library asks for.",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^(collected: [a-z-]+(, [a-z-]+)*|not-collected: .{10,})$"
+      }
+    },
+    "accountDeletion": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "required": ["inApp", "webUrl"],
+          "additionalProperties": false,
+          "properties": {
+            "inApp": {
+              "type": "string",
+              "description": "The route file that deletes the account in the app."
+            },
+            "webUrl": {
+              "type": "string",
+              "pattern": "^https://",
+              "description": "The page where people request deletion without the app (Google Play)."
+            }
+          }
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "collect": {
+      "type": "object",
+      "required": ["type", "linked", "tracking", "purposes"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "advertising-data",
+            "audio-data",
+            "browsing-history",
+            "calendar-events",
+            "coarse-location",
+            "contacts",
+            "crash-data",
+            "credit-info",
+            "customer-support",
+            "device-id",
+            "email-address",
+            "emails-or-messages",
+            "environment-scanning",
+            "files-and-docs",
+            "fitness",
+            "gameplay-content",
+            "hands",
+            "head",
+            "health",
+            "installed-apps",
+            "name",
+            "other-contact-info",
+            "other-data",
+            "other-diagnostic-data",
+            "other-financial-info",
+            "other-usage-data",
+            "other-user-content",
+            "payment-info",
+            "performance-data",
+            "phone-number",
+            "photos-or-videos",
+            "videos",
+            "physical-address",
+            "precise-location",
+            "product-interaction",
+            "purchase-history",
+            "search-history",
+            "sensitive-info",
+            "sms-or-mms",
+            "user-id"
+          ],
+          "description": "A data type id (assets/data-types.json of the skill maps it to App Privacy and Data safety)."
+        },
+        "linked": {
+          "type": "boolean",
+          "description": "Linked to the person's identity (an account, a user id, a device id that is joined with other data)."
+        },
+        "tracking": {
+          "type": "boolean",
+          "description": "Used for tracking: joined with other companies' data for advertising, or shared with a data broker."
+        },
+        "purposes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "account-management",
+              "analytics",
+              "app-functionality",
+              "developer-advertising",
+              "developer-communications",
+              "fraud-prevention",
+              "other",
+              "product-personalization",
+              "third-party-advertising"
+            ]
+          }
+        },
+        "shared": {
+          "type": "boolean",
+          "description": "Data safety: transferred to a third party (not a service provider acting for the app)."
+        },
+        "optional": {
+          "type": "boolean",
+          "description": "The person can choose not to give it (App Privacy and Data safety ask)."
+        }
+      }
+    }
+  }
+}

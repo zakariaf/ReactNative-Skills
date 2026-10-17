@@ -1,0 +1,696 @@
+{
+  "bad-desc-angle": {
+    "expect": ["[desc-angle]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-notes/SKILL.md",
+          "find": "description: Checks sample greetings for the validator self-test. Use when testing the skill validator. Not for real apps (greeting-checks).",
+          "with": "description: Checks sample greetings for a <name>. Use when testing the skill validator."
+        }
+      }
+    ]
+  },
+  "bad-desc-length": {
+    "expect": ["[desc-length]", "limit 300"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-notes/SKILL.md",
+          "find": "description: Checks sample greetings for the validator self-test. Use when testing the skill validator. Not for real apps (greeting-checks).",
+          "with": "description: Checks sample greetings for the validator self-test, and keeps adding words to the description and keeps adding words to the description and keeps adding words to the description and keeps adding words to the description and keeps adding words to the description and keeps adding words to the description . Use when testing the skill validator."
+        }
+      }
+    ]
+  },
+  "bad-desc-person": {
+    "expect": ["[desc-person]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-notes/SKILL.md",
+          "find": "description: Checks sample greetings for the validator self-test. Use when testing the skill validator. Not for real apps (greeting-checks).",
+          "with": "description: Checks sample greetings so you can test things. Use when testing the skill validator."
+        }
+      }
+    ]
+  },
+  "bad-desc-trigger": {
+    "expect": ["[desc-trigger]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-notes/SKILL.md",
+          "find": "description: Checks sample greetings for the validator self-test. Use when testing the skill validator. Not for real apps (greeting-checks).",
+          "with": "description: Checks sample greetings for the validator self-test of the skill library."
+        }
+      }
+    ]
+  },
+  "bad-desc-verb": {
+    "expect": ["[desc-verb]", "starts with \"Sample\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-notes/SKILL.md",
+          "find": "description: Checks sample greetings for the validator self-test. Use when testing the skill validator. Not for real apps (greeting-checks).",
+          "with": "description: Sample greetings checker for the self-test. Use when testing the skill validator."
+        }
+      }
+    ]
+  },
+  "bad-device-explicit": {
+    "expect": ["[device-explicit]", "greeting-notes/references/guide.md:12"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-notes/references/guide.md",
+          "find": "- Keep it under forty characters.\n",
+          "with": "- Keep it under forty characters.\n\nTo see a greeting on the simulator:\n\n```sh\nmaestro test flows/greeting.yaml\n```\n"
+        }
+      }
+    ]
+  },
+  "bad-device-explicit-adb": {
+    "expect": ["[device-explicit]", "greeting-notes/references/guide.md:12"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-notes/references/guide.md",
+          "find": "- Keep it under forty characters.\n",
+          "with": "- Keep it under forty characters.\n\nTo see a greeting on the emulator:\n\n```sh\nadb shell am start -n com.example.greetings/.MainActivity\n```\n"
+        }
+      }
+    ]
+  },
+  "bad-device-explicit-simctl": {
+    "expect": ["[device-explicit]", "greeting-notes/references/guide.md:12"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-notes/references/guide.md",
+          "find": "- Keep it under forty characters.\n",
+          "with": "- Keep it under forty characters.\n\nTo open the greeting link:\n\n```sh\nxcrun simctl openurl booted tasks://greeting\n```\n"
+        }
+      }
+    ]
+  },
+  "bad-dod-position": {
+    "expect": ["[dod-position]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-notes/SKILL.md",
+          "find": "## Definition of done",
+          "with": "This sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \nThis sentence only pads the workflow so that the Definition of done starts too far down the file for compaction to keep it. \n\n## Definition of done"
+        }
+      }
+    ]
+  },
+  "bad-dod-script": {
+    "expect": ["[dod-script]", "greeting-checks/SKILL.md"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-checks/SKILL.md",
+          "find": "- [ ] `node ${CLAUDE_SKILL_DIR}/scripts/check-greeting.mjs greetings` prints `RESULT: PASS`.\n",
+          "with": "- [ ] The greetings read well aloud.\n"
+        }
+      }
+    ]
+  },
+  "bad-files-exist": {
+    "expect": ["[files-exist]", "references/ghost.md"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-notes/SKILL.md",
+          "find": "| Greeting function to copy | Workflow step 2 |\n",
+          "with": "| Greeting function to copy | Workflow step 2 |\n| `references/ghost.md` | A file that is not there | Never |\n"
+        }
+      }
+    ]
+  },
+  "bad-files-listed": {
+    "expect": ["[files-listed]", "greeting-notes/references/extra.md"],
+    "ops": [
+      {
+        "write": {
+          "file": "skills/greeting-notes/references/extra.md",
+          "content": "# Extra\n\nA file nobody listed.\n"
+        }
+      }
+    ]
+  },
+  "bad-fixture-budget": {
+    "expect": ["[fixture-budget]", "greeting-checks/tests/"],
+    "ops": [
+      {
+        "copy": {
+          "from": "skills/greeting-checks/scripts/check-lib.mjs",
+          "to": "skills/greeting-checks/tests/fixtures/good/filler-1.txt"
+        }
+      },
+      {
+        "copy": {
+          "from": "skills/greeting-checks/scripts/check-lib.mjs",
+          "to": "skills/greeting-checks/tests/fixtures/good/filler-2.txt"
+        }
+      },
+      {
+        "copy": {
+          "from": "skills/greeting-checks/scripts/check-lib.mjs",
+          "to": "skills/greeting-checks/tests/fixtures/good/filler-3.txt"
+        }
+      },
+      {
+        "copy": {
+          "from": "skills/greeting-checks/scripts/check-lib.mjs",
+          "to": "skills/greeting-checks/tests/fixtures/good/filler-4.txt"
+        }
+      },
+      {
+        "copy": {
+          "from": "skills/greeting-checks/scripts/check-lib.mjs",
+          "to": "skills/greeting-checks/tests/fixtures/good/filler-5.txt"
+        }
+      },
+      {
+        "copy": {
+          "from": "skills/greeting-checks/scripts/check-lib.mjs",
+          "to": "skills/greeting-checks/tests/fixtures/good/filler-6.txt"
+        }
+      },
+      {
+        "copy": {
+          "from": "skills/greeting-checks/scripts/check-lib.mjs",
+          "to": "skills/greeting-checks/tests/fixtures/good/filler-7.txt"
+        }
+      },
+      {
+        "copy": {
+          "from": "skills/greeting-checks/scripts/check-lib.mjs",
+          "to": "skills/greeting-checks/tests/fixtures/good/filler-8.txt"
+        }
+      },
+      {
+        "copy": {
+          "from": "skills/greeting-checks/scripts/check-lib.mjs",
+          "to": "skills/greeting-checks/tests/fixtures/good/filler-9.txt"
+        }
+      },
+      {
+        "copy": {
+          "from": "skills/greeting-checks/scripts/check-lib.mjs",
+          "to": "skills/greeting-checks/tests/fixtures/good/filler-10.txt"
+        }
+      }
+    ]
+  },
+  "bad-fixture-budget-binary": {
+    "expect": ["[fixture-budget]", "blob.bin"],
+    "ops": [{ "write": { "file": "skills/greeting-checks/tests/fixtures/good/blob.bin", "base64": "AAECAAME" } }]
+  },
+  "bad-fixture-hygiene": {
+    "expect": ["[fixture-hygiene]", ".gitignore"],
+    "ops": [
+      {
+        "rename": {
+          "from": "skills/greeting-checks/tests/fixtures/good/hello.txt",
+          "to": "skills/greeting-checks/tests/fixtures/good/.gitignore"
+        }
+      },
+      { "write": { "file": "skills/greeting-checks/tests/fixtures/good/hello.txt", "content": "Hello, Ada\n" } }
+    ]
+  },
+  "bad-fixture-hygiene-metadata": {
+    "expect": ["[fixture-hygiene]", "metadata.json"],
+    "ops": [
+      {
+        "write": {
+          "file": "skills/greeting-checks/tests/fixtures/good/metadata.json",
+          "content": "{ \"kind\": \"export\" }\n"
+        }
+      }
+    ]
+  },
+  "bad-fixtures": {
+    "expect": ["[fixtures]", "bad-rude"],
+    "ops": [{ "delete": "skills/greeting-checks/tests/fixtures/bad-rude/EXPECT.txt" }]
+  },
+  "bad-fixtures-overlay": {
+    "expect": ["[fixtures]", "bad-overlay"],
+    "ops": [
+      { "write": { "file": "skills/greeting-checks/tests/fixtures/bad-overlay/EXPECT.txt", "content": "greeting\n" } },
+      {
+        "write": {
+          "file": "skills/greeting-checks/tests/fixtures/bad-overlay/mutation.json",
+          "content": "[\n  { \"frobnicate\": { \"file\": \"hello.txt\" } }\n]\n"
+        }
+      }
+    ]
+  },
+  "bad-fm-close": {
+    "expect": ["[fm-close]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-notes/SKILL.md",
+          "find": "Checks sample greetings for the validator self-test. Use when testing the skill validator. Not for real apps (greeting-checks).\n---\n",
+          "with": "Checks sample greetings for the validator self-test. Use when testing the skill validator. Not for real apps (greeting-checks).\n"
+        }
+      }
+    ]
+  },
+  "bad-fm-dmi-runbook": {
+    "expect": ["[fm-dmi-runbook]", "greeting-notes/SKILL.md:4"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-notes/SKILL.md",
+          "find": "Checks sample greetings for the validator self-test. Use when testing the skill validator. Not for real apps (greeting-checks).\n",
+          "with": "Checks sample greetings for the validator self-test. Use when testing the skill validator. Not for real apps (greeting-checks).\ndisable-model-invocation: true\n"
+        }
+      }
+    ]
+  },
+  "bad-fm-dmi-runbook-no-ask": {
+    "expect": ["[fm-dmi-runbook]", "run-greeting-send/SKILL.md"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/run-greeting-send/SKILL.md",
+          "find": "3. Stop and ask the developer before sending the greeting anywhere.\n",
+          "with": "3. Send the greeting.\n"
+        }
+      }
+    ]
+  },
+  "bad-fm-key": {
+    "expect": ["[fm-key]", "key \"paths\" is not allowed"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-notes/SKILL.md",
+          "find": "Checks sample greetings for the validator self-test. Use when testing the skill validator. Not for real apps (greeting-checks).\n",
+          "with": "Checks sample greetings for the validator self-test. Use when testing the skill validator. Not for real apps (greeting-checks).\npaths: \"**/*.ts\"\n"
+        }
+      }
+    ]
+  },
+  "bad-fm-line1": {
+    "expect": ["[fm-line1]", "greeting-notes/SKILL.md:1"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-notes/SKILL.md",
+          "find": "---\nname: greeting-notes\n",
+          "with": "\n---\nname: greeting-notes\n"
+        }
+      }
+    ]
+  },
+  "bad-fm-no-allowed-tools": {
+    "expect": ["[fm-no-allowed-tools]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-notes/SKILL.md",
+          "find": "Checks sample greetings for the validator self-test. Use when testing the skill validator. Not for real apps (greeting-checks).\n",
+          "with": "Checks sample greetings for the validator self-test. Use when testing the skill validator. Not for real apps (greeting-checks).\nallowed-tools: Read\n"
+        }
+      }
+    ]
+  },
+  "bad-fm-yaml": {
+    "expect": ["[fm-yaml]", "greeting-notes/SKILL.md:3"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-notes/SKILL.md",
+          "find": "description: Checks sample greetings for the validator self-test. Use when testing the skill validator. Not for real apps (greeting-checks).",
+          "with": "description: Checks sample greetings. Use when: testing the skill validator."
+        }
+      }
+    ]
+  },
+  "bad-installed-named": {
+    "expect": ["[fm-line1]", "vendor-dates/SKILL.md:1"],
+    "args": "{dir}/.agents/skills/vendor-dates",
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/vendor-dates/SKILL.md",
+          "content": "# A vendored skill without frontmatter\n"
+        }
+      }
+    ]
+  },
+  "bad-layout": {
+    "expect": ["[layout]", "greeting-notes/notes.txt"],
+    "ops": [
+      { "write": { "file": "skills/greeting-notes/notes.txt", "content": "Loose notes at the top of the skill.\n" } },
+      {
+        "replace": {
+          "file": "skills/greeting-notes/SKILL.md",
+          "find": "| Greeting function to copy | Workflow step 2 |\n",
+          "with": "| Greeting function to copy | Workflow step 2 |\n| `notes.txt` | Loose notes | Never |\n"
+        }
+      }
+    ]
+  },
+  "bad-library-layout": {
+    "expect": ["[library-layout]", "README.md"],
+    "ops": [
+      {
+        "write": { "file": "skills/README.md", "content": "# Skills\n\nA catalogue that belongs in the repo README.\n" }
+      }
+    ]
+  },
+  "bad-link-resolve": {
+    "expect": ["[link-resolve]", "references/missing.md"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-notes/SKILL.md",
+          "find": "## Definition of done",
+          "with": "3. Then read [the missing notes](references/missing.md).\n\n## Definition of done"
+        }
+      }
+    ]
+  },
+  "bad-name-format": {
+    "expect": ["[name-format]", "greeting_notes/SKILL.md:2"],
+    "ops": [
+      { "rename": { "from": "skills/greeting-notes", "to": "skills/greeting_notes" } },
+      {
+        "replace": {
+          "file": "skills/greeting_notes/SKILL.md",
+          "find": "name: greeting-notes",
+          "with": "name: greeting_notes"
+        }
+      }
+    ]
+  },
+  "bad-name-match": {
+    "expect": ["[name-match]", "differs from the folder name"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-notes/SKILL.md",
+          "find": "name: greeting-notes",
+          "with": "name: other-name"
+        }
+      }
+    ]
+  },
+  "bad-name-reserved": {
+    "expect": ["[name-reserved]", "simplify/SKILL.md:2"],
+    "ops": [
+      { "rename": { "from": "skills/greeting-notes", "to": "skills/simplify" } },
+      { "replace": { "file": "skills/simplify/SKILL.md", "find": "name: greeting-notes", "with": "name: simplify" } }
+    ]
+  },
+  "bad-no-project-ref": {
+    "expect": ["[no-project-ref]", "greeting-notes/references/guide.md:9"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-notes/references/guide.md",
+          "find": "- Keep it under forty characters.\n",
+          "with": "- Keep it under forty characters.\n\nBefore you commit, run node tools/validate-skills.mjs on the library.\n"
+        }
+      }
+    ]
+  },
+  "bad-no-project-ref-home": {
+    "expect": ["[no-project-ref]", "greeting-notes/references/guide.md:9"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-notes/references/guide.md",
+          "find": "- Keep it under forty characters.\n",
+          "with": "- Keep it under forty characters.\n\nThe draft lives in /home/someone/greetings.md for now.\n"
+        }
+      }
+    ]
+  },
+  "bad-no-project-ref-other-skill": {
+    "expect": ["[no-project-ref]", "greeting-notes/references/guide.md:9"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-notes/references/guide.md",
+          "find": "- Keep it under forty characters.\n",
+          "with": "- Keep it under forty characters.\n\nThe wording rules are in .claude/skills/other-skill/references/words.md.\n"
+        }
+      }
+    ]
+  },
+  "bad-no-runtime-env": {
+    "expect": ["[no-runtime-env]", "greeting-notes/references/guide.md:9"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-notes/references/guide.md",
+          "find": "- Keep it under forty characters.\n",
+          "with": "- Keep it under forty characters.\n\nThe data folder is under CLAUDE_PLUGIN_ROOT when the skill runs as a plugin.\n"
+        }
+      }
+    ]
+  },
+  "bad-no-runtime-env-script": {
+    "expect": ["[no-runtime-env]", "greeting-checks/scripts/check-greeting.mjs:9"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-checks/scripts/check-greeting.mjs",
+          "find": "const SPEC = {",
+          "with": "const skillDir = process.env.CLAUDE_SKILL_DIR ?? '.';\nvoid skillDir;\n\nconst SPEC = {"
+        }
+      }
+    ]
+  },
+  "bad-no-shouting": {
+    "expect": ["[no-shouting]", "greeting-notes/references/guide.md:9"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-notes/references/guide.md",
+          "find": "- Keep it under forty characters.\n",
+          "with": "- Keep it under forty characters.\n\nIt is IMPORTANT to greet first.\n"
+        }
+      }
+    ]
+  },
+  "bad-ref-toc": {
+    "expect": ["[ref-toc]", "greeting-notes/references/guide.md"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-notes/references/guide.md",
+          "find": "- Keep it under forty characters.\n",
+          "with": "- Keep it under forty characters.\n\n- Greeting example 1: Hello, friend number 1.\n- Greeting example 2: Hello, friend number 2.\n- Greeting example 3: Hello, friend number 3.\n- Greeting example 4: Hello, friend number 4.\n- Greeting example 5: Hello, friend number 5.\n- Greeting example 6: Hello, friend number 6.\n- Greeting example 7: Hello, friend number 7.\n- Greeting example 8: Hello, friend number 8.\n- Greeting example 9: Hello, friend number 9.\n- Greeting example 10: Hello, friend number 10.\n- Greeting example 11: Hello, friend number 11.\n- Greeting example 12: Hello, friend number 12.\n- Greeting example 13: Hello, friend number 13.\n- Greeting example 14: Hello, friend number 14.\n- Greeting example 15: Hello, friend number 15.\n- Greeting example 16: Hello, friend number 16.\n- Greeting example 17: Hello, friend number 17.\n- Greeting example 18: Hello, friend number 18.\n- Greeting example 19: Hello, friend number 19.\n- Greeting example 20: Hello, friend number 20.\n- Greeting example 21: Hello, friend number 21.\n- Greeting example 22: Hello, friend number 22.\n- Greeting example 23: Hello, friend number 23.\n- Greeting example 24: Hello, friend number 24.\n- Greeting example 25: Hello, friend number 25.\n- Greeting example 26: Hello, friend number 26.\n- Greeting example 27: Hello, friend number 27.\n- Greeting example 28: Hello, friend number 28.\n- Greeting example 29: Hello, friend number 29.\n- Greeting example 30: Hello, friend number 30.\n- Greeting example 31: Hello, friend number 31.\n- Greeting example 32: Hello, friend number 32.\n- Greeting example 33: Hello, friend number 33.\n- Greeting example 34: Hello, friend number 34.\n- Greeting example 35: Hello, friend number 35.\n- Greeting example 36: Hello, friend number 36.\n- Greeting example 37: Hello, friend number 37.\n- Greeting example 38: Hello, friend number 38.\n- Greeting example 39: Hello, friend number 39.\n- Greeting example 40: Hello, friend number 40.\n- Greeting example 41: Hello, friend number 41.\n- Greeting example 42: Hello, friend number 42.\n- Greeting example 43: Hello, friend number 43.\n- Greeting example 44: Hello, friend number 44.\n- Greeting example 45: Hello, friend number 45.\n- Greeting example 46: Hello, friend number 46.\n- Greeting example 47: Hello, friend number 47.\n- Greeting example 48: Hello, friend number 48.\n- Greeting example 49: Hello, friend number 49.\n- Greeting example 50: Hello, friend number 50.\n- Greeting example 51: Hello, friend number 51.\n- Greeting example 52: Hello, friend number 52.\n- Greeting example 53: Hello, friend number 53.\n- Greeting example 54: Hello, friend number 54.\n- Greeting example 55: Hello, friend number 55.\n- Greeting example 56: Hello, friend number 56.\n- Greeting example 57: Hello, friend number 57.\n- Greeting example 58: Hello, friend number 58.\n- Greeting example 59: Hello, friend number 59.\n- Greeting example 60: Hello, friend number 60.\n- Greeting example 61: Hello, friend number 61.\n- Greeting example 62: Hello, friend number 62.\n- Greeting example 63: Hello, friend number 63.\n- Greeting example 64: Hello, friend number 64.\n- Greeting example 65: Hello, friend number 65.\n- Greeting example 66: Hello, friend number 66.\n- Greeting example 67: Hello, friend number 67.\n- Greeting example 68: Hello, friend number 68.\n- Greeting example 69: Hello, friend number 69.\n- Greeting example 70: Hello, friend number 70.\n- Greeting example 71: Hello, friend number 71.\n- Greeting example 72: Hello, friend number 72.\n- Greeting example 73: Hello, friend number 73.\n- Greeting example 74: Hello, friend number 74.\n- Greeting example 75: Hello, friend number 75.\n- Greeting example 76: Hello, friend number 76.\n- Greeting example 77: Hello, friend number 77.\n- Greeting example 78: Hello, friend number 78.\n- Greeting example 79: Hello, friend number 79.\n- Greeting example 80: Hello, friend number 80.\n- Greeting example 81: Hello, friend number 81.\n- Greeting example 82: Hello, friend number 82.\n- Greeting example 83: Hello, friend number 83.\n- Greeting example 84: Hello, friend number 84.\n- Greeting example 85: Hello, friend number 85.\n- Greeting example 86: Hello, friend number 86.\n- Greeting example 87: Hello, friend number 87.\n- Greeting example 88: Hello, friend number 88.\n- Greeting example 89: Hello, friend number 89.\n- Greeting example 90: Hello, friend number 90.\n- Greeting example 91: Hello, friend number 91.\n- Greeting example 92: Hello, friend number 92.\n- Greeting example 93: Hello, friend number 93.\n- Greeting example 94: Hello, friend number 94.\n- Greeting example 95: Hello, friend number 95.\n- Greeting example 96: Hello, friend number 96.\n- Greeting example 97: Hello, friend number 97.\n- Greeting example 98: Hello, friend number 98.\n- Greeting example 99: Hello, friend number 99.\n- Greeting example 100: Hello, friend number 100.\n- Greeting example 101: Hello, friend number 101.\n- Greeting example 102: Hello, friend number 102.\n- Greeting example 103: Hello, friend number 103.\n- Greeting example 104: Hello, friend number 104.\n- Greeting example 105: Hello, friend number 105.\n- Greeting example 106: Hello, friend number 106.\n- Greeting example 107: Hello, friend number 107.\n- Greeting example 108: Hello, friend number 108.\n- Greeting example 109: Hello, friend number 109.\n- Greeting example 110: Hello, friend number 110.\n"
+        }
+      }
+    ]
+  },
+  "bad-script-deps": {
+    "expect": ["[script-deps]", "without the node: prefix"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-checks/scripts/check-greeting.mjs",
+          "find": "import { join } from 'node:path';\n",
+          "with": "import { join } from 'node:path';\nimport fs from 'fs';\n"
+        }
+      }
+    ]
+  },
+  "bad-script-help": {
+    "expect": ["[script-help]", "greeting-checks/scripts/check-greeting.mjs"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-checks/scripts/check-greeting.mjs",
+          "find": "const SPEC = {",
+          "with": "if (process.argv.includes('--help')) process.exit(3);\n\nconst SPEC = {"
+        }
+      }
+    ]
+  },
+  "bad-script-lib": {
+    "expect": ["[script-lib]", "greeting-checks/scripts/check-greeting.mjs"],
+    "ops": [
+      {
+        "write": {
+          "file": "skills/greeting-checks/scripts/check-greeting.mjs",
+          "content": "#!/usr/bin/env node\n// check-greeting.mjs written without the shared helper (the planted bug).\n\nimport { readdirSync, readFileSync } from 'node:fs';\n\nif (process.argv.includes('--help')) {\n  console.log('Usage: node check-greeting.mjs [folder]');\n  process.exit(0);\n}\nconst folder = process.argv[2] ?? '.';\nconst files = readdirSync(folder).filter((name) => name.endsWith('.txt'));\nif (files.length === 0) {\n  console.log('ERROR nothing to check');\n  console.log('RESULT: FAIL (1 problems)');\n  process.exit(2);\n}\nlet problems = 0;\nfor (const name of files) {\n  if (!readFileSync(`${folder}/${name}`, 'utf8').startsWith('Hello')) {\n    problems += 1;\n    console.log(`FAIL ${name}:1 [greeting] does not start with \"Hello\" Fix: start with Hello.`);\n  }\n}\nconsole.log(problems ? `RESULT: FAIL (${problems} problems)` : 'RESULT: PASS');\nprocess.exitCode = problems ? 1 : 0;\n"
+        }
+      }
+    ]
+  },
+  "bad-script-result": {
+    "expect": ["[script-result]", "greeting-checks/scripts/check-greeting.mjs"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-checks/scripts/check-greeting.mjs",
+          "find": "const SPEC = {",
+          "with": "if (process.argv.length === 2) {\n  console.log('checked nothing');\n  process.exit(0);\n}\n\nconst SPEC = {"
+        }
+      }
+    ]
+  },
+  "bad-section-format": {
+    "expect": ["[section-format]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-notes/SKILL.md",
+          "find": "1. **Greet first.**",
+          "with": "- **Greet first.**"
+        }
+      }
+    ]
+  },
+  "bad-sections": {
+    "expect": ["[sections]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-notes/SKILL.md",
+          "find": "## Anti-patterns\n\n- Skipping the guide and guessing the wording.\n\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "skills/greeting-notes/SKILL.md",
+          "find": "## Definition of done",
+          "with": "## Anti-patterns\n\n- Skipping the guide and guessing the wording.\n\n## Definition of done"
+        }
+      }
+    ]
+  },
+  "bad-selftest-missing": {
+    "expect": ["[selftest-missing]"],
+    "ops": [
+      { "delete": "skills/greeting-checks/scripts/selftest.mjs" },
+      {
+        "replace": {
+          "file": "skills/greeting-checks/SKILL.md",
+          "find": "| `scripts/selftest.mjs` | Proves the checker | After changing the checker |\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-shared-drift": {
+    "expect": ["[shared-drift]", "greeting-checks/scripts/check-lib.mjs"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-checks/scripts/check-lib.mjs",
+          "find": "^([^\\n]*\\n)",
+          "with": "$1// a local edit that the canonical copy does not have\n",
+          "regex": true
+        }
+      }
+    ]
+  },
+  "bad-shared-json": {
+    "expect": ["[shared-json]"],
+    "ops": [
+      {
+        "write": {
+          "file": "skills/greeting-checks/assets/shared.json",
+          "content": "[\n  { \"from\": \"scripts/check-lib.mjs\" }\n]\n"
+        }
+      }
+    ]
+  },
+  "bad-shared-undeclared": {
+    "expect": ["[shared-undeclared]"],
+    "ops": [
+      { "delete": "skills/greeting-checks/assets" },
+      {
+        "replace": {
+          "file": "skills/greeting-checks/SKILL.md",
+          "find": "| `assets/shared.json` | Shared files this skill copies in | When adding a shared file |\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-skill-lines": {
+    "expect": ["[skill-lines]", "greeting-notes/SKILL.md:301"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/greeting-notes/SKILL.md",
+          "find": "- Skipping the guide and guessing the wording.\n",
+          "with": "- Skipping the guide and guessing the wording.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n- Another sample anti-pattern line.\n"
+        }
+      }
+    ]
+  },
+  "bad-skill-md": {
+    "expect": ["[skill-md]", "greeting-notes/SKILL.md"],
+    "ops": [{ "delete": "skills/greeting-notes/SKILL.md" }]
+  },
+  "error-missing-path": {
+    "expect": ["ERROR [bad-input] nothing to check:", "does not exist or is not a folder"],
+    "args": "{dir}/no-such-folder"
+  },
+  "pass-no-skills": {
+    "expect": ["NOT APPLICABLE: no project skills"],
+    "args": "{dir}/app",
+    "ops": [{ "write": { "file": "app/package.json", "content": "{ \"name\": \"tasks-app\", \"private\": true }\n" } }]
+  },
+  "pass-overlay-cases": {
+    "expect": ["skill greeting-checks: passes", "3 of 3 skills pass"],
+    "ops": [
+      { "write": { "file": "skills/greeting-checks/tests/fixtures/bad-planted/EXPECT.txt", "content": "greeting\n" } },
+      {
+        "write": {
+          "file": "skills/greeting-checks/tests/fixtures/bad-planted/mutation.json",
+          "content": "[\n  { \"write\": { \"file\": \"hello.txt\", \"content\": \"Go away\\n\" } }\n]\n"
+        }
+      }
+    ]
+  },
+  "pass-repo-installed": {
+    "expect": [
+      "note: 1 installed skill(s) not validated (their authors own them; pass .agents/skills to validate them): vendor-dates",
+      "3 of 3 skills pass"
+    ],
+    "args": "{dir} --shared {dir}/shared",
+    "ops": [
+      { "write": { "file": "package.json", "content": "{ \"name\": \"tasks-app\", \"private\": true }\n" } },
+      {
+        "write": {
+          "file": ".agents/skills/vendor-dates/SKILL.md",
+          "content": "# A vendored skill without frontmatter\n"
+        }
+      }
+    ]
+  },
+  "pass-repo-only-installed": {
+    "expect": [
+      "NOT APPLICABLE: only installed skills (vendor-dates under .agents/skills/), which their authors own: pass .agents/skills to check them",
+      "RESULT: PASS"
+    ],
+    "args": "{dir}",
+    "ops": [
+      { "delete": "skills" },
+      { "write": { "file": "package.json", "content": "{ \"name\": \"tasks-app\", \"private\": true }\n" } },
+      {
+        "write": {
+          "file": ".agents/skills/vendor-dates/SKILL.md",
+          "content": "# A vendored skill without frontmatter\n"
+        }
+      }
+    ]
+  }
+}

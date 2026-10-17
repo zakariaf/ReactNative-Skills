@@ -1,0 +1,542 @@
+{
+  "bad-application-id": {
+    "expect": [
+      "FAIL app.config.ts [application-id] the contract applicationId com.acme.notes is not a string literal of the app config"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/android-release.json", "path": ["applicationId"], "value": "com.acme.notes" } }
+    ]
+  },
+  "bad-contract-missing": {
+    "expect": ["FAIL contracts/android-release.json [contract] there is no release contract"],
+    "ops": [{ "delete": "contracts/android-release.json" }]
+  },
+  "bad-contract-reason": {
+    "expect": ["[contract] permissions.android.permission.INTERNET has no reason"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/android-release.json",
+          "path": ["permissions", "android.permission.INTERNET", "reason"],
+          "value": "net"
+        }
+      }
+    ]
+  },
+  "bad-contract-release-language": {
+    "expect": [
+      "FAIL contracts/android-release.json:26 [contract] releaseNotesLanguage is \"English\", not a Play language code",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/android-release.json", "path": ["releaseNotesLanguage"], "value": "English" } }
+    ]
+  },
+  "bad-contract-shape": {
+    "expect": ["[contract] rollout is [0.5,1]"],
+    "ops": [{ "json": { "file": "contracts/android-release.json", "path": ["rollout"], "value": [0.5, 1] } }]
+  },
+  "bad-credentials-read": {
+    "expect": ["FAIL scripts/upload-notes.ts:2 [credentials-read] names a signing secret"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/upload-notes.ts",
+          "lines": [
+            "// scripts/upload-notes.ts",
+            "const KEY_FILE = `${process.env['HOME'] ?? ''}/.android-keys/com.acme.tasks-play-service-account.json`;",
+            "export { KEY_FILE };"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-gated-upload-auto-submit": {
+    "expect": [
+      "FAIL package.json:9 [gated-upload] eas build --auto-submit for --platform all: the bundle goes to Google Play before the store-AAB gate reads it",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "ship:stores"],
+          "value": "npm run -s verify && eas build --platform all --profile production --non-interactive --freeze-credentials --auto-submit"
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "ship:ios"],
+          "value": "npm run -s verify && eas build --platform ios --profile production --non-interactive --freeze-credentials --auto-submit"
+        }
+      }
+    ]
+  },
+  "bad-gated-upload-latest": {
+    "expect": [
+      "FAIL .github/workflows/release.yml:11 [gated-upload] eas submit --latest for --platform android: submits whatever build finished last, not the gated bytes",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": ".github/workflows/release.yml",
+          "lines": [
+            "name: release",
+            "on: workflow_dispatch",
+            "jobs:",
+            "  submit:",
+            "    runs-on: ubuntu-latest",
+            "    steps:",
+            "      - uses: actions/checkout@v4",
+            "      # never: eas submit --platform android --latest",
+            "      - run: npm run -s verify",
+            "      - run: |",
+            "          eas submit --platform android \\",
+            "            --profile production --latest --non-interactive"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-gated-upload-quoted": {
+    "expect": [
+      "FAIL scripts/ship.sh:3 [gated-upload] eas build --auto-submit for --platform android",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/ship.sh",
+          "content": "#!/bin/sh\nset -eu\neas build --platform android --profile \"$PROFILE\" --non-interactive --freeze-credentials --auto-submit\n"
+        }
+      }
+    ]
+  },
+  "bad-inline-secrets": {
+    "expect": [
+      "FAIL package.json:9 [inline-secrets] a signing password passed as -Pandroid.injected.signing.*.password"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "bundle:signed"],
+          "value": "cd android && ./gradlew bundleRelease -Pandroid.injected.signing.store.password=hunter2"
+        }
+      }
+    ]
+  },
+  "bad-inline-secrets-env": {
+    "expect": [
+      "FAIL .env.production:2 [inline-secrets] a signing password written into .env.production (UPLOAD_KEY_PASSWORD)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": ".env.production",
+          "lines": ["EXPO_PUBLIC_APP_VARIANT=production", "UPLOAD_KEY_PASSWORD=\"planted-value-3\""]
+        }
+      },
+      {
+        "write": {
+          "file": ".env.example",
+          "lines": [
+            "UPLOAD_STORE_PASSWORD=<your upload store password>",
+            "UPLOAD_KEY_PASSWORD=$UPLOAD_KEY_PASSWORD",
+            "MYAPP_UPLOAD_KEY_PASSWORD=__UPLOAD_KEY_PASSWORD__",
+            ""
+          ]
+        }
+      }
+    ]
+  },
+  "bad-inline-secrets-gradle-properties": {
+    "expect": [
+      "FAIL gradle.properties:5 [inline-secrets] a signing password written into gradle.properties (MYAPP_UPLOAD_STORE_PASSWORD)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "gradle.properties",
+          "lines": [
+            "org.gradle.jvmargs=-Xmx4g",
+            "MYAPP_UPLOAD_STORE_FILE=com.acme.tasks-upload.jks",
+            "MYAPP_UPLOAD_KEY_ALIAS=upload",
+            "# MYAPP_UPLOAD_KEY_PASSWORD=not-a-finding-in-a-comment",
+            "MYAPP_UPLOAD_STORE_PASSWORD=planted-value-2"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-inline-secrets-literal": {
+    "expect": [
+      "FAIL plugins/with-release-options.ts:2 [inline-secrets] a literal storePassword",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "plugins/with-release-options.ts",
+          "content": "// plugins/with-release-options.ts\nexport const signing = { storePassword: 'planted-value-4' };\n"
+        }
+      }
+    ]
+  },
+  "bad-inline-secrets-properties": {
+    "expect": [
+      "FAIL keystore.properties:4 [inline-secrets] a signing password written into keystore.properties (storePassword)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "keystore.properties",
+          "lines": [
+            "# upload key for release builds",
+            "storeFile=/Users/dev/.android-keys/com.acme.tasks-upload.jks",
+            "keyAlias=upload",
+            "storePassword=planted-value-1",
+            "keyPassword=android"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-inline-secrets-shell": {
+    "expect": [
+      "FAIL scripts/make-upload-key.sh:2 [inline-secrets] a keytool password on the command line",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/make-upload-key.sh",
+          "lines": [
+            "#!/bin/sh",
+            "keytool -genkeypair -keystore ~/.android-keys/com.acme.tasks-upload.jks -storepass:env UPLOAD_STORE_PASSWORD -keypass planted-value"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-lane-clock": {
+    "expect": [
+      "FAIL scripts/clock/system-clock.ts [lane] is missing (release-android.ts imports it for the token time)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [{ "delete": "scripts/clock/system-clock.ts" }]
+  },
+  "bad-lane-eas-application-id": {
+    "expect": [
+      "FAIL eas.json [lane] submit.production.android.applicationId is \"com.acme.tasks.preview\", the contract applicationId is com.acme.tasks",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/android-release.json", "path": ["lane"], "value": "eas" } },
+      {
+        "write": {
+          "file": "eas.json",
+          "json": {
+            "cli": { "appVersionSource": "remote" },
+            "build": { "production": { "autoIncrement": true, "android": { "buildType": "app-bundle" } } },
+            "submit": {
+              "production": {
+                "android": { "applicationId": "com.acme.tasks", "track": "internal", "releaseStatus": "completed" }
+              }
+            }
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "eas.json",
+          "path": ["submit", "production", "android", "applicationId"],
+          "value": "com.acme.tasks.preview"
+        }
+      }
+    ]
+  },
+  "bad-lane-eas-missing": {
+    "expect": ["FAIL eas.json [lane] the contract lane is eas, but eas.json has no submit.production.android"],
+    "ops": [{ "json": { "file": "contracts/android-release.json", "path": ["lane"], "value": "eas" } }]
+  },
+  "bad-lane-eas-track": {
+    "expect": ["FAIL eas.json [lane] submit.production.android.track is \"beta\", the contract uploadTrack is internal"],
+    "ops": [
+      { "json": { "file": "contracts/android-release.json", "path": ["lane"], "value": "eas" } },
+      {
+        "write": {
+          "file": "eas.json",
+          "json": {
+            "cli": { "appVersionSource": "remote" },
+            "build": { "production": { "autoIncrement": true, "android": { "buildType": "app-bundle" } } },
+            "submit": {
+              "production": {
+                "android": { "applicationId": "com.acme.tasks", "track": "internal", "releaseStatus": "completed" }
+              }
+            }
+          }
+        }
+      },
+      { "json": { "file": "eas.json", "path": ["submit", "production", "android", "track"], "value": "beta" } }
+    ]
+  },
+  "bad-lane-files": {
+    "expect": ["FAIL scripts/release-android/rollout.ts [lane] is missing (local lane tooling)"],
+    "ops": [{ "delete": "scripts/release-android/rollout.ts" }]
+  },
+  "bad-lane-script": {
+    "expect": [
+      "FAIL package.json [lane] the contract lane is local, but scripts[\"release:android\"] is \"eas build --platform android\""
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "release:android"],
+          "value": "eas build --platform android"
+        }
+      }
+    ]
+  },
+  "bad-multi-package-wrong-place": {
+    "expect": ["FAIL apps/mobile/plugins/with-upload-signing.ts [signing-plugin] is missing"],
+    "args": "{dir} --app-dir apps/mobile",
+    "ops": [
+      { "rename": { "from": "app.config.ts", "to": "apps/mobile/app.config.ts" } },
+      { "rename": { "from": "scripts", "to": "apps/mobile/scripts" } },
+      { "rename": { "from": "plugins", "to": "apps/mobile/plugins" } },
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      { "rename": { "from": "contracts", "to": "apps/mobile/contracts" } },
+      { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+      {
+        "write": { "file": "package.json", "json": { "name": "tasks-repo", "private": true, "workspaces": ["apps/*"] } }
+      },
+      { "rename": { "from": "apps/mobile/plugins", "to": "plugins" } }
+    ]
+  },
+  "bad-release-nothing-ships": {
+    "expect": ["FAIL contracts/android-release.json [contract] there is no release contract"],
+    "args": "{dir} --release",
+    "ops": [
+      { "delete": "contracts/android-release.json" },
+      { "json": { "file": "package.json", "path": ["scripts", "release:android"], "delete": true } }
+    ]
+  },
+  "bad-release-placeholder": {
+    "expect": [
+      "FAIL contracts/android-release.json:4 [ship-placeholder] the contract applicationId is the template bundle id"
+    ],
+    "args": "{dir} --release",
+    "ops": [
+      { "json": { "file": "contracts/android-release.json", "path": ["applicationId"], "value": "com.example.tasks" } },
+      {
+        "replace": { "file": "app.config.ts", "find": "appId: 'com.acme.tasks'", "with": "appId: 'com.example.tasks'" }
+      }
+    ]
+  },
+  "bad-release-upload-cert": {
+    "expect": ["FAIL contracts/android-release.json:5 [upload-cert] uploadCertificateSha256 is null"],
+    "args": "{dir} --release",
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/android-release.json",
+          "path": ["uploadCertificateSha256"],
+          "value": null,
+          "literalNull": true
+        }
+      }
+    ]
+  },
+  "bad-secrets-ignored": {
+    "expect": [
+      "FAIL .gitignore [secrets-ignored] does not ignore *.keystore",
+      "FAIL .claude/settings.json [secrets-ignored] permissions.deny lacks Read(**/*service-account*.json)"
+    ],
+    "ops": [
+      { "replace": { "file": ".gitignore", "find": "*.keystore\n", "with": "" } },
+      { "replace": { "file": ".claude/settings.json", "find": "\"Read(**/*service-account*.json)\", ", "with": "" } }
+    ]
+  },
+  "bad-secrets-ignored-credentials-json": {
+    "expect": [
+      "FAIL .gitignore [secrets-ignored] does not ignore credentials.json",
+      "FAIL .claude/settings.json [secrets-ignored] permissions.deny lacks Read(**/credentials.json)",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "credentials.json",
+          "json": {
+            "android": {
+              "keystore": {
+                "keystorePath": "/home/dev/.android-keys/com.acme.tasks-upload.jks",
+                "keystorePassword": "planted-not-a-password",
+                "keyAlias": "upload",
+                "keyPassword": "planted-not-a-password"
+              }
+            }
+          }
+        }
+      },
+      { "replace": { "file": ".gitignore", "find": "credentials.json\n", "with": "" } },
+      { "replace": { "file": ".claude/settings.json", "find": ", \"Read(**/credentials.json)\"", "with": "" } }
+    ]
+  },
+  "bad-secrets-outside-keystore": {
+    "expect": ["FAIL upload.jks [secrets-outside] a keystore inside the repo"],
+    "ops": [{ "write": { "file": "upload.jks", "content": "stands in for a keystore (never a real key)\n" } }]
+  },
+  "bad-secrets-outside-service-account": {
+    "expect": ["FAIL keys/play.json [secrets-outside] a Google service-account key inside the repo"],
+    "ops": [
+      {
+        "write": {
+          "file": "keys/play.json",
+          "json": {
+            "type": "service_account",
+            "client_email": "release@tasks-test.iam.gserviceaccount.com",
+            "private_key": "(redacted in this fixture)"
+          }
+        }
+      }
+    ]
+  },
+  "bad-signing-plugin": {
+    "expect": [
+      "FAIL app.config.ts [signing-plugin] the local lane needs ['./plugins/with-upload-signing.ts', { applicationId }]"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "      ['./plugins/with-upload-signing.ts', { applicationId: BASE.appId }],\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-signing-plugin-file": {
+    "expect": ["FAIL plugins/with-upload-signing.ts [signing-plugin] is missing"],
+    "ops": [{ "delete": ["plugins/with-upload-signing.ts", "plugins/with-upload-signing.test.ts"] }]
+  },
+  "bad-target-sdk-config": {
+    "expect": ["FAIL app.config.ts:27 [target-sdk-config] targetSdkVersion is 34, below 36"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    plugins: [\n",
+          "with": "    plugins: [\n      ['expo-build-properties', { android: { targetSdkVersion: 34 } }],\n"
+        }
+      }
+    ]
+  },
+  "bad-version-source": {
+    "expect": [
+      "FAIL app.config.ts [version-source] has 0 `const ANDROID_VERSION_CODE = <n>;` lines, expected 1",
+      "moves once to per-platform counters",
+      "FAIL app.config.ts [version-source] android.versionCode is not ANDROID_VERSION_CODE"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "const ANDROID_VERSION_CODE = 14;",
+          "with": "const BUILD_NUMBER = 14;"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "versionCode: ANDROID_VERSION_CODE,",
+          "with": "versionCode: BUILD_NUMBER,"
+        }
+      }
+    ]
+  },
+  "error-multi-package-no-app-dir": {
+    "expect": [
+      "ERROR [bad-input] package.json declares workspaces and no expo dependency",
+      "Pass --app-dir <the app folder>"
+    ],
+    "ops": [
+      { "rename": { "from": "app.config.ts", "to": "apps/mobile/app.config.ts" } },
+      { "rename": { "from": "scripts", "to": "apps/mobile/scripts" } },
+      { "rename": { "from": "plugins", "to": "apps/mobile/plugins" } },
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      { "rename": { "from": "contracts", "to": "apps/mobile/contracts" } },
+      { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+      {
+        "write": { "file": "package.json", "json": { "name": "tasks-repo", "private": true, "workspaces": ["apps/*"] } }
+      }
+    ]
+  },
+  "error-no-package-json": { "expect": ["ERROR [bad-input] nothing to check"], "ops": [{ "delete": "package.json" }] },
+  "pass-eas-lane": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "contracts/android-release.json", "path": ["lane"], "value": "eas" } },
+      {
+        "write": {
+          "file": "eas.json",
+          "json": {
+            "cli": { "appVersionSource": "remote" },
+            "build": { "production": { "autoIncrement": true, "android": { "buildType": "app-bundle" } } },
+            "submit": {
+              "production": {
+                "android": { "applicationId": "com.acme.tasks", "track": "internal", "releaseStatus": "completed" }
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "pass-ios-only": {
+    "expect": ["NOT APPLICABLE: the app config limits platforms and android is not one of them"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    slug: 'tasks',\n",
+          "with": "    slug: 'tasks',\n    platforms: ['ios'],\n"
+        }
+      }
+    ]
+  },
+  "pass-multi-package": {
+    "expect": ["check-play-release-setup: 1 release setup checked, 0 problems", "RESULT: PASS"],
+    "args": "{dir} --app-dir apps/mobile --release",
+    "ops": [
+      { "rename": { "from": "app.config.ts", "to": "apps/mobile/app.config.ts" } },
+      { "rename": { "from": "scripts", "to": "apps/mobile/scripts" } },
+      { "rename": { "from": "plugins", "to": "apps/mobile/plugins" } },
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      { "rename": { "from": "contracts", "to": "apps/mobile/contracts" } },
+      { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+      {
+        "write": { "file": "package.json", "json": { "name": "tasks-repo", "private": true, "workspaces": ["apps/*"] } }
+      }
+    ]
+  },
+  "pass-no-expo": {
+    "expect": ["NOT APPLICABLE: expo is not a dependency in package.json"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo"], "delete": true } }]
+  },
+  "pass-nothing-ships": {
+    "expect": ["NOT APPLICABLE: nothing in the repo ships to Google Play yet"],
+    "ops": [
+      { "delete": "contracts/android-release.json" },
+      { "json": { "file": "package.json", "path": ["scripts", "release:android"], "delete": true } }
+    ]
+  },
+  "pass-release": { "expect": ["RESULT: PASS"], "args": "{dir} --release" }
+}

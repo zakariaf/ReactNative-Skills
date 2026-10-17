@@ -1,0 +1,342 @@
+{
+  "bad-api-url-literal": {
+    "expect": [
+      "[first-party-network]",
+      "_expo/static/js/ios/index-0123456789abcdef.hbc.map (src/api/fetch-api-client.ts)",
+      "can hold a remote URL outside the URL seams"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "dist-audit/_expo/static/js/ios/index-0123456789abcdef.hbc.map",
+          "path": ["sourcesContent", 6],
+          "value": "const base = 'https://api.acme.app/v1'; const deviceFetch = globalThis.fetch; export const request = (path) => deviceFetch(base + path);"
+        }
+      }
+    ]
+  },
+  "bad-baseline-reason": {
+    "expect": [
+      "[baseline-reason]",
+      "contracts/network-baseline.json",
+      "js entry \"expo\" has no categories or no real reason"
+    ],
+    "ops": [{ "json": { "file": "contracts/network-baseline.json", "path": ["js", "expo", "reason"], "value": "ok" } }]
+  },
+  "bad-contract-invalid": {
+    "expect": ["[contract]", "contracts/privacy.json", "profile \"sometimes\" is not one of api-port, offline-only"],
+    "ops": [{ "json": { "file": "contracts/privacy.json", "path": ["profile"], "value": "sometimes" } }]
+  },
+  "bad-first-party-fetch": {
+    "expect": [
+      "[first-party-network]",
+      "_expo/static/js/ios/index-0123456789abcdef.hbc.map (src/features/tasks/use-tasks-model.ts)",
+      "shipped first-party ios module can open a connection (fetch) outside the network seams"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "dist-audit/_expo/static/js/ios/index-0123456789abcdef.hbc.map",
+          "path": ["sourcesContent", 8],
+          "value": "export function useTasksModel() { return fetch('/tasks'); }"
+        }
+      }
+    ]
+  },
+  "bad-first-party-file-transfer": {
+    "expect": [
+      "[first-party-network]",
+      "_expo/static/js/ios/index-0123456789abcdef.hbc.map (src/features/tasks/use-tasks-model.ts)",
+      "can open a connection (fileTransfer) outside the network seams"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "dist-audit/_expo/static/js/ios/index-0123456789abcdef.hbc.map",
+          "path": ["sourcesContent", 8],
+          "value": "import { File, Paths } from 'expo-file-system';\nexport const attach = (url) => File.downloadFileAsync(url, Paths.cache);"
+        }
+      }
+    ]
+  },
+  "bad-first-party-url": {
+    "expect": [
+      "[first-party-network]",
+      "_expo/static/js/ios/index-0123456789abcdef.hbc.map (src/app/_layout.tsx)",
+      "can hold a remote URL outside the URL seams"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "dist-audit/_expo/static/js/ios/index-0123456789abcdef.hbc.map",
+          "path": ["sourcesContent", 9],
+          "value": "const logo = { uri: 'https://cdn.acme.app/logo.png' };"
+        }
+      }
+    ]
+  },
+  "bad-first-party-websocket": {
+    "expect": ["[first-party-network]", "(src/features/tasks/use-tasks-model.ts)", "(webSocket)"],
+    "ops": [
+      {
+        "json": {
+          "file": "dist-audit/_expo/static/js/ios/index-0123456789abcdef.hbc.map",
+          "path": ["sourcesContent", 8],
+          "value": "export const live = () => new WebSocket(liveUrl);"
+        }
+      }
+    ]
+  },
+  "bad-new-category": {
+    "expect": ["[baseline-new]", "NEW react-native: fetch (not in the baseline)"],
+    "ops": [
+      {
+        "json": {
+          "file": "dist-audit/_expo/static/js/ios/index-0123456789abcdef.hbc.map",
+          "path": ["sourcesContent", 1],
+          "value": "const ws = new WebSocket(url); fetch(url);"
+        }
+      }
+    ]
+  },
+  "bad-new-package": {
+    "expect": [
+      "[baseline-new]",
+      "_expo/static/js/ios/index-0123456789abcdef.hbc.map",
+      "NEW some-analytics: fetch, remoteUrl (not in the baseline)"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "dist-audit/_expo/static/js/ios/index-0123456789abcdef.hbc.map",
+          "path": ["sources", 10],
+          "value": "/app/node_modules/some-analytics/dist/index.js"
+        }
+      },
+      {
+        "json": {
+          "file": "dist-audit/_expo/static/js/ios/index-0123456789abcdef.hbc.map",
+          "path": ["sourcesContent", 10],
+          "value": "fetch('https://collect.analytics.test/v1', { body });"
+        }
+      }
+    ]
+  },
+  "bad-offline-api-fetch": {
+    "expect": ["[first-party-network]", "(src/api/fetch-api-client.ts)", "(fetch)"],
+    "ops": [
+      { "json": { "file": "contracts/privacy.json", "path": ["profile"], "value": "offline-only" } },
+      { "json": { "file": "contracts/privacy.json", "path": ["linkFiles"], "value": ["src/config/external-links.ts"] } }
+    ]
+  },
+  "bad-sample-id": {
+    "expect": [
+      "[sample-id]",
+      "_expo/static/js/ios/index-0123456789abcdef.hbc.map (src/features/tasks/use-tasks-model.ts)",
+      "Google's sample ad publisher ID outside the ads SDK"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "dist-audit/_expo/static/js/ios/index-0123456789abcdef.hbc.map",
+          "path": ["sourcesContent", 8],
+          "value": "export const BANNER = 'ca-app-pub-3940256099942544/2934735716';"
+        }
+      }
+    ]
+  },
+  "bad-sdk-peer-not-covered": {
+    "expect": ["[baseline-new]", "NEW @crash/core: fetch (not in the baseline)"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["sdks", "@crash/react-native"],
+          "value": {
+            "family": "crash reporting",
+            "why": "crash reports behind the crash reporter port, after consent",
+            "collects": []
+          }
+        },
+        "$comment": "A peer of a declared SDK is the app's own package: it is not covered."
+      },
+      {
+        "write": {
+          "file": "node_modules/@crash/react-native/package.json",
+          "content": "{ \"name\": \"@crash/react-native\", \"peerDependencies\": { \"@crash/core\": \"1.0.0\" } }\n"
+        }
+      },
+      { "write": { "file": "node_modules/@crash/core/package.json", "content": "{ \"name\": \"@crash/core\" }\n" } },
+      {
+        "json": {
+          "file": "dist-audit/_expo/static/js/ios/index-0123456789abcdef.hbc.map",
+          "path": ["sources", 10],
+          "value": "/app/node_modules/@crash/core/dist/transport.js"
+        }
+      },
+      {
+        "json": {
+          "file": "dist-audit/_expo/static/js/ios/index-0123456789abcdef.hbc.map",
+          "path": ["sourcesContent", 10],
+          "value": "export const send = (envelope) => fetch(dsnUrl, { method: 'POST', body: envelope });"
+        }
+      }
+    ]
+  },
+  "bad-storekit-test-code": {
+    "expect": ["[storekit-test-code]", "(src/features/tasks/use-tasks-model.ts)"],
+    "ops": [
+      {
+        "json": {
+          "file": "dist-audit/_expo/static/js/ios/index-0123456789abcdef.hbc.map",
+          "path": ["sourcesContent", 8],
+          "value": "const session = new SKTestSession('Products.storekit');"
+        }
+      }
+    ]
+  },
+  "error-no-baseline": {
+    "expect": ["ERROR [bad-input]", "no network baseline"],
+    "ops": [{ "delete": "contracts/network-baseline.json" }]
+  },
+  "error-no-export": { "expect": ["ERROR [bad-input]", "export folder"], "ops": [{ "delete": "dist-audit" }] },
+  "error-unknown-variant": {
+    "expect": ["ERROR [bad-input]", "--variant store is not production, preview or development"],
+    "args": "{dir} --variant store",
+    "ops": []
+  },
+  "pass-declared-sdk-covers": {
+    "expect": ["audit-bundle:", "RESULT: PASS"],
+    "ops": [
+      {
+        "json": {
+          "file": "dist-audit/_expo/static/js/ios/index-0123456789abcdef.hbc.map",
+          "path": ["sourcesContent", 5],
+          "value": "export function verify(receipt) { return fetch('https://api.openiap.test/verify', { body: receipt }); } const live = new WebSocket(url);"
+        }
+      }
+    ]
+  },
+  "pass-first-party-comment": {
+    "expect": ["audit-bundle:", "RESULT: PASS"],
+    "ops": [
+      {
+        "json": {
+          "file": "dist-audit/_expo/static/js/ios/index-0123456789abcdef.hbc.map",
+          "path": ["sourcesContent", 8],
+          "value": "/**\n * The tasks model. It never calls fetch() itself: requests go through the ApiClient\n * (see 'https://docs.acme.app/architecture').\n */\nexport function useTasksModel(api) { return api.request('/tasks'); } // not fetch(path)"
+        }
+      }
+    ]
+  },
+  "pass-offline-links-declared": {
+    "expect": ["audit-bundle:", "RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "contracts/privacy.json", "path": ["profile"], "value": "offline-only" } },
+      { "json": { "file": "contracts/privacy.json", "path": ["linkFiles"], "value": ["src/config/external-links.ts"] } },
+      {
+        "json": {
+          "file": "dist-audit/_expo/static/js/ios/index-0123456789abcdef.hbc.map",
+          "path": ["sourcesContent", 6],
+          "value": "export const request = (path) => Promise.resolve(path);"
+        }
+      },
+      {
+        "json": {
+          "file": "dist-audit/_expo/static/js/android/index-fedcba9876543210.hbc.map",
+          "path": ["sourcesContent", 6],
+          "value": "export const request = (path) => Promise.resolve(path);"
+        }
+      }
+    ]
+  },
+  "pass-preview-sample-id": {
+    "expect": ["audit-bundle:", "RESULT: PASS"],
+    "args": "{dir} --variant preview",
+    "ops": [
+      {
+        "json": {
+          "file": "dist-audit/_expo/static/js/ios/index-0123456789abcdef.hbc.map",
+          "path": ["sourcesContent", 8],
+          "value": "export const BANNER = 'ca-app-pub-3940256099942544/2934735716';"
+        }
+      }
+    ]
+  },
+  "pass-sdk-dependency-covered": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["sdks", "@crash/react-native"],
+          "value": {
+            "family": "crash reporting",
+            "why": "crash reports behind the crash reporter port, after consent",
+            "collects": []
+          }
+        },
+        "$comment": "A declared SDK covers the packages it installs: @crash/react-native depends on @crash/core, whose transport can go online."
+      },
+      {
+        "write": {
+          "file": "node_modules/@crash/react-native/package.json",
+          "content": "{ \"name\": \"@crash/react-native\", \"dependencies\": { \"@crash/core\": \"1.0.0\" } }\n"
+        }
+      },
+      { "write": { "file": "node_modules/@crash/core/package.json", "content": "{ \"name\": \"@crash/core\" }\n" } },
+      {
+        "json": {
+          "file": "dist-audit/_expo/static/js/ios/index-0123456789abcdef.hbc.map",
+          "path": ["sources", 10],
+          "value": "/app/node_modules/@crash/core/dist/transport.js"
+        }
+      },
+      {
+        "json": {
+          "file": "dist-audit/_expo/static/js/ios/index-0123456789abcdef.hbc.map",
+          "path": ["sourcesContent", 10],
+          "value": "export const send = (envelope) => fetch(dsnUrl, { method: 'POST', body: envelope });"
+        }
+      }
+    ]
+  },
+  "pass-second-transport-declared": {
+    "expect": ["audit-bundle:", "RESULT: PASS"],
+    "ops": [
+      {
+        "json": {
+          "file": "dist-audit/_expo/static/js/ios/index-0123456789abcdef.hbc.map",
+          "path": ["sources", 9],
+          "value": "/src/services/file-transfer/upload-adapter.ts"
+        }
+      },
+      {
+        "json": {
+          "file": "dist-audit/_expo/static/js/ios/index-0123456789abcdef.hbc.map",
+          "path": ["sourcesContent", 9],
+          "value": "export const upload = (body) => fetch(uploadUrl, { method: 'POST', body });"
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["networkModules"],
+          "value": ["src/services/file-transfer/*-adapter.ts"]
+        }
+      }
+    ]
+  },
+  "pass-stale-note": {
+    "expect": ["NOTE STALE react-native-reanimated: in the baseline but not found", "RESULT: PASS"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/network-baseline.json",
+          "path": ["js", "react-native-reanimated"],
+          "value": { "categories": ["remoteUrl"], "reason": "documentation links inside error messages" }
+        }
+      }
+    ]
+  }
+}

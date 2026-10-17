@@ -1,0 +1,13 @@
+{
+  "components": [],
+  "specs": {
+    "asRenderedBorders": true,
+    "overrides": [
+      {
+        "path": "chip.radius",
+        "value": 8,
+        "why": "The approved design draws chips with an 8 pt radius; the token file still says the small radius."
+      }
+    ]
+  }
+}

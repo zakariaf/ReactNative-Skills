@@ -1,0 +1,1039 @@
+{
+  "bad-configs-missing": {
+    "expect": [
+      "eslint.config.mjs [eslint-missing] eslint.config.mjs does not exist",
+      ".prettierrc.json [prettier-option] .prettierrc.json does not exist",
+      "knip.json [knip-config] knip.json does not exist"
+    ],
+    "ops": [{ "delete": ["eslint.config.mjs", ".prettierrc.json", "knip.json"] }]
+  },
+  "bad-eslint-allow-list": {
+    "expect": [
+      "eslint.config.mjs",
+      "[eslint-weakened] an allow list that lifts a banned package for a block (the canonical config has one: the consent adapter) appears 2 times; the canonical config has 1 [allow-list]"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  // Raw Pressable only in ui/, raw Image only in the Icon component; ui/ stays presentational.\n",
+          "with": "  // A planted second allow list: every adapter may now ask for tracking.\n  {\n    files: ADAPTERS,\n    rules: {\n      'no-restricted-imports': restrictedImports({\n        paths: without(RUNTIME_PATHS, ...VENDOR_SDK_PATHS),\n        patterns: [NODE_BUILTINS],\n        allow: [ATT_IMPORT],\n      }),\n    },\n  },\n  // Raw Pressable only in ui/, raw Image only in the Icon component; ui/ stays presentational.\n"
+        }
+      }
+    ]
+  },
+  "bad-eslint-att-unbanned": {
+    "expect": [
+      "eslint.config.mjs [eslint-required] missing the expo-sqlite adapter-only ban in VENDOR_SDK_PATHS (SqlDriver) [vendor-sqlite]",
+      "eslint.config.mjs [eslint-required] missing ATT_IMPORT in BANNED_PACKAGE_PATHS, so every file but the consent adapter keeps the ban [att-in-banned-list]",
+      "eslint.config.mjs [eslint-required] missing ATT_ADAPTER naming one consent adapter (src/services/consent/*-consent-adapter.ts and its platform files), not a folder of adapters [att-adapter-only]",
+      "[eslint-weakened] VENDOR_SDK_PATHS lacks the canonical entry vendor('expo-sqlite','SqlDriver') [canonical-const]",
+      "[eslint-weakened] BANNED_PACKAGE_PATHS lacks the canonical entry ATT_IMPORT [canonical-const]",
+      "[eslint-weakened] the file group ATT_ADAPTER adds 'src/services/*/*-adapter.ts', which reaches a whole folder; an exemption group adds only exact file names [file-group]"
+    ],
+    "ops": [
+      { "replace": { "file": "eslint.config.mjs", "find": "  ATT_IMPORT,\n", "with": "" } },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "const ATT_ADAPTER = [\n  'src/services/consent/*-consent-adapter{,.ios,.android,.native,.web}.{ts,tsx}',\n];",
+          "with": "const ATT_ADAPTER = ['src/services/*/*-adapter.ts'];"
+        }
+      },
+      { "replace": { "file": "eslint.config.mjs", "find": "  vendor('expo-sqlite', 'SqlDriver'),\n", "with": "" } }
+    ]
+  },
+  "bad-eslint-block-scope": {
+    "expect": [
+      "[eslint-weakened] the block for files: ALL_TS (rules max-lines, max-lines-per-function, complexity, ...) is missing or its files/ignores changed [canonical-block]",
+      "[eslint-weakened] the block for files: RUNTIME, ignores: TESTS (rules import/no-restricted-paths) is missing or its files/ignores changed [canonical-block]",
+      "eslint.config.mjs:602 [eslint-weakened] a block beyond the canonical ones reaches every file under 'src/core/**/*.ts'; it replaces those files' rule options [exemption-scope]",
+      "eslint.config.mjs:742 [eslint-weakened] a block beyond the canonical ones reaches every file under RUNTIME; it replaces those files' rule options [exemption-scope]",
+      "eslint.config.mjs:529 [eslint-weakened] the block for files: GOLDEN_TESTS (rules jest/no-large-snapshots) is out of order: a later block replaces an earlier one's options, so the order is part of the config [canonical-block]"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  // 3. Size and complexity limits.\n  {\n    files: ALL_TS,\n",
+          "with": "  // 3. Size and complexity limits.\n  {\n    files: ['src/core/**/*.ts'],\n"
+        },
+        "$comment": "E10, verified with ESLint 9.39.5: 4 parameters in src/features pass"
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "    files: RUNTIME,\n    ignores: TESTS,\n",
+          "with": "    files: RUNTIME,\n    ignores: [...TESTS, 'src/features/**'],\n"
+        },
+        "$comment": "E10: the zones no longer reach src/features"
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  { files: GOLDEN_TESTS, rules: { 'jest/no-large-snapshots': 'off' } },\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  // 0. No inline eslint-disable comments anywhere; unused exceptions are errors.\n",
+          "with": "  { files: GOLDEN_TESTS, rules: { 'jest/no-large-snapshots': 'off' } },\n\n  // 0. No inline eslint-disable comments anywhere; unused exceptions are errors.\n"
+        },
+        "$comment": "a canonical block moved before the blocks it overrides"
+      }
+    ]
+  },
+  "bad-eslint-exemption-scope": {
+    "expect": [
+      "eslint.config.mjs:826 [eslint-weakened] a block beyond the canonical ones reaches every file under 'src/features/**/*.{ts,tsx}'; it replaces those files' rule options [exemption-scope]",
+      "eslint.config.mjs:65 [eslint-weakened] the file group ADAPTERS adds 'src/features/**/*.ts', which reaches a whole folder; an exemption group adds only exact file names [file-group]",
+      "[eslint-weakened] the file group NETWORK_CODE lacks 'src/api/**/*.ts', so its rules no longer reach those files [file-group]",
+      "[eslint-weakened] the file group NETWORK_CODE adds 'src/**/*.ts', which reaches a whole folder; an exemption group adds only exact file names [file-group]",
+      "[eslint-weakened] restrictedImports({}) (the package bans only; the canonical config uses it for block 4 and for __mocks__/jest.setup.ts) appears 3 times; the canonical config has 2 [fresh-list]"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  // 5c. File-level exemptions (the ONLY places these APIs are allowed).\n",
+          "with": "  // A planted weakening: only the package bans for every feature file.\n  {\n    files: ['src/features/**/*.{ts,tsx}'],\n    rules: { 'no-restricted-imports': restrictedImports({}) },\n  },\n\n  // 5c. File-level exemptions (the ONLY places these APIs are allowed).\n"
+        },
+        "$comment": "ESLint: a vendor SDK, Text and node:fs imported in src/features pass"
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  'src/data/**/*-sql-driver{,.ios,.android,.native,.web}.ts',\n];",
+          "with": "  'src/data/**/*-sql-driver{,.ios,.android,.native,.web}.ts',\n  'src/features/**/*.ts',\n];"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "const NETWORK_CODE = ['src/api/**/*.ts'];",
+          "with": "const NETWORK_CODE = ['src/**/*.ts'];"
+        }
+      }
+    ]
+  },
+  "bad-eslint-filter-imports": {
+    "expect": [
+      "eslint.config.mjs:825 [eslint-weakened] a block beyond the canonical ones reaches every file under 'src/features/**/*.{ts,tsx}'; it replaces those files' rule options [exemption-scope]"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  // 5c. File-level exemptions (the ONLY places these APIs are allowed).\n",
+          "with": "  // A planted weakening: Text and node:fs for every feature file through RUNTIME_PATHS.filter().\n  {\n    files: ['src/features/**/*.{ts,tsx}'],\n    rules: {\n      'no-restricted-imports': restrictedImports({\n        paths: RUNTIME_PATHS.filter((entry) => entry !== TEXT_IMPORT),\n      }),\n    },\n  },\n\n  // 5c. File-level exemptions (the ONLY places these APIs are allowed).\n"
+        },
+        "$comment": "E4, verified with ESLint 9.39.5: Text from react-native and node:fs in src/features pass"
+      }
+    ]
+  },
+  "bad-eslint-filter-properties": {
+    "expect": [
+      "eslint.config.mjs:825 [eslint-weakened] a block beyond the canonical ones reaches every file under 'src/features/**/*.{ts,tsx}'; it replaces those files' rule options [exemption-scope]"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  // 5c. File-level exemptions (the ONLY places these APIs are allowed).\n",
+          "with": "  // A planted weakening: Date.now for every feature file, spelled without the exemption helpers.\n  {\n    files: ['src/features/**/*.{ts,tsx}'],\n    rules: {\n      'no-restricted-properties': [\n        'error',\n        ...RESTRICTED_PROPERTIES.filter((entry) => entry.property !== 'now'),\n      ],\n    },\n  },\n\n  // 5c. File-level exemptions (the ONLY places these APIs are allowed).\n"
+        },
+        "$comment": "E3, verified with ESLint 9.39.5: Date.now() in src/features passes"
+      }
+    ]
+  },
+  "bad-eslint-fresh-list": {
+    "expect": [
+      "eslint.config.mjs:827 [eslint-weakened] a hand-written no-restricted-imports array (every block uses restrictedImports() or RUNTIME_IMPORTS) appears 1 times; the canonical config has 0 [fresh-list]",
+      "eslint.config.mjs:828 [eslint-weakened] a declaration of '@typescript-eslint/no-floating-promises' appears 2 times; the canonical config has 1 [option-redeclared]",
+      "eslint.config.mjs:829 [eslint-weakened] a declaration of '@typescript-eslint/strict-boolean-expressions' appears 2 times; the canonical config has 1 [option-redeclared]",
+      "eslint.config.mjs:830 [eslint-weakened] a fresh no-restricted-syntax list (literal entries instead of the shared lists) appears 1 times; the canonical config has 0 [fresh-list]",
+      "eslint.config.mjs:831 [eslint-weakened] a fresh no-restricted-properties list",
+      "eslint.config.mjs:832 [eslint-weakened] a declaration of '@typescript-eslint/no-misused-promises' (strictTypeChecked sets it",
+      "Fix: Rebuild it from the shared lists: 'no-restricted-imports': restrictedImports({ paths: without(RUNTIME_PATHS, ONE_EXEMPTED_ENTRY), patterns: [NODE_BUILTINS] })"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  // 5c. File-level exemptions (the ONLY places these APIs are allowed).\n",
+          "with": "  // A planted weakening: fresh short lists and weaker options for every feature file.\n  {\n    files: ['src/features/**/*.{ts,tsx}'],\n    rules: {\n      'no-restricted-imports': ['error', { paths: ['axios'] }],\n      '@typescript-eslint/no-floating-promises': ['error', { ignoreVoid: true }],\n      '@typescript-eslint/strict-boolean-expressions': ['error', { allowString: true, allowNumber: true }],\n      'no-restricted-syntax': ['error', { selector: 'TSEnumDeclaration', message: 'No enums.' }],\n      'no-restricted-properties': ['error', { object: 'Math', property: 'random' }],\n      '@typescript-eslint/no-misused-promises': ['error', { checksVoidReturn: false }],\n    },\n  },\n\n  // 5c. File-level exemptions (the ONLY places these APIs are allowed).\n"
+        }
+      }
+    ]
+  },
+  "bad-eslint-gaps": {
+    "expect": [
+      "eslint.config.mjs [eslint-required] missing the runtime block's no-restricted-globals with NETWORK_GLOBALS (network only through the ApiClient) [network-globals-used]",
+      "[eslint-required] missing the asyncHandler selector, verbatim (async on* handlers, handleSubmit(...) on an on* prop, async handleX functions) [async-handler]",
+      "[eslint-required] missing the PRE_EXISTING list spread into globalIgnores",
+      "[eslint-rule-off] @typescript-eslint/no-explicit-any is switched off 1 times; the canonical config does it 0 times",
+      "[eslint-rule-off] no-restricted-syntax is switched off 1 times",
+      "[eslint-weakened] tseslint.configs.disableTypeChecked (allowed only for the plain JS config files) appears 2 times",
+      "[ignore-pre-existing] the pre-existing folder research/ is not in PRE_EXISTING, so ESLint would lint it",
+      "eslint.config.mjs:680 [eslint-weakened] the block for files: RUNTIME (rules no-restricted-globals, no-restricted-properties, no-restricted-imports, ...) differs from templates/eslint.config.mjs: it changes the rule 'no-restricted-globals' [canonical-block]",
+      "[eslint-weakened] a block beyond the canonical ones reaches every file under 'src/ui/**/*.tsx'; it replaces those files' rule options [exemption-scope]",
+      "[eslint-required] missing the handlerBody selector, verbatim"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "    rules: { 'import/no-default-export': 'off', 'no-restricted-globals': 'off' },\n  },\n",
+          "with": "    rules: { 'import/no-default-export': 'off', 'no-restricted-globals': 'off' },\n  },\n\n  // A planted weakening: type information and two rules switched off for UI code.\n  {\n    files: ['src/ui/**/*.tsx'],\n    extends: [tseslint.configs.disableTypeChecked],\n    rules: { '@typescript-eslint/no-explicit-any': ['off'], 'no-restricted-syntax': 0 },\n  },\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "'no-restricted-globals': ['error', ...NETWORK_GLOBALS, ...TEST_GLOBALS],",
+          "with": "'no-restricted-globals': ['error', ...TEST_GLOBALS],"
+        }
+      },
+      { "replace": { "file": "eslint.config.mjs", "find": "  asyncHandler: {", "with": "  asyncHandlerDraft: {" } },
+      { "replace": { "file": "eslint.config.mjs", "find": "    ...PRE_EXISTING,\n", "with": "" } },
+      {
+        "write": {
+          "file": "research/tools/check-notes.mjs",
+          "content": "// research/tools/check-notes.mjs: a pre-existing tool nobody listed in PRE_EXISTING.\nconsole.log('notes ok');\n"
+        }
+      },
+      {
+        "replace": { "file": "eslint.config.mjs", "find": "  handlerBody: {", "with": "  handlerBodyDraft: {" },
+        "$comment": "the verifier's handler hole: onPress={() => Linking.openURL(url)} passes without it"
+      }
+    ]
+  },
+  "bad-eslint-group-all-ts": {
+    "expect": [
+      "[eslint-weakened] the file group ALL_TS lacks '**/*.{ts,tsx}', so its rules no longer reach those files [file-group]"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "const ALL_TS = ['**/*.{ts,tsx}'];",
+          "with": "const ALL_TS = ['src/core/**/*.{ts,tsx}'];"
+        },
+        "$comment": "E2, verified with ESLint 9.39.5: strictTypeChecked and every limit leave src/features (4 parameters pass)"
+      }
+    ]
+  },
+  "bad-eslint-group-runtime": {
+    "expect": [
+      "[eslint-weakened] the file group RUNTIME lacks 'src/**/*.{ts,tsx}', so its rules no longer reach those files [file-group]"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "const RUNTIME = ['src/**/*.{ts,tsx}'];",
+          "with": "const RUNTIME = ['src/app/**/*.{ts,tsx}'];"
+        },
+        "$comment": "E1, verified with ESLint 9.39.5: Date.now() and fetch() in src/features pass"
+      }
+    ]
+  },
+  "bad-eslint-limit-shapes": {
+    "expect": [
+      "eslint.config.mjs:827 [eslint-limit-changed] max-depth is 6; the canonical values are 3",
+      "eslint.config.mjs:828 [eslint-limit-changed] max-params is 7; the canonical values are 3",
+      "eslint.config.mjs:829 [eslint-limit-changed] max-nested-callbacks is 8; the canonical values are 3 or 4",
+      "eslint.config.mjs:830 [eslint-limit-changed] complexity is 25; the canonical values are 10",
+      "eslint.config.mjs:831 [eslint-limit-changed] max-lines is 600; the canonical values are 250 or 400",
+      "eslint.config.mjs:832 [eslint-limit-changed] max-lines-per-function is 120; the canonical values are 40 or 80",
+      "eslint.config.mjs:837 [eslint-limit-changed] max-depth is declared without a value, so ESLint's default 4 applies; the canonical values are 3",
+      "[eslint-weakened] a declaration of 'max-depth' appears 3 times; the canonical config has 1 [option-redeclared]",
+      "[eslint-weakened] a declaration of 'complexity' appears 2 times; the canonical config has 1 [option-redeclared]"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  // 5c. File-level exemptions (the ONLY places these APIs are allowed).\n",
+          "with": "  // A planted weakening: every limit raised for a legacy feature, in the shapes ESLint accepts.\n  {\n    files: ['src/features/legacy/**/*.{ts,tsx}'],\n    rules: {\n      'max-depth': ['error', { max: 6 }],\n      'max-params': [2, { max: 7 }],\n      \"max-nested-callbacks\": [\"error\", { max: 8 }],\n      complexity: ['error', 25],\n      'max-lines': ['error', 600],\n      'max-lines-per-function': ['error', { skipComments: true, max: 120 }],\n    },\n  },\n  {\n    files: ['src/features/archive/**/*.ts'],\n    rules: { 'max-depth': 'error' },\n  },\n\n  // 5c. File-level exemptions (the ONLY places these APIs are allowed).\n"
+        }
+      }
+    ]
+  },
+  "bad-eslint-messages": {
+    "expect": [
+      "eslint.config.mjs [eslint-required] missing the Date.now entry with its canonical message 'Inject ClockPort (src/services/clock).' [message-date-now]",
+      "[eslint-required] missing 'skills/**' in globalIgnores",
+      "[eslint-required] missing '.agents/**' in globalIgnores"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "{ object: 'Date', property: 'now', message: 'Inject ClockPort (src/services/clock).' },",
+          "with": "{ object: 'Date', property: 'now', message: 'Use an injected clock.' },"
+        }
+      },
+      { "replace": { "file": "eslint.config.mjs", "find": "    'skills/**',\n", "with": "" } },
+      { "replace": { "file": "eslint.config.mjs", "find": "    '.agents/**',\n", "with": "" } }
+    ]
+  },
+  "bad-eslint-name-globs": {
+    "expect": [
+      "eslint.config.mjs:825 [eslint-weakened] a block beyond the canonical ones reaches every file under 'src/**/use-*.ts'; it replaces those files' rule options [exemption-scope]",
+      "eslint.config.mjs:825 [eslint-weakened] a block beyond the canonical ones reaches every file under 'src/**/*-screen.tsx'; it replaces those files' rule options [exemption-scope]"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  // 5c. File-level exemptions (the ONLY places these APIs are allowed).\n",
+          "with": "  // A planted weakening: globs with a name part that still reach every hook and screen.\n  {\n    files: ['src/**/use-*.ts', 'src/**/*-screen.tsx'],\n    rules: {\n      'no-restricted-properties': ['error', ...withoutProperty('Date', 'now')],\n      'no-restricted-imports': restrictedImports({\n        paths: without(RUNTIME_PATHS, TEXT_IMPORT, ...VENDOR_SDK_PATHS),\n        patterns: [NODE_BUILTINS],\n      }),\n    },\n  },\n\n  // 5c. File-level exemptions (the ONLY places these APIs are allowed).\n"
+        },
+        "$comment": "E9, verified with ESLint 9.39.5: Date.now, a vendor SDK and Text in a model hook or screen pass"
+      }
+    ]
+  },
+  "bad-eslint-stray": {
+    "expect": [
+      "eslint.config.mjs [eslint-required] missing eslint-config-prettier as the LAST entry",
+      ".eslintrc.json [config-stray] .eslintrc.json is a second eslint config"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  prettierConfig,\n]);",
+          "with": "  prettierConfig,\n  { rules: {} },\n]);"
+        }
+      },
+      { "write": { "file": ".eslintrc.json", "content": "{ \"root\": true }\n" } }
+    ]
+  },
+  "bad-eslint-string-files": {
+    "expect": [
+      "eslint.config.mjs:827 [eslint-weakened] a block beyond the canonical ones reaches every file under 'src/features/**/*.{ts,tsx}'; it replaces those files' rule options [exemption-scope]",
+      "eslint.config.mjs:836 [eslint-weakened] a block's files value [FEATURE_CODE].flat() cannot be resolved to globs [exemption-scope]"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "// App zones on resolved paths (block 5-zones).\n",
+          "with": "const FEATURE_CODE = 'src/features/**/*.{ts,tsx}';\n\n// App zones on resolved paths (block 5-zones).\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  // 5c. File-level exemptions (the ONLY places these APIs are allowed).\n",
+          "with": "  // A planted weakening: every vendor SDK for every feature file, through a string const.\n  {\n    files: [FEATURE_CODE],\n    rules: {\n      'no-restricted-imports': restrictedImports({\n        paths: without(RUNTIME_PATHS, ...VENDOR_SDK_PATHS),\n        patterns: [NODE_BUILTINS],\n      }),\n    },\n  },\n  {\n    files: [FEATURE_CODE].flat(),\n    rules: { 'no-restricted-properties': ['error', ...withoutProperty('Date', 'now')] },\n  },\n\n  // 5c. File-level exemptions (the ONLY places these APIs are allowed).\n"
+        },
+        "$comment": "E5, verified with ESLint 9.39.5: import * as Haptics from 'expo-haptics' in a feature passes"
+      }
+    ]
+  },
+  "bad-eslint-structure": {
+    "expect": [
+      "eslint.config.mjs:309 [eslint-weakened] the shared const SYNTAX differs from templates/eslint.config.mjs (expected \"ass an explicit delay.",
+      "eslint.config.mjs:88 [eslint-weakened] .splice( mutates a value the config shares [side-effect]",
+      "[eslint-weakened] .length = mutates a value the config shares [side-effect]",
+      "[eslint-weakened] the top-level statement \"RESTRICTED_PROPERTIES.length = 0;\" is not an import, a const or the config [top-level-statement]",
+      "[eslint-weakened] defineConfig lists tseslint.configs.disableTypeChecked, which is not a canonical config item; a shared config can switch any rule off for every file [config-item]"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "    message: 'Pass an explicit delay.',\n",
+          "with": "    message: 'Prefer an explicit delay.',\n"
+        },
+        "$comment": "a shared list edited in place"
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "// App zones on resolved paths (block 5-zones).\n",
+          "with": "const SPARE_PATHS = RUNTIME_PATHS.splice(0, 3);\n\n// App zones on resolved paths (block 5-zones).\n"
+        },
+        "$comment": "a mutation at module load: every block that spreads RUNTIME_PATHS loses the first three vendor bans"
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "export default defineConfig([\n",
+          "with": "RESTRICTED_PROPERTIES.length = 0;\n\nexport default defineConfig([\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  // 1. Expo base: import, react, react-hooks (React Compiler rules) and expo rules.\n  expoConfig,\n",
+          "with": "  // 1. Expo base: import, react, react-hooks (React Compiler rules) and expo rules.\n  expoConfig,\n  tseslint.configs.disableTypeChecked,\n"
+        },
+        "$comment": "a shared config object that applies to every file"
+      }
+    ]
+  },
+  "bad-eslint-tests-group": {
+    "expect": [
+      "[eslint-weakened] the file group TESTS adds 'src/**/*-screen.tsx', which reaches a whole folder; an exemption group adds only exact file names [file-group]"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  '__mocks__/**/*.{ts,tsx}',\n];\nconst GOLDEN_TESTS",
+          "with": "  '__mocks__/**/*.{ts,tsx}',\n  'src/**/*-screen.tsx',\n];\nconst GOLDEN_TESTS"
+        },
+        "$comment": "E6, verified with ESLint 9.39.5: a 94-line screen passes (the test limits apply)"
+      }
+    ]
+  },
+  "bad-eslint-weakened": {
+    "expect": [
+      "eslint.config.mjs [eslint-required] missing linterOptions.noInlineConfig: true",
+      "[eslint-weakened] noInlineConfig: false appears 1 times; the canonical config has 0 [inline-config-on]",
+      "[eslint-limit-changed] max-lines is 300; the canonical values are 250 or 400",
+      "[eslint-warn] a rule uses the \"warn\" severity",
+      "[eslint-rule-off] complexity is switched off 1 times",
+      "[eslint-forbidden-import] imports eslint-plugin-prettier",
+      "[eslint-required] missing strict-boolean-expressions with allowString: false and allowNumber: false [strict-booleans]",
+      "[eslint-required] missing the asyncHandler selector, verbatim (async on* handlers, handleSubmit(...) on an on* prop, async handleX functions) [async-handler]",
+      "[eslint-required] missing the newDate selector, verbatim (no new Date() in app code) [new-date]",
+      "[eslint-required] missing the axios ban in BANNED_PACKAGE_PATHS (network goes through the ApiClient) [banned-axios]",
+      "[eslint-warn] react-native/no-inline-styles uses severity 1 (warn)",
+      "[eslint-weakened] a linterOptions block appears 2 times; the canonical config has 1 [linter-options]"
+    ],
+    "ops": [
+      { "replace": { "file": "eslint.config.mjs", "find": "noInlineConfig: true,", "with": "noInlineConfig: false," } },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "'max-lines': ['error', { max: 250, skipBlankLines: true, skipComments: true }],",
+          "with": "'max-lines': ['error', { max: 300, skipBlankLines: true, skipComments: true }],"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "'sonarjs/no-commented-code': 'error',",
+          "with": "'sonarjs/no-commented-code': 'warn',"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "complexity: ['error', { max: 10, variant: 'modified' }],",
+          "with": "complexity: 'off',"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "import prettierConfig from 'eslint-config-prettier/flat';\n",
+          "with": "import prettierConfig from 'eslint-config-prettier/flat';\nimport prettierPlugin from 'eslint-plugin-prettier';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "{ allowString: false, allowNumber: false, allowNullableObject: true }",
+          "with": "{ allowString: true, allowNumber: false, allowNullableObject: true }"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "'FunctionDeclaration[async=true][id.name=/^handle[A-Z]/]',",
+          "with": "'FunctionDeclaration[async=true][id.name=/^handleNever$/]',"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "selector: \"NewExpression[callee.name='Date'][arguments.length=0]\",\n    message: 'new Date() reads",
+          "with": "selector: \"NewExpression[callee.name='Date'][arguments.length=9]\",\n    message: 'new Date() reads"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  banned('axios', 'Use the ApiClient in src/api/ (fetch, typed and validated).'),\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "'react-native/no-inline-styles': 'error',",
+          "with": "'react-native/no-inline-styles': 1,"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  // 1. Expo base: import, react, react-hooks (React Compiler rules) and expo rules.\n",
+          "with": "  { linterOptions: { reportUnusedDisableDirectives: 'off' } },\n\n  // 1. Expo base: import, react, react-hooks (React Compiler rules) and expo rules.\n"
+        }
+      }
+    ]
+  },
+  "bad-ignore-app-code-eslint": {
+    "expect": [
+      "eslint.config.mjs:498 [ignore-app-code] PRE_EXISTING lists 'src/features/**', which reaches into the app path src, so ESLint and check-source skip app code",
+      "eslint.config.mjs:526 [ignore-app-code] globalIgnores lists 'scripts/**', which reaches into the app path scripts",
+      "eslint.config.mjs:527 [eslint-weakened] globalIgnores lists 'research/**'; only the canonical entries and ...PRE_EXISTING belong there [global-ignores]",
+      "[eslint-weakened] an ignores key",
+      "appears 3 times; the canonical config has 2 [block-ignores]",
+      "Fix: Remove it: app code (src/, test/, __mocks__/, scripts/, plugins/, app.config.ts, the workspaces and every rn-skills.config.json \"layoutEntries\" item) is always linted, formatted and type-checked.",
+      "eslint.config.mjs:531 [eslint-weakened] a block beyond the canonical ones reaches every file (a block without files); it replaces those files' rule options [exemption-scope]"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "const PRE_EXISTING = ['handbook/**'];",
+          "with": "const PRE_EXISTING = ['handbook/**', 'src/features/**'];"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "    '.kiro/**',\n    ...PRE_EXISTING,\n",
+          "with": "    '.kiro/**',\n    'scripts/**',\n    'research/**',\n    ...PRE_EXISTING,\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  // 0. No inline eslint-disable comments anywhere; unused exceptions are errors.\n",
+          "with": "  { ignores: ['src/legacy/**'] },\n\n  // 0. No inline eslint-disable comments anywhere; unused exceptions are errors.\n"
+        }
+      }
+    ]
+  },
+  "bad-ignore-app-code-prettier": {
+    "expect": [
+      ".prettierignore:39 [ignore-app-code] the line components/ matches app files such as src/features/tasks/components/task-row.tsx, so format:check skips app code",
+      ".prettierignore:40 [ignore-app-code] the line /src/features/ reaches into the app path src, so format:check skips app code",
+      "check-configs: 5 config areas checked, 2 problems"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "lines": [
+            "// src/features/tasks/components/task-row.tsx: app code a slashless ignore line would hide.",
+            "export const TASK_ROW = 'task-row';"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": ".prettierignore",
+          "find": "\nhandbook/\n",
+          "with": "\nhandbook/\ncomponents/\n/src/features/\n"
+        }
+      }
+    ]
+  },
+  "bad-ignore-app-code-tsconfig": {
+    "expect": [
+      "tsconfig.json:25 [ignore-app-code] exclude lists \"src/features\", which reaches into the app path src, so npm run typecheck skips app code",
+      "tsconfig.json:26 [ignore-app-code] exclude lists \"plugins\", which is the app path plugins, so npm run typecheck skips app code",
+      "check-configs: 5 config areas checked, 2 problems"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "tsconfig.json",
+          "find": "    \"handbook\",\n",
+          "with": "    \"handbook\",\n    \"src/features\",\n    \"plugins\",\n"
+        }
+      }
+    ]
+  },
+  "bad-knip": {
+    "expect": [
+      "knip.json:1 [knip-config] rules.files is missing",
+      "[knip-config] rules.exports is \"warn\"; every knip rule is \"error\"",
+      ".knip.json [config-stray] .knip.json is a second knip config",
+      "knip.json:1 [knip-config] \"exclude\" filters the issue types knip reports",
+      "knip.json:1 [ignore-app-code] ignore lists 'src/**', which reaches into the app path src, so npm run check:unused skips app code",
+      "knip.json:1 [knip-config] project lacks \"test/**/*.{ts,tsx}\"",
+      "knip.json:1 [knip-config] entry adds \"src/features/**/*.ts\"; every export of an entry file counts as used"
+    ],
+    "ops": [
+      { "json": { "file": "knip.json", "path": ["rules", "exports"], "value": "warn" } },
+      { "json": { "file": "knip.json", "path": ["rules", "files"], "delete": true } },
+      { "write": { "file": ".knip.json", "content": "{ \"rules\": { \"exports\": \"off\" } }\n" } },
+      {
+        "$comment": "verified: with these keys npx knip exits 0 over a planted dead export",
+        "json": { "file": "knip.json", "path": ["exclude"], "value": ["exports", "types"] }
+      },
+      { "json": { "file": "knip.json", "path": ["ignore"], "value": ["src/**"] } },
+      { "json": { "file": "knip.json", "path": ["project"], "value": ["*.ts", "src/**/*.{ts,tsx}"] } },
+      { "json": { "file": "knip.json", "path": ["entry", 4], "value": "src/features/**/*.ts" } }
+    ]
+  },
+  "bad-monorepo": {
+    "expect": [
+      "apps/mobile/tsconfig.json:1 [tsconfig-program] sets compilerOptions.strict",
+      "apps/mobile/tsconfig.json:1 [tsconfig-world] an Expo app workspace lists [\"jest\",\"node\"]",
+      "apps/web/tsconfig.json [tsconfig-missing] apps/web/tsconfig.json does not exist (an Expo app workspace is its own program)",
+      "apps/mobile/eslint.config.mjs [config-stray] a workspace has its own eslint config"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["apps/*"] } },
+      {
+        "write": {
+          "file": "apps/mobile/package.json",
+          "content": "{\n  \"name\": \"@acme/mobile\",\n  \"private\": true,\n  \"dependencies\": {\n    \"expo\": \"~57.0.26\"\n  }\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/tsconfig.json",
+          "content": "{\n  \"extends\": \"../../tsconfig.base.json\",\n  \"compilerOptions\": {\n    \"types\": [\n      \"jest\"\n    ],\n    \"paths\": {\n      \"@/*\": [\n        \"./src/*\"\n      ]\n    }\n  },\n  \"include\": [\n    \"**/*.ts\",\n    \"**/*.tsx\"\n  ]\n}\n"
+        }
+      },
+      {
+        "json": { "file": "apps/mobile/tsconfig.json", "path": ["compilerOptions", "types"], "value": ["jest", "node"] }
+      },
+      { "json": { "file": "apps/mobile/tsconfig.json", "path": ["compilerOptions", "strict"], "value": false } },
+      { "write": { "file": "apps/mobile/eslint.config.mjs", "content": "export default [];\n" } },
+      {
+        "write": {
+          "file": "apps/web/package.json",
+          "content": "{\n  \"name\": \"@acme/web\",\n  \"private\": true,\n  \"dependencies\": {\n    \"expo\": \"~57.0.26\"\n  }\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-monorepo-native-ignore": {
+    "expect": [
+      "apps/mobile/android/, the native project prebuild generates for that Expo app workspace",
+      ".prettierignore:40 [ignore-app-code] the line apps/*/src/ reaches into the app path apps, so format:check skips app code",
+      ".prettierignore:41 [ignore-app-code] the line packages/*/ios/ reaches into the app path packages, so format:check skips app code",
+      "check-configs: 5 config areas checked, 3 problems"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["apps/*"] } },
+      {
+        "write": {
+          "file": "apps/mobile/package.json",
+          "content": "{\n  \"name\": \"@acme/mobile\",\n  \"private\": true,\n  \"dependencies\": {\n    \"expo\": \"~57.0.26\"\n  }\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/tsconfig.json",
+          "content": "{\n  \"extends\": \"../../tsconfig.base.json\",\n  \"compilerOptions\": {\n    \"types\": [\n      \"jest\"\n    ],\n    \"paths\": {\n      \"@/*\": [\n        \"./src/*\"\n      ]\n    }\n  },\n  \"include\": [\n    \"**/*.ts\",\n    \"**/*.tsx\"\n  ]\n}\n"
+        }
+      },
+      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["apps/*", "packages/*"] } },
+      {
+        "write": {
+          "file": "packages/native-kit/package.json",
+          "content": "{\n  \"name\": \"@acme/native-kit\",\n  \"private\": true,\n  \"devDependencies\": {\n    \"expo\": \"~57.0.26\"\n  }\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "packages/native-kit/tsconfig.json",
+          "content": "{\n  \"extends\": \"../../tsconfig.base.json\",\n  \"compilerOptions\": {\n    \"types\": [\n      \"jest\"\n    ],\n    \"paths\": {\n      \"@/*\": [\n        \"./src/*\"\n      ]\n    }\n  },\n  \"include\": [\n    \"**/*.ts\",\n    \"**/*.tsx\"\n  ]\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "packages/native-kit/expo-module.config.json",
+          "content": "{\n  \"platforms\": [\"apple\", \"android\"],\n  \"apple\": { \"modules\": [\"NativeKitModule\"] }\n}\n"
+        }
+      },
+      { "write": { "file": "packages/native-kit/src/index.ts", "content": "export const nativeKit = 'native-kit';\n" } },
+      { "write": { "file": "apps/mobile/src/app/index.tsx", "content": "export const route = 'index';\n" } },
+      {
+        "replace": {
+          "file": ".prettierignore",
+          "find": "\nhandbook/\n",
+          "with": "\nhandbook/\napps/*/ios/\napps/*/src/\npackages/*/ios/\n"
+        }
+      },
+      { "write": { "file": "packages/native-kit/ios/NativeKitModule.swift", "content": "import ExpoModulesCore\n" } }
+    ]
+  },
+  "bad-package": {
+    "expect": [
+      "package.json:1 [package-pin] eslint is \"10.0.0\", expected \"9.39.5\"",
+      "typescript is \"^7.0.0\"",
+      "globals is not in package.json",
+      "eslint-config-expo is \"~57.0.2\", expected \"57.0.2\"",
+      "[lint-script] script \"lint\" runs eslint without --max-warnings 0",
+      "script \"lint\" passes --quiet to eslint",
+      "[package-overrides] overrides do not hold 2 of 10 @typescript-eslint/* packages at 8.70.1 (@typescript-eslint/parser, @typescript-eslint/utils)",
+      "package.json:1 [lint-script] script \"lint:app\" passes --ignore-pattern to eslint",
+      "package.json:1 [lint-script] script \"lint:app\" lints src instead of .",
+      "package.json:1 [lint-script] script \"lint:ci\" swallows eslint's exit code (eslint ... || true)",
+      "package.json:1 [lint-script] script \"lint:report\" swallows eslint's exit code (eslint ... | tee reports/lint.txt)"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["devDependencies", "eslint"], "value": "10.0.0" } },
+      { "json": { "file": "package.json", "path": ["devDependencies", "typescript"], "value": "^7.0.0" } },
+      { "json": { "file": "package.json", "path": ["devDependencies", "globals"], "delete": true } },
+      { "json": { "file": "package.json", "path": ["devDependencies", "eslint-config-expo"], "value": "~57.0.2" } },
+      { "json": { "file": "package.json", "path": ["scripts", "lint"], "value": "eslint . --quiet" } },
+      { "json": { "file": "package.json", "path": ["overrides", "@typescript-eslint/utils"], "delete": true } },
+      { "json": { "file": "package.json", "path": ["overrides", "@typescript-eslint/parser"], "value": "8.71.0" } },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "lint:app"],
+          "value": "eslint src --max-warnings 0 --ignore-pattern src/legacy/**"
+        }
+      },
+      {
+        "$comment": "verified: the lint gate stays green whatever eslint reports",
+        "json": { "file": "package.json", "path": ["scripts", "lint:ci"], "value": "eslint . --max-warnings 0 || true" }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "lint:report"],
+          "value": "eslint . --max-warnings 0 | tee reports/lint.txt"
+        }
+      }
+    ]
+  },
+  "bad-prettier": {
+    "expect": [
+      ".prettierrc.json:1 [prettier-option] printWidth is 120, expected 100",
+      "[prettier-option] singleQuote is false, expected true",
+      "prettier.config.js [config-stray] prettier.config.js is a second prettier config",
+      "package.json:1 [config-stray] the \"prettier\" key is a second prettier config (Prettier reads package.json before .prettierrc.json)",
+      "package.json:1 [config-stray] the \"eslintConfig\" key is a second eslint config",
+      "src/features/.prettierrc.json:1 [config-stray] src/features/.prettierrc.json is a nested Prettier config",
+      "eslint.config.cts [config-stray] eslint.config.cts is a second eslint config"
+    ],
+    "ops": [
+      { "json": { "file": ".prettierrc.json", "path": ["printWidth"], "value": 120 } },
+      { "json": { "file": ".prettierrc.json", "path": ["singleQuote"], "value": false } },
+      { "write": { "file": "prettier.config.js", "content": "module.exports = { semi: false };\n" } },
+      {
+        "$comment": "verified: prettier --find-config-path returns package.json (Prettier 3.9.9 reads it before .prettierrc.json)",
+        "json": { "file": "package.json", "path": ["prettier"], "value": { "semi": false } }
+      },
+      { "json": { "file": "package.json", "path": ["eslintConfig"], "value": { "extends": "expo" } } },
+      {
+        "$comment": "verified: prettier --find-config-path returns the nested file for files below it",
+        "write": { "file": "src/features/.prettierrc.json", "content": "{ \"printWidth\": 140 }\n" }
+      },
+      { "write": { "file": "eslint.config.cts", "content": "export default [];\n" } }
+    ]
+  },
+  "bad-prettier-ignore": {
+    "expect": [
+      ".prettierignore:1 [prettier-ignore] .prettierignore lacks \"skills/\"",
+      "[prettier-ignore] .prettierignore lacks \".agents/\"",
+      "[prettier-ignore] .prettierignore still holds the __PRE_EXISTING__ placeholder",
+      "[ignore-pre-existing] the pre-existing folder handbook/ is not ignored",
+      "[ignore-pre-existing] the pre-existing file notes.md is not ignored"
+    ],
+    "ops": [
+      { "replace": { "file": ".prettierignore", "find": "\nskills/\n", "with": "\n" } },
+      { "replace": { "file": ".prettierignore", "find": "\n.agents/\n", "with": "\n" } },
+      { "replace": { "file": ".prettierignore", "find": "\nhandbook/\n", "with": "\n__PRE_EXISTING__\n" } },
+      { "write": { "file": "notes.md", "content": "# Notes\n\nkept   by hand\n" } }
+    ]
+  },
+  "bad-prettier-ignore-native-unanchored": {
+    "expect": [
+      ".prettierignore:1 [prettier-ignore] .prettierignore lacks \"/ios/\"",
+      ".prettierignore:5 [ignore-app-code] the line ios/ matches app files such as scripts/ios/toolchain.ts, so format:check skips app code",
+      "check-configs: 5 config areas checked, 2 problems"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/ios/toolchain.ts",
+          "lines": [
+            "// scripts/ios/toolchain.ts: repo tooling under a folder named ios/, which only the root /ios/ line may skip.",
+            "export const XCODE_MAJOR = 26;"
+          ]
+        }
+      },
+      { "replace": { "file": ".prettierignore", "find": "\n/ios/\n", "with": "\nios/\n" } }
+    ]
+  },
+  "bad-tsconfig-alias": {
+    "expect": [
+      "src/tsconfig.json:1 [tsconfig-alias] @/* resolves to [\"src/features/*\"] here but to [\"src/*\"] in tsconfig.json",
+      "src/tsconfig.json:1 [tsconfig-alias] the root program maps @test/* but the app program does not"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "src/tsconfig.json",
+          "path": ["compilerOptions", "paths"],
+          "value": { "@/*": ["./features/*"] }
+        }
+      }
+    ]
+  },
+  "bad-tsconfig-base": {
+    "expect": [
+      "tsconfig.base.json:1 [tsconfig-base-option] compilerOptions.strict is false, expected true",
+      "[tsconfig-base-option] compilerOptions.noUncheckedIndexedAccess is undefined, expected true",
+      "[tsconfig-base-option] compilerOptions.noUnusedLocals is true",
+      "tsconfig.base.json:1 [tsconfig-base-option] compilerOptions.noImplicitAny is false, which turns off part of \"strict\" for every program",
+      "tsconfig.base.json:1 [tsconfig-base-option] compilerOptions.strictFunctionTypes is false, which turns off part of \"strict\"",
+      "tsconfig.base.json:1 [tsconfig-base-option] compilerOptions.allowJs is not in the canonical set",
+      "tsconfig.base.json:1 [tsconfig-base-option] sets the top-level key \"exclude\", which every program that does not set its own inherits"
+    ],
+    "ops": [
+      { "json": { "file": "tsconfig.base.json", "path": ["compilerOptions", "strict"], "value": false } },
+      {
+        "json": {
+          "file": "tsconfig.base.json",
+          "path": ["compilerOptions", "noUncheckedIndexedAccess"],
+          "delete": true
+        }
+      },
+      { "json": { "file": "tsconfig.base.json", "path": ["compilerOptions", "noUnusedLocals"], "value": true } },
+      { "json": { "file": "tsconfig.base.json", "path": ["compilerOptions", "noImplicitAny"], "value": false } },
+      { "json": { "file": "tsconfig.base.json", "path": ["compilerOptions", "strictFunctionTypes"], "value": false } },
+      { "json": { "file": "tsconfig.base.json", "path": ["compilerOptions", "allowJs"], "value": true } },
+      {
+        "$comment": "verified: with Buffer.from() planted in an unimported src/features file, tsc -p src/tsconfig.json exits 0",
+        "json": { "file": "tsconfig.base.json", "path": ["exclude"], "value": ["${configDir}/features"] }
+      }
+    ]
+  },
+  "bad-tsconfig-expo-env": {
+    "expect": [
+      "tsconfig.json:1 [tsconfig-expo-env] exclude lacks \"expo-env.d.ts\"",
+      "tsconfig.json:1 [tsconfig-world] exclude lacks \"src/app-env.d.ts\"",
+      "TS2339 on process.exitCode",
+      "src/tsconfig.json:1 [tsconfig-expo-env] include lists \"../expo-env.d.ts\" without excluding it"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "tsconfig.json",
+          "path": ["exclude"],
+          "value": [
+            "node_modules",
+            "ios",
+            "android",
+            "build",
+            "dist",
+            "web-build",
+            "coverage",
+            "reports",
+            ".stryker-tmp",
+            ".skill-tooling",
+            "skills"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "src/tsconfig.json",
+          "path": ["include"],
+          "value": ["**/*", "../.expo/types/**/*.ts", "../expo-env.d.ts"]
+        }
+      }
+    ]
+  },
+  "bad-tsconfig-missing": {
+    "expect": [
+      "src/tsconfig.json [tsconfig-missing] src/tsconfig.json does not exist",
+      "src/app-env.d.ts:1 [app-env] does not exist"
+    ],
+    "ops": [{ "delete": ["src/tsconfig.json", "src/app-env.d.ts"] }]
+  },
+  "bad-tsconfig-pre-existing": {
+    "expect": [
+      "tsconfig.json:1 [ignore-pre-existing] the pre-existing folder research/ holds .ts/.tsx files but is not in the root tsconfig.json \"exclude\", so npm run typecheck would type-check it under the strict set Fix: research/ holds code. When the app imports it, move it under src/ (or declare \"research\" in rn-skills.config.json \"layoutEntries\") so it stays linted, formatted and type-checked; only when it is not app code, add \"research\" to \"exclude\" in tsconfig.json (next to \"skills\")",
+      "tsconfig.json:1 [ignore-pre-existing] the pre-existing file legacy-build.ts is not in the root tsconfig.json \"exclude\"",
+      "Fix: When the app uses it (a tool config or code), declare \"legacy-build.ts\" in rn-skills.config.json \"layoutEntries\" so it stays linted and formatted; otherwise add \"legacy-build.ts\" to \"exclude\" in tsconfig.json",
+      "check-configs: 5 config areas checked, 2 problems"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "research/tools/old-script.ts",
+          "content": "// research/tools/old-script.ts: a pre-existing tool, ignored by ESLint and Prettier but not by tsc.\nexport const total = (values: number[]) => values.reduce((sum, value) => sum + value);\n"
+        }
+      },
+      {
+        "write": {
+          "file": "legacy-build.ts",
+          "content": "// legacy-build.ts: a pre-existing top-level script.\nexport const steps = ['clean', 'bundle'];\n"
+        }
+      },
+      {
+        "replace": {
+          "file": ".prettierignore",
+          "find": "\nhandbook/\n",
+          "with": "\nhandbook/\nresearch/\nlegacy-build.ts\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "const PRE_EXISTING = ['handbook/**'];",
+          "with": "const PRE_EXISTING = ['handbook/**', 'research/**', 'legacy-build.ts'];"
+        }
+      }
+    ]
+  },
+  "bad-tsconfig-program": {
+    "expect": [
+      "src/tsconfig.json:1 [tsconfig-program] extends is \"../tsconfig.json\", expected \"../tsconfig.base.json\"",
+      "src/tsconfig.json:1 [tsconfig-program] sets compilerOptions.skipLibCheck",
+      "src/tsconfig.json:1 [tsconfig-world] compilerOptions.types is [\"jest\",\"node\"], expected [\"jest\"]",
+      "tsconfig.json:1 [tsconfig-world] compilerOptions.lib is [\"ESNext\"]",
+      "src/tsconfig.json:1 [tsconfig-world] exclude lists \"features/legacy\"; excluding a folder from the app program drops the no-Node-types guarantee"
+    ],
+    "ops": [
+      { "json": { "file": "src/tsconfig.json", "path": ["extends"], "value": "../tsconfig.json" } },
+      { "json": { "file": "src/tsconfig.json", "path": ["compilerOptions", "skipLibCheck"], "value": true } },
+      { "json": { "file": "src/tsconfig.json", "path": ["compilerOptions", "types"], "value": ["jest", "node"] } },
+      { "json": { "file": "tsconfig.json", "path": ["compilerOptions", "lib"], "value": ["ESNext"] } },
+      { "json": { "file": "src/tsconfig.json", "path": ["exclude"], "value": ["features/legacy"] } }
+    ]
+  },
+  "bad-tsconfig-typed-routes": {
+    "expect": [
+      "src/tsconfig.json:1 [tsconfig-world] include lacks \"../.expo/types/**/*.ts\"",
+      "typed routes are a global augmentation nothing imports",
+      "src/tsconfig.json:1 [tsconfig-world] include \"../scripts/**/*.ts\" pulls Node-world files into the app program"
+    ],
+    "ops": [{ "json": { "file": "src/tsconfig.json", "path": ["include"], "value": ["**/*", "../scripts/**/*.ts"] } }]
+  },
+  "error-bad-area": {
+    "expect": ["ERROR [bad-input] --only lint is not an area"],
+    "args": "{dir} --only lint",
+    "ops": []
+  },
+  "error-no-package": {
+    "expect": ["ERROR [bad-input] nothing to check:", "has no package.json"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "pass-expo-repo-files": {
+    "expect": ["check-configs: 5 config areas checked, 0 problems"],
+    "ops": [
+      { "write": { "file": "store.config.json", "content": "{ \"configVersion\": 0, \"apple\": { \"info\": {} } }\n" } },
+      { "write": { "file": "google-services.json", "content": "{ \"project_info\": {} }\n" } },
+      {
+        "write": {
+          "file": "react-native.config.js",
+          "content": "// react-native.config.js: autolinking settings the app uses.\nmodule.exports = { dependencies: {} };\n"
+        }
+      },
+      { "write": { "file": "patches/expo-router+57.0.24.patch", "content": "diff --git a/x b/x\n" } },
+      { "write": { "file": "CONTRIBUTING.md", "content": "# Contributing\n" } },
+      {
+        "write": {
+          "file": "global.d.ts",
+          "content": "// global.d.ts: an ambient declaration the root program reads.\nexport {};\n"
+        }
+      },
+      { "write": { "file": "pnpm-lock.yaml", "content": "lockfileVersion: '9.0'\n" } },
+      {
+        "write": {
+          "file": "modules/task-widget/index.ts",
+          "content": "// modules/task-widget/index.ts: a local Expo module (npx create-expo-module --local).\nexport const TASK_WIDGET_MODULE = 'TaskWidget';\n"
+        }
+      }
+    ]
+  },
+  "pass-monorepo": {
+    "expect": ["check-configs: 5 config areas checked, 0 problems"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["apps/*"] } },
+      {
+        "write": {
+          "file": "apps/mobile/package.json",
+          "content": "{\n  \"name\": \"@acme/mobile\",\n  \"private\": true,\n  \"dependencies\": {\n    \"expo\": \"~57.0.26\"\n  }\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/tsconfig.json",
+          "content": "{\n  \"extends\": \"../../tsconfig.base.json\",\n  \"compilerOptions\": {\n    \"types\": [\n      \"jest\"\n    ],\n    \"paths\": {\n      \"@/*\": [\n        \"./src/*\"\n      ]\n    }\n  },\n  \"include\": [\n    \"**/*.ts\",\n    \"**/*.tsx\"\n  ]\n}\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "const NETWORK_CODE = ['src/api/**/*.ts'];",
+          "with": "const NETWORK_CODE = ['apps/*/src/api/**/*.ts'];"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "const URL_CODE = ['src/config/**/*.ts'];",
+          "with": "const URL_CODE = ['apps/*/src/config/**/*.ts'];"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  'src/services/*/*-adapter{,.ios,.android,.native,.web}.{ts,tsx}',\n",
+          "with": "  'apps/*/src/services/*/*-adapter{,.ios,.android,.native,.web}.{ts,tsx}',\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "const RUNTIME = ['src/**/*.{ts,tsx}'];",
+          "with": "const RUNTIME = ['apps/*/src/**/*.{ts,tsx}'];"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "    files: ['src/ui/**/*.{ts,tsx}'],\n",
+          "with": "    files: ['apps/*/src/ui/**/*.{ts,tsx}'],\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "        typescript: { project: ['tsconfig.json', 'src/tsconfig.json'] },\n",
+          "with": "        typescript: { project: ['tsconfig.json', 'apps/mobile/tsconfig.json'] },\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "          zones: [\n",
+          "with": "          zones: [\n            {\n              target: './apps/mobile/src/**/*',\n              from: './apps/web',\n              message: 'Apps never import each other.',\n            },\n"
+        }
+      },
+      {
+        "replace": {
+          "file": ".prettierignore",
+          "find": "\nhandbook/\n",
+          "with": "\nhandbook/\napps/*/ios/\napps/*/android/\n"
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/ios/Harness/Images.xcassets/Contents.json",
+          "content": "{\n  \"info\" : {\n    \"version\" : 1,\n    \"author\" : \"xcode\"\n  }\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-only-eslint": {
+    "expect": ["check-configs: 1 config areas checked, 0 problems"],
+    "args": "{dir} --only eslint",
+    "ops": [{ "json": { "file": "tsconfig.base.json", "path": ["compilerOptions", "strict"], "value": false } }]
+  }
+}

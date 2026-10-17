@@ -1,0 +1,20 @@
+{
+  "feedback.failure.unknown": "حدث خطأ ما. حاول مرة أخرى.",
+  "feedback.notice.dismiss": "إغلاق",
+  "feedback.offline.none": "أنت غير متصل. تتم مزامنة التغييرات عند عودة الاتصال.",
+  "feedback.offline.unvalidated": "أنت متصل، لكن قد لا يكون الإنترنت متاحًا.",
+  "feedback.undo": "تراجع",
+  "feedback.updating": "جارٍ التحديث…",
+  "tasks.notice.offline": "أنت غير متصل. قد لا تكون هذه المهام محدّثة.",
+  "tasks.state.empty.action": "أضف مهمة",
+  "tasks.state.empty.body": "أضف أول شيء تريد إنجازه.",
+  "tasks.state.empty.title": "لا توجد مهام بعد",
+  "tasks.state.failed.action": "حاول مرة أخرى",
+  "tasks.state.failed.title": "تعذّر تحميل مهامك",
+  "tasks.state.filtered-empty.action": "اعرض كل المهام",
+  "tasks.state.filtered-empty.body": "لا توجد مهمة تطابق هذا الفلتر.",
+  "tasks.state.filtered-empty.title": "لا نتائج مطابقة",
+  "tasks.state.loading.label": "جارٍ تحميل المهام",
+  "tasks.state.offline.body": "تُحمَّل مهامك تلقائيًا عند عودة الاتصال.",
+  "tasks.state.offline.title": "أنت غير متصل"
+}

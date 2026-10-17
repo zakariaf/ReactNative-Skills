@@ -1,0 +1,10 @@
+{
+  "base": [
+    {
+      "templates": true,
+      "firstLinePath": true
+    },
+    "@tests/bases/app"
+  ],
+  "extends": "good"
+}

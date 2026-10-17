@@ -1,0 +1,1178 @@
+{
+  "bad-allow-scripts-range": {
+    "expect": [
+      "[install-scripts] allowScripts key \"lefthook@^2.1.0\" is a form this check cannot evaluate",
+      "npm never matches a range or a tag"
+    ],
+    "ops": [{ "json": { "file": "package.json", "path": ["allowScripts"], "value": { "lefthook@^2.1.0": true } } }]
+  },
+  "bad-allow-scripts-string-value": {
+    "expect": [
+      "[install-scripts] allowScripts \"lefthook@2.1.14\" is \"true\"; npm counts only true (approve) and false (deny)",
+      "[install-scripts] lefthook@2.1.14 has an install script that allowScripts does not cover"
+    ],
+    "ops": [
+      {
+        "json": { "file": "package.json", "path": ["allowScripts"], "value": { "lefthook@2.1.14": "true" } },
+        "$comment": "npm counts only the booleans true and false; a string leaves the package unreviewed."
+      }
+    ]
+  },
+  "bad-banned-app": {
+    "expect": [
+      "[banned] @react-native-community/netinfo is in the lockfile",
+      "the app reads connectivity through expo-network only"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/dependency-policy.json",
+          "path": ["banned", 7],
+          "value": {
+            "pattern": "^@react-native-community/netinfo$",
+            "scope": "anywhere",
+            "reason": "the app reads connectivity through expo-network only",
+            "source": "app"
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/some-lib/node_modules/@react-native-community/netinfo"],
+          "value": { "version": "12.0.1", "license": "MIT" }
+        }
+      }
+    ]
+  },
+  "bad-banned-transitive": {
+    "expect": ["[banned] node-ipc is in the lockfile (node_modules/some-tool/node_modules/node-ipc)", "protestware"],
+    "ops": [
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/some-tool/node_modules/node-ipc"],
+          "value": { "version": "12.0.0", "license": "MIT" }
+        }
+      }
+    ]
+  },
+  "bad-caret-pin": {
+    "expect": ["[pin-exact] typescript is \"^6.0.3\", not an exact version", "npm install typescript@6.0.3 -D"],
+    "ops": [{ "json": { "file": "package.json", "path": ["devDependencies", "typescript"], "value": "^6.0.3" } }]
+  },
+  "bad-deprecated": {
+    "expect": [
+      "[deprecated] zustand@5.0.15 is deprecated on npm: \"Planted: this release is deprecated",
+      "\"deprecated\": \"<why it stays and until when>\""
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/zustand", "deprecated"],
+          "value": "Planted: this release is deprecated, upgrade to the next one"
+        }
+      }
+    ]
+  },
+  "bad-direct-http-client": {
+    "expect": ["[banned] request is banned: deprecated and unmaintained", "Instead: the built-in fetch"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "request"], "value": "2.88.2" } },
+      {
+        "json": { "file": "package-lock.json", "path": ["packages", "", "dependencies", "request"], "value": "2.88.2" }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/request"],
+          "value": { "version": "2.88.2", "license": "Apache-2.0" }
+        }
+      }
+    ]
+  },
+  "bad-do-not-add": {
+    "expect": ["[do-not-add] babel-preset-expo: comes with expo"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["devDependencies", "babel-preset-expo"], "value": "57.0.13" } },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "", "devDependencies", "babel-preset-expo"],
+          "value": "57.0.13"
+        }
+      }
+    ]
+  },
+  "bad-duplicate-native": {
+    "expect": ["[one-version] expo-haptics is installed as 57.0.3, 57.0.9", "the policy pins 57.0.3"],
+    "ops": [
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/expo-haptics"],
+          "value": { "version": "57.0.9", "license": "MIT" }
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/some-lib/node_modules/expo-haptics"],
+          "value": { "version": "57.0.3", "license": "MIT" }
+        }
+      }
+    ]
+  },
+  "bad-eas-cli-dev-dependency": {
+    "expect": [
+      "[do-not-add] eas-cli: EAS CLI is a global tool: expo-doctor fails a project that installs it",
+      "Remove it: npm uninstall eas-cli."
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["devDependencies", "eas-cli"], "value": "24.10.0" } },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "", "devDependencies", "eas-cli"],
+          "value": "24.10.0"
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/eas-cli"],
+          "value": { "version": "24.10.0", "dev": true, "license": "MIT", "bin": { "eas": "bin/run" } }
+        }
+      }
+    ]
+  },
+  "bad-eas-env": {
+    "expect": [
+      "eas.json:9 [npm-env] build.production.env sets NPM_CONFIG_LEGACY_PEER_DEPS: legacy-peer-deps=true: npm then ignores peerDependencies",
+      "an NPM_CONFIG_* variable beats the project .npmrc in the install EAS Build runs (npm ci, or npm install under EAS_NO_FROZEN_LOCKFILE)",
+      "Delete NPM_CONFIG_LEGACY_PEER_DEPS; on ERESOLVE go back to the policy row."
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "eas.json",
+          "lines": [
+            "{",
+            "  // EAS reads eas.json with comments; so does the check.",
+            "  \"cli\": { \"version\": \">= 16.0.0\", \"appVersionSource\": \"remote\" },",
+            "  \"build\": {",
+            "    \"base\": { \"node\": \"26.4.0\", \"env\": { \"EXPO_NO_TELEMETRY\": \"1\" } },",
+            "    \"development\": { \"extends\": \"base\", \"developmentClient\": true, \"distribution\": \"internal\" },",
+            "    \"production\": {",
+            "      \"extends\": \"base\",",
+            "      \"env\": { \"APP_VARIANT\": \"production\", \"NPM_CONFIG_LEGACY_PEER_DEPS\": \"true\" }",
+            "    }",
+            "  }",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-eas-env-allow-scripts": {
+    "expect": [
+      "eas.json:7 [npm-env] build.base.env sets NPM_CONFIG_ALLOW_SCRIPTS: allow-scripts=dtrace-provider@0.8.8,protobufjs@7.6.6: approvals belong in the root package.json allowScripts",
+      "npm 11.17 refuses this key from a variable or the command line for any install inside the project (EALLOWSCRIPTS)",
+      "Delete NPM_CONFIG_ALLOW_SCRIPTS (with it npm ci itself stops with EALLOWSCRIPTS)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "eas.json",
+          "lines": [
+            "{",
+            "  \"cli\": { \"version\": \">= 16.0.0\", \"appVersionSource\": \"remote\" },",
+            "  \"build\": {",
+            "    \"base\": {",
+            "      \"node\": \"26.4.0\",",
+            "      \"env\": {",
+            "        \"NPM_CONFIG_ALLOW_SCRIPTS\": \"dtrace-provider@0.8.8,protobufjs@7.6.6\"",
+            "      }",
+            "    },",
+            "    \"production\": { \"extends\": \"base\" }",
+            "  }",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-eas-env-exclude": {
+    "expect": [
+      "eas.json:5 [npm-env] build.preview.env sets npm_config_min_release_age_exclude: min-release-age-exclude=expo-* replaces every dated exclude block of the project .npmrc with an undated list that never expires",
+      "a needed young release goes into a dated exclude block of the project .npmrc"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "eas.json",
+          "lines": [
+            "{",
+            "  \"build\": {",
+            "    \"preview\": {",
+            "      \"distribution\": \"internal\",",
+            "      \"env\": { \"APP_VARIANT\": \"preview\", \"npm_config_min_release_age_exclude\": \"expo-*\" }",
+            "    }",
+            "  }",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-eas-no-frozen-lockfile": {
+    "expect": [
+      "eas.json:9 [npm-env] build.preview.env sets EAS_NO_FROZEN_LOCKFILE=1: EAS Build then installs with npm install instead of npm ci",
+      "Delete EAS_NO_FROZEN_LOCKFILE.",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "eas.json",
+          "lines": [
+            "{",
+            "  \"cli\": { \"version\": \">= 16.0.0\", \"appVersionSource\": \"remote\" },",
+            "  \"build\": {",
+            "    \"base\": { \"node\": \"26.4.0\", \"env\": { \"EXPO_NO_TELEMETRY\": \"1\" } },",
+            "    \"development\": { \"extends\": \"base\", \"developmentClient\": true, \"distribution\": \"internal\" },",
+            "    \"preview\": {",
+            "      \"extends\": \"base\",",
+            "      \"distribution\": \"internal\",",
+            "      \"env\": { \"APP_VARIANT\": \"preview\", \"EAS_NO_FROZEN_LOCKFILE\": \"1\" }",
+            "    }",
+            "  }",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-engines-missing": {
+    "expect": [
+      "package.json:1 [engines] has no \"engines.npm\", so engine-strict=true lets any npm run the install",
+      "[engines] has no \"engines.node\"",
+      "Set \"engines\": { \"npm\": \">=11.17.0\" } in the root package.json"
+    ],
+    "ops": [{ "json": { "file": "package.json", "path": ["engines"], "delete": true } }]
+  },
+  "bad-engines-npm-range": {
+    "expect": ["package.json:8 [engines] \"engines.npm\" is \">=10\", which admits npm below 11.17.0"],
+    "ops": [{ "json": { "file": "package.json", "path": ["engines", "npm"], "value": ">=10" } }]
+  },
+  "bad-exclude-block-outlives": {
+    "expect": [
+      ".npmrc:26 [npmrc-exclude] exclude block expires 2099-12-31, after 2026-10-10 (today + the 7-day release age): a block can never outlive its release by more than the release age; it was extended or invented",
+      "Set expires= to the publish date of the youngest release it covers + 7 days"
+    ],
+    "ops": [{ "replace": { "file": ".npmrc", "find": "expires=2026-10-10", "with": "expires=2099-12-31" } }]
+  },
+  "bad-exclude-catch-all": {
+    "expect": [
+      ".npmrc:32 [npmrc-exclude] exclude * matches every package, so it switches the release age off for the whole tree",
+      "Name the exact packages the needed release brings"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".npmrc",
+          "find": "min-release-age-exclude[]=@expo/*\n",
+          "with": "min-release-age-exclude[]=@expo/*\n\n# exclude-block expires=2026-10-09 reason=urgent fix\nmin-release-age-exclude[]=*\n"
+        }
+      }
+    ]
+  },
+  "bad-exclude-catch-all-comma": {
+    "expect": [
+      ".npmrc:28 [npmrc-exclude] exclude @*/* matches every scoped package, so it switches the release age off"
+    ],
+    "ops": [
+      {
+        "op": "replace",
+        "file": ".npmrc",
+        "find": "min-release-age-exclude[]=expo-*\n",
+        "with": "min-release-age-exclude[]=expo-*,@*/*\n",
+        "$comment": "npm splits one exclude value on commas: the second pattern is a catch-all for every scoped package."
+      }
+    ]
+  },
+  "bad-exclude-spelling": {
+    "expect": [".npmrc:9 [npmrc-exclude] exclude knip is not inside a dated exclude block"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".npmrc",
+          "find": "save-exact=true\n",
+          "with": "save-exact=true\nmin-release-age-exclude = knip\n"
+        }
+      }
+    ]
+  },
+  "bad-expired-block": {
+    "expect": [
+      ".npmrc:27 [npmrc-exclude] exclude expo sits in a block that expired on 2026-09-20",
+      "Delete the whole block (never extend it)"
+    ],
+    "ops": [{ "replace": { "file": ".npmrc", "find": "expires=2026-10-10", "with": "expires=2026-09-20" } }]
+  },
+  "bad-expo-caret": {
+    "expect": [
+      "[expo-spec] expo-constants is \"^57.0.21\", not \"~57.0.21\", the specifier of this SDK's module map",
+      "Run npx expo install expo-constants@~57.0.21"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-constants"], "value": "^57.0.21" } },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "", "dependencies", "expo-constants"],
+          "value": "^57.0.21"
+        }
+      }
+    ]
+  },
+  "bad-expo-same-day-patch": {
+    "expect": [
+      "[expo-spec] expo-haptics is \"~57.0.4\", not \"~57.0.3\"",
+      "Run npx expo install expo-haptics@~57.0.3 and keep what it writes",
+      "a plain npx expo install writes what Expo's online versions list names today, which can be a patch published that day",
+      "WARN with its due date in scripts/deps/check-deps.ts",
+      "[table-version] expo-haptics is \"~57.0.4\" but the policy pins \"~57.0.3\""
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-haptics"], "value": "~57.0.4" } },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "", "dependencies", "expo-haptics"],
+          "value": "~57.0.4"
+        }
+      }
+    ]
+  },
+  "bad-expo-spec": {
+    "expect": [
+      "[expo-spec] expo-haptics is \"57.0.3\", not \"~57.0.3\", the specifier of this SDK's module map",
+      "npx expo install expo-haptics@~57.0.3"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-haptics"], "value": "57.0.3" } },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "", "dependencies", "expo-haptics"],
+          "value": "57.0.3"
+        }
+      }
+    ]
+  },
+  "bad-held-back": {
+    "expect": [
+      "[held-back] eslint 10.0.0 is past a held-back major",
+      "eslint-config-expo ships an eslint-plugin-react that supports ESLint 10"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["devDependencies", "eslint"], "value": "10.0.0" } },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "", "devDependencies", "eslint"],
+          "value": "10.0.0"
+        }
+      }
+    ]
+  },
+  "bad-jest-image-snapshot-types-missing": {
+    "expect": [
+      "[companion] jest-image-snapshot 6.5.2 is installed but its companion @types/jest-image-snapshot 6.4.2 is not",
+      "TS7016"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["devDependencies", "jest-image-snapshot"], "value": "6.5.2" } },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "", "devDependencies", "jest-image-snapshot"],
+          "value": "6.5.2"
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/jest-image-snapshot"],
+          "value": { "version": "6.5.2", "dev": true, "license": "Apache-2.0" }
+        }
+      }
+    ]
+  },
+  "bad-license-exception": {
+    "expect": ["[license-exceptions] licenses.exceptions.caniuse-lite needs an exact \"license\" and a real \"reason\""],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/dependency-policy.json",
+          "path": ["licenses", "exceptions", "caniuse-lite", "reason"],
+          "value": ""
+        }
+      }
+    ]
+  },
+  "bad-missing-eslint-override": {
+    "expect": [
+      "[companion] overrides.@typescript-eslint/utils is missing; typescript-eslint 8.70.1 needs it pinned at 8.70.1"
+    ],
+    "ops": [{ "json": { "file": "package.json", "path": ["overrides", "@typescript-eslint/utils"], "delete": true } }]
+  },
+  "bad-nested-typescript-eslint": {
+    "expect": [
+      "[one-version] @typescript-eslint/eslint-plugin is installed as 8.70.1, 8.71.0",
+      "typescript-eslint needs @typescript-eslint/eslint-plugin 8.70.1"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/@typescript-eslint/eslint-plugin"],
+          "value": { "version": "8.71.0", "dev": true, "license": "MIT" }
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/typescript-eslint/node_modules/@typescript-eslint/eslint-plugin"],
+          "value": { "version": "8.70.1", "dev": true, "license": "MIT" }
+        }
+      }
+    ]
+  },
+  "bad-no-lockfile": {
+    "expect": ["package-lock.json [lockfile-missing] is missing"],
+    "ops": [{ "delete": "package-lock.json" }]
+  },
+  "bad-not-in-table": {
+    "expect": ["[not-in-table] left-pad is not in the dependency policy"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "left-pad"], "value": "1.3.0" } },
+      {
+        "json": { "file": "package-lock.json", "path": ["packages", "", "dependencies", "left-pad"], "value": "1.3.0" }
+      }
+    ]
+  },
+  "bad-npmrc-allow-all-scripts": {
+    "expect": [
+      ".npmrc:13 [npmrc-policy] sets dangerously-allow-all-scripts: npm then runs every install script, approved or not"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".npmrc",
+          "find": "strict-allow-scripts=true\n",
+          "with": "strict-allow-scripts=true\ndangerously-allow-all-scripts=true\n"
+        }
+      }
+    ]
+  },
+  "bad-npmrc-allow-scripts": {
+    "expect": [
+      ".npmrc:13 [npmrc-policy] sets allow-scripts=lefthook,unrs-resolver: approvals belong in the root package.json allowScripts"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".npmrc",
+          "find": "strict-allow-scripts=true\n",
+          "with": "strict-allow-scripts=true\nallow-scripts=lefthook,unrs-resolver\n"
+        }
+      }
+    ]
+  },
+  "bad-npmrc-before": {
+    "expect": [
+      ".npmrc:5 [npmrc-policy] sets before=2099-12-31: a before date replaces min-release-age (npm uses before and drops the age)",
+      "A needed young release goes into a dated exclude block."
+    ],
+    "ops": [
+      {
+        "replace": { "file": ".npmrc", "find": "min-release-age=7\n", "with": "min-release-age=7\nbefore=2099-12-31\n" }
+      }
+    ]
+  },
+  "bad-npmrc-force-bare": {
+    "expect": [".npmrc:9 [npmrc-policy] sets force: npm then overrides conflicts and protections"],
+    "ops": [
+      {
+        "op": "replace",
+        "file": ".npmrc",
+        "find": "save-exact=true\n",
+        "with": "save-exact=true\nforce\n",
+        "$comment": "A bare key with no = is true to npm (ini)."
+      }
+    ]
+  },
+  "bad-npmrc-inline-comment": {
+    "expect": [
+      ".npmrc:20 [npmrc-policy] sets force: npm then overrides conflicts and protections",
+      ".npmrc:21 [npmrc-policy] sets strict-allow-scripts=false, outside the policy (strict-allow-scripts=true)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".npmrc",
+          "find": "package-lock=true\n",
+          "with": "package-lock=true\nforce # only until the peer conflict is fixed\nstrict-allow-scripts=false ; temporary\n"
+        },
+        "$comment": "npm (ini 6) cuts a value at an unescaped # or ;, so both lines are read: force is true and strict-allow-scripts false (the last value of a key wins)."
+      }
+    ]
+  },
+  "bad-npmrc-legacy-peer-deps": {
+    "expect": [
+      ".npmrc:16 [npmrc-policy] sets legacy-peer-deps: npm then ignores peerDependencies",
+      "Delete the line. On ERESOLVE, go back to the policy row"
+    ],
+    "ops": [
+      {
+        "replace": { "file": ".npmrc", "find": "legacy-peer-deps=false\n", "with": "legacy-peer-deps=true\n" },
+        "$comment": "The usual answer to ERESOLVE, flipped in the line the template writes out."
+      }
+    ]
+  },
+  "bad-npmrc-package-lock-false": {
+    "expect": [
+      ".npmrc:19 [npmrc-policy] sets package-lock=false: npm install (what developers run, and EAS Build under EAS_NO_FROZEN_LOCKFILE) then ignores package-lock.json and stops writing it",
+      "Commit package-lock.json and keep package-lock=true"
+    ],
+    "ops": [
+      {
+        "replace": { "file": ".npmrc", "find": "package-lock=true\n", "with": "package-lock=false\n" },
+        "$comment": "Libraries often ship this line; npm install then ignores and stops writing package-lock.json."
+      }
+    ]
+  },
+  "bad-npx-banned": {
+    "expect": [
+      "lefthook.yml:6 [npx-install] \"npx expo-cli doctor\" makes npx install expo-cli, which is banned: deprecated"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "lefthook.yml",
+          "lines": [
+            "# lefthook.yml",
+            "pre-push:",
+            "  commands:",
+            "    doctor:",
+            "      # run: npx expo-cli doctor   (a comment: not read)",
+            "      run: npx expo-cli doctor"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-npx-do-not-add": {
+    "expect": [
+      "package.json:13 [npx-install] \"npx -p sentry-expo sentry-expo-upload-sourcemaps dist\" makes npx install sentry-expo, a package the policy keeps out of the repo (doNotAdd)",
+      "Follow the policy's reason for sentry-expo instead of npx: superseded by @sentry/react-native"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "upload:sourcemaps"],
+          "value": "npx -p sentry-expo sentry-expo-upload-sourcemaps dist"
+        }
+      }
+    ]
+  },
+  "bad-npx-eas-bin": {
+    "expect": [
+      "package.json:13 [npx-install] \"npm run -s check:unused && npx eas build --platform ios\" makes npx install npm's \"eas\" package, an unrelated templating library, not EAS CLI"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "build:ios"],
+          "value": "npm run -s check:unused && npx eas build --platform ios"
+        }
+      }
+    ]
+  },
+  "bad-npx-eas-cli": {
+    "expect": [
+      ".github/workflows/release.yml:10 [npx-install] \"npx -y eas-cli@latest build --platform all --non-interactive\" makes npx install eas-cli into its own cache, where the project .npmrc applies (the release age, strict-allow-scripts) but the root package.json allowScripts and the lockfile do not: EAS CLI's tree holds install scripts",
+      "stops with ESTRICTALLOWSCRIPTS on a fresh runner while a warm npx cache hides it",
+      "Install EAS CLI globally instead: npm install -g --min-release-age=7 --ignore-scripts eas-cli@<x.y.z>"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": ".github/workflows/release.yml",
+          "lines": [
+            "name: release",
+            "on: workflow_dispatch",
+            "jobs:",
+            "  build:",
+            "    runs-on: ubuntu-24.04",
+            "    steps:",
+            "      - uses: actions/checkout@v5",
+            "      - name: Build with npx eas-cli (a step name, not a command)",
+            "      - run: npm ci",
+            "      - run: npx -y eas-cli@latest build --platform all --non-interactive"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-offline-only-analytics": {
+    "expect": [
+      "[banned] posthog-react-native is in the lockfile (node_modules/some-sdk/node_modules/posthog-react-native)",
+      "offline-only: product analytics"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/dependency-policy.json", "path": ["profiles"], "value": ["offline-only"] } },
+      {
+        "json": {
+          "file": "contracts/dependency-policy.json",
+          "path": ["banned"],
+          "value": [
+            {
+              "pattern": "^flatmap-stream$",
+              "scope": "anywhere",
+              "reason": "the malicious payload of the 2018 event-stream compromise; npm replaced it with a security placeholder, so a copy means a stale or poisoned lockfile",
+              "useInstead": "regenerate the lockfile from a clean tree",
+              "source": "supply-chain"
+            },
+            {
+              "pattern": "^(node-ipc|peacenotwar)$",
+              "scope": "anywhere",
+              "reason": "protestware: node-ipc 10.1.1 to 10.1.3 overwrote files on some machines and later releases pull peacenotwar, which writes files to the desktop",
+              "useInstead": "remove the dependency that pulls it in (npm explain <pkg>)",
+              "source": "supply-chain"
+            },
+            {
+              "pattern": "^expo-cli$",
+              "scope": "direct",
+              "reason": "deprecated: the global Expo CLI was superseded by the local CLI (npx expo) and eas-cli",
+              "useInstead": "npx expo (comes with expo) and npx eas-cli",
+              "source": "supply-chain"
+            },
+            {
+              "pattern": "^(react-native-unimodules|expo-random)$",
+              "scope": "direct",
+              "reason": "deprecated: react-native-unimodules was replaced by the expo package, expo-random by expo-crypto",
+              "useInstead": "expo, expo-crypto",
+              "source": "supply-chain"
+            },
+            {
+              "pattern": "^@react-native-community/async-storage$",
+              "scope": "direct",
+              "reason": "deprecated: the package moved to @react-native-async-storage/async-storage and this name gets no fixes",
+              "useInstead": "expo-sqlite/kv-store (or the maintained name, if the app's policy allows it)",
+              "source": "supply-chain"
+            },
+            {
+              "pattern": "^metro-react-native-babel-preset$",
+              "scope": "direct",
+              "reason": "deprecated: replaced by @react-native/babel-preset, which babel-preset-expo already includes",
+              "useInstead": "babel-preset-expo (comes with expo)",
+              "source": "supply-chain"
+            },
+            {
+              "pattern": "^(request|node-sass|expo-firebase-analytics)$",
+              "scope": "direct",
+              "reason": "deprecated and unmaintained (request since 2020, node-sass unsupported, expo-firebase-analytics retired)",
+              "useInstead": "the built-in fetch; sass; an analytics SDK behind a port (analytics-and-consent)",
+              "source": "supply-chain"
+            },
+            {
+              "pattern": "^expo-updates$",
+              "scope": "anywhere",
+              "reason": "offline-only: OTA updates are network traffic",
+              "useInstead": "reloadAppAsync from expo to restart; ship changes through the stores",
+              "source": "profile:offline-only"
+            },
+            {
+              "pattern": "^expo-dev-client$",
+              "scope": "anywhere",
+              "reason": "offline-only: development builds open a network inspector and load bundles from Metro; test release builds instead",
+              "useInstead": "release builds on a named simulator or emulator",
+              "source": "profile:offline-only"
+            },
+            {
+              "pattern": "^@react-native-community/netinfo$",
+              "scope": "anywhere",
+              "reason": "offline-only: its default reachability check fetches a Google URL from the app",
+              "useInstead": "expo-network behind ConnectivityPort",
+              "source": "profile:offline-only"
+            },
+            {
+              "pattern": "^(react-native-purchases|react-native-purchases-ui)$",
+              "scope": "anywhere",
+              "reason": "offline-only: every purchase goes through RevenueCat's servers",
+              "useInstead": "expo-iap behind PurchasePort",
+              "source": "profile:offline-only"
+            },
+            {
+              "pattern": "^(firebase|@react-native-firebase/.+)$",
+              "scope": "anywhere",
+              "reason": "offline-only: a backend and analytics",
+              "useInstead": "no replacement; the profile rules this feature out",
+              "source": "profile:offline-only"
+            },
+            {
+              "pattern": "^(@sentry/.+|sentry-expo|@bugsnag/.+|@datadog/.+)$",
+              "scope": "anywhere",
+              "reason": "offline-only: crash reporting services send reports over the network",
+              "useInstead": "a local error log (ErrorLogPort)",
+              "source": "profile:offline-only"
+            },
+            {
+              "pattern": "^(expo-insights|expo-observe|expo-app-metrics)$",
+              "scope": "anywhere",
+              "reason": "offline-only: Expo telemetry services",
+              "useInstead": "no replacement; the profile rules this feature out",
+              "source": "profile:offline-only"
+            },
+            {
+              "pattern": "^expo-notifications$",
+              "scope": "anywhere",
+              "reason": "offline-only: push registration contacts Apple, Google and Expo servers",
+              "useInstead": "no replacement (or a local-only notification module the profile reviews)",
+              "source": "profile:offline-only"
+            },
+            {
+              "pattern": "^(@amplitude/.+|expo-analytics-amplitude|@segment/.+|posthog-react-native|mixpanel-react-native)$",
+              "scope": "anywhere",
+              "reason": "offline-only: product analytics send events over the network",
+              "useInstead": "no replacement; the profile rules this feature out",
+              "source": "profile:offline-only"
+            },
+            {
+              "pattern": "^(react-native-webview|expo-web-browser)$",
+              "scope": "anywhere",
+              "reason": "offline-only: web views are a network surface",
+              "useInstead": "OS hand-off links through Linking",
+              "source": "profile:offline-only"
+            },
+            {
+              "pattern": "^(axios|ky|got|node-fetch|cross-fetch)$",
+              "scope": "direct",
+              "reason": "offline-only: the app makes no requests (some tools pull these in transitively, so only direct dependencies count)",
+              "useInstead": "nothing in the app; Node's built-in fetch in tooling",
+              "source": "profile:offline-only"
+            }
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/some-sdk/node_modules/posthog-react-native"],
+          "value": { "version": "4.9.0", "license": "MIT" }
+        }
+      }
+    ]
+  },
+  "bad-overrides": {
+    "expect": ["[overrides] overrides.react is 19.3.0 but the app uses 19.2.3"],
+    "ops": [{ "json": { "file": "package.json", "path": ["overrides", "react"], "value": "19.3.0" } }]
+  },
+  "bad-policy-line": {
+    "expect": ["[npmrc-policy] lacks the line save-exact=true"],
+    "ops": [{ "replace": { "file": ".npmrc", "find": "save-exact=true\n", "with": "" } }]
+  },
+  "bad-policy-missing": {
+    "expect": [
+      "contracts/dependency-policy.json [policy-contract] is missing",
+      "Copy templates/contracts/dependency-policy.json"
+    ],
+    "ops": [{ "delete": "contracts/dependency-policy.json" }]
+  },
+  "bad-policy-override": {
+    "expect": ["[npmrc-policy] sets min-release-age=1", "npm keeps the last value of a key"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".npmrc",
+          "find": "min-release-age-exclude[]=@expo/*\n",
+          "with": "min-release-age-exclude[]=@expo/*\n\nmin-release-age=1\n"
+        }
+      }
+    ]
+  },
+  "bad-policy-profile": {
+    "expect": [
+      "[policy-contract] \"banned\" lacks ^expo-updates$ (profile offline-only)",
+      "the app's own gate (scripts/deps/check-deps.ts) reads only this file"
+    ],
+    "ops": [{ "json": { "file": "contracts/dependency-policy.json", "path": ["profiles"], "value": ["offline-only"] } }]
+  },
+  "bad-policy-row": {
+    "expect": ["[policy-contract] packages.zustand.why is missing"],
+    "ops": [
+      { "json": { "file": "contracts/dependency-policy.json", "path": ["packages", "zustand", "why"], "delete": true } }
+    ]
+  },
+  "bad-policy-unknown-key": {
+    "expect": [
+      "contracts/dependency-policy.json:826 [policy-contract] heldback is not a key of the contract (did you mean \"heldBack\"?)",
+      "contracts/dependency-policy.json:501 [policy-contract] packages.expo-system-ui.implicituse is not a key of the contract (did you mean \"implicitUse\"?)",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      { "replace": { "file": "contracts/dependency-policy.json", "find": "\"heldBack\":", "with": "\"heldback\":" } },
+      {
+        "replace": {
+          "file": "contracts/dependency-policy.json",
+          "find": "\"implicitUse\": \"read by the config plugin",
+          "with": "\"implicituse\": \"read by the config plugin"
+        }
+      }
+    ]
+  },
+  "bad-release-age-below-floor": {
+    "expect": [
+      ".npmrc:4 [npmrc-policy] sets min-release-age=3, outside the policy (min-release-age=7 or higher)",
+      "Make it min-release-age=7 or higher"
+    ],
+    "ops": [{ "replace": { "file": ".npmrc", "find": "min-release-age=7\n", "with": "min-release-age=3\n" } }]
+  },
+  "bad-stale-approval": {
+    "expect": ["[stale-approval] allowScripts approves lefthook@2.1.13 but 2.1.14 is installed"],
+    "ops": [{ "json": { "file": "package.json", "path": ["allowScripts"], "value": { "lefthook@2.1.13": true } } }]
+  },
+  "bad-stale-lockfile": {
+    "expect": ["package-lock.json:1 [lockfile-sync] dependencies of the root differ from its package.json"],
+    "ops": [{ "json": { "file": "package.json", "path": ["devDependencies", "prettier"], "value": "3.9.9" } }]
+  },
+  "bad-stale-override": {
+    "expect": ["[stale-override] overrides.lodash is neither react, react-native"],
+    "ops": [{ "json": { "file": "package.json", "path": ["overrides", "lodash"], "value": "4.17.21" } }]
+  },
+  "bad-strict-allow-scripts-missing": {
+    "expect": [
+      ".npmrc:1 [npmrc-policy] lacks the line strict-allow-scripts=true: without it npm 11.17 runs an install script nobody reviewed"
+    ],
+    "ops": [{ "replace": { "file": ".npmrc", "find": "\nstrict-allow-scripts=true\n", "with": "\n" } }]
+  },
+  "bad-table-sdk": {
+    "expect": ["[table-sdk] the app is on Expo SDK 58 but the dependency policy is for SDK 57"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "expo"], "value": "~58.0.2" } },
+      { "json": { "file": "package-lock.json", "path": ["packages", "", "dependencies", "expo"], "value": "~58.0.2" } }
+    ]
+  },
+  "bad-table-version": {
+    "expect": ["[table-version] zustand is \"5.0.14\" but the policy pins \"5.0.15\""],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "zustand"], "value": "5.0.14" } },
+      {
+        "json": { "file": "package-lock.json", "path": ["packages", "", "dependencies", "zustand"], "value": "5.0.14" }
+      }
+    ]
+  },
+  "bad-test-renderer-missing": {
+    "expect": [
+      "[companion] @testing-library/react-native 14.0.1 is installed but its companion test-renderer 1.2.0 is not"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["devDependencies", "test-renderer"], "delete": true } },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "", "devDependencies", "test-renderer"],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/test-renderer"],
+          "value": { "version": "1.3.0", "dev": true, "license": "MIT" }
+        }
+      }
+    ]
+  },
+  "bad-test-renderer-nested": {
+    "expect": ["[one-version] test-renderer is installed as 1.2.0, 1.3.0"],
+    "ops": [
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/@testing-library/react-native/node_modules/test-renderer"],
+          "value": { "version": "1.3.0", "dev": true, "license": "MIT" }
+        }
+      }
+    ]
+  },
+  "bad-two-reacts": {
+    "expect": ["[one-react] react is installed as 19.2.3, 19.3.0"],
+    "ops": [
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/test-renderer/node_modules/react"],
+          "value": { "version": "19.3.0", "license": "MIT" }
+        }
+      }
+    ]
+  },
+  "bad-unapproved-script": {
+    "expect": ["[install-scripts] unrs-resolver@1.12.2 has an install script that allowScripts does not cover"],
+    "ops": [
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/unrs-resolver"],
+          "value": { "version": "1.12.2", "dev": true, "hasInstallScript": true }
+        }
+      }
+    ]
+  },
+  "bad-undated-exclude": {
+    "expect": ["[npmrc-exclude] exclude prettier is not inside a dated exclude block"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".npmrc",
+          "find": "save-exact=true\n",
+          "with": "save-exact=true\nmin-release-age-exclude[]=prettier\n"
+        }
+      }
+    ]
+  },
+  "bad-unpinned-approval": {
+    "expect": [
+      "[unpinned-approval] allowScripts approves \"lefthook\" for every version, so the install script of every future release runs without a review",
+      "npm approve-scripts lefthook (it replaces the key with \"lefthook@2.1.14\": true)"
+    ],
+    "ops": [
+      {
+        "json": { "file": "package.json", "path": ["allowScripts"], "value": { "lefthook": true } },
+        "$comment": "npm approve-scripts --no-allow-scripts-pin writes this name-only key; npm 11.17 then runs the script of every lefthook version."
+      }
+    ]
+  },
+  "bad-unpinned-approval-star": {
+    "expect": ["[unpinned-approval] allowScripts approves \"fsevents@*\" for every version", "\"fsevents@2.3.3\": true"],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["allowScripts"],
+          "value": { "lefthook@2.1.14": true, "fsevents@*": true }
+        },
+        "$comment": "name@* is the same name-only allow to npm."
+      }
+    ]
+  },
+  "bad-unused-native": {
+    "expect": ["[unused-dependency] expo-haptics is a native module the app installs, but no code file"],
+    "ops": [{ "delete": "src/services/haptics/expo-haptics-adapter.ts" }]
+  },
+  "bad-workflow-npm-env": {
+    "expect": [
+      ".github/workflows/ci.yml:9 [npm-env] sets NPM_CONFIG_MIN_RELEASE_AGE: min-release-age=0 is outside the policy (min-release-age=7 or higher); an NPM_CONFIG_* variable beats the project .npmrc for every npm command of the job",
+      "Delete NPM_CONFIG_MIN_RELEASE_AGE (the project .npmrc holds the policy)."
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": ".github/workflows/ci.yml",
+          "lines": [
+            "name: ci",
+            "on: [push]",
+            "jobs:",
+            "  verify:",
+            "    runs-on: macos-15",
+            "    env:",
+            "      # NPM_CONFIG_FORCE: true   (a comment: not read)",
+            "      NPM_CONFIG_REGISTRY: https://registry.npmjs.org/",
+            "      NPM_CONFIG_MIN_RELEASE_AGE: 0",
+            "    steps:",
+            "      - uses: actions/checkout@v5",
+            "      - run: npm ci"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-wrong-workspace": {
+    "expect": ["[wrong-workspace] zustand belongs in dependencies, not in devDependencies"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "zustand"], "delete": true } },
+      { "json": { "file": "package.json", "path": ["devDependencies", "zustand"], "value": "5.0.15" } },
+      { "json": { "file": "package-lock.json", "path": ["packages", "", "dependencies", "zustand"], "delete": true } },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "", "devDependencies", "zustand"],
+          "value": "5.0.15"
+        }
+      }
+    ]
+  },
+  "error-no-package-json": {
+    "expect": ["ERROR [bad-input] nothing to check: . has no package.json"],
+    "args": ".",
+    "ops": [{ "delete": "package.json" }]
+  },
+  "pass-allow-scripts-multi-version": {
+    "expect": ["check-deps-policy: 1 package.json files checked, 0 problems"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["allowScripts"], "value": { "lefthook@2.1.13 || 2.1.14": true } } }
+    ]
+  },
+  "pass-denial-every-version": {
+    "expect": ["check-deps-policy: 1 package.json files checked, 0 problems"],
+    "ops": [
+      {
+        "json": { "file": "package.json", "path": ["allowScripts"], "value": { "lefthook": false } },
+        "$comment": "A name-only false is a reviewed denial of every version: npm installs lefthook without running its script."
+      }
+    ]
+  },
+  "pass-eas-env-harmless": {
+    "expect": ["check-deps-policy: 1 package.json files checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "eas.json",
+          "lines": [
+            "{",
+            "  \"cli\": { \"version\": \">= 16.0.0\", \"appVersionSource\": \"remote\" },",
+            "  \"build\": {",
+            "    \"base\": {",
+            "      \"node\": \"26.4.0\",",
+            "      \"env\": {",
+            "        \"EXPO_NO_TELEMETRY\": \"1\",",
+            "        \"NPM_CONFIG_MIN_RELEASE_AGE\": \"14\",",
+            "        \"npm_config_legacy_peer_deps\": \"false\",",
+            "        \"NPM_CONFIG_STRICT_ALLOW_SCRIPTS\": \"true\",",
+            "        \"NPM_CONFIG_FORCE\": \"\",",
+            "        \"EAS_NO_FROZEN_LOCKFILE\": \"\",",
+            "        \"NPM_CONFIG_REGISTRY\": \"https://registry.npmjs.org/\"",
+            "      }",
+            "    },",
+            "    \"production\": { \"extends\": \"base\", \"env\": { \"APP_VARIANT\": \"production\" } },",
+            "  }",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-knip-ignored": {
+    "expect": ["check-deps-policy: 1 package.json files checked, 0 problems"],
+    "ops": [
+      { "delete": "src/services/haptics/expo-haptics-adapter.ts" },
+      {
+        "write": {
+          "file": "knip.json",
+          "lines": ["{", "  \"ignoreDependencies\": [", "    \"expo-haptics\"", "  ]", "}"]
+        }
+      }
+    ]
+  },
+  "pass-npmrc-ini-values": {
+    "expect": ["check-deps-policy: 1 package.json files checked, 0 problems"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".npmrc",
+          "find": "min-release-age=7\n",
+          "with": "min-release-age=10.5 # a stricter wait\n"
+        }
+      },
+      {
+        "replace": {
+          "file": ".npmrc",
+          "find": "strict-allow-scripts=true\n",
+          "with": "strict-allow-scripts=\"true\"\n"
+        }
+      },
+      {
+        "replace": { "file": ".npmrc", "find": "engine-strict=true\n", "with": "engine-strict = 'true'\n" },
+        "$comment": "npm reads 10.5 as a number of days, strips the inline comment and one pair of quotes (verified with npm config get on npm 11.17.0)."
+      }
+    ]
+  },
+  "pass-npx-local-tools": {
+    "expect": ["check-deps-policy: 1 package.json files checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": ".github/workflows/ci.yml",
+          "lines": [
+            "name: ci",
+            "on: [push]",
+            "jobs:",
+            "  verify:",
+            "    runs-on: macos-15",
+            "    steps:",
+            "      - uses: actions/checkout@v5",
+            "      # npx eas-cli build   (a comment: not read)",
+            "      - name: npx eas-cli build (a step name, not a command)",
+            "        run: npm ci",
+            "      - run: |",
+            "          npx expo install --check",
+            "          npx tsc --noEmit",
+            "          npx expo-doctor",
+            "      - run: npm install -g --min-release-age=7 --ignore-scripts eas-cli@24.10.0 && eas build --platform all --non-interactive"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "doctor"],
+          "value": "npx expo-doctor && npm exec -- tsc --noEmit"
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/typescript", "bin"],
+          "value": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" }
+        }
+      }
+    ]
+  },
+  "pass-override-reference": {
+    "expect": ["check-deps-policy: 1 package.json files checked, 0 problems"],
+    "ops": [
+      {
+        "op": "json",
+        "file": "package.json",
+        "path": ["overrides", "react"],
+        "value": "$react",
+        "$comment": "npm's documented override reference: $react is the root's own react specifier, the same pin."
+      }
+    ]
+  },
+  "pass-policy-config-key": {
+    "expect": ["check-deps-policy: 1 package.json files checked, 0 problems"],
+    "ops": [
+      { "rename": { "from": "contracts/dependency-policy.json", "to": "qa/dependency-policy.json" } },
+      { "write": { "file": "rn-skills.config.json", "json": { "dependencyPolicy": "qa/dependency-policy.json" } } }
+    ]
+  },
+  "pass-release-age-stricter": {
+    "expect": ["check-deps-policy: 1 package.json files checked, 0 problems"],
+    "ops": [{ "replace": { "file": ".npmrc", "find": "min-release-age=7\n", "with": "min-release-age=14\n" } }]
+  },
+  "pass-unused-not-yet-created": {
+    "expect": [
+      "SKIP src [unused-dependency] not yet created (expo-project-bootstrap creates it)",
+      "check-deps-policy: 1 package.json files checked, 0 problems, 1 skipped"
+    ],
+    "ops": [{ "delete": "src" }]
+  }
+}

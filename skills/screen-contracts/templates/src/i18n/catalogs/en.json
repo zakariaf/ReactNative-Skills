@@ -1,0 +1,13 @@
+{
+  "lists.delete-dialog.body": "Its tasks are deleted too.",
+  "lists.delete-dialog.cancel": "Cancel",
+  "lists.delete-dialog.confirm": "Delete",
+  "lists.delete-dialog.title": "Delete {listName}?",
+  "lists.empty.body": "Make a list to group your tasks.",
+  "lists.empty.title": "No lists yet",
+  "lists.error.body": "Your lists could not be loaded.",
+  "lists.list-row.delete-button.label": "Delete {listName}",
+  "lists.list-row.delete-button.text": "Delete",
+  "lists.retry-button.label": "Try again",
+  "lists.title": "Lists"
+}

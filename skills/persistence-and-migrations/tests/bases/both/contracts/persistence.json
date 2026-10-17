@@ -1,0 +1,16 @@
+{
+  "$schema": "./persistence.schema.json",
+  "mode": "both",
+  "databaseFile": "app.db",
+  "protectedTables": ["entitlements", "error_log"],
+  "resetModules": ["src/data/reset-data.ts"],
+  "sqlAllowed": [],
+  "rootComponent": "src/app/_layout.tsx",
+  "keyValueStore": "expo-sqlite/kv-store",
+  "fixturesTest": "test/sqlite/migration-fixtures.test.ts",
+  "document": {
+    "appId": "tasks-app",
+    "protectedSections": ["premium"],
+    "resetModules": ["src/data/document/reset-document.ts"]
+  }
+}

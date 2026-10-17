@@ -1,0 +1,11 @@
+{
+  "base": [
+    {
+      "from": "@skill/templates/src/data/backup/fixtures",
+      "to": ".",
+      "fill": {
+        "__APP_SLUG__": "tasks"
+      }
+    }
+  ]
+}

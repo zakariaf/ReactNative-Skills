@@ -1,0 +1,14 @@
+{
+  "$schema": "./levels.schema.json",
+  "$comment": "The level layout of every game with shipped levels, read by level-generation-and-solvers' check-levels.mjs: the generated pack files, the LevelsSpec modes and the levels contract test must agree with it. Change it together with the plan, regenerate the packs and commit with a Gate-Change: trailer.",
+  "games": [
+    {
+      "id": "__GAME_ID__",
+      "packCount": 3,
+      "levelsPerPack": 30,
+      "starRule": "par",
+      "daily": true,
+      "endless": false
+    }
+  ]
+}

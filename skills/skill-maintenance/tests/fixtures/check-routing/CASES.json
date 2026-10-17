@@ -1,0 +1,130 @@
+{
+  "bad-coverage": {
+    "expect": ["[eval-coverage]", "note-sync has 1 eval (needs 2)"],
+    "ops": [{ "json": { "file": "evals.json", "path": ["evals", 5], "delete": true } }]
+  },
+  "bad-evals": {
+    "expect": ["[eval-unknown-skill]", "evals[0] expects ghost-skill", "[eval-shape]", "evals[1]"],
+    "ops": [
+      { "json": { "file": "evals.json", "path": ["evals", 0, "expect"], "value": "ghost-skill" } },
+      { "json": { "file": "evals.json", "path": ["evals", 1, "prompt"], "value": "" } }
+    ]
+  },
+  "bad-live-false-positive": {
+    "expect": ["[route-false-positive]", "evals[6] \"What is 2 + 2?\" loaded note-sync"],
+    "args": "{dir}/skills --evals {dir}/evals.json --live --claude {dir}/fake-claude.mjs --repo {dir}",
+    "ops": [{ "json": { "file": "fake-answers.json", "path": ["2 + 2"], "value": "tasks:note-sync" } }]
+  },
+  "bad-live-miss": {
+    "expect": ["[route-miss]", "evals[2]", "chose task-lists; expected reminder-alerts"],
+    "args": "{dir}/skills --evals {dir}/evals.json --live --claude {dir}/fake-claude.mjs --repo {dir}",
+    "ops": [{ "json": { "file": "fake-answers.json", "path": ["fires twice"], "value": "task-lists" } }]
+  },
+  "bad-miss": {
+    "expect": ["[route-miss]", "evals[4]", "ranks task-lists #", "top 1: note-sync"],
+    "args": "{dir}/skills --evals {dir}/evals.json --top 1",
+    "ops": [{ "json": { "file": "evals.json", "path": ["evals", 4, "expect"], "value": "task-lists" } }]
+  },
+  "bad-template-seed": {
+    "expect": [
+      "[eval-placeholder]",
+      "evals[0] still holds the template placeholder __NEW_SKILL_NAME__",
+      "evals[1] still holds the template placeholder __SECOND_TASK_PROMPT_FOR_THE_NEW_SKILL__"
+    ],
+    "args": "{dir}/skills --evals {dir}/evals.json --skip-missing",
+    "ops": [
+      { "json": { "file": "evals.json", "path": ["evals", 0, "expect"], "value": "__NEW_SKILL_NAME__" } },
+      {
+        "json": {
+          "file": "evals.json",
+          "path": ["evals", 1, "prompt"],
+          "value": "__SECOND_TASK_PROMPT_FOR_THE_NEW_SKILL__"
+        }
+      }
+    ]
+  },
+  "error-live-not-loaded": {
+    "expect": [
+      "ERROR [bad-input] skill task-lists is not loaded in this session",
+      "Pass --plugin-dir . when the repo authors its skills in skills/"
+    ],
+    "args": "{dir}/skills --evals {dir}/evals.json --live --claude {dir}/fake-claude.mjs --repo {dir}",
+    "ops": [{ "write": { "file": "fake-loaded.json", "content": "[\"reminder-alerts\", \"note-sync\", \"debug\"]\n" } }]
+  },
+  "error-no-evals": {
+    "expect": ["ERROR [bad-input] nothing to check: evals file", "routing-evals.json does not exist"],
+    "args": "{dir}",
+    "ops": [
+      { "delete": "evals.json" },
+      { "write": { "file": "package.json", "content": "{ \"name\": \"tasks-app\", \"private\": true }\n" } }
+    ]
+  },
+  "pass-contract": {
+    "expect": ["ok   evals[2] reminder-alerts #1", "check-routing: 7 evals (offline, top 3) checked, 0 problems"],
+    "args": "{dir}",
+    "ops": [
+      { "rename": { "from": "evals.json", "to": "contracts/routing-evals.json" } },
+      { "write": { "file": "package.json", "content": "{ \"name\": \"tasks-app\", \"private\": true }\n" } }
+    ]
+  },
+  "pass-installed-skill": {
+    "expect": ["check-routing: 7 evals (offline, top 3) checked, 0 problems", "RESULT: PASS"],
+    "args": "{dir}",
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/vendor-dates/SKILL.md",
+          "content": "---\nname: vendor-dates\ndescription: Formats dates and relative times for a vendored kit. Use when a date shows wrong. Not for lists (task-lists).\n---\n\n# vendor-dates\n"
+        }
+      },
+      { "write": { "file": "package.json", "content": "{ \"name\": \"tasks-app\", \"private\": true }\n" } },
+      { "rename": { "from": "evals.json", "to": "contracts/routing-evals.json" } }
+    ]
+  },
+  "pass-live": {
+    "expect": [
+      "ok   evals[0] task-lists (1/1)",
+      "ok   evals[6] no skill (1 runs)",
+      "check-routing: 7 evals (live, 1 run(s) each) checked, 0 problems"
+    ],
+    "args": "{dir}/skills --evals {dir}/evals.json --live --claude {dir}/fake-claude.mjs --repo {dir}"
+  },
+  "pass-prompt-live": {
+    "expect": ["chose: task-lists", "RESULT: PASS"],
+    "args": "{dir}/skills --prompt swipe-to-complete-stutters --live --claude {dir}/fake-claude.mjs --repo {dir}"
+  },
+  "pass-prompt-rank": {
+    "expect": [
+      "rank #1 reminder-alerts",
+      "rank #2",
+      "rank #3",
+      "check-routing: 1 prompt (offline, top 3; add --expect <skill> to judge it) checked, 0 problems",
+      "RESULT: PASS"
+    ],
+    "args": "{dir}/skills --prompt the-reminder-notification-fires-twice-after-snooze"
+  },
+  "pass-repo-only-installed": {
+    "expect": [
+      "NOT APPLICABLE: only installed skills (note-sync, reminder-alerts, task-lists under .agents/skills/), which their authors own: pass .agents/skills to check them",
+      "RESULT: PASS"
+    ],
+    "args": "{dir}",
+    "ops": [
+      { "write": { "file": "package.json", "content": "{ \"name\": \"tasks-app\", \"private\": true }\n" } },
+      { "rename": { "from": "skills", "to": ".agents/skills" } }
+    ]
+  },
+  "pass-skip-missing": {
+    "expect": ["skip evals[7]: list-sharing does not exist yet", "RESULT: PASS"],
+    "args": "{dir}/skills --evals {dir}/evals.json --skip-missing",
+    "ops": [
+      {
+        "json": {
+          "file": "evals.json",
+          "path": ["evals", 7],
+          "value": { "prompt": "share a list with another account", "expect": "list-sharing" }
+        }
+      }
+    ]
+  }
+}

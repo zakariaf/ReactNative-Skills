@@ -1,0 +1,13 @@
+{
+  "router": "expo-router",
+  "home": "/",
+  "routes": ["(app)/notes", "(app)/notes/[noteId]"],
+  "protected": [],
+  "guarded": [],
+  "modals": [],
+  "paramParsers": {
+    "(app)/notes/[noteId]": "src/features/note-detail/note-detail-params.ts"
+  },
+  "debugRoutes": [],
+  "placeholders": []
+}

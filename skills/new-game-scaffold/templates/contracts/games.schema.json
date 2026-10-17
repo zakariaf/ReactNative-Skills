@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Games",
+  "description": "Every game of the app, declared as data: the design notes the code must agree with. scaffold-game.mjs writes an entry per new game; check-game-scaffold.mjs holds the game folder, the catalogs, the loaded game module and (when multi-package) the game's own app to it.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["games"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "games": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "class",
+          "panMode",
+          "levels",
+          "daily",
+          "endless",
+          "hints",
+          "continue",
+          "loseReasons"
+        ],
+        "properties": {
+          "id": {
+            "description": "kebab-case and permanent: the folder <gamesDir>/<id>, identity.id, the catalog namespace <id>. and the key of every saved run.",
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+          },
+          "name": {
+            "description": "The display name in the source language (<id>.name).",
+            "type": "string",
+            "minLength": 1
+          },
+          "class": {
+            "description": "How the game runs: turn by turn, simulate-then-replay, or real time (a sim/ folder).",
+            "enum": ["turn-based", "simulate-replay", "realtime"]
+          },
+          "panMode": {
+            "description": "The pan gesture the board turns into intents (GameInput.panMode).",
+            "enum": ["none", "swipe", "drag", "aim"]
+          },
+          "levels": {
+            "description": "null for a game without level packs (a daily- or endless-only game too); else the pack layout of the shipped level tables, which must equal the game's packCount and levelsPerPack in contracts/levels.json (level-generation-and-solvers).",
+            "oneOf": [
+              { "type": "null" },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["packs", "levelsPerPack"],
+                "properties": {
+                  "packs": { "type": "integer", "minimum": 1 },
+                  "levelsPerPack": { "type": "integer", "minimum": 1 }
+                }
+              }
+            ]
+          },
+          "daily": {
+            "description": "The levels spec has a daily level (equal to daily in contracts/levels.json when the game has packs).",
+            "type": "boolean"
+          },
+          "endless": {
+            "description": "The levels spec has an endless run (difficulty 100, never won; equal to endless in contracts/levels.json when the game has packs).",
+            "type": "boolean"
+          },
+          "hints": {
+            "description": "GameRules.hints.kind: solver only when a solver proves the next move.",
+            "enum": ["none", "solver"]
+          },
+          "continue": {
+            "description": "GameRules.continueRun.kind: once when a lost run may continue one time.",
+            "enum": ["none", "once"]
+          },
+          "loseReasons": {
+            "description": "Every way of losing, one <id>.lose.<reason> catalog key each; [] for a game that cannot be lost.",
+            "type": "array",
+            "items": { "type": "string", "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$" },
+            "uniqueItems": true
+          },
+          "app": {
+            "description": "When multi-package: the game's own app folder (apps/<id>).",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "apps": {
+      "description": "When multi-package (one game = one white-label app): the facts every app shares.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dir", "scope", "bundlePrefix", "products", "locales", "composer", "adUnits"],
+      "properties": {
+        "dir": {
+          "description": "The apps folder (a workspaces pattern <dir>/*).",
+          "type": "string"
+        },
+        "scope": {
+          "description": "The npm scope of the app packages (@acme).",
+          "type": "string",
+          "pattern": "^@[a-z0-9][a-z0-9-._]*$"
+        },
+        "bundlePrefix": {
+          "description": "Every app's iOS bundle id and Android package is <bundlePrefix>.<id without hyphens>.",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(\\.[a-z][a-z0-9]*)+$"
+        },
+        "products": {
+          "description": "In-app product suffixes: product <bundle id>.<suffix>.",
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" }
+        },
+        "locales": {
+          "description": "The apps' language tags; every app has one catalog per tag.",
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "composer": {
+          "description": "The shared function app.config.ts calls with the app's settings and process.env.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["import", "name", "type"],
+          "properties": {
+            "import": { "type": "string" },
+            "name": { "type": "string" },
+            "type": { "type": "string" }
+          }
+        },
+        "fontsDir": {
+          "description": "The shared font files and licence texts every app bundles byte for byte.",
+          "type": "string"
+        },
+        "adUnits": {
+          "description": "null for apps without ads; else the ad unit names each app has ids for.",
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "banner",
+                  "interstitial",
+                  "rewarded",
+                  "appOpen",
+                  "native",
+                  "rewardedInterstitial"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

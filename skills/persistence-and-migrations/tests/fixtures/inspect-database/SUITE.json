@@ -1,0 +1,8 @@
+{
+  "base": [
+    {
+      "from": "@tests/bases/both/src/data/migrations/fixtures/db-v2.sql",
+      "to": "app.sql"
+    }
+  ]
+}

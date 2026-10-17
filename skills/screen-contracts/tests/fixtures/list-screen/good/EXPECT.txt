@@ -1,0 +1,5 @@
+lists.retry-button | button | PressableSurface | lists.retry-button.label | "Try again" | error | this screen | bounds
+lists.list-row.{listId}.delete-button | button | PressableSurface | lists.list-row.delete-button.text a11y lists.list-row.delete-button.label | "Delete"
+states: default; empty (not drawn: Chosen); error (not drawn: Chosen)
+list-screen: 1 screens checked, 0 problems
+RESULT: PASS

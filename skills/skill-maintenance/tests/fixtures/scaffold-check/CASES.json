@@ -1,0 +1,14 @@
+{
+  "bad-unfilled": {
+    "expect": [
+      "[placeholder-left]",
+      "store-listing-texts/SKILL.md:3",
+      "__FILL_SUBJECT__",
+      "store-listing-texts/scripts/check-rules.mjs:17",
+      "[rule-why]",
+      "[related-names]",
+      "[expect-rule-id]"
+    ],
+    "extends": null
+  }
+}

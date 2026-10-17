@@ -1,0 +1,41 @@
+{
+  "$schema": "./contrast.schema.json",
+  "$comment": "The app's one pair table. The theme palette entry ('app') is also read by design-system-structure's write-palette and check-design-system; add one entry per other colour table (chart series, tag colours). Keys: the accessibility-as-code skill's references/contrast-and-colour.md.",
+  "palettes": [
+    {
+      "name": "app",
+      "file": "src/theme/palette.ts",
+      "export": "PALETTE",
+      "sets": ["light", "dark"],
+      "optionalSets": ["colorBlind.light", "colorBlind.dark"],
+      "base": "background",
+      "edge": "border",
+      "text": [
+        ["text", "background"],
+        ["text", "surface"],
+        ["text", "sunken"],
+        ["textMuted", "background"],
+        ["textMuted", "surface"],
+        ["textMuted", "sunken"],
+        ["onPrimary", "primary"],
+        ["danger", "surface"],
+        ["danger", "dangerSurface"],
+        ["text", "dangerSurface"],
+        ["success", "surface"],
+        ["warning", "surface"]
+      ],
+      "graphics": [
+        ["border", "background"],
+        ["border", "surface"],
+        ["focus", "background"],
+        ["focus", "surface"]
+      ],
+      "shapes": [
+        ["primary", "background"],
+        ["primary", "surface"]
+      ],
+      "distinct": []
+    }
+  ],
+  "exceptions": []
+}

@@ -1,0 +1,271 @@
+{
+  "area": "animation",
+  "entries": [
+    {
+      "id": "animation-frame-clock-reset",
+      "topic": "Frame callbacks",
+      "symptom": "The first animation runs; every later one freezes, then jumps to the end",
+      "cause": "Reanimated resets timeSinceFirstFrame to 0 whenever a frame callback is re-activated (verified in react-native-reanimated 4.5 FrameCallbackRegistryUI)",
+      "fix": "Record a start time from frame.timestamp on the first frame of each run and use timestamp - start; never timeSinceFirstFrame for an animation that restarts",
+      "match": [
+        "timeSinceFirstFrame"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "skia-canvas-rendering"
+    },
+    {
+      "id": "animation-frame-callback-throw",
+      "topic": "Frame callbacks",
+      "symptom": "A canvas freezes after an exception inside a frame callback",
+      "cause": "An uncaught error on the UI thread stops the callback silently",
+      "fix": "Wrap each frame body in one runner that catches, stops the callback and reports through scheduleOnRN, so the app pauses and records the error",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "skia-canvas-rendering"
+    },
+    {
+      "id": "animation-frame-callback-idle",
+      "topic": "Frame callbacks",
+      "symptom": "The phone stays warm while nothing moves",
+      "cause": "A frame callback (or a Picture that reads the clock) keeps running every frame",
+      "fix": "Stop the frame callback when nothing animates; pause on background (useIsAppActive), focus loss and full-screen ads",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "performance-budgets"
+    },
+    {
+      "id": "animation-runonjs-deprecated",
+      "topic": "Worklets",
+      "symptom": "runOnJS logs a deprecation warning, or code written from memory uses runOnJS",
+      "cause": "react-native-worklets 0.10 deprecates runOnJS (@deprecated Use scheduleOnRN)",
+      "fix": "Use scheduleOnRN(fn, ...args) from react-native-worklets",
+      "match": [
+        "runOnJS"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "motion-and-animation",
+      "appliesTo": {
+        "react-native-worklets": ">=0.10"
+      }
+    },
+    {
+      "id": "animation-shared-value-access",
+      "topic": "Worklets",
+      "symptom": "Shared value updates misbehave under the React Compiler, or the compiler lint flags .value",
+      "cause": ".value property access is not compiler-safe",
+      "fix": "Use .get() and .set()",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "motion-and-animation"
+    },
+    {
+      "id": "animation-missing-worklet",
+      "topic": "Worklets",
+      "symptom": "A crash on the UI thread when a gesture or frame callback calls a helper: \"is not a worklet\" or \"Tried to synchronously call\"",
+      "cause": "A function without the 'worklet' directive cannot run on the UI thread (a runtime error, not a build error)",
+      "fix": "Add 'worklet' (or a file-level directive for pure geometry modules) and test that UI-thread modules import only worklet modules",
+      "match": [
+        "is not a worklet",
+        "Tried to synchronously call"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "motion-and-animation"
+    },
+    {
+      "id": "animation-worklet-closure-copy",
+      "topic": "Worklets",
+      "symptom": "A worklet keeps using an old value after JS changed it",
+      "cause": "Values captured by a worklet are copied when it is first scheduled",
+      "fix": "Pass anything that changes through a shared value; no promises, await, setTimeout or third-party code inside worklets",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "motion-and-animation"
+    },
+    {
+      "id": "animation-spring-heavy",
+      "topic": "Reanimated",
+      "symptom": "withSpring feels heavy and slow after the Reanimated 4 upgrade",
+      "cause": "Reanimated 4's default spring is the 'gentle' config (mass 4, stiffness 900, damping 120), not Reanimated 3's mass 1",
+      "fix": "Pass the spring config from the motion tokens explicitly on every withSpring",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "motion-and-animation",
+      "appliesTo": {
+        "react-native-reanimated": "4.x"
+      }
+    },
+    {
+      "id": "animation-reduced-motion-constant",
+      "topic": "Reanimated",
+      "symptom": "Changing Reduce Motion while the app runs has no effect on some animations",
+      "cause": "Reanimated's useReducedMotion is read once at module load",
+      "fix": "Read reduce motion through the app's a11y store (useReduceMotion) and a root ReducedMotionConfig",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "accessibility-as-code"
+    },
+    {
+      "id": "animation-repeat-ignores-reduce-motion",
+      "topic": "Reanimated",
+      "symptom": "A decorative loop keeps moving with Reduce Motion on, and screenshots of that screen never settle",
+      "cause": "A withRepeat loop never reads the reduce-motion setting",
+      "fix": "Make the loop rest when useReduceMotion() is true (or pass ReduceMotion.System); screenshot tooling then gets a still screen too",
+      "match": [
+        "CAPTURE FAILED \\(unstable\\)"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "motion-and-animation"
+    },
+    {
+      "id": "animation-skia-mutable-path",
+      "topic": "Skia",
+      "symptom": "Skia logs a deprecation warning for moveTo, addCircle or transform on an SkPath",
+      "cause": "Skia 2.6 moved to immutable paths built with Skia.PathBuilder; the old mutators still work but warn and will be removed",
+      "fix": "Build paths with Skia.PathBuilder.Make()...build() once, and place them with canvas save/translate/scale/restore",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "skia-canvas-rendering",
+      "appliesTo": {
+        "@shopify/react-native-skia": ">=2.6"
+      }
+    },
+    {
+      "id": "animation-canvas-onlayout",
+      "topic": "Skia",
+      "symptom": "Canvas onLayout does not fire on the New Architecture",
+      "cause": "Canvas onLayout is deprecated on Fabric",
+      "fix": "Use onSize or useCanvasSize()",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "skia-canvas-rendering"
+    },
+    {
+      "id": "animation-drawtext-arabic",
+      "topic": "Skia",
+      "symptom": "Arabic-script words drawn on a canvas render as broken, unjoined letters",
+      "cause": "canvas.drawText does no text shaping",
+      "fix": "Use a Skia Paragraph (ParagraphBuilder with TextDirection.RTL) for shaped text; drawText only for digits and Latin",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "skia-canvas-rendering"
+    },
+    {
+      "id": "animation-paragraph-per-frame",
+      "topic": "Skia",
+      "symptom": "Frame drops when a canvas shows text",
+      "cause": "Building a Paragraph every frame is costly",
+      "fix": "Build on text or locale change and cache it; draw a retained Paragraph node",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "skia-canvas-rendering"
+    },
+    {
+      "id": "animation-icon-even-odd",
+      "topic": "Skia",
+      "symptom": "Path icons render as filled blobs (rings and cut-outs filled in)",
+      "cause": "A path union comes back with the even-odd fill rule",
+      "fix": "Apply AsWinding after the union (or set the fill type explicitly)",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "icons-app-icon-and-splash"
+    },
+    {
+      "id": "animation-promotion-60hz",
+      "topic": "Frame rate",
+      "symptom": "Animations run at 60 Hz on a 120 Hz iPhone",
+      "cause": "Info.plist lacks CADisableMinimumFrameDurationOnPhone = true (an override removed what the SDK 57 prebuild template sets)",
+      "fix": "Keep the template value; the canvas checker reports an override",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "skia-canvas-rendering"
+    },
+    {
+      "id": "animation-sim-60fps",
+      "topic": "Frame rate",
+      "symptom": "The iOS simulator never exceeds 60 fps; a 120 Hz loop measures about 116 ticks/s",
+      "cause": "The simulator is capped at 60 fps and its display-link timing differs",
+      "fix": "Count ticks, never wall time; check 120 Hz on a real high-refresh device",
+      "match": [],
+      "status": "open",
+      "needsHuman": false,
+      "skill": "performance-budgets"
+    },
+    {
+      "id": "animation-90hz-misjudged",
+      "topic": "Frame rate",
+      "symptom": "A 90 Hz Android phone shows false hitches in frame measurements",
+      "cause": "The measurement assumed 120 Hz frame budgets on a 90 Hz display",
+      "fix": "Read the display's refresh rate and judge frames against its own budget (8.3, 11.1 or 16.7 ms)",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "performance-budgets",
+      "platforms": [
+        "android"
+      ]
+    },
+    {
+      "id": "animation-rngh-v3-migration",
+      "topic": "Gestures",
+      "symptom": "Gesture callbacks never fire after a Gesture Handler 3 upgrade, or gestures cannot be composed",
+      "cause": "Gesture Handler 3 renames onStart to onActivate and onEnd to onDeactivate, merges onChange into onUpdate, and hook-based gestures cannot relate to builder gestures",
+      "fix": "Keep gestures behind one hook per surface and move all of its gestures to the new API in one commit",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "canvas-gestures-and-hit-testing"
+    },
+    {
+      "id": "animation-slider-blocks-scroll",
+      "topic": "Gestures",
+      "symptom": "A list does not scroll when a drag starts on a slider, and the value jumps",
+      "cause": "The slider's pan gesture had minDistance(0)",
+      "fix": "Race pan and tap: the pan activates after a few points sideways and fails after a few points vertically; check on a device",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "ui-component-library"
+    },
+    {
+      "id": "animation-gesture-thresholds",
+      "topic": "Gestures",
+      "symptom": "Swipes feel wrong or taps wait",
+      "cause": "Gesture thresholds and composition order were never validated on a device",
+      "fix": "Tune on a device; test Exclusive(pan, longPress, tap) so taps do not wait",
+      "match": [],
+      "status": "open",
+      "needsHuman": false,
+      "skill": "canvas-gestures-and-hit-testing"
+    },
+    {
+      "id": "animation-gestures-rtl-android",
+      "topic": "Gestures",
+      "symptom": "Gestures behave differently in right-to-left on Android",
+      "cause": "Gesture coordinates are physical; only iOS was probed",
+      "fix": "Run the gesture tests and a device check in RTL on Android before shipping RTL",
+      "match": [],
+      "status": "open",
+      "needsHuman": false,
+      "skill": "canvas-gestures-and-hit-testing",
+      "platforms": [
+        "android"
+      ]
+    }
+  ]
+}

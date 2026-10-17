@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tdd.schema.json",
+  "title": "TDD contract (tdd-workflow)",
+  "description": "App-specific facts the TDD checkers read from contracts/tdd.json (or the file rn-skills.config.json names under tddContract). Every key is optional; a missing key takes the default for the canonical layout (each workspace's src/ when package.json has workspaces).",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "logicGlobs": {
+      "description": "Folders whose .ts modules with a runtime export need a test (check-tests, rule untested-module). Replaces the default list.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$)).+$" },
+      "default": [
+        "src/core/**",
+        "src/data/**",
+        "src/services/**",
+        "src/stores/**",
+        "src/api/**",
+        "src/features/**",
+        "src/hooks/**"
+      ]
+    },
+    "sourceGlobs": {
+      "description": "Production code for the history rules (check-test-edits, rule code-without-test): .ts and .tsx files matching one of these globs, minus tests, testing/, fixtures/, __mocks__/ and .d.ts files.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$)).+$" },
+      "default": ["src/**", "scripts/**", "plugins/**"]
+    },
+    "ignore": {
+      "description": "Extra repo-relative globs both checkers skip (installed skills, node_modules and generated native folders are always skipped).",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "default": []
+    },
+    "requirementIdPattern": {
+      "description": "A regular expression matching the app's requirement IDs (for example \\bTASKS-\\d+\\b). When set, every new test file of a feat or fix commit quotes one (requirement-not-quoted) and every Spec-Change trailer cites one (spec-change-reason). null for an app without requirement IDs: a Spec-Change trailer then still names some reference (TASKS-12, #41, issue 41, spec 4.2), the commit-msg default. Use the same pattern as contracts/commits.json requirementRef.pattern when the app sets both.",
+      "type": ["string", "null"],
+      "default": null
+    }
+  }
+}

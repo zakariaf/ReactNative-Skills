@@ -1,0 +1,36 @@
+{
+  "$schema": "./architecture.schema.json",
+  "$comment": "The app's architecture facts. check-boundaries.mjs and check-layout.mjs add these to their defaults (the canonical src/ zones, SDK classifications and bans). Every entry is an architecture decision: change it in its own commit, together with eslint.config.mjs where the same list lives there. Filled for this harness: the template's two vendorSdks, the test build's test-only folders (debug-menu-and-test-hooks' four, design-visual-parity's harness) and one reasoned exception, the harness's parity launch screen.",
+  "srcFolders": [],
+  "sdkPackagePatterns": [],
+  "vendorSdks": {
+    "expo-notifications": "LocalNotificationsPort and PushPort",
+    "expo-secure-store": "SecureStoragePort"
+  },
+  "vendorSdkFiles": {},
+  "portlessSdks": {},
+  "bannedPackages": {},
+  "adapterFiles": [],
+  "compositionRoot": [],
+  "nodeWorldFiles": [],
+  "serverFiles": [],
+  "allowedImports": [
+    {
+      "from": "src/features/debug/parity-launch-screen.tsx",
+      "to": "src/features/parity/**",
+      "reason": "The parity launch screen (design-visual-parity, examples/parity-launch-screen.tsx) is the test build's bridge between the debug hooks and the parity harness: it builds the ParityAppliers from useTestHooks() and renders ParityLaunchRoot. Both folders are test-only, reached only through the test-only entry."
+    }
+  ],
+  "nonFeatureScreens": [],
+  "testOnlyFolders": [
+    "src/features/debug/",
+    "src/services/test-hooks/",
+    "src/services/debug-storage/",
+    "src/stores/debug-overrides/",
+    "src/features/parity/"
+  ],
+  "importTimeExempt": [],
+  "gameFacing": [],
+  "assetExtensions": [],
+  "packages": []
+}

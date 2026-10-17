@@ -1,0 +1,1021 @@
+{
+  "bad-browser-global": {
+    "expect": [
+      "src/features/tasks/tasks-screen.tsx:14 [web-browser-global]",
+      "uses document in a file iOS and Android load too"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "    void AccessibilityInfo.isBoldTextEnabled().then(setIsBold);",
+          "with": "    void AccessibilityInfo.isBoldTextEnabled().then(setIsBold);\n    document.title = 'Tasks';"
+        }
+      }
+    ]
+  },
+  "bad-browser-global-storage": {
+    "expect": ["src/services/share/react-native-share-adapter.ts:10 [web-browser-global]", "uses localStorage"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/share/react-native-share-adapter.ts",
+          "find": "      const result = await Share.share({ title, message: `${title} ${url}` });",
+          "with": "      const result = await Share.share({ title, message: `${title} ${url}` });\n      localStorage.setItem('last-share', url);"
+        }
+      }
+    ]
+  },
+  "bad-contract-host": {
+    "expect": ["contracts/web.json:1 [web-contract]", "host must be one of"],
+    "ops": [{ "json": { "file": "contracts/web.json", "path": ["host"], "value": "netlify" } }]
+  },
+  "bad-contract-missing": {
+    "expect": ["contracts/web.json:1 [web-contract]", "has no web contract"],
+    "ops": [{ "delete": "contracts/web.json" }]
+  },
+  "bad-contract-smoke-routes": {
+    "expect": ["contracts/web.json:1 [web-contract]", "smokeRoutes must list"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/web.json",
+          "path": ["smokeRoutes"],
+          "value": [{ "path": "tasks", "testID": "tasks.list" }]
+        }
+      }
+    ]
+  },
+  "bad-error-net": {
+    "expect": [
+      "src/services/error-net/app-error-net.ts:4 [web-error-net]",
+      "uncaught errors and rejections in the browser go unrecorded"
+    ],
+    "ops": [{ "delete": "src/services/error-net/app-error-net.web.ts" }]
+  },
+  "bad-module-ads": {
+    "expect": [
+      "src/features/tasks/tasks-screen.tsx:5 [web-module-support]",
+      "the web bundle reaches react-native-google-mobile-ads",
+      "Importing native-only module"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "import { visibleCount } from './task-list';",
+          "with": "import { TestIds } from 'react-native-google-mobile-ads';\n\nimport { visibleCount } from './task-list';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "count={visibleCount({ start: 0, end: 3 })}",
+          "with": "count={visibleCount({ start: 0, end: TestIds.BANNER.length })}"
+        }
+      }
+    ]
+  },
+  "bad-module-native-only-contract": {
+    "expect": [
+      "src/services/share/react-native-share-adapter.web.ts:3 [web-module-support]",
+      "listed in contracts/web.json nativeOnlyPackages"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/web.json", "path": ["nativeOnlyPackages"], "value": ["react-native-mmkv"] } },
+      {
+        "replace": {
+          "file": "src/services/share/react-native-share-adapter.web.ts",
+          "find": "import type * as NativeShare from './react-native-share-adapter';",
+          "with": "import type * as NativeShare from './react-native-share-adapter';\nimport { MMKV } from 'react-native-mmkv';\n\nconst store = new MMKV();"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/share/react-native-share-adapter.web.ts",
+          "find": "return 'shared';",
+          "with": "store.set('shared', true);\n      return 'shared';"
+        }
+      }
+    ]
+  },
+  "bad-module-rn-internal": {
+    "expect": ["src/ui/ad-slot.tsx:3 [web-module-support]", "refuses React Native internals"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/ad-slot.tsx",
+          "find": "// The web and any platform without ads: the slot keeps its place and shows nothing.\n",
+          "with": "// The web and any platform without ads: the slot keeps its place and shows nothing.\nimport codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';\n\nexport const NativeSlot = codegenNativeComponent('AdSlot');\n"
+        }
+      }
+    ]
+  },
+  "bad-module-secure-store-no-web": {
+    "expect": [
+      "src/services/session/expo-secure-store-session-adapter.ts:2 [web-module-support]",
+      "the web bundle reaches expo-secure-store"
+    ],
+    "ops": [{ "delete": "src/services/session/expo-secure-store-session-adapter.web.ts" }]
+  },
+  "bad-pair-native-only": {
+    "expect": ["src/ui/press-pulse.native.ts:1 [web-platform-pair]", "the web bundle cannot resolve './press-pulse'"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/press-pulse.native.ts",
+          "content": "// src/ui/press-pulse.native.ts\nexport function pressPulse(): void {}\n"
+        }
+      }
+    ]
+  },
+  "bad-pair-no-base": {
+    "expect": ["src/ui/hover-card.web.tsx:1 [web-platform-pair]", "has no base file hover-card.tsx"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/hover-card.web.tsx",
+          "content": "// src/ui/hover-card.web.tsx\nexport function HoverCard(): null {\n  return null;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-pair-route": {
+    "expect": [
+      "src/app/about.web.tsx:1 [web-platform-pair]",
+      "Expo Router accepts a platform route only beside a route of the same name"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/about.web.tsx",
+          "content": "// src/app/about.web.tsx\nexport { TaskScreen as default } from '@/features/tasks/task-screen';\n"
+        }
+      }
+    ]
+  },
+  "bad-pair-shadowed": {
+    "expect": [
+      "src/ui/task-badge.web.tsx:1 [web-platform-pair]",
+      "Metro resolves task-badge.ts before task-badge.web.tsx"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/task-badge.ts",
+          "content": "// src/ui/task-badge.ts\nexport const badgeLabel = (count: number): string => String(count);\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/ui/task-badge.web.tsx",
+          "content": "// src/ui/task-badge.web.tsx\nimport type * as Native from './task-badge';\n\nexport const badgeLabel: typeof Native.badgeLabel = (count) => `${count}`;\n"
+        }
+      }
+    ]
+  },
+  "bad-rn-api-export": {
+    "expect": ["src/features/tasks/task-screen.tsx:5 [web-rn-api]", "uses ToastAndroid from react-native"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/task-screen.tsx",
+          "find": "import { View } from 'react-native';",
+          "with": "import { ToastAndroid, View } from 'react-native';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/task-screen.tsx",
+          "find": "  return <View testID=\"task.detail\" />;",
+          "with": "  ToastAndroid.show('Saved', ToastAndroid.SHORT);\n  return <View testID=\"task.detail\" />;"
+        }
+      }
+    ]
+  },
+  "bad-rn-api-export-unguarded-use": {
+    "expect": ["src/features/tasks/task-screen.tsx:7 [web-rn-api]", "uses Settings from react-native"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/task-screen.tsx",
+          "find": "import { View } from 'react-native';",
+          "with": "import { Platform, Settings, View } from 'react-native';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/task-screen.tsx",
+          "find": "  return <View testID=\"task.detail\" />;",
+          "with": "  const readCount = (): number => {\n    if (Platform.OS === 'web') console.info('web');\n    const value: unknown = Settings.get('launches');\n    return typeof value === 'number' ? value : 0;\n  };\n  return <View testID=\"task.detail\" onTouchEnd={() => readCount()} />;"
+        }
+      }
+    ]
+  },
+  "bad-rn-api-member": {
+    "expect": [
+      "src/features/tasks/tasks-screen.tsx:13 [web-rn-api]",
+      "AccessibilityInfo.isBoldTextEnabled is undefined in react-native-web"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "    // react-native-web has no isBoldTextEnabled: the web keeps the default.\n    if (Platform.OS === 'web') return;\n",
+          "with": "    // Platform is still read: Platform.OS === 'ios' is not a web check.\n    if (Platform.OS === 'ios') setIsBold(false);\n"
+        }
+      }
+    ]
+  },
+  "bad-rn-api-namespace": {
+    "expect": [
+      "src/features/tasks/task-screen.tsx:6 [web-rn-api]",
+      "Appearance.setColorScheme is undefined in react-native-web"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/task-screen.tsx",
+          "find": "import { View } from 'react-native';",
+          "with": "import * as RN from 'react-native';\nimport { View } from 'react-native';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/task-screen.tsx",
+          "find": "  return <View testID=\"task.detail\" />;",
+          "with": "  RN.Appearance.setColorScheme('dark');\n  return <View testID=\"task.detail\" />;"
+        }
+      }
+    ]
+  },
+  "bad-rn-api-native-guard-or": {
+    "expect": [
+      "src/features/tasks/task-screen.tsx:6 [web-rn-api]",
+      "Linking.openSettings is undefined in react-native-web"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/task-screen.tsx",
+          "find": "import { View } from 'react-native';",
+          "with": "import { Linking, Platform, View } from 'react-native';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/task-screen.tsx",
+          "find": "  return <View testID=\"task.detail\" />;",
+          "with": "  const settings = (isReady: boolean): void => {\n    if (Platform.OS === 'ios' || isReady) void Linking.openSettings();\n  };\n  return <View testID=\"task.detail\" onTouchEnd={() => settings(true)} />;"
+        }
+      }
+    ]
+  },
+  "bad-rn-api-screen-reader": {
+    "expect": [
+      "src/features/tasks/task-screen.tsx:5 [web-rn-api]",
+      "AccessibilityInfo.isScreenReaderEnabled misleads in react-native-web: it always resolves true"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/task-screen.tsx",
+          "find": "import { View } from 'react-native';",
+          "with": "import { AccessibilityInfo, View } from 'react-native';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/task-screen.tsx",
+          "find": "  return <View testID=\"task.detail\" />;",
+          "with": "  const readReader = (): Promise<boolean> => AccessibilityInfo.isScreenReaderEnabled();\n  return <View testID=\"task.detail\" onTouchEnd={() => readReader()} />;"
+        }
+      }
+    ]
+  },
+  "bad-rn-api-select-eager": {
+    "expect": [
+      "src/features/tasks/task-screen.tsx:5 [web-rn-api]",
+      "uses PlatformColor from react-native, which react-native-web does not export"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/task-screen.tsx",
+          "find": "import { View } from 'react-native';",
+          "with": "import { Platform, PlatformColor, View } from 'react-native';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/task-screen.tsx",
+          "find": "  return <View testID=\"task.detail\" />;",
+          "with": "  const color = Platform.select({ ios: PlatformColor('labelColor'), web: '#111111', default: '#111111' });\n  return <View testID=\"task.detail\" style={{ borderColor: color }} />;"
+        }
+      }
+    ]
+  },
+  "bad-rn-api-select-no-web": {
+    "expect": ["src/features/tasks/task-screen.tsx:7 [web-rn-api]", "Alert.alert does nothing in react-native-web"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/task-screen.tsx",
+          "find": "import { View } from 'react-native';",
+          "with": "import { Alert, Platform, View } from 'react-native';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/task-screen.tsx",
+          "find": "  return <View testID=\"task.detail\" />;",
+          "with": "  const confirmDelete = (id: string): void => {\n    const title = Platform.select({ ios: 'Delete task?', default: 'Delete this task?' });\n    Alert.alert(title, id);\n  };\n  return <View testID=\"task.detail\" onTouchEnd={() => confirmDelete('t-1')} />;"
+        }
+      }
+    ]
+  },
+  "bad-rn-api-silent": {
+    "expect": ["src/features/tasks/task-screen.tsx:5 [web-rn-api]", "Alert.alert does nothing in react-native-web"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/task-screen.tsx",
+          "find": "import { View } from 'react-native';",
+          "with": "import { Alert, View } from 'react-native';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/task-screen.tsx",
+          "find": "  return <View testID=\"task.detail\" />;",
+          "with": "  Alert.alert('Delete task?');\n  return <View testID=\"task.detail\" />;"
+        }
+      }
+    ]
+  },
+  "bad-rn-api-unrelated-web-check": {
+    "expect": ["src/features/tasks/task-screen.tsx:9 [web-rn-api]", "Alert.alert does nothing in react-native-web"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/task-screen.tsx",
+          "find": "import { View } from 'react-native';",
+          "with": "import { Alert, Platform, View } from 'react-native';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/task-screen.tsx",
+          "find": "  return <View testID=\"task.detail\" />;",
+          "with": "  const confirmDelete = (id: string): void => {\n    if (Platform.OS === 'web') {\n      console.info('web');\n    }\n    Alert.alert('Delete task?', id);\n  };\n  return <View testID=\"task.detail\" onTouchEnd={() => confirmDelete('t-1')} />;"
+        }
+      }
+    ]
+  },
+  "bad-rn-api-wrong-direction": {
+    "expect": [
+      "src/i18n/direction.ts:13 [web-rn-api] I18nManager.isRTL misleads in react-native-web: it is undefined, so the layout direction reads as left-to-right for every language",
+      "src/i18n/direction.ts:18 [web-rn-api] I18nManager.allowRTL misleads",
+      "src/i18n/direction.ts:19 [web-rn-api] I18nManager.forceRTL misleads",
+      ".web sibling"
+    ],
+    "ops": [{ "delete": "src/i18n/direction.web.ts" }]
+  },
+  "bad-sqlite-credentialless": {
+    "expect": [
+      "app.config.ts:14 [web-sqlite-setup]",
+      "Cross-Origin-Embedder-Policy is credentialless, which Safari and every iOS browser ignore"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "'Cross-Origin-Embedder-Policy': 'require-corp'",
+          "with": "'Cross-Origin-Embedder-Policy': 'credentialless'"
+        }
+      }
+    ]
+  },
+  "bad-sqlite-credentialless-constant": {
+    "expect": [
+      "scripts/metro/web-sqlite-metro.ts:18 [web-sqlite-setup]",
+      "Cross-Origin-Embedder-Policy is credentialless",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "        headers: {\n          'Cross-Origin-Embedder-Policy': 'require-corp',\n          'Cross-Origin-Opener-Policy': 'same-origin',\n        },",
+          "with": "        headers: { ...CROSS_ORIGIN_ISOLATION_HEADERS },"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "import type { ConfigContext, ExpoConfig } from 'expo/config';",
+          "with": "import type { ConfigContext, ExpoConfig } from 'expo/config';\n\nimport { CROSS_ORIGIN_ISOLATION_HEADERS } from './scripts/metro/web-sqlite-metro.ts';"
+        }
+      },
+      {
+        "replace": {
+          "file": "scripts/metro/web-sqlite-metro.ts",
+          "find": "  'Cross-Origin-Embedder-Policy': 'require-corp',",
+          "with": "  'Cross-Origin-Embedder-Policy': 'credentialless',"
+        }
+      }
+    ]
+  },
+  "bad-sqlite-credentialless-override": {
+    "expect": ["app.config.ts:17 [web-sqlite-setup]", "Cross-Origin-Embedder-Policy is credentialless"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "        headers: {\n          'Cross-Origin-Embedder-Policy': 'require-corp',",
+          "with": "        headers: {\n          ...CROSS_ORIGIN_ISOLATION_HEADERS,\n          'Cross-Origin-Embedder-Policy': 'credentialless',"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "import type { ConfigContext, ExpoConfig } from 'expo/config';",
+          "with": "import type { ConfigContext, ExpoConfig } from 'expo/config';\n\nimport { CROSS_ORIGIN_ISOLATION_HEADERS } from './scripts/metro/web-sqlite-metro.ts';"
+        }
+      }
+    ]
+  },
+  "bad-sqlite-host-headers": {
+    "expect": ["app.config.ts:1 [web-sqlite-setup]", "the expo-router plugin sets no Cross-Origin-Embedder-Policy"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    [\n      'expo-router',\n      {\n        headers: {\n          'Cross-Origin-Embedder-Policy': 'require-corp',\n          'Cross-Origin-Opener-Policy': 'same-origin',\n        },\n      },\n    ],\n",
+          "with": "    'expo-router',\n"
+        }
+      }
+    ]
+  },
+  "bad-sqlite-metro": {
+    "expect": [
+      "metro.config.js:1 [web-sqlite-setup]",
+      "Metro does not treat .wasm as an asset",
+      "the dev server does not send the cross-origin isolation headers"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "metro.config.js",
+          "find": "module.exports = withWebSqlite(config);",
+          "with": "module.exports = config;"
+        }
+      },
+      {
+        "replace": {
+          "file": "metro.config.js",
+          "find": "const { withWebSqlite } = require('./scripts/metro/web-sqlite-metro.ts');\n\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-sqlite-no-metro": {
+    "expect": ["metro.config.js:1 [web-sqlite-setup]", "there is no metro.config.js"],
+    "ops": [{ "delete": "metro.config.js" }]
+  },
+  "bad-sqlite-single-on-eas": {
+    "expect": ["app.config.ts:1 [web-sqlite-setup]", "a single export writes no _expo/.routes.json"],
+    "ops": [
+      { "replace": { "file": "app.config.ts", "find": "output: 'static'", "with": "output: 'single'" } },
+      { "json": { "file": "contracts/web.json", "path": ["output"], "value": "single" } }
+    ]
+  },
+  "bad-sqlite-static-host-headers": {
+    "expect": ["public/_headers:1 [web-sqlite-setup]", "public/_headers does not set both"],
+    "ops": [
+      { "json": { "file": "contracts/web.json", "path": ["host"], "value": "static-host" } },
+      { "write": { "file": "public/_headers", "content": "/*\n  Cross-Origin-Opener-Policy: same-origin\n" } }
+    ]
+  },
+  "bad-sqlite-warm-up": {
+    "expect": [
+      "src/app/_layout.tsx:1 [web-sqlite-warm-up]",
+      "src/data/expo-sqlite-sql-driver.ts calls expo-sqlite synchronously"
+    ],
+    "ops": [{ "replace": { "file": "src/app/_layout.tsx", "find": "warmUp={storageWarmUp}", "with": "warmUp={null}" } }]
+  },
+  "bad-sqlite-warm-up-async-only": {
+    "expect": ["src/app/_layout.tsx:1 [web-sqlite-warm-up]", "a second tab of the app cannot open the database files"],
+    "ops": [
+      { "delete": "src/services/direction-guard/kv-direction-guard-adapter.ts" },
+      {
+        "write": {
+          "file": "src/data/expo-sqlite-sql-driver.ts",
+          "content": "// src/data/expo-sqlite-sql-driver.ts\nimport { openDatabaseAsync } from 'expo-sqlite';\n\nexport async function createExpoSqliteSqlDriver(fileName: string): Promise<{ readonly path: string }> {\n  const database = await openDatabaseAsync(fileName);\n  return { path: database.databasePath };\n}\n"
+        }
+      },
+      { "replace": { "file": "src/app/_layout.tsx", "find": "warmUp={storageWarmUp}", "with": "warmUp={null}" } }
+    ]
+  },
+  "bad-sqlite-warm-up-layout-sync": {
+    "expect": [
+      "src/app/_layout.tsx:13 [web-sqlite-warm-up]",
+      "the root layout creates kv-settings-storage-adapter.ts itself, and it reads expo-sqlite synchronously"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/settings-storage/kv-settings-storage-adapter.ts",
+          "lines": [
+            "// src/services/settings-storage/kv-settings-storage-adapter.ts",
+            "// The settings text in expo-sqlite/kv-store, read synchronously (the root layout reads the saved language).",
+            "import Storage from 'expo-sqlite/kv-store';",
+            "",
+            "export function createKvSettingsStorageAdapter(): { readonly read: () => string | null } {",
+            "  return { read: () => Storage.getItemSync('settings') };",
+            "}"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "import { appErrorNet } from '@/services/error-net/app-error-net';\n",
+          "with": "import { appErrorNet } from '@/services/error-net/app-error-net';\nimport { createKvSettingsStorageAdapter } from '@/services/settings-storage/kv-settings-storage-adapter';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "  const [storageWarmUp] = useState(openDeviceWebStorage);\n",
+          "with": "  const [storageWarmUp] = useState(openDeviceWebStorage);\n  const [savedSettings] = useState(() => createKvSettingsStorageAdapter().read());\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "<DirectionGate guard={services.directionGuard}>",
+          "with": "<DirectionGate guard={services.directionGuard} key={savedSettings ?? 'none'}>"
+        }
+      }
+    ]
+  },
+  "bad-sqlite-warm-up-outermost": {
+    "expect": [
+      "src/app/_layout.tsx:22 [web-sqlite-warm-up]",
+      "the root layout renders <DirectionGate> outside WebStorageGate"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "    <WebStorageGate\n",
+          "with": "    <DirectionGate guard={services.directionGuard}>\n    <WebStorageGate\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "      <DirectionGate guard={services.directionGuard}>\n        <AppRoot services={services} />\n      </DirectionGate>\n    </WebStorageGate>\n",
+          "with": "      <AppRoot services={services} />\n    </WebStorageGate>\n    </DirectionGate>\n"
+        }
+      }
+    ]
+  },
+  "bad-ssr-scope": {
+    "expect": [
+      "src/services/share/react-native-share-adapter.web.ts:4 [web-ssr-scope]",
+      "reads navigator at module scope",
+      "web.output \"static\""
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/share/react-native-share-adapter.web.ts",
+          "find": "import type * as NativeShare from './react-native-share-adapter';\n",
+          "with": "import type * as NativeShare from './react-native-share-adapter';\n\nconst canShare = navigator.share !== undefined;\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/share/react-native-share-adapter.web.ts",
+          "find": "    if (typeof navigator.share !== 'function') return 'unavailable';",
+          "with": "    if (!canShare) return 'unavailable';"
+        }
+      }
+    ]
+  },
+  "bad-static-routes": {
+    "expect": [
+      "src/app/tasks/[id].tsx:1 [web-static-routes]",
+      "the dynamic route tasks/[id] has no generateStaticParams"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/web.json", "path": ["host"], "value": "static-host" } },
+      {
+        "write": {
+          "file": "public/_headers",
+          "content": "/*\n  Cross-Origin-Embedder-Policy: require-corp\n  Cross-Origin-Opener-Policy: same-origin\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/tasks/[id].tsx",
+          "find": "\nexport function generateStaticParams(): Record<string, string>[] {\n  return [{ id: 'task-1' }, { id: 'task-2' }];\n}\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-target-no-rnw": {
+    "expect": ["package.json:1 [web-target]", "react-native-web is not installed"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "react-native-web"], "delete": true } }]
+  },
+  "bad-target-output-mismatch": {
+    "expect": ["app.config.ts:8 [web-target]", "web.output is \"static\" but contracts/web.json says \"single\""],
+    "ops": [
+      { "json": { "file": "contracts/web.json", "path": ["output"], "value": "single" } },
+      { "json": { "file": "contracts/web.json", "path": ["host"], "value": "static-host" } },
+      {
+        "write": {
+          "file": "public/_headers",
+          "content": "/*\n  Cross-Origin-Embedder-Policy: require-corp\n  Cross-Origin-Opener-Policy: same-origin\n"
+        }
+      }
+    ]
+  },
+  "bad-target-output-unset": {
+    "expect": ["app.config.ts:8 [web-target]", "web.output is not set"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "web: { output: 'static', favicon: './assets/images/favicon.png' },",
+          "with": "web: { favicon: './assets/images/favicon.png' },"
+        }
+      }
+    ]
+  },
+  "bad-token-storage": {
+    "expect": [
+      "src/services/session/expo-secure-store-session-adapter.web.ts:8 [web-token-storage]",
+      "keeps what the native file stores in expo-secure-store in browser storage"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/session/expo-secure-store-session-adapter.web.ts",
+          "find": "    readToken: () => Promise.resolve(token),",
+          "with": "    readToken: () => Promise.resolve(token ?? localStorage.getItem('session.token')),"
+        }
+      }
+    ]
+  },
+  "bad-token-storage-async-storage": {
+    "expect": ["src/services/session/expo-secure-store-session-adapter.web.ts:3 [web-token-storage]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/session/expo-secure-store-session-adapter.web.ts",
+          "find": "import type * as NativeSession from './expo-secure-store-session-adapter';",
+          "with": "import AsyncStorage from '@react-native-async-storage/async-storage';\n\nimport type * as NativeSession from './expo-secure-store-session-adapter';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/session/expo-secure-store-session-adapter.web.ts",
+          "find": "    readToken: () => Promise.resolve(token),",
+          "with": "    readToken: () => (token === null ? AsyncStorage.getItem('session.token') : Promise.resolve(token)),"
+        }
+      }
+    ]
+  },
+  "bad-token-storage-window-prefix": {
+    "expect": [
+      "src/services/session/expo-secure-store-session-adapter.web.ts:8 [web-token-storage]",
+      "keeps what the native file stores in expo-secure-store in browser storage"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/session/expo-secure-store-session-adapter.web.ts",
+          "find": "    readToken: () => Promise.resolve(token),",
+          "with": "    readToken: () => Promise.resolve(token ?? window.localStorage.getItem('session.token')),"
+        }
+      }
+    ]
+  },
+  "bad-variant-exports": {
+    "expect": [
+      "src/services/share/react-native-share-adapter.web.ts:1 [web-variant-exports]",
+      "does not export createReactNativeShareAdapter"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/share/react-native-share-adapter.web.ts",
+          "find": "export const createReactNativeShareAdapter:",
+          "with": "const createShareAdapter:"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/share/react-native-share-adapter.web.ts",
+          "find": "  },\n});\n",
+          "with": "  },\n});\n\nexport const createWebShareAdapter = createShareAdapter;\n"
+        }
+      }
+    ]
+  },
+  "bad-variant-typed": {
+    "expect": [
+      "src/services/session/expo-secure-store-session-adapter.web.ts:1 [web-variant-typed]",
+      "does not hold itself to expo-secure-store-session-adapter.ts"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/session/expo-secure-store-session-adapter.web.ts",
+          "find": "import type * as NativeSession from './expo-secure-store-session-adapter';\n\nexport const createExpoSecureStoreSessionAdapter: typeof NativeSession.createExpoSecureStoreSessionAdapter = () => {",
+          "with": "import type { SessionPort } from './session-port';\n\nexport const createExpoSecureStoreSessionAdapter = (): SessionPort => {"
+        }
+      }
+    ]
+  },
+  "error-contract-unknown-key": {
+    "expect": ["ERROR [bad-input]", "unknown key \"routes\""],
+    "ops": [{ "json": { "file": "contracts/web.json", "path": ["routes"], "value": [] } }]
+  },
+  "error-no-package-json": {
+    "expect": ["ERROR [bad-input] nothing to check: no package.json"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "pass-monorepo-app-dir": {
+    "expect": ["source files checked, 0 problems", "RESULT: PASS"],
+    "args": ". --app-dir apps/mobile",
+    "ops": [
+      { "mkdir": "apps" },
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+      { "rename": { "from": "app.config.ts", "to": "apps/mobile/app.config.ts" } },
+      { "rename": { "from": "metro.config.js", "to": "apps/mobile/metro.config.js" } },
+      { "rename": { "from": "tsconfig.json", "to": "apps/mobile/tsconfig.json" } },
+      { "rename": { "from": "contracts", "to": "apps/mobile/contracts" } },
+      { "rename": { "from": "scripts", "to": "apps/mobile/scripts" } }
+    ]
+  },
+  "pass-no-app-config": {
+    "expect": ["SKIP app.config.ts [web-target] not yet created (expo-project-bootstrap creates it)", "RESULT: PASS"],
+    "ops": [{ "delete": "app.config.ts" }]
+  },
+  "pass-no-react-dom": {
+    "expect": ["NOT APPLICABLE: the app ships no web build: react-dom is not in package.json"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "react-dom"], "delete": true } }]
+  },
+  "pass-no-react-native": {
+    "expect": ["NOT APPLICABLE: react-native is not in package.json"],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["dependencies"],
+          "value": { "react": "19.2.3", "react-dom": "19.2.3" }
+        }
+      }
+    ]
+  },
+  "pass-platforms-without-web": {
+    "expect": ["NOT APPLICABLE: the app config platforms (ios, android) leave out web"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "  slug: 'tasks',\n",
+          "with": "  slug: 'tasks',\n  platforms: ['ios', 'android'],\n"
+        }
+      }
+    ]
+  },
+  "pass-rn-api-feature-detect": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "    // react-native-web has no isBoldTextEnabled: the web keeps the default.\n    if (Platform.OS === 'web') return;\n    void AccessibilityInfo.isBoldTextEnabled().then(setIsBold);",
+          "with": "    if (typeof AccessibilityInfo.isBoldTextEnabled !== 'function' || Platform.OS === 'ios') return;\n    void AccessibilityInfo.isBoldTextEnabled().then(setIsBold);"
+        }
+      }
+    ]
+  },
+  "pass-rn-api-guarded-export-use": {
+    "expect": ["source files checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/task-screen.tsx",
+          "find": "import { View } from 'react-native';",
+          "with": "import { Platform, PlatformColor, Settings, View } from 'react-native';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/task-screen.tsx",
+          "find": "  return <View testID=\"task.detail\" />;",
+          "with": "  const readCount = (): number => {\n    if (Platform.OS !== 'ios') return 0;\n    const value: unknown = Settings.get('launches');\n    return typeof value === 'number' ? value : 0;\n  };\n  const labelColor = Platform.OS === 'ios' ? PlatformColor('label') : undefined;\n  return <View testID=\"task.detail\" style={{ borderColor: labelColor }} onTouchEnd={() => readCount()} />;"
+        }
+      }
+    ]
+  },
+  "pass-rn-api-guards": {
+    "expect": ["source files checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/task-screen.tsx",
+          "find": "import { View } from 'react-native';",
+          "with": "import { Alert, Appearance, Linking, Platform, View } from 'react-native';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/task-screen.tsx",
+          "find": "  return <View testID=\"task.detail\" />;",
+          "with": "  const earlyReturn = (id: string): void => {\n    if (Platform.OS === 'web') {\n      console.info(id);\n      return;\n    }\n    Alert.alert('Delete task?', id);\n  };\n  const elseBranch = (): void => {\n    if (Platform.OS === 'web') console.info('web');\n    else void Linking.openSettings();\n  };\n  const negativeBody = (): void => {\n    if (Platform.OS !== 'web' && Appearance.getColorScheme() !== null) {\n      [1, 2].forEach(() => {\n        Appearance.setColorScheme('dark');\n      });\n    }\n  };\n  const ternary = (): void => (Platform.OS === 'web' ? undefined : Alert.alert('Done'));\n  const both = (): void => {\n    Platform.OS !== 'web' && Alert.alert('Saved');\n  };\n  const choose = Platform.select({ web: () => undefined, default: () => Alert.alert('Hi') });\n  return <View testID=\"task.detail\" onTouchEnd={() => { earlyReturn('t-1'); elseBranch(); negativeBody(); ternary(); both(); choose(); }} />;"
+        }
+      }
+    ]
+  },
+  "pass-rn-api-native-guard": {
+    "expect": ["source files checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/task-screen.tsx",
+          "find": "import { View } from 'react-native';",
+          "with": "import { Alert, Appearance, Linking, Platform, ToastAndroid, View } from 'react-native';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/task-screen.tsx",
+          "find": "  return <View testID=\"task.detail\" />;",
+          "with": "  const toast = (): void => {\n    if (Platform.OS === 'android') ToastAndroid.show('Saved', ToastAndroid.SHORT);\n  };\n  const settings = (): void => {\n    if (Platform.OS === 'ios' || Platform.OS === 'android') void Linking.openSettings();\n  };\n  const grouped = (): void => {\n    (Platform.OS === 'ios' || Platform.OS === 'android') && Alert.alert('Saved');\n  };\n  const andRight = (): void => {\n    Platform.OS === 'ios' && Appearance.setColorScheme('dark');\n  };\n  const ternary = (): void => (Platform.OS === 'android' ? Alert.alert('Done') : undefined);\n  const earlyIos = (): void => {\n    if (Platform.OS !== 'ios') return;\n    void Linking.openSettings();\n  };\n  const negated = (): void => {\n    if (!(Platform.OS === 'web')) Alert.alert('Hi');\n  };\n  return <View testID=\"task.detail\" onTouchEnd={() => { toast(); settings(); grouped(); andRight(); ternary(); earlyIos(); negated(); }} />;"
+        }
+      }
+    ]
+  },
+  "pass-rn-api-select-native-arrow": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/task-screen.tsx",
+          "find": "import { View } from 'react-native';",
+          "with": "import { Platform, ToastAndroid, View } from 'react-native';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/task-screen.tsx",
+          "find": "  return <View testID=\"task.detail\" />;",
+          "with": "  const saved = Platform.select({\n    android: () => ToastAndroid.show('Saved', ToastAndroid.SHORT),\n    default: () => undefined,\n  });\n  return <View testID=\"task.detail\" onTouchEnd={saved} />;"
+        }
+      }
+    ]
+  },
+  "pass-sqlite-warm-up-layout-web-adapter": {
+    "expect": ["check-web-support: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/settings-storage/kv-settings-storage-adapter.ts",
+          "lines": [
+            "// src/services/settings-storage/kv-settings-storage-adapter.ts",
+            "// The settings text in expo-sqlite/kv-store, read synchronously (the root layout reads the saved language).",
+            "import Storage from 'expo-sqlite/kv-store';",
+            "",
+            "export function createKvSettingsStorageAdapter(): { readonly read: () => string | null } {",
+            "  return { read: () => Storage.getItemSync('settings') };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/settings-storage/kv-settings-storage-adapter.web.ts",
+          "lines": [
+            "// src/services/settings-storage/kv-settings-storage-adapter.web.ts",
+            "// The settings text in localStorage in the web build: readable before the storage warm-up.",
+            "import type * as Native from './kv-settings-storage-adapter';",
+            "",
+            "export const createKvSettingsStorageAdapter: typeof Native.createKvSettingsStorageAdapter = () => ({",
+            "  read: () => (typeof localStorage === 'undefined' ? null : localStorage.getItem('settings')),",
+            "});"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "import { appErrorNet } from '@/services/error-net/app-error-net';\n",
+          "with": "import { appErrorNet } from '@/services/error-net/app-error-net';\nimport { createKvSettingsStorageAdapter } from '@/services/settings-storage/kv-settings-storage-adapter';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "  const [storageWarmUp] = useState(openDeviceWebStorage);\n",
+          "with": "  const [storageWarmUp] = useState(openDeviceWebStorage);\n  const [savedSettings] = useState(() => createKvSettingsStorageAdapter().read());\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "<DirectionGate guard={services.directionGuard}>",
+          "with": "<DirectionGate guard={services.directionGuard} key={savedSettings ?? 'none'}>"
+        }
+      }
+    ]
+  },
+  "pass-ssr-scope-guarded": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/share/react-native-share-adapter.web.ts",
+          "find": "import type * as NativeShare from './react-native-share-adapter';\n",
+          "with": "import type * as NativeShare from './react-native-share-adapter';\n\nconst canShare = typeof navigator !== 'undefined' && navigator.share !== undefined;\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/share/react-native-share-adapter.web.ts",
+          "find": "    if (typeof navigator.share !== 'function') return 'unavailable';",
+          "with": "    if (!canShare) return 'unavailable';"
+        }
+      }
+    ]
+  },
+  "pass-ssr-scope-single": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/share/react-native-share-adapter.web.ts",
+          "find": "import type * as NativeShare from './react-native-share-adapter';\n",
+          "with": "import type * as NativeShare from './react-native-share-adapter';\n\nconst canShare = navigator.share !== undefined;\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/share/react-native-share-adapter.web.ts",
+          "find": "    if (typeof navigator.share !== 'function') return 'unavailable';",
+          "with": "    if (!canShare) return 'unavailable';"
+        }
+      },
+      { "replace": { "file": "app.config.ts", "find": "output: 'static'", "with": "output: 'single'" } },
+      { "json": { "file": "contracts/web.json", "path": ["output"], "value": "single" } },
+      { "json": { "file": "contracts/web.json", "path": ["host"], "value": "static-host" } },
+      {
+        "write": {
+          "file": "public/_headers",
+          "content": "/*\n  Cross-Origin-Embedder-Policy: require-corp\n  Cross-Origin-Opener-Policy: same-origin\n"
+        }
+      }
+    ]
+  },
+  "pass-static-host-headers": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "contracts/web.json", "path": ["host"], "value": "static-host" } },
+      {
+        "write": {
+          "file": "public/_headers",
+          "content": "/*\n  Cross-Origin-Embedder-Policy: require-corp\n  Cross-Origin-Opener-Policy: same-origin\n"
+        }
+      }
+    ]
+  },
+  "pass-static-routes-client": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "contracts/web.json", "path": ["host"], "value": "static-host" } },
+      { "json": { "file": "contracts/web.json", "path": ["clientRoutes"], "value": ["tasks/[id]"] } },
+      {
+        "write": {
+          "file": "public/_headers",
+          "content": "/*\n  Cross-Origin-Embedder-Policy: require-corp\n  Cross-Origin-Opener-Policy: same-origin\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/tasks/[id].tsx",
+          "find": "\nexport function generateStaticParams(): Record<string, string>[] {\n  return [{ id: 'task-1' }, { id: 'task-2' }];\n}\n",
+          "with": ""
+        }
+      }
+    ]
+  }
+}

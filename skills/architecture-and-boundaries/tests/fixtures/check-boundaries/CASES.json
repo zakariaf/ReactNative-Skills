@@ -1,0 +1,2119 @@
+{
+  "bad-adapter-import": {
+    "expect": [
+      "src/features/tasks/use-tasks-model.ts:1 [adapter-import] imports the adapter src/services/clock/system-clock-adapter.ts",
+      "src/stores/tasks-store.ts:1 [adapter-import] imports the adapter src/data/expo-sqlite-sql-driver.ts"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "import { useServices } from '@/services/services-context';\n",
+          "with": "import { createSystemClockAdapter } from '@/services/clock/system-clock-adapter';\nimport { useServices } from '@/services/services-context';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/stores/tasks-store.ts",
+          "find": "import { createStore } from 'zustand/vanilla';\n",
+          "with": "import { createExpoSqliteSqlDriver } from '@/data/expo-sqlite-sql-driver';\nimport { createStore } from 'zustand/vanilla';\n"
+        }
+      }
+    ]
+  },
+  "bad-asset-paths": {
+    "expect": [
+      "src/features/tasks/components/empty-tasks.tsx:6 [parent-import] import from \"../../../../assets/images/empty-list.png\" Fix: Name the asset through the alias",
+      "src/ui/brand-logo.tsx:6 [unresolved-import] \"@/assets/images/logo.png\" resolves to no file (src/assets/images/logo.png)",
+      "needs \"@/assets/*\": [\"./assets/*\"] in tsconfig.json paths",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/empty-tasks.tsx",
+          "lines": [
+            "import { Image } from 'react-native';",
+            "",
+            "import type { JSX } from 'react';",
+            "",
+            "export function EmptyTasks(): JSX.Element {",
+            "  return <Image source={require('../../../../assets/images/empty-list.png')} />;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/ui/brand-logo.tsx",
+          "lines": [
+            "import { Image } from 'react-native';",
+            "",
+            "import type { JSX } from 'react';",
+            "",
+            "export function BrandLogo(): JSX.Element {",
+            "  return <Image source={require('@/assets/images/logo.png')} />;",
+            "}"
+          ]
+        }
+      },
+      {
+        "png": {
+          "files": ["assets/images/empty-list.png", "assets/images/logo.png"],
+          "width": 8,
+          "height": 8,
+          "fill": "#ffffff"
+        }
+      },
+      { "json": { "file": "tsconfig.json", "path": ["compilerOptions", "paths", "@/assets/*"], "delete": true } }
+    ]
+  },
+  "bad-cycle-and-paths": {
+    "expect": [
+      "src/stores/lists-model.ts:1 [import-cycle] import cycle: src/stores/lists-model.ts -> src/stores/tasks-model.ts -> src/stores/lists-model.ts",
+      "src/ui/task-badge.tsx:1 [parent-import] import from \"../core/tasks/task\"",
+      "src/ui/task-badge.tsx:2 [unresolved-import] \"@/ui/missing-file\" resolves to no file"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/stores/lists-model.ts",
+          "lines": [
+            "import { taskCountLabel } from './tasks-model';",
+            "",
+            "export const listLabel = (count: number): string => `${taskCountLabel(count)} in this list`;"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/tasks-model.ts",
+          "lines": [
+            "import { listLabel } from './lists-model';",
+            "",
+            "export const taskCountLabel = (count: number): string => `${String(count)} tasks`;",
+            "export const describeList = (count: number): string => listLabel(count);"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/ui/task-badge.tsx",
+          "lines": [
+            "import type { Task } from '../core/tasks/task';",
+            "import { MissingIcon } from '@/ui/missing-file';",
+            "",
+            "export function TaskBadge({ task }: { readonly task: Task }) {",
+            "  return <MissingIcon label={task.title} />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-direction": {
+    "expect": [
+      "src/core/tasks/task-label.ts:1 [core-pure] imports react",
+      "src/core/tasks/task-label.ts:2 [core-pure] imports src/theme/tokens.ts",
+      "src/stores/tasks-store.ts:1 [layer-direction] the stores layer imports the feature file src/features/tasks/task-filter.ts",
+      "src/features/tasks/use-tasks-model.ts:1 [no-tooling-import] imports test/make-task.ts",
+      "src/features/task-detail/use-task-detail-model.ts:1 [feature-to-feature] feature task-detail imports feature tasks (src/features/tasks/task-filter.ts)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/core/tasks/task-label.ts",
+          "lines": [
+            "import { useMemo } from 'react';",
+            "import { spacing } from '@/theme/tokens';",
+            "",
+            "export const taskLabel = { useMemo, spacing };"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/stores/tasks-store.ts",
+          "find": "import { createStore } from 'zustand/vanilla';\n",
+          "with": "import { openTasks } from '@/features/tasks/task-filter';\nimport { createStore } from 'zustand/vanilla';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "import { useServices } from '@/services/services-context';\n",
+          "with": "import { makeTask } from '@test/make-task';\nimport { useServices } from '@/services/services-context';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/task-detail/use-task-detail-model.ts",
+          "find": "import { useServices } from '@/services/services-context';\n",
+          "with": "import { openTasks } from '@/features/tasks/task-filter';\nimport { useServices } from '@/services/services-context';\n"
+        }
+      }
+    ]
+  },
+  "bad-fake-import": {
+    "expect": [
+      "src/stores/lists-store.ts:1 [fake-import] imports the fake src/services/clock/fake-clock.ts",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/stores/lists-store.ts",
+          "lines": [
+            "import { createFakeClock } from '@/services/clock/fake-clock';",
+            "",
+            "import { createTasksStore } from './tasks-store';",
+            "",
+            "export const listsStore = { store: createTasksStore(), clock: createFakeClock() };"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-fat-route": {
+    "expect": [
+      "src/app/explore.tsx:5 [route-thin] the route calls useState()",
+      "src/app/explore.tsx:6 [route-thin] the route calls useEffect()",
+      "src/app/explore.tsx:1 [route-thin] the route renders no screen from src/features/",
+      "RESULT: FAIL (3 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/explore.tsx",
+          "lines": [
+            "import { useEffect, useState } from 'react';",
+            "import { FlatList, Pressable, Text } from 'react-native';",
+            "",
+            "export default function ExploreRoute() {",
+            "  const [items, setItems] = useState<string[]>([]);",
+            "  useEffect(() => {",
+            "    setItems(['Inbox', 'Today']);",
+            "  }, []);",
+            "  return (",
+            "    <FlatList",
+            "      data={items}",
+            "      renderItem={({ item }) => (",
+            "        <Pressable>",
+            "          <Text>{item}</Text>",
+            "        </Pressable>",
+            "      )}",
+            "    />",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-game-boundaries": {
+    "expect": [
+      "src/games/lights-out/board/board-model.ts:1 [game-to-game] game lights-out imports game sliding-puzzle (src/games/sliding-puzzle/rules/is-solved.ts)",
+      "src/games/lights-out/board/board-model.ts:2 [game-facing] game lights-out imports src/stores/tasks-store.ts, which games do not face",
+      "src/games/lights-out/board/board-model.ts:3 [game-facing] game lights-out imports src/services/services-context.tsx, which games do not face",
+      "src/games/lights-out/rules/toggle.ts:1 [game-to-game] game lights-out imports game sliding-puzzle (src/games/sliding-puzzle/rules/is-solved.ts)",
+      "src/games/lights-out/board/board-model.ts:7 [game-facing] game lights-out imports src/games/game-registry.ts, which games do not face",
+      "src/games/lights-out/board/board-model.ts:8 [game-facing] game lights-out imports src/features/tasks/task-filter.ts, which games do not face",
+      "RESULT: FAIL (6 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/game-registry.ts",
+          "lines": [
+            "// The list of games the app offers: a shelf file, not a game.",
+            "export const GAME_IDS = ['lights-out', 'sliding-puzzle'] as const;"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/lights-out/board/board-model.test.ts",
+          "lines": [
+            "// Tests may drive the game with app code (the game-facing relief); they still never import another game.",
+            "import { createTasksStore } from '@/stores/tasks-store';",
+            "",
+            "import { boardModel } from './board-model';",
+            "",
+            "describe('boardModel', () => {",
+            "  it('builds', () => {",
+            "    expect([createTasksStore, boardModel]).toHaveLength(2);",
+            "  });",
+            "});"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/lights-out/board/board-model.ts",
+          "lines": [
+            "import { isSolved } from '@/games/sliding-puzzle/rules/is-solved';",
+            "import { createTasksStore } from '@/stores/tasks-store';",
+            "import { useServices } from '@/services/services-context';",
+            "import { AppText } from '@/ui/app-text';",
+            "import { spacing } from '@/theme/tokens';",
+            "import type { ClockPort } from '@/services/clock/clock-port';",
+            "import { GAME_IDS } from '@/games/game-registry';",
+            "import { openTasks } from '@/features/tasks/task-filter';",
+            "",
+            "import { toggle } from '@/games/lights-out/rules/toggle';",
+            "",
+            "export type BoardClock = ClockPort;",
+            "export const boardModel = { isSolved, createTasksStore, useServices, AppText, spacing, toggle, GAME_IDS, openTasks };"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/lights-out/rules/toggle.ts",
+          "lines": [
+            "import { isSolved } from '@/games/sliding-puzzle/rules/is-solved';",
+            "",
+            "export const toggle = (isOn: boolean): boolean => !isOn && isSolved([]);"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/sliding-puzzle/rules/is-solved.ts",
+          "lines": [
+            "export const isSolved = (tiles: readonly number[]): boolean => tiles.every((tile, index) => tile === index);"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-gate-unconditional": {
+    "expect": [
+      "src/test-only.ts:6 [test-only-gate] require() of './test-only-entry' has no condition: the gate ships its entry in every bundle",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/test-only.ts",
+          "find": "  process.env.EXPO_PUBLIC_APP_VARIANT === 'production'\n    ? null\n    : (require('./test-only-entry') as TestOnlyApi);",
+          "with": "  require('./test-only-entry') as TestOnlyApi;"
+        }
+      }
+    ]
+  },
+  "bad-local-module": {
+    "expect": [
+      "src/features/tasks/use-task-timer.ts:2 [vendor-sdk] imports the local Expo module modules/live-activity outside its adapter",
+      "src/stores/timer-store.ts:2 [vendor-sdk] imports the local Expo module live-activity (modules/live-activity) outside its adapter",
+      "src/services/task-timer/live-activity-task-timer-adapter.ts:2 [parent-import] import from \"../../../modules/live-activity\" Fix: Import the local Expo module through its alias",
+      "RESULT: FAIL (3 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "modules/live-activity/expo-module.config.json",
+          "lines": [
+            "{",
+            "  \"platforms\": [",
+            "    \"apple\",",
+            "    \"android\"",
+            "  ],",
+            "  \"apple\": {",
+            "    \"modules\": [",
+            "      \"LiveActivityModule\"",
+            "    ]",
+            "  },",
+            "  \"android\": {",
+            "    \"modules\": [",
+            "      \"expo.modules.liveactivity.LiveActivityModule\"",
+            "    ]",
+            "  }",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "modules/live-activity/index.ts",
+          "lines": [
+            "// The local Expo module's JavaScript entry (npx create-expo-module --local).",
+            "export { default } from './src/live-activity-module';"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "modules/live-activity/package.json",
+          "lines": [
+            "{ \"name\": \"live-activity\", \"version\": \"0.1.0\", \"private\": true, \"main\": \"index.ts\" }"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "modules/live-activity/src/live-activity-module.ts",
+          "lines": [
+            "import { requireNativeModule } from 'expo';",
+            "",
+            "export default requireNativeModule('LiveActivity');"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-timer.ts",
+          "lines": [
+            "// A feature reaching the native module directly: the port and its fake are bypassed.",
+            "import LiveActivity from '@/modules/live-activity';",
+            "",
+            "export const startTimer = (taskId: string): unknown => LiveActivity.start(taskId, 0);"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/task-timer/live-activity-task-timer-adapter.ts",
+          "lines": [
+            "// The adapter may import the module, but by its alias, not by a parent path.",
+            "import LiveActivity from '../../../modules/live-activity';",
+            "",
+            "export const createLiveActivityTaskTimerAdapter = () => ({ start: LiveActivity.start });"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/timer-store.ts",
+          "lines": [
+            "// The same module by its package name (modules/live-activity/package.json).",
+            "import LiveActivity from 'live-activity';",
+            "",
+            "export const timerModule = LiveActivity;"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "tsconfig.json",
+          "path": ["compilerOptions", "paths", "@/modules/*"],
+          "value": ["./modules/*"]
+        }
+      }
+    ]
+  },
+  "bad-module-require": {
+    "expect": [
+      "src/features/tasks/lazy-filter.ts:3 [test-only-gate] require() of './task-filter' in app code",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/lazy-filter.ts",
+          "lines": [
+            "// A require() of a module (not an asset) keeps it in every bundle and hides the import from the graph.",
+            "export function loadFilter(): unknown {",
+            "  return require('./task-filter') as unknown;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-node-import": {
+    "expect": [
+      "app.config.ts:4 [node-import] imports src/config/app-name.ts, which Node cannot load (src/config/app-name.ts imports expo-constants)",
+      "plugins/with-app-name.ts:2 [node-import] imports \"@/core/tasks/task\" through a tsconfig alias",
+      "scripts/quality/count-tasks.ts:4 [node-import] imports \"../../src/core/tasks/task\" without its file extension",
+      "app.config.ts:5 [node-import] imports src/config/app-variant.ts, which Node cannot load (src/config/app-variant.ts imports \"./app-variant-names\" without its file extension)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/config/app-name.ts",
+          "lines": [
+            "import Constants from 'expo-constants';",
+            "",
+            "export const APP_NAME = `Tasks ${String(Constants.expoConfig?.version)}`;"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/config/app-variant-names.ts",
+          "lines": [
+            "export const VARIANT_NAMES = { development: 'Tasks (Dev)', preview: 'Tasks (Preview)', production: 'Tasks' } as const;"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/config/app-variant.ts",
+          "find": "// Neutral: read by Node (app.config.ts) and by the app. Imports nothing.\n",
+          "with": "import { VARIANT_NAMES } from './app-variant-names';\n\n// Neutral: read by Node (app.config.ts) and by the app. Imports nothing.\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "import { resolveAppVariant } from './src/config/app-variant.ts';\n",
+          "with": "import { APP_NAME } from './src/config/app-name.ts';\nimport { resolveAppVariant } from './src/config/app-variant.ts';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "plugins/with-app-name.ts",
+          "find": "// plugins/with-app-name.ts\n",
+          "with": "// plugins/with-app-name.ts\nimport { isTaskDone } from '@/core/tasks/task';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "scripts/quality/count-tasks.ts",
+          "find": "'../../src/core/tasks/task.ts'",
+          "with": "'../../src/core/tasks/task'"
+        }
+      }
+    ]
+  },
+  "bad-node-world": {
+    "expect": [
+      "src/data/tasks-export.ts:1 [node-builtin] imports the Node built-in \"node:path\"",
+      "src/data/tasks-export.ts:2 [node-world-import] imports src/config/build-config.ts, which needs Node (src/config/build-config.ts runs in Node)",
+      "src/data/tasks-export.ts:3 [node-world-import] imports src/config/plugin-list.ts, which needs Node (src/config/plugin-list.ts imports expo/config-plugins)",
+      "src/data/tasks-export.ts:4 [node-builtin] imports the Node built-in \"buffer\""
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/config/build-config.ts",
+          "lines": [
+            "// Builds part of the Expo config inside src/config: Node world by declaration (contract nodeWorldFiles).",
+            "export function buildConfig(name: string): { readonly name: string } {",
+            "  return { name };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/config/plugin-list.ts",
+          "lines": [
+            "import { withPlugins } from 'expo/config-plugins';",
+            "",
+            "export const pluginList = [withPlugins];"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/data/tasks-export.ts",
+          "lines": [
+            "import { join } from 'node:path';",
+            "import type { buildConfig } from '@/config/build-config';",
+            "import { pluginList } from '@/config/plugin-list';",
+            "import { Buffer } from 'buffer';",
+            "",
+            "export const exportPath = join('exports', 'tasks.json');",
+            "export const plugins = pluginList;",
+            "export const encoded = Buffer.from('tasks');",
+            "export type Builder = typeof buildConfig;"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/architecture.json",
+          "path": ["nodeWorldFiles"],
+          "value": ["src/config/build-config.ts"]
+        }
+      }
+    ]
+  },
+  "bad-platform-value-import": {
+    "expect": [
+      "FAIL src/services/haptics/expo-haptics-adapter.web.ts:2 [adapter-import] imports the adapter src/services/haptics/expo-haptics-adapter.ts",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/haptics/expo-haptics-adapter.ts",
+          "lines": [
+            "// iOS: a light impact.",
+            "import { ImpactFeedbackStyle, impactAsync } from 'expo-haptics';",
+            "",
+            "import type { HapticsPort } from './haptics-port';",
+            "",
+            "export function createExpoHapticsAdapter(): HapticsPort {",
+            "  return { tap: () => void impactAsync(ImpactFeedbackStyle.Light).catch(() => undefined) };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/haptics/expo-haptics-adapter.web.ts",
+          "lines": [
+            "// Web: a value import of the base adapter bundles the native SDK into the web build.",
+            "import { createExpoHapticsAdapter as createNative } from './expo-haptics-adapter';",
+            "",
+            "export const createExpoHapticsAdapter = createNative;"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/haptics/fake-haptics.test.ts",
+          "lines": [
+            "import { createFakeHaptics } from './fake-haptics';",
+            "",
+            "describe('createFakeHaptics', () => {",
+            "  it('counts taps', () => {",
+            "    const haptics = createFakeHaptics();",
+            "    haptics.tap();",
+            "    expect(haptics.taps()).toBe(1);",
+            "  });",
+            "});"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/haptics/fake-haptics.ts",
+          "lines": [
+            "import type { HapticsPort } from './haptics-port';",
+            "",
+            "export function createFakeHaptics(): HapticsPort & { readonly taps: () => number } {",
+            "  let count = 0;",
+            "  return { tap: () => { count += 1; }, taps: () => count };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/haptics/haptics-port.ts",
+          "lines": ["export type HapticsPort = { readonly tap: () => void };"]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/create-device-services.ts",
+          "find": "import { createSystemClockAdapter } from '@/services/clock/system-clock-adapter';\n",
+          "with": "import { createSystemClockAdapter } from '@/services/clock/system-clock-adapter';\nimport { createExpoHapticsAdapter } from '@/services/haptics/expo-haptics-adapter';\n\nexport const hapticsFactory = createExpoHapticsAdapter;\n"
+        }
+      }
+    ]
+  },
+  "bad-policy-banned": {
+    "expect": [
+      "src/features/tasks/format-due.ts:1 [banned-package] imports moment: format dates with Intl at the edge (src/i18n)",
+      "doNotAdd in contracts/dependency-policy.json (dependency-management)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/dependency-policy.json",
+          "lines": [
+            "{",
+            "  \"doNotAdd\": {",
+            "    \"moment\": \"format dates with Intl at the edge (src/i18n)\",",
+            "    \"ky\": \"the app requests through the ApiClient port\"",
+            "  }",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/format-due.ts",
+          "lines": [
+            "import moment from 'moment';",
+            "",
+            "export function formatDue(dueMs: number): string {",
+            "  return moment(dueMs).format('LL');",
+            "}"
+          ]
+        }
+      },
+      { "json": { "file": "package.json", "path": ["dependencies", "moment"], "value": "2.30.1" } }
+    ]
+  },
+  "bad-pure": {
+    "expect": [
+      "src/core/tasks/task-sort.ts:1 [core-pure] imports react-native",
+      "src/core/tasks/task-sort.ts:2 [core-pure] imports src/ui/app-text.tsx",
+      "src/games/lights-out/rules/apply-move.ts:1 [core-pure] rules/levels import src/games/lights-out/board/draw-board.ts",
+      "src/games/lights-out/levels/level-table.ts:1 [core-pure] rules/levels import src/i18n/messages.ts",
+      "src/games/lights-out/rules/apply-move.test.ts:1 [core-pure] imports react-native",
+      "src/games/lights-out/rules/apply-move.test.ts:2 [core-pure] rules/levels import src/stores/tasks-store.ts",
+      "src/games/lights-out/levels/level-table.test.ts:1 [core-pure] rules/levels import src/games/lights-out/testing/lights-out-bot.ts",
+      "src/ui/task-row.tsx:1 [ui-presentational] src/ui imports src/stores/tasks-store.ts"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/core/tasks/task-sort.ts",
+          "lines": [
+            "import { Platform } from 'react-native';",
+            "import { AppText } from '@/ui/app-text';",
+            "",
+            "export const sortInfo = { os: Platform.OS, AppText };"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/lights-out/board/draw-board.ts",
+          "lines": ["export const drawBoard = (): string => 'board';"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/lights-out/levels/level-table.test.ts",
+          "lines": [
+            "import { lightsOutBot } from '@/games/lights-out/testing/lights-out-bot';",
+            "",
+            "import { levelTable } from './level-table';",
+            "",
+            "describe('levelTable', () => {",
+            "  it('solves', () => {",
+            "    expect([lightsOutBot, levelTable]).toHaveLength(2);",
+            "  });",
+            "});"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/lights-out/levels/level-table.ts",
+          "lines": [
+            "import { MESSAGES } from '@/i18n/messages';",
+            "import { toggle } from '@/games/lights-out/rules/toggle';",
+            "",
+            "export const levelTable = { MESSAGES, toggle };"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/lights-out/rules/apply-move.test.ts",
+          "lines": [
+            "import { View } from 'react-native';",
+            "import { createTasksStore } from '@/stores/tasks-store';",
+            "import { drawBoard } from '@/games/lights-out/board/draw-board';",
+            "",
+            "import { applyMove } from './apply-move';",
+            "",
+            "describe('applyMove', () => {",
+            "  it('replays on the board', () => {",
+            "    expect([View, createTasksStore, drawBoard, applyMove]).toHaveLength(4);",
+            "  });",
+            "});"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/lights-out/rules/apply-move.ts",
+          "lines": [
+            "import { drawBoard } from '@/games/lights-out/board/draw-board';",
+            "import { toggle } from '@/games/lights-out/rules/toggle';",
+            "",
+            "export const applyMove = { drawBoard, toggle };"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/lights-out/rules/toggle.ts",
+          "lines": ["export const toggle = (isOn: boolean): boolean => !isOn;"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/lights-out/testing/lights-out-bot.ts",
+          "lines": ["export const lightsOutBot = 'bot';"]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/ui/task-row.tsx",
+          "find": "import { spacing } from '@/theme/tokens';\n",
+          "with": "import { createTasksStore } from '@/stores/tasks-store';\nimport { spacing } from '@/theme/tokens';\n"
+        }
+      }
+    ]
+  },
+  "bad-pure-react-library": {
+    "expect": [
+      "src/core/tasks/task-atoms.ts:1 [core-pure] imports jotai",
+      "src/core/tasks/task-atoms.ts:2 [core-pure] imports tiny-signals",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/core/tasks/task-atoms.ts",
+          "lines": [
+            "import { atom } from 'jotai';",
+            "import { useSignal } from 'tiny-signals';",
+            "",
+            "export const openCount = atom(0);",
+            "export const useOpenSignal = useSignal;"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/tiny-signals/package.json",
+          "content": "{ \"name\": \"tiny-signals\", \"version\": \"1.0.0\", \"peerDependencies\": { \"react\": \">=18\" } }\n"
+        }
+      }
+    ]
+  },
+  "bad-route-hooks": {
+    "expect": [
+      "src/app/lists/index.tsx:12 [route-thin] the route calls useQuery() from @tanstack/react-query",
+      "src/app/lists/index.tsx:13 [route-thin] the route calls React.useMemo() from react",
+      "src/app/lists/index.tsx:14 [route-thin] the route calls useListCount(), a hook it does not import from src/features/ or expo-router",
+      "RESULT: FAIL (3 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/lists/index.tsx",
+          "lines": [
+            "// A route that renders a feature component but fetches and derives inline: screen logic in a route.",
+            "import { useQuery } from '@tanstack/react-query';",
+            "import React from 'react';",
+            "",
+            "import { TasksScreen } from '@/features/tasks/tasks-screen';",
+            "",
+            "function useListCount(lists: readonly string[]): number {",
+            "  return lists.length;",
+            "}",
+            "",
+            "export default function ListsRoute() {",
+            "  const query = useQuery({ queryKey: ['lists'], queryFn: () => fetch('https://example.com/lists').then((response) => response.json() as Promise<string[]>) });",
+            "  const lists = React.useMemo(() => query.data ?? [], [query.data]);",
+            "  const count = useListCount(lists);",
+            "  void count;",
+            "  return <TasksScreen />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-routes": {
+    "expect": [
+      "src/features/tasks/tasks-screen.tsx:1 [route-leaf] imports the route file src/app/tasks/[taskId].tsx",
+      "src/app/index.tsx:1 [route-thin] the route imports src/stores/tasks-selectors.ts",
+      "src/app/index.tsx:2 [route-thin] the route imports src/services/clock/clock-port.ts"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "import { AppText } from '@/ui/app-text';\n",
+          "with": "import TaskDetailRoute from '@/app/tasks/[taskId]';\nimport { AppText } from '@/ui/app-text';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/index.tsx",
+          "find": "import { TasksScreen } from '@/features/tasks/tasks-screen';\n",
+          "with": "import { selectOpenTasks } from '@/stores/tasks-selectors';\nimport type { ClockPort } from '@/services/clock/clock-port';\nimport { TasksScreen } from '@/features/tasks/tasks-screen';\n"
+        }
+      }
+    ]
+  },
+  "bad-server-boundary": {
+    "expect": [
+      "src/app/api/tasks+api.ts:2 [server-boundary] server code imports the app runtime module react-native",
+      "src/app/api/tasks+api.ts:4 [server-boundary] server code imports src/ui/app-text.tsx (ui)",
+      "src/app/api/tasks+api.ts:5 [server-boundary] server code imports src/stores/tasks-store.ts (stores)",
+      "src/features/tasks/use-task-digest.ts:1 [server-boundary] bundled app code imports the server file src/app/api/tasks+api.ts",
+      "RESULT: FAIL (4 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/api/tasks+api.ts",
+          "lines": [
+            "// An API route that reaches into the app: the native bundle never holds it, so neither may it hold the app.",
+            "import { Platform } from 'react-native';",
+            "",
+            "import { AppText } from '@/ui/app-text';",
+            "import { createTasksStore } from '@/stores/tasks-store';",
+            "",
+            "export function GET(): Response {",
+            "  return Response.json({ os: Platform.OS, parts: [AppText.name, createTasksStore.name] });",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-digest.ts",
+          "lines": [
+            "import { GET } from '@/app/api/tasks+api';",
+            "",
+            "// The app calls an API route over HTTP; importing it drags server code into the bundle.",
+            "export const readDigest = (): Response => GET();"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-services-factories": {
+    "expect": [
+      "src/features/tasks/use-fresh-services.ts:1 [adapter-import] imports the composition root src/services/create-device-services.ts outside the root layout",
+      "src/features/tasks/use-fresh-services.ts:2 [fake-import] imports the test services src/services/create-test-services.ts",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-fresh-services.ts",
+          "lines": [
+            "import { createDeviceServices } from '@/services/create-device-services';",
+            "import { createTestServices } from '@/services/create-test-services';",
+            "",
+            "import type { Services } from '@/services/services-context';",
+            "",
+            "/** Every call builds new adapters; the test services' stand-ins throw on first use. */",
+            "export function useFreshServices(isPreview: boolean): Services {",
+            "  return isPreview ? createTestServices() : createDeviceServices();",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-test-only": {
+    "expect": [
+      "src/features/debug/debug-link.ts:2 [test-only-gate] imports src/test-only-entry.ts directly",
+      "src/features/debug/debug-link.ts:6 [test-only-gate] require() of './debug-screen' in app code",
+      "src/features/debug/debug-gate.ts:3 [test-only-gate] require() of './debug-screen' is decided by EXPO_PUBLIC_APP_VARIANT outside a test-only.ts gate",
+      "RESULT: FAIL (3 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/debug/debug-gate.ts",
+          "lines": [
+            "// A second gate outside src/**/test-only.ts: test-only code then has two ways in.",
+            "export const DEBUG_SCREEN: unknown =",
+            "  process.env.EXPO_PUBLIC_APP_VARIANT === 'production' ? null : (require('./debug-screen') as unknown);"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/debug/debug-link.ts",
+          "lines": [
+            "import { IS_TEST_BUILD } from '@/config/app-variant';",
+            "import { DebugScreen } from '@/test-only-entry';",
+            "",
+            "export function openDebugScreen(): unknown {",
+            "  // An imported constant does not fold: Metro keeps the module in every bundle (verified on SDK 57).",
+            "  const screen = IS_TEST_BUILD ? (require('./debug-screen') as { readonly DebugScreen: unknown }) : null;",
+            "  return [DebugScreen, screen];",
+            "}"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/config/app-variant.ts",
+          "find": "export type AppVariant = (typeof APP_VARIANTS)[number];\n",
+          "with": "export type AppVariant = (typeof APP_VARIANTS)[number];\nexport const IS_TEST_BUILD = process.env.EXPO_PUBLIC_APP_VARIANT !== 'production';\n"
+        }
+      }
+    ]
+  },
+  "bad-test-only-cycle": {
+    "expect": [
+      "[import-cycle] import cycle through the test-only gate",
+      "src/features/debug/use-debug-flag.ts -> src/test-only.ts -> src/test-only-entry.ts",
+      "never the gate (test-only.ts) or a helper that imports the gate",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/debug/use-debug-flag.ts",
+          "lines": [
+            "import { TEST_ONLY } from '@/test-only';",
+            "",
+            "export function useDebugFlag(): boolean {",
+            "  return TEST_ONLY !== null;",
+            "}"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/debug/use-debug-model.ts",
+          "find": "import { useServices } from '@/services/services-context';\n",
+          "with": "import { useServices } from '@/services/services-context';\n\nimport { useDebugFlag } from './use-debug-flag';\n"
+        }
+      }
+    ]
+  },
+  "bad-test-only-folder-route": {
+    "expect": [
+      "src/app/(app)/debug.tsx:3 [test-only-gate] imports src/features/debug/debug-screen.tsx, which sits in a testOnlyFolders folder, outside the test-only entry",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/(app)/debug.tsx",
+          "lines": [
+            "// The debug screen as an ordinary route: Expo Router bundles every route, so the screen and the fake",
+            "// clock it imports ship in production builds although src/features/debug/ is a testOnlyFolders folder.",
+            "export { DebugScreen as default } from '@/features/debug/debug-screen';"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/debug/debug-screen.tsx",
+          "find": "import { AppText } from '@/ui/app-text';\n",
+          "with": "import { createFakeClock } from '@/services/clock/fake-clock';\nimport { AppText } from '@/ui/app-text';\n\nexport const simulatedClock = createFakeClock;\n"
+        }
+      },
+      {
+        "json": { "file": "contracts/architecture.json", "path": ["testOnlyFolders"], "value": ["src/features/debug/"] }
+      }
+    ]
+  },
+  "bad-unclassified-sdk": {
+    "expect": [
+      "src/features/tasks/use-attach-photo.ts:2 [unclassified-sdk] imports expo-image-picker, an SDK that is neither behind a port (vendorSdks) nor recorded as portless (portlessSdks)",
+      "src/features/tasks/use-attach-photo.ts:3 [unclassified-sdk] imports expo-contacts",
+      "src/features/tasks/use-attach-photo.ts:5 [unclassified-sdk] imports expo-calendar",
+      "src/services/clipboard/expo-clipboard-adapter.ts:2 [unclassified-sdk] imports expo-clipboard",
+      "src/features/tasks/use-checkout.ts:3 [unclassified-sdk] imports @stripe/stripe-react-native",
+      "src/features/tasks/use-checkout.ts:4 [unclassified-sdk] imports @notifee/react-native",
+      "src/features/tasks/use-checkout.ts:5 [unclassified-sdk] imports lottie-react-native",
+      "src/features/tasks/use-checkout.ts:6 [unclassified-sdk] imports @acme/haptic-kit",
+      "RESULT: FAIL (8 problems)"
+    ],
+    "ops": [
+      { "delete": "contracts/architecture.json" },
+      {
+        "write": {
+          "file": "src/features/tasks/use-attach-photo.ts",
+          "lines": [
+            "// Without a contract, side-effect SDKs no default classifies cannot slip into a model hook.",
+            "import { launchImageLibraryAsync } from 'expo-image-picker';",
+            "import { getContactsAsync } from 'expo-contacts';",
+            "import { router } from 'expo-router';",
+            "import { getCalendarsAsync } from 'expo-calendar';",
+            "",
+            "export const attachPhoto = { launchImageLibraryAsync, getContactsAsync, router, getCalendarsAsync };"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/use-checkout.test.ts",
+          "lines": [
+            "// A test imports what its subject imports, and test libraries: no decision is forced here.",
+            "import { renderHook } from '@testing-library/react-native';",
+            "import LottieView from 'lottie-react-native';",
+            "",
+            "import { checkout } from './use-checkout';",
+            "",
+            "describe('checkout', () => {",
+            "  it('lists the SDKs', () => {",
+            "    expect([renderHook, LottieView, checkout]).toHaveLength(3);",
+            "  });",
+            "});"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/use-checkout.ts",
+          "lines": [
+            "// SDKs named *-react-native or @scope/*react-native* need the same decision, and so does a package",
+            "// whose name hides it but whose node_modules folder ships native code (expo-module.config.json).",
+            "import { useStripe } from '@stripe/stripe-react-native';",
+            "import notifee from '@notifee/react-native';",
+            "import LottieView from 'lottie-react-native';",
+            "import { pulse } from '@acme/haptic-kit';",
+            "import { toDay } from '@acme/date-kit';",
+            "",
+            "export const checkout = { useStripe, notifee, LottieView, pulse, toDay };"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/clipboard/expo-clipboard-adapter.ts",
+          "lines": [
+            "// Even an adapter needs the decision: the SDK goes into vendorSdks with its port.",
+            "import { getStringAsync } from 'expo-clipboard';",
+            "",
+            "export const createExpoClipboardAdapter = () => ({ readText: getStringAsync });"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@acme/haptic-kit/package.json",
+          "content": "{ \"name\": \"@acme/haptic-kit\", \"version\": \"1.0.0\", \"main\": \"index.js\" }\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@acme/haptic-kit/expo-module.config.json",
+          "content": "{ \"platforms\": [\"apple\", \"android\"] }\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@acme/date-kit/package.json",
+          "content": "{ \"name\": \"@acme/date-kit\", \"version\": \"1.0.0\" }\n"
+        }
+      }
+    ]
+  },
+  "bad-vendor-and-banned": {
+    "expect": [
+      "src/features/tasks/upgrade-button.tsx:1 [vendor-sdk] imports the vendor SDK expo-iap outside its adapter",
+      "src/features/tasks/upgrade-button.tsx:2 [banned-package] imports axios",
+      "src/i18n/language-store.ts:1 [vendor-sdk] imports the vendor SDK expo-sqlite/kv-store outside its adapter",
+      "src/i18n/language-store.ts:2 [banned-package] imports @react-native-async-storage/async-storage",
+      "src/services/clock/system-clock-adapter.ts:3 [vendor-sdk] imports expo-tracking-transparency, which only src/services/consent/*-consent-adapter.ts may import",
+      "src/features/tasks/use-session-token.ts:1 [vendor-sdk] imports the vendor SDK expo-secure-store outside its adapter",
+      "src/features/tasks/legacy-purchase.js:2 [vendor-sdk] imports the vendor SDK expo-iap outside its adapter",
+      "RESULT: FAIL (7 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/legacy-purchase.js",
+          "lines": [
+            "// A JavaScript file under src/ (allowJs) follows the same rules as TypeScript.",
+            "import { requestPurchase } from 'expo-iap';",
+            "",
+            "export const legacyPurchase = { requestPurchase };"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/upgrade-button.tsx",
+          "lines": [
+            "import { fetchProducts } from 'expo-iap';",
+            "import axios from 'axios';",
+            "",
+            "export const upgrade = { fetchProducts, axios };"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/use-session-token.ts",
+          "lines": [
+            "import { getItemAsync } from 'expo-secure-store';",
+            "",
+            "export const readToken = (): Promise<string | null> => getItemAsync('session');"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/i18n/language-store.ts",
+          "lines": [
+            "import Storage from 'expo-sqlite/kv-store';",
+            "import AsyncStorage from '@react-native-async-storage/async-storage';",
+            "",
+            "export const languageStores = [Storage, AsyncStorage];"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/clock/system-clock-adapter.ts",
+          "find": "// The one app file allowed to read Date (the lint config's CLOCK_ADAPTERS exemption).\n",
+          "with": "// The one app file allowed to read Date (the lint config's CLOCK_ADAPTERS exemption).\nimport { requestTrackingPermissionsAsync } from 'expo-tracking-transparency';\n"
+        }
+      }
+    ]
+  },
+  "error-contract-unknown-key": {
+    "expect": ["ERROR [bad-input] contracts/architecture.json: unknown key \"zones\""],
+    "ops": [{ "json": { "file": "contracts/architecture.json", "path": ["zones"], "value": [] } }]
+  },
+  "error-exception-without-reason": {
+    "expect": ["ERROR [bad-input] contracts/architecture.json: allowedImports[0].reason must be a non-empty string"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/architecture.json",
+          "path": ["allowedImports"],
+          "value": [{ "from": "src/features/a/**", "to": "src/features/b/**" }]
+        }
+      }
+    ]
+  },
+  "error-no-files": {
+    "expect": ["ERROR [bad-input] nothing to check: 0 TypeScript and JavaScript files found"],
+    "args": "{dir}/contracts",
+    "ops": []
+  },
+  "pass-allowed-import": {
+    "expect": ["check-boundaries: ", ", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/task-detail/use-task-detail-model.ts",
+          "find": "import { useServices } from '@/services/services-context';\n",
+          "with": "import { openTasks } from '@/features/tasks/task-filter';\nimport { useServices } from '@/services/services-context';\n"
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/architecture.json",
+          "path": ["allowedImports"],
+          "value": [
+            {
+              "from": "src/features/task-detail/**",
+              "to": "src/features/tasks/task-filter.ts",
+              "reason": "Task detail shows the list filter until the filter moves to src/core (tracked in the backlog)."
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "pass-api-route": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/+middleware.ts",
+          "lines": [
+            "// The one root middleware: server code like the API routes.",
+            "import type { MiddlewareFunction } from 'expo-router/server';",
+            "",
+            "const middleware: MiddlewareFunction = () => undefined;",
+            "",
+            "export default middleware;"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/api/tasks/[taskId]+api.ts",
+          "lines": [
+            "// An Expo Router API route: server code, left out of the native bundle (expo-router _ctx.ios.js).",
+            "import { randomUUID } from 'node:crypto';",
+            "",
+            "import { StatusError } from 'expo-server';",
+            "",
+            "import { isTaskDone } from '@/core/tasks/task';",
+            "import { saveTask } from '@/data/tasks-repository';",
+            "import { taskDigest } from '@/server/task-digest';",
+            "",
+            "import type { ApiClient } from '@/api/api-client';",
+            "import type { ClockPort } from '@/services/clock/clock-port';",
+            "",
+            "export type TaskRouteDeps = { readonly api: ApiClient; readonly clock: ClockPort };",
+            "",
+            "export function GET(request: Request): Response {",
+            "  const taskId = new URL(request.url).pathname.split('/').pop();",
+            "  if (taskId === undefined || taskId === '') throw new StatusError(400, 'taskId is required');",
+            "  const task = { id: taskId, title: randomUUID(), done: false };",
+            "  return Response.json({ digest: taskDigest(task), done: isTaskDone(task), save: saveTask.name });",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/server/task-digest.ts",
+          "lines": [
+            "// A server helper (contract serverFiles): Node built-ins are fine here, and the app never imports it.",
+            "import { createHash } from 'node:crypto';",
+            "",
+            "import type { Task } from '@/core/tasks/task';",
+            "",
+            "export function taskDigest(task: Task): string {",
+            "  return createHash('sha256').update(`${task.id}:${task.title}`).digest('hex');",
+            "}"
+          ]
+        }
+      },
+      { "json": { "file": "contracts/architecture.json", "path": ["srcFolders"], "value": ["server"] } },
+      { "json": { "file": "contracts/architecture.json", "path": ["serverFiles"], "value": ["src/server/**"] } }
+    ]
+  },
+  "pass-asset-extension": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/board-model.ts",
+          "lines": [
+            "// A 3D model the app registered in metro.config.js resolver.assetExts and in the contract's assetExtensions.",
+            "export const BOARD_MODEL = require('@/assets/models/board.glb') as number;"
+          ]
+        }
+      },
+      { "json": { "file": "contracts/architecture.json", "path": ["assetExtensions"], "value": ["glb"] } },
+      { "write": { "file": "assets/models/board.glb", "content": "glTF\n" } }
+    ]
+  },
+  "pass-asset-require": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/empty-tasks.tsx",
+          "lines": [
+            "// Assets are required by their file: Metro bundles them, and there is no module to import.",
+            "import { Image } from 'react-native';",
+            "",
+            "import type { JSX } from 'react';",
+            "",
+            "export function EmptyTasks(): JSX.Element {",
+            "  return (",
+            "    <>",
+            "      <Image source={require('@/assets/images/empty-list.png')} />",
+            "      <Image source={require('@/assets/images/logo.png')} />",
+            "    </>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/ui/fonts.ts",
+          "lines": [
+            "// The fonts useFonts() loads in the root layout.",
+            "export const FONTS = {",
+            "  Inter: require('@/assets/fonts/inter-regular.ttf'),",
+            "  Chime: require('@/assets/sounds/chime.mp3'),",
+            "} as const;"
+          ]
+        }
+      },
+      {
+        "png": {
+          "files": ["assets/images/empty-list.png", "assets/images/logo@2x.png", "assets/images/logo@3x.png"],
+          "width": 8,
+          "height": 8,
+          "fill": "#ffffff"
+        }
+      },
+      { "write": { "file": "assets/fonts/inter-regular.ttf", "content": "font\n" } },
+      { "write": { "file": "assets/sounds/chime.mp3", "content": "sound\n" } }
+    ]
+  },
+  "pass-data-adapter": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/expo-database-files-adapter.ts",
+          "lines": [
+            "// The data layer's file adapter: the only importer of expo-file-system (a default vendor SDK).",
+            "import { Directory, File } from 'expo-file-system';",
+            "",
+            "export type DatabaseFiles = {",
+            "  readonly list: (dir: string) => readonly string[];",
+            "  readonly remove: (path: string) => void;",
+            "};",
+            "",
+            "export function createExpoDatabaseFilesAdapter(): DatabaseFiles {",
+            "  return {",
+            "    list: (dir) => new Directory(`file://${dir}`).list().map((entry) => entry.name),",
+            "    remove: (path) => new File(`file://${path}`).delete(),",
+            "  };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/data/open-device-database.ts",
+          "lines": [
+            "// The data layer's device opener: the composition root calls it once; it composes its own adapters.",
+            "import { createExpoDatabaseFilesAdapter } from './expo-database-files-adapter';",
+            "import { createExpoSqliteSqlDriver } from './expo-sqlite-sql-driver';",
+            "",
+            "import type { DatabaseFiles } from './expo-database-files-adapter';",
+            "import type { SqlDriver } from './sql-driver';",
+            "",
+            "export function openDeviceDatabase(): { readonly driver: SqlDriver; readonly files: DatabaseFiles } {",
+            "  return { driver: createExpoSqliteSqlDriver('tasks.db'), files: createExpoDatabaseFilesAdapter() };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-data-opener": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/open-device-database.ts",
+          "lines": [
+            "// The data layer's device opener: the root layout calls it once, after createDeviceServices().",
+            "import { createSqliteErrorLogAdapter } from '@/services/error-log/sqlite-error-log-adapter';",
+            "",
+            "import { createExpoSqliteSqlDriver } from './expo-sqlite-sql-driver';",
+            "",
+            "import type { SqlDriver } from './sql-driver';",
+            "import type { ErrorLogPort } from '@/services/error-log/error-log-port';",
+            "",
+            "export function openDeviceData(memoryLog: ErrorLogPort): { readonly driver: SqlDriver; readonly errorLog: ErrorLogPort } {",
+            "  const driver = createExpoSqliteSqlDriver('tasks.db');",
+            "  return { driver, errorLog: createSqliteErrorLogAdapter({ driver, fallback: memoryLog }) };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/error-log/sqlite-error-log-adapter.ts",
+          "lines": [
+            "// The error log as rows in the app database: it needs the open driver, so the data opener creates it.",
+            "import type { SqlDriver } from '@/data/sql-driver';",
+            "import type { ErrorLogPort } from '@/services/error-log/error-log-port';",
+            "",
+            "export function createSqliteErrorLogAdapter(deps: { readonly driver: SqlDriver; readonly fallback: ErrorLogPort }): ErrorLogPort {",
+            "  return { record: deps.fallback.record, entries: deps.fallback.entries };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-dev-only-require": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "rn-skills.config.json",
+          "lines": ["{", "  \"devOnlyRequires\": [", "    \"./dev-tools/*\"", "  ]", "}"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/config/dev-tooling.ts",
+          "lines": [
+            "// Debug-bundle tooling is not test-only code: __DEV__ is its gate (app-variants-and-environment rule 9).",
+            "export function loadDevTooling(): void {",
+            "  if (__DEV__) {",
+            "    require('./reactotron-config');",
+            "  }",
+            "  if (__DEV__) {",
+            "    const plugins: string[] = [];",
+            "    plugins.push('react-query');",
+            "    // Not the first statement of its block: the __DEV__ if still decides it.",
+            "    require('@dev-plugins/react-query');",
+            "  }",
+            "  const tracker: unknown = __DEV__ ? require('./dev-tools/render-tracker') : null;",
+            "  const whyDidYouRender: unknown = __DEV__ ? require('@welldone-software/why-did-you-render') : null;",
+            "  void tracker;",
+            "  void whyDidYouRender;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/config/dev-tools/render-tracker.ts",
+          "lines": [
+            "// Debug-bundle tooling the app lists in rn-skills.config.json devOnlyRequires.",
+            "export const TRACK_RENDERS = true;"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/config/reactotron-config.ts",
+          "lines": [
+            "// Debug-bundle tooling: configures Reactotron (a stub here).",
+            "export const REACTOTRON_HOST = 'localhost';"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-fake-in-test-only": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/debug/use-debug-model.ts",
+          "find": "import { useServices } from '@/services/services-context';\n",
+          "with": "import { createFakeClock } from '@/services/clock/fake-clock';\nimport { useServices } from '@/services/services-context';\n\nexport const simulatedClock = createFakeClock;\n"
+        }
+      },
+      {
+        "json": { "file": "contracts/architecture.json", "path": ["testOnlyFolders"], "value": ["src/features/debug/"] }
+      }
+    ]
+  },
+  "pass-game-seam": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/canvas/canvas-layout.ts",
+          "lines": [
+            "// src/canvas/canvas-layout.ts",
+            "/** The size of one grid cell on the canvas, in points. */",
+            "export const cellSize = (width: number, columns: number): number => width / columns;"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/canvas/canvas-types.ts",
+          "lines": [
+            "// src/canvas/canvas-types.ts",
+            "/** A cell the player touched on a grid board. */",
+            "export type CanvasTarget = { readonly row: number; readonly column: number };"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/game-host/game-module.ts",
+          "lines": [
+            "// The seam a game implements; the host hands stores and services in as values.",
+            "export type GameModule<State> = {",
+            "  readonly id: string;",
+            "  readonly initial: () => State;",
+            "};"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/lights-out/board/lights-out-board.ts",
+          "lines": [
+            "// The canvas kit is part of what every game faces by default (game boards draw and hit-test with it).",
+            "import { cellSize } from '@/canvas/canvas-layout';",
+            "",
+            "import type { CanvasTarget } from '@/canvas/canvas-types';",
+            "",
+            "export const firstCell: CanvasTarget = { row: 0, column: Math.floor(cellSize(300, 5)) };"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/lights-out/board/lights-out-module.ts",
+          "lines": [
+            "import type { GameModule } from '@/games/game-host/game-module';",
+            "import { isTaskDone } from '@/core/tasks/task';",
+            "",
+            "import { toggle } from '@/games/lights-out/rules/toggle';",
+            "",
+            "export const lightsOutModule: GameModule<boolean> = { id: 'lights-out', initial: () => toggle(Boolean(isTaskDone)) };"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/lights-out/rules/toggle.ts",
+          "lines": ["export const toggle = (isOn: boolean): boolean => !isOn;"]
+        }
+      },
+      { "json": { "file": "contracts/architecture.json", "path": ["gameFacing"], "value": ["src/games/game-host/**"] } }
+    ]
+  },
+  "pass-gate-not-equal": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/test-only.ts",
+          "find": "  process.env.EXPO_PUBLIC_APP_VARIANT === 'production'\n    ? null\n    : (require('./test-only-entry') as TestOnlyApi);",
+          "with": "  process.env.EXPO_PUBLIC_APP_VARIANT !== 'production'\n    ? (require('./test-only-entry') as TestOnlyApi)\n    : null;"
+        }
+      }
+    ]
+  },
+  "pass-gate-polarity-elsewhere": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "An inverted gate ships test-only code to the store. app-variants-and-environment's inclusion-gate owns the literal comparison and its polarity (DECISIONS: one rule, one owner), so check-boundaries checks only that the gate has a condition.",
+        "replace": {
+          "file": "src/test-only.ts",
+          "find": "process.env.EXPO_PUBLIC_APP_VARIANT === 'production'",
+          "with": "process.env.EXPO_PUBLIC_APP_VARIANT === 'development'"
+        }
+      }
+    ]
+  },
+  "pass-inclusion-flag": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/storybook-gate.ts",
+          "lines": [
+            "// Storybook enters the bundle only when the build sets the flag: the literal comparison folds at the call.",
+            "export const StorybookRoot: unknown =",
+            "  process.env.EXPO_PUBLIC_STORYBOOK_ENABLED === 'true' ? (require('./storybook-root') as unknown) : null;"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/ui/storybook-root.tsx",
+          "lines": ["// The Storybook UI root (a stub here).", "export const STORYBOOK_TITLE = 'Storybook';"]
+        }
+      }
+    ]
+  },
+  "pass-local-module": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "modules/live-activity/expo-module.config.json",
+          "lines": [
+            "{",
+            "  \"platforms\": [",
+            "    \"apple\",",
+            "    \"android\"",
+            "  ],",
+            "  \"apple\": {",
+            "    \"modules\": [",
+            "      \"LiveActivityModule\"",
+            "    ]",
+            "  },",
+            "  \"android\": {",
+            "    \"modules\": [",
+            "      \"expo.modules.liveactivity.LiveActivityModule\"",
+            "    ]",
+            "  }",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "modules/live-activity/index.ts",
+          "lines": [
+            "// The local Expo module's JavaScript entry (npx create-expo-module --local).",
+            "export { default } from './src/live-activity-module';"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "modules/live-activity/src/live-activity-module.ts",
+          "lines": [
+            "import { requireNativeModule } from 'expo';",
+            "",
+            "export default requireNativeModule('LiveActivity');"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/task-timer/fake-task-timer.test.ts",
+          "lines": [
+            "import { createFakeTaskTimer } from './fake-task-timer';",
+            "",
+            "describe('createFakeTaskTimer', () => {",
+            "  it('records the started task', async () => {",
+            "    const timer = createFakeTaskTimer();",
+            "    await timer.start('task-1', 0);",
+            "    expect(timer.started).toEqual(['task-1']);",
+            "  });",
+            "});"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/task-timer/fake-task-timer.ts",
+          "lines": [
+            "import { ok } from '@/core/result';",
+            "",
+            "import type { TaskTimerPort } from './task-timer-port';",
+            "",
+            "export function createFakeTaskTimer(): TaskTimerPort & { readonly started: string[] } {",
+            "  const started: string[] = [];",
+            "  return { started, start: (taskId) => { started.push(taskId); return Promise.resolve(ok(undefined)); } };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/task-timer/live-activity-task-timer-adapter.ts",
+          "lines": [
+            "// The only importer of the local Expo module modules/live-activity (through the @/modules/* alias).",
+            "import LiveActivity from '@/modules/live-activity';",
+            "",
+            "import { attemptAsync } from '@/core/result';",
+            "",
+            "import type { TaskTimerPort } from './task-timer-port';",
+            "",
+            "export function createLiveActivityTaskTimerAdapter(): TaskTimerPort {",
+            "  return {",
+            "    start: (taskId, startedAtMs) =>",
+            "      attemptAsync(() => LiveActivity.start(taskId, startedAtMs), () => 'unavailable' as const),",
+            "  };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/task-timer/task-timer-port.ts",
+          "lines": [
+            "import type { Result } from '@/core/result';",
+            "",
+            "/** Shows a running task timer outside the app (a Live Activity on iOS, an ongoing notification on Android). */",
+            "export type TaskTimerPort = {",
+            "  readonly start: (taskId: string, startedAtMs: number) => Promise<Result<void, 'unavailable'>>;",
+            "};"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "tsconfig.json",
+          "path": ["compilerOptions", "paths", "@/modules/*"],
+          "value": ["./modules/*"]
+        }
+      }
+    ]
+  },
+  "pass-no-contract": {
+    "expect": ["note: no contracts/architecture.json; the default zones, vendor SDKs and bans apply", "RESULT: PASS"],
+    "ops": [{ "delete": "contracts/architecture.json" }]
+  },
+  "pass-platform-adapter": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/haptics/expo-haptics-adapter.android.ts",
+          "lines": [
+            "// Android: the system's own tap feedback.",
+            "import { AndroidHaptics, performAndroidHapticsAsync } from 'expo-haptics';",
+            "",
+            "import type { HapticsPort } from './haptics-port';",
+            "",
+            "export function createExpoHapticsAdapter(): HapticsPort {",
+            "  return { tap: () => void performAndroidHapticsAsync(AndroidHaptics.Keyboard_Tap).catch(() => undefined) };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/haptics/expo-haptics-adapter.ios.ts",
+          "lines": [
+            "// iOS: a light impact.",
+            "import { ImpactFeedbackStyle, impactAsync } from 'expo-haptics';",
+            "",
+            "import type { HapticsPort } from './haptics-port';",
+            "",
+            "export function createExpoHapticsAdapter(): HapticsPort {",
+            "  return { tap: () => void impactAsync(ImpactFeedbackStyle.Light).catch(() => undefined) };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/haptics/fake-haptics.test.ts",
+          "lines": [
+            "import { createFakeHaptics } from './fake-haptics';",
+            "",
+            "describe('createFakeHaptics', () => {",
+            "  it('counts taps', () => {",
+            "    const haptics = createFakeHaptics();",
+            "    haptics.tap();",
+            "    expect(haptics.taps()).toBe(1);",
+            "  });",
+            "});"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/haptics/fake-haptics.ts",
+          "lines": [
+            "import type { HapticsPort } from './haptics-port';",
+            "",
+            "export function createFakeHaptics(): HapticsPort & { readonly taps: () => number } {",
+            "  let count = 0;",
+            "  return { tap: () => { count += 1; }, taps: () => count };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/haptics/haptics-port.ts",
+          "lines": ["export type HapticsPort = { readonly tap: () => void };"]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/create-device-services.ts",
+          "find": "import { createSystemClockAdapter } from '@/services/clock/system-clock-adapter';\n",
+          "with": "import { createSystemClockAdapter } from '@/services/clock/system-clock-adapter';\nimport { createExpoHapticsAdapter } from '@/services/haptics/expo-haptics-adapter';\n\nexport const hapticsFactory = createExpoHapticsAdapter;\n"
+        }
+      }
+    ]
+  },
+  "pass-platform-type-import": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/haptics/expo-haptics-adapter.ts",
+          "lines": [
+            "// iOS: a light impact.",
+            "import { ImpactFeedbackStyle, impactAsync } from 'expo-haptics';",
+            "",
+            "import type { HapticsPort } from './haptics-port';",
+            "",
+            "export function createExpoHapticsAdapter(): HapticsPort {",
+            "  return { tap: () => void impactAsync(ImpactFeedbackStyle.Light).catch(() => undefined) };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/haptics/expo-haptics-adapter.web.ts",
+          "lines": [
+            "// Web: no haptics. The base adapter's types hold this file to the same exports (web-support's",
+            "// web-variant-typed); a type-only import of its own base adapter bundles nothing.",
+            "import type * as Native from './expo-haptics-adapter';",
+            "",
+            "export const createExpoHapticsAdapter: typeof Native.createExpoHapticsAdapter = () => ({",
+            "  tap: () => undefined,",
+            "});"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/haptics/fake-haptics.test.ts",
+          "lines": [
+            "import { createFakeHaptics } from './fake-haptics';",
+            "",
+            "describe('createFakeHaptics', () => {",
+            "  it('counts taps', () => {",
+            "    const haptics = createFakeHaptics();",
+            "    haptics.tap();",
+            "    expect(haptics.taps()).toBe(1);",
+            "  });",
+            "});"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/haptics/fake-haptics.ts",
+          "lines": [
+            "import type { HapticsPort } from './haptics-port';",
+            "",
+            "export function createFakeHaptics(): HapticsPort & { readonly taps: () => number } {",
+            "  let count = 0;",
+            "  return { tap: () => { count += 1; }, taps: () => count };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/haptics/haptics-port.ts",
+          "lines": ["export type HapticsPort = { readonly tap: () => void };"]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/create-device-services.ts",
+          "find": "import { createSystemClockAdapter } from '@/services/clock/system-clock-adapter';\n",
+          "with": "import { createSystemClockAdapter } from '@/services/clock/system-clock-adapter';\nimport { createExpoHapticsAdapter } from '@/services/haptics/expo-haptics-adapter';\n\nexport const hapticsFactory = createExpoHapticsAdapter;\n"
+        }
+      }
+    ]
+  },
+  "pass-polyfill-builtin": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/encode-backup.ts",
+          "lines": [
+            "// The buffer package from npm (a declared dependency), not Node's built-in module.",
+            "import { Buffer } from 'buffer';",
+            "",
+            "export const encodeBackup = (json: string): string => Buffer.from(json, 'utf8').toString('base64');"
+          ]
+        }
+      },
+      { "json": { "file": "package.json", "path": ["dependencies", "buffer"], "value": "6.0.3" } }
+    ]
+  },
+  "pass-portless-sdk": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/icons/check-icon.tsx",
+          "lines": [
+            "import Svg, { Path } from 'react-native-svg';",
+            "",
+            "import type { JSX } from 'react';",
+            "",
+            "export function CheckIcon(): JSX.Element {",
+            "  return (",
+            "    <Svg viewBox=\"0 0 24 24\">",
+            "      <Path d=\"M4 12l5 5L20 6\" />",
+            "    </Svg>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/architecture.json",
+          "path": ["portlessSdks"],
+          "value": { "react-native-svg": "draws vector icons; no side effect" }
+        }
+      }
+    ]
+  },
+  "pass-react-navigation": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      { "delete": "src/app" },
+      {
+        "write": {
+          "file": "index.ts",
+          "lines": [
+            "import { registerRootComponent } from 'expo';",
+            "",
+            "import { App } from './src/navigation/app';",
+            "",
+            "registerRootComponent(App);"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/navigation/app.tsx",
+          "lines": [
+            "import { NavigationContainer } from '@react-navigation/native';",
+            "import { useState } from 'react';",
+            "",
+            "import { TasksScreen } from '@/features/tasks/tasks-screen';",
+            "import { createDeviceServices } from '@/services/create-device-services';",
+            "import { ServicesProvider } from '@/services/services-context';",
+            "",
+            "export function App() {",
+            "  const [services] = useState(createDeviceServices);",
+            "  return (",
+            "    <ServicesProvider services={services}>",
+            "      <NavigationContainer>",
+            "        <TasksScreen />",
+            "      </NavigationContainer>",
+            "    </ServicesProvider>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-router"], "delete": true } },
+      { "json": { "file": "package.json", "path": ["dependencies", "@react-navigation/native"], "value": "7.1.28" } },
+      { "json": { "file": "package.json", "path": ["main"], "value": "index.ts" } },
+      { "json": { "file": "contracts/architecture.json", "path": ["srcFolders"], "value": ["navigation"] } },
+      {
+        "json": {
+          "file": "contracts/architecture.json",
+          "path": ["compositionRoot"],
+          "value": ["src/navigation/app.tsx"]
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/architecture.json",
+          "path": ["allowedImports"],
+          "value": [
+            {
+              "from": "src/navigation/**",
+              "to": "src/features/**",
+              "reason": "React Navigation: the navigator renders the feature screens (there is no routes folder)."
+            }
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/architecture.json",
+          "path": ["portlessSdks", "@react-navigation/native"],
+          "value": "navigation: the navigator and its hooks"
+        }
+      }
+    ]
+  },
+  "pass-route-hooks": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/lists/index.tsx",
+          "lines": [
+            "// Router hooks and the feature's own hooks are the hooks a route may call.",
+            "import { useLocalSearchParams, useRouter } from 'expo-router';",
+            "",
+            "import { TasksScreen } from '@/features/tasks/tasks-screen';",
+            "import { useTasksModel as useModel } from '@/features/tasks/use-tasks-model';",
+            "",
+            "export default function ListsRoute() {",
+            "  const { listId } = useLocalSearchParams<{ listId?: string }>();",
+            "  const router = useRouter();",
+            "  const { today } = useModel();",
+            "  void [listId, router, today];",
+            "  return <TasksScreen />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-route-test-in-feature": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/tasks-navigation.test.tsx",
+          "lines": [
+            "// src/features/tasks/tasks-navigation.test.tsx — a route test: it renders the route files' default",
+            "// exports through the router helper, beside the feature (never inside src/app/).",
+            "import { screen } from '@testing-library/react-native';",
+            "",
+            "import TasksRoute from '@/app/index';",
+            "import TaskDetailRoute from '@/app/tasks/[taskId]';",
+            "import { renderRouterWithProviders } from '@test/render-router-with-providers';",
+            "",
+            "const ROUTES = { index: TasksRoute, 'tasks/[taskId]': TaskDetailRoute };",
+            "",
+            "describe('tasks navigation', () => {",
+            "  it('opens a task from a deep link', async () => {",
+            "    const view = await renderRouterWithProviders(ROUTES, { initialUrl: '/tasks/t1' });",
+            "",
+            "    expect(view.getPathname()).toBe('/tasks/t1');",
+            "    expect(screen.getByRole('header')).toBeOnTheScreen();",
+            "  });",
+            "});"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "test/render-router-with-providers.tsx",
+          "lines": [
+            "// test/render-router-with-providers.tsx — a stand-in for the route-test helper that",
+            "// unit-and-component-tests ships: Expo Router's in-memory router with route getters.",
+            "import { renderRouter } from 'expo-router/testing-library';",
+            "",
+            "import type { ComponentType } from 'react';",
+            "",
+            "export async function renderRouterWithProviders(",
+            "  routes: Record<string, ComponentType>,",
+            "  options: { initialUrl?: string } = {},",
+            "): Promise<{ getPathname: () => string }> {",
+            "  const view = renderRouter(routes, { initialUrl: options.initialUrl ?? '/' });",
+            "  await view;",
+            "  return { getPathname: () => view.getPathname() };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-test-only-folder-route": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/(app)/debug.tsx",
+          "lines": [
+            "// The debug route reaches the screen through the gate: production builds get TEST_ONLY === null and",
+            "// redirect, and the debug folder never enters their bundle. A type import is erased, so it is fine.",
+            "import { Redirect } from 'expo-router';",
+            "",
+            "import { type DebugScreen } from '@/features/debug/debug-screen';",
+            "import { TEST_ONLY } from '@/test-only';",
+            "",
+            "type DebugScreenComponent = typeof DebugScreen;",
+            "",
+            "export default function DebugRoute() {",
+            "  const Screen: DebugScreenComponent | undefined = TEST_ONLY?.DebugScreen;",
+            "  if (Screen === undefined) return <Redirect href=\"/\" />;",
+            "  return <Screen />;",
+            "}"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/debug/debug-screen.tsx",
+          "find": "import { AppText } from '@/ui/app-text';\n",
+          "with": "import { createFakeClock } from '@/services/clock/fake-clock';\nimport { AppText } from '@/ui/app-text';\n\nexport const simulatedClock = createFakeClock;\n"
+        }
+      },
+      {
+        "json": { "file": "contracts/architecture.json", "path": ["testOnlyFolders"], "value": ["src/features/debug/"] }
+      }
+    ]
+  },
+  "pass-thin-routes": {
+    "expect": [", 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/home.tsx",
+          "lines": [
+            "import { Redirect } from 'expo-router';",
+            "",
+            "export default function HomeRoute() {",
+            "  return <Redirect href=\"/\" />;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/lists/index.tsx",
+          "lines": ["export { TasksScreen as default } from '@/features/tasks/tasks-screen';"]
+        }
+      }
+    ]
+  }
+}

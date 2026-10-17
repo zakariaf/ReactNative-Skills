@@ -1,0 +1,58 @@
+{
+ "base": [
+  "@tests/bases/app",
+  {
+   "templates": true,
+   "firstLinePath": true
+  },
+  {
+   "from": "@skill/examples/screens.json",
+   "to": "contracts/screens.json"
+  }
+ ],
+ "argsFile": "append",
+ "ops": [
+  {
+   "json": {
+    "file": "contracts/visual-parity.json",
+    "path": [
+     "devices"
+    ],
+    "value": [
+     "iphone-16-pro"
+    ]
+   }
+  },
+  {
+   "json": {
+    "file": "contracts/visual-parity.json",
+    "path": [
+     "themes"
+    ],
+    "value": [
+     "light"
+    ]
+   }
+  },
+  {
+   "json": {
+    "file": "contracts/visual-parity.json",
+    "path": [
+     "languages"
+    ],
+    "value": [
+     "en"
+    ]
+   }
+  },
+  {
+   "json": {
+    "file": "contracts/visual-parity.json",
+    "path": [
+     "rtlLanguages"
+    ],
+    "value": []
+   }
+  }
+ ]
+}

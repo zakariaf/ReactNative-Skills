@@ -1,0 +1,21 @@
+{
+  "$comment": "Store toolchain requirements that can force an SDK or toolchain move regardless of the SDK trigger. Read by check-sdk-trigger.mjs (rule store-deadline): a requirement in effect that the app does not meet is a FAIL; one that starts later is a notice line. Add an entry when Apple or Google announce one (with its source); never delete one that is in effect.",
+  "verified": "2026-10-04",
+  "appStore": [
+    {
+      "from": "2026-04-28",
+      "xcodeMin": "26.0",
+      "rule": "apps uploaded to App Store Connect must be built with Xcode 26 or later, using an SDK for iOS 26",
+      "source": "https://developer.apple.com/news/upcoming-requirements/"
+    }
+  ],
+  "play": [
+    {
+      "from": "2026-08-31",
+      "targetSdkMin": 36,
+      "extensionUntil": "2026-11-01",
+      "rule": "new apps and app updates must target Android 16 (API level 36) or higher (phones and tablets; Wear OS and Android Automotive OS 35, Android TV and Android XR 34)",
+      "source": "https://developer.android.com/google/play/requirements/target-sdk"
+    }
+  ]
+}

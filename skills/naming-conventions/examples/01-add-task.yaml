@@ -1,0 +1,21 @@
+# .maestro/flows/smoke/01-add-task.yaml
+# Naming shape of a flow: .maestro/flows/<area>/<nn>-<name>.yaml, shared steps in .maestro/subflows/,
+# and every step selects by testID, so the flow runs unchanged in every locale (en, ar) on the iOS
+# simulator and the Android emulator. The e2e-maestro skill owns the real flows.
+appId: ${APP_ID}
+name: Adding a task shows it at the top of the open tasks
+tags: [smoke]
+---
+- launchApp:
+    clearState: true
+- runFlow: ../../subflows/grant-notifications.yaml
+- tapOn:
+    id: 'tasks.add-button'
+- inputText: 'Buy milk'
+- tapOn:
+    id: 'task-editor.save-button'
+- assertVisible:
+    id: 'tasks.task-row.task-1'
+- assertVisible:
+    id: 'tasks.title'
+    text: 'Tasks|المهام' # a text matcher may narrow an id selector

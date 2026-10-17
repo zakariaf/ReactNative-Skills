@@ -1,0 +1,23 @@
+{
+  "$schema": "./e2e.schema.json",
+  "$comment": "The app's E2E facts, read by scripts/e2e/ (the runner and the screenshot capture) and by the e2e-maestro skill's checkers. productionAppIds and network are required; the schema says what every other key does and its default. Filled for this harness: it has no API (privacy profile api-port with no host yet) and its test builds install the network guard, so the runtime proof is offline-only; buildExtra keeps ads off because react-native-google-mobile-ads is installed.",
+  "productionAppIds": ["com.example.harness"],
+  "buildExtra": {
+    "adsMode": "off"
+  },
+  "network": {
+    "mode": "offline-only"
+  },
+  "largeText": {
+    "locales": ["en", "ar"]
+  },
+  "screenshots": {
+    "locales": ["en", "ar"],
+    "devices": ["phone", "tablet"]
+  },
+  "manualFolders": [],
+  "extraTestIDs": {
+    "debug.menu": "The debug menu's root (debug-menu-and-test-hooks; test builds only).",
+    "debug.setup-error": "Shown when the app refuses a debug link (debug-menu-and-test-hooks); the setup sub-flow asserts it is absent."
+  }
+}

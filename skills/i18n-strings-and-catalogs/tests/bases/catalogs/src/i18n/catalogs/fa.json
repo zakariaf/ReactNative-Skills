@@ -1,0 +1,13 @@
+{
+  "app.name": "کارها",
+  "debug.title": "Debug menu",
+  "permissions.camera.usage-description": "با این اجازه می‌توانید به یک کار عکس اضافه کنید. عکس‌ها روی همین دستگاه می‌مانند، مگر اینکه آن‌ها را به اشتراک بگذارید.",
+  "reminders.next": "یادآوری بعدی – {dateText}",
+  "tasks.delete.title": "این کار حذف شود؟",
+  "tasks.list.rank": "{place, selectordinal, other {#مین}} فهرست شما",
+  "tasks.list.title": "کارها",
+  "tasks.moved": "به {listName} منتقل شد",
+  "tasks.page": "صفحهٔ {page, number}",
+  "tasks.progress": "{doneRate, number, ::percent} انجام شد",
+  "tasks.summary.open": "{openCount, plural, =0 {هیچ کار بازی نمانده} one {# کار باز} other {# کار باز}}"
+}

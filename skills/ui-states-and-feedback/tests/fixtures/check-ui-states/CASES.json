@@ -1,0 +1,909 @@
+{
+  "bad-announce-ios": {
+    "expect": ["FAIL src/features/notes/sync-status.tsx:6 [announce-ios]", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/notes/sync-status.tsx",
+          "lines": [
+            "// planted: a live region with no announcement: TalkBack reads it, VoiceOver never does",
+            "import { Text, View } from 'react-native';",
+            "",
+            "export function SyncStatus({ text }: { readonly text: string }): React.JSX.Element {",
+            "  return (",
+            "    <View accessible accessibilityRole=\"alert\" accessibilityLiveRegion=\"polite\">",
+            "      <Text>{text}</Text>",
+            "    </View>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-bare-spinner": {
+    "expect": ["FAIL src/features/notes/notes-screen.tsx:6 [bare-spinner]", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/notes/notes-screen.tsx",
+          "lines": [
+            "// planted: a spinner on a screen with no delay: it flashes on every fast load",
+            "import { ActivityIndicator, Text } from 'react-native';",
+            "",
+            "export function NotesScreen({ isLoading }: { readonly isLoading: boolean }): React.JSX.Element {",
+            "  if (isLoading) {",
+            "    return <ActivityIndicator testID=\"notes.loading\" />;",
+            "  }",
+            "  return <Text>notes</Text>;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-busy-overlay": {
+    "expect": ["FAIL src/ui/saving-overlay.tsx:5 [busy-overlay]", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/saving-overlay.tsx",
+          "lines": [
+            "// planted: a modal spinner over the whole app while one note saves",
+            "import { ActivityIndicator, Modal } from 'react-native';",
+            "",
+            "export function SavingOverlay({ isSaving }: { readonly isSaving: boolean }): React.JSX.Element {",
+            "  return (<Modal visible={isSaving} transparent>",
+            "      <ActivityIndicator />",
+            "    </Modal>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-confirm-outcome": {
+    "expect": [
+      "FAIL src/features/notes/use-delete-note.ts:8 [confirm-outcome]",
+      "FAIL src/features/notes/use-delete-note.ts:12 [confirm-outcome]",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/notes/use-delete-note.ts",
+          "lines": [
+            "// planted: two ways to run the action on a non-confirmed outcome (Android back answers 'dismissed')",
+            "import type { ConfirmOutcome } from '@/ui/feedback/confirm';",
+            "",
+            "export async function deleteNotes(ask: () => Promise<ConfirmOutcome>, remove: () => void): Promise<void> {",
+            "  const outcome = await ask();",
+            "  // A comment that mentions !== 'cancelled' stays silent.",
+            "  const label = \"outcome !== 'dismissed'\";",
+            "  if (outcome !== 'cancelled') remove();",
+            "  if (label === '') return;",
+            "  const again = await ask();",
+            "  // A guard on 'cancelled' alone lets 'dismissed' fall through to the delete.",
+            "  if (again === 'cancelled') return;",
+            "  remove();",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-confirm-undeclared": {
+    "expect": [
+      "FAIL src/features/tasks/use-tasks-model.ts",
+      "[confirm-undeclared] confirm \"tasks.clear-done-dialog\" is not declared",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/screen-states.json", "path": ["confirmations", 0, "whyNotUndo"], "value": "" } }
+    ]
+  },
+  "bad-confirm-vague": {
+    "expect": [
+      "FAIL src/features/notes/use-clear-notes.ts:6 [confirm-vague]",
+      "confirmLabel \"common.ok\" and title \"notes.clear.are-you-sure\"",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/notes/use-clear-notes.ts",
+          "lines": [
+            "// planted: \"Are you sure?\" with an OK button; the contract declares it, so only the wording fails",
+            "import type { Feedback } from '@/ui/feedback/feedback-context';",
+            "import type { TFunction } from '@/i18n/create-t';",
+            "",
+            "export async function clearNotes(feedback: Feedback, t: TFunction): Promise<boolean> {",
+            "  const outcome = await feedback.confirm({",
+            "    title: t('notes.clear.are-you-sure'),",
+            "    body: t('notes.clear.body'),",
+            "    confirmLabel: t('common.ok'),",
+            "    cancelLabel: t('common.cancel'),",
+            "    tone: 'destructive',",
+            "    testID: 'notes.clear-dialog',",
+            "  });",
+            "  return outcome === 'confirmed';",
+            "}"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/screen-states.json",
+          "path": ["confirmations", 1],
+          "value": { "testID": "notes.clear-dialog", "whyNotUndo": "The notes are deleted on the server for good." }
+        }
+      }
+    ]
+  },
+  "bad-contract-file": {
+    "expect": [
+      "FAIL contracts/screen-states.json:6 [contract-file]",
+      "its view src/features/tasks/missing-view.tsx does not exist",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/screen-states.json",
+          "path": ["screens", 0, "view"],
+          "value": "src/features/tasks/missing-view.tsx"
+        }
+      }
+    ]
+  },
+  "bad-contract-invalid": {
+    "expect": [
+      "FAIL contracts/screen-states.json:6 [contract-invalid] screens[0]: \"states\" must list states",
+      "[contract-invalid] the contract has an unknown key \"owner\"",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/screen-states.json", "path": ["screens", 0, "states", 1], "value": "spinning" } },
+      { "json": { "file": "contracts/screen-states.json", "path": ["owner"], "value": "me" } }
+    ]
+  },
+  "bad-contract-missing": {
+    "expect": ["FAIL contracts/screen-states.json:1 [contract-missing]", "RESULT: FAIL (1 problems)"],
+    "ops": [{ "delete": "contracts/screen-states.json" }]
+  },
+  "bad-empty-default": {
+    "expect": [
+      "FAIL src/features/tasks/use-task-titles.ts:9 [empty-default]",
+      "FAIL src/features/tasks/use-task-titles.ts:14 [empty-default]",
+      "FAIL src/features/tasks/use-task-titles.ts:21 [empty-default]",
+      "RESULT: FAIL (3 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-titles.ts",
+          "lines": [
+            "// planted: three ways to default query data to [], each turns \"not loaded\" and \"failed\" into \"empty\"",
+            "import { useQuery, useSuspenseQuery } from '@tanstack/react-query';",
+            "",
+            "import { listScreenStateOf } from '@/ui/feedback/screen-state';",
+            "",
+            "type Options = Parameters<typeof useQuery<string[]>>[0];",
+            "",
+            "export function useTaskTitles(options: Options): readonly string[] {",
+            "  const { data = [] } = useQuery(options);",
+            "  return data;",
+            "}",
+            "",
+            "export function useDoneTitles(options: Options): readonly string[] {",
+            "  const { isFetching, data: done = [] } = useQuery(options);",
+            "  return isFetching ? [] : done;",
+            "}",
+            "",
+            "export function useTitlesState(options: Options): ReturnType<typeof listScreenStateOf<string>> {",
+            "  const query = useQuery(options);",
+            "  return listScreenStateOf({",
+            "    items: query.data ?? [],",
+            "    isFetching: query.isFetching,",
+            "    isPaused: false,",
+            "    failureKey: null,",
+            "    isFiltered: false,",
+            "  });",
+            "}",
+            "",
+            "// allowed: the state above is derived from the query, so a [] for a count decides nothing",
+            "export function useTitleCount(options: Options): number {",
+            "  const query = useQuery(options);",
+            "  return (query.data ?? []).length;",
+            "}",
+            "",
+            "// allowed: useSuspenseQuery always has data, so this default is dead code, not a wrong state",
+            "export function useSuspendedTitles(options: Options): readonly string[] {",
+            "  const { data = [] } = useSuspenseQuery(options);",
+            "  return data;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-empty-default-passed": {
+    "expect": [
+      "FAIL src/features/tasks/use-notes-state.ts:12 [empty-default]",
+      "FAIL src/features/tasks/use-notes-state.ts:18 [empty-default]",
+      "FAIL src/features/tasks/use-notes-state.ts:25 [empty-default]",
+      "RESULT: FAIL (3 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-notes-state.ts",
+          "lines": [
+            "// planted: query data defaulted to [] first, then handed to the state function under another name",
+            "import { useInfiniteQuery, useQuery } from '@tanstack/react-query';",
+            "",
+            "import { listScreenStateOf } from '@/ui/feedback/screen-state';",
+            "",
+            "type Options = Parameters<typeof useQuery<string[]>>[0];",
+            "type PagedOptions = Parameters<typeof useInfiniteQuery<{ readonly items: string[] }>>[0];",
+            "type State = ReturnType<typeof listScreenStateOf<string>>;",
+            "",
+            "export function useNotesState(options: Options): State {",
+            "  const query = useQuery(options);",
+            "  const notes = query.data ?? [];",
+            "  return listScreenStateOf({ items: notes, isFetching: query.isFetching, isPaused: false, failureKey: null, isFiltered: false });",
+            "}",
+            "",
+            "export function useRenamedState(options: Options): State {",
+            "  const { data: rows, isFetching } = useQuery(options);",
+            "  const items = rows ?? [];",
+            "  return listScreenStateOf({ items, isFetching, isPaused: false, failureKey: null, isFiltered: false });",
+            "}",
+            "",
+            "export function usePagedState(options: PagedOptions): State {",
+            "  const pages = useInfiniteQuery(options);",
+            "  return listScreenStateOf({",
+            "    items: pages.data?.pages.flatMap((page) => page.items) ?? [],",
+            "    isFetching: pages.isFetching,",
+            "    isPaused: false,",
+            "    failureKey: null,",
+            "    isFiltered: false,",
+            "  });",
+            "}",
+            "",
+            "// allowed: a count next to a derived state decides nothing",
+            "export function useNoteCount(options: Options): number {",
+            "  const query = useQuery(options);",
+            "  const all = query.data ?? [];",
+            "  return all.length;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-loading-delayed": {
+    "expect": [
+      "FAIL src/features/tasks/components/tasks-state-switch.tsx:1 [loading-delayed]",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/tasks-state-switch.tsx",
+          "find": "import { DelayedPlaceholder } from '@/ui/feedback/delayed-placeholder';\n",
+          "with": "import { LoadingGate } from './loading-gate';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/components/tasks-state-switch.tsx",
+          "find": "DelayedPlaceholder",
+          "with": "LoadingGate",
+          "all": true
+        }
+      }
+    ]
+  },
+  "bad-native-alert": {
+    "expect": ["FAIL src/features/notes/use-delete-note.ts:5 [native-alert]", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/notes/use-delete-note.ts",
+          "lines": [
+            "// planted: Alert.alert as a confirmation (Android ignores destructive styles; back resolves nothing)",
+            "import { Alert } from 'react-native';",
+            "",
+            "export function askDelete(title: string, onDelete: () => void): void {",
+            "  Alert.alert(title, undefined, [{ text: 'Delete', style: 'destructive', onPress: onDelete }]);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-offline-notice": {
+    "expect": ["FAIL src/features/notes/use-notes-sync.ts:5 [offline-notice]", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/notes/use-notes-sync.ts",
+          "lines": [
+            "// planted: offline lasts, but a notice leaves after a few seconds",
+            "import type { NoticeRequest } from '@/ui/feedback/notice';",
+            "",
+            "export function warnOffline(notify: (request: NoticeRequest) => void, t: (key: string) => string): void {",
+            "  notify({ text: t('notes.sync.offline'), testID: 'notes.offline-notice' });",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-refresh-blanks": {
+    "expect": ["FAIL src/features/notes/notes-screen.tsx:6 [refresh-blanks]", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/notes/notes-screen.tsx",
+          "lines": [
+            "// planted: every refresh returns the placeholder, so the list disappears and loses its place",
+            "import type { ReactNode } from 'react';",
+            "",
+            "type Query = { readonly isFetching: boolean; readonly data: readonly string[] | undefined };",
+            "export function NotesBody({ query, placeholder, list }: { readonly query: Query; readonly placeholder: ReactNode; readonly list: ReactNode }): ReactNode {",
+            "  if (query.isFetching) return placeholder;",
+            "  return list;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-screen-undeclared": {
+    "expect": [
+      "FAIL src/features/notes/use-note-detail-model.ts:5 [screen-undeclared] src/features/notes/ reads server state",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/notes/use-notes-model.ts",
+          "lines": [
+            "// planted: a notes screen reads server state, but the contract declares no notes screen",
+            "import { useQuery } from '@tanstack/react-query';",
+            "",
+            "export function useNotesModel(options: Parameters<typeof useQuery<string[]>>[0]): readonly string[] | undefined {",
+            "  return useQuery(options).data;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/notes/use-note-detail-model.ts",
+          "lines": [
+            "// planted: a second reader in the same folder: one problem per folder, not per file",
+            "import { useQuery } from '@tanstack/react-query';",
+            "",
+            "export function useNoteDetailModel(options: Parameters<typeof useQuery<string>>[0]): string | undefined {",
+            "  return useQuery(options).data;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-detail-model.ts",
+          "lines": [
+            "// allowed: the tasks folder is declared (its view and test are in the contract)",
+            "import { useQuery } from '@tanstack/react-query';",
+            "",
+            "export function useTaskDetailModel(options: Parameters<typeof useQuery<string>>[0]): string | undefined {",
+            "  return useQuery(options).data;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-screen-undeclared-route": {
+    "expect": [
+      "FAIL src/app/(tabs)/accounts.tsx:6 [screen-undeclared] src/app/(tabs)/ reads server state",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/(tabs)/accounts.tsx",
+          "lines": [
+            "// planted: a route that queries directly (not thin) and is declared nowhere",
+            "import { useQuery } from '@tanstack/react-query';",
+            "import { Text } from 'react-native';",
+            "",
+            "export default function AccountsRoute(): React.JSX.Element {",
+            "  const query = useQuery({ queryKey: ['accounts'], queryFn: async () => ['a'] });",
+            "  return <Text>{query.data?.length}</Text>;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-state-action": {
+    "expect": ["[state-action] the \"filtered-empty\" state offers no next step", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/tasks-state-switch.tsx",
+          "find": "          action={{ label: copy.filteredAction, onPress: props.onClearFilter }}\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-state-flags": {
+    "expect": ["FAIL src/features/notes/use-notes-model.ts:7 [state-flags]", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/notes/use-notes-model.ts",
+          "lines": [
+            "// planted: a loading flag and an error in two useStates (loading and failed can both be true)",
+            "import { useState } from 'react';",
+            "",
+            "export function useNotesModel(): { readonly isLoading: boolean; readonly error: string | null } {",
+            "  const [isLoading, setIsLoading] = useState(true);",
+            "  setIsLoading(false);",
+            "  const [error] = useState<string | null>(null);",
+            "  return { isLoading, error };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-state-kinds": {
+    "expect": [
+      "FAIL src/ui/feedback/screen-state.ts:13 [state-kinds]",
+      "lacks empty and has undeclared blank",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/feedback/screen-state.ts",
+          "find": "| { readonly kind: 'empty' }",
+          "with": "| { readonly kind: 'blank' }"
+        }
+      }
+    ]
+  },
+  "bad-state-tested": {
+    "expect": [
+      "FAIL src/ui/feedback/screen-state.test.ts:1 [state-tested]",
+      "never renders tasks.state.loading",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/screen-states.json",
+          "path": ["screens", 0, "test"],
+          "value": "src/ui/feedback/screen-state.test.ts"
+        }
+      }
+    ]
+  },
+  "bad-state-testid": {
+    "expect": [
+      "FAIL src/features/tasks/components/tasks-state-switch.tsx:1 [state-testid]",
+      "testID=\"tasks.state.offline\"",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/tasks-state-switch.tsx",
+          "find": "testID=\"tasks.state.offline\"",
+          "with": "testID=\"tasks.offline\""
+        }
+      }
+    ]
+  },
+  "bad-states-required": {
+    "expect": [
+      "FAIL contracts/screen-states.json:6 [states-required]",
+      "does not declare \"filtered-empty\"",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/screen-states.json", "path": ["screens", 0, "stateType"], "delete": true } },
+      {
+        "json": {
+          "file": "contracts/screen-states.json",
+          "path": ["screens", 0, "states"],
+          "value": ["loading", "offline", "failed", "empty"]
+        }
+      }
+    ]
+  },
+  "error-bad-contract-json": {
+    "expect": ["ERROR [bad-input] contracts/screen-states.json is not valid JSON"],
+    "ops": [{ "write": { "file": "contracts/screen-states.json", "content": "{ \"screens\": [\n" } }]
+  },
+  "error-no-package-json": { "expect": ["ERROR [bad-input] no package.json"], "ops": [{ "delete": "package.json" }] },
+  "error-no-source-folder": {
+    "expect": ["ERROR [bad-input] nothing to check: app-src/ does not exist"],
+    "args": "{dir} --src-dir app-src"
+  },
+  "pass-announce-in-model": {
+    "expect": ["check-ui-states:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/notes/sync-status.tsx",
+          "lines": [
+            "// allowed: a pure view renders the live region; its model hook announces on iOS",
+            "import { Text, View } from 'react-native';",
+            "",
+            "export function SyncStatus({ text }: { readonly text: string }): React.JSX.Element {",
+            "  return (",
+            "    <View accessible accessibilityRole=\"alert\" accessibilityLiveRegion=\"polite\">",
+            "      <Text>{text}</Text>",
+            "    </View>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/notes/components/sync-line.tsx",
+          "lines": [
+            "// allowed: a component of the same feature; the feature's model hook announces",
+            "import { Text } from 'react-native';",
+            "",
+            "export function SyncLine({ text }: { readonly text: string }): React.JSX.Element {",
+            "  return <Text accessibilityLiveRegion=\"polite\">{text}</Text>;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/notes/use-notes-sync-model.ts",
+          "lines": [
+            "// allowed: the model announces the failure once on iOS, where VoiceOver reads no live region",
+            "import { useEffect } from 'react';",
+            "import { Platform } from 'react-native';",
+            "",
+            "import { useAnnounce } from '@/ui/a11y/use-announce';",
+            "",
+            "export function useNotesSyncModel(failureText: string | null): { readonly failureText: string | null } {",
+            "  const announce = useAnnounce();",
+            "  useEffect(() => {",
+            "    if (failureText !== null && Platform.OS === 'ios') announce(failureText);",
+            "  }, [announce, failureText]);",
+            "  return { failureText };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-config-contract": {
+    "expect": ["check-ui-states:", "RESULT: PASS"],
+    "ops": [
+      { "rename": { "from": "contracts/screen-states.json", "to": "qa/screen-states.json" } },
+      { "write": { "file": "rn-skills.config.json", "json": { "uiStates": { "contract": "qa/screen-states.json" } } } }
+    ]
+  },
+  "pass-installed-skills-silent": {
+    "expect": ["check-ui-states:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/demo/SKILL.md",
+          "lines": ["---", "name: demo", "description: Planted findings in an installed skill.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": ".agents/skills/demo/src/features/notes/notes.tsx",
+          "lines": [
+            "// planted: must stay silent inside an installed skill",
+            "import { ActivityIndicator, Alert } from 'react-native';",
+            "export function N(): React.JSX.Element { Alert.alert('x'); return <ActivityIndicator />; }"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/kit/SKILL.md",
+          "lines": ["---", "name: kit", "description: A vendored skill inside src.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/kit/notes-screen.tsx",
+          "lines": [
+            "// planted: a vendored skill folder under src is pruned whole",
+            "import { Alert } from 'react-native';",
+            "export function warn(): void { Alert.alert('x'); }"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/demo/SKILL.md",
+          "lines": ["---", "name: demo", "description: Planted findings in a skills folder.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/demo/src/features/notes/notes.tsx",
+          "lines": [
+            "// planted: must stay silent inside a skills folder",
+            "import { Alert } from 'react-native';",
+            "export function warn(): void { Alert.alert('x'); }"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-installed-skills-whole-repo": {
+    "expect": ["check-ui-states:", "RESULT: PASS"],
+    "args": "{dir} --src-dir .",
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/demo/SKILL.md",
+          "lines": ["---", "name: demo", "description: Planted findings in an installed skill.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": ".agents/skills/demo/src/features/notes/notes.tsx",
+          "lines": [
+            "// planted: must stay silent inside an installed skill",
+            "import { ActivityIndicator, Alert } from 'react-native';",
+            "export function N(): React.JSX.Element { Alert.alert('x'); return <ActivityIndicator />; }"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/kit/SKILL.md",
+          "lines": ["---", "name: kit", "description: A vendored skill inside src.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/kit/notes-screen.tsx",
+          "lines": [
+            "// planted: a vendored skill folder under src is pruned whole",
+            "import { Alert } from 'react-native';",
+            "export function warn(): void { Alert.alert('x'); }"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/demo/SKILL.md",
+          "lines": ["---", "name: demo", "description: Planted findings in a skills folder.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/demo/src/features/notes/notes.tsx",
+          "lines": [
+            "// planted: must stay silent inside a skills folder",
+            "import { Alert } from 'react-native';",
+            "export function warn(): void { Alert.alert('x'); }"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-no-contract-yet": {
+    "expect": ["contracts/screen-states.json: none yet", "RESULT: PASS"],
+    "base": ["@tests/bases/app"]
+  },
+  "pass-not-react-native": {
+    "expect": ["NOT APPLICABLE: react-native is not in package.json", "RESULT: PASS"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "react-native"], "delete": true } }]
+  },
+  "pass-patterns": {
+    "expect": ["check-ui-states:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/busy-button.tsx",
+          "lines": [
+            "// allowed: a control in src/ui shows its own busy state with a spinner",
+            "import { ActivityIndicator, Modal, RefreshControl, Text, View } from 'react-native';",
+            "",
+            "export function BusyButton({ isBusy, isOpen }: { readonly isBusy: boolean; readonly isOpen: boolean }): React.JSX.Element {",
+            "  return (",
+            "    <View>",
+            "      {isBusy ? <ActivityIndicator /> : <Text>Save</Text>}",
+            "      <RefreshControl refreshing={false} />",
+            "      <Modal visible={isOpen} transparent>",
+            "        <Text>A dialog without a spinner</Text>",
+            "      </Modal>",
+            "    </View>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/notes/use-notes-outcome.ts",
+          "lines": [
+            "// allowed: only 'confirmed' runs the action; a refresh flag that is not an early return",
+            "import type { ConfirmOutcome } from '@/ui/feedback/confirm';",
+            "",
+            "export function shouldDelete(outcome: ConfirmOutcome, query: { readonly isFetching: boolean }): boolean {",
+            "  if (outcome !== 'confirmed') return false;",
+            "  const isRefreshing = query.isFetching;",
+            "  if (isRefreshing) {",
+            "    // a quiet indicator, the content stays",
+            "  }",
+            "  return true;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/notes/use-notes-sync.ts",
+          "lines": [
+            "// allowed: a result notice whose key is not about being offline",
+            "import type { NoticeRequest } from '@/ui/feedback/notice';",
+            "",
+            "export function reportSynced(notify: (request: NoticeRequest) => void, t: (key: string) => string): void {",
+            "  notify({ text: t('notes.sync.done'), testID: 'notes.synced-notice' });",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/notes/use-delete-note.ts",
+          "lines": [
+            "// allowed: a shared verb on the button ('Delete') names what happens",
+            "import type { Feedback } from '@/ui/feedback/feedback-context';",
+            "import type { TFunction } from '@/i18n/create-t';",
+            "",
+            "export async function deleteNote(feedback: Feedback, t: TFunction): Promise<boolean> {",
+            "  const outcome = await feedback.confirm({",
+            "    title: t('notes.delete.title'),",
+            "    body: t('notes.delete.body'),",
+            "    confirmLabel: t('common.delete'),",
+            "    cancelLabel: t('common.cancel'),",
+            "    tone: 'destructive',",
+            "    testID: 'notes.delete-dialog',",
+            "  });",
+            "  return outcome === 'confirmed';",
+            "}"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/screen-states.json",
+          "path": ["confirmations", 1],
+          "value": { "testID": "notes.delete-dialog", "whyNotUndo": "The note is deleted on the server for good." }
+        }
+      }
+    ]
+  },
+  "pass-query-infrastructure": {
+    "expect": ["contracts/screen-states.json: none yet (no screen reads server state", "RESULT: PASS"],
+    "base": ["@tests/bases/app"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/api/create-query-client.ts",
+          "lines": [
+            "// allowed: query plumbing in src/api is not a screen, so no contract is owed yet",
+            "import { QueryClient } from '@tanstack/react-query';",
+            "",
+            "export function createQueryClient(): QueryClient {",
+            "  return new QueryClient({ defaultOptions: { queries: { networkMode: 'online' } } });",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/api/query-provider.tsx",
+          "lines": [
+            "// allowed: the provider wraps the app; it reads no data itself",
+            "import { QueryClientProvider } from '@tanstack/react-query';",
+            "import { useState } from 'react';",
+            "",
+            "import { createQueryClient } from './create-query-client';",
+            "",
+            "import type { ReactNode } from 'react';",
+            "",
+            "export function QueryProvider({ children }: { readonly children: ReactNode }): ReactNode {",
+            "  const [client] = useState(createQueryClient);",
+            "  return <QueryClientProvider client={client}>{children}</QueryClientProvider>;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/api/tasks/task-queries.ts",
+          "lines": [
+            "// allowed: query options are defined here and read by screens later",
+            "import { queryOptions } from '@tanstack/react-query';",
+            "",
+            "export const taskQueries = {",
+            "  list: (fetchTasks: () => Promise<readonly string[]>) => queryOptions({ queryKey: ['tasks', 'list'], queryFn: fetchTasks }),",
+            "};"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/task-editor/use-task-editor-model.ts",
+          "lines": [
+            "// allowed: a form model that only writes (useMutation, useQueryClient) reads no server state",
+            "import { useMutation, useQueryClient } from '@tanstack/react-query';",
+            "",
+            "export function useTaskEditorModel(save: (title: string) => Promise<void>): { readonly onSave: (title: string) => void } {",
+            "  const queryClient = useQueryClient();",
+            "  const mutation = useMutation({ mutationFn: save, onSettled: () => queryClient.invalidateQueries({ queryKey: ['tasks'] }) });",
+            "  return { onSave: (title) => { mutation.mutate(title); } };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-refresh-guards": {
+    "expect": ["check-ui-states:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-more-tasks.ts",
+          "lines": [
+            "// allowed: guards on a refresh that render nothing: the load-more guard TanStack recommends and an effect that waits",
+            "import { useInfiniteQuery } from '@tanstack/react-query';",
+            "import { useEffect } from 'react';",
+            "",
+            "type PagedOptions = Parameters<typeof useInfiniteQuery<{ readonly items: string[] }>>[0];",
+            "",
+            "export function useMoreTasks(options: PagedOptions, save: () => void): () => void {",
+            "  const query = useInfiniteQuery(options);",
+            "  const { isFetching } = query;",
+            "  useEffect(() => {",
+            "    if (isFetching) return;",
+            "    save();",
+            "  }, [isFetching, save]);",
+            "  const onEndReached = (): void => {",
+            "    if (query.isFetching || !query.hasNextPage) return;",
+            "    void query.fetchNextPage();",
+            "  };",
+            "  return onEndReached;",
+            "}",
+            "",
+            "export function isWorthSaving(items: readonly string[], query: { readonly isFetching: boolean }): boolean {",
+            "  return items.some((item) => {",
+            "    if (query.isFetching) return false;",
+            "    return item !== '';",
+            "  });",
+            "}"
+          ]
+        }
+      }
+    ]
+  }
+}

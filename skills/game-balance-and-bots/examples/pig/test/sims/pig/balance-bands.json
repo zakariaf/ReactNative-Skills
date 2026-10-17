@@ -1,0 +1,81 @@
+{
+  "gameId": "pig",
+  "status": "proposed",
+  "approvedOn": null,
+  "seedsPerCell": 100,
+  "maxMoves": 400,
+  "grid": {
+    "random": [0, 25, 50, 75],
+    "holdAt20": [0, 25, 50, 75],
+    "lookahead": [25]
+  },
+  "bands": [
+    {
+      "policy": "holdAt20",
+      "difficulty": 0,
+      "metric": "winRate",
+      "min": 0.75,
+      "max": 0.95,
+      "why": "A person who holds at 20 wins most first levels (0.84 measured), never all of them."
+    },
+    {
+      "policy": "holdAt20",
+      "difficulty": 75,
+      "metric": "winRate",
+      "min": 0.3,
+      "max": 0.6,
+      "why": "The hardest row is close to a coin flip for a reasonable player (0.46 measured)."
+    },
+    {
+      "policy": "random",
+      "difficulty": 0,
+      "metric": "winRate",
+      "min": 0,
+      "max": 0.5,
+      "why": "Holding at random wins fewer than half of the easiest levels (0.41 measured): when to stop matters."
+    },
+    {
+      "policy": "holdAt20",
+      "difficulty": 25,
+      "metric": "medianMoves",
+      "min": 15,
+      "max": 40,
+      "why": "A level lasts a couple of dozen rolls (median 26), about a minute of play."
+    }
+  ],
+  "curve": { "policy": "holdAt20", "metric": "winRate", "direction": "down", "minStep": 0.08 },
+  "skillGap": {
+    "difficulty": 25,
+    "metric": "winRate",
+    "order": ["random", "holdAt20", "lookahead"],
+    "better": "higher",
+    "minStep": 0.1
+  },
+  "firstPayoff": { "policy": "holdAt20", "difficulty": 0, "withinMoves": 2, "minShare": 0.9 },
+  "twist": { "policy": "holdAt20", "difficulty": 25, "minPerRun": 1 },
+  "endless": {
+    "policy": "holdAt20",
+    "difficulty": 100,
+    "bands": [
+      {
+        "metric": "medianMoves",
+        "min": 45,
+        "max": 100,
+        "why": "An endless run outlasts a level (median 70 rolls measured) and still ends."
+      },
+      {
+        "metric": "medianScore",
+        "min": 90,
+        "max": 180,
+        "why": "A reasonable endless run banks more than any level target (median 132 measured)."
+      },
+      {
+        "metric": "twistPerRun",
+        "min": 4,
+        "max": 10,
+        "why": "Busts keep biting in the endless run (7.01 per run measured), so pushing your luck stays a choice."
+      }
+    ]
+  },
+  "notes": "Pig, four tuning rows on the 0..100 scale sampled at their lower bounds (0/25/50/75), the endless run at 100, 100 seeds. The first run (busts in a row that end the run: 3; turns per row 10/12/14/16) had random play beating the hold-at-20 player on the easiest row (0.72 vs 0.61): 39 of its 100 runs ended in a bust streak, so the rules punished pushing your luck. maxBusts 3 -> 5 restored the skill gap (random 0.54, holdAt20 0.83 at d25) but random still won 0.76 of the easiest levels and the curve fell by only 0.05-0.09 per row. Fewer turns per row (7/9/10/11) gave holdAt20 0.84/0.74/0.63/0.46, random 0.41/0.16/0.04/0 and the lookahead upper bound 0.90 at d25 (8/9/10/11 was rejected: random won 0.56 of the easiest levels). The payoff (a roll that survives, the push-your-luck yes) and the twist (a bust that throws points away) were decided before the first sim run; banks are what the score (medianScore) measures, and the later observation that a bank would have come within 10 rolls in only 65 % of runs is why they are not a tag. The curve step (0.08) and the skill-gap step (0.1) sit below the measured 0.10-0.17 and 0.16. Proposed until a person has played it on an iPhone and an Android phone."
+}

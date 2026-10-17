@@ -1,0 +1,9 @@
+appId: com.acme.tasks
+tags:
+  - smoke
+---
+- launchApp
+- tapOn:
+    id: tasks.add-button
+- assertVisible:
+    id: tasks.screen

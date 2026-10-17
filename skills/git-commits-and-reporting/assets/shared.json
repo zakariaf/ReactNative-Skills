@@ -1,0 +1,5 @@
+[
+  { "from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs" },
+  { "from": "repo-templates/scripts/git/", "to": "templates/scripts/git/" },
+  { "from": "repo-templates/quality-gates.json", "to": "assets/quality-gates.json" }
+]

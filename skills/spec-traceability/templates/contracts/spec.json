@@ -1,0 +1,33 @@
+{
+  "$schema": "./spec.schema.json",
+  "$comment": "The app's requirement-ID scheme, read by spec-traceability's spec-lookup and check-spec-refs. Every key is optional; these values are the defaults. Keep each traced prefix a capital word ending in '-' so the default requirement reference of the commit rules (scripts/git/requirement-ref.json) accepts it.",
+  "specDir": "docs/spec",
+  "kinds": [
+    {
+      "kind": "non-negotiable",
+      "prefix": "NN-",
+      "defaultStatus": "decided",
+      "requiredFields": ["Enforced by"]
+    },
+    { "kind": "screen", "prefix": "SCR-", "traced": true, "named": true },
+    { "kind": "requirement", "prefix": "REQ-", "traced": true },
+    {
+      "kind": "decision",
+      "prefix": "DEC-",
+      "defaultStatus": "open",
+      "requiredFields": ["Default|Decided"]
+    },
+    { "kind": "out-of-scope", "prefix": "OOS-", "defaultStatus": "out-of-scope" }
+  ],
+  "sections": "auto",
+  "aliases": {},
+  "traceGlobs": [
+    "*.test.ts",
+    "*.test.tsx",
+    "*.test.js",
+    "*.test.mjs",
+    ".maestro/**/*.yaml",
+    ".maestro/**/*.yml"
+  ],
+  "ignore": []
+}

@@ -1,0 +1,25 @@
+{
+  "$schema": "./screen-states.schema.json",
+  "$comment": "Every screen that loads, lists or filters data, the states it shows besides its content, and every confirmation the app asks. Read by check-ui-states (ui-states-and-feedback). testIDs are '<id>.state.<state>'.",
+  "screens": [
+    {
+      "id": "tasks",
+      "view": "src/features/tasks/components/tasks-state-switch.tsx",
+      "test": "src/features/tasks/components/tasks-state-switch.test.tsx",
+      "stateType": {
+        "file": "src/ui/feedback/screen-state.ts",
+        "name": "ListScreenState"
+      },
+      "states": ["loading", "offline", "failed", "empty", "filtered-empty"],
+      "isList": true,
+      "hasFilter": true,
+      "readsServer": true
+    }
+  ],
+  "confirmations": [
+    {
+      "testID": "tasks.clear-done-dialog",
+      "whyNotUndo": "Clearing done tasks deletes them on the server for good; there is no restore endpoint, so Undo cannot bring them back."
+    }
+  ]
+}

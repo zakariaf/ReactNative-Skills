@@ -1,0 +1,56 @@
+{
+  "bad-looser": {
+    "expect": [
+      "[budget-looser]",
+      "quality-gates.json:5",
+      "perf.hitchMsPerSecondMax is 20, looser than the starting value 10"
+    ],
+    "ops": [{ "json": { "file": "quality-gates.json", "path": ["perf", "hitchMsPerSecondMax"], "value": 20 } }]
+  },
+  "bad-missing": {
+    "expect": ["[budget-missing]", "quality-gates.json:1", "perf.saveWriteP95MsMax is undefined"],
+    "ops": [{ "json": { "file": "quality-gates.json", "path": ["perf", "saveWriteP95MsMax"], "delete": true } }]
+  },
+  "bad-no-perf": {
+    "expect": ["[budget-missing]", "quality-gates.json has no \"perf\" section"],
+    "ops": [
+      { "json": { "file": "quality-gates.json", "path": ["perf"], "delete": true } },
+      { "json": { "file": "quality-gates.json", "path": ["a11y"], "value": { "minTouchPt": 44 } } }
+    ]
+  },
+  "bad-not-positive": {
+    "expect": ["[budget-missing]", "quality-gates.json:7", "perf.saveWriteP95MsMax is 0"],
+    "ops": [{ "json": { "file": "quality-gates.json", "path": ["perf", "saveWriteP95MsMax"], "value": 0 } }]
+  },
+  "bad-unknown": {
+    "expect": ["[budget-unknown]", "perf.listItemsMountedMax is not a known budget"],
+    "ops": [{ "json": { "file": "quality-gates.json", "path": ["perf", "listItemsMountedMax"], "value": 150 } }]
+  },
+  "error-no-gates-file": {
+    "expect": ["ERROR [bad-input] nothing to check: quality-gates.json does not exist"],
+    "ops": [{ "delete": "quality-gates.json" }]
+  },
+  "error-not-json": {
+    "expect": ["ERROR [bad-input] quality-gates.json is not valid JSON"],
+    "ops": [{ "write": { "file": "quality-gates.json", "content": "{ \"perf\": " } }]
+  },
+  "error-unknown-allow": {
+    "expect": ["ERROR [bad-input] --allow names unknown budgets: coldStartMsMax"],
+    "args": "{dir} --allow coldStartMsMax"
+  },
+  "pass-allowed-loosening": {
+    "expect": [
+      "perf.memoryFootprintMbMax = 180 is looser than 150 (allowed by --allow memoryFootprintMbMax)",
+      "RESULT: PASS"
+    ],
+    "args": "{dir} --allow memoryFootprintMbMax",
+    "ops": [{ "json": { "file": "quality-gates.json", "path": ["perf", "memoryFootprintMbMax"], "value": 180 } }]
+  },
+  "pass-tighter-budgets": {
+    "expect": ["check-budgets: 10 budgets checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "quality-gates.json", "path": ["perf", "coldStartHomeMsMax"], "value": 800 } },
+      { "json": { "file": "quality-gates.json", "path": ["perf", "bundleJsBytesMax"], "value": 3000000 } }
+    ]
+  }
+}

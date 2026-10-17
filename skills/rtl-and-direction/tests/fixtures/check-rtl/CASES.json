@@ -1,0 +1,1160 @@
+{
+  "bad-bidi-escape": {
+    "expect": ["[bidi-in-source]", "src/features/tasks/list-label.ts:3", "isolate()"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/list-label.ts",
+          "lines": [
+            "// src/features/tasks/list-label.ts (planted: a hand-written right-to-left isolate)",
+            "export function listLabel(name: string): string {",
+            "  return '\\u2067' + name + '\\u2069';",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-bidi-ltr-label": {
+    "expect": ["[bidi-in-source]", "src/features/settings/debug-label.ts:3", "direction=\"ltr\""],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/settings/debug-label.ts",
+          "lines": [
+            "// src/features/settings/debug-label.ts (planted: an English label in an Arabic row \"fixed\" with LRE ... PDF)",
+            "export function debugLabel(text: string): string {",
+            "  return `‪${text}‬`;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-bidi-raw": {
+    "expect": ["[bidi-in-source]", "raw bidi control U+200F", "src/features/tasks/mark.ts:2"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/mark.ts",
+          "lines": ["// src/features/tasks/mark.ts (planted: a raw right-to-left mark)", "export const MARK = '‏';"]
+        }
+      }
+    ]
+  },
+  "bad-device-forces-rtl": {
+    "expect": [
+      "[expo-localization-rtl]",
+      "app.config.ts:6",
+      "forcesRTL is set for expo-localization: it forces a right-to-left layout at every launch"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/rtl.json", "path": ["directionSource"], "value": "device" } },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "{ supportedLocales: { ios: LOCALES, android: LOCALES } }",
+          "with": "{ supportedLocales: { ios: LOCALES, android: LOCALES }, supportsRTL: true, forcesRTL: true }"
+        }
+      }
+    ]
+  },
+  "bad-direction-gate-missing": {
+    "expect": ["[direction-before-render]", "src/app/_layout.tsx:1", "without deciding the layout direction first"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "  return (\n    <DirectionGate\n      language={startup.language}\n      guard={startup.services.directionGuard}\n      onGiveUp={handleGiveUp}\n      onGuardFailure={handleGuardFailure}\n    >\n      <AppRoot services={startup.services} language={startup.language} />\n    </DirectionGate>\n  );",
+          "with": "  void handleGiveUp;\n  return <AppRoot services={startup.services} language={startup.language} />;"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "import { DirectionGate } from '@/i18n/direction-gate';\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-direction-module-missing": {
+    "expect": [
+      "[direction-module]",
+      "src/i18n/direction.ts:1",
+      "is missing although the app ships a right-to-left language"
+    ],
+    "ops": [{ "delete": "src/i18n/direction.ts" }]
+  },
+  "bad-direction-no-allow": {
+    "expect": ["[direction-module]", "never calls I18nManager.allowRTL()"],
+    "ops": [{ "replace": { "file": "src/i18n/direction.ts", "find": "  I18nManager.allowRTL(isRtl);\n", "with": "" } }]
+  },
+  "bad-direction-order": {
+    "expect": ["[direction-before-render]", "src/app/_layout.tsx:46", "decideStartup(), which calls openDeviceData()"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "function decideStartup(): Startup {\n",
+          "with": "function decideStartup(): Startup {\n  openDeviceData(createDeviceServices());\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "import { DirectionGate } from '@/i18n/direction-gate';",
+          "with": "import { openDeviceData } from '@/data/open-device-database';\nimport { DirectionGate } from '@/i18n/direction-gate';"
+        }
+      }
+    ]
+  },
+  "bad-direction-provider-language": {
+    "expect": [
+      "[layout-direction]",
+      "src/features/tasks/tasks-screen.tsx:9",
+      "<DirectionProvider> takes its direction from the language"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "lines": [
+            "// src/features/tasks/tasks-screen.tsx (planted: icons flip with the language before the layout flips)",
+            "import { DirectionProvider } from '@/i18n/direction-context';",
+            "import { directionOf } from '@/i18n/languages';",
+            "",
+            "import { TaskRow } from './components/task-row';",
+            "",
+            "export function TasksScreen({ language }: { readonly language: 'en' | 'ar' }): React.JSX.Element {",
+            "  return (",
+            "    <DirectionProvider direction={directionOf(language)}>",
+            "      <TaskRow title=\"t\" dueText=\"d\" countText=\"c\" />",
+            "    </DirectionProvider>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-direction-reload-first": {
+    "expect": ["[direction-module]", "reloads before it records the pending direction"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/i18n/direction.ts",
+          "find": "  const recorded = guard.writePending(direction);\n  if (!recorded.ok) return err(recorded.error);\n  forceLayoutDirection(direction);\n  try {\n    await beforeReload();\n  } finally {\n    await reloadAppAsync(`layout direction -> ${direction}`);\n  }\n",
+          "with": "  forceLayoutDirection(direction);\n  try {\n    await beforeReload();\n  } finally {\n    await reloadAppAsync(`layout direction -> ${direction}`);\n  }\n  const recorded = guard.writePending(direction);\n  if (!recorded.ok) return err(recorded.error);\n"
+        }
+      }
+    ]
+  },
+  "bad-directional-icons-extra": {
+    "expect": ["[directional-icons]", "src/ui/icons/icon-paths.ts:12", "\"play\" is in DIRECTIONAL_ICONS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/icons/icon-paths.ts",
+          "find": "new Set<IconName>(['back', 'chevron'])",
+          "with": "new Set<IconName>(['back', 'chevron', 'play'])"
+        }
+      }
+    ]
+  },
+  "bad-directional-icons-missing": {
+    "expect": ["[directional-icons]", "\"chevron\" points along the reading direction"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/icons/icon-paths.ts",
+          "find": "new Set<IconName>(['back', 'chevron'])",
+          "with": "new Set<IconName>(['back'])"
+        }
+      }
+    ]
+  },
+  "bad-expo-updates": {
+    "expect": ["[reload-outside-direction]", "src/features/settings/restart.ts:5", "Updates.reloadAsync()"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/settings/restart.ts",
+          "lines": [
+            "// src/features/settings/restart.ts (planted: an update reload used to switch the layout direction)",
+            "import * as Updates from 'expo-updates';",
+            "",
+            "export async function restartForLocale(): Promise<void> {",
+            "  await Updates.reloadAsync();",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-fallback-screen-no-locale": {
+    "expect": [
+      "[root-direction-provider]",
+      "src/features/crash-recovery/crash-fallback.tsx:1",
+      "the root ErrorBoundary fallback (crash-fallback.tsx)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/crash-recovery/crash-fallback.tsx",
+          "lines": [
+            "// src/features/crash-recovery/crash-fallback.tsx",
+            "// The app's root fallback, the `Fallback` the root layout hands createRouteErrorBoundary. It renders",
+            "// outside every provider the root layout mounts (Expo Router's boundary replaces the layout), so it",
+            "// reads no React context that lacks a default. useTheme() is safe: design-system-structure's theme",
+            "// context defaults to the app's light theme, the same theme AppText falls back to, so the text and",
+            "// the background stay a pair whose contrast the theme proves. Copy comes from i18n-strings-and-",
+            "// catalogs' createTranslateNow (src/i18n/translate-now.ts), a t() that needs no provider: it uses the",
+            "// language and digits I18nProvider showed last, so the person keeps their own language, and the",
+            "// device's languages when no provider committed yet. Expo Router's root mounts SafeAreaProvider above",
+            "// the layout, so safe-area hooks still work. Keep it trivial: nothing catches or records an error",
+            "// thrown here.",
+            "import { createTranslateNow } from '@/i18n/translate-now';",
+            "import { appErrorNet } from '@/services/error-net/app-error-net';",
+            "import { useTheme } from '@/theme/use-theme';",
+            "",
+            "import { CrashScreen } from './crash-screen';",
+            "",
+            "import type { CrashFallbackProps } from './create-route-error-boundary';",
+            "",
+            "/** A missing crash message is recorded, never thrown: a throw here would be an unrecorded crash. */",
+            "function reportMessageError(error: Error): void {",
+            "  appErrorNet.report({ source: 'render', error, isFatal: false });",
+            "}",
+            "",
+            "/** The crash screen with the app's copy and background; its one way out is `onRestart`. */",
+            "export function CrashFallback({ onRestart }: CrashFallbackProps): React.JSX.Element {",
+            "  const theme = useTheme();",
+            "  const t = createTranslateNow(reportMessageError);",
+            "  return (",
+            "    <CrashScreen",
+            "      title={t('crash.title')}",
+            "      body={t('crash.body')}",
+            "      actionLabel={t('crash.restart')}",
+            "      onAction={onRestart}",
+            "      backgroundColor={theme.colors.background}",
+            "    />",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/crash-recovery/crash-screen.tsx",
+          "lines": [
+            "// src/features/crash-recovery/crash-screen.tsx",
+            "// The fallback a crashed route shows: a title, one sentence and one way out. A pure view whose",
+            "// strings and background arrive as props. Under the root layout it renders outside every provider",
+            "// the layout mounts, so it reads no context that lacks a default. The app passes the background",
+            "// from useTheme(), whose context defaults to the light theme outside ThemeProvider: the same theme",
+            "// AppText falls back to, so text and background stay a pair whose contrast the theme proves. Keep",
+            "// it trivial: no boundary catches an error thrown here, and React reports it to React Native as a",
+            "// fatal crash the error net never sees.",
+            "import { Button, StyleSheet, View } from 'react-native';",
+            "",
+            "import { AppText } from '@/ui/app-text';",
+            "",
+            "export type CrashScreenProps = {",
+            "  readonly title: string;",
+            "  readonly body: string;",
+            "  readonly actionLabel: string;",
+            "  readonly onAction: () => void;",
+            "  /**",
+            "   * The screen background, from useTheme() (its context defaults to the light theme outside",
+            "   * ThemeProvider), so it always matches the theme AppText draws the text with.",
+            "   */",
+            "  readonly backgroundColor: string;",
+            "};",
+            "",
+            "/** Crash fallback: one way out, never an automatic retry. */",
+            "export function CrashScreen({",
+            "  title,",
+            "  body,",
+            "  actionLabel,",
+            "  onAction,",
+            "  backgroundColor,",
+            "}: CrashScreenProps): React.JSX.Element {",
+            "  return (",
+            "    <View",
+            "      testID=\"crash.screen\"",
+            "      style={[styles.screen, { backgroundColor }]}",
+            "      accessibilityRole=\"alert\"",
+            "    >",
+            "      <AppText testID=\"crash.title\">{title}</AppText>",
+            "      <AppText testID=\"crash.body\">{body}</AppText>",
+            "      <Button testID=\"crash.restart-button\" title={actionLabel} onPress={onAction} />",
+            "    </View>",
+            "  );",
+            "}",
+            "",
+            "const styles = StyleSheet.create({",
+            "  screen: { flex: 1, justifyContent: 'center', gap: 16, paddingHorizontal: 24 },",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-forces-rtl-extra": {
+    "expect": ["[expo-localization-rtl]", "app.config.ts:6", "forcesRTL"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "  name: 'Tasks',\n",
+          "with": "  name: 'Tasks',\n  extra: { forcesRTL: true },\n"
+        }
+      }
+    ]
+  },
+  "bad-gate-wrapped-provider": {
+    "expect": [
+      "[direction-before-render]",
+      "src/app/_layout.tsx:58",
+      "<SQLiteProvider> wraps DirectionGate in RootLayout"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "import { useState } from 'react';\n",
+          "with": "import { useState } from 'react';\nimport { SQLiteProvider } from 'expo-sqlite';\n\nimport { migrateTasks } from '@/data/migrate-tasks';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "    <DirectionGate\n",
+          "with": "    <SQLiteProvider databaseName=\"tasks.db\" onInit={migrateTasks}>\n    <DirectionGate\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "    </DirectionGate>\n",
+          "with": "    </DirectionGate>\n    </SQLiteProvider>\n"
+        }
+      }
+    ]
+  },
+  "bad-gate-wrapped-strict-mode": {
+    "expect": ["[direction-before-render]", "<StrictMode> wraps DirectionGate in RootLayout"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "import { useState } from 'react';\n",
+          "with": "import { StrictMode, useState } from 'react';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "    <DirectionGate\n",
+          "with": "    <StrictMode>\n    <DirectionGate\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "    </DirectionGate>\n",
+          "with": "    </DirectionGate>\n    </StrictMode>\n"
+        }
+      }
+    ]
+  },
+  "bad-i18nmanager": {
+    "expect": ["[i18nmanager]", "src/features/tasks/components/task-row.tsx:2", "useDirection()"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "find": "import { StyleSheet, View } from 'react-native';",
+          "with": "import { I18nManager, StyleSheet, View } from 'react-native';\n\nexport const IS_RTL = I18nManager.isRTL;"
+        }
+      }
+    ]
+  },
+  "bad-inline-boundary-no-locale": {
+    "expect": [
+      "[root-direction-provider]",
+      "src/app/_layout.tsx:28",
+      "the root ErrorBoundary, drawn inline in the root layout,"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "export const ErrorBoundary = createRouteErrorBoundary({\n  record: (error) => {\n    appErrorNet.report({ source: 'render', error, isFatal: false });\n  },\n  Fallback: CrashFallback,\n  // The root fallback replaces the whole navigator: reloading the bundle is the dependable way out.\n  restart: () => reloadAppAsync('crash-recovery'),\n});",
+          "with": "export function ErrorBoundary({ retry }: ErrorBoundaryProps): React.JSX.Element {\n  const t = createTranslateNow((error) => {\n    appErrorNet.report({ source: 'render', error, isFatal: false });\n  });\n  return (\n    <View style={{ flex: 1, justifyContent: 'center', paddingInline: 24 }}>\n      <AppText>{t('crash.title')}</AppText>\n      <AppText onPress={() => void retry()}>{t('crash.restart')}</AppText>\n    </View>\n  );\n}"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "import { CrashFallback } from '@/features/crash-recovery/crash-fallback';\nimport { createRouteErrorBoundary } from '@/features/crash-recovery/create-route-error-boundary';\n",
+          "with": "import { createTranslateNow } from '@/i18n/translate-now';\nimport { AppText } from '@/ui/app-text';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "import { useState } from 'react';\n",
+          "with": "import { useState } from 'react';\nimport { View } from 'react-native';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "import type { DirectionGiveUp } from '@/i18n/direction-gate';\n",
+          "with": "import type { DirectionGiveUp } from '@/i18n/direction-gate';\nimport type { ErrorBoundaryProps } from 'expo-router';\n"
+        }
+      }
+    ]
+  },
+  "bad-nav-direction": {
+    "expect": [
+      "[layout-direction]",
+      "src/features/root-navigator/navigation-root.tsx:8",
+      "<NavigationContainer> takes its direction from the language"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/root-navigator/navigation-root.tsx",
+          "lines": [
+            "// src/features/root-navigator/navigation-root.tsx (React Navigation appendix; planted: direction from the language)",
+            "import { NavigationContainer } from '@react-navigation/native';",
+            "",
+            "import { directionOf } from '@/i18n/languages';",
+            "",
+            "export function NavigationRoot({ language }: { readonly language: 'en' | 'ar' }): React.JSX.Element {",
+            "  return (",
+            "    <NavigationContainer direction={directionOf(language)}>",
+            "      <></>",
+            "    </NavigationContainer>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-number-to-text": {
+    "expect": [
+      "[number-to-text]",
+      "src/features/tasks/components/task-row.tsx:27",
+      ".toFixed(",
+      "createNumberFormatter"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "find": "<AppText>{countText}</AppText>",
+          "with": "<AppText>{Number(countText).toFixed(0)}</AppText>"
+        }
+      }
+    ]
+  },
+  "bad-number-to-text-nested": {
+    "expect": ["[number-to-text]", "src/features/tasks/components/task-row.tsx:32", "String(", "createNumberFormatter"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "find": "      <Icon name=\"chevron\" />\n",
+          "with": "      <Icon name=\"chevron\" />\n      {[1, 2, 3].map((dot) => (\n        <View key={`dot-${String(dot)}`} testID={`tasks.task-row.dot-${String(dot)}`}>\n          {dot > 1 ? <AppText>{countText}</AppText> : String(dot)}\n        </View>\n      ))}\n"
+        }
+      }
+    ]
+  },
+  "bad-outside-root-function-boundary": {
+    "expect": [
+      "[root-direction-provider]",
+      "src/features/crash-recovery/crash-fallback.tsx:1",
+      "the root ErrorBoundary fallback (crash-fallback.tsx)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "export const ErrorBoundary = createRouteErrorBoundary({\n  record: (error) => {\n    appErrorNet.report({ source: 'render', error, isFatal: false });\n  },\n  Fallback: CrashFallback,\n  // The root fallback replaces the whole navigator: reloading the bundle is the dependable way out.\n  restart: () => reloadAppAsync('crash-recovery'),\n});",
+          "with": "export function ErrorBoundary(): React.JSX.Element {\n  return <CrashFallback onRestart={() => void reloadAppAsync('crash-recovery')} />;\n}"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "import { createRouteErrorBoundary } from '@/features/crash-recovery/create-route-error-boundary';\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/crash-recovery/crash-fallback.tsx",
+          "find": "    <TextLocaleProvider value={{ language, direction: directionOf(language) }}>\n",
+          "with": "    <>\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/crash-recovery/crash-fallback.tsx",
+          "find": "    </TextLocaleProvider>\n",
+          "with": "    </>\n"
+        }
+      }
+    ]
+  },
+  "bad-outside-root-no-locale": {
+    "expect": [
+      "[root-direction-provider]",
+      "src/features/crash-recovery/crash-fallback.tsx:1",
+      "the root ErrorBoundary fallback (crash-fallback.tsx)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/crash-recovery/crash-fallback.tsx",
+          "find": "    <TextLocaleProvider value={{ language, direction: directionOf(language) }}>\n",
+          "with": "    <>\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/crash-recovery/crash-fallback.tsx",
+          "find": "    </TextLocaleProvider>\n",
+          "with": "    </>\n"
+        }
+      }
+    ]
+  },
+  "bad-physical-animated-style": {
+    "expect": ["[physical-style-key]", "src/features/tasks/components/task-check.tsx:11", "marginLeft", "marginStart"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-check.tsx",
+          "find": "marginStart: withTiming(progress.get() * 20),",
+          "with": "marginLeft: withTiming(progress.get() * 20),"
+        }
+      }
+    ]
+  },
+  "bad-physical-inline-style": {
+    "expect": ["[physical-style-key]", "src/features/tasks/components/task-row.tsx:23", "paddingRight"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "find": "{ paddingStart: 4 }",
+          "with": "{ paddingRight: 4 }"
+        }
+      }
+    ]
+  },
+  "bad-physical-margin": {
+    "expect": ["[physical-style-key]", "src/features/tasks/components/task-row.tsx:9", "marginLeft", "marginStart"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "find": "due: { marginStart: 'auto', marginEnd: 8 },",
+          "with": "due: { marginLeft: 'auto', marginEnd: 8 },"
+        }
+      }
+    ]
+  },
+  "bad-physical-position": {
+    "expect": ["[physical-style-key]", "src/features/tasks/components/task-row.tsx:10", "\"right\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "find": "badge: { position: 'absolute', top: 4, end: 4 },",
+          "with": "badge: { position: 'absolute', top: 4, right: 4 },"
+        }
+      }
+    ]
+  },
+  "bad-physical-radius": {
+    "expect": [
+      "[physical-style-key]",
+      "src/features/tasks/components/task-row.tsx:8",
+      "borderTopLeftRadius",
+      "borderTopStartRadius"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "find": "borderTopStartRadius: 12",
+          "with": "borderTopLeftRadius: 12"
+        }
+      }
+    ]
+  },
+  "bad-physical-style-arrow-helper": {
+    "expect": ["[physical-style-key]", "src/features/tasks/components/task-row.tsx:15", "right"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "find": "import { StyleSheet, View } from 'react-native';\n",
+          "with": "import { StyleSheet, View } from 'react-native';\n\nimport type { ViewStyle } from 'react-native';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "find": "export type TaskRowProps = {",
+          "with": "const thumbAt = (x: number): ViewStyle => ({ position: 'absolute', right: x });\n\nexport type TaskRowProps = {"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "find": "      <View style={styles.badge}>",
+          "with": "      <View style={[styles.badge, thumbAt(4)]}>"
+        }
+      }
+    ]
+  },
+  "bad-physical-style-helper": {
+    "expect": ["[physical-style-key]", "src/features/tasks/components/task-row.tsx:16", "marginLeft"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "find": "import { StyleSheet, View } from 'react-native';\n",
+          "with": "import { StyleSheet, View } from 'react-native';\n\nimport type { TextStyle } from 'react-native';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "find": "export type TaskRowProps = {",
+          "with": "function countAlign(): TextStyle {\n  return { marginLeft: 4, fontVariant: ['tabular-nums'] };\n}\n\nexport type TaskRowProps = {"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "find": "        <AppText>{countText}</AppText>",
+          "with": "        <AppText style={countAlign()}>{countText}</AppText>"
+        }
+      }
+    ]
+  },
+  "bad-physical-surface": {
+    "expect": [
+      "[physical-surface-ltr]",
+      "src/features/tasks/components/task-map.tsx:10",
+      "<TaskMapCanvas> is a physical surface"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-map.tsx",
+          "find": "<PhysicalDirectionView testID=\"tasks.map\">",
+          "with": "<View testID=\"tasks.map\">"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-map.tsx",
+          "find": "</PhysicalDirectionView>",
+          "with": "</View>"
+        }
+      }
+    ]
+  },
+  "bad-react-navigation-no-gate": {
+    "expect": ["[direction-before-render]", "App.tsx:1", "without deciding the layout direction first"],
+    "ops": [
+      { "rename": { "from": "src/app/_layout.tsx", "to": "App.tsx" } },
+      {
+        "replace": {
+          "file": "App.tsx",
+          "find": "  return (\n    <DirectionGate\n      language={startup.language}\n      guard={startup.services.directionGuard}\n      onGiveUp={handleGiveUp}\n      onGuardFailure={handleGuardFailure}\n    >\n      <AppRoot services={startup.services} language={startup.language} />\n    </DirectionGate>\n  );",
+          "with": "  void handleGiveUp;\n  return <AppRoot services={startup.services} language={startup.language} />;"
+        }
+      },
+      {
+        "replace": { "file": "App.tsx", "find": "import { DirectionGate } from '@/i18n/direction-gate';\n", "with": "" }
+      }
+    ]
+  },
+  "bad-reload": {
+    "expect": ["[reload-outside-direction]", "src/features/settings/apply-language.ts:5", "restartForDirection"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/settings/apply-language.ts",
+          "lines": [
+            "// src/features/settings/apply-language.ts (planted: a language change reloads without the guard)",
+            "import { reloadAppAsync } from 'expo';",
+            "",
+            "export async function applyLanguage(): Promise<void> {",
+            "  await reloadAppAsync('language changed');",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-reload-module-scope": {
+    "expect": [
+      "[reload-at-module-scope]",
+      "src/features/settings/reload-now.ts:4",
+      "reloadAppAsync() runs at import time"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/settings/reload-now.ts",
+          "lines": [
+            "// src/features/settings/reload-now.ts (planted: a reload while the bundle is being evaluated)",
+            "import { reloadAppAsync } from 'expo';",
+            "",
+            "void reloadAppAsync('apply settings');",
+            "",
+            "export const RELOADED = true;"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-restart-screen-no-locale": {
+    "expect": ["[root-direction-provider]", "src/i18n/direction-restart.tsx:1", "the direction restart screen"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/i18n/direction-restart.tsx",
+          "find": "    <TextLocaleProvider value={{ language, direction: directionOf(language) }}>\n",
+          "with": "    <>\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/i18n/direction-restart.tsx",
+          "find": "    </TextLocaleProvider>\n",
+          "with": "    </>\n"
+        }
+      }
+    ]
+  },
+  "bad-row-reverse": {
+    "expect": ["[row-reverse]", "src/features/tasks/components/task-row.tsx:8"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "find": "row: { flexDirection: 'row',",
+          "with": "row: { flexDirection: 'row-reverse',"
+        }
+      }
+    ]
+  },
+  "bad-scale-x": {
+    "expect": ["[scale-x-flip]", "src/features/tasks/components/task-map.tsx:9"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-map.tsx",
+          "find": "<PhysicalDirectionView testID=\"tasks.map\">",
+          "with": "<PhysicalDirectionView testID=\"tasks.map\" style={{ transform: [{ scaleX: -1 }] }}>"
+        }
+      }
+    ]
+  },
+  "bad-supports-rtl": {
+    "expect": ["[expo-localization-rtl]", "app.config.ts:6", "supportsRTL"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "{ supportedLocales: { ios: LOCALES, android: LOCALES } }",
+          "with": "{ supportedLocales: { ios: LOCALES, android: LOCALES }, supportsRTL: true }"
+        }
+      }
+    ]
+  },
+  "bad-text-align": {
+    "expect": ["[text-align-literal]", "src/features/tasks/components/task-row.tsx:9"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "find": "due: { marginStart: 'auto', marginEnd: 8 },",
+          "with": "due: { marginStart: 'auto', marginEnd: 8, textAlign: 'right' },"
+        }
+      }
+    ]
+  },
+  "bad-text-align-ternary": {
+    "expect": ["[text-align-literal]", "src/features/tasks/components/task-row.tsx:24", "textAlign takes 'right'"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "find": "      <View style={[styles.due, { paddingStart: 4 }]}>",
+          "with": "      <View style={[styles.due, { paddingStart: 4, textAlign: isRtl ? 'right' : 'left' }]}>"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "find": "export function TaskRow({ title, dueText, countText }: TaskRowProps): React.JSX.Element {\n",
+          "with": "export function TaskRow({ title, dueText, countText }: TaskRowProps): React.JSX.Element {\n  const isRtl = useDirection() === 'rtl';\n"
+        }
+      }
+    ]
+  },
+  "bad-text-import": {
+    "expect": ["[text-import]", "src/features/tasks/components/task-row.tsx:2"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "find": "import { StyleSheet, View } from 'react-native';",
+          "with": "import { StyleSheet, Text, View } from 'react-native';"
+        }
+      }
+    ]
+  },
+  "bad-writing-direction": {
+    "expect": ["[writing-direction]", "src/features/tasks/components/task-row.tsx:9", "direction=\"ltr\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "find": "due: { marginStart: 'auto', marginEnd: 8 },",
+          "with": "due: { marginStart: 'auto', marginEnd: 8, writingDirection: 'rtl' },"
+        }
+      }
+    ]
+  },
+  "error-bad-contract": {
+    "expect": ["ERROR [bad-input]", "\"physicalSurfaces\" must be a list of strings"],
+    "ops": [{ "json": { "file": "contracts/rtl.json", "path": ["physicalSurfaces"], "value": "TaskMapCanvas" } }]
+  },
+  "error-empty-repo": {
+    "expect": ["ERROR [bad-input] nothing to check"],
+    "base": [],
+    "ops": [{ "write": { "file": "README.md", "content": "No app here.\n" } }]
+  },
+  "pass-device-direction": {
+    "expect": [
+      "direction-module, direction-before-render: not checked (contracts/rtl.json directionSource is \"device\"",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      { "delete": "src/i18n/direction.ts" },
+      { "json": { "file": "contracts/rtl.json", "path": ["directionSource"], "value": "device" } },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "{ supportedLocales: { ios: LOCALES, android: LOCALES } }",
+          "with": "{ supportedLocales: { ios: LOCALES, android: LOCALES }, supportsRTL: true }"
+        }
+      }
+    ]
+  },
+  "pass-direction-web-sibling": {
+    "expect": ["check-rtl:", "0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/i18n/direction.web.ts",
+          "content": "// src/i18n/direction.web.ts: the web sibling of the direction module (web-support).\nimport { reloadAppAsync } from 'expo';\nimport { I18nManager } from 'react-native';\n\nexport const IS_RTL_ON_WEB = I18nManager.getConstants().isRTL;\n\nexport async function restartForDirection(): Promise<void> {\n  await reloadAppAsync('direction change');\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-fallback-screen-provider": {
+    "expect": ["check-rtl:", "0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/crash-recovery/crash-fallback.tsx",
+          "lines": [
+            "// src/features/crash-recovery/crash-fallback.tsx",
+            "// The app's root fallback, the `Fallback` the root layout hands createRouteErrorBoundary. It renders",
+            "// outside every provider the root layout mounts (Expo Router's boundary replaces the layout), so it",
+            "// reads no React context that lacks a default. useTheme() is safe: design-system-structure's theme",
+            "// context defaults to the app's light theme, the same theme AppText falls back to, so the text and",
+            "// the background stay a pair whose contrast the theme proves. Copy comes from i18n-strings-and-",
+            "// catalogs' createTranslateNow (src/i18n/translate-now.ts), a t() that needs no provider: it uses the",
+            "// language and digits I18nProvider showed last, so the person keeps their own language, and the",
+            "// device's languages when no provider committed yet. Expo Router's root mounts SafeAreaProvider above",
+            "// the layout, so safe-area hooks still work. Keep it trivial: nothing catches or records an error",
+            "// thrown here.",
+            "import { createTranslateNow } from '@/i18n/translate-now';",
+            "import { appErrorNet } from '@/services/error-net/app-error-net';",
+            "import { useTheme } from '@/theme/use-theme';",
+            "",
+            "import { CrashScreen } from './crash-screen';",
+            "",
+            "import type { CrashFallbackProps } from './create-route-error-boundary';",
+            "",
+            "/** A missing crash message is recorded, never thrown: a throw here would be an unrecorded crash. */",
+            "function reportMessageError(error: Error): void {",
+            "  appErrorNet.report({ source: 'render', error, isFatal: false });",
+            "}",
+            "",
+            "/** The crash screen with the app's copy and background; its one way out is `onRestart`. */",
+            "export function CrashFallback({ onRestart }: CrashFallbackProps): React.JSX.Element {",
+            "  const theme = useTheme();",
+            "  const t = createTranslateNow(reportMessageError);",
+            "  return (",
+            "    <CrashScreen",
+            "      title={t('crash.title')}",
+            "      body={t('crash.body')}",
+            "      actionLabel={t('crash.restart')}",
+            "      onAction={onRestart}",
+            "      backgroundColor={theme.colors.background}",
+            "    />",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/crash-recovery/crash-screen.tsx",
+          "lines": [
+            "// src/features/crash-recovery/crash-screen.tsx",
+            "// The fallback a crashed route shows: a title, one sentence and one way out. A pure view whose",
+            "// strings and background arrive as props. Under the root layout it renders outside every provider",
+            "// the layout mounts, so it reads no context that lacks a default. The app passes the background",
+            "// from useTheme(), whose context defaults to the light theme outside ThemeProvider: the same theme",
+            "// AppText falls back to, so text and background stay a pair whose contrast the theme proves. Keep",
+            "// it trivial: no boundary catches an error thrown here, and React reports it to React Native as a",
+            "// fatal crash the error net never sees.",
+            "import { Button, StyleSheet, View } from 'react-native';",
+            "",
+            "import { directionOf } from '@/i18n/languages';",
+            "import { languageNow } from '@/i18n/translate-now';",
+            "import { TextLocaleProvider } from '@/theme/text-locale';",
+            "import { AppText } from '@/ui/app-text';",
+            "",
+            "export type CrashScreenProps = {",
+            "  readonly title: string;",
+            "  readonly body: string;",
+            "  readonly actionLabel: string;",
+            "  readonly onAction: () => void;",
+            "  /**",
+            "   * The screen background, from useTheme() (its context defaults to the light theme outside",
+            "   * ThemeProvider), so it always matches the theme AppText draws the text with.",
+            "   */",
+            "  readonly backgroundColor: string;",
+            "};",
+            "",
+            "/** Crash fallback: one way out, never an automatic retry. */",
+            "export function CrashScreen({",
+            "  title,",
+            "  body,",
+            "  actionLabel,",
+            "  onAction,",
+            "  backgroundColor,",
+            "}: CrashScreenProps): React.JSX.Element {",
+            "  const { language } = languageNow();",
+            "  return (",
+            "    <TextLocaleProvider value={{ language, direction: directionOf(language) }}>",
+            "      <View",
+            "        testID=\"crash.screen\"",
+            "        style={[styles.screen, { backgroundColor }]}",
+            "        accessibilityRole=\"alert\"",
+            "      >",
+            "        <AppText testID=\"crash.title\">{title}</AppText>",
+            "        <AppText testID=\"crash.body\">{body}</AppText>",
+            "        <Button testID=\"crash.restart-button\" title={actionLabel} onPress={onAction} />",
+            "      </View>",
+            "    </TextLocaleProvider>",
+            "  );",
+            "}",
+            "",
+            "const styles = StyleSheet.create({",
+            "  screen: { flex: 1, justifyContent: 'center', gap: 16, paddingHorizontal: 24 },",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-gate-before-reload": {
+    "expect": ["check-rtl:", "0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "      onGiveUp={handleGiveUp}\n",
+          "with": "      onGiveUp={handleGiveUp}\n      beforeReload={() => startup.services.audio.dispose()}\n"
+        }
+      }
+    ]
+  },
+  "pass-gate-wrapper": {
+    "expect": ["check-rtl:", "0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "import { useState } from 'react';\n",
+          "with": "import { useState } from 'react';\nimport { GestureHandlerRootView } from 'react-native-gesture-handler';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "    <DirectionGate\n",
+          "with": "    <GestureHandlerRootView style={{ flex: 1 }}>\n    <DirectionGate\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "    </DirectionGate>\n",
+          "with": "    </DirectionGate>\n    </GestureHandlerRootView>\n"
+        }
+      }
+    ]
+  },
+  "pass-inline-boundary-with-locale": {
+    "expect": ["check-rtl:", "0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "export const ErrorBoundary = createRouteErrorBoundary({\n  record: (error) => {\n    appErrorNet.report({ source: 'render', error, isFatal: false });\n  },\n  Fallback: CrashFallback,\n  // The root fallback replaces the whole navigator: reloading the bundle is the dependable way out.\n  restart: () => reloadAppAsync('crash-recovery'),\n});",
+          "with": "export function ErrorBoundary({ retry }: ErrorBoundaryProps): React.JSX.Element {\n  const t = createTranslateNow((error) => {\n    appErrorNet.report({ source: 'render', error, isFatal: false });\n  });\n  const { language } = languageNow();\n  return (\n    <TextLocaleProvider value={{ language, direction: directionOf(language) }}>\n      <View style={{ flex: 1, justifyContent: 'center', paddingInline: 24 }}>\n        <AppText>{t('crash.title')}</AppText>\n        <AppText onPress={() => void retry()}>{t('crash.restart')}</AppText>\n      </View>\n    </TextLocaleProvider>\n  );\n}"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "import { CrashFallback } from '@/features/crash-recovery/crash-fallback';\nimport { createRouteErrorBoundary } from '@/features/crash-recovery/create-route-error-boundary';\n",
+          "with": "import { directionOf } from '@/i18n/languages';\nimport { createTranslateNow, languageNow } from '@/i18n/translate-now';\nimport { TextLocaleProvider } from '@/theme/text-locale';\nimport { AppText } from '@/ui/app-text';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "import { useState } from 'react';\n",
+          "with": "import { useState } from 'react';\nimport { View } from 'react-native';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "import type { DirectionGiveUp } from '@/i18n/direction-gate';\n",
+          "with": "import type { DirectionGiveUp } from '@/i18n/direction-gate';\nimport type { ErrorBoundaryProps } from 'expo-router';\n"
+        }
+      }
+    ]
+  },
+  "pass-ltr-only": {
+    "expect": [
+      "direction-module, direction-before-render, root-direction-provider: not checked (src/i18n/languages.ts lists no right-to-left language)",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      { "delete": "src/i18n/direction.ts" },
+      {
+        "replace": {
+          "file": "src/i18n/languages.ts",
+          "find": "const RTL_LANGUAGES: ReadonlySet<Language> = new Set<Language>(['ar']);",
+          "with": "const RTL_LANGUAGES: ReadonlySet<Language> = new Set<Language>([]);"
+        }
+      }
+    ]
+  },
+  "pass-monorepo": {
+    "expect": ["check-rtl:", "0 problems", "RESULT: PASS"],
+    "args": "{dir} --app-dir apps/mobile",
+    "ops": [
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      { "rename": { "from": "app.config.ts", "to": "apps/mobile/app.config.ts" } },
+      { "rename": { "from": "contracts", "to": "apps/mobile/contracts" } },
+      { "rename": { "from": "tsconfig.json", "to": "apps/mobile/tsconfig.json" } },
+      { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+      {
+        "write": { "file": "package.json", "json": { "name": "tasks-repo", "private": true, "workspaces": ["apps/*"] } }
+      }
+    ]
+  },
+  "pass-no-languages": {
+    "expect": [
+      "SKIP src/i18n/languages.ts [direction-module] not yet created (i18n-strings-and-catalogs creates it)",
+      "SKIP src/i18n/languages.ts [direction-before-render] not yet created (i18n-strings-and-catalogs creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "src/i18n/languages.ts" }]
+  },
+  "pass-no-root-layout": {
+    "expect": [
+      "SKIP src/app/_layout.tsx [direction-before-render] not yet created (expo-project-bootstrap creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "src/app/_layout.tsx" }]
+  },
+  "pass-number-in-attribute": {
+    "expect": ["check-rtl:", "0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "find": "      <Icon name=\"chevron\" />\n",
+          "with": "      <Icon name=\"chevron\" />\n      {[1, 2, 3].map((dot) => (\n        <View\n          key={`dot-${String(dot)}`}\n          testID={`tasks.task-row.dot-${dot.toString()}`}\n          style={{ width: `${String(dot * 10)}%` }}\n        >\n          <AppText>{countText}</AppText>\n        </View>\n      ))}\n      {[4, 5].map((dot) => <View key={`pip-${String(dot)}`} style={{ height: dot }} />)}\n"
+        }
+      }
+    ]
+  },
+  "pass-react-navigation": {
+    "expect": ["check-rtl:", "0 problems", "RESULT: PASS"],
+    "ops": [
+      { "delete": "src/features/root-navigator/root-stack.tsx" },
+      { "rename": { "from": "src/app/_layout.tsx", "to": "App.tsx" } },
+      {
+        "replace": {
+          "file": "App.tsx",
+          "find": "export const ErrorBoundary = createRouteErrorBoundary({",
+          "with": "export const ErrorBoundary = createRouteErrorBoundary({\n  // With React Navigation, App.tsx renders the boundary itself; check-rtl reads the same export."
+        }
+      }
+    ]
+  },
+  "pass-web-storage-gate": {
+    "expect": ["check-rtl:", "0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "import { useState } from 'react';\n",
+          "with": "import { useState } from 'react';\n\nimport { WebStorageGate } from '@/features/root-navigator/web-storage-gate';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "    <DirectionGate\n",
+          "with": "    <WebStorageGate>\n    <DirectionGate\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "    </DirectionGate>\n",
+          "with": "    </DirectionGate>\n    </WebStorageGate>\n"
+        }
+      }
+    ]
+  }
+}

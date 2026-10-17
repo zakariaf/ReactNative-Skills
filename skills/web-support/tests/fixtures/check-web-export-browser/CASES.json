@@ -1,0 +1,86 @@
+{
+  "bad-console": {
+    "expect": ["dist/index.html [browser-console] /: console.error: Appearance.setColorScheme is not a function"],
+    "ops": [
+      {
+        "replace": {
+          "file": "dist/_expo/static/js/web/index-3f2a.js",
+          "find": "  document.getElementById('root').appendChild(screen);\n",
+          "with": "  document.getElementById('root').appendChild(screen);\n  console.error('Appearance.setColorScheme is not a function');\n"
+        }
+      }
+    ]
+  },
+  "bad-direction": {
+    "expect": [
+      "dist/index.html [browser-direction] /: (--lang=ar) <html> has dir=\"ltr\" lang=\"ar\", expected dir=\"rtl\" and lang ar"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "dist/_expo/static/js/web/index-3f2a.js",
+          "find": "  document.documentElement.dir = isArabic ? 'rtl' : 'ltr';\n",
+          "with": "  document.documentElement.dir = 'ltr';\n"
+        }
+      }
+    ]
+  },
+  "bad-exception": {
+    "expect": [
+      "dist/index.html [browser-exception] /: uncaught exception: TypeError: isBoldTextEnabled is not a function"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "dist/_expo/static/js/web/index-3f2a.js",
+          "find": "  document.getElementById('root').appendChild(screen);\n",
+          "with": "  document.getElementById('root').appendChild(screen);\n  setTimeout(function fail() { throw new TypeError('isBoldTextEnabled is not a function'); }, 0);\n"
+        }
+      }
+    ]
+  },
+  "bad-isolation": {
+    "expect": [
+      "dist/index.html [browser-isolation] /: the page is not cross-origin isolated",
+      "served with dist/_headers (static host)"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/web.json", "path": ["host"], "value": "static-host" } },
+      { "write": { "file": "dist/_headers", "content": "/*\n  Cross-Origin-Opener-Policy: same-origin\n" } }
+    ]
+  },
+  "bad-testid": {
+    "expect": ["dist/settings.html [browser-testid] /settings: the page did not show [data-testid=\"settings.list\"]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "dist/_expo/static/js/web/index-3f2a.js",
+          "find": "'settings.list'",
+          "with": "'settings.screen'"
+        }
+      }
+    ]
+  },
+  "pass-custom-server": {
+    "expect": [
+      "served with the canonical isolation headers (custom-server; deploy/nginx.conf is not read)",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/web.json", "path": ["host"], "value": "custom-server" } },
+      { "json": { "file": "contracts/web.json", "path": ["headersFile"], "value": "deploy/nginx.conf" } }
+    ]
+  },
+  "pass-static-host-headers": {
+    "expect": ["served with dist/_headers (static host)", "RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "contracts/web.json", "path": ["host"], "value": "static-host" } },
+      {
+        "write": {
+          "file": "dist/_headers",
+          "content": "# Netlify and Cloudflare Pages read this file (copied from public/_headers).\n/*\n  Cross-Origin-Embedder-Policy: require-corp\n  Cross-Origin-Opener-Policy: same-origin\n"
+        }
+      }
+    ]
+  }
+}

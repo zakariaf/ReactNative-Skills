@@ -1,0 +1,424 @@
+{
+  "area": "ios",
+  "entries": [
+    {
+      "id": "ios-wrong-xcode",
+      "topic": "Xcode",
+      "symptom": "xcodebuild -version prints another Xcode than the pinned one, or a built app has an unexpected DTXcode",
+      "cause": "/Applications/Xcode.app is another version on this Mac, and a tool used it because DEVELOPER_DIR was not set, or someone ran xcode-select",
+      "fix": "Select the pinned Xcode per process with DEVELOPER_DIR (the toolchain helper does); never run xcode-select -s, which changes every session on the machine",
+      "match": [
+        "DTXcode is \""
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "ios-simulator-build",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "ios-xcode-newer-black-screen",
+      "topic": "Xcode",
+      "symptom": "Black screen at launch after building with an Xcode newer than the pinned one on Expo SDK 57",
+      "cause": "The newer iOS SDK expects the UIScene life cycle, which SDK 57 apps do not adopt by default",
+      "fix": "Stay on the pinned Xcode until the SDK upgrade; if a newer Xcode is required, add ['expo-build-properties', { ios: { enableSceneSupport: true } }] (expo 57.0.23 or newer) and prove the launch on a simulator",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "expo-sdk-upgrade",
+      "platforms": [
+        "ios"
+      ],
+      "appliesTo": {
+        "expo": "57.x"
+      }
+    },
+    {
+      "id": "ios-xcode-licence",
+      "topic": "Xcode",
+      "symptom": "You have not agreed to the Xcode license agreements",
+      "cause": "The selected Xcode was installed but its licence was never accepted",
+      "fix": "Human step: the developer runs sudo <Xcode>/Contents/Developer/usr/bin/xcodebuild -license accept in their own terminal (an agent never runs sudo)",
+      "match": [
+        "agreed to the Xcode license",
+        "license agreements"
+      ],
+      "status": "verified",
+      "needsHuman": true,
+      "skill": "ios-simulator-build",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "ios-simctl-clt",
+      "topic": "Xcode",
+      "symptom": "xcrun: error: unable to find utility \"simctl\"",
+      "cause": "DEVELOPER_DIR (or xcode-select) points at the Command Line Tools, not at an Xcode app",
+      "fix": "Point DEVELOPER_DIR at <Xcode>.app/Contents/Developer for the process (the toolchain helper does)",
+      "match": [
+        "unable to find utility \"simctl\""
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "ios-simulator-build",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "ios-derived-data-module-cache",
+      "topic": "Xcode",
+      "symptom": "** BUILD FAILED ** in a pod: a precompiled .pcm \"was compiled with module cache path\" of another folder, then \"missing required module 'SwiftShims'\"",
+      "cause": "The repo was copied or moved: the build cleaned ios/ but kept its DerivedData folder, whose module cache still names the old path",
+      "fix": "Delete this app's own DerivedData folder (the build output folder the build script names), then rerun the same build; after copying a repo, delete its build folders and ios/ before the first build",
+      "match": [
+        "was compiled with module cache path",
+        "missing required module 'SwiftShims'"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "ios-simulator-build",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "ios-pod-download",
+      "topic": "Prebuild",
+      "symptom": "pod install fails downloading a pod (Google-Mobile-Ads-SDK, GoogleUserMessagingPlatform, a Skia or IAP pod): Failed to download, CDN: trunk, Couldn't connect to server",
+      "cause": "Pods are downloaded at prebuild time; no network or a CDN problem",
+      "fix": "Retry once after a few minutes; never loosen pod versions or edit the Podfile.lock by hand",
+      "match": [
+        "Failed to download",
+        "CDN: trunk",
+        "Couldn't connect to server"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "ios-simulator-build",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "ios-skia-prebuilt-missing",
+      "topic": "Prebuild",
+      "symptom": "pod install fails: react-native-skia: Skia prebuilt binaries not found",
+      "cause": "@shopify/react-native-skia downloads its prebuilt Skia libraries in an install step that did not run (install scripts not approved, or an offline install)",
+      "fix": "Run npx install-skia (after reading what it fetches), or approve the package install script per the dependency policy, then prebuild again",
+      "match": [
+        "Skia prebuilt binaries not found"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "dependency-management",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "ios-no-workspace",
+      "topic": "Prebuild",
+      "symptom": "No .xcworkspace in ios/ after prebuild",
+      "cause": "The prebuild stopped early on a config error",
+      "fix": "Read the prebuild log the build wrote, fix the config error, rerun npx expo prebuild --platform ios --clean",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "ios-simulator-build",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "ios-workspace-name",
+      "topic": "xcodebuild",
+      "symptom": "xcodebuild cannot find the workspace or scheme named after package.json",
+      "cause": "The workspace and scheme come from expo.name with spaces and punctuation removed, not from the package name",
+      "fix": "Discover ios/*.xcworkspace after prebuild and derive the scheme from it",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "ios-simulator-build",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "ios-sim-signing",
+      "topic": "xcodebuild",
+      "symptom": "Signing for \"<App>\" requires a development team (on a simulator build)",
+      "cause": "CODE_SIGNING_ALLOWED=NO is missing from the simulator build",
+      "fix": "Simulator builds never sign: Release, -sdk iphonesimulator, -destination id=<udid>, CODE_SIGNING_ALLOWED=NO",
+      "match": [
+        "requires a development team"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "ios-simulator-build",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "ios-pod-native-error",
+      "topic": "xcodebuild",
+      "symptom": "** BUILD FAILED ** with a Swift, Objective-C or C++ error inside a pod",
+      "cause": "A native module and the SDK disagree, usually after a version change made by hand",
+      "fix": "npx expo install --check, restore the pinned versions, then prebuild with --clean; a library that still fails needs an update (dependency-management)",
+      "match": [
+        "\\*\\* BUILD FAILED \\*\\*"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "ios-simulator-build",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "ios-expo-run-debug",
+      "topic": "xcodebuild",
+      "symptom": "npx expo run:ios made a Debug build (dev menu, JS from Metro) with whatever Xcode xcode-select points at",
+      "cause": "expo run:ios builds Debug for the default Xcode and picks a simulator itself",
+      "fix": "Build the evidence build with the build skill's script (Release, iphonesimulator, CODE_SIGNING_ALLOWED=NO, DEVELOPER_DIR, a named simulator)",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "ios-simulator-build",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "ios-screenshot-dev-null",
+      "topic": "Simulator",
+      "symptom": "simctl io <udid> screenshot /dev/null fails: Operation not permitted",
+      "cause": "simctl cannot write its PNG to /dev/null",
+      "fix": "Write to a temporary file and delete it",
+      "match": [
+        "screenshot /dev/null"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "ios-simulator-build",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "ios-black-spinner-after-boot",
+      "topic": "Simulator",
+      "symptom": "A screenshot right after simctl bootstatus -b is black with a small spinner",
+      "cause": "bootstatus returns while SpringBoard is still starting",
+      "fix": "Wait for the app's ready signal (two identical screenshots a few seconds apart) before the screenshot that counts",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "ios-simulator-build",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "ios-first-boot-banner",
+      "topic": "Simulator",
+      "symptom": "A system banner (\"Ready for Apple Intelligence\" or similar) covers the app on a new simulator",
+      "cause": "One-time system banner on the first launch after simctl create",
+      "fix": "Warm a new simulator up once and discard its first capture",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "ios-simulator-build",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "ios-status-bar-override",
+      "topic": "Simulator",
+      "symptom": "The status bar shows a 24-hour time or a charging bolt after simctl status_bar override --time 9:41",
+      "cause": "The simulator inherited the Mac region; --batteryState charged draws a bolt; overrides reset on every reboot",
+      "fix": "xcrun simctl spawn <udid> defaults write -g AppleLocale -string en_US, reboot, re-apply; use --batteryState discharging --batteryLevel 100 after every boot",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "ios-simulator-build",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "ios-status-bar-time-format",
+      "topic": "Simulator",
+      "symptom": "simctl status_bar rejects --time \"9:41 AM\": Invalid, non-ISO date/time string",
+      "cause": "Only 9:41 style or an ISO date with milliseconds is accepted",
+      "fix": "Use --time 9:41 (or an ISO time such as ...T09:41:00.000Z)",
+      "match": [
+        "non-ISO date/time string"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "ios-simulator-build",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "ios-openurl-alert",
+      "topic": "Simulator",
+      "symptom": "\"Open in <App>?\" alert after simctl openurl; testIDs vanish from the Maestro hierarchy",
+      "cause": "iOS asks before opening a custom scheme from simctl openurl, nothing accepts the prompt, and pending alerts queue and dim the app",
+      "fix": "Open debug and deep links through Maestro's openLink in a sub-flow that waits for the alert animation, taps Open, and taps again if the alert is still there; never send them with simctl openurl",
+      "match": [
+        "Open in [“\"]"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "e2e-maestro",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "ios-zsh-word-splitting",
+      "topic": "Simulator",
+      "symptom": "A launch argument such as -AppleLanguages \"(ar)\" stored in a shell variable is ignored",
+      "cause": "zsh does not word-split $ARGS, so the words arrive as one argument",
+      "fix": "Pass each word as its own argument (an argument array in the script, never a string)",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "ios-simulator-build",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "ios-apple-languages-ignored",
+      "topic": "Simulator",
+      "symptom": "xcrun simctl launch <udid> <bundleId> -AppleLanguages \"(ar)\" still shows the app in English or left to right",
+      "cause": "The app does not declare the language (no CFBundleLocalizations entry), or the argument arrived as one word",
+      "fix": "Configure expo-localization's supportedLocales with the app's locales so prebuild writes CFBundleLocalizations; pass each launch argument as its own word",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "rtl-and-direction",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "ios-device-name-runtime",
+      "topic": "Simulator",
+      "symptom": "simctl create \"<device name>\" fails: the device type is not in the runtime",
+      "cause": "Each iOS runtime ships its own device list (a new runtime drops older models)",
+      "fix": "List the device types with xcrun simctl list devicetypes for the installed runtime, and name the model in the build contract",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "ios-simulator-build",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "ios-other-sessions-simulators",
+      "topic": "Simulator",
+      "symptom": "Another session's simulator was shut down, erased or reached by this session's command",
+      "cause": "simctl shutdown all / erase all / delete all, or a command that targets \"booted\", touch every simulator on the machine",
+      "fix": "Name simulators <project>-<purpose>, target them by UDID, shut down and delete only your own",
+      "match": [
+        "shutdown all",
+        "erase all",
+        "simctl \\w+ booted"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "ios-simulator-build",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "ios-simulator-insufficient-resources",
+      "topic": "Simulator",
+      "symptom": "simctl boot exits with \"Unable to boot device due to insufficient system resources\" (maxUserProcs / runningUserProcs)",
+      "cause": "Too many simulators are booted on the machine, other sessions included, so the per-user process limit is reached",
+      "fix": "Shut down only this session's own simulators that are not needed now (xcrun simctl shutdown <udid>), then rerun; never shutdown all",
+      "match": [
+        "insufficient system resources"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "ios-simulator-build",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "ios-already-booted",
+      "topic": "Simulator",
+      "symptom": "Unable to boot device in current state: Booted",
+      "cause": "The simulator was already booted",
+      "fix": "Harmless: use xcrun simctl bootstatus <udid> -b, which boots only when needed",
+      "match": [
+        "Unable to boot device in current state: Booted"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "ios-simulator-build",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "ios-disk-full",
+      "topic": "Simulator",
+      "symptom": "No space left on device, or a simulator will not boot",
+      "cause": "Old DerivedData, build folders, runtimes and unavailable simulators",
+      "fix": "Delete this repo's build output and run xcrun simctl delete unavailable; never erase simulators the tooling did not create",
+      "match": [
+        "No space left on device"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "ios-simulator-build",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "ios-app-not-ready",
+      "topic": "Simulator",
+      "symptom": "The build script reports that the app was not ready after its timeout",
+      "cause": "A JS error before the first screen, or the ready signal the script waits for never comes (a first-run screen that never reaches the expected screen)",
+      "fix": "Open the last screenshot, read the process log (xcrun simctl spawn <udid> log show --last 2m --predicate 'process == \"<Executable>\"'), fix the error; the ready signal falls back to a still screen",
+      "match": [
+        "was not ready after"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "ios-simulator-build",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "ios-js-bundle-swap",
+      "topic": "Simulator",
+      "symptom": "An app whose main.jsbundle was swapped for fast iteration fails to install or launch",
+      "cause": "The bundle changed after the app was signed (even ad hoc)",
+      "fix": "After copying the new bundle run codesign --force --sign - --deep <App>.app, then install and launch by UDID; the evidence build is always the full Release run",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "ios-simulator-build",
+      "platforms": [
+        "ios"
+      ]
+    }
+  ]
+}

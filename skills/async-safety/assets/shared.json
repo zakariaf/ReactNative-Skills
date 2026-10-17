@@ -1,0 +1,10 @@
+[
+  { "from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs" },
+  { "from": "scripts/lib/source-scan.mjs", "to": "scripts/lib/source-scan.mjs" },
+  { "from": "repo-templates/src/core/async/latest-request.ts", "to": "templates/src/core/async/latest-request.ts" },
+  { "from": "repo-templates/src/core/async/latest-request.test.ts", "to": "templates/src/core/async/latest-request.test.ts" },
+  { "from": "repo-templates/src/services/async/delay-or-abort.ts", "to": "templates/src/services/async/delay-or-abort.ts" },
+  { "from": "repo-templates/src/services/async/delay-or-abort.test.ts", "to": "templates/src/services/async/delay-or-abort.test.ts" },
+  { "from": "repo-templates/src/services/async/with-timeout.ts", "to": "templates/src/services/async/with-timeout.ts" },
+  { "from": "repo-templates/src/services/async/with-timeout.test.ts", "to": "templates/src/services/async/with-timeout.test.ts" }
+]

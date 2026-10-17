@@ -1,0 +1,4 @@
+plan: 2 golden test file(s) to re-accept
+src/features/tasks/tasks-digest.golden.test.ts
+test/goldens/progress-ring.golden.test.ts
+RESULT: PASS

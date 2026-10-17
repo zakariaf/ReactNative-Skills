@@ -1,0 +1,11 @@
+{
+  "name": "React-Core",
+  "subspecs": [
+    {
+      "name": "Default",
+      "resource_bundles": {
+        "React-Core_privacy": "React/Resources/*.{xcprivacy,bundle}"
+      }
+    }
+  ]
+}

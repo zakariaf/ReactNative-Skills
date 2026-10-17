@@ -1,0 +1,21 @@
+{
+  "$comment": "Every catalog key the templates name, with an English text and an RTL example (Arabic). Replace __GAME_ID__ with the game id, add each key to every catalog the app ships, and send the translations through the app's review queue (i18n-strings-and-catalogs).",
+  "en": {
+    "__GAME_ID__.continue.more-moves": "Get more moves",
+    "__GAME_ID__.hud.moves": "Moves {moves, number} / {maxMoves, number}",
+    "__GAME_ID__.lose.out-of-moves": "No moves left",
+    "__GAME_ID__.name": "Lights Out",
+    "__GAME_ID__.stats.biggest-toggle": "Biggest toggle",
+    "__GAME_ID__.stats.boards-cleared": "Boards cleared",
+    "__GAME_ID__.stats.cells-toggled": "Lights toggled"
+  },
+  "ar": {
+    "__GAME_ID__.continue.more-moves": "احصل على حركات إضافية",
+    "__GAME_ID__.hud.moves": "الحركات {moves, number} / {maxMoves, number}",
+    "__GAME_ID__.lose.out-of-moves": "لم تبق حركات",
+    "__GAME_ID__.name": "إطفاء الأنوار",
+    "__GAME_ID__.stats.biggest-toggle": "أكبر تبديل",
+    "__GAME_ID__.stats.boards-cleared": "اللوحات المطفأة",
+    "__GAME_ID__.stats.cells-toggled": "الأنوار المبدّلة"
+  }
+}

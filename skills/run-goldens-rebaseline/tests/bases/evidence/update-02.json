@@ -1,0 +1,57 @@
+{
+ "numFailedTestSuites": 0,
+ "numFailedTests": 0,
+ "numPassedTests": 3,
+ "numTotalTestSuites": 1,
+ "numTotalTests": 3,
+ "numRuntimeErrorTestSuites": 0,
+ "snapshot": {
+  "added": 0,
+  "didUpdate": true,
+  "failure": false,
+  "filesAdded": 0,
+  "filesRemoved": 0,
+  "filesRemovedList": [],
+  "filesUnmatched": 0,
+  "filesUpdated": 1,
+  "matched": 1,
+  "total": 3,
+  "unchecked": 0,
+  "uncheckedKeysByFile": [],
+  "unmatched": 0,
+  "updated": 2
+ },
+ "startTime": 1791900040000,
+ "success": true,
+ "testResults": [
+  {
+   "name": "test/goldens/progress-ring.golden.test.ts",
+   "status": "passed",
+   "startTime": 1791900040100,
+   "endTime": 1791900040500,
+   "assertionResults": [
+    {
+     "ancestorTitles": [
+      "progress ring golden"
+     ],
+     "title": "draws the ring at narrow",
+     "status": "passed"
+    },
+    {
+     "ancestorTitles": [
+      "progress ring golden"
+     ],
+     "title": "draws the ring at phone",
+     "status": "passed"
+    },
+    {
+     "ancestorTitles": [
+      "progress ring golden"
+     ],
+     "title": "draws the ring at tablet",
+     "status": "passed"
+    }
+   ]
+  }
+ ]
+}

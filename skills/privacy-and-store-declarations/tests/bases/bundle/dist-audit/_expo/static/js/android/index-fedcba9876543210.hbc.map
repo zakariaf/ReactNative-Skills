@@ -1,0 +1,29 @@
+{
+ "version": 3,
+ "sources": [
+  "\u0000polyfill:external-require",
+  "/app/node_modules/react-native/Libraries/WebSocket/WebSocket.js",
+  "/app/node_modules/whatwg-fetch/dist/fetch.umd.js",
+  "/app/node_modules/expo/src/winter/fetch/fetch.ts",
+  "/app/node_modules/react-native-google-mobile-ads/src/TestIds.ts",
+  "/app/node_modules/expo-iap/src/index.ts",
+  "/src/api/fetch-api-client.ts",
+  "/src/config/external-links.ts",
+  "/src/features/tasks/use-tasks-model.ts",
+  "/src/app/_layout.tsx"
+ ],
+ "sourcesContent": [
+  "var x = 1;",
+  "const ws = new WebSocket(url); const doc = 'https://reactnative.dev/docs/network';",
+  "function fetch(input) { return new XMLHttpRequest(); } fetch(input);",
+  "export async function fetch(input) { return nativeFetch(input); } fetch(x);",
+  "export const TestIds = { BANNER: 'ca-app-pub-3940256099942544/2934735716' };",
+  "export function requestPurchase(sku) { return native.requestPurchase(sku); }",
+  "const deviceFetch = globalThis.fetch; export const request = (path) => deviceFetch(base + path); deviceFetch(path); fetch(path);",
+  "export const PRIVACY_POLICY_URL = 'https://tasks.acme.app/privacy';",
+  "export function useTasksModel(api) { return api.request('/tasks'); }",
+  "export default function Layout() { return null; }"
+ ],
+ "names": [],
+ "mappings": ""
+}

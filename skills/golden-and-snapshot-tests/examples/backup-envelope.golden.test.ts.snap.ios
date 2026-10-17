@@ -1,0 +1,48 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`[contract] encodeBackup goldens encodes format 1 for a right-to-left title exported on 2027-01-01 1`] = `
+"{
+  "format": 1,
+  "exportedAt": "2027-01-01T00:00:00.000Z",
+  "tasks": [
+    {
+      "id": "t9",
+      "title": "شراء الخبز",
+      "isDone": false,
+      "dueKey": "2027-01-01"
+    }
+  ],
+  "checksum": "fnv1a32:fb0235c1"
+}"
+`;
+
+exports[`[contract] encodeBackup goldens encodes format 1 for an empty list exported at the end of 2026-12-31 1`] = `
+"{
+  "format": 1,
+  "exportedAt": "2026-12-31T23:59:59.000Z",
+  "tasks": [],
+  "checksum": "fnv1a32:741638a5"
+}"
+`;
+
+exports[`[contract] encodeBackup goldens encodes format 1 for two tasks exported on 2026-10-03 1`] = `
+"{
+  "format": 1,
+  "exportedAt": "2026-10-03T09:00:00.000Z",
+  "tasks": [
+    {
+      "id": "t1",
+      "title": "Renew passport",
+      "isDone": false,
+      "dueKey": "2026-09-30"
+    },
+    {
+      "id": "t4",
+      "title": "Pay rent",
+      "isDone": true,
+      "dueKey": null
+    }
+  ],
+  "checksum": "fnv1a32:de9542b0"
+}"
+`;

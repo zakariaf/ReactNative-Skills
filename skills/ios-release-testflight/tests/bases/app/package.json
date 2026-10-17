@@ -1,0 +1,9 @@
+{
+  "name": "tasks",
+  "private": true,
+  "dependencies": {
+    "expo": "~57.0.26",
+    "expo-tracking-transparency": "~57.0.0",
+    "react-native-google-mobile-ads": "17.2.0"
+  }
+}

@@ -1,0 +1,17 @@
+[
+  { "from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs" },
+  { "from": "repo-templates/jest.sim.config.js", "to": "templates/jest.sim.config.js" },
+  { "from": "games/src/core/game/game-engine.ts", "to": "templates/src/core/game/game-engine.ts" },
+  { "from": "games/src/core/game/difficulty.ts", "to": "templates/src/core/game/difficulty.ts" },
+  { "from": "games/src/core/game/difficulty.test.ts", "to": "templates/src/core/game/difficulty.test.ts" },
+  { "from": "games/src/core/game/testing/play-bot.ts", "to": "templates/src/core/game/testing/play-bot.ts" },
+  { "from": "games/src/core/game/testing/play-bot.test.ts", "to": "templates/src/core/game/testing/play-bot.test.ts" },
+  { "from": "games/src/games/__GAME_ID__/rules/__GAME_ID__-tuning.test.ts", "to": "templates/src/games/__GAME_ID__/rules/__GAME_ID__-tuning.test.ts" },
+  { "from": "games/src/games/__GAME_ID__/rules/__GAME_ID__-tuning.ts", "to": "templates/src/games/__GAME_ID__/rules/__GAME_ID__-tuning.ts" },
+  { "from": "games/src/games/__GAME_ID__/rules/__GAME_ID__-types.ts", "to": "templates/src/games/__GAME_ID__/rules/__GAME_ID__-types.ts" },
+  { "from": "games/src/games/__GAME_ID__/rules/apply-move.ts", "to": "templates/src/games/__GAME_ID__/rules/apply-move.ts" },
+  { "from": "games/src/games/__GAME_ID__/rules/create.ts", "to": "templates/src/games/__GAME_ID__/rules/create.ts" },
+  { "from": "games/src/games/__GAME_ID__/rules/list-moves.ts", "to": "templates/src/games/__GAME_ID__/rules/list-moves.ts" },
+  { "from": "games/src/games/__GAME_ID__/rules/outcome.ts", "to": "templates/src/games/__GAME_ID__/rules/outcome.ts" },
+  { "from": "games/src/games/__GAME_ID__/rules/toggle-cells.ts", "to": "templates/src/games/__GAME_ID__/rules/toggle-cells.ts" }
+]

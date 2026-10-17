@@ -1,0 +1,3 @@
+plan  merge    .gitignore (appends
+pre-existing top-level entries ignored by Prettier, ESLint and the root TypeScript program: docs
+0 conflicts

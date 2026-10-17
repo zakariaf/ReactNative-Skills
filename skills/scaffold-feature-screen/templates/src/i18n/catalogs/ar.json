@@ -1,0 +1,8 @@
+{
+  "__DETAIL__.body": "__DETAIL_BODY__",
+  "__DETAIL__.invalid-link.body": "هذا الرابط لا يفتح أي شيء في التطبيق. ربما يكون قديمًا أو مكتوبًا بشكل خاطئ.",
+  "__DETAIL__.invalid-link.go-home": "الانتقال إلى الشاشة الأولى",
+  "__DETAIL__.title": "__DETAIL_TITLE__",
+  "__FEATURE__.body": "__BODY__",
+  "__FEATURE__.title": "__TITLE__"
+}

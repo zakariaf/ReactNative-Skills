@@ -1,0 +1,4 @@
+{
+  "tasks.list.title": "المهام",
+  "tasks.summary.open": "{openCount, plural, =0 {لا مهام مفتوحة} zero {لا مهام مفتوحة} one {مهمة مفتوحة واحدة} two {مهمتان مفتوحتان} few {# مهام مفتوحة} many {# مهمة مفتوحة} other {# مهمة مفتوحة}}"
+}

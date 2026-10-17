@@ -1,0 +1,4 @@
+PLAN move app.db (user_version 2) into kept-
+PLAN copy app.db.v1.bak (user_version 1, quick_check ok) over app.db
+STOP: restoring discards every write made since the upgrade
+RESULT: PASS

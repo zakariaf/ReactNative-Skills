@@ -1,0 +1,4 @@
+updated src/features/tasks/tasks-digest.golden.test.ts
+golden paths changed since --start (1)
+src/features/tasks/tasks-digest.golden.test.ts.snap.ios (git diff -- src/features/tasks/tasks-digest.golden.test.ts.snap.ios)
+RESULT: PASS

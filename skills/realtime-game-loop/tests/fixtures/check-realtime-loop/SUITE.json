@@ -1,0 +1,11 @@
+{
+  "base": [
+    "@tests/bases/app",
+    {
+      "templates": true,
+      "firstLinePath": true,
+      "fill": { "__GAME_ID__": "bounce-arena", "__GAME_PASCAL__": "BounceArena", "__GAME_CONST__": "BOUNCE_ARENA" }
+    },
+    { "from": "@skill/examples/ricochet-volley", "firstLinePath": true }
+  ]
+}

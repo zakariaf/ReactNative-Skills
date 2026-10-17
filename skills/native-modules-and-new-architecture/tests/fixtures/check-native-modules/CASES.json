@@ -1,0 +1,629 @@
+{
+  "bad-binding-duplicate": {
+    "expect": [
+      "FAIL src/services/time-zone/native-time-zone-adapter.ts:11",
+      "TimeChange is already bound in src/services/time-change/native-time-change-adapter.ts:",
+      "[binding-unique]"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/time-zone/native-time-zone-adapter.ts",
+          "content": "// src/services/time-zone/native-time-zone-adapter.ts\nimport { requireOptionalNativeModule } from 'expo';\n\ntype TimeChangeBinding = {\n  getTimeZoneId(): string;\n  isAutomaticTimeEnabledAsync?(): Promise<boolean>;\n  addListener(eventName: 'onTimeChange', listener: (payload: { reason: string }) => void): { remove(): void };\n};\n\nexport function createNativeTimeZoneAdapter(\n  native = requireOptionalNativeModule<TimeChangeBinding>('TimeChange'),\n): { timeZoneId(): string } {\n  return { timeZoneId: () => native?.getTimeZoneId() ?? 'UTC' };\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-binding-lazy": {
+    "expect": ["[binding-lazy]", "runs at import time"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/time-change/native-time-change-adapter.ts",
+          "find": "  native: TimeChangeBinding | null = requireOptionalNativeModule<TimeChangeBinding>('TimeChange'),",
+          "with": "  native: TimeChangeBinding | null = NATIVE,"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/time-change/native-time-change-adapter.ts",
+          "find": "const UNAVAILABLE:",
+          "with": "const NATIVE = requireOptionalNativeModule<TimeChangeBinding>('TimeChange');\n\nconst UNAVAILABLE:"
+        }
+      }
+    ]
+  },
+  "bad-binding-name": {
+    "expect": [
+      "[binding-name]",
+      "binds the native module 'TimeChanged'",
+      "the native module 'TimeChange' is never bound"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/time-change/native-time-change-adapter.ts",
+          "find": "<TimeChangeBinding>('TimeChange')",
+          "with": "<TimeChangeBinding>('TimeChanged')"
+        }
+      }
+    ]
+  },
+  "bad-binding-optional": {
+    "expect": ["[binding-optional]", "requireNativeModule throws when the running binary lacks the module"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/time-change/native-time-change-adapter.ts",
+          "find": "requireOptionalNativeModule",
+          "with": "requireNativeModule",
+          "all": true
+        }
+      }
+    ]
+  },
+  "bad-binding-place": {
+    "expect": ["FAIL src/features/tasks/use-time-zone.ts:11 [binding-place]", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-time-zone.ts",
+          "content": "// src/features/tasks/use-time-zone.ts\nimport { requireOptionalNativeModule } from 'expo';\n\ntype TimeChangeBinding = {\n  getTimeZoneId(): string;\n  isAutomaticTimeEnabledAsync?(): Promise<boolean>;\n  addListener(eventName: 'onTimeChange', listener: (payload: { reason: string }) => void): { remove(): void };\n};\n\nexport function readTimeZone(): string {\n  return requireOptionalNativeModule<TimeChangeBinding>('TimeChange')?.getTimeZoneId() ?? 'UTC';\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-binding-type": {
+    "expect": ["[binding-type]", "requireOptionalNativeModule('TimeChange') is untyped"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/time-change/native-time-change-adapter.ts",
+          "find": "requireOptionalNativeModule<TimeChangeBinding>('TimeChange')",
+          "with": "requireOptionalNativeModule('TimeChange')"
+        }
+      }
+    ]
+  },
+  "bad-codegen-config": {
+    "expect": ["FAIL modules/task-checksum/package.json:", "[codegen-config]", "jsSrcsDir \"specs\" is not a folder"],
+    "ops": [
+      {
+        "json": {
+          "file": "modules/task-checksum/package.json",
+          "path": ["codegenConfig", "jsSrcsDir"],
+          "value": "specs"
+        }
+      }
+    ]
+  },
+  "bad-codegen-config-app": {
+    "expect": ["FAIL package.json:", "[codegen-config]", "the app package.json declares codegenConfig"],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["codegenConfig"],
+          "value": { "name": "AppSpec", "type": "modules", "jsSrcsDir": "specs" }
+        }
+      }
+    ]
+  },
+  "bad-codegen-config-podspec": {
+    "expect": ["[codegen-config]", "has iOS code but no podspec at its root"],
+    "ops": [
+      {
+        "rename": {
+          "from": "modules/task-checksum/TaskChecksum.podspec",
+          "to": "modules/task-checksum/ios/TaskChecksum.podspec"
+        }
+      }
+    ]
+  },
+  "bad-codegen-spec": {
+    "expect": ["[codegen-spec]", "declares no \"export interface Spec extends TurboModule\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "modules/task-checksum/src/NativeTaskChecksum.ts",
+          "find": "export interface Spec extends TurboModule {",
+          "with": "export interface TaskChecksumSpec extends TurboModule {"
+        }
+      },
+      {
+        "replace": {
+          "file": "modules/task-checksum/src/NativeTaskChecksum.ts",
+          "find": "get<Spec>",
+          "with": "get<TaskChecksumSpec>"
+        }
+      }
+    ]
+  },
+  "bad-codegen-spec-place": {
+    "expect": [
+      "FAIL src/services/task-checksum/task-checksum-spec.ts:10 [codegen-spec]",
+      "codegen reads module specs only from files named Native<Name>.ts"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/task-checksum/task-checksum-spec.ts",
+          "content": "// src/services/task-checksum/task-checksum-spec.ts\nimport { TurboModuleRegistry } from 'react-native';\n\nimport type { TurboModule } from 'react-native';\n\nexport interface Spec extends TurboModule {\n  checksum(text: string): string;\n}\n\nexport default TurboModuleRegistry.get<Spec>('NativeTaskChecksum');\n"
+        }
+      }
+    ]
+  },
+  "bad-contract-drift": {
+    "expect": [
+      "[contract-drift]",
+      "the binding type names getTimeZone, which neither the Swift nor the Kotlin definition",
+      "Function(\"getTimeZoneId\") of 'TimeChange' is missing from the binding type"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/time-change/native-time-change-adapter.ts",
+          "find": "  getTimeZoneId(): string;\n",
+          "with": "  getTimeZone(): string;\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/time-change/native-time-change-adapter.ts",
+          "find": "native.getTimeZoneId()",
+          "with": "native.getTimeZone()"
+        }
+      }
+    ]
+  },
+  "bad-contract-drift-event": {
+    "expect": [
+      "[contract-drift]",
+      "listens for \"onTimeChanged\"",
+      "Events(\"onTimeChange\") of 'TimeChange' is missing from the binding type"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/time-change/native-time-change-adapter.ts",
+          "find": "eventName: 'onTimeChange',",
+          "with": "eventName: 'onTimeChanged',"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/time-change/native-time-change-adapter.ts",
+          "find": "addListener('onTimeChange',",
+          "with": "addListener('onTimeChanged',"
+        }
+      }
+    ]
+  },
+  "bad-contract-drift-inline-generic": {
+    "expect": [
+      "[contract-drift]",
+      "the binding type names getTimeZone",
+      "Function(\"getTimeZoneId\") of 'TimeChange' is missing from the binding type"
+    ],
+    "ops": [
+      {
+        "$comment": "The inline-generic declare class form still catches a renamed member.",
+        "replace": {
+          "file": "src/services/time-change/native-time-change-adapter.ts",
+          "find": "export type TimeChangeBinding = {\n  getTimeZoneId(): string;\n  /** Android only. */\n  isAutomaticTimeEnabledAsync?(): Promise<boolean>;\n  addListener(\n    eventName: 'onTimeChange',\n    listener: (payload: NativeTimeChangePayload) => void,\n  ): { remove(): void };\n};",
+          "with": "export declare class TimeChangeBinding extends NativeModule<{\n  onTimeChange: (payload: NativeTimeChangePayload) => void;\n}> {\n  getTimeZone(): string;\n  /** Android only. */\n  isAutomaticTimeEnabledAsync?(): Promise<boolean>;\n}"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/time-change/native-time-change-adapter.ts",
+          "find": "import { requireOptionalNativeModule } from 'expo';",
+          "with": "import { NativeModule, requireOptionalNativeModule } from 'expo';"
+        }
+      }
+    ]
+  },
+  "bad-contract-drift-turbo": {
+    "expect": [
+      "FAIL src/services/task-checksum/native-task-checksum-adapter.ts:5 [contract-drift]",
+      "the binding type names checksumm, which the codegen interface Spec of 'NativeTaskChecksum'",
+      "checksum of the codegen interface Spec (modules/task-checksum/src/NativeTaskChecksum.ts:11) is missing from the binding type TaskChecksumBinding"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/task-checksum/native-task-checksum-adapter.ts",
+          "content": "// src/services/task-checksum/native-task-checksum-adapter.ts\nimport { requireOptionalNativeModule } from 'expo';\n\ntype TaskChecksumBinding = {\n  checksumm(text: string): string;\n};\n\nexport function createNativeTaskChecksumAdapter(native = requireOptionalNativeModule<TaskChecksumBinding>('NativeTaskChecksum')) {\n  return { checksum: (text: string): string | null => native?.checksumm(text) ?? null };\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-legacy-js-api": {
+    "expect": ["FAIL src/features/tasks/legacy-bridge.ts:2 [legacy-js-api]", "imports NativeModules from react-native"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/legacy-bridge.ts",
+          "content": "// src/features/tasks/legacy-bridge.ts\nimport { NativeModules } from 'react-native';\n\nexport const legacyBridge: unknown = NativeModules['TaskBridge'];\n"
+        }
+      }
+    ]
+  },
+  "bad-legacy-js-api-namespace": {
+    "expect": ["FAIL src/features/tasks/time-zone-label.ts:5", "through the namespace import RN", "[legacy-js-api]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/time-zone-label.ts",
+          "content": "// src/features/tasks/time-zone-label.ts\nimport * as RN from 'react-native';\n\nexport function timeZoneLabel(): string {\n  return String(RN.NativeModules.TimeChange?.getTimeZoneId?.() ?? RN.Platform.OS);\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-legacy-native-api": {
+    "expect": ["FAIL modules/time-change/ios/TimeChangeBridge.m:8 [legacy-native-api]"],
+    "ops": [
+      {
+        "write": {
+          "file": "modules/time-change/ios/TimeChangeBridge.m",
+          "content": "// modules/time-change/ios/TimeChangeBridge.m\n#import <React/RCTBridgeModule.h>\n\n@interface TimeChangeBridge : NSObject <RCTBridgeModule>\n@end\n\n@implementation TimeChangeBridge\nRCT_EXPORT_MODULE()\n@end\n"
+        }
+      }
+    ]
+  },
+  "bad-legacy-native-api-kotlin": {
+    "expect": ["[legacy-native-api]", "A ReactContextBaseJavaModule is legacy bridge code"],
+    "ops": [
+      {
+        "write": {
+          "file": "modules/time-change/android/src/main/java/expo/modules/timechange/TimeChangeLegacy.kt",
+          "content": "package expo.modules.timechange\n\nimport com.facebook.react.bridge.ReactApplicationContext\nimport com.facebook.react.bridge.ReactContextBaseJavaModule\nimport com.facebook.react.bridge.ReactMethod\n\nclass TimeChangeLegacy(context: ReactApplicationContext) : ReactContextBaseJavaModule(context) {\n  override fun getName() = \"TimeChangeLegacy\"\n\n  @ReactMethod\n  fun ping() {}\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-main-thread": {
+    "expect": [
+      "[main-thread]",
+      "Function(\"getTimeZoneId\") touches UI (UIApplication.shared) on the JavaScript thread"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "modules/time-change/ios/TimeChangeModule.swift",
+          "find": "      TimeChangeSystem.currentTimeZoneId()\n    }\n\n    // Observe",
+          "with": "      _ = UIApplication.shared.applicationState\n      return TimeChangeSystem.currentTimeZoneId()\n    }\n\n    // Observe"
+        }
+      }
+    ]
+  },
+  "bad-module-build-files": {
+    "expect": [
+      "FAIL modules/time-change/ios/TimeChange.podspec:1 [module-build-files]",
+      "does not depend on ExpoModulesCore"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "modules/time-change/ios/TimeChange.podspec",
+          "find": "  s.dependency 'ExpoModulesCore'\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-module-build-files-gradle": {
+    "expect": ["FAIL modules/time-change/android/build.gradle:1 [module-build-files]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "modules/time-change/android/build.gradle",
+          "find": "  id 'expo-module-gradle-plugin'\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-module-class": {
+    "expect": ["[module-class]", "TimeChangeModule is not public"],
+    "ops": [
+      {
+        "replace": {
+          "file": "modules/time-change/ios/TimeChangeModule.swift",
+          "find": "public class TimeChangeModule: Module {",
+          "with": "class TimeChangeModule: Module {"
+        }
+      }
+    ]
+  },
+  "bad-module-class-unlisted": {
+    "expect": [
+      "[module-class]",
+      "lists the Kotlin module class expo.modules.timechange.TimeChangeModul",
+      "TimeChangeModule extends Module but expo-module.config.json does not list it"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "modules/time-change/expo-module.config.json",
+          "find": "\"modules\": [\"expo.modules.timechange.TimeChangeModule\"]",
+          "with": "\"modules\": [\"expo.modules.timechange.TimeChangeModul\"]"
+        }
+      }
+    ]
+  },
+  "bad-module-config-missing": {
+    "expect": ["FAIL modules/time-change/expo-module.config.json:1 [module-config]", "has no expo-module.config.json"],
+    "ops": [{ "delete": "modules/time-change/expo-module.config.json" }]
+  },
+  "bad-module-config-unlinked": {
+    "expect": ["[module-config]", "is never linked: android is not declared"],
+    "ops": [
+      {
+        "replace": {
+          "file": "modules/time-change/expo-module.config.json",
+          "find": "\"platforms\": [\"apple\", \"android\"]",
+          "with": "\"platforms\": [\"apple\"]"
+        }
+      }
+    ]
+  },
+  "bad-module-name": {
+    "expect": ["[module-name]", "sets no Name(\"...\")"],
+    "ops": [
+      {
+        "replace": {
+          "file": "modules/time-change/ios/TimeChangeModule.swift",
+          "find": "    Name(\"TimeChange\")\n\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-module-name-mismatch": {
+    "expect": ["[module-name]", "is Name(\"TimeChange\") on iOS but Name(\"TimeChanges\") on Android"],
+    "ops": [
+      {
+        "replace": {
+          "file": "modules/time-change/android/src/main/java/expo/modules/timechange/TimeChangeModule.kt",
+          "find": "Name(\"TimeChange\")",
+          "with": "Name(\"TimeChanges\")"
+        }
+      }
+    ]
+  },
+  "bad-native-placement": {
+    "expect": ["FAIL src/features/tasks/TaskWidgetBridge.swift:1 [native-placement]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/TaskWidgetBridge.swift",
+          "content": "import Foundation\n\nenum TaskWidgetBridge {}\n"
+        }
+      }
+    ]
+  },
+  "bad-native-placement-inline": {
+    "expect": ["FAIL app.config.ts:5 [native-placement]", "enables experiments.inlineModules"],
+    "ops": [
+      {
+        "write": {
+          "file": "app.config.ts",
+          "content": "// app.config.ts\nexport default {\n  name: 'Tasks',\n  slug: 'tasks',\n  experiments: { inlineModules: { watchedDirectories: ['src'] } },\n};\n"
+        }
+      }
+    ]
+  },
+  "bad-native-placement-inline-json": {
+    "expect": ["FAIL app.json:4 [native-placement]", "enables experiments.inlineModules"],
+    "ops": [
+      {
+        "write": {
+          "file": "app.json",
+          "content": "{\n  \"expo\": {\n    \"name\": \"Tasks\",\n    \"experiments\": { \"inlineModules\": true }\n  }\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-native-placement-inline-quoted": {
+    "expect": ["FAIL app.config.ts:5 [native-placement]", "enables experiments.inlineModules"],
+    "ops": [
+      {
+        "write": {
+          "file": "app.config.ts",
+          "content": "// app.config.ts\nexport default {\n  name: 'Tasks',\n  slug: 'tasks',\n  experiments: { 'inlineModules': { watchedDirectories: ['src'] } },\n};\n"
+        }
+      }
+    ]
+  },
+  "bad-observer-release": {
+    "expect": ["FAIL modules/time-change/ios/TimeChangeSystem.swift:", "[observer-release]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "modules/time-change/ios/TimeChangeSystem.swift",
+          "find": "    for token in tokens {\n      NotificationCenter.default.removeObserver(token)\n    }\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-observer-release-kotlin": {
+    "expect": ["[observer-release]", "adds a broadcast receiver that this file never removes"],
+    "ops": [
+      {
+        "replace": {
+          "file": "modules/time-change/android/src/main/java/expo/modules/timechange/TimeChangeReceiver.kt",
+          "find": "    context.unregisterReceiver(this)\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-observer-stop": {
+    "expect": [
+      "FAIL modules/time-change/ios/TimeChangeModule.swift:",
+      "starts observing in OnStartObserving(\"onTimeChange\") but never stops",
+      "has no OnDestroy",
+      "[observer-stop]"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "modules/time-change/ios/TimeChangeModule.swift",
+          "find": "\n    OnStopObserving(\"onTimeChange\") {\n      self.observer.stop()\n    }\n\n    OnDestroy {\n      self.observer.stop()\n    }\n",
+          "with": "\n"
+        }
+      }
+    ]
+  },
+  "bad-observer-stop-destroy": {
+    "expect": ["FAIL modules/time-change/ios/TimeChangeModule.swift:", "has no OnDestroy", "[observer-stop]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "modules/time-change/ios/TimeChangeModule.swift",
+          "find": "\n    OnDestroy {\n      self.observer.stop()\n    }\n",
+          "with": "\n"
+        }
+      }
+    ]
+  },
+  "bad-observer-stop-kotlin": {
+    "expect": [
+      "FAIL modules/time-change/android/src/main/java/expo/modules/timechange/TimeChangeModule.kt:",
+      "starts observing in OnStartObserving(\"onTimeChange\") but never stops",
+      "has no OnDestroy",
+      "[observer-stop]"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "modules/time-change/android/src/main/java/expo/modules/timechange/TimeChangeModule.kt",
+          "find": "\n    OnStopObserving(\"onTimeChange\") {\n      stopObserving()\n    }\n\n    OnDestroy {\n      stopObserving()\n    }\n",
+          "with": "\n"
+        }
+      }
+    ]
+  },
+  "bad-platform-parity": {
+    "expect": ["[platform-parity]", "'TimeChange' exports getUtcOffsetMinutes on Android but not on iOS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "modules/time-change/android/src/main/java/expo/modules/timechange/TimeChangeModule.kt",
+          "find": "    // Android only:",
+          "with": "    Function(\"getUtcOffsetMinutes\") {\n      java.util.TimeZone.getDefault().rawOffset / 60_000\n    }\n\n    // Android only:"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/time-change/native-time-change-adapter.ts",
+          "find": "  getTimeZoneId(): string;\n",
+          "with": "  getTimeZoneId(): string;\n  getUtcOffsetMinutes(): number;\n"
+        }
+      }
+    ]
+  },
+  "error-bad-package-json": {
+    "expect": ["ERROR [bad-input] package.json does not parse"],
+    "ops": [{ "write": { "file": "package.json", "content": "{ \"name\": " } }]
+  },
+  "error-no-package-json": {
+    "expect": ["ERROR [bad-input] nothing to check: no package.json in the repo root"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "pass-binding-inline-generic": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "The binding type as a declare class whose events generic is an inline object: the body is found after the balanced <...>.",
+        "replace": {
+          "file": "src/services/time-change/native-time-change-adapter.ts",
+          "find": "export type TimeChangeBinding = {\n  getTimeZoneId(): string;\n  /** Android only. */\n  isAutomaticTimeEnabledAsync?(): Promise<boolean>;\n  addListener(\n    eventName: 'onTimeChange',\n    listener: (payload: NativeTimeChangePayload) => void,\n  ): { remove(): void };\n};",
+          "with": "export declare class TimeChangeBinding extends NativeModule<{\n  onTimeChange: (payload: NativeTimeChangePayload) => void;\n}> {\n  getTimeZoneId(): string;\n  /** Android only. */\n  isAutomaticTimeEnabledAsync?(): Promise<boolean>;\n}"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/time-change/native-time-change-adapter.ts",
+          "find": "import { requireOptionalNativeModule } from 'expo';",
+          "with": "import { NativeModule, requireOptionalNativeModule } from 'expo';"
+        }
+      }
+    ]
+  },
+  "pass-binding-platform-variants": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "copy": {
+          "from": "src/services/time-change/native-time-change-adapter.ts",
+          "to": "src/services/time-change/native-time-change-adapter.android.ts"
+        }
+      },
+      {
+        "copy": {
+          "from": "src/services/time-change/native-time-change-adapter.ts",
+          "to": "src/services/time-change/native-time-change-adapter.ios.ts"
+        }
+      }
+    ]
+  },
+  "pass-binding-turbo-spec-type": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/task-checksum/native-task-checksum-adapter.ts",
+          "content": "// src/services/task-checksum/native-task-checksum-adapter.ts\nimport { requireOptionalNativeModule } from 'expo';\n\nimport type { Spec } from '@/modules/task-checksum/src/NativeTaskChecksum';\n\nexport function createNativeTaskChecksumAdapter(native = requireOptionalNativeModule<Spec>('NativeTaskChecksum')) {\n  return { checksum: (text: string): string | null => native?.checksum(text) ?? null };\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-installed-skills-silent": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "write": { "file": ".agents/skills/demo/SKILL.md", "content": "---\nname: demo\ndescription: Demo.\n---\n" } },
+      { "write": { "file": ".agents/skills/demo/ios/LegacyBridge.m", "content": "RCT_EXPORT_MODULE()\n" } },
+      { "write": { "file": "skills/demo/SKILL.md", "content": "---\nname: demo\ndescription: Demo.\n---\n" } },
+      {
+        "write": { "file": "skills/demo/android/Legacy.kt", "content": "class Legacy : ReactContextBaseJavaModule()\n" }
+      },
+      {
+        "write": { "file": "vendor/native-kit/SKILL.md", "content": "---\nname: native-kit\ndescription: Kit.\n---\n" }
+      },
+      { "write": { "file": "vendor/native-kit/Widget.swift", "content": "import Foundation\n" } }
+    ]
+  },
+  "pass-main-thread-dispatch": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "modules/time-change/ios/TimeChangeModule.swift",
+          "find": "      TimeChangeSystem.currentTimeZoneId()\n    }\n\n    // Observe",
+          "with": "      DispatchQueue.main.async {\n        _ = UIApplication.shared.applicationState\n      }\n      return TimeChangeSystem.currentTimeZoneId()\n    }\n\n    // Observe"
+        }
+      }
+    ]
+  },
+  "pass-modules-dir": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "rename": { "from": "modules", "to": "native" } },
+      { "json": { "file": "package.json", "path": ["expo", "autolinking", "nativeModulesDir"], "value": "./native" } }
+    ]
+  },
+  "pass-native-source-dirs": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "write": { "file": "targets/widget/TaskWidget.swift", "content": "import WidgetKit\n" } },
+      { "write": { "file": "rn-skills.config.json", "json": { "nativeSourceDirs": ["targets"] } } }
+    ]
+  },
+  "pass-not-expo": {
+    "expect": ["NOT APPLICABLE: expo is not a dependency in package.json"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo"], "delete": true } }]
+  }
+}

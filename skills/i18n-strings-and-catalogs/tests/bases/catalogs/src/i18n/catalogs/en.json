@@ -1,0 +1,13 @@
+{
+  "app.name": "Tasks",
+  "debug.title": "Debug menu",
+  "permissions.camera.usage-description": "Lets you add a photo to a task. Photos stay on this device unless you share them.",
+  "reminders.next": "Next reminder – {dateText}",
+  "tasks.delete.title": "Delete this task?",
+  "tasks.list.rank": "Your {place, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} list",
+  "tasks.list.title": "Tasks",
+  "tasks.moved": "Moved to {listName}",
+  "tasks.page": "Page {page, number}",
+  "tasks.progress": "{doneRate, number, ::percent} done",
+  "tasks.summary.open": "{openCount, plural, =0 {No open tasks} one {# open task} other {# open tasks}}"
+}

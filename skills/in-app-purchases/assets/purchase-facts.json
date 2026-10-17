@@ -1,0 +1,80 @@
+{
+  "$comment": "Library facts the in-app-purchases checkers read (the app's own facts live in contracts/in-app-purchases.json). Re-verify on every expo-iap upgrade: npm view expo-iap version; read ErrorCode, getAvailablePurchases, restorePurchases and the plugin options in the new source.",
+  "verified": "2026-10-10",
+  "sdk": {
+    "package": "expo-iap",
+    "version": "5.8.0"
+  },
+  "adapter": {
+    "allowedImports": [
+      "ErrorCode",
+      "endConnection",
+      "fetchProducts",
+      "finishTransaction",
+      "getAvailablePurchases",
+      "initConnection",
+      "purchaseErrorListener",
+      "purchaseUpdatedListener",
+      "requestPurchase",
+      "restorePurchases",
+      "Purchase",
+      "PurchaseError",
+      "Product"
+    ],
+    "mustContain": {
+      "onlyIncludeActiveItemsIOS: false": "read Transaction.all (refunds stay visible) with getAvailablePurchases({ onlyIncludeActiveItemsIOS: false })",
+      "isConsumable: false": "finish the non-consumable with finishTransaction({ purchase, isConsumable: false })"
+    }
+  },
+  "serverApis": [
+    "kitApi",
+    "KitApiError",
+    "verifyPurchaseWithProvider",
+    "verifyPurchase"
+  ],
+  "neverAllowedApis": [
+    "useIAP",
+    "andDangerouslyFinishTransactionAutomatically"
+  ],
+  "bannedConfigWords": [
+    "iapkitApiKey",
+    "alternativeBilling",
+    "enableLocalDev",
+    "localPath",
+    "onside",
+    "horizon",
+    "fireOS",
+    "vegaOS",
+    "EXPO_IAP_ONSIDE",
+    "EXPO_IAP_HORIZON",
+    "EXPO_IAP_FIREOS",
+    "EXPO_IAP_VEGA",
+    "openiapPlatform",
+    "horizonEnabled",
+    "fireOsEnabled"
+  ],
+  "storekit": {
+    "dir": "scripts/storekit",
+    "flowsFolder": "storekit",
+    "relaunchFlows": [
+      "02-refund-relaunch.yaml",
+      "04-approval-relaunch.yaml"
+    ],
+    "relaunchWaitMs": 60000
+  },
+  "storePin": {
+    "$comment": "expo-iap 5.8.0 picks the Android store at build time: explicit property > task flavor > connected debug device (debug builds only) > play (android/openiap-store.gradle). openiapStore (gradle.properties) or ORG_GRADLE_PROJECT_openiapStore (eas.json env, .env) may only pin Play.",
+    "keys": [
+      "openiapStore",
+      "ORG_GRADLE_PROJECT_openiapStore"
+    ],
+    "allowedValues": [
+      "play",
+      "google",
+      "gplay",
+      "googleplay",
+      "google-play",
+      "gms"
+    ]
+  }
+}

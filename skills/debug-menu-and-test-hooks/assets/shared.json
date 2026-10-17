@@ -1,0 +1,21 @@
+[
+  {"from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs"},
+  {"from": "scripts/lib/app-modules.mjs", "to": "scripts/lib/app-modules.mjs"},
+  {"from": "scripts/lib/source-scan.mjs", "to": "scripts/lib/source-scan.mjs"},
+  {"from": "repo-templates/src/core/result.ts", "to": "tests/bases/app/src/core/result.ts"},
+  {"from": "repo-templates/src/core/dates/date-key.ts", "to": "tests/bases/app/src/core/dates/date-key.ts"},
+  {"from": "repo-templates/src/i18n/languages.ts", "to": "tests/bases/app/src/i18n/languages.ts"},
+  {"from": "repo-templates/src/services/connectivity/connectivity-port.ts", "to": "tests/bases/app/src/services/connectivity/connectivity-port.ts"},
+  {"from": "repo-templates/src/services/connectivity/reachability-hub.ts", "to": "tests/bases/app/src/services/connectivity/reachability-hub.ts"},
+  {"from": "repo-templates/contracts/debug-links.json", "to": "templates/contracts/debug-links.json"},
+  {"from": "repo-templates/contracts/debug-links.schema.json", "to": "templates/contracts/debug-links.schema.json"},
+  {"from": "repo-templates/src/test-only.ts", "to": "templates/src/test-only.ts"},
+  {"from": "repo-templates/src/services/test-hooks/", "to": "templates/src/services/test-hooks/"},
+  {"from": "repo-templates/src/services/debug-storage/", "to": "templates/src/services/debug-storage/"},
+  {"from": "repo-templates/src/stores/debug-overrides/", "to": "templates/src/stores/debug-overrides/"},
+  {"from": "repo-templates/src/features/debug/debug-motion-config.tsx", "to": "templates/src/features/debug/debug-motion-config.tsx"},
+  {"from": "repo-templates/src/features/debug/debug-root-kit.test.tsx", "to": "templates/src/features/debug/debug-root-kit.test.tsx"},
+  {"from": "repo-templates/src/features/debug/debug-root-kit.tsx", "to": "templates/src/features/debug/debug-root-kit.tsx"},
+  {"from": "repo-templates/src/features/debug/test-hooks-context.tsx", "to": "templates/src/features/debug/test-hooks-context.tsx"},
+  {"from": "repo-templates/src/features/debug/test-hooks-root.tsx", "to": "templates/src/features/debug/test-hooks-root.tsx"}
+]

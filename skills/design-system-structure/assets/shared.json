@@ -1,0 +1,14 @@
+[
+  { "from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs" },
+  { "from": "scripts/lib/app-modules.mjs", "to": "scripts/lib/app-modules.mjs" },
+  { "from": "repo-templates/src/theme/", "to": "templates/src/theme/" },
+  { "from": "repo-templates/design/tokens.json", "to": "templates/design/tokens.json" },
+  { "from": "repo-templates/src/ui/app-text.tsx", "to": "templates/src/ui/app-text.tsx" },
+  { "from": "repo-templates/src/ui/app-text.test.tsx", "to": "templates/src/ui/app-text.test.tsx" },
+  { "from": "repo-templates/src/ui/app-text-balance.test.tsx", "to": "templates/src/ui/app-text-balance.test.tsx" },
+  { "from": "repo-templates/src/ui/app-text.android.test.tsx", "to": "templates/src/ui/app-text.android.test.tsx" },
+  { "from": "repo-templates/src/ui/use-balanced-wrap.ts", "to": "templates/src/ui/use-balanced-wrap.ts" },
+  { "from": "repo-templates/src/ui/use-balanced-wrap.test.ts", "to": "templates/src/ui/use-balanced-wrap.test.ts" },
+  { "from": "repo-templates/src/ui/press-feedback-context.tsx", "to": "templates/src/ui/press-feedback-context.tsx" },
+  { "from": "repo-templates/src/ui/press-feedback-context.test.tsx", "to": "templates/src/ui/press-feedback-context.test.tsx" }
+]

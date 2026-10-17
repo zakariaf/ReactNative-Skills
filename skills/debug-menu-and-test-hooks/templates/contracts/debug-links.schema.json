@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "debug-links.schema.json",
+  "title": "Debug deep-link contract",
+  "description": "The parameters of the test-build debug link, mirrored from the registry file (debug-menu-and-test-hooks).",
+  "type": "object",
+  "required": ["registry", "path", "params"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "registry": {
+      "description": "Repo path of the registry module that exports DEBUG_LINK_PATH and DEBUG_LINK_PARAMS.",
+      "type": "string",
+      "pattern": "^[^/.][^:]*\\.ts$"
+    },
+    "path": {
+      "description": "The route path of the link, equal to DEBUG_LINK_PATH.",
+      "type": "string",
+      "pattern": "^[a-z0-9-]+(/[a-z0-9-]+)*$"
+    },
+    "params": {
+      "description": "Every parameter the link accepts, by name.",
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "description": "screen, params, initial and state are React Navigation's nested-navigation params, never debug-link names.",
+        "pattern": "^[a-z][a-zA-Z0-9]*$",
+        "not": { "enum": ["screen", "params", "initial", "state"] }
+      },
+      "additionalProperties": {
+        "type": "object",
+        "required": ["effect"],
+        "additionalProperties": false,
+        "properties": {
+          "values": {
+            "description": "The allowed values, in the registry's order.",
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "kind": {
+            "description": "A value kind instead of a list: date (YYYY-MM-DD or real).",
+            "enum": ["date"]
+          },
+          "effect": {
+            "description": "What the parameter changes.",
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "oneOf": [{ "required": ["values"] }, { "required": ["kind"] }]
+      }
+    }
+  }
+}

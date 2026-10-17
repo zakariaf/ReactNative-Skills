@@ -1,0 +1,11 @@
+{
+  "name": "game-host-fixture",
+  "private": true,
+  "main": "expo-router/entry",
+  "dependencies": {
+    "expo": "~57.0.26",
+    "expo-router": "~57.0.24",
+    "react": "19.2.3",
+    "zustand": "5.0.15"
+  }
+}

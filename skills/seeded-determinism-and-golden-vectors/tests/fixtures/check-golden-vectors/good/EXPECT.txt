@@ -1,0 +1,2 @@
+SKIP src/data/daily-focus/daily-focus-outcome-repository.ts [outcome-version] not yet created (persistence-and-migrations creates it)
+RESULT: PASS

@@ -1,0 +1,3 @@
+[no-memo-apis] calls React.memo
+src/features/tasks/components/task-badge.tsx:6
+RESULT: FAIL (1 problems)

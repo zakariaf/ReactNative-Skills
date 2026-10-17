@@ -1,0 +1,3 @@
+[hook-file] exports useOpenCount from task-counts.ts
+src/features/tasks/task-counts.ts:4
+RESULT: FAIL (1 problems)

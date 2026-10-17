@@ -1,0 +1,19 @@
+{
+  "bad-invalid-plan": {
+    "expect": ["[plan-invalid] \"themes\" must list \"light\" and/or \"dark\", each once"],
+    "ops": [{ "json": { "file": "contracts/design-review.json", "path": ["themes"], "value": ["light", "sepia"] } }]
+  },
+  "pass-reshoot-drops-signoff": {
+    "expect": [
+      "1 capture(s) changed after the sign-off (tasks.default--dark--en--default--ios-phone-small): the sign-off was dropped; look at them and sign again"
+    ],
+    "ops": [
+      {
+        "copy": {
+          "from": "reports/design-review/2026-10-01-1-0-0/cells/tasks.default--light--en--default--ios-phone-small.png",
+          "to": "reports/design-review/2026-10-01-1-0-0/cells/tasks.default--dark--en--default--ios-phone-small.png"
+        }
+      }
+    ]
+  }
+}

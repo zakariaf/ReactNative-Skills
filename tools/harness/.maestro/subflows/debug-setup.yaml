@@ -1,0 +1,16 @@
+# .maestro/subflows/debug-setup.yaml — a sub-flow, never run on its own (it is not under flows/).
+# Puts a test build into a known state through the test-only debug link
+# ${APP_SCHEME}://debug/setup?${QUERY} (debug-menu-and-test-hooks owns the link; its parameters are
+# in contracts/debug-links.json), then waits for WAIT_FOR. QUERY always ends on the screen to open
+# (open=...) and WAIT_FOR is that screen's testID: waiting for the screen the flow started on would
+# pass with a lost link. A link the app refuses shows debug.setup-error, which fails the flow.
+# Send a language that flips the layout direction in a link of its own (the app restarts once).
+appId: ${APP_ID}
+---
+- runFlow:
+    file: open-link.yaml
+    env:
+      LINK: '${APP_SCHEME}://debug/setup?${QUERY}'
+      WAIT_FOR: '${WAIT_FOR}'
+- assertNotVisible:
+    id: 'debug.setup-error'

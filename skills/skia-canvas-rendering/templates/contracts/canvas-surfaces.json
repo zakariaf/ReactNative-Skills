@@ -1,0 +1,5 @@
+{
+  "$schema": "./canvas-surfaces.schema.json",
+  "paletteSets": ["light", "dark"],
+  "surfaces": [{ "id": "__SURFACE__", "dir": "src/features/__FEATURE__/canvas", "kind": "timeline" }]
+}

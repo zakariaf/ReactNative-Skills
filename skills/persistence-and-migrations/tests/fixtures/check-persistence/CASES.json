@@ -1,0 +1,1623 @@
+{
+  "bad-async-storage": {
+    "expect": ["[second-persistence]", "src/stores/cache.ts:2", "@react-native-async-storage/async-storage"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/stores/cache.ts",
+          "content": "// src/stores/cache.ts\nimport AsyncStorage from '@react-native-async-storage/async-storage';\n\nexport async function cacheTasks(json: string): Promise<void> {\n  await AsyncStorage.setItem('tasks', json);\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-baseline-not-passed": {
+    "expect": [
+      "[unversioned-data]",
+      "src/data/migrations/migrations.ts",
+      "BASELINE is set but no openAppDatabase call receives it"
+    ],
+    "extends": "pass-adopted-variant",
+    "ops": [
+      { "replace": { "file": "src/data/open-device-database.ts", "find": "    baseline: BASELINE,\n", "with": "" } }
+    ]
+  },
+  "bad-baseline-variant-unfrozen": {
+    "expect": [
+      "[fixture-missing]",
+      "src/data/migrations/migrations.ts",
+      "BASELINE variant 1 has no frozen db-v0-<variant>.sql"
+    ],
+    "extends": "pass-adopted-variant",
+    "ops": [{ "delete": "src/data/migrations/fixtures/db-v0-tasks-altered.sql" }]
+  },
+  "bad-checkpoint-not-called": {
+    "expect": [
+      "[no-background-checkpoint]",
+      "src/app/_layout.tsx",
+      "useCheckpointOnBackground is defined but never called"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "  useCheckpointOnBackground(data.database);\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-contract-missing": {
+    "expect": ["[contract]", "contracts/persistence.json", "the persistence contract is missing"],
+    "ops": [{ "delete": "contracts/persistence.json" }]
+  },
+  "bad-contract-mode": {
+    "expect": ["[contract]", "mode: must be one of tables, document, both"],
+    "ops": [{ "json": { "file": "contracts/persistence.json", "path": ["mode"], "value": "files" } }]
+  },
+  "bad-driver-cast-in-feature": {
+    "expect": [
+      "[sqlite-outside-data]",
+      "src/features/settings/use-storage-model.ts:9",
+      "reaches the raw SqlDriver (.driver) outside src/data/",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/settings/use-storage-model.ts",
+          "content": "// src/features/settings/use-storage-model.ts\nimport { useAppData } from '@/data/app-data-context';\n\nimport type { AppDatabase } from '@/data/app-database';\n\n/** Planted: the status is cast back to the old AppDatabase to dig out its driver. */\nexport function useStorageModel(): unknown {\n  const data = useAppData();\n  return (data.database as unknown as AppDatabase).driver;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-driver-in-feature": {
+    "expect": [
+      "[sqlite-outside-data]",
+      "src/features/tasks/use-open-task-count.ts:2",
+      "imports the SqlDriver port (src/data/sql-driver.ts) outside src/data/"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-open-task-count.ts",
+          "content": "// src/features/tasks/use-open-task-count.ts\nimport type { SqlDriver } from '@/data/sql-driver';\n\n/** Planted: a feature that holds the driver can run any statement. */\nexport type OpenTaskCountDeps = { readonly driver: SqlDriver };\n"
+        }
+      }
+    ]
+  },
+  "bad-exec-in-repository": {
+    "expect": [
+      "[exec-in-repository]",
+      "src/data/tasks/sqlite-task-repository.ts:108",
+      "calls driver.exec() (2 statements)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "    removeList: (listId) => {",
+          "with": "    clearAll: () =>\n      attempt(() => {\n        driver.exec('DELETE FROM tasks; DELETE FROM lists;');\n      }, taskFailureOf(errorLog)),\n    removeList: (listId) => {"
+        }
+      }
+    ]
+  },
+  "bad-feature-driver-constant": {
+    "expect": [
+      "[sqlite-outside-data]",
+      "src/features/cleanup/use-cleanup-model.ts:10",
+      "reaches the raw SqlDriver (.driver) outside src/data/",
+      "[sql-outside-data]",
+      "runs SQL through .run() (DELETE FROM"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/maintenance-sql.ts",
+          "content": "// src/data/maintenance-sql.ts\nexport const CLEAR_DONE_SQL = 'DELETE FROM tasks WHERE is_done = 1';\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/cleanup/use-cleanup-model.ts",
+          "content": "// src/features/cleanup/use-cleanup-model.ts\nimport { useAppData } from '@/data/app-data-context';\nimport { CLEAR_DONE_SQL } from '@/data/maintenance-sql';\n\n/** Planted: the model digs the driver out of the data layer and runs a statement past every repository rule. */\nexport function useCleanupModel(): { readonly clearDone: () => void } {\n  const { database } = useAppData();\n  return {\n    clearDone: () => {\n      database.driver.transaction(() => database.driver.run(CLEAR_DONE_SQL, []));\n    },\n  };\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-fixture-edited": {
+    "expect": ["[fixture-frozen]", "src/data/migrations/fixtures/db-v1.sql", "db-v1.sql changed"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/migrations/fixtures/db-v1.sql",
+          "find": "'Water the plants'",
+          "with": "'Water the garden'"
+        }
+      }
+    ]
+  },
+  "bad-fixture-missing": {
+    "expect": [
+      "[fixture-missing]",
+      "src/data/migrations/fixtures/db-v2.sql",
+      "no db-v2.sql: version 2 has no frozen database"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/migrations/v0002-add-task-due-date.ts",
+          "content": "// src/data/migrations/v0002-add-task-due-date.ts: version 2 of the app database.\nimport type { Migration } from '@/data/migrations/migration-runner';\n\nexport const ADD_TASK_DUE_DATE: Migration = {\n  version: 2,\n  name: 'add-task-due-date',\n  up: (driver) => {\n    driver.exec('ALTER TABLE tasks ADD COLUMN due_on TEXT');\n  },\n};\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/migrations/migrations.ts",
+          "find": "import { CREATE_LISTS_AND_TASKS } from './v0001-create-lists-and-tasks';",
+          "with": "import { CREATE_LISTS_AND_TASKS } from './v0001-create-lists-and-tasks';\nimport { ADD_TASK_DUE_DATE } from './v0002-add-task-due-date';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/migrations/migrations.ts",
+          "find": "[CREATE_LISTS_AND_TASKS]",
+          "with": "[CREATE_LISTS_AND_TASKS, ADD_TASK_DUE_DATE]"
+        }
+      },
+      {
+        "replace": {
+          "file": "test/sqlite/migration-fixtures.test.ts",
+          "find": "[{ name: 'db-v1', version: 1 }]",
+          "with": "[\n  { name: 'db-v1', version: 1 },\n  { name: 'db-v2', version: 2 },\n]"
+        }
+      }
+    ]
+  },
+  "bad-fixture-untested": {
+    "expect": ["[fixture-untested]", "test/sqlite/migration-fixtures.test.ts", "db-v1 is not in FIXTURES"],
+    "ops": [
+      {
+        "replace": {
+          "file": "test/sqlite/migration-fixtures.test.ts",
+          "find": "[{ name: 'db-v1', version: 1 }]",
+          "with": "[]"
+        }
+      }
+    ]
+  },
+  "bad-foreign-keys-off": {
+    "expect": ["[pragmas]", "no PRAGMA foreign_keys = ON"],
+    "ops": [
+      { "replace": { "file": "src/data/app-database.ts", "find": "PRAGMA foreign_keys = ON;\n`;", "with": "`;" } }
+    ]
+  },
+  "bad-fresh-install-fails": {
+    "expect": ["[migration-replay]", "a fresh install fails at version 1"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/migrations/v0001-create-lists-and-tasks.ts",
+          "find": "CREATE INDEX tasks_by_list ON tasks (list_id, id);",
+          "with": "CREATE INDEX tasks_by_list ON tasks (list_id, missing_column);"
+        }
+      }
+    ]
+  },
+  "bad-helper-in-other-file": {
+    "expect": [
+      "[sql-outside-repository]",
+      "src/data/tasks/task-rows.ts:9",
+      "runs statements (.run(), 2 calls) outside a repository file"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/tasks/task-rows.ts",
+          "content": "// src/data/tasks/task-rows.ts\nimport type { SqlDriver } from '@/data/sql-driver';\n\nconst DELETE_TASKS_OF_LIST_SQL = 'DELETE FROM tasks WHERE list_id = ?';\nconst DELETE_LIST_SQL = 'DELETE FROM lists WHERE id = ?';\n\n/** Planted: the list's two DELETEs moved to a sibling file, where they run without a transaction. */\nexport function deleteListRows(driver: SqlDriver, id: number): number {\n  driver.run(DELETE_TASKS_OF_LIST_SQL, [id]);\n  return driver.run(DELETE_LIST_SQL, [id]).changes;\n}\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "import { invalidInput, taskFailureOf } from '@/data/tasks/task-failures';\n",
+          "with": "import { invalidInput, taskFailureOf } from '@/data/tasks/task-failures';\nimport { deleteListRows } from '@/data/tasks/task-rows';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "      const removed = attempt(() => {\n        let changes = 0;\n        driver.transaction(() => {\n          driver.run(DELETE_TASKS_OF_LIST_SQL, [id]);\n          changes = driver.run(DELETE_LIST_SQL, [id]).changes;\n        });\n        return changes;\n      }, taskFailureOf(errorLog));",
+          "with": "      const removed = attempt(() => deleteListRows(driver, id), taskFailureOf(errorLog));"
+        }
+      }
+    ]
+  },
+  "bad-helper-loop-no-transaction": {
+    "expect": [
+      "[transaction-write] removeList runs a statement per item of a loop outside driver.transaction (through deleteListRows)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "$comment": "Planted: the same helper without its transaction: a statement per item, each its own commit.",
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "function listWrites(\n",
+          "with": "/** Planted: a loop of statements, no transaction on either side. */\nfunction deleteListRows(driver: SqlDriver, ids: readonly number[]): number {\n  let changes = 0;\n  for (const id of ids) {\n    driver.run(DELETE_TASKS_OF_LIST_SQL, [id]);\n    changes += driver.run(DELETE_LIST_SQL, [id]).changes;\n  }\n  return changes;\n}\n\nfunction listWrites(\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "        driver.transaction(() => {\n          driver.run(DELETE_TASKS_OF_LIST_SQL, [id]);\n          changes = driver.run(DELETE_LIST_SQL, [id]).changes;\n        });",
+          "with": "        changes = deleteListRows(driver, [id]);"
+        }
+      }
+    ]
+  },
+  "bad-helper-write-no-transaction": {
+    "expect": [
+      "[transaction-write]",
+      "src/data/tasks/sqlite-task-repository.ts:118",
+      "removeList runs 2 statements outside driver.transaction (through deleteListRows)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "function listWrites(\n",
+          "with": "/** Planted: two statements in a helper, no transaction on either side. */\nfunction deleteListRows(driver: SqlDriver, id: number): number {\n  driver.run(DELETE_TASKS_OF_LIST_SQL, [id]);\n  return driver.run(DELETE_LIST_SQL, [id]).changes;\n}\n\nfunction listWrites(\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "        driver.transaction(() => {\n          driver.run(DELETE_TASKS_OF_LIST_SQL, [id]);\n          changes = driver.run(DELETE_LIST_SQL, [id]).changes;\n        });",
+          "with": "        changes = deleteListRows(driver, id);"
+        }
+      }
+    ]
+  },
+  "bad-helper-write-unvalidated": {
+    "expect": [
+      "[validate-before-write]",
+      "src/data/tasks/sqlite-task-repository.ts:137",
+      "addTask writes without validating its input first (through insertTask)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "function taskWrites(",
+          "with": "/** Planted: the helper writes, and nobody validated the input on the way. */\nfunction insertTask(driver: SqlDriver, task: Omit<Task, 'id' | 'isDone'>): Task {\n  const { lastInsertRowId } = driver.run(INSERT_TASK_SQL, [task.listId, task.title, task.createdAtMs]);\n  return { id: lastInsertRowId, ...task, isDone: false };\n}\n\nfunction taskWrites("
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "      const parsed = v.safeParse(NEW_TASK, input);\n      if (!parsed.success) return err(invalidInput(parsed.issues));\n      const { listId, title } = parsed.output;\n      const createdAtMs = clock.nowMs();\n      return attempt(\n        () => {\n          const { lastInsertRowId } = driver.run(INSERT_TASK_SQL, [listId, title, createdAtMs]);\n          return { id: lastInsertRowId, listId, title, isDone: false, createdAtMs };\n        },\n        taskFailureOf(errorLog, { listId }),\n      );",
+          "with": "      const { listId, title } = input;\n      const createdAtMs = clock.nowMs();\n      return attempt(\n        () => insertTask(driver, { listId, title, createdAtMs }),\n        taskFailureOf(errorLog, { listId }),\n      );"
+        }
+      }
+    ]
+  },
+  "bad-kv-only-store-in-feature": {
+    "expect": [
+      "[sqlite-outside-data]",
+      "src/features/settings/use-settings-model.ts:2",
+      "imports expo-sqlite/kv-store outside a preferences adapter"
+    ],
+    "ops": [
+      { "delete": ["src/data", "test/sqlite", "contracts", "src/services/error-log/sqlite-error-log-adapter.ts"] },
+      {
+        "write": {
+          "file": "src/app/_layout.tsx",
+          "content": "// src/app/_layout.tsx: the root layout of a preferences-only app (a stand-in: never compiled).\nimport { Stack } from 'expo-router';\n\nexport default function RootLayout(): React.JSX.Element {\n  return <Stack />;\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/settings/use-settings-model.ts",
+          "content": "// src/features/settings/use-settings-model.ts: a model hook that reads storage itself (planted).\nimport Storage from 'expo-sqlite/kv-store';\n\nexport function useSettingsModel(): string | null {\n  return Storage.getItemSync('theme');\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/preferences/kv-preferences-adapter.ts",
+          "content": "// src/services/preferences/kv-preferences-adapter.ts: small preferences in expo-sqlite's key-value store.\nimport Storage from 'expo-sqlite/kv-store';\n\nimport type { PreferencesPort } from '@/services/preferences/preferences-port';\n\nexport function createKvPreferencesAdapter(): PreferencesPort {\n  return {\n    theme: () => Storage.getItemSync('theme'),\n    setTheme: (theme) => {\n      Storage.setItemSync('theme', theme);\n    },\n  };\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-kv-store-in-feature": {
+    "expect": ["[sqlite-outside-data]", "src/features/settings/use-theme.ts:2", "outside a preferences adapter"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/settings/use-theme.ts",
+          "content": "// src/features/settings/use-theme.ts\nimport Storage from 'expo-sqlite/kv-store';\n\nexport function readTheme(): string | null {\n  return Storage.getItemSync('theme');\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-legacy-not-adoptable": {
+    "expect": [
+      "[unversioned-data]",
+      "src/data/migrations/fixtures/db-v0-tasks-altered.sql",
+      "db-v0-tasks-altered.sql would open as unversioned"
+    ],
+    "extends": "pass-adopted-variant",
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/migrations/migrations.ts",
+          "find": "variants: [TASKS_ALTERED_DDL]",
+          "with": "variants: []"
+        }
+      }
+    ]
+  },
+  "bad-localstorage-in-feature": {
+    "expect": [
+      "[sqlite-outside-data]",
+      "src/features/tasks/use-sort-order.ts:2",
+      "imports expo-sqlite/localStorage/install outside a preferences adapter",
+      "src/features/tasks/use-sort-order.ts:6",
+      "uses the global localStorage (.getItem) outside a preferences adapter"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-sort-order.ts",
+          "content": "// src/features/tasks/use-sort-order.ts\nimport 'expo-sqlite/localStorage/install';\n\n/** Planted: a model reads the global key-value store directly, with no port and no adapter. */\nexport function savedSortOrder(): string {\n  return localStorage.getItem('tasks.sort') ?? 'created';\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-localstorage-in-web-file": {
+    "expect": [
+      "src/features/tasks/sort-order.web.ts:3 [sqlite-outside-data]",
+      "In a .web file localStorage is the browser's own Web Storage"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/sort-order.web.ts",
+          "content": "// src/features/tasks/sort-order.web.ts\nexport function savedSortOrder(): string {\n  return window.localStorage.getItem('tasks.sort') ?? 'created';\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-localstorage-install-in-layout": {
+    "expect": [
+      "[sqlite-outside-data]",
+      "src/app/_layout.tsx:2",
+      "imports expo-sqlite/localStorage/install outside a preferences adapter",
+      "src/services/preferences/preferences-port.ts:8",
+      "uses the global localStorage (.getItem) outside a preferences adapter",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      { "delete": ["src/data", "test/sqlite", "contracts", "src/services/error-log/sqlite-error-log-adapter.ts"] },
+      {
+        "write": {
+          "file": "src/app/_layout.tsx",
+          "content": "// src/app/_layout.tsx: the root layout of a preferences-only app (a stand-in: never compiled).\nimport 'expo-sqlite/localStorage/install';\n\nimport { Stack } from 'expo-router';\n\n/** Planted: the install in the root layout, which architecture-and-boundaries reports as a vendor SDK outside its adapter. */\nexport default function RootLayout(): React.JSX.Element {\n  return <Stack />;\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/preferences/preferences-port.ts",
+          "content": "// src/services/preferences/preferences-port.ts: the preferences the app keeps (a stand-in: never compiled).\nexport type PreferencesPort = {\n  readonly theme: () => string | null;\n  /** Planted: a port file is not the adapter, so it may not read the global localStorage either. */\n  readonly savedTheme: string | null;\n};\n\nexport const PORT_DEFAULT_THEME = localStorage.getItem('theme');\n"
+        }
+      }
+    ]
+  },
+  "bad-loop-write": {
+    "expect": ["[transaction-write]", "addLists runs a statement per item of a loop outside driver.transaction"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "    removeList: (listId) => {",
+          "with": "    addLists: (inputs: readonly NewList[]) => {\n      for (const input of inputs) {\n        const parsed = v.safeParse(NEW_LIST, input);\n        if (parsed.success) driver.run(INSERT_LIST_SQL, [parsed.output.name, clock.nowMs()]);\n      }\n      return ok(undefined);\n    },\n    removeList: (listId) => {"
+        }
+      }
+    ]
+  },
+  "bad-loose-schema": {
+    "expect": ["[schema-strict]", "src/data/tasks/task-schema.ts:10", "uses v.object"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/tasks/task-schema.ts",
+          "find": "export const LIST_ROW = v.strictObject({",
+          "with": "export const LIST_ROW = v.object({"
+        }
+      }
+    ]
+  },
+  "bad-migration-down": {
+    "expect": ["[migration-forward-only]", "declares a down step"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/migrations/v0001-create-lists-and-tasks.ts",
+          "find": "  name: 'create-lists-and-tasks',\n",
+          "with": "  name: 'create-lists-and-tasks',\n  down: (driver) => {\n    driver.exec('DROP TABLE tasks');\n  },\n"
+        }
+      }
+    ]
+  },
+  "bad-migration-gap": {
+    "expect": ["[migration-chain]", "no migration file for version 2 (the numbers have a gap)"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/migrations/v0003-add-list-color.ts",
+          "content": "// src/data/migrations/v0003-add-list-color.ts: version 3 of the app database.\nimport type { Migration } from '@/data/migrations/migration-runner';\n\nexport const ADD_LIST_COLOR: Migration = {\n  version: 3,\n  name: 'add-list-color',\n  up: (driver) => {\n    driver.exec('ALTER TABLE lists ADD COLUMN color TEXT');\n  },\n};\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/migrations/migrations.ts",
+          "find": "import { CREATE_LISTS_AND_TASKS } from './v0001-create-lists-and-tasks';",
+          "with": "import { CREATE_LISTS_AND_TASKS } from './v0001-create-lists-and-tasks';\nimport { ADD_LIST_COLOR } from './v0003-add-list-color';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/migrations/migrations.ts",
+          "find": "[CREATE_LISTS_AND_TASKS]",
+          "with": "[CREATE_LISTS_AND_TASKS, ADD_LIST_COLOR]"
+        }
+      }
+    ]
+  },
+  "bad-migration-imports": {
+    "expect": [
+      "[migration-pure]",
+      "src/data/migrations/v0001-create-lists-and-tasks.ts:2",
+      "imports @/data/app-database at run time"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/migrations/v0001-create-lists-and-tasks.ts",
+          "find": "import type { Migration } from '@/data/migrations/migration-runner';",
+          "with": "import { APP_DB_FILE } from '@/data/app-database';\nimport type { Migration } from '@/data/migrations/migration-runner';\n\nexport const FILE = APP_DB_FILE;"
+        }
+      }
+    ]
+  },
+  "bad-migration-stamps-version": {
+    "expect": ["[migration-forward-only]", "sets PRAGMA user_version itself"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/migrations/v0001-create-lists-and-tasks.ts",
+          "find": "  details TEXT\n) STRICT;\n",
+          "with": "  details TEXT\n) STRICT;\nPRAGMA user_version = 1;\n"
+        }
+      }
+    ]
+  },
+  "bad-migration-unregistered": {
+    "expect": [
+      "[migration-chain]",
+      "src/data/migrations/v0002-add-task-due-date.ts",
+      "version 2 is not registered in MIGRATIONS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/migrations/v0002-add-task-due-date.ts",
+          "content": "// src/data/migrations/v0002-add-task-due-date.ts: version 2 of the app database.\nimport type { Migration } from '@/data/migrations/migration-runner';\n\nexport const ADD_TASK_DUE_DATE: Migration = {\n  version: 2,\n  name: 'add-task-due-date',\n  up: (driver) => {\n    driver.exec('ALTER TABLE tasks ADD COLUMN due_on TEXT');\n  },\n};\n"
+        }
+      }
+    ]
+  },
+  "bad-missing-runner": {
+    "expect": ["[missing-file]", "src/data/migrations/migration-runner.ts", "the forward-only migration runner"],
+    "ops": [{ "delete": "src/data/migrations/migration-runner.ts" }]
+  },
+  "bad-mmkv-second-store": {
+    "expect": [
+      "[second-persistence]",
+      "src/services/preferences/mmkv-preferences-adapter.ts:2",
+      "but contracts/persistence.json names expo-sqlite/kv-store"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/preferences/mmkv-preferences-adapter.ts",
+          "content": "// src/services/preferences/mmkv-preferences-adapter.ts\nimport { createMMKV } from 'react-native-mmkv';\n\nexport const preferences = createMMKV();\n"
+        }
+      }
+    ]
+  },
+  "bad-newer-db-throws": {
+    "expect": ["[newer-db-crash]", "src/data/app-database.ts:275", "the open path throws"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/app-database.ts",
+          "find": "    if (found > latest) return leave(driver, deps, { kind: 'newer-version', found });",
+          "with": "    if (found > latest) throw new Error('database from a newer build');\n    deps.errorLog.record('startup', { kind: 'newer-version', found });"
+        }
+      }
+    ]
+  },
+  "bad-no-background-listener": {
+    "expect": ["[no-background-checkpoint]", "no AppState \"background\" listener calls checkpoint()"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/use-checkpoint-on-background.ts",
+          "find": "if (next === 'background')",
+          "with": "if (next === 'inactive')"
+        }
+      }
+    ]
+  },
+  "bad-no-snapshot": {
+    "expect": ["[migration-snapshot]", "no snapshot (VACUUM INTO) before the migrations run"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/app-database.ts",
+          "find": "driver.run('VACUUM INTO ?', [plan.snapshot]);",
+          "with": "driver.run('SELECT ?', [plan.snapshot]);"
+        }
+      }
+    ]
+  },
+  "bad-no-wal": {
+    "expect": ["[pragmas]", "src/data/app-database.ts", "no PRAGMA journal_mode = WAL"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/app-database.ts",
+          "find": "PRAGMA journal_mode = WAL;",
+          "with": "PRAGMA journal_mode = DELETE;"
+        }
+      }
+    ]
+  },
+  "bad-no-wal-checkpoint": {
+    "expect": ["[transaction-write]", "checkpoint() does not run PRAGMA wal_checkpoint(TRUNCATE)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/app-database.ts",
+          "find": "'PRAGMA wal_checkpoint(TRUNCATE)'",
+          "with": "'PRAGMA wal_checkpoint(PASSIVE)'"
+        }
+      }
+    ]
+  },
+  "bad-open-at-import": {
+    "expect": ["[open-at-import]", "src/app/_layout.tsx:7", "calls openDeviceDatabase() at module level"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/_layout.tsx",
+          "content": "// src/app/_layout.tsx: planted: the database opens when the module is imported.\nimport { Stack } from 'expo-router';\n\nimport { openDeviceDatabase } from '@/data/open-device-database';\nimport { useCheckpointOnBackground } from '@/data/use-checkpoint-on-background';\n\nconst database = openDeviceDatabase({ record: () => undefined });\n\nexport default function RootLayout(): React.JSX.Element {\n  useCheckpointOnBackground(database);\n  return <Stack />;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-open-every-render": {
+    "expect": [
+      "[open-at-import]",
+      "src/app/_layout.tsx:28",
+      "useState(openOnce(...)) opens the database on every render"
+    ],
+    "ops": [
+      { "replace": { "file": "src/app/_layout.tsx", "find": "useState(openOnce);", "with": "useState(openOnce());" } }
+    ]
+  },
+  "bad-open-in-render": {
+    "expect": ["[open-at-import]", "src/app/_layout.tsx:28", "calls openOnce() in the body of RootLayout"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "const [data] = useState(openOnce);",
+          "with": "const data = openOnce();"
+        }
+      }
+    ]
+  },
+  "bad-parse-int-validation": {
+    "expect": ["[validate-before-write]", "addTask writes without validating its input first"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "      const parsed = v.safeParse(NEW_TASK, input);\n      if (!parsed.success) return err(invalidInput(parsed.issues));\n      const { listId, title } = parsed.output;",
+          "with": "      const listId = Number.parseInt(String(input.listId), 10);\n      const title = JSON.parse(JSON.stringify(input.title)) as string;"
+        }
+      }
+    ]
+  },
+  "bad-peek-writes": {
+    "expect": ["[peek-writes]", "src/data/peek-database.ts", "the startup peek calls .exec()"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/peek-database.ts",
+          "find": "    return read({ get: driver.get, all: driver.all });",
+          "with": "    driver.exec('PRAGMA journal_mode = WAL');\n    return read({ get: driver.get, all: driver.all });"
+        }
+      }
+    ]
+  },
+  "bad-pragmas-before-version": {
+    "expect": ["[newer-db-crash]", "the pragmas run before the version check"],
+    "ops": [
+      { "replace": { "file": "src/data/app-database.ts", "find": "    driver.exec(APP_DB_PRAGMAS);\n", "with": "" } },
+      {
+        "replace": {
+          "file": "src/data/app-database.ts",
+          "find": "    const found = readUserVersion(driver);\n",
+          "with": "    driver.exec(APP_DB_PRAGMAS);\n    const found = readUserVersion(driver);\n"
+        }
+      }
+    ]
+  },
+  "bad-pragmas-not-run": {
+    "expect": ["[pragmas]", "APP_DB_PRAGMAS is defined but never executed"],
+    "ops": [
+      { "replace": { "file": "src/data/app-database.ts", "find": "    driver.exec(APP_DB_PRAGMAS);\n", "with": "" } }
+    ]
+  },
+  "bad-protected-reset": {
+    "expect": ["[protected-reset]", "src/data/reset-data.ts", "a reset touches the protected table entitlements"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/reset-data.ts",
+          "find": "['DELETE FROM tasks', 'DELETE FROM lists']",
+          "with": "['DELETE FROM tasks', 'DELETE FROM lists', 'DELETE FROM entitlements']"
+        }
+      }
+    ]
+  },
+  "bad-read-aliased-sql": {
+    "expect": [
+      "[validate-on-read]",
+      "src/data/tasks/sqlite-task-repository.ts:89",
+      "tasksOf reads rows without a row schema"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "    tasksOf: (listId) =>\n      attempt(() => readableRows(TASKS, driver.all(SELECT_TASKS_SQL, [listId]), errorLog), fail),",
+          "with": "    tasksOf: (listId) =>\n      attempt(() => {\n        const query = SELECT_TASKS_SQL;\n        return driver.all(query, [listId]).map((row) => ({\n          id: Number(row['id']),\n          listId: Number(row['list_id']),\n          title: String(row['title']),\n          isDone: row['is_done'] === 1,\n          createdAtMs: Number(row['created_at_ms']),\n        }));\n      }, fail),"
+        }
+      }
+    ]
+  },
+  "bad-read-helper-parses-other": {
+    "expect": [
+      "[validate-on-read]",
+      "src/data/tasks/sqlite-task-repository.ts:93",
+      "tasksOf reads rows without a row schema (no safeParse on its path)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "function readMethods(",
+          "with": "/** Planted: the helper receives the rows, parses only the list id, and maps the rows as they came. */\nfunction tasksFrom(rows: readonly SqlRow[], listId: number): readonly Task[] {\n  v.parse(LIST_ID, listId);\n  return rows.map((row) => TASKS.toItem(row as TaskRow));\n}\n\nfunction readMethods("
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "      attempt(() => readableRows(TASKS, driver.all(SELECT_TASKS_SQL, [listId]), errorLog), fail),",
+          "with": "      attempt(() => tasksFrom(driver.all(SELECT_TASKS_SQL, [listId]), listId), fail),"
+        }
+      }
+    ]
+  },
+  "bad-read-parses-input-only": {
+    "expect": [
+      "[validate-on-read]",
+      "src/data/tasks/sqlite-task-repository.ts:91",
+      "tasksOf reads rows without a row schema (no safeParse on its path)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "    tasksOf: (listId) =>\n      attempt(() => readableRows(TASKS, driver.all(SELECT_TASKS_SQL, [listId]), errorLog), fail),",
+          "with": "    tasksOf: (listId) => {\n      // Planted: the input is parsed, the rows are not.\n      const id = v.safeParse(LIST_ID, listId);\n      if (!id.success) return err(invalidInput(id.issues));\n      return attempt(\n        () => driver.all(SELECT_TASKS_SQL, [id.output]).map((row) => TASKS.toItem(row as TaskRow)),\n        fail,\n      );\n    },"
+        }
+      }
+    ]
+  },
+  "bad-read-unvalidated": {
+    "expect": [
+      "[validate-on-read]",
+      "src/data/tasks/sqlite-task-repository.ts:85",
+      "lists reads rows without a row schema (no safeParse on its path)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "v.safeParse(reader.schema, row)",
+          "with": "trustRow(reader.schema, row)"
+        }
+      }
+    ]
+  },
+  "bad-rebuild-drops-rows": {
+    "expect": [
+      "[migration-replay]",
+      "src/data/migrations/fixtures/db-v1.sql",
+      "upgrading db-v1 loses rows (tasks: 3 of 4 after the upgrade)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/migrations/fixtures/db-v2.sql",
+          "content": "-- src/data/migrations/fixtures/db-v2.sql: a database written by version 2 of the app. Frozen: never edit it; its checksum is in fixture-checksums.ts.\nPRAGMA foreign_keys = OFF;\nBEGIN;\nCREATE TABLE lists (\n  id            INTEGER PRIMARY KEY,\n  name          TEXT    NOT NULL CHECK (length(name) BETWEEN 1 AND 80),\n  created_at_ms INTEGER NOT NULL\n) STRICT;\nINSERT INTO lists (id, name, created_at_ms) VALUES (1, 'Home', 1790000000000);\nINSERT INTO lists (id, name, created_at_ms) VALUES (2, 'Work', 1790000060000);\nCREATE TABLE entitlements (\n  product        TEXT    PRIMARY KEY NOT NULL,\n  is_owned       INTEGER NOT NULL CHECK (is_owned IN (0, 1)),\n  owned_since_ms INTEGER,\n  revoked_at_ms  INTEGER\n) STRICT;\nINSERT INTO entitlements (product, is_owned, owned_since_ms, revoked_at_ms) VALUES ('premium', 1, 1790000360000, NULL);\nCREATE TABLE error_log (\n  id      INTEGER PRIMARY KEY AUTOINCREMENT,\n  at_ms   INTEGER NOT NULL,\n  area    TEXT    NOT NULL,\n  message TEXT    NOT NULL,\n  details TEXT\n) STRICT;\nINSERT INTO error_log (id, at_ms, area, message, details) VALUES (1, 1790000420000, 'network', 'request timed out', NULL);\nINSERT INTO error_log (id, at_ms, area, message, details) VALUES (2, 1790000480000, 'storage', 'unreadable tasks row: is_done', NULL);\nCREATE TABLE \"tasks\" (\n  id            INTEGER PRIMARY KEY,\n  list_id       INTEGER NOT NULL REFERENCES lists (id),\n  title         TEXT    NOT NULL CHECK (length(title) BETWEEN 1 AND 30),\n  is_done       INTEGER NOT NULL DEFAULT 0 CHECK (is_done IN (0, 1)),\n  created_at_ms INTEGER NOT NULL\n) STRICT;\nINSERT INTO tasks (id, list_id, title, is_done, created_at_ms) VALUES (1, 1, 'Water the plants', 1, 1790000120000);\nINSERT INTO tasks (id, list_id, title, is_done, created_at_ms) VALUES (3, 1, 'شراء الحليب', 0, 1790000240000);\nINSERT INTO tasks (id, list_id, title, is_done, created_at_ms) VALUES (4, 2, 'Send the report 📊', 0, 1790000300000);\nDELETE FROM sqlite_sequence;\nINSERT INTO sqlite_sequence (name, seq) VALUES ('error_log', 2);\nCREATE INDEX tasks_by_list ON tasks (list_id, id);\nPRAGMA user_version = 2;\nCOMMIT;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/data/migrations/v0002-shorten-task-titles.ts",
+          "content": "// src/data/migrations/v0002-shorten-task-titles.ts: version 2 of the app database. Frozen once it ships.\nimport type { Migration } from '@/data/migrations/migration-runner';\n\n/** Planted: the rebuild copies with INSERT OR IGNORE, so a row the new CHECK refuses silently disappears. */\nexport const SHORTEN_TASK_TITLES: Migration = {\n  version: 2,\n  name: 'shorten-task-titles',\n  rebuildsTables: true,\n  up: (driver) => {\n    driver.exec(`\nCREATE TABLE tasks_new (\n  id            INTEGER PRIMARY KEY,\n  list_id       INTEGER NOT NULL REFERENCES lists (id),\n  title         TEXT    NOT NULL CHECK (length(title) BETWEEN 1 AND 30),\n  is_done       INTEGER NOT NULL DEFAULT 0 CHECK (is_done IN (0, 1)),\n  created_at_ms INTEGER NOT NULL\n) STRICT;\nINSERT OR IGNORE INTO tasks_new (id, list_id, title, is_done, created_at_ms)\n  SELECT id, list_id, title, is_done, created_at_ms FROM tasks;\nDROP TABLE tasks;\nALTER TABLE tasks_new RENAME TO tasks;\nCREATE INDEX tasks_by_list ON tasks (list_id, id);\n`);\n  },\n};\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/migrations/migrations.ts",
+          "find": "import { CREATE_LISTS_AND_TASKS } from './v0001-create-lists-and-tasks';\n",
+          "with": "import { CREATE_LISTS_AND_TASKS } from './v0001-create-lists-and-tasks';\nimport { SHORTEN_TASK_TITLES } from './v0002-shorten-task-titles';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/migrations/migrations.ts",
+          "find": "[CREATE_LISTS_AND_TASKS]",
+          "with": "[CREATE_LISTS_AND_TASKS, SHORTEN_TASK_TITLES]"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/migrations/fixtures/fixture-checksums.ts",
+          "find": "  'db-v1': '7cb0d956',\n",
+          "with": "  'db-v1': '7cb0d956',\n  'db-v2': '2e2299bd',\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "test/sqlite/migration-fixtures.test.ts",
+          "find": "const FIXTURES = [{ name: 'db-v1', version: 1 }] as const;",
+          "with": "const FIXTURES = [\n  { name: 'db-v1', version: 1 },\n  { name: 'db-v2', version: 2 },\n] as const;"
+        }
+      }
+    ]
+  },
+  "bad-rebuild-loses-children": {
+    "expect": [
+      "[migration-replay]",
+      "src/data/migrations/fixtures/db-v1.sql",
+      "upgrading db-v1 loses rows (tasks: 0 of 4 after the upgrade)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/migrations/fixtures/db-v2.sql",
+          "content": "-- src/data/migrations/fixtures/db-v2.sql: a database written by version 2 of the app. Frozen: never edit it; its checksum is in fixture-checksums.ts.\nPRAGMA foreign_keys = OFF;\nBEGIN;\nCREATE TABLE entitlements (\n  product        TEXT    PRIMARY KEY NOT NULL,\n  is_owned       INTEGER NOT NULL CHECK (is_owned IN (0, 1)),\n  owned_since_ms INTEGER,\n  revoked_at_ms  INTEGER\n) STRICT;\nINSERT INTO entitlements (product, is_owned, owned_since_ms, revoked_at_ms) VALUES ('premium', 1, 1790000360000, NULL);\nCREATE TABLE error_log (\n  id      INTEGER PRIMARY KEY AUTOINCREMENT,\n  at_ms   INTEGER NOT NULL,\n  area    TEXT    NOT NULL,\n  message TEXT    NOT NULL,\n  details TEXT\n) STRICT;\nINSERT INTO error_log (id, at_ms, area, message, details) VALUES (1, 1790000420000, 'network', 'request timed out', NULL);\nINSERT INTO error_log (id, at_ms, area, message, details) VALUES (2, 1790000480000, 'storage', 'unreadable tasks row: is_done', NULL);\nCREATE TABLE \"tasks\" (\n  id            INTEGER PRIMARY KEY,\n  list_id       INTEGER NOT NULL REFERENCES lists (id) ON DELETE CASCADE,\n  title         TEXT    NOT NULL CHECK (length(title) BETWEEN 1 AND 200),\n  is_done       INTEGER NOT NULL DEFAULT 0 CHECK (is_done IN (0, 1)),\n  created_at_ms INTEGER NOT NULL\n) STRICT;\nINSERT INTO tasks (id, list_id, title, is_done, created_at_ms) VALUES (1, 1, 'Water the plants', 1, 1790000120000);\nINSERT INTO tasks (id, list_id, title, is_done, created_at_ms) VALUES (2, 1, 'Call the plumber about the kitchen''s tap', 0, 1790000180000);\nINSERT INTO tasks (id, list_id, title, is_done, created_at_ms) VALUES (3, 1, 'شراء الحليب', 0, 1790000240000);\nINSERT INTO tasks (id, list_id, title, is_done, created_at_ms) VALUES (4, 2, 'Send the report 📊', 0, 1790000300000);\nCREATE TABLE \"lists\" (\n  id            INTEGER PRIMARY KEY,\n  name          TEXT    NOT NULL CHECK (length(name) BETWEEN 1 AND 60),\n  created_at_ms INTEGER NOT NULL\n) STRICT;\nINSERT INTO lists (id, name, created_at_ms) VALUES (1, 'Home', 1790000000000);\nINSERT INTO lists (id, name, created_at_ms) VALUES (2, 'Work', 1790000060000);\nDELETE FROM sqlite_sequence;\nINSERT INTO sqlite_sequence (name, seq) VALUES ('error_log', 2);\nCREATE INDEX tasks_by_list ON tasks (list_id, id);\nPRAGMA user_version = 2;\nCOMMIT;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/data/migrations/v0002-tighten-list-names.ts",
+          "content": "// src/data/migrations/v0002-tighten-list-names.ts: version 2 of the app database. Frozen once it ships.\nimport type { Migration } from '@/data/migrations/migration-runner';\n\n/** Planted: tasks get ON DELETE CASCADE, then lists is rebuilt with foreign keys still on (no rebuildsTables). */\nexport const TIGHTEN_LIST_NAMES: Migration = {\n  version: 2,\n  name: 'tighten-list-names',\n  up: (driver) => {\n    driver.exec(`\nCREATE TABLE tasks_new (\n  id            INTEGER PRIMARY KEY,\n  list_id       INTEGER NOT NULL REFERENCES lists (id) ON DELETE CASCADE,\n  title         TEXT    NOT NULL CHECK (length(title) BETWEEN 1 AND 200),\n  is_done       INTEGER NOT NULL DEFAULT 0 CHECK (is_done IN (0, 1)),\n  created_at_ms INTEGER NOT NULL\n) STRICT;\nINSERT INTO tasks_new (id, list_id, title, is_done, created_at_ms)\n  SELECT id, list_id, title, is_done, created_at_ms FROM tasks;\nDROP TABLE tasks;\nALTER TABLE tasks_new RENAME TO tasks;\nCREATE INDEX tasks_by_list ON tasks (list_id, id);\nCREATE TABLE lists_new (\n  id            INTEGER PRIMARY KEY,\n  name          TEXT    NOT NULL CHECK (length(name) BETWEEN 1 AND 60),\n  created_at_ms INTEGER NOT NULL\n) STRICT;\nINSERT INTO lists_new (id, name, created_at_ms) SELECT id, name, created_at_ms FROM lists;\nDROP TABLE lists;\nALTER TABLE lists_new RENAME TO lists;\n`);\n  },\n};\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/migrations/migrations.ts",
+          "find": "import { CREATE_LISTS_AND_TASKS } from './v0001-create-lists-and-tasks';\n",
+          "with": "import { CREATE_LISTS_AND_TASKS } from './v0001-create-lists-and-tasks';\nimport { TIGHTEN_LIST_NAMES } from './v0002-tighten-list-names';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/migrations/migrations.ts",
+          "find": "[CREATE_LISTS_AND_TASKS]",
+          "with": "[CREATE_LISTS_AND_TASKS, TIGHTEN_LIST_NAMES]"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/migrations/fixtures/fixture-checksums.ts",
+          "find": "  'db-v1': '7cb0d956',\n",
+          "with": "  'db-v1': '7cb0d956',\n  'db-v2': 'a27196bc',\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "test/sqlite/migration-fixtures.test.ts",
+          "find": "const FIXTURES = [{ name: 'db-v1', version: 1 }] as const;",
+          "with": "const FIXTURES = [\n  { name: 'db-v1', version: 1 },\n  { name: 'db-v2', version: 2 },\n] as const;"
+        }
+      }
+    ]
+  },
+  "bad-rebuild-without-flag": {
+    "expect": [
+      "[migration-rebuild]",
+      "src/data/migrations/v0002-cascade-task-deletes.ts:19",
+      "drops a table (DROP TABLE) without rebuildsTables: true"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/migrations/fixtures/db-v2.sql",
+          "content": "-- src/data/migrations/fixtures/db-v2.sql: a database written by version 2 of the app. Frozen: never edit it; its checksum is in fixture-checksums.ts.\nPRAGMA foreign_keys = OFF;\nBEGIN;\nCREATE TABLE lists (\n  id            INTEGER PRIMARY KEY,\n  name          TEXT    NOT NULL CHECK (length(name) BETWEEN 1 AND 80),\n  created_at_ms INTEGER NOT NULL\n) STRICT;\nINSERT INTO lists (id, name, created_at_ms) VALUES (1, 'Home', 1790000000000);\nINSERT INTO lists (id, name, created_at_ms) VALUES (2, 'Work', 1790000060000);\nCREATE TABLE entitlements (\n  product        TEXT    PRIMARY KEY NOT NULL,\n  is_owned       INTEGER NOT NULL CHECK (is_owned IN (0, 1)),\n  owned_since_ms INTEGER,\n  revoked_at_ms  INTEGER\n) STRICT;\nINSERT INTO entitlements (product, is_owned, owned_since_ms, revoked_at_ms) VALUES ('premium', 1, 1790000360000, NULL);\nCREATE TABLE error_log (\n  id      INTEGER PRIMARY KEY AUTOINCREMENT,\n  at_ms   INTEGER NOT NULL,\n  area    TEXT    NOT NULL,\n  message TEXT    NOT NULL,\n  details TEXT\n) STRICT;\nINSERT INTO error_log (id, at_ms, area, message, details) VALUES (1, 1790000420000, 'network', 'request timed out', NULL);\nINSERT INTO error_log (id, at_ms, area, message, details) VALUES (2, 1790000480000, 'storage', 'unreadable tasks row: is_done', NULL);\nCREATE TABLE \"tasks\" (\n  id            INTEGER PRIMARY KEY,\n  list_id       INTEGER NOT NULL REFERENCES lists (id) ON DELETE CASCADE,\n  title         TEXT    NOT NULL CHECK (length(title) BETWEEN 1 AND 200),\n  is_done       INTEGER NOT NULL DEFAULT 0 CHECK (is_done IN (0, 1)),\n  created_at_ms INTEGER NOT NULL\n) STRICT;\nINSERT INTO tasks (id, list_id, title, is_done, created_at_ms) VALUES (1, 1, 'Water the plants', 1, 1790000120000);\nINSERT INTO tasks (id, list_id, title, is_done, created_at_ms) VALUES (2, 1, 'Call the plumber about the kitchen''s tap', 0, 1790000180000);\nINSERT INTO tasks (id, list_id, title, is_done, created_at_ms) VALUES (3, 1, 'شراء الحليب', 0, 1790000240000);\nINSERT INTO tasks (id, list_id, title, is_done, created_at_ms) VALUES (4, 2, 'Send the report 📊', 0, 1790000300000);\nDELETE FROM sqlite_sequence;\nINSERT INTO sqlite_sequence (name, seq) VALUES ('error_log', 2);\nCREATE INDEX tasks_by_list ON tasks (list_id, id);\nPRAGMA user_version = 2;\nCOMMIT;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/data/migrations/v0002-cascade-task-deletes.ts",
+          "content": "// src/data/migrations/v0002-cascade-task-deletes.ts: version 2 of the app database. Frozen once it ships.\nimport type { Migration } from '@/data/migrations/migration-runner';\n\n/** Planted: a table rebuild without rebuildsTables: true (harmless here, fatal for a parent table). */\nexport const CASCADE_TASK_DELETES: Migration = {\n  version: 2,\n  name: 'cascade-task-deletes',\n  up: (driver) => {\n    driver.exec(`\nCREATE TABLE tasks_new (\n  id            INTEGER PRIMARY KEY,\n  list_id       INTEGER NOT NULL REFERENCES lists (id) ON DELETE CASCADE,\n  title         TEXT    NOT NULL CHECK (length(title) BETWEEN 1 AND 200),\n  is_done       INTEGER NOT NULL DEFAULT 0 CHECK (is_done IN (0, 1)),\n  created_at_ms INTEGER NOT NULL\n) STRICT;\nINSERT INTO tasks_new (id, list_id, title, is_done, created_at_ms)\n  SELECT id, list_id, title, is_done, created_at_ms FROM tasks;\nDROP TABLE tasks;\nALTER TABLE tasks_new RENAME TO tasks;\nCREATE INDEX tasks_by_list ON tasks (list_id, id);\n`);\n  },\n};\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/migrations/migrations.ts",
+          "find": "import { CREATE_LISTS_AND_TASKS } from './v0001-create-lists-and-tasks';\n",
+          "with": "import { CREATE_LISTS_AND_TASKS } from './v0001-create-lists-and-tasks';\nimport { CASCADE_TASK_DELETES } from './v0002-cascade-task-deletes';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/migrations/migrations.ts",
+          "find": "[CREATE_LISTS_AND_TASKS]",
+          "with": "[CREATE_LISTS_AND_TASKS, CASCADE_TASK_DELETES]"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/migrations/fixtures/fixture-checksums.ts",
+          "find": "  'db-v1': '7cb0d956',\n",
+          "with": "  'db-v1': '7cb0d956',\n  'db-v2': 'ffcdc820',\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "test/sqlite/migration-fixtures.test.ts",
+          "find": "const FIXTURES = [{ name: 'db-v1', version: 1 }] as const;",
+          "with": "const FIXTURES = [\n  { name: 'db-v1', version: 1 },\n  { name: 'db-v2', version: 2 },\n] as const;"
+        }
+      }
+    ]
+  },
+  "bad-repository-misnamed": {
+    "expect": [
+      "[sql-outside-repository]",
+      "src/data/notes/note-repository.ts:10",
+      "runs statements (.run(), .all(), 3 calls) outside a repository file"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/notes/note-repository.ts",
+          "content": "// src/data/notes/note-repository.ts\nimport type { SqlDriver } from '@/data/sql-driver';\n\nexport type Note = { readonly id: number; readonly body: string };\n\n/** Planted: a repository under another name: no input schema, no Result, no transaction, no row schema, no test. */\nexport function createNoteRepository(driver: SqlDriver) {\n  return {\n    add: (body: string, tag: string): void => {\n      driver.run('INSERT INTO notes (body) VALUES (?)', [body]);\n      driver.run('INSERT INTO note_tags (tag) VALUES (?)', [tag]);\n    },\n    all: (): readonly Note[] => driver.all('SELECT id, body FROM notes', []) as unknown as Note[],\n  };\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-repository-untested": {
+    "expect": [
+      "[missing-file]",
+      "src/data/tasks/sqlite-task-repository.ts",
+      "no node:sqlite test under test/ imports this repository"
+    ],
+    "ops": [{ "delete": "test/sqlite/sqlite-task-repository.test.ts" }]
+  },
+  "bad-reset-no-transaction": {
+    "expect": ["[transaction-write]", "src/data/reset-data.ts", "the reset does not run inside driver.transaction"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/reset-data.ts",
+          "find": "  driver.transaction(() => {\n    for (const sql of RESET_SQL) driver.run(sql, []);\n  });",
+          "with": "  for (const sql of RESET_SQL) driver.run(sql, []);"
+        }
+      }
+    ]
+  },
+  "bad-reset-table-list": {
+    "expect": ["[protected-reset]", "src/data/reset-data.ts", "a reset builds its SQL from a value (a table list)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/reset-data.ts",
+          "find": "const RESET_SQL = ['DELETE FROM tasks', 'DELETE FROM lists'] as const;",
+          "with": "const RESET_TABLES = ['tasks', 'lists', 'entitlements'] as const;"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/reset-data.ts",
+          "find": "    for (const sql of RESET_SQL) driver.run(sql, []);",
+          "with": "    for (const table of RESET_TABLES) driver.run(`DELETE FROM ${table}`, []);"
+        }
+      }
+    ]
+  },
+  "bad-reset-touches-error-log": {
+    "expect": ["[protected-reset]", "src/data/reset-data.ts", "a reset touches the protected table error_log"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/reset-data.ts",
+          "find": "['DELETE FROM tasks', 'DELETE FROM lists']",
+          "with": "['DELETE FROM tasks', 'DELETE FROM lists', 'DELETE FROM error_log']"
+        }
+      }
+    ]
+  },
+  "bad-runner-no-transaction": {
+    "expect": [
+      "[transaction-write]",
+      "src/data/migrations/migration-runner.ts",
+      "a step and its user_version stamp do not run inside one driver.transaction"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/migrations/migration-runner.ts",
+          "find": "    driver.transaction(() => {\n      migration.up(driver);\n      if (isRebuild) assertForeignKeys(driver);\n      driver.exec(`PRAGMA user_version = ${String(migration.version)}`);\n    });",
+          "with": "    migration.up(driver);\n    if (isRebuild) assertForeignKeys(driver);\n    driver.exec(`PRAGMA user_version = ${String(migration.version)}`);"
+        }
+      }
+    ]
+  },
+  "bad-second-read-unvalidated": {
+    "expect": ["[validate-on-read]", "listRows reads rows without a row schema (no safeParse on its path)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "    tasksOf: (listId) =>",
+          "with": "    listRows: () => attempt(() => driver.all(SELECT_LISTS_SQL, []), fail),\n    tasksOf: (listId) =>"
+        }
+      }
+    ]
+  },
+  "bad-second-validator": {
+    "expect": ["[single-validator]", "src/features/tasks/task-form-schema.ts:2", "imports zod"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/task-form-schema.ts",
+          "content": "// src/features/tasks/task-form-schema.ts\nimport { z } from 'zod';\n\nexport const TASK_FORM = z.object({ title: z.string().min(1) });\n"
+        }
+      }
+    ]
+  },
+  "bad-shipped-migration-edited": {
+    "expect": [
+      "[migration-replay]",
+      "src/data/migrations/fixtures/db-v1.sql",
+      "upgrading db-v1 does not give the fresh schema"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/migrations/v0001-create-lists-and-tasks.ts",
+          "find": "  name          TEXT    NOT NULL CHECK (length(name) BETWEEN 1 AND 80),\n",
+          "with": "  name          TEXT    NOT NULL CHECK (length(name) BETWEEN 1 AND 80),\n  color         TEXT,\n"
+        }
+      }
+    ]
+  },
+  "bad-snapshot-not-pruned": {
+    "expect": ["[migration-snapshot]", "old snapshots are never pruned"],
+    "ops": [
+      {
+        "replace": { "file": "src/data/app-database.ts", "find": "  pruneSnapshots(deps, driver.path);\n", "with": "" }
+      }
+    ]
+  },
+  "bad-snapshot-swallowed": {
+    "expect": [
+      "[migration-snapshot]",
+      "src/data/app-database.ts:251",
+      "a failed snapshot is caught and the migration runs anyway"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/app-database.ts",
+          "find": "    } catch (error) {\n      return migrationFailed(\n        deps,\n        from,\n        new Error(`snapshot: ${messageOf(error)}`, { cause: error }),\n      );\n    }",
+          "with": "    } catch (error) {\n      deps.errorLog.record('storage', error);\n    }"
+        }
+      }
+    ]
+  },
+  "bad-snapshot-timestamped": {
+    "expect": ["[migration-snapshot]", "src/data/database-snapshots.ts:28", "the snapshot name embeds a time"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/database-snapshots.ts",
+          "find": "  return `${databasePath}.v${String(from)}.bak`;",
+          "with": "  return `${databasePath}.v${String(from)}-${String(Date.now())}.bak`;"
+        }
+      }
+    ]
+  },
+  "bad-sql-concatenated-variable": {
+    "expect": [
+      "[sql-bound-params]",
+      "src/data/tasks/sqlite-task-repository.ts:146",
+      "builds SQL from a value (string concatenation)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "        () => driver.run(SET_DONE_SQL, [change.isDone ? 1 : 0, change.taskId]).changes,",
+          "with": "        () => {\n          const sql = 'UPDATE tasks SET is_done = ' + String(change.isDone ? 1 : 0) + ' WHERE id = ?';\n          return driver.run(sql, [change.taskId]).changes;\n        },"
+        }
+      }
+    ]
+  },
+  "bad-sql-driver-call-in-feature": {
+    "expect": [
+      "[sql-outside-data]",
+      "src/features/tasks/use-table-names.ts:6",
+      "runs SQL through .all() (select name from sqlite_master)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-table-names.ts",
+          "content": "// src/features/tasks/use-table-names.ts\nimport type { AppDatabase } from '@/data/app-database';\n\n/** Planted: lowercase SQL on SQLite's own table, handed to the driver the database carries. */\nexport function tableNames(database: AppDatabase): readonly unknown[] {\n  return database.driver.all(\"select name from sqlite_master where type = 'table'\", []);\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-sql-in-feature": {
+    "expect": ["[sql-outside-data]", "src/features/tasks/task-count.ts:5", "holds SQL (SELECT"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/task-count.ts",
+          "content": "// src/features/tasks/task-count.ts\nimport type { AppDatabase } from '@/data/app-database';\n\nexport function taskCount(database: AppDatabase): unknown {\n  return database.driver.get('SELECT COUNT(*) AS n FROM tasks', [])?.['n'];\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-sql-interpolated": {
+    "expect": [
+      "[sql-bound-params]",
+      "src/data/tasks/sqlite-task-repository.ts:146",
+      "builds SQL from a value (a template literal with ${...})"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "        () => driver.run(SET_DONE_SQL, [change.isDone ? 1 : 0, change.taskId]).changes,",
+          "with": "        () =>\n          driver.run(`UPDATE tasks SET is_done = ${change.isDone ? 1 : 0} WHERE id = ${change.taskId}`, [])\n            .changes,"
+        }
+      }
+    ]
+  },
+  "bad-sql-lowercase-in-feature": {
+    "expect": [
+      "[sql-outside-data]",
+      "src/features/tasks/use-open-task-count.ts:6",
+      "holds SQL (select count(*) as n from tasks)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-open-task-count.ts",
+          "content": "// src/features/tasks/use-open-task-count.ts\nimport type { AppDatabase } from '@/data/app-database';\n\n/** Planted: lowercase SQL in a feature, through the driver the database carries. */\nexport function openTaskCount(database: AppDatabase): unknown {\n  return database.driver.get('select count(*) as n from tasks where is_done = 0', [])?.['n'];\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-sql-outside-method": {
+    "expect": [
+      "[sql-outside-method]",
+      "src/data/tasks/sqlite-task-repository.ts:158",
+      "runs .run() in seedInbox, which no method calls"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "/** One object of methods; each converts its own failures once (task-failures.ts). */",
+          "with": "/** Planted: a statement no method reaches, so no rule sees its validation or transaction. */\nexport function seedInbox(driver: SqlDriver): void {\n  driver.run(INSERT_LIST_SQL, ['Inbox', 0]);\n}\n\n/** One object of methods; each converts its own failures once (task-failures.ts). */"
+        }
+      }
+    ]
+  },
+  "bad-sqlite-in-feature": {
+    "expect": [
+      "[sqlite-outside-data]",
+      "src/features/tasks/use-task-count.ts:2",
+      "imports expo-sqlite outside src/data/"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-count.ts",
+          "content": "// src/features/tasks/use-task-count.ts\nimport { openDatabaseSync } from 'expo-sqlite';\n\nexport const database = openDatabaseSync('app.db');\n"
+        }
+      }
+    ]
+  },
+  "bad-table-not-strict": {
+    "expect": ["[pragmas]", "src/data/migrations/v0001-create-lists-and-tasks.ts", "table lists is not STRICT"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/migrations/v0001-create-lists-and-tasks.ts",
+          "find": "  created_at_ms INTEGER NOT NULL\n) STRICT;\nCREATE TABLE tasks",
+          "with": "  created_at_ms INTEGER NOT NULL\n);\nCREATE TABLE tasks"
+        }
+      }
+    ]
+  },
+  "bad-unversioned-ignored": {
+    "expect": [
+      "[unversioned-data]",
+      "src/data/app-database.ts",
+      "does not check, before the pragmas, whether a user_version 0 file already holds tables"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/app-database.ts",
+          "find": "    const tables = userTables(driver);\n    if (found === 0 && tables.length > 0 && !isAdoptable(driver, deps)) {\n      deps.errorLog.record('storage', new Error(`unversioned database holds ${tables.join(', ')}`));\n      return leave(driver, deps, { kind: 'unversioned', tables });\n    }\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-write-after-row-parse": {
+    "expect": [
+      "[validate-before-write]",
+      "src/data/tasks/sqlite-task-repository.ts:146",
+      "renameTask writes without validating its input first",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "const SET_DONE_SQL = 'UPDATE tasks SET is_done = ? WHERE id = ?';\n",
+          "with": "const SET_DONE_SQL = 'UPDATE tasks SET is_done = ? WHERE id = ?';\nconst SELECT_TASK_SQL = 'SELECT id, list_id, title, is_done, created_at_ms FROM tasks WHERE id = ?';\nconst RENAME_TASK_SQL = 'UPDATE tasks SET title = ? WHERE id = ?';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "    setDone: (taskId, isDone) => {",
+          "with": "    renameTask: (taskId: number, title: string) => {\n      // Planted: the row read is parsed, the new title is written unvalidated.\n      const current = v.safeParse(TASK_ROW, driver.get(SELECT_TASK_SQL, [taskId]));\n      if (!current.success) return err({ kind: 'task-not-found', taskId });\n      return attempt(() => driver.run(RENAME_TASK_SQL, [title, current.output.id]).changes, taskFailureOf(errorLog));\n    },\n    setDone: (taskId, isDone) => {"
+        }
+      }
+    ]
+  },
+  "bad-write-imported-sql": {
+    "expect": [
+      "[validate-before-write]",
+      "src/data/tasks/sqlite-task-repository.ts:133",
+      "addTask writes without validating its input first"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/tasks/task-sql.ts",
+          "content": "// src/data/tasks/task-sql.ts\n/** The Tasks statements, kept in a sibling file (a common layout). */\nexport const INSERT_TASK_ROW_SQL =\n  'INSERT INTO tasks (list_id, title, is_done, created_at_ms) VALUES (?, ?, 0, ?)';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "import { invalidInput, taskFailureOf } from '@/data/tasks/task-failures';\n",
+          "with": "import { invalidInput, taskFailureOf } from '@/data/tasks/task-failures';\nimport { INSERT_TASK_ROW_SQL } from '@/data/tasks/task-sql';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "      const parsed = v.safeParse(NEW_TASK, input);\n      if (!parsed.success) return err(invalidInput(parsed.issues));\n      const { listId, title } = parsed.output;\n      const createdAtMs = clock.nowMs();\n      return attempt(\n        () => {\n          const { lastInsertRowId } = driver.run(INSERT_TASK_SQL, [listId, title, createdAtMs]);",
+          "with": "      const { listId, title } = input;\n      const createdAtMs = clock.nowMs();\n      return attempt(\n        () => {\n          const { lastInsertRowId } = driver.run(INSERT_TASK_ROW_SQL, [listId, title, createdAtMs]);"
+        }
+      }
+    ]
+  },
+  "bad-write-no-transaction": {
+    "expect": [
+      "[transaction-write]",
+      "src/data/tasks/sqlite-task-repository.ts:112",
+      "removeList runs 2 statements outside driver.transaction"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "        driver.transaction(() => {\n          driver.run(DELETE_TASKS_OF_LIST_SQL, [id]);\n          changes = driver.run(DELETE_LIST_SQL, [id]).changes;\n        });",
+          "with": "        driver.run(DELETE_TASKS_OF_LIST_SQL, [id]);\n        changes = driver.run(DELETE_LIST_SQL, [id]).changes;"
+        }
+      }
+    ]
+  },
+  "bad-write-unvalidated": {
+    "expect": [
+      "[validate-before-write]",
+      "src/data/tasks/sqlite-task-repository.ts",
+      "addTask writes without validating its input first"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "      const parsed = v.safeParse(NEW_TASK, input);\n      if (!parsed.success) return err(invalidInput(parsed.issues));\n      const { listId, title } = parsed.output;",
+          "with": "      const { listId, title } = input;"
+        }
+      }
+    ]
+  },
+  "bad-zustand-persist": {
+    "expect": ["[second-persistence]", "src/stores/tasks-store.ts:3", "imports persist from zustand/middleware"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/stores/tasks-store.ts",
+          "content": "// src/stores/tasks-store.ts\nimport { createStore } from 'zustand/vanilla';\nimport { createJSONStorage, persist } from 'zustand/middleware';\n\nexport const tasksStore = createStore(persist(() => ({ tasks: [] }), { name: 'tasks', storage: createJSONStorage(() => localStorage) }));\n"
+        }
+      }
+    ]
+  },
+  "error-broken-contract": {
+    "expect": ["ERROR [bad-input] contracts/persistence.json is not valid JSON"],
+    "ops": [{ "write": { "file": "contracts/persistence.json", "content": "{ \"mode\": \"tables\",\n" } }]
+  },
+  "error-no-package-json": {
+    "expect": ["ERROR [bad-input] nothing to check: no package.json"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "pass-adopted-variant": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/migrations/fixtures/db-v0-tasks-altered.sql",
+          "content": "-- src/data/migrations/fixtures/db-v0-tasks-altered.sql: a database builds before this layer left at user_version 0 (tasks.is_done added by ALTER TABLE). Frozen: never edit it; its checksum is in fixture-checksums.ts.\nPRAGMA foreign_keys = OFF;\nBEGIN;\nCREATE TABLE lists (\n  id            INTEGER PRIMARY KEY,\n  name          TEXT    NOT NULL CHECK (length(name) BETWEEN 1 AND 80),\n  created_at_ms INTEGER NOT NULL\n) STRICT;\nINSERT INTO lists (id, name, created_at_ms) VALUES (1, 'Home', 1780000000000);\nCREATE TABLE tasks (\n  id            INTEGER PRIMARY KEY,\n  list_id       INTEGER NOT NULL REFERENCES lists (id),\n  title         TEXT    NOT NULL CHECK (length(title) BETWEEN 1 AND 200),\n  created_at_ms INTEGER NOT NULL\n, is_done INTEGER NOT NULL DEFAULT 0 CHECK (is_done IN (0, 1))) STRICT;\nINSERT INTO tasks (id, list_id, title, created_at_ms, is_done) VALUES (1, 1, 'Renew the passport', 1780000060000, 0);\nINSERT INTO tasks (id, list_id, title, created_at_ms, is_done) VALUES (2, 1, 'Book the dentist', 1780000120000, 1);\nCREATE TABLE entitlements (\n  product        TEXT    PRIMARY KEY NOT NULL,\n  is_owned       INTEGER NOT NULL CHECK (is_owned IN (0, 1)),\n  owned_since_ms INTEGER,\n  revoked_at_ms  INTEGER\n) STRICT;\nINSERT INTO entitlements (product, is_owned, owned_since_ms, revoked_at_ms) VALUES ('premium', 1, 1780000180000, NULL);\nCREATE TABLE error_log (\n  id      INTEGER PRIMARY KEY AUTOINCREMENT,\n  at_ms   INTEGER NOT NULL,\n  area    TEXT    NOT NULL,\n  message TEXT    NOT NULL,\n  details TEXT\n) STRICT;\nDELETE FROM sqlite_sequence;\nCREATE INDEX tasks_by_list ON tasks (list_id, id);\nPRAGMA user_version = 0;\nCOMMIT;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/data/migrations/fixtures/db-v2.sql",
+          "content": "-- src/data/migrations/fixtures/db-v2.sql: a database written by version 2 of the app. Frozen: never edit it; its checksum is in fixture-checksums.ts.\nPRAGMA foreign_keys = OFF;\nBEGIN;\nCREATE TABLE lists (\n  id            INTEGER PRIMARY KEY,\n  name          TEXT    NOT NULL CHECK (length(name) BETWEEN 1 AND 80),\n  created_at_ms INTEGER NOT NULL\n) STRICT;\nINSERT INTO lists (id, name, created_at_ms) VALUES (1, 'Home', 1790000000000);\nINSERT INTO lists (id, name, created_at_ms) VALUES (2, 'Work', 1790000060000);\nCREATE TABLE entitlements (\n  product        TEXT    PRIMARY KEY NOT NULL,\n  is_owned       INTEGER NOT NULL CHECK (is_owned IN (0, 1)),\n  owned_since_ms INTEGER,\n  revoked_at_ms  INTEGER\n) STRICT;\nINSERT INTO entitlements (product, is_owned, owned_since_ms, revoked_at_ms) VALUES ('premium', 1, 1790000360000, NULL);\nCREATE TABLE error_log (\n  id      INTEGER PRIMARY KEY AUTOINCREMENT,\n  at_ms   INTEGER NOT NULL,\n  area    TEXT    NOT NULL,\n  message TEXT    NOT NULL,\n  details TEXT\n) STRICT;\nINSERT INTO error_log (id, at_ms, area, message, details) VALUES (1, 1790000420000, 'network', 'request timed out', NULL);\nINSERT INTO error_log (id, at_ms, area, message, details) VALUES (2, 1790000480000, 'storage', 'unreadable tasks row: is_done', NULL);\nCREATE TABLE \"tasks\" (\n  id            INTEGER PRIMARY KEY,\n  list_id       INTEGER NOT NULL REFERENCES lists (id),\n  title         TEXT    NOT NULL CHECK (length(title) BETWEEN 1 AND 200),\n  is_done       INTEGER NOT NULL DEFAULT 0 CHECK (is_done IN (0, 1)),\n  created_at_ms INTEGER NOT NULL\n) STRICT;\nINSERT INTO tasks (id, list_id, title, is_done, created_at_ms) VALUES (1, 1, 'Water the plants', 1, 1790000120000);\nINSERT INTO tasks (id, list_id, title, is_done, created_at_ms) VALUES (2, 1, 'Call the plumber about the kitchen''s tap', 0, 1790000180000);\nINSERT INTO tasks (id, list_id, title, is_done, created_at_ms) VALUES (3, 1, 'شراء الحليب', 0, 1790000240000);\nINSERT INTO tasks (id, list_id, title, is_done, created_at_ms) VALUES (4, 2, 'Send the report 📊', 0, 1790000300000);\nDELETE FROM sqlite_sequence;\nINSERT INTO sqlite_sequence (name, seq) VALUES ('error_log', 2);\nCREATE INDEX tasks_by_list ON tasks (list_id, id);\nPRAGMA user_version = 2;\nCOMMIT;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/data/migrations/v0002-rebuild-tasks.ts",
+          "content": "// src/data/migrations/v0002-rebuild-tasks.ts: version 2 of the app database. Frozen once it ships.\nimport type { Migration } from '@/data/migrations/migration-runner';\n\n/** Adoption: installs that added is_done by ALTER TABLE and fresh installs end with one tasks table. */\nexport const REBUILD_TASKS: Migration = {\n  version: 2,\n  name: 'rebuild-tasks',\n  rebuildsTables: true,\n  up: (driver) => {\n    driver.exec(`\nCREATE TABLE tasks_new (\n  id            INTEGER PRIMARY KEY,\n  list_id       INTEGER NOT NULL REFERENCES lists (id),\n  title         TEXT    NOT NULL CHECK (length(title) BETWEEN 1 AND 200),\n  is_done       INTEGER NOT NULL DEFAULT 0 CHECK (is_done IN (0, 1)),\n  created_at_ms INTEGER NOT NULL\n) STRICT;\nINSERT INTO tasks_new (id, list_id, title, is_done, created_at_ms)\n  SELECT id, list_id, title, is_done, created_at_ms FROM tasks;\nDROP TABLE tasks;\nALTER TABLE tasks_new RENAME TO tasks;\nCREATE INDEX tasks_by_list ON tasks (list_id, id);\n`);\n  },\n};\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/migrations/migrations.ts",
+          "find": "import { CREATE_LISTS_AND_TASKS } from './v0001-create-lists-and-tasks';\n",
+          "with": "import { CREATE_LISTS_AND_TASKS } from './v0001-create-lists-and-tasks';\nimport { REBUILD_TASKS } from './v0002-rebuild-tasks';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/migrations/migrations.ts",
+          "find": "[CREATE_LISTS_AND_TASKS]",
+          "with": "[CREATE_LISTS_AND_TASKS, REBUILD_TASKS]"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/migrations/fixtures/fixture-checksums.ts",
+          "find": "  'db-v1': '7cb0d956',\n",
+          "with": "  'db-v1': '7cb0d956',\n  'db-v2': '2f5ddf42',\n  'db-v0-tasks-altered': 'edb7dd53',\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "test/sqlite/migration-fixtures.test.ts",
+          "find": "const FIXTURES = [{ name: 'db-v1', version: 1 }] as const;",
+          "with": "const FIXTURES = [\n  { name: 'db-v1', version: 1 },\n  { name: 'db-v2', version: 2 },\n] as const;"
+        }
+      },
+      {
+        "replace": {
+          "file": "test/sqlite/migration-fixtures.test.ts",
+          "find": "const LEGACY_FIXTURES: readonly (keyof typeof FIXTURE_CHECKSUMS)[] = [];",
+          "with": "const LEGACY_FIXTURES: readonly (keyof typeof FIXTURE_CHECKSUMS)[] = ['db-v0-tasks-altered'];"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/migrations/migrations.ts",
+          "find": "export const BASELINE: Baseline | null = null;",
+          "with": "/** The schema builds that added tasks.is_done by ALTER TABLE left: verbatim from db-v0-tasks-altered.sql. */\nconst TASKS_ALTERED_DDL = `CREATE TABLE lists (\n  id            INTEGER PRIMARY KEY,\n  name          TEXT    NOT NULL CHECK (length(name) BETWEEN 1 AND 80),\n  created_at_ms INTEGER NOT NULL\n) STRICT;\nCREATE TABLE tasks (\n  id            INTEGER PRIMARY KEY,\n  list_id       INTEGER NOT NULL REFERENCES lists (id),\n  title         TEXT    NOT NULL CHECK (length(title) BETWEEN 1 AND 200),\n  created_at_ms INTEGER NOT NULL\n, is_done INTEGER NOT NULL DEFAULT 0 CHECK (is_done IN (0, 1))) STRICT;\nCREATE INDEX tasks_by_list ON tasks (list_id, id);\nCREATE TABLE entitlements (\n  product        TEXT    PRIMARY KEY NOT NULL,\n  is_owned       INTEGER NOT NULL CHECK (is_owned IN (0, 1)),\n  owned_since_ms INTEGER,\n  revoked_at_ms  INTEGER\n) STRICT;\nCREATE TABLE error_log (\n  id      INTEGER PRIMARY KEY AUTOINCREMENT,\n  at_ms   INTEGER NOT NULL,\n  area    TEXT    NOT NULL,\n  message TEXT    NOT NULL,\n  details TEXT\n) STRICT;`;\n\nexport const BASELINE: Baseline | null = { version: 1, variants: [TASKS_ALTERED_DDL] };"
+        }
+      }
+    ]
+  },
+  "pass-feature-delivery-driver": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/orders/use-order-model.ts",
+          "content": "// src/features/orders/use-order-model.ts\nimport { useAppData } from '@/data/app-data-context';\n\ntype Order = { readonly id: number; readonly driver?: { readonly name: string } };\n\n/** An Order's delivery driver is the app's own noun, not the SqlDriver: nothing to report. */\nexport function useOrderModel(order: Order): { readonly driverName: string; readonly isSaved: boolean } {\n  const { database } = useAppData();\n  return { driverName: order.driver?.name ?? '', isSaved: database.isPersistent };\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-helper-own-transaction-loop": {
+    "expect": ["check-persistence:", "RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "A helper that holds its own driver.transaction around a loop of run() calls, called alone from a method: fully covered, never a transaction-write finding.",
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "function listWrites(\n",
+          "with": "/** Deletes each list with its tasks, every statement inside one transaction of its own. */\nfunction deleteListRows(driver: SqlDriver, ids: readonly number[]): number {\n  let changes = 0;\n  driver.transaction(() => {\n    for (const id of ids) {\n      driver.run(DELETE_TASKS_OF_LIST_SQL, [id]);\n      changes += driver.run(DELETE_LIST_SQL, [id]).changes;\n    }\n  });\n  return changes;\n}\n\nfunction listWrites(\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "        driver.transaction(() => {\n          driver.run(DELETE_TASKS_OF_LIST_SQL, [id]);\n          changes = driver.run(DELETE_LIST_SQL, [id]).changes;\n        });",
+          "with": "        changes = deleteListRows(driver, [id]);"
+        }
+      }
+    ]
+  },
+  "pass-installed-skills-ignored": {
+    "expect": ["check-persistence:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/planted/SKILL.md",
+          "content": "---\nname: planted\ndescription: Plants findings that must stay silent.\n---\n"
+        }
+      },
+      {
+        "write": {
+          "file": ".agents/skills/planted/templates/src/stores/cache.ts",
+          "content": "import AsyncStorage from '@react-native-async-storage/async-storage';\nimport { openDatabaseSync } from 'expo-sqlite';\nexport const SQL = 'DELETE FROM tasks';\nexport { AsyncStorage, openDatabaseSync };\n"
+        }
+      },
+      {
+        "write": {
+          "file": "skills/other/SKILL.md",
+          "content": "---\nname: other\ndescription: Another installed skill.\n---\n"
+        }
+      },
+      {
+        "write": {
+          "file": "skills/other/src/features/x/form.ts",
+          "content": "import { z } from 'zod';\nexport const X = z.string();\n"
+        }
+      },
+      {
+        "write": {
+          "file": "vendor/kit/SKILL.md",
+          "content": "---\nname: kit\ndescription: A vendored skill folder.\n---\n"
+        }
+      },
+      {
+        "write": {
+          "file": "vendor/kit/src/features/y/query.ts",
+          "content": "export const Q = 'SELECT id FROM lists';\n"
+        }
+      }
+    ]
+  },
+  "pass-kv-store-only": {
+    "expect": [
+      "NOT APPLICABLE: no app database: no contracts/persistence.json, no src/data/, and expo-sqlite is not imported, or only as expo-sqlite/kv-store or expo-sqlite/localStorage/install (preferences); the repo-wide rules passed"
+    ],
+    "ops": [
+      { "delete": ["src/data", "test/sqlite", "contracts", "src/services/error-log/sqlite-error-log-adapter.ts"] },
+      {
+        "write": {
+          "file": "src/app/_layout.tsx",
+          "content": "// src/app/_layout.tsx: the root layout of a preferences-only app (a stand-in: never compiled).\nimport { Stack } from 'expo-router';\n\nexport default function RootLayout(): React.JSX.Element {\n  return <Stack />;\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/preferences/kv-preferences-adapter.ts",
+          "content": "// src/services/preferences/kv-preferences-adapter.ts: small preferences in expo-sqlite's key-value store.\nimport Storage from 'expo-sqlite/kv-store';\n\nimport type { PreferencesPort } from '@/services/preferences/preferences-port';\n\nexport function createKvPreferencesAdapter(): PreferencesPort {\n  return {\n    theme: () => Storage.getItemSync('theme'),\n    setTheme: (theme) => {\n      Storage.setItemSync('theme', theme);\n    },\n  };\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-legacy-import": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/persistence.json",
+          "path": ["legacyImports"],
+          "value": ["src/data/import-legacy-preferences.ts"]
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["dependencies", "@react-native-async-storage/async-storage"],
+          "value": "2.2.0"
+        }
+      },
+      {
+        "write": {
+          "file": "src/data/import-legacy-preferences.ts",
+          "lines": [
+            "// src/data/import-legacy-preferences.ts: copies the old AsyncStorage preferences into the app database once (removed after two releases).",
+            "import AsyncStorage from '@react-native-async-storage/async-storage';",
+            "",
+            "export async function readLegacyTheme(): Promise<string | null> {",
+            "  return AsyncStorage.getItem('theme');",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-localstorage-polyfill": {
+    "expect": [
+      "NOT APPLICABLE: no app database: no contracts/persistence.json, no src/data/, and expo-sqlite is not imported, or only as expo-sqlite/kv-store or expo-sqlite/localStorage/install (preferences); the repo-wide rules passed"
+    ],
+    "ops": [
+      { "delete": ["src/data", "test/sqlite", "contracts", "src/services/error-log/sqlite-error-log-adapter.ts"] },
+      {
+        "write": {
+          "file": "src/app/_layout.tsx",
+          "content": "// src/app/_layout.tsx: the root layout of a preferences-only app (a stand-in: never compiled); the localStorage install sits in the adapter, not here.\nimport { Stack } from 'expo-router';\n\nexport default function RootLayout(): React.JSX.Element {\n  return <Stack />;\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/preferences/local-storage-preferences-adapter.ts",
+          "content": "// src/services/preferences/local-storage-preferences-adapter.ts: small preferences in the global localStorage (expo-sqlite's kv-store).\nimport 'expo-sqlite/localStorage/install';\n\nimport type { PreferencesPort } from '@/services/preferences/preferences-port';\n\n/** The install is this file's first import: the global exists before any read, and only this adapter imports the SDK. */\nexport function createLocalStoragePreferencesAdapter(): PreferencesPort {\n  return {\n    theme: () => localStorage.getItem('theme'),\n    setTheme: (theme) => {\n      localStorage.setItem('theme', theme);\n    },\n  };\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-not-applicable": {
+    "expect": ["NOT APPLICABLE: package.json lists no local persistence package (expo-sqlite, AsyncStorage, MMKV, ...)"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo-sqlite"], "delete": true } }]
+  },
+  "pass-parse-helper": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "function taskWrites(",
+          "with": "/** Validation in a helper the method calls first counts as validation. */\nfunction parseNewTask(input: unknown): v.SafeParseResult<typeof NEW_TASK> {\n  return v.safeParse(NEW_TASK, input);\n}\n\nfunction taskWrites("
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "      const parsed = v.safeParse(NEW_TASK, input);",
+          "with": "      const parsed = parseNewTask(input);"
+        }
+      }
+    ]
+  },
+  "pass-prose-not-sql": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/task-help.ts",
+          "content": "// src/features/tasks/task-help.ts\n/** Prose that shares words with SQL names no table of the app: never reported. */\nexport const TASK_HELP = [\n  'Select a task from the list to see its details.',\n  'Delete from this device only; your other lists stay.',\n  'Update the list name, then set a colour.',\n] as const;\n"
+        }
+      }
+    ]
+  },
+  "pass-read-shapes": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "const SET_DONE_SQL = 'UPDATE tasks SET is_done = ? WHERE id = ?';\n",
+          "with": "const SET_DONE_SQL = 'UPDATE tasks SET is_done = ? WHERE id = ?';\nconst SELECT_TASK_SQL = 'SELECT id, list_id, title, is_done, created_at_ms FROM tasks WHERE id = ?';\nconst COUNT_TASKS_SQL = 'SELECT COUNT(*) AS n FROM tasks WHERE list_id = ?';\nconst RENAME_TASK_SQL = 'UPDATE tasks SET title = ? WHERE id = ?';\nconst COUNT_ROW = v.strictObject({ n: v.number() });\nconst parseTaskRow = v.safeParser(TASK_ROW);\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "function readMethods(",
+          "with": "/** Hands back the rows unchecked: every caller passes them through a row schema. */\nfunction taskRowsOf(driver: SqlDriver, listId: number): readonly SqlRow[] {\n  return driver.all(SELECT_TASKS_SQL, [listId]);\n}\n\nfunction readMethods("
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "    tasksOf: (listId) =>",
+          "with": "    taskAt: (taskId: number) =>\n      attempt(() => {\n        const row = driver.get(SELECT_TASK_SQL, [taskId]);\n        const parsed = v.safeParse(TASK_ROW, row);\n        return parsed.success ? TASKS.toItem(parsed.output) : null;\n      }, fail),\n    countOf: (listId: number) =>\n      attempt(() => {\n        const counted = v.safeParse(COUNT_ROW, driver.get(COUNT_TASKS_SQL, [listId]));\n        return counted.success ? counted.output.n : 0;\n      }, fail),\n    titlesOf: (listId: number) =>\n      attempt(\n        () =>\n          driver.all(SELECT_TASKS_SQL, [listId]).flatMap((row) => {\n            const parsed = v.safeParse(TASK_ROW, row);\n            return parsed.success ? [parsed.output.title] : [];\n          }),\n        fail,\n      ),\n    checkedRowsOf: (listId: number) =>\n      attempt(() => driver.all(SELECT_TASKS_SQL, [listId]).map(parseTaskRow), fail),\n    doneOf: (listId: number) =>\n      attempt(() => {\n        const done: Task[] = [];\n        for (const row of taskRowsOf(driver, listId)) {\n          const parsed = parseTaskRow(row);\n          if (parsed.success && parsed.output.is_done === 1) done.push(TASKS.toItem(parsed.output));\n        }\n        return done;\n      }, fail),\n    viaHelperOf: (listId: number) =>\n      attempt(() => readableRows(TASKS, taskRowsOf(driver, listId), errorLog), fail),\n    tasksOf: (listId) =>"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "    setDone: (taskId, isDone) => {",
+          "with": "    renameTask: (taskId: number, title: string) => {\n      const input = v.safeParse(NEW_TASK, { listId: 1, title });\n      if (!input.success) return err(invalidInput(input.issues));\n      const current = v.safeParse(TASK_ROW, driver.get(SELECT_TASK_SQL, [taskId]));\n      if (!current.success) return err({ kind: 'task-not-found', taskId });\n      return attempt(\n        () => driver.run(RENAME_TASK_SQL, [input.output.title, current.output.id]).changes,\n        taskFailureOf(errorLog),\n      );\n    },\n    setDone: (taskId, isDone) => {"
+        }
+      }
+    ]
+  },
+  "pass-root-layout-not-yet-created": {
+    "expect": [
+      "SKIP src/app/_layout.tsx [no-background-checkpoint] not yet created (app-startup-and-bootstrap creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "src/app/_layout.tsx" }]
+  },
+  "pass-sql-allowed-module": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/database-stats.ts",
+          "content": "// src/data/database-stats.ts: the file's size for the debug menu (an infrastructure read the contract allows).\nimport type { SqlDriver } from '@/data/sql-driver';\n\nexport function databasePages(driver: SqlDriver): number {\n  return Number(driver.get('PRAGMA page_count', [])?.['page_count'] ?? 0);\n}\n"
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/persistence.json",
+          "path": ["sqlAllowed"],
+          "value": ["src/data/database-stats.ts"]
+        }
+      }
+    ]
+  },
+  "pass-sql-literal-concatenation": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/tasks/sqlite-task-repository.ts",
+          "find": "const SELECT_LISTS_SQL = 'SELECT id, name, created_at_ms FROM lists ORDER BY name, id';",
+          "with": "const SELECT_LISTS_SQL =\n  'SELECT id, name, created_at_ms ' +\n  'FROM lists ORDER BY name, id';"
+        }
+      }
+    ]
+  },
+  "pass-web-direction-local-storage": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/i18n/direction.web.ts",
+          "content": "// src/i18n/direction.web.ts\nconst KEY = 'app.layout-direction';\n\nexport function readForcedDirection(): string | null {\n  return window.localStorage.getItem(KEY);\n}\n"
+        }
+      }
+    ]
+  }
+}

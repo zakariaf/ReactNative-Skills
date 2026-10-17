@@ -1,0 +1,541 @@
+{
+  "$comment": "Expected RESOLVED quality gates, checked by scripts/quality/check-quality-gates.ts (npm run verify). Change only together with the gate itself and a Gate-Change: commit trailer.",
+  "eslint": {
+    "linterOptions": {
+      "noInlineConfig": true,
+      "reportUnusedDisableDirectives": 2,
+      "reportUnusedInlineConfigs": 2
+    },
+    "ruleSets": {
+      "logic": {
+        "max-lines": [
+          2,
+          {
+            "max": 250,
+            "skipBlankLines": true,
+            "skipComments": true
+          }
+        ],
+        "max-lines-per-function": [
+          2,
+          {
+            "max": 40,
+            "skipBlankLines": true,
+            "skipComments": true,
+            "IIFEs": true
+          }
+        ],
+        "complexity": [
+          2,
+          {
+            "max": 10,
+            "variant": "modified"
+          }
+        ],
+        "sonarjs/cognitive-complexity": [2, 15],
+        "max-depth": [2, 3],
+        "max-params": [2, 3],
+        "max-nested-callbacks": [2, 3],
+        "max-classes-per-file": [2, 1],
+        "@typescript-eslint/no-floating-promises": [
+          2,
+          {
+            "ignoreVoid": false,
+            "ignoreIIFE": false
+          }
+        ],
+        "@typescript-eslint/strict-boolean-expressions": [
+          2,
+          {
+            "allowString": false,
+            "allowNumber": false,
+            "allowNullableObject": true
+          }
+        ],
+        "@typescript-eslint/no-explicit-any": [2],
+        "@typescript-eslint/ban-ts-comment": [
+          2,
+          {
+            "minimumDescriptionLength": 10
+          }
+        ],
+        "import/no-default-export": [2],
+        "no-restricted-properties": [
+          2,
+          {
+            "object": "Math",
+            "property": "random",
+            "message": "Use the seeded RNG (src/core/rng) or an injected random source."
+          },
+          {
+            "object": "Date",
+            "property": "now",
+            "message": "Inject ClockPort (src/services/clock)."
+          },
+          {
+            "object": "performance",
+            "property": "now",
+            "message": "Use the frame timestamp or ClockPort."
+          },
+          {
+            "object": "I18nManager",
+            "property": "isRTL",
+            "message": "Read direction from DirectionContext."
+          }
+        ]
+      },
+      "component": {
+        "max-lines-per-function": [
+          2,
+          {
+            "max": 80,
+            "skipBlankLines": true,
+            "skipComments": true,
+            "IIFEs": true
+          }
+        ],
+        "react/jsx-max-depth": [
+          2,
+          {
+            "max": 5
+          }
+        ],
+        "react/no-multi-comp": [
+          2,
+          {
+            "ignoreStateless": false
+          }
+        ],
+        "react/jsx-no-literals": [
+          2,
+          {
+            "noStrings": true,
+            "ignoreProps": true,
+            "noAttributeStrings": false
+          }
+        ],
+        "react-native/no-inline-styles": [2],
+        "react-native/no-color-literals": [2],
+        "react-hooks/exhaustive-deps": [2]
+      },
+      "test": {
+        "max-lines": [
+          2,
+          {
+            "max": 400,
+            "skipBlankLines": true,
+            "skipComments": true
+          }
+        ],
+        "max-nested-callbacks": [2, 4],
+        "jest/expect-expect": [
+          2,
+          {
+            "assertFunctionNames": ["expect", "fc.assert"]
+          }
+        ],
+        "jest/no-identical-title": [2],
+        "jest/no-focused-tests": [2],
+        "jest/no-disabled-tests": [2],
+        "jest/valid-title": [
+          2,
+          {
+            "mustMatch": {
+              "it": "^(can|[a-z]+s)\\b"
+            }
+          }
+        ]
+      }
+    },
+    "probes": {
+      "src/core/gate-probe.ts": "logic",
+      "src/features/gate-probe/gate-probe.ts": "logic",
+      "src/ui/gate-probe.tsx": "component",
+      "src/ui/gate-probe.test.tsx": "test"
+    }
+  },
+  "typescript": {
+    "shared": {
+      "strict": true,
+      "noUncheckedIndexedAccess": true,
+      "exactOptionalPropertyTypes": true,
+      "noImplicitOverride": true,
+      "noImplicitReturns": true,
+      "noFallthroughCasesInSwitch": true,
+      "noPropertyAccessFromIndexSignature": true,
+      "erasableSyntaxOnly": true,
+      "verbatimModuleSyntax": true,
+      "isolatedModules": true,
+      "useUnknownInCatchVariables": true,
+      "allowUnreachableCode": false,
+      "allowUnusedLabels": false,
+      "forceConsistentCasingInFileNames": true,
+      "customConditions": ["react-native-strict-api", "react-native"]
+    },
+    "projects": {
+      "tsconfig.json": {
+        "types": ["jest", "node"]
+      },
+      "src/tsconfig.json": {
+        "types": ["jest"]
+      }
+    }
+  },
+  "jest": {
+    "coverageThreshold": {
+      "global": {
+        "statements": 90,
+        "lines": 90,
+        "functions": 90,
+        "branches": 85
+      },
+      "./src/core/": {
+        "statements": 95,
+        "lines": 95,
+        "functions": 95,
+        "branches": 90
+      },
+      "./src/data/": {
+        "statements": 95,
+        "lines": 95,
+        "functions": 95,
+        "branches": 90
+      },
+      "./src/games/*/rules/**/*.ts": {
+        "statements": 95,
+        "lines": 95,
+        "functions": 95,
+        "branches": 90
+      }
+    },
+    "collectCoverageFrom": [
+      "src/**/*.{ts,tsx}",
+      "!**/*.{test,golden.test,sim.test}.{ts,tsx}",
+      "!**/*.d.ts",
+      "!**/fixtures/**",
+      "!**/testing/**"
+    ],
+    "projects": {
+      "unit": {
+        "roots": ["<rootDir>"],
+        "testMatch": [
+          "<rootDir>/src/**/*.test.{ts,tsx}",
+          "<rootDir>/scripts/**/*.test.{ts,tsx}",
+          "<rootDir>/plugins/**/*.test.{ts,tsx}",
+          "<rootDir>/test/**/*.test.{ts,tsx}"
+        ],
+        "testPathIgnorePatterns": [
+          "/node_modules/",
+          "<rootDir>/(ios|android|build|dist|web-build)/",
+          "<rootDir>/(coverage|reports|skills|\\.stryker-tmp|\\.skill-tooling)/",
+          "<rootDir>/\\.(agents|claude|codex|cursor|windsurf|roo|cline|continue|kiro)/",
+          "\\.golden\\.test\\.",
+          "\\.sim\\.test\\.",
+          "\\.android\\.test\\."
+        ],
+        "modulePathIgnorePatterns": [
+          "<rootDir>/(ios|android|build|dist|web-build)/",
+          "<rootDir>/(coverage|reports|skills|\\.stryker-tmp|\\.skill-tooling)/",
+          "<rootDir>/\\.(agents|claude|codex|cursor|windsurf|roo|cline|continue|kiro)/"
+        ]
+      },
+      "android": {
+        "roots": ["<rootDir>"],
+        "testMatch": [
+          "<rootDir>/src/**/*.android.test.{ts,tsx}",
+          "<rootDir>/scripts/**/*.android.test.{ts,tsx}",
+          "<rootDir>/plugins/**/*.android.test.{ts,tsx}",
+          "<rootDir>/test/**/*.android.test.{ts,tsx}"
+        ],
+        "testPathIgnorePatterns": [
+          "/node_modules/",
+          "<rootDir>/(ios|android|build|dist|web-build)/",
+          "<rootDir>/(coverage|reports|skills|\\.stryker-tmp|\\.skill-tooling)/",
+          "<rootDir>/\\.(agents|claude|codex|cursor|windsurf|roo|cline|continue|kiro)/"
+        ],
+        "modulePathIgnorePatterns": [
+          "<rootDir>/(ios|android|build|dist|web-build)/",
+          "<rootDir>/(coverage|reports|skills|\\.stryker-tmp|\\.skill-tooling)/",
+          "<rootDir>/\\.(agents|claude|codex|cursor|windsurf|roo|cline|continue|kiro)/"
+        ]
+      },
+      "golden": {
+        "roots": ["<rootDir>"],
+        "testMatch": [
+          "<rootDir>/src/**/*.golden.test.ts",
+          "<rootDir>/scripts/**/*.golden.test.ts",
+          "<rootDir>/plugins/**/*.golden.test.ts",
+          "<rootDir>/test/**/*.golden.test.ts"
+        ],
+        "testPathIgnorePatterns": [
+          "/node_modules/",
+          "<rootDir>/(ios|android|build|dist|web-build)/",
+          "<rootDir>/(coverage|reports|skills|\\.stryker-tmp|\\.skill-tooling)/",
+          "<rootDir>/\\.(agents|claude|codex|cursor|windsurf|roo|cline|continue|kiro)/"
+        ],
+        "modulePathIgnorePatterns": [
+          "<rootDir>/(ios|android|build|dist|web-build)/",
+          "<rootDir>/(coverage|reports|skills|\\.stryker-tmp|\\.skill-tooling)/",
+          "<rootDir>/\\.(agents|claude|codex|cursor|windsurf|roo|cline|continue|kiro)/"
+        ]
+      }
+    }
+  },
+  "npmScripts": {
+    "verify": "node scripts/quality/run-verify.ts",
+    "check:fast": "prettier --check . --log-level warn && eslint . --max-warnings 0 --cache --cache-strategy content --cache-location node_modules/.cache/eslint/ && npm run -s typecheck && jest --ci --onlyChanged --passWithNoTests",
+    "format:check": "prettier --check . --log-level warn",
+    "lint": "eslint . --max-warnings 0",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p src/tsconfig.json",
+    "test": "jest --ci",
+    "test:coverage": "jest --ci --coverage --randomize",
+    "test:sim": "jest --ci --config jest.sim.config.js",
+    "test:golden": "jest --ci --selectProjects golden",
+    "check:unused": "knip",
+    "i18n:verify": "node scripts/i18n/verify-catalogs.ts",
+    "export:audit": "APP_VARIANT=production EXPO_PUBLIC_APP_VARIANT=production expo export --platform ios --platform android --source-maps --output-dir dist-audit",
+    "audit:licenses": "node scripts/audit/audit-licenses.ts",
+    "check:deps": "node scripts/deps/check-deps.ts"
+  },
+  "verifyExtraSteps": [],
+  "claudeSettings": {
+    "permissions": {
+      "deny": [
+        "Read(~/.appstoreconnect/**)",
+        "Read(**/*.p8)",
+        "Read(**/AuthKey_*)",
+        "Read(**/*.p12)",
+        "Read(**/*.mobileprovision)",
+        "Read(**/*.keystore)",
+        "Read(**/*.jks)",
+        "Read(**/credentials.json)",
+        "Read(**/*service-account*.json)",
+        "Read(**/key.properties)",
+        "Read(**/keystore.properties)",
+        "Bash(git commit *--no-verify*)",
+        "Bash(git commit -n*)",
+        "Bash(git commit * -n*)",
+        "Bash(git push *--no-verify*)"
+      ],
+      "ask": [
+        "Edit(/eslint.config.mjs)",
+        "Edit(/quality-gates.json)",
+        "Edit(/lefthook.yml)",
+        "Edit(/knip.json)",
+        "Edit(/.prettierrc.json)",
+        "Edit(/.npmrc)",
+        "Edit(/jest.config.js)",
+        "Edit(/jest.sim.config.js)",
+        "Edit(/stryker.config.json)",
+        "Edit(/tsconfig*.json)",
+        "Edit(/src/tsconfig.json)",
+        "Edit(/.prettierignore)",
+        "Edit(/babel.config.js)",
+        "Edit(/jest.setup.ts)",
+        "Edit(/contracts/knip-ignores.json)",
+        "Edit(/scripts/quality/check-quality-gates.ts)",
+        "Edit(/scripts/quality/gate-diff.ts)",
+        "Edit(/scripts/quality/gated-paths.ts)",
+        "Edit(/scripts/quality/verify-plan.ts)",
+        "Edit(/scripts/quality/run-verify.ts)",
+        "Edit(/scripts/quality/device-only.ts)",
+        "Edit(/scripts/hooks/**)",
+        "Edit(/.claude/settings.json)",
+        "Edit(/.claude/settings.local.json)"
+      ]
+    },
+    "hooks": {
+      "PostToolUse": [
+        {
+          "matcher": "Edit|Write",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "node \"$(git rev-parse --show-toplevel)/scripts/hooks/after-edit.ts\"",
+              "timeout": 120
+            }
+          ]
+        }
+      ],
+      "Stop": [
+        {
+          "hooks": [
+            {
+              "type": "command",
+              "command": "cd \"$(git rev-parse --show-toplevel)\" && npm run -s check:fast 1>&2 || exit 2",
+              "timeout": 600
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "knip": {
+    "rules": {
+      "files": "error",
+      "dependencies": "error",
+      "devDependencies": "error",
+      "optionalPeerDependencies": "error",
+      "unlisted": "error",
+      "binaries": "error",
+      "unresolved": "error",
+      "exports": "error",
+      "nsExports": "error",
+      "types": "error",
+      "nsTypes": "error",
+      "enumMembers": "error",
+      "namespaceMembers": "error",
+      "duplicates": "error",
+      "catalog": "error",
+      "catalogReferences": "error",
+      "cycles": "error"
+    }
+  },
+  "lefthook": {
+    "pre-commit": {
+      "parallel": true,
+      "jobs": [
+        {
+          "name": "no-secrets",
+          "run": "echo \"Refusing to commit a secret or signing file:\" {staged_files} >&2; exit 1",
+          "glob": [
+            "*.p8",
+            "*.p12",
+            "*.mobileprovision",
+            "*.keystore",
+            "*.jks",
+            "AuthKey_*",
+            "**/AuthKey_*",
+            "ApiKey_*",
+            "**/ApiKey_*",
+            "*.pem",
+            "credentials.json",
+            "**/credentials.json",
+            "*service-account*.json",
+            "**/*service-account*.json",
+            "key.properties",
+            "**/key.properties",
+            "keystore.properties",
+            "**/keystore.properties",
+            ".env*",
+            "**/.env*"
+          ],
+          "exclude": [".env.example", "**/.env.example"]
+        },
+        {
+          "name": "format",
+          "run": "npx prettier --check {staged_files}",
+          "glob": ["*.{ts,tsx,js,mjs,cjs,json,md,yml,yaml}"]
+        },
+        {
+          "name": "lint",
+          "run": "npx eslint --max-warnings 0 --no-warn-ignored {staged_files}",
+          "glob": ["*.{ts,tsx,js,mjs,cjs}"]
+        },
+        {
+          "name": "typecheck",
+          "run": "npm run -s typecheck",
+          "glob": ["*.{ts,tsx,json}"]
+        },
+        {
+          "name": "test-related",
+          "run": "npx jest --ci --bail --findRelatedTests --passWithNoTests {staged_files}",
+          "glob": ["*.{ts,tsx,json}"]
+        }
+      ]
+    },
+    "commit-msg": {
+      "jobs": [
+        {
+          "name": "commit-message",
+          "run": "node scripts/git/check-commit-message.ts {1}"
+        }
+      ]
+    },
+    "pre-push": {
+      "jobs": [
+        {
+          "name": "verify",
+          "run": "npm run verify"
+        }
+      ]
+    }
+  },
+  "npmrcLines": ["min-release-age=7", "engine-strict=true", "save-exact=true"],
+  "perf": {
+    "coldStartHomeMsMax": 1000,
+    "coldStartSimRegressionFactor": 1.2,
+    "hitchMsPerSecondMax": 10,
+    "frameP95MsMax": 17,
+    "saveWriteP95MsMax": 5,
+    "drawCallsPerFrameMax": 1000,
+    "bundleJsBytesMax": 6000000,
+    "bundleGrowthMaxRatio": 1.1,
+    "memoryFootprintMbMax": 150,
+    "skiaCanvasesPerScreenMax": 8
+  },
+  "a11y": {
+    "minTouchPt": 44,
+    "maxFontScale": 2,
+    "textContrastMin": 4.5,
+    "nonTextContrastMin": 3,
+    "minCvdDistanceOk": 0.07
+  },
+  "gatedPaths": [
+    "quality-gates.json",
+    "eslint.config.mjs",
+    "tsconfig.base.json",
+    "tsconfig.json",
+    "src/tsconfig.json",
+    "tsconfig.stryker.json",
+    "src/app-env.d.ts",
+    "jest.config.js",
+    "jest.sim.config.js",
+    "jest.setup.ts",
+    "babel.config.js",
+    "stryker.config.json",
+    "knip.json",
+    "lefthook.yml",
+    ".prettierrc.json",
+    ".prettierignore",
+    ".npmrc",
+    ".claude/settings.json",
+    "contracts/architecture.json",
+    "contracts/dependency-policy.json",
+    "contracts/goldens.json",
+    "contracts/knip-ignores.json",
+    "contracts/seeded-generators.json",
+    "**/*.vectors.json",
+    "src/data/**/fixtures/**",
+    "test/goldens/skia-golden.ts",
+    "**/__snapshots__/*.golden.test.ts.snap",
+    "**/*.golden.test.ts.snap.ios",
+    "**/*.golden.test.ts.snap.android",
+    "**/__image_snapshots__/**",
+    ".maestro/baselines/**",
+    "perf-baselines/**",
+    "contracts/schema-ledger.json",
+    "contracts/network-baseline.json",
+    "contracts/privacy.json",
+    "contracts/levels.json",
+    "src/games/*/levels/pack-*.json",
+    "design/parity/waivers.json",
+    "design/parity/manifest.json",
+    "design/parity/fixture.json",
+    "design/parity/mockup/**",
+    "design/parity/devices/**",
+    "design/parity/iphone-16-pro/**",
+    "design/parity/android-parity/**",
+    ".github/workflows/**",
+    ".github/dependabot.yml",
+    "scripts/e2e/install-maestro.sh",
+    "scripts/e2e/screenshot-compare.ts",
+    "scripts/quality/check-quality-gates.ts",
+    "scripts/quality/gate-diff.ts",
+    "scripts/quality/gated-paths.ts",
+    "scripts/quality/verify-plan.ts",
+    "scripts/quality/run-verify.ts",
+    "scripts/quality/device-only.ts",
+    "scripts/hooks/after-edit.ts"
+  ]
+}

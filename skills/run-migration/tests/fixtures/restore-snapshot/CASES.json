@@ -1,0 +1,104 @@
+{
+  "bad-damaged-snapshot": {
+    "expect": ["FAIL app.db.v1.bak:1 [snapshot-health] app.db.v1.bak is not a healthy database at version 1"],
+    "ops": [
+      {
+        "write": { "file": "db/app.db.v1.bak", "content": "this is not a database, only text left by a killed copy\n" }
+      }
+    ]
+  },
+  "bad-snapshot-version": {
+    "expect": [
+      "FAIL app.db.v3.bak:1 [snapshot-health] app.db.v3.bak is not a healthy database at version 3 (quick_check: ok, user_version: 1)"
+    ],
+    "ops": [{ "copy": { "from": "db/app.db.v1.bak", "to": "db/app.db.v3.bak" } }]
+  },
+  "error-booted": {
+    "expect": ["ERROR [bad-input] --udid booted does not name one simulator"],
+    "args": "--udid booted --bundle-id com.acme.tasks",
+    "ops": []
+  },
+  "error-from-missing": {
+    "expect": ["ERROR [bad-input] no app.db.v7.bak in"],
+    "args": "--dir {dir}/db --from 7",
+    "ops": []
+  },
+  "error-no-database": { "expect": ["ERROR [bad-input] no app.db in"], "ops": [{ "delete": "db/app.db" }] },
+  "error-no-snapshot": {
+    "expect": ["ERROR [bad-input] no snapshot app.db.v<N>.bak in"],
+    "ops": [{ "delete": "db/app.db.v1.bak" }]
+  },
+  "error-no-target": { "expect": ["ERROR [bad-input] name exactly one database"], "args": "--yes", "ops": [] },
+  "error-simulator-terminate-fails": {
+    "expect": [
+      "ERROR [bad-input] xcrun simctl terminate 0A1B2C3D-0000-4000-8000-0000000000AA com.acme.tasks failed: Unable to lookup in current state: Shutdown"
+    ],
+    "args": "--udid 0A1B2C3D-0000-4000-8000-0000000000AA --bundle-id com.acme.tasks --yes",
+    "ops": [{ "write": { "file": "device-stub.json", "lines": ["{ \"terminate\": \"error\" }"] } }]
+  },
+  "error-two-targets": {
+    "expect": ["ERROR [bad-input] name exactly one database"],
+    "args": "--dir {dir}/db --serial emulator-5554 --package com.acme.tasks",
+    "ops": []
+  },
+  "pass-emulator-restore": {
+    "expect": [
+      "PLAN stop the app: adb -s emulator-5554 shell am force-stop com.acme.tasks",
+      "PLAN move app.db (user_version 2) into kept-",
+      "STOPPED com.acme.tasks force-stopped on emulator-5554",
+      "RESTORED app.db from app.db.v1.bak (user_version 1)",
+      "RESULT: PASS"
+    ],
+    "args": "--serial emulator-5554 --package com.acme.tasks --yes",
+    "ops": []
+  },
+  "pass-pick-from": {
+    "expect": ["PLAN copy app.db.v1.bak (user_version 1, quick_check ok) over app.db"],
+    "args": "--dir {dir}/db --from 1",
+    "ops": [{ "copy": { "from": "db/app.db.v1.bak", "to": "db/app.db.v3.bak" } }]
+  },
+  "pass-repo-root-positional": {
+    "expect": [
+      "PLAN copy app.db.v1.bak (user_version 1, quick_check ok) over app.db",
+      "STOP: restoring discards",
+      "RESULT: PASS"
+    ],
+    "args": "{dir} --dir db",
+    "ops": []
+  },
+  "pass-restore": {
+    "expect": [
+      "RESTORED app.db from app.db.v1.bak (user_version 1)",
+      "NEXT launch only a build whose steps after v1 are fixed"
+    ],
+    "args": "--dir {dir}/db --yes",
+    "ops": []
+  },
+  "pass-simulator-app-not-running": {
+    "expect": [
+      "PLAN stop the app: xcrun simctl terminate 0A1B2C3D-0000-4000-8000-0000000000AA com.acme.tasks",
+      "STOPPED com.acme.tasks was not running on 0A1B2C3D-0000-4000-8000-0000000000AA (nothing to terminate)",
+      "RESTORED app.db from app.db.v1.bak (user_version 1)",
+      "RESULT: PASS"
+    ],
+    "args": "--udid 0A1B2C3D-0000-4000-8000-0000000000AA --bundle-id com.acme.tasks --yes",
+    "ops": []
+  },
+  "pass-simulator-app-running": {
+    "expect": [
+      "STOPPED com.acme.tasks terminated on 0A1B2C3D-0000-4000-8000-0000000000AA",
+      "RESTORED app.db from app.db.v1.bak (user_version 1)",
+      "RESULT: PASS"
+    ],
+    "args": "--udid 0A1B2C3D-0000-4000-8000-0000000000AA --bundle-id com.acme.tasks --yes",
+    "ops": [{ "write": { "file": "device-stub.json", "lines": ["{ \"terminate\": \"running\" }"] } }]
+  },
+  "pass-wal-moved-aside": {
+    "expect": [
+      "PLAN move app.db, app.db-wal (user_version 2) into kept-",
+      "RESTORED app.db from app.db.v1.bak (user_version 1)"
+    ],
+    "args": "--dir {dir}/db --yes",
+    "ops": [{ "write": { "file": "db/app.db-wal", "content": "a leftover write-ahead log\n" } }]
+  }
+}

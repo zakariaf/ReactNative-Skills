@@ -1,0 +1,12 @@
+[
+  { "from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs" },
+  { "from": "scripts/lib/ts-literal.mjs", "to": "scripts/lib/ts-literal.mjs" },
+  { "from": "scripts/lib/app-modules.mjs", "to": "scripts/lib/app-modules.mjs" },
+  { "from": "repo-templates/__mocks__/react-native-audio-api.ts", "to": "templates/__mocks__/react-native-audio-api.ts" },
+  { "from": "repo-templates/src/ui/press-feedback-context.tsx", "to": "templates/src/ui/press-feedback-context.tsx" },
+  { "from": "repo-templates/src/ui/press-feedback-context.test.tsx", "to": "templates/src/ui/press-feedback-context.test.tsx" },
+  { "from": "repo-templates/src/hooks/use-is-app-active.ts", "to": "templates/src/hooks/use-is-app-active.ts" },
+  { "from": "repo-templates/src/hooks/use-is-app-active.test.ts", "to": "templates/src/hooks/use-is-app-active.test.ts" },
+  { "from": "repo-templates/src/core/rng/sfc32.ts", "to": "templates/src/core/rng/sfc32.ts" },
+  { "from": "repo-templates/src/core/rng/sfc32.test.ts", "to": "templates/src/core/rng/sfc32.test.ts" }
+]

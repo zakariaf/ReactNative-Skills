@@ -1,0 +1,68 @@
+{
+  "base": [
+    "@tests/bases/app",
+    {
+      "templates": true,
+      "firstLinePath": true,
+      "fill": {
+        "__SIMULATOR_PREFIX__": "tasks",
+        "__APP_ID__": "com.acme.tasks"
+      }
+    }
+  ],
+  "ops": [
+    {
+      "json": {
+        "file": "contracts/ios-sim-build.json",
+        "path": [
+          "postPrebuild"
+        ],
+        "value": [
+          "audit:privacy"
+        ]
+      }
+    },
+    {
+      "write": {
+        "file": ".agents/skills/decoy/SKILL.md",
+        "content": "---\nname: decoy\ndescription: Planted findings that every scan must skip.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": ".agents/skills/decoy/scripts/reset.sh",
+        "content": "xcrun simctl erase all\nsudo xcode-select -s /Applications/Xcode.app\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/decoy/SKILL.md",
+        "content": "---\nname: decoy\ndescription: Planted findings that every scan must skip.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/decoy/reset.sh",
+        "content": "xcrun simctl shutdown all\nadb shell pm clear com.acme.tasks\n"
+      }
+    },
+    {
+      "write": {
+        "file": "scripts/vendor/kit/SKILL.md",
+        "content": "---\nname: decoy\ndescription: Planted findings that every scan must skip.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "scripts/vendor/kit/boot.ts",
+        "content": "spawnSync('xcrun', ['simctl', 'create', 'Vendor Phone', 'iPhone 17', 'x']);\nspawnSync('maestro', ['test', 'flow.yaml']);\n"
+      }
+    },
+    {
+      "write": {
+        "file": "ios/scripts/reset.sh",
+        "content": "xcrun simctl delete all\n"
+      }
+    }
+  ]
+}

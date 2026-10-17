@@ -1,0 +1,1 @@
+FAIL package-lock.json:1 [install-matches-lock] jest-image-snapshot is installed at 6.4.0, the lockfile says 6.5.2

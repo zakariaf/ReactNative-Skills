@@ -1,0 +1,315 @@
+{
+ "frame": "tasks-default",
+ "device": "test-phone",
+ "kind": "phone",
+ "size": {
+  "w": 160,
+  "h": 300
+ },
+ "background": "#FFFFFF",
+ "palettes": {
+  "dark": {
+   "#FFFFFF": "#111418",
+   "#1A1D23": "#F2F4F7",
+   "#F2F4F7": "#1E232B",
+   "#C9D1DC": "#3A4250",
+   "#4A5160": "#B8BFCC",
+   "#6B7280": "#9AA3B2",
+   "#2F6FED": "#5B8DF6",
+   "#1B3F8A": "#9DB8F9",
+   "#0B0D12": "#000000",
+   "#E8EEF9": "#202A3A",
+   "#C62828": "#FF8A80",
+   "#7A8599": "#5A6577"
+  }
+ },
+ "renders": [
+  {
+   "theme": "light",
+   "lang": "en"
+  }
+ ],
+ "elements": [
+  {
+   "testID": "tasks.screen",
+   "rect": [
+    0,
+    0,
+    160,
+    300
+   ]
+  },
+  {
+   "testID": "tasks.title",
+   "rect": [
+    12,
+    24,
+    70,
+    18
+   ],
+   "runs": [
+    {
+     "text": "Tasks",
+     "box": [
+      12,
+      24,
+      48,
+      18
+     ],
+     "color": "#1A1D23",
+     "font": "700 14px Demo Sans",
+     "ink": [
+      12,
+      27,
+      46,
+      12
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "tasks.add-button",
+   "rect": [
+    94,
+    22,
+    54,
+    22
+   ],
+   "fill": "#2F6FED",
+   "border": {
+    "w": 2,
+    "color": "#1B3F8A"
+   },
+   "label": "Add",
+   "runs": [
+    {
+     "text": "Add",
+     "box": [
+      118,
+      27,
+      24,
+      12
+     ],
+     "color": "#FFFFFF",
+     "font": "700 14px Demo Sans",
+     "ink": [
+      118,
+      29,
+      22,
+      8
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "tasks.add-button.icon",
+   "rect": [
+    99,
+    29,
+    8,
+    8
+   ],
+   "fill": "#FFFFFF"
+  },
+  {
+   "testID": "tasks.summary",
+   "rect": [
+    12,
+    52,
+    136,
+    14
+   ],
+   "runs": [
+    {
+     "text": "3 open",
+     "box": [
+      12,
+      52,
+      40,
+      14
+     ],
+     "color": "#4A5160",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      12,
+      55,
+      38,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "tasks.task-row.milk",
+   "rect": [
+    12,
+    74,
+    136,
+    32
+   ],
+   "fill": "#F2F4F7",
+   "border": {
+    "w": 2,
+    "color": "#C9D1DC"
+   },
+   "label": "Buy milk",
+   "runs": [
+    {
+     "text": "Buy milk",
+     "box": [
+      38,
+      83,
+      70,
+      14
+     ],
+     "color": "#1A1D23",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      38,
+      86,
+      66,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "tasks.task-row.milk.check",
+   "rect": [
+    18,
+    83,
+    14,
+    14
+   ],
+   "fill": "#FFFFFF",
+   "border": {
+    "w": 2,
+    "color": "#2F6FED"
+   }
+  },
+  {
+   "testID": "tasks.task-row.bread",
+   "rect": [
+    12,
+    114,
+    136,
+    32
+   ],
+   "fill": "#F2F4F7",
+   "border": {
+    "w": 2,
+    "color": "#C9D1DC"
+   },
+   "label": "Bake bread",
+   "runs": [
+    {
+     "text": "Bake bread",
+     "box": [
+      38,
+      123,
+      70,
+      14
+     ],
+     "color": "#1A1D23",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      38,
+      126,
+      66,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "tasks.task-row.bread.check",
+   "rect": [
+    18,
+    123,
+    14,
+    14
+   ],
+   "fill": "#FFFFFF",
+   "border": {
+    "w": 2,
+    "color": "#2F6FED"
+   }
+  },
+  {
+   "testID": "tasks.task-row.mail",
+   "rect": [
+    12,
+    154,
+    136,
+    32
+   ],
+   "fill": "#F2F4F7",
+   "border": {
+    "w": 2,
+    "color": "#C9D1DC"
+   },
+   "label": "Send mail",
+   "runs": [
+    {
+     "text": "Send mail",
+     "box": [
+      38,
+      163,
+      70,
+      14
+     ],
+     "color": "#1A1D23",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      38,
+      166,
+      66,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "tasks.task-row.mail.check",
+   "rect": [
+    18,
+    163,
+    14,
+    14
+   ],
+   "fill": "#FFFFFF",
+   "border": {
+    "w": 2,
+    "color": "#2F6FED"
+   }
+  },
+  {
+   "testID": "tasks.footer-note",
+   "rect": [
+    12,
+    250,
+    136,
+    14
+   ],
+   "runs": [
+    {
+     "text": "Synced just now",
+     "box": [
+      12,
+      250,
+      90,
+      14
+     ],
+     "color": "#6B7280",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      12,
+      253,
+      86,
+      9
+     ]
+    }
+   ]
+  }
+ ]
+}

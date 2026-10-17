@@ -1,0 +1,21 @@
+[
+  {
+    "name": "FieldNote",
+    "file": "form/field-note.tsx",
+    "role": "text; the error and the progress note sit in a polite live region",
+    "parts": ["error", "status", "hint"]
+  },
+  {
+    "name": "KeyboardDoneBar",
+    "file": "form/keyboard-done-bar.tsx",
+    "role": "button (Done), shown only while the keyboard is up",
+    "parts": ["done"]
+  },
+  {
+    "name": "TextField",
+    "file": "form/text-field.tsx",
+    "role": "one text field element: label as its name, error or hint as its hint",
+    "parts": ["label", "input"],
+    "notes": "The note parts (.error, .status, .hint) are derived by FieldNote from the same testID."
+  }
+]

@@ -1,0 +1,253 @@
+{
+  "$comment": "The data types and purposes contracts/privacy.json may name, each mapped to Apple's App Privacy label (category > type), the NSPrivacyCollectedDataType constant a pod's PrivacyInfo.xcprivacy uses, and Google Play's Data safety form (category > type). Apple constants verified on 2026-10-14 from Apple's documentation data (re-verify: curl -s https://developer.apple.com/tutorials/data/documentation/bundleresources/app-privacy-configuration/nsprivacycollecteddatatypes/nsprivacycollecteddatatype.json | grep -oE 'NSPrivacyCollectedDataType[A-Za-z]+' | sort -u). Play labels verified the same day from Google's Data safety help page (support.google.com/googleplay/android-developer/answer/10787469); where Play has no exact twin the closest type is named and the reference says so. Types and purposes with apple null exist on Play only: files-and-docs, calendar-events and installed-apps have no Apple twin (when they leave the device, Apple counts them as Other User Content or Other Data Types, so the app declares that type too). Apple has one type for emails and texts, Play has two: emails-or-messages prints Play's Emails, and sms-or-mms (nsType null, so no pod maps to it) prints Play's SMS or MMS under the same Apple type. Photos and videos likewise: photos-or-videos (the pod constant) prints Play's Photos, and videos (nsType null) prints Play's Videos under Apple's one Photos or Videos type; an app that collects both declares both rows. Apple's Performance Data and Other Diagnostic Data both print Play's Diagnostics (Google: the app's performance on the device, such as battery life, loading time, latency and frame rate, or any technical diagnostics), merged into one Data safety line; Play's Other app performance data is left for data no other type covers.",
+  "verified": "2026-10-14",
+  "types": {
+    "name": {
+      "apple": "Contact Info > Name",
+      "nsType": "NSPrivacyCollectedDataTypeName",
+      "play": "Personal info > Name"
+    },
+    "email-address": {
+      "apple": "Contact Info > Email Address",
+      "nsType": "NSPrivacyCollectedDataTypeEmailAddress",
+      "play": "Personal info > Email address"
+    },
+    "phone-number": {
+      "apple": "Contact Info > Phone Number",
+      "nsType": "NSPrivacyCollectedDataTypePhoneNumber",
+      "play": "Personal info > Phone number"
+    },
+    "physical-address": {
+      "apple": "Contact Info > Physical Address",
+      "nsType": "NSPrivacyCollectedDataTypePhysicalAddress",
+      "play": "Personal info > Address"
+    },
+    "other-contact-info": {
+      "apple": "Contact Info > Other User Contact Info",
+      "nsType": "NSPrivacyCollectedDataTypeOtherUserContactInfo",
+      "play": "Personal info > Other info"
+    },
+    "health": {
+      "apple": "Health & Fitness > Health",
+      "nsType": "NSPrivacyCollectedDataTypeHealth",
+      "play": "Health and fitness > Health info"
+    },
+    "fitness": {
+      "apple": "Health & Fitness > Fitness",
+      "nsType": "NSPrivacyCollectedDataTypeFitness",
+      "play": "Health and fitness > Fitness info"
+    },
+    "payment-info": {
+      "apple": "Financial Info > Payment Info",
+      "nsType": "NSPrivacyCollectedDataTypePaymentInfo",
+      "play": "Financial info > User payment info"
+    },
+    "credit-info": {
+      "apple": "Financial Info > Credit Info",
+      "nsType": "NSPrivacyCollectedDataTypeCreditInfo",
+      "play": "Financial info > Credit score"
+    },
+    "other-financial-info": {
+      "apple": "Financial Info > Other Financial Info",
+      "nsType": "NSPrivacyCollectedDataTypeOtherFinancialInfo",
+      "play": "Financial info > Other financial info"
+    },
+    "precise-location": {
+      "apple": "Location > Precise Location",
+      "nsType": "NSPrivacyCollectedDataTypePreciseLocation",
+      "play": "Location > Precise location"
+    },
+    "coarse-location": {
+      "apple": "Location > Coarse Location",
+      "nsType": "NSPrivacyCollectedDataTypeCoarseLocation",
+      "play": "Location > Approximate location"
+    },
+    "sensitive-info": {
+      "apple": "Sensitive Info > Sensitive Info",
+      "nsType": "NSPrivacyCollectedDataTypeSensitiveInfo",
+      "play": "Personal info > Other info"
+    },
+    "contacts": {
+      "apple": "Contacts > Contacts",
+      "nsType": "NSPrivacyCollectedDataTypeContacts",
+      "play": "Contacts > Contacts"
+    },
+    "emails-or-messages": {
+      "apple": "User Content > Emails or Text Messages",
+      "nsType": "NSPrivacyCollectedDataTypeEmailsOrTextMessages",
+      "play": "Messages > Emails"
+    },
+    "sms-or-mms": {
+      "apple": "User Content > Emails or Text Messages",
+      "nsType": null,
+      "play": "Messages > SMS or MMS"
+    },
+    "photos-or-videos": {
+      "apple": "User Content > Photos or Videos",
+      "nsType": "NSPrivacyCollectedDataTypePhotosorVideos",
+      "play": "Photos and videos > Photos"
+    },
+    "videos": {
+      "apple": "User Content > Photos or Videos",
+      "nsType": null,
+      "play": "Photos and videos > Videos"
+    },
+    "audio-data": {
+      "apple": "User Content > Audio Data",
+      "nsType": "NSPrivacyCollectedDataTypeAudioData",
+      "play": "Audio files > Voice or sound recordings"
+    },
+    "gameplay-content": {
+      "apple": "User Content > Gameplay Content",
+      "nsType": "NSPrivacyCollectedDataTypeGameplayContent",
+      "play": "App activity > Other user-generated content"
+    },
+    "customer-support": {
+      "apple": "User Content > Customer Support",
+      "nsType": "NSPrivacyCollectedDataTypeCustomerSupport",
+      "play": "Messages > Other in-app messages"
+    },
+    "other-user-content": {
+      "apple": "User Content > Other User Content",
+      "nsType": "NSPrivacyCollectedDataTypeOtherUserContent",
+      "play": "App activity > Other user-generated content"
+    },
+    "browsing-history": {
+      "apple": "Browsing History > Browsing History",
+      "nsType": "NSPrivacyCollectedDataTypeBrowsingHistory",
+      "play": "Web browsing > Web browsing history"
+    },
+    "search-history": {
+      "apple": "Search History > Search History",
+      "nsType": "NSPrivacyCollectedDataTypeSearchHistory",
+      "play": "App activity > In-app search history"
+    },
+    "user-id": {
+      "apple": "Identifiers > User ID",
+      "nsType": "NSPrivacyCollectedDataTypeUserID",
+      "play": "Personal info > User IDs"
+    },
+    "device-id": {
+      "apple": "Identifiers > Device ID",
+      "nsType": "NSPrivacyCollectedDataTypeDeviceID",
+      "play": "Device or other IDs > Device or other IDs"
+    },
+    "purchase-history": {
+      "apple": "Purchases > Purchase History",
+      "nsType": "NSPrivacyCollectedDataTypePurchaseHistory",
+      "play": "Financial info > Purchase history"
+    },
+    "product-interaction": {
+      "apple": "Usage Data > Product Interaction",
+      "nsType": "NSPrivacyCollectedDataTypeProductInteraction",
+      "play": "App activity > App interactions"
+    },
+    "advertising-data": {
+      "apple": "Usage Data > Advertising Data",
+      "nsType": "NSPrivacyCollectedDataTypeAdvertisingData",
+      "play": "App activity > Other actions"
+    },
+    "other-usage-data": {
+      "apple": "Usage Data > Other Usage Data",
+      "nsType": "NSPrivacyCollectedDataTypeOtherUsageData",
+      "play": "App activity > Other actions"
+    },
+    "crash-data": {
+      "apple": "Diagnostics > Crash Data",
+      "nsType": "NSPrivacyCollectedDataTypeCrashData",
+      "play": "App info and performance > Crash logs"
+    },
+    "performance-data": {
+      "apple": "Diagnostics > Performance Data",
+      "nsType": "NSPrivacyCollectedDataTypePerformanceData",
+      "play": "App info and performance > Diagnostics"
+    },
+    "other-diagnostic-data": {
+      "apple": "Diagnostics > Other Diagnostic Data",
+      "nsType": "NSPrivacyCollectedDataTypeOtherDiagnosticData",
+      "play": "App info and performance > Diagnostics"
+    },
+    "environment-scanning": {
+      "apple": "Surroundings > Environment Scanning",
+      "nsType": "NSPrivacyCollectedDataTypeEnvironmentScanning",
+      "play": "Personal info > Other info"
+    },
+    "hands": {
+      "apple": "Body > Hands",
+      "nsType": "NSPrivacyCollectedDataTypeHands",
+      "play": "Personal info > Other info"
+    },
+    "head": {
+      "apple": "Body > Head",
+      "nsType": "NSPrivacyCollectedDataTypeHead",
+      "play": "Personal info > Other info"
+    },
+    "other-data": {
+      "apple": "Other Data > Other Data Types",
+      "nsType": "NSPrivacyCollectedDataTypeOtherDataTypes",
+      "play": "Personal info > Other info"
+    },
+    "files-and-docs": {
+      "apple": null,
+      "nsType": null,
+      "play": "Files and docs > Files and docs"
+    },
+    "calendar-events": {
+      "apple": null,
+      "nsType": null,
+      "play": "Calendar > Calendar events"
+    },
+    "installed-apps": {
+      "apple": null,
+      "nsType": null,
+      "play": "App activity > Installed apps"
+    }
+  },
+  "purposes": {
+    "third-party-advertising": {
+      "apple": "Third-Party Advertising",
+      "nsPurpose": "NSPrivacyCollectedDataTypePurposeThirdPartyAdvertising",
+      "play": "Advertising or marketing"
+    },
+    "developer-advertising": {
+      "apple": "Developer's Advertising or Marketing",
+      "nsPurpose": "NSPrivacyCollectedDataTypePurposeDeveloperAdvertising",
+      "play": "Advertising or marketing"
+    },
+    "analytics": {
+      "apple": "Analytics",
+      "nsPurpose": "NSPrivacyCollectedDataTypePurposeAnalytics",
+      "play": "Analytics"
+    },
+    "product-personalization": {
+      "apple": "Product Personalization",
+      "nsPurpose": "NSPrivacyCollectedDataTypePurposeProductPersonalization",
+      "play": "Personalization"
+    },
+    "app-functionality": {
+      "apple": "App Functionality",
+      "nsPurpose": "NSPrivacyCollectedDataTypePurposeAppFunctionality",
+      "play": "App functionality"
+    },
+    "other": {
+      "apple": "Other Purposes",
+      "nsPurpose": "NSPrivacyCollectedDataTypePurposeOther",
+      "play": "App functionality"
+    },
+    "developer-communications": {
+      "apple": null,
+      "nsPurpose": null,
+      "play": "Developer communications"
+    },
+    "fraud-prevention": {
+      "apple": null,
+      "nsPurpose": null,
+      "play": "Fraud prevention, security, and compliance"
+    },
+    "account-management": {
+      "apple": null,
+      "nsPurpose": null,
+      "play": "Account management"
+    }
+  }
+}

@@ -1,0 +1,3 @@
+[scrollview-list] ScrollView renders [...tasks].sort(...).map(...) with no stated bound
+src/features/tasks/components/done-tasks.tsx:18
+RESULT: FAIL (1 problems)

@@ -1,0 +1,435 @@
+{
+  "bad-cancel-all": {
+    "expect": ["src/services/local-notifications/expo-local-notifications-adapter.ts:", "[cancel-all]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/local-notifications/expo-local-notifications-adapter.ts",
+          "find": "  cancelScheduledNotificationAsync,\n",
+          "with": "  cancelAllScheduledNotificationsAsync,\n  cancelScheduledNotificationAsync,\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/local-notifications/expo-local-notifications-adapter.ts",
+          "find": "  for (const id of ids) {\n    const cancelled",
+          "with": "  if (ids.length > 20) await cancelAllScheduledNotificationsAsync();\n  for (const id of ids) {\n    const cancelled"
+        }
+      }
+    ]
+  },
+  "bad-enable-at-launch": {
+    "expect": ["src/app/(app)/_layout.tsx:12", "[permission-at-launch]", "reminderSync.enable()"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/(app)/_layout.tsx",
+          "content": "// src/app/(app)/_layout.tsx\n// Planted: the group layout opens the permission prompt at launch through the reminder sync.\nimport { Stack } from 'expo-router';\nimport { useEffect } from 'react';\n\nimport { useReminderWiring } from '@/features/reminders/use-reminder-wiring';\nimport { useReminderSync } from '@/hooks/use-reminder-sync';\nimport { useReminderTaps } from '@/hooks/use-reminder-taps';\n\nexport default function AppLayout() {\n  const { sync: reminderSync, notifications, t, openReminder } = useReminderWiring();\n  useEffect(() => { void reminderSync.enable(); }, [reminderSync]);\n  useReminderSync(reminderSync, t);\n  useReminderTaps(notifications, openReminder);\n  return <Stack />;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-exact-alarm": {
+    "expect": ["app.config.ts:6", "[exact-alarm]"],
+    "ops": [
+      {
+        "write": {
+          "file": "app.config.ts",
+          "content": "// app.config.ts\nimport type { ExpoConfig } from 'expo/config';\n\nexport default (): ExpoConfig => ({\n  name: 'Tasks', slug: 'tasks',\n  android: { permissions: ['android.permission.USE_EXACT_ALARM'] },\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-foreground-handler-handed-over": {
+    "expect": [
+      "src/services/create-root-kits.ts:7",
+      "[foreground-handler]",
+      "no other adapter calls setNotificationHandler"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/create-root-kits.ts",
+          "content": "// src/services/create-root-kits.ts\n// Planted: the handler is handed to a push adapter the app does not have.\nimport { createExpoLocalNotificationsAdapter } from '@/services/local-notifications/expo-local-notifications-adapter';\nimport { createLocalNotificationsKit } from '@/services/local-notifications/local-notifications-root-kit';\n\nexport function createRootKits({ data, services, sync }) {\n  const notifications = createExpoLocalNotificationsAdapter({ errorLog: data.errorLog, installForegroundHandler: false });\n  return [createLocalNotificationsKit({ notifications, sync, hrefForReminder: () => '/' })];\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-foreground-handler-missing": {
+    "expect": [
+      "src/services/local-notifications/expo-local-notifications-adapter.ts:1",
+      "[foreground-handler]",
+      "no setNotificationHandler call"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/local-notifications/expo-local-notifications-adapter.ts",
+          "find": "  setNotificationHandler,\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/local-notifications/expo-local-notifications-adapter.ts",
+          "find": "setNotificationHandler({\n    handleNotification",
+          "with": "Object.freeze({\n    handleNotification"
+        }
+      }
+    ]
+  },
+  "bad-foreground-handler-second": {
+    "expect": [
+      "src/services/push/expo-push-adapter.ts:5",
+      "[foreground-handler]",
+      "a second setNotificationHandler call"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/push/expo-push-adapter.ts",
+          "content": "// src/services/push/expo-push-adapter.ts\nimport { setNotificationHandler } from 'expo-notifications';\n\nexport function installPushHandler(): void {\n  setNotificationHandler({\n    handleNotification: () =>\n      Promise.resolve({ shouldShowBanner: false, shouldShowList: true, shouldPlaySound: false, shouldSetBadge: false }),\n  });\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-literal-text": {
+    "expect": ["src/services/local-notifications/reminder-texts.ts:", "[literal-text]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/local-notifications/reminder-texts.ts",
+          "find": "title: t('reminders.notification.title'),",
+          "with": "title: 'Task reminder',"
+        }
+      }
+    ]
+  },
+  "bad-literal-text-template": {
+    "expect": [
+      "src/services/local-notifications/reminder-texts.ts:",
+      "[literal-text]",
+      "a template literal with fixed words"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/local-notifications/reminder-texts.ts",
+          "find": "title: t('reminders.notification.title'),",
+          "with": "title: `Reminder: ${reminder.label}`,"
+        }
+      }
+    ]
+  },
+  "bad-permission-at-launch": {
+    "expect": ["src/app/_layout.tsx:9", "[permission-at-launch]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/_layout.tsx",
+          "content": "// src/app/_layout.tsx\nimport { Slot } from 'expo-router';\nimport { useEffect } from 'react';\n\nimport { useReminderWiring } from '@/features/reminders/use-reminder-wiring';\n\nexport default function RootLayout() {\n  const { notifications } = useReminderWiring();\n  useEffect(() => { notifications.requestPermission().catch(() => undefined); }, [notifications]);\n  return <Slot />;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-permission-in-effect": {
+    "expect": [
+      "src/features/tasks/use-tasks-model.ts:10",
+      "[permission-at-launch]",
+      "from an effect",
+      "reminderSync.enable()"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "content": "// src/features/tasks/use-tasks-model.ts\n// Planted: the home screen's model turns reminders on when it mounts, so the prompt opens at launch.\nimport { useEffect } from 'react';\n\nimport { useServices } from '@/services/services-context';\n\nexport function useTasksModel(): { readonly remindMe: () => void } {\n  const { reminderSync } = useServices();\n  useEffect(() => {\n    void reminderSync.enable();\n  }, [reminderSync]);\n  return { remindMe: () => void reminderSync.enable() };\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-repeating-trigger": {
+    "expect": ["src/services/local-notifications/expo-local-notifications-adapter.ts:", "[repeating-trigger]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/local-notifications/expo-local-notifications-adapter.ts",
+          "find": "type: SchedulableTriggerInputTypes.DATE,",
+          "with": "type: SchedulableTriggerInputTypes.DAILY,"
+        }
+      }
+    ]
+  },
+  "bad-root-kit-unregistered": {
+    "expect": ["src/services/create-root-kits.ts:1 [root-kit]", "the local notifications root kit is never registered"],
+    "ops": [
+      { "$comment": "The kit exists but the registry never creates it.", "delete": "src/services/create-root-kits.ts" }
+    ]
+  },
+  "bad-schedule-api": {
+    "expect": ["src/services/push/expo-push-adapter.ts:5", "[schedule-api]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/push/expo-push-adapter.ts",
+          "content": "// src/services/push/expo-push-adapter.ts\nimport { scheduleNotificationAsync } from 'expo-notifications';\n\nexport function showNow(title: string): Promise<string> {\n  return scheduleNotificationAsync({ content: { title }, trigger: null });\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-sdk-import": {
+    "expect": ["src/features/tasks/use-task-reminder.ts:2", "[sdk-import]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-reminder.ts",
+          "content": "// src/features/tasks/use-task-reminder.ts\nimport { getPermissionsAsync } from 'expo-notifications';\n\nexport const canRemind = async (): Promise<boolean> => (await getPermissionsAsync()).granted;\n"
+        }
+      }
+    ]
+  },
+  "bad-sdk-import-mixed": {
+    "expect": ["src/features/tasks/reminder-permission.test.ts:3", "[sdk-import]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/reminder-permission.test.ts",
+          "content": "// src/features/tasks/reminder-permission.test.ts\n// Planted: one value name in a braced list makes the whole import a value import, even in a test.\nimport { type NotificationResponse, getPermissionsAsync } from 'expo-notifications';\n\nit('reads the permission', async () => {\n  const response: NotificationResponse | null = null;\n  expect(response).toBeNull();\n  await getPermissionsAsync();\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-sync-hook-ignores-app-state": {
+    "expect": ["src/hooks/use-reminder-sync.ts:1", "[sync-on-foreground]", "does not follow the app state"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/hooks/use-reminder-sync.ts",
+          "find": "import { useIsAppActive } from '@/hooks/use-is-app-active';\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/hooks/use-reminder-sync.ts",
+          "find": "  const isActive = useIsAppActive();\n",
+          "with": "  const isActive = true;\n"
+        }
+      }
+    ]
+  },
+  "bad-sync-on-foreground": {
+    "expect": ["src/hooks/use-reminder-sync.ts:1", "[sync-on-foreground]", "nothing mounts useReminderSync"],
+    "ops": [
+      {
+        "$comment": "The kit's effects no longer sync on the way back to the foreground.",
+        "replace": {
+          "file": "src/services/local-notifications/local-notifications-root-kit.tsx",
+          "find": "  useReminderSync(sync, t);\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-sync-only-writer": {
+    "expect": ["src/features/tasks/save-reminder.ts:6", "[sync-only-writer]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/save-reminder.ts",
+          "content": "// src/features/tasks/save-reminder.ts\nimport type { PlannedNotification } from '@/core/reminders/plan-reminders';\nimport type { LocalNotificationsPort } from '@/services/local-notifications/local-notifications-port';\n\nexport async function scheduleNow(notifications: LocalNotificationsPort, planned: readonly PlannedNotification[]): Promise<void> {\n  await notifications.scheduleNotifications(planned);\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-tap-handling": {
+    "expect": [
+      "src/services/local-notifications/expo-local-notifications-adapter.ts:",
+      "[tap-handling]",
+      "never reads the tap that launched the app"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/local-notifications/expo-local-notifications-adapter.ts",
+          "find": "  getLastNotificationResponse,\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/local-notifications/expo-local-notifications-adapter.ts",
+          "find": "      const response = getLastNotificationResponse();\n      return response === null ? null : toTap(response);",
+          "with": "      return null;"
+        }
+      }
+    ]
+  },
+  "bad-tap-hook-no-launch-read": {
+    "expect": ["src/hooks/use-reminder-taps.ts:", "[tap-handling]", "never reads lastTap()"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/hooks/use-reminder-taps.ts",
+          "find": "    const launchTap = notifications.lastTap();\n    if (launchTap !== null) handle(launchTap);\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-tap-hook-not-mounted": {
+    "expect": ["src/hooks/use-reminder-taps.ts:1", "[tap-handling]", "nothing mounts useReminderTaps"],
+    "ops": [
+      {
+        "$comment": "The kit's effects no longer route reminder taps.",
+        "replace": {
+          "file": "src/services/local-notifications/local-notifications-root-kit.tsx",
+          "find": "  useReminderTaps(notifications, (reminderId) => {\n    router.navigate(hrefForReminder(reminderId));\n  });\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-trigger-channel": {
+    "expect": ["src/services/local-notifications/expo-local-notifications-adapter.ts:", "[trigger-channel]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/local-notifications/expo-local-notifications-adapter.ts",
+          "find": "      channelId: notification.channelId,\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-wall-clock": {
+    "expect": ["src/services/local-notifications/reminder-sync.ts:", "[wall-clock]", "reads the clock (Date.now("],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/local-notifications/reminder-sync.ts",
+          "find": "nowMs: deps.clock.nowMs(),",
+          "with": "nowMs: Date.now(),"
+        }
+      }
+    ]
+  },
+  "bad-wall-clock-day-length": {
+    "expect": ["src/core/reminders/wall-clock.ts:", "[wall-clock]", "assumes a 24-hour day (86_400_000)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/reminders/wall-clock.ts",
+          "find": "// not-a-calendar-day: the epoch day number",
+          "with": "// the epoch day number"
+        }
+      }
+    ]
+  },
+  "error-no-src": { "expect": ["ERROR [bad-input]", "app source folder src/"], "ops": [{ "delete": "src" }] },
+  "pass-exact-alarm-blocked": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "app.config.ts",
+          "content": "// app.config.ts\nimport type { ExpoConfig } from 'expo/config';\n\nexport default (): ExpoConfig => ({\n  name: 'Tasks', slug: 'tasks',\n  // A library that declares USE_EXACT_ALARM in its manifest is overruled here.\n  android: { blockedPermissions: ['android.permission.USE_EXACT_ALARM'] },\n});\n"
+        }
+      }
+    ]
+  },
+  "pass-installed-skills": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/reminders-kit/SKILL.md",
+          "content": "---\nname: reminders-kit\ndescription: Planted findings that must stay silent.\n---\n"
+        }
+      },
+      {
+        "write": {
+          "file": ".agents/skills/reminders-kit/src/features/bad.ts",
+          "content": "import { cancelAllScheduledNotificationsAsync } from 'expo-notifications';\nexport const reset = (): Promise<void> => cancelAllScheduledNotificationsAsync();\n"
+        }
+      },
+      {
+        "write": {
+          "file": "skills/reminders-kit/SKILL.md",
+          "content": "---\nname: reminders-kit\ndescription: Planted findings that must stay silent.\n---\n"
+        }
+      },
+      {
+        "write": {
+          "file": "skills/reminders-kit/src/bad.ts",
+          "content": "import { scheduleNotificationAsync } from 'expo-notifications';\nexport const now = () => scheduleNotificationAsync({ content: { title: 'Hi' }, trigger: { type: 'daily', hour: 9, minute: 0, repeats: true } });\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/reminder-demo/SKILL.md",
+          "content": "---\nname: reminder-demo\ndescription: A vendored skill folder inside src.\n---\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/reminder-demo/bad.ts",
+          "content": "import { setNotificationHandler } from 'expo-notifications';\nsetNotificationHandler(null);\n"
+        }
+      }
+    ]
+  },
+  "pass-not-applicable": {
+    "expect": ["NOT APPLICABLE: expo-notifications is not in package.json"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo-notifications"], "delete": true } }]
+  },
+  "pass-push-only": {
+    "expect": ["NOT APPLICABLE: expo-notifications is installed but nothing schedules a local notification"],
+    "ops": [{ "delete": "src/services/local-notifications" }]
+  },
+  "pass-push-owns-handler": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/create-root-kits.ts",
+          "content": "// src/services/create-root-kits.ts\n// push-notifications is adopted: its adapter owns the one foreground handler.\nimport { createExpoLocalNotificationsAdapter } from '@/services/local-notifications/expo-local-notifications-adapter';\nimport { createLocalNotificationsKit } from '@/services/local-notifications/local-notifications-root-kit';\nimport { installPushHandler } from '@/services/push/expo-push-adapter';\n\nexport function createRootKits({ data, services, sync }) {\n  installPushHandler();\n  const notifications = createExpoLocalNotificationsAdapter({ errorLog: data.errorLog, installForegroundHandler: false });\n  return [createLocalNotificationsKit({ notifications, sync, hrefForReminder: () => '/' })];\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/push/expo-push-adapter.ts",
+          "lines": [
+            "// src/services/push/expo-push-adapter.ts",
+            "// push-notifications' adapter: the one foreground handler, for pushes and local reminders alike.",
+            "import * as Notifications from 'expo-notifications';",
+            "",
+            "export function installPushHandler(): void {",
+            "  Notifications.setNotificationHandler({",
+            "    handleNotification: () =>",
+            "      Promise.resolve({ shouldShowBanner: true, shouldShowList: true, shouldPlaySound: false, shouldSetBadge: false }),",
+            "  });",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-type-only-imports": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/reminder-response.ts",
+          "content": "// src/features/tasks/reminder-response.ts\nimport { type NotificationResponse, type NotificationRequest } from 'expo-notifications';\n\nimport type { NotificationContent } from 'expo-notifications';\n\nexport type { NotificationTrigger } from 'expo-notifications';\nexport type Sdk = typeof import('expo-notifications');\nexport type Tapped = { readonly response: NotificationResponse; readonly request: NotificationRequest; readonly content: NotificationContent };\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/push/expo-notifications-push-adapter.test.ts",
+          "content": "// src/services/push/expo-notifications-push-adapter.test.ts\n// Type-only imports are erased before the bundle: the adapter test may name the SDK's types.\nimport type * as ExpoNotifications from 'expo-notifications';\n\njest.mock('expo-notifications');\n\nconst native = jest.requireMock<typeof ExpoNotifications>('expo-notifications');\n\nit('reads the automock', () => {\n  expect(native).toBeDefined();\n});\n"
+        }
+      }
+    ]
+  }
+}

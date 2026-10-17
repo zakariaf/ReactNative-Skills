@@ -1,0 +1,869 @@
+{
+ "frame": "lists-default",
+ "device": "test-phone",
+ "kind": "phone-tall",
+ "size": {
+  "w": 160,
+  "h": 590
+ },
+ "background": "#FFFFFF",
+ "palettes": {
+  "dark": {
+   "#FFFFFF": "#111418",
+   "#1A1D23": "#F2F4F7",
+   "#F2F4F7": "#1E232B",
+   "#C9D1DC": "#3A4250",
+   "#4A5160": "#B8BFCC",
+   "#6B7280": "#9AA3B2",
+   "#2F6FED": "#5B8DF6",
+   "#1B3F8A": "#9DB8F9",
+   "#0B0D12": "#000000",
+   "#E8EEF9": "#202A3A",
+   "#C62828": "#FF8A80",
+   "#7A8599": "#5A6577"
+  }
+ },
+ "renders": [
+  {
+   "theme": "light",
+   "lang": "en"
+  }
+ ],
+ "elements": [
+  {
+   "testID": "lists.screen",
+   "rect": [
+    0,
+    0,
+    160,
+    590
+   ]
+  },
+  {
+   "testID": "lists.header",
+   "rect": [
+    0,
+    20,
+    160,
+    30
+   ],
+   "fill": "#E8EEF9"
+  },
+  {
+   "testID": "lists.title",
+   "rect": [
+    12,
+    26,
+    60,
+    18
+   ],
+   "runs": [
+    {
+     "text": "Lists",
+     "box": [
+      12,
+      26,
+      40,
+      18
+     ],
+     "color": "#1A1D23",
+     "font": "700 14px Demo Sans",
+     "ink": [
+      12,
+      29,
+      38,
+      12
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "lists.list-row.home",
+   "rect": [
+    12,
+    56,
+    136,
+    32
+   ],
+   "fill": "#F2F4F7",
+   "border": {
+    "w": 2,
+    "color": "#C9D1DC"
+   },
+   "runs": [
+    {
+     "text": "Home",
+     "box": [
+      22,
+      65,
+      60,
+      14
+     ],
+     "color": "#1A1D23",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      22,
+      68,
+      56,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "lists.list-row.home.delete-button",
+   "rect": [
+    100,
+    62,
+    42,
+    20
+   ],
+   "label": "Delete",
+   "runs": [
+    {
+     "text": "Delete",
+     "box": [
+      104,
+      65,
+      34,
+      14
+     ],
+     "color": "#C62828",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      104,
+      68,
+      32,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "lists.list-row.work",
+   "rect": [
+    12,
+    96,
+    136,
+    32
+   ],
+   "fill": "#F2F4F7",
+   "border": {
+    "w": 2,
+    "color": "#C9D1DC"
+   },
+   "runs": [
+    {
+     "text": "Work",
+     "box": [
+      22,
+      105,
+      60,
+      14
+     ],
+     "color": "#1A1D23",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      22,
+      108,
+      56,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "lists.list-row.work.delete-button",
+   "rect": [
+    100,
+    102,
+    42,
+    20
+   ],
+   "label": "Delete",
+   "runs": [
+    {
+     "text": "Delete",
+     "box": [
+      104,
+      105,
+      34,
+      14
+     ],
+     "color": "#C62828",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      104,
+      108,
+      32,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "lists.list-row.garden",
+   "rect": [
+    12,
+    136,
+    136,
+    32
+   ],
+   "fill": "#F2F4F7",
+   "border": {
+    "w": 2,
+    "color": "#C9D1DC"
+   },
+   "runs": [
+    {
+     "text": "Garden",
+     "box": [
+      22,
+      145,
+      60,
+      14
+     ],
+     "color": "#1A1D23",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      22,
+      148,
+      56,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "lists.list-row.garden.delete-button",
+   "rect": [
+    100,
+    142,
+    42,
+    20
+   ],
+   "label": "Delete",
+   "runs": [
+    {
+     "text": "Delete",
+     "box": [
+      104,
+      145,
+      34,
+      14
+     ],
+     "color": "#C62828",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      104,
+      148,
+      32,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "lists.list-row.travel",
+   "rect": [
+    12,
+    176,
+    136,
+    32
+   ],
+   "fill": "#F2F4F7",
+   "border": {
+    "w": 2,
+    "color": "#C9D1DC"
+   },
+   "runs": [
+    {
+     "text": "Travel",
+     "box": [
+      22,
+      185,
+      60,
+      14
+     ],
+     "color": "#1A1D23",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      22,
+      188,
+      56,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "lists.list-row.travel.delete-button",
+   "rect": [
+    100,
+    182,
+    42,
+    20
+   ],
+   "label": "Delete",
+   "runs": [
+    {
+     "text": "Delete",
+     "box": [
+      104,
+      185,
+      34,
+      14
+     ],
+     "color": "#C62828",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      104,
+      188,
+      32,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "lists.list-row.books",
+   "rect": [
+    12,
+    216,
+    136,
+    32
+   ],
+   "fill": "#F2F4F7",
+   "border": {
+    "w": 2,
+    "color": "#C9D1DC"
+   },
+   "runs": [
+    {
+     "text": "Books",
+     "box": [
+      22,
+      225,
+      60,
+      14
+     ],
+     "color": "#1A1D23",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      22,
+      228,
+      56,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "lists.list-row.books.delete-button",
+   "rect": [
+    100,
+    222,
+    42,
+    20
+   ],
+   "label": "Delete",
+   "runs": [
+    {
+     "text": "Delete",
+     "box": [
+      104,
+      225,
+      34,
+      14
+     ],
+     "color": "#C62828",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      104,
+      228,
+      32,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "lists.list-row.gifts",
+   "rect": [
+    12,
+    256,
+    136,
+    32
+   ],
+   "fill": "#F2F4F7",
+   "border": {
+    "w": 2,
+    "color": "#C9D1DC"
+   },
+   "runs": [
+    {
+     "text": "Gifts",
+     "box": [
+      22,
+      265,
+      60,
+      14
+     ],
+     "color": "#1A1D23",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      22,
+      268,
+      56,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "lists.list-row.gifts.delete-button",
+   "rect": [
+    100,
+    262,
+    42,
+    20
+   ],
+   "label": "Delete",
+   "runs": [
+    {
+     "text": "Delete",
+     "box": [
+      104,
+      265,
+      34,
+      14
+     ],
+     "color": "#C62828",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      104,
+      268,
+      32,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "lists.list-row.music",
+   "rect": [
+    12,
+    296,
+    136,
+    32
+   ],
+   "fill": "#F2F4F7",
+   "border": {
+    "w": 2,
+    "color": "#C9D1DC"
+   },
+   "runs": [
+    {
+     "text": "Music",
+     "box": [
+      22,
+      305,
+      60,
+      14
+     ],
+     "color": "#1A1D23",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      22,
+      308,
+      56,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "lists.list-row.music.delete-button",
+   "rect": [
+    100,
+    302,
+    42,
+    20
+   ],
+   "label": "Delete",
+   "runs": [
+    {
+     "text": "Delete",
+     "box": [
+      104,
+      305,
+      34,
+      14
+     ],
+     "color": "#C62828",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      104,
+      308,
+      32,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "lists.list-row.films",
+   "rect": [
+    12,
+    336,
+    136,
+    32
+   ],
+   "fill": "#F2F4F7",
+   "border": {
+    "w": 2,
+    "color": "#C9D1DC"
+   },
+   "runs": [
+    {
+     "text": "Films",
+     "box": [
+      22,
+      345,
+      60,
+      14
+     ],
+     "color": "#1A1D23",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      22,
+      348,
+      56,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "lists.list-row.films.delete-button",
+   "rect": [
+    100,
+    342,
+    42,
+    20
+   ],
+   "label": "Delete",
+   "runs": [
+    {
+     "text": "Delete",
+     "box": [
+      104,
+      345,
+      34,
+      14
+     ],
+     "color": "#C62828",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      104,
+      348,
+      32,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "lists.list-row.health",
+   "rect": [
+    12,
+    376,
+    136,
+    32
+   ],
+   "fill": "#F2F4F7",
+   "border": {
+    "w": 2,
+    "color": "#C9D1DC"
+   },
+   "runs": [
+    {
+     "text": "Health",
+     "box": [
+      22,
+      385,
+      60,
+      14
+     ],
+     "color": "#1A1D23",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      22,
+      388,
+      56,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "lists.list-row.health.delete-button",
+   "rect": [
+    100,
+    382,
+    42,
+    20
+   ],
+   "label": "Delete",
+   "runs": [
+    {
+     "text": "Delete",
+     "box": [
+      104,
+      385,
+      34,
+      14
+     ],
+     "color": "#C62828",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      104,
+      388,
+      32,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "lists.list-row.ideas",
+   "rect": [
+    12,
+    416,
+    136,
+    32
+   ],
+   "fill": "#F2F4F7",
+   "border": {
+    "w": 2,
+    "color": "#C9D1DC"
+   },
+   "runs": [
+    {
+     "text": "Ideas",
+     "box": [
+      22,
+      425,
+      60,
+      14
+     ],
+     "color": "#1A1D23",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      22,
+      428,
+      56,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "lists.list-row.ideas.delete-button",
+   "rect": [
+    100,
+    422,
+    42,
+    20
+   ],
+   "label": "Delete",
+   "runs": [
+    {
+     "text": "Delete",
+     "box": [
+      104,
+      425,
+      34,
+      14
+     ],
+     "color": "#C62828",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      104,
+      428,
+      32,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "lists.list-row.shop",
+   "rect": [
+    12,
+    456,
+    136,
+    32
+   ],
+   "fill": "#F2F4F7",
+   "border": {
+    "w": 2,
+    "color": "#C9D1DC"
+   },
+   "runs": [
+    {
+     "text": "Shop",
+     "box": [
+      22,
+      465,
+      60,
+      14
+     ],
+     "color": "#1A1D23",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      22,
+      468,
+      56,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "lists.list-row.shop.delete-button",
+   "rect": [
+    100,
+    462,
+    42,
+    20
+   ],
+   "label": "Delete",
+   "runs": [
+    {
+     "text": "Delete",
+     "box": [
+      104,
+      465,
+      34,
+      14
+     ],
+     "color": "#C62828",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      104,
+      468,
+      32,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "lists.list-row.later",
+   "rect": [
+    12,
+    496,
+    136,
+    32
+   ],
+   "fill": "#F2F4F7",
+   "border": {
+    "w": 2,
+    "color": "#C9D1DC"
+   },
+   "runs": [
+    {
+     "text": "Later",
+     "box": [
+      22,
+      505,
+      60,
+      14
+     ],
+     "color": "#1A1D23",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      22,
+      508,
+      56,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "lists.list-row.later.delete-button",
+   "rect": [
+    100,
+    502,
+    42,
+    20
+   ],
+   "label": "Delete",
+   "runs": [
+    {
+     "text": "Delete",
+     "box": [
+      104,
+      505,
+      34,
+      14
+     ],
+     "color": "#C62828",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      104,
+      508,
+      32,
+      9
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "lists.bottom-bar",
+   "rect": [
+    0,
+    540,
+    160,
+    50
+   ],
+   "fill": "#FFFFFF",
+   "border": {
+    "w": 2,
+    "color": "#C9D1DC"
+   }
+  },
+  {
+   "testID": "lists.new-button",
+   "rect": [
+    12,
+    548,
+    136,
+    28
+   ],
+   "fill": "#2F6FED",
+   "label": "New list",
+   "runs": [
+    {
+     "text": "New list",
+     "box": [
+      52,
+      555,
+      56,
+      14
+     ],
+     "color": "#FFFFFF",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      52,
+      558,
+      54,
+      9
+     ]
+    }
+   ]
+  }
+ ]
+}

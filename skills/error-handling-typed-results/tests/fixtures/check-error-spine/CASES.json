@@ -1,0 +1,1095 @@
+{
+  "bad-adapter-boundary": {
+    "expect": [
+      "FAIL src/services/sync/http-sync-adapter.ts:7 [adapter-boundary] an await in an adapter outside try/catch: a vendor rejection escapes the boundary",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/sync/http-sync-adapter.ts",
+          "lines": [
+            "// src/services/sync/http-sync-adapter.ts",
+            "import type { SyncPort } from './sync-port';",
+            "",
+            "export function createHttpSyncAdapter(baseUrl: string): SyncPort {",
+            "  return {",
+            "    pull: async () => {",
+            "      const response = await fetch(`${baseUrl}/tasks`);",
+            "      return response.ok;",
+            "    },",
+            "  };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/sync/sync-port.ts",
+          "lines": [
+            "// src/services/sync/sync-port.ts",
+            "/** Pulls tasks from the server. */",
+            "export type SyncPort = { readonly pull: () => Promise<boolean> };"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-catch-handled": {
+    "expect": [
+      "FAIL src/features/tasks/count-tasks.ts:9 [catch-handled] the catch swallows the error: no err(...), no rethrow, and the error is not passed on",
+      "FAIL src/features/tasks/count-tasks.ts:15 [catch-handled] the catch swallows the error: no err(...), no rethrow, and the error is not passed on",
+      "FAIL src/features/tasks/count-tasks.ts:24 [catch-handled] the catch swallows the error: no err(...), no rethrow, and the error is not passed on",
+      "FAIL src/features/tasks/count-tasks.ts:32 [catch-handled] the catch swallows the error: no err(...), no rethrow, and the error is not passed on",
+      "FAIL src/features/tasks/count-tasks.ts:41 [catch-handled] the catch swallows the error: no err(...), no rethrow, and the error is not passed on",
+      "FAIL src/features/tasks/count-tasks.ts:51 [catch-handled] the catch swallows the error: no err(...), no rethrow, and the error is not passed on",
+      "FAIL src/features/tasks/count-tasks.ts:58 [catch-handled] the .catch handler drops the rejection",
+      "FAIL src/features/tasks/count-tasks.ts:62 [catch-handled] the .catch handler drops the rejection",
+      "FAIL src/features/tasks/count-tasks.ts:67 [catch-handled] a best-effort marker outside an adapter",
+      "RESULT: FAIL (9 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/count-tasks.ts",
+          "lines": [
+            "// src/features/tasks/count-tasks.ts",
+            "import type { SqlDriver } from '@/data/sql-driver';",
+            "",
+            "export type Logger = { readonly debug: (message: unknown) => void };",
+            "",
+            "export function countTasks(driver: SqlDriver): number {",
+            "  try {",
+            "    return driver.run('SELECT COUNT(*) FROM tasks', []).changes;",
+            "  } catch (error) {",
+            "    console.warn('count failed', error);",
+            "  }",
+            "  try {",
+            "    return driver.run('SELECT COUNT(*) FROM archived_tasks', []).changes;",
+            "    // A comment does not handle anything: ESLint no-empty accepts this block, the checker does not.",
+            "  } catch {",
+            "    // ignore",
+            "  }",
+            "  return 0;",
+            "}",
+            "",
+            "export function findTaskChanges(driver: SqlDriver, id: string): number | null {",
+            "  try {",
+            "    return driver.run('SELECT * FROM tasks WHERE id = ?', [id]).changes;",
+            "  } catch {",
+            "    return null;",
+            "  }",
+            "}",
+            "",
+            "export function listTaskCounts(driver: SqlDriver): readonly number[] {",
+            "  try {",
+            "    return [driver.run('SELECT id FROM tasks', []).changes];",
+            "  } catch (error) {",
+            "    console.error('listing tasks failed', error);",
+            "    return [];",
+            "  }",
+            "}",
+            "",
+            "export function countDone(driver: SqlDriver, logger: Logger): number {",
+            "  try {",
+            "    return driver.run('SELECT COUNT(*) FROM tasks WHERE is_done = 1', []).changes;",
+            "  } catch (error) {",
+            "    logger.debug(error);",
+            "    return 0;",
+            "  }",
+            "}",
+            "",
+            "export function isReadable(driver: SqlDriver): boolean {",
+            "  try {",
+            "    driver.run('SELECT 1', []);",
+            "    return true;",
+            "  } catch (error) {",
+            "    if (error instanceof SyntaxError) return false;",
+            "    return false;",
+            "  }",
+            "}",
+            "",
+            "export function refreshTasks(load: () => Promise<void>): void {",
+            "  load().catch(() => undefined);",
+            "}",
+            "",
+            "export function markStale(load: () => Promise<void>, setStale: (stale: boolean) => void): void {",
+            "  load().catch(() => setStale(true));",
+            "}",
+            "",
+            "export function buzzOnDone(buzz: () => Promise<void>): void {",
+            "  // best-effort: a missing buzz is fine, but this is not an adapter",
+            "  buzz().catch(() => undefined);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-failure-message-key": {
+    "expect": [
+      "FAIL src/features/tasks/task-failure-message.ts:12 [failure-message-key] message key \"errors.storage-is-busy\" is not in src/i18n/catalogs/en.json",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/task-failure-message.ts",
+          "find": "'storage-busy': 'errors.storage-busy',",
+          "with": "'storage-busy': 'errors.storage-is-busy',"
+        }
+      }
+    ]
+  },
+  "bad-failure-message-key-config": {
+    "expect": [
+      "FAIL src/features/tasks/task-failure-message.ts:10 [failure-message-key] message key \"tasks.error.title-empty\" is not in src/i18n/source/en-US.json",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      { "rename": { "from": "src/i18n/catalogs/en.json", "to": "src/i18n/source/en-US.json" } },
+      { "json": { "file": "src/i18n/source/en-US.json", "path": ["tasks.error.title-empty"], "delete": true } },
+      {
+        "write": { "file": "rn-skills.config.json", "lines": ["{ \"sourceCatalog\": \"src/i18n/source/en-US.json\" }"] }
+      }
+    ]
+  },
+  "bad-failure-shape": {
+    "expect": [
+      "FAIL src/features/tasks/parse-due-date.ts:7 [failure-shape] Result error type is string",
+      "FAIL src/features/tasks/parse-due-date.ts:8 [failure-shape] err() gets a string",
+      "FAIL src/features/tasks/parse-due-date.ts:12 [failure-shape] Result error type is Error",
+      "FAIL src/features/tasks/parse-due-date.ts:13 [failure-shape] err() gets an Error object",
+      "FAIL src/features/tasks/parse-due-date.ts:16 [failure-shape] Result error type is a string-literal union",
+      "FAIL src/features/tasks/parse-due-date.ts:20 [failure-shape] Result error type is a union with string in it",
+      "FAIL src/features/tasks/parse-due-date.ts:24 [failure-shape] Result error type is a union with Error in it",
+      "FAIL src/features/tasks/parse-due-date.ts:25 [failure-shape] err() gets no failure (null or undefined)",
+      "FAIL src/features/tasks/parse-due-date.ts:28 [failure-shape] Result error type is a union with undefined in it",
+      "FAIL src/features/tasks/parse-due-date.ts:29 [failure-shape] err() gets no failure (null or undefined)",
+      "RESULT: FAIL (10 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/parse-due-date.ts",
+          "lines": [
+            "// src/features/tasks/parse-due-date.ts",
+            "import { err, ok } from '@/core/result';",
+            "",
+            "import type { Result } from '@/core/result';",
+            "",
+            "/** Parses a YYYY-MM-DD due date typed by the user. */",
+            "export function parseDueDate(raw: string): Result<string, string> {",
+            "  if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(raw)) return err('Enter a date like 2026-10-03');",
+            "  return ok(raw);",
+            "}",
+            "",
+            "export function parseDueTime(raw: string): Result<string, Error> {",
+            "  return raw === '' ? err(new Error('empty time')) : ok(raw);",
+            "}",
+            "",
+            "export function parsePriority(raw: string): Result<number, 'empty' | 'not-a-number'> {",
+            "  return raw === '' ? err({ kind: 'empty' }) : ok(Number(raw));",
+            "}",
+            "",
+            "export function parseEstimate(raw: string): Result<number, string | Error> {",
+            "  return raw === '' ? err({ kind: 'empty' }) : ok(Number(raw));",
+            "}",
+            "",
+            "export function parseReminder(raw: string): Result<number, Error | null> {",
+            "  return raw === '' ? err(null) : ok(Number(raw));",
+            "}",
+            "",
+            "export function parseListId(raw: string): Result<number, { readonly kind: 'empty' } | undefined> {",
+            "  return raw === '' ? err(undefined) : ok(Number(raw));",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-failure-text": {
+    "expect": [
+      "FAIL src/features/tasks/archive-task.ts:7 [failure-text] ArchiveFailure has a message field (UI text in a failure)",
+      "FAIL src/features/tasks/archive-task.ts:12 [failure-text] the failure carries UI text (message)",
+      "FAIL src/features/tasks/archive-task.ts:16 [failure-text] the failure carries UI text (title)",
+      "FAIL src/features/tasks/archive-task.ts:20 [failure-text] the failure carries UI text (reason: a sentence)",
+      "FAIL src/features/tasks/archive-task.ts:24 [failure-text] the failure carries UI text (reason: a sentence)",
+      "RESULT: FAIL (5 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/archive-task.ts",
+          "lines": [
+            "// src/features/tasks/archive-task.ts",
+            "import { err } from '@/core/result';",
+            "",
+            "import type { Result } from '@/core/result';",
+            "",
+            "export type ArchiveFailure =",
+            "  | { readonly kind: 'archive-failed'; readonly message: string }",
+            "  | { readonly kind: 'archive-blocked'; readonly title: string }",
+            "  | { readonly kind: 'archive-locked'; readonly reason: string; readonly column: string };",
+            "",
+            "export function archiveTask(): Result<void, ArchiveFailure> {",
+            "  return err({ kind: 'archive-failed', message: 'Could not archive this task' });",
+            "}",
+            "",
+            "export function archiveAll(t: (key: string) => string): Result<void, ArchiveFailure> {",
+            "  return err({ kind: 'archive-blocked', title: t('tasks.archive.blocked') });",
+            "}",
+            "",
+            "export function archiveLocked(): Result<void, ArchiveFailure> {",
+            "  return err({ kind: 'archive-locked', reason: 'This task is locked and cannot be archived.', column: 'tasks.title' });",
+            "}",
+            "",
+            "export function archiveLockedAgain(): Result<void, ArchiveFailure> {",
+            "  return err({ kind: 'archive-locked', reason: 'Locked by another device', column: 'tasks.is_done' });",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-no-destructive-recovery": {
+    "expect": [
+      "FAIL src/data/tasks/open-tasks.ts:8 [no-destructive-recovery] deleteDatabaseSync() on an error path (a catch block)",
+      "FAIL src/data/tasks/open-tasks.ts:15 [no-destructive-recovery] DELETE FROM on an error path (a failure branch)",
+      "FAIL src/data/tasks/open-tasks.ts:22 [no-destructive-recovery] .clear() on an error path (a .catch handler)",
+      "RESULT: FAIL (3 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/tasks/open-tasks.ts",
+          "lines": [
+            "// src/data/tasks/open-tasks.ts",
+            "import type { SqlDriver } from '@/data/sql-driver';",
+            "",
+            "export function openTasks(driver: SqlDriver, deleteDatabaseSync: (name: string) => void): number {",
+            "  try {",
+            "    return driver.run('SELECT COUNT(*) FROM tasks', []).changes;",
+            "  } catch (error) {",
+            "    deleteDatabaseSync('tasks.db');",
+            "    throw new Error('the tasks database was unreadable', { cause: error });",
+            "  }",
+            "}",
+            "",
+            "export function dropOnFailure(driver: SqlDriver, result: { readonly ok: boolean }): void {",
+            "  if (!result.ok) {",
+            "    driver.run('DELETE FROM tasks', []);",
+            "  }",
+            "}",
+            "",
+            "export function retryLater(save: () => Promise<void>, drafts: { readonly clear: () => void }, reportError: (error: unknown) => void): void {",
+            "  save().catch((error: unknown) => {",
+            "    reportError(error);",
+            "    drafts.clear();",
+            "  });",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-result-ignored": {
+    "expect": [
+      "FAIL src/core/tasks/parse-title.ts:14 [result-ignored] the Result of parseTitle() is dropped",
+      "FAIL src/features/tasks/quick-add-button.tsx:15 [result-ignored] an on* handler drops the Result of add()",
+      "FAIL src/features/tasks/quick-add-button.tsx:18 [result-ignored] an on* handler drops the Result of add()",
+      "FAIL src/features/tasks/quick-add-button.tsx:19 [result-ignored] an on* handler drops the Result of rename()",
+      "FAIL src/features/tasks/refresh-tasks.ts:5 [result-ignored] the Result of pull() is dropped",
+      "FAIL src/features/tasks/run-task-batch.ts:10 [result-ignored] the Result of add() is dropped",
+      "FAIL src/features/tasks/run-task-batch.ts:12 [result-ignored] the Result of rename() is dropped",
+      "FAIL src/features/tasks/run-task-batch.ts:14 [result-ignored] the Result of rename() is dropped",
+      "FAIL src/features/tasks/run-task-batch.ts:17 [result-ignored] the Result of add() is dropped",
+      "FAIL src/features/tasks/run-task-batch.ts:18 [result-ignored] the Result of rename() is dropped",
+      "FAIL src/features/tasks/run-task-batch.ts:19 [result-ignored] the Result of add() is dropped",
+      "FAIL src/features/tasks/run-task-batch.ts:20 [result-ignored] forEach drops the Result of add() for every item",
+      "FAIL src/features/tasks/run-task-batch.ts:21 [result-ignored] forEach drops the Result of add() for every item",
+      "FAIL src/features/tasks/run-task-batch.ts:22 [result-ignored] forEach drops the Result of rename() for every item",
+      "FAIL src/features/tasks/title-batch.ts:7 [result-ignored] the Result of parseTitle() is dropped",
+      "FAIL src/features/tasks/title-batch.ts:8 [result-ignored] the Result of parseTitle() is dropped",
+      "FAIL src/features/tasks/use-quick-add-model.ts:9 [result-ignored] the Result of add() is dropped",
+      "FAIL src/features/tasks/use-title-check-model.ts:7 [result-ignored] the Result of checkTitle() is dropped",
+      "RESULT: FAIL (18 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-quick-add-model.ts",
+          "lines": [
+            "// src/features/tasks/use-quick-add-model.ts",
+            "import type { TaskRepository } from '@/data/tasks/task-repository';",
+            "",
+            "export type QuickAddModel = { readonly add: (title: string) => void };",
+            "",
+            "export function useQuickAddModel(repository: TaskRepository): QuickAddModel {",
+            "  return {",
+            "    add: (title) => {",
+            "      repository.add({ id: title, title });",
+            "    },",
+            "  };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/quick-add-button.tsx",
+          "lines": [
+            "// src/features/tasks/quick-add-button.tsx",
+            "import { Button, TextInput } from 'react-native';",
+            "",
+            "import type { TaskRepository } from '@/data/tasks/task-repository';",
+            "",
+            "export type QuickAddButtonProps = {",
+            "  readonly repository: TaskRepository;",
+            "  readonly label: string;",
+            "};",
+            "",
+            "export function QuickAddButton({ repository, label }: QuickAddButtonProps): React.JSX.Element {",
+            "  return (",
+            "    <>",
+            "      <Button",
+            "        onPress={() => repository.add({ id: 'new', title: label })}",
+            "        title={label}",
+            "      />",
+            "      <Button onPress={() => void repository.add({ id: 'next', title: label })} title={label} />",
+            "      <TextInput onChangeText={(text) => repository.rename('task-1', text)} />",
+            "    </>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/sync/sync-port.ts",
+          "lines": [
+            "// src/services/sync/sync-port.ts",
+            "import type { Result } from '@/core/result';",
+            "",
+            "export type SyncFailure = { readonly kind: 'offline' } | { readonly kind: 'server-error'; readonly status: number };",
+            "",
+            "export interface SyncPort {",
+            "  pull(): Promise<Result<number, SyncFailure>>;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/refresh-tasks.ts",
+          "lines": [
+            "// src/features/tasks/refresh-tasks.ts",
+            "import type { SyncPort } from '@/services/sync/sync-port';",
+            "",
+            "export async function refreshTasks(port: SyncPort): Promise<void> {",
+            "  await port.pull();",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/core/tasks/parse-title.ts",
+          "lines": [
+            "// src/core/tasks/parse-title.ts",
+            "import { err, ok } from '@/core/result';",
+            "",
+            "import type { Result } from '@/core/result';",
+            "",
+            "export type TitleFailure = { readonly kind: 'title-empty' };",
+            "",
+            "export function parseTitle(raw: string): Result<string, TitleFailure> {",
+            "  return raw.trim() === '' ? err({ kind: 'title-empty' }) : ok(raw.trim());",
+            "}",
+            "",
+            "export function checkTitles(titles: readonly string[]): void {",
+            "  for (const title of titles) {",
+            "    parseTitle(title);",
+            "  }",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/core/tasks/index.ts",
+          "lines": ["// src/core/tasks/index.ts", "export { parseTitle } from './parse-title';"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/use-title-check-model.ts",
+          "lines": [
+            "// src/features/tasks/use-title-check-model.ts",
+            "import { parseTitle as checkTitle } from '@/core/tasks/parse-title';",
+            "",
+            "export function useTitleCheckModel(title: string): { readonly check: () => void } {",
+            "  return {",
+            "    check: () => {",
+            "      checkTitle(title);",
+            "    },",
+            "  };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/title-batch.ts",
+          "lines": [
+            "// src/features/tasks/title-batch.ts",
+            "import * as titles from '@/core/tasks/parse-title';",
+            "import { parseTitle } from '@/core/tasks';",
+            "",
+            "export function checkBatch(batch: readonly string[]): void {",
+            "  for (const title of batch) {",
+            "    titles.parseTitle(title);",
+            "    parseTitle(title);",
+            "  }",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/run-task-batch.ts",
+          "lines": [
+            "// src/features/tasks/run-task-batch.ts",
+            "import type { TaskRepository } from '@/data/tasks/task-repository';",
+            "",
+            "export type TaskCommand = { readonly type: 'add' | 'rename' | 'retitle'; readonly id: string; readonly title: string };",
+            "",
+            "/** Every write below drops its Result: a failed save vanishes without a trace. */",
+            "export function runTaskBatch(repository: TaskRepository, commands: readonly TaskCommand[], titles: readonly string[]): void {",
+            "  for (const command of commands) {",
+            "    switch (command.type) {",
+            "      case 'add': repository.add({ id: command.id, title: command.title }); break;",
+            "      case 'rename':",
+            "        repository.rename(command.id, command.title);",
+            "        break;",
+            "      default: repository.rename(command.id, command.title.trim());",
+            "    }",
+            "  }",
+            "  if (titles.length > 0) repository.add({ id: 'first', title: titles[0] ?? '' });",
+            "  else repository.rename('first', '');",
+            "  for (const title of titles) repository.add({ id: title, title });",
+            "  titles.forEach((title) => repository.add({ id: title, title }));",
+            "  titles.forEach(async (title) => await repository.add({ id: `copy-${title}`, title }));",
+            "  titles.forEach(title => repository.rename(title, title));",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-result-module-missing": {
+    "expect": ["FAIL src/core/result.ts:1 [result-module] the app has no Result module", "RESULT: FAIL (1 problems)"],
+    "ops": [{ "delete": "src/core/result.ts" }]
+  },
+  "bad-result-module-shape": {
+    "expect": ["FAIL src/core/result.ts:1 [result-module] missing export function err", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/result.ts",
+          "find": "export function err<TError>(error: TError): Result<never, TError> {",
+          "with": "export function fail<TError>(error: TError): Result<never, TError> {"
+        }
+      }
+    ]
+  },
+  "bad-rethrow-cause": {
+    "expect": [
+      "FAIL src/data/tasks/export-tasks.ts:8 [rethrow-cause] throw new Error(...) in a catch drops the original error",
+      "FAIL src/data/tasks/export-tasks.ts:16 [rethrow-cause] throw new RangeError(...) in a catch drops the original error",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/tasks/export-tasks.ts",
+          "lines": [
+            "// src/data/tasks/export-tasks.ts",
+            "import type { SqlDriver } from '@/data/sql-driver';",
+            "",
+            "export function exportTasks(driver: SqlDriver): number {",
+            "  try {",
+            "    return driver.run('SELECT * FROM tasks', []).changes;",
+            "  } catch (error) {",
+            "    throw new Error(`export failed: ${String(error)}`);",
+            "  }",
+            "}",
+            "",
+            "export function exportArchive(driver: SqlDriver): number {",
+            "  try {",
+            "    return driver.run('SELECT * FROM archived_tasks', []).changes;",
+            "  } catch {",
+            "    throw new RangeError('archive export failed');",
+            "  }",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-single-result": {
+    "expect": [
+      "FAIL src/features/tasks/legacy-result.ts:2 [single-result] imports the result library neverthrow",
+      "FAIL src/features/tasks/legacy-result.ts:5 [single-result] a second Result type",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/legacy-result.ts",
+          "lines": [
+            "// src/features/tasks/legacy-result.ts",
+            "import { Result as NeverthrowResult } from 'neverthrow';",
+            "",
+            "/** A home-grown second Result shape: callers now need adapters between the two. */",
+            "export type Result<TValue> = { readonly value: TValue } | { readonly problem: number };",
+            "export type LegacyCount = NeverthrowResult<number, never>;"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-ui-error-message": {
+    "expect": [
+      "FAIL src/features/tasks/task-error-banner.tsx:9 [ui-error-message] the UI shows raw error text",
+      "FAIL src/features/tasks/use-task-error-model.ts:5 [ui-error-message] the UI shows raw error text",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/task-error-banner.tsx",
+          "lines": [
+            "// src/features/tasks/task-error-banner.tsx",
+            "import { AppText } from '@/ui/app-text';",
+            "",
+            "export type TaskErrorBannerProps = { readonly error: Error };",
+            "",
+            "export function TaskErrorBanner({ error }: TaskErrorBannerProps): React.JSX.Element {",
+            "  return (",
+            "    <AppText testID=\"tasks.error-banner\">",
+            "      {error.message}",
+            "    </AppText>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-error-model.ts",
+          "lines": [
+            "// src/features/tasks/use-task-error-model.ts",
+            "",
+            "/** Builds the banner text from the caught error. */",
+            "export function useTaskErrorModel(error: unknown): { readonly text: string } {",
+            "  return { text: `Saving failed: ${String(error)}` };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "error-no-package-json": {
+    "expect": ["ERROR [bad-input] no package.json in", "RESULT: FAIL (1 problems)"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "error-no-source-folder": {
+    "expect": ["ERROR [bad-input] nothing to check: app-src/ does not exist", "RESULT: FAIL (1 problems)"],
+    "args": "{dir} --src-dir app-src"
+  },
+  "pass-adapter-attempt-async-callback": {
+    "expect": ["check-error-spine:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/sync/http-sync-adapter.ts",
+          "lines": [
+            "// src/services/sync/http-sync-adapter.ts",
+            "import { attemptAsync } from '@/core/result';",
+            "",
+            "import type { SyncFailure, SyncPort } from './sync-port';",
+            "",
+            "function toSyncFailure(thrown: unknown): SyncFailure {",
+            "  return thrown instanceof TypeError ? { kind: 'offline' } : { kind: 'server-error', status: 0 };",
+            "}",
+            "",
+            "function withTimeout<T>(task: () => Promise<T>, afterMs: number): Promise<T> {",
+            "  return Promise.race([task(), new Promise<T>((_, reject) => setTimeout(() => reject(new Error(`timed out after ${String(afterMs)} ms`)), afterMs))]);",
+            "}",
+            "",
+            "export function createHttpSyncAdapter(url: string): SyncPort {",
+            "  return {",
+            "    pull: () =>",
+            "      attemptAsync(async () => {",
+            "        const response = await fetch(url);",
+            "        const body = (await response.json()) as { readonly count: number };",
+            "        return body.count;",
+            "      }, toSyncFailure),",
+            "    push: async (count) =>",
+            "      await attemptAsync<number, SyncFailure>(",
+            "        () =>",
+            "          withTimeout(async () => {",
+            "            const response = await fetch(url, { method: 'POST', body: JSON.stringify({ count }) });",
+            "            return response.status;",
+            "          }, 8_000),",
+            "        toSyncFailure,",
+            "      ),",
+            "  };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/sync/sync-port.ts",
+          "lines": [
+            "// src/services/sync/sync-port.ts",
+            "import type { Result } from '@/core/result';",
+            "",
+            "export type SyncFailure = { readonly kind: 'offline' } | { readonly kind: 'server-error'; readonly status: number };",
+            "",
+            "/** Pulls and pushes the task count. */",
+            "export type SyncPort = {",
+            "  readonly pull: () => Promise<Result<number, SyncFailure>>;",
+            "  readonly push: (count: number) => Promise<Result<number, SyncFailure>>;",
+            "};"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-catalog-not-created": {
+    "expect": [
+      "SKIP src/i18n/catalogs/en.json [failure-message-key] not yet created (i18n-strings-and-catalogs creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "src/i18n/catalogs/en.json" }]
+  },
+  "pass-catch-handled-attempt-probe": {
+    "expect": ["check-error-spine:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/core/tasks/parse-link.ts",
+          "lines": [
+            "// src/core/tasks/parse-link.ts",
+            "import { attempt } from '@/core/result';",
+            "",
+            "import type { Result } from '@/core/result';",
+            "",
+            "export type LinkFailure = { readonly kind: 'invalid-url' };",
+            "",
+            "/** The throw is the expected answer, so it is converted, not caught: no swallowing catch. */",
+            "export function isValidUrl(raw: string): boolean {",
+            "  return attempt(() => new URL(raw), () => ({ kind: 'invalid-url' }) as const).ok;",
+            "}",
+            "",
+            "/** A parser keeps the failure for its caller. */",
+            "export function parseLink(raw: string): Result<URL, LinkFailure> {",
+            "  return attempt(() => new URL(raw.trim()), (): LinkFailure => ({ kind: 'invalid-url' }));",
+            "}",
+            "",
+            "/** A feature probe: Intl.Segmenter is missing on some engines; the answer is a boolean. */",
+            "export function canSegmentWords(): boolean {",
+            "  return attempt(() => new Intl.Segmenter('en', { granularity: 'word' }), () => ({ kind: 'unsupported' }) as const).ok;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-catch-handled-canonical-error-log": {
+    "$comment": "architecture-and-boundaries' canonical memory error log (synced into tests/bases/canonical-error-log) as it ships: its last-resort catch carries the best-effort marker, so the unmodified canonical file passes.",
+    "expect": ["check-error-spine:", "RESULT: PASS"],
+    "base": [
+      "@tests/bases/app",
+      { "templates": true, "firstLinePath": true },
+      { "from": "@skill/examples", "firstLinePath": true },
+      "@tests/bases/canonical-error-log"
+    ]
+  },
+  "pass-catch-handled-forms": {
+    "expect": ["check-error-spine:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/tasks/task-reads.ts",
+          "lines": [
+            "// src/data/tasks/task-reads.ts",
+            "import { err, ok } from '@/core/result';",
+            "",
+            "import type { Result } from '@/core/result';",
+            "import type { ErrorLogPort } from '@/services/error-log/error-log-port';",
+            "",
+            "export type ReadFailure = { readonly kind: 'malformed' } | { readonly kind: 'storage-unavailable' };",
+            "",
+            "export function parseTask(raw: string): Result<unknown, ReadFailure> {",
+            "  try {",
+            "    return ok(JSON.parse(raw));",
+            "  } catch {",
+            "    return err({ kind: 'malformed' });",
+            "  }",
+            "}",
+            "",
+            "export function countOr(read: () => number, errorLog: Pick<ErrorLogPort, 'record'>, fallback: number): number {",
+            "  try {",
+            "    return read();",
+            "  } catch (error) {",
+            "    console.warn('count failed', error);",
+            "    errorLog.record('tasks', error);",
+            "    return fallback;",
+            "  }",
+            "}",
+            "",
+            "export function readOrThrow(read: () => number): number {",
+            "  try {",
+            "    return read();",
+            "  } catch (error) {",
+            "    throw new Error('reading the task count failed', { cause: error });",
+            "  }",
+            "}",
+            "",
+            "export function stateOf(read: () => number, toState: (thrown: unknown) => number): number {",
+            "  try {",
+            "    return read();",
+            "  } catch (thrown: unknown) {",
+            "    return toState(thrown);",
+            "  }",
+            "}",
+            "",
+            "export function loadInto(",
+            "  load: () => Promise<number>,",
+            "  onDone: (result: Result<number, ReadFailure>) => void,",
+            "  reportError: (error: unknown) => void,",
+            "): void {",
+            "  load()",
+            "    .then((count) => {",
+            "      onDone(ok(count));",
+            "    })",
+            "    .catch((error: unknown) => {",
+            "      reportError(error);",
+            "      onDone(err({ kind: 'storage-unavailable' }));",
+            "    });",
+            "  load().catch(reportError);",
+            "  load().catch((error: unknown) => reportError(error));",
+            "  load().catch(() => err({ kind: 'storage-unavailable' }));",
+            "}",
+            "",
+            "/** An optional callback receives the error (design-system-structure's root paint does this). */",
+            "export function paintGround(paint: () => Promise<void>, onError?: (error: unknown) => void): void {",
+            "  paint().catch((error: unknown) => {",
+            "    onError?.(error);",
+            "  });",
+            "  try {",
+            "    void paint();",
+            "  } catch (error: unknown) {",
+            "    onError?.(error);",
+            "  }",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-installed-skills-silent": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/demo/src/features/bad.ts",
+          "lines": [
+            "// planted: every rule of check-error-spine would fire here if it were scanned",
+            "import { ok } from 'neverthrow';",
+            "",
+            "export type Result<T> = { readonly value: T };",
+            "export function load(): void {",
+            "  try {",
+            "    ok(1);",
+            "  } catch (error) {",
+            "    console.warn(error);",
+            "  }",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/demo/src/features/bad.ts",
+          "lines": [
+            "// planted: every rule of check-error-spine would fire here if it were scanned",
+            "import { ok } from 'neverthrow';",
+            "",
+            "export type Result<T> = { readonly value: T };",
+            "export function load(): void {",
+            "  try {",
+            "    ok(1);",
+            "  } catch (error) {",
+            "    console.warn(error);",
+            "  }",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/kit/SKILL.md",
+          "lines": ["---", "name: kit", "description: A vendored skill folder inside src.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/kit/bad.ts",
+          "lines": [
+            "// planted: every rule of check-error-spine would fire here if it were scanned",
+            "import { ok } from 'neverthrow';",
+            "",
+            "export type Result<T> = { readonly value: T };",
+            "export function load(): void {",
+            "  try {",
+            "    ok(1);",
+            "  } catch (error) {",
+            "    console.warn(error);",
+            "  }",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-not-react-native": {
+    "expect": ["NOT APPLICABLE: react-native is not in package.json", "RESULT: PASS"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "react-native"], "delete": true } }]
+  },
+  "pass-result-ignored-collections": {
+    "expect": ["check-error-spine:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/selected-ids.ts",
+          "lines": [
+            "// src/features/tasks/selected-ids.ts",
+            "/** The ids the user picked, in order; a Set, a Map and an array, none of which returns a Result. */",
+            "export function selectedIds(ids: readonly string[], skipped: ReadonlySet<string>): ReadonlySet<string> {",
+            "  const selected = new Set<string>();",
+            "  const positions = new Map<string, number>();",
+            "  const order: string[] = [];",
+            "  for (const id of ids) {",
+            "    if (skipped.has(id)) continue;",
+            "    selected.add(id);",
+            "    positions.set(id, order.length);",
+            "    order.push(id);",
+            "  }",
+            "  selected.delete('');",
+            "  return selected;",
+            "}",
+            "",
+            "export function renameAll(labels: Map<string, string>, rename: { readonly rename: (id: string) => void }): void {",
+            "  for (const id of labels.keys()) rename.rename(id);",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/use-batch-results.ts",
+          "lines": [
+            "// src/features/tasks/use-batch-results.ts",
+            "import type { Result } from '@/core/result';",
+            "import type { Task } from '@/core/tasks/task';",
+            "import type { TaskFailure } from '@/core/tasks/task-failure';",
+            "import type { TaskRepository } from '@/data/tasks/task-repository';",
+            "",
+            "/** Every Result below is used: assigned, returned, collected or passed on. None is a bare statement. */",
+            "export function addAll(repository: TaskRepository, titles: readonly string[], useFirst: boolean): readonly Result<Task, TaskFailure>[] {",
+            "  const first = useFirst ? repository.add({ id: 'first', title: titles[0] ?? '' }) : repository.add({ id: 'fallback', title: 'x' });",
+            "  const results = titles.map((title) => repository.add({ id: title, title }));",
+            "  const options = { default: repository.add({ id: 'default', title: 'd' }), retry: (): Result<Task, TaskFailure> => repository.add({ id: 'r', title: 'r' }) };",
+            "  const seen = new Set<string>();",
+            "  titles.forEach((title) => seen.add(title));",
+            "  titles.forEach((title) => {",
+            "    const result = repository.add({ id: `each-${title}`, title });",
+            "    if (!result.ok) seen.delete(title);",
+            "  });",
+            "  if (seen.size > 0) return [first, ...results, options.default, options.retry()];",
+            "  return titles.length > 0 ? results : [repository.add({ id: 'empty', title: 'e' })];",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-result-ignored-local-shadow": {
+    "expect": ["check-error-spine:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/core/tasks/load.ts",
+          "lines": [
+            "// src/core/tasks/load.ts",
+            "import { err, ok } from '@/core/result';",
+            "",
+            "import type { Result } from '@/core/result';",
+            "",
+            "export type LoadFailure = { readonly kind: 'empty-input' };",
+            "",
+            "/** Normalises a raw task list payload. */",
+            "export function refresh(raw: string): Result<string, LoadFailure> {",
+            "  return raw === '' ? err({ kind: 'empty-input' }) : ok(raw.trim());",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/settings/settings-refresh.ts",
+          "lines": [
+            "// src/features/settings/settings-refresh.ts",
+            "/** Re-reads the settings; returns nothing. */",
+            "export function refresh(): void {",
+            "  // reads the store again",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/settings/use-settings-model.ts",
+          "lines": [
+            "// src/features/settings/use-settings-model.ts",
+            "import { useEffect } from 'react';",
+            "",
+            "export function useSettingsModel(): void {",
+            "  function refresh(): void {",
+            "    // a local function that happens to share the name",
+            "  }",
+            "  useEffect(() => {",
+            "    refresh();",
+            "  }, []);",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/settings/use-sync-model.ts",
+          "lines": [
+            "// src/features/settings/use-sync-model.ts",
+            "import { refresh as reloadSettings } from '@/features/settings/settings-refresh';",
+            "",
+            "export function useSyncModel(refresh: () => void): { readonly sync: () => void } {",
+            "  return {",
+            "    sync: () => {",
+            "      refresh();",
+            "      reloadSettings();",
+            "    },",
+            "  };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/settings/use-reload-model.ts",
+          "lines": [
+            "// src/features/settings/use-reload-model.ts",
+            "import { refresh } from '@/features/settings/settings-refresh';",
+            "",
+            "function useRefresher(): { readonly load: () => void } {",
+            "  return { load: () => undefined };",
+            "}",
+            "",
+            "export function useReloadModel(): { readonly reload: () => void } {",
+            "  const { load } = useRefresher();",
+            "  return {",
+            "    reload: () => {",
+            "      refresh();",
+            "      load();",
+            "    },",
+            "  };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/settings/use-pull-model.ts",
+          "lines": [
+            "// src/features/settings/use-pull-model.ts",
+            "function usePuller(): { readonly refresh: () => void } {",
+            "  return { refresh: () => undefined };",
+            "}",
+            "",
+            "export function usePullModel(): { readonly pull: () => void } {",
+            "  const { refresh } = usePuller();",
+            "  return {",
+            "    pull: () => {",
+            "      refresh();",
+            "    },",
+            "  };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-result-module-option": {
+    "expect": ["check-error-spine:", "RESULT: PASS"],
+    "args": "{dir} --result-module src/shared/result.ts",
+    "ops": [{ "rename": { "from": "src/core/result.ts", "to": "src/shared/result.ts" } }]
+  },
+  "pass-ui-error-message-field-key": {
+    "expect": ["check-error-spine:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/title-field.tsx",
+          "lines": [
+            "// src/features/tasks/components/title-field.tsx",
+            "import { AppText } from '@/ui/app-text';",
+            "",
+            "type FieldError = { readonly message?: string };",
+            "",
+            "export type TitleFieldProps = {",
+            "  readonly fieldState: { readonly error?: FieldError };",
+            "  readonly t: (key: string) => string;",
+            "  readonly intl: { readonly formatMessage: (descriptor: { readonly id: string }) => string };",
+            "};",
+            "",
+            "export function TitleField({ fieldState, t, intl }: TitleFieldProps): React.JSX.Element {",
+            "  return (",
+            "    <>",
+            "      <AppText testID=\"tasks.title-error\">{fieldState.error ? t(fieldState.error.message ?? 'forms.invalid') : ''}</AppText>",
+            "      <AppText testID=\"tasks.title-hint\">{intl.formatMessage({ id: fieldState.error?.message ?? 'forms.invalid' })}</AppText>",
+            "    </>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-workspace-react-native": {
+    "expect": ["check-error-spine:", "RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "react-native"], "delete": true } },
+      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["apps/*"] } },
+      {
+        "write": {
+          "file": "apps/mobile/package.json",
+          "json": { "name": "@tasks/mobile", "private": true, "dependencies": { "react-native": "0.86.3" } }
+        }
+      }
+    ]
+  }
+}

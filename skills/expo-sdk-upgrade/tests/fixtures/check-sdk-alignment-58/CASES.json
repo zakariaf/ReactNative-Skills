@@ -1,0 +1,299 @@
+{
+  "bad-builder-left": {
+    "expect": [
+      "FAIL src/features/tasks/components/hold-to-delete.tsx:4 [gesture-api] uses the Gesture Handler builder Gesture.LongPress(), deprecated in v3"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/hold-to-delete.tsx",
+          "content": "// src/features/tasks/components/hold-to-delete.tsx\nimport { Gesture } from 'react-native-gesture-handler';\n\nexport const HOLD_TO_DELETE = Gesture.LongPress().minDuration(450);\n"
+        }
+      }
+    ]
+  },
+  "bad-compile-sdk-pin": {
+    "expect": ["FAIL app.config.ts:7 [android-sdk] compileSdkVersion 36 is below SDK 58's compileSdk 37"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "return ['expo-router',",
+          "with": "return [['expo-build-properties', { android: { compileSdkVersion: 36 } }], 'expo-router',"
+        }
+      }
+    ]
+  },
+  "bad-eas-alias-left": {
+    "expect": [
+      "FAIL eas.json:30 [eas-image] build.production.ios.image is \"sdk-57\", built for SDK 57, but the app is on SDK 58"
+    ],
+    "ops": [{ "json": { "file": "eas.json", "path": ["build", "production", "ios", "image"], "value": "sdk-57" } }]
+  },
+  "bad-jest-29-left": {
+    "expect": [
+      "FAIL package.json:1 [sdk-tooling] jest is 29.7.0, but SDK 58 needs 30.x",
+      "FAIL package.json:1 [sdk-tooling] @types/jest is 29.5.14, but SDK 58 needs 30.0.0"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["devDependencies", "jest"], "value": "29.7.0" } },
+      { "json": { "file": "package.json", "path": ["devDependencies", "babel-jest"], "value": "29.7.0" } },
+      { "json": { "file": "package.json", "path": ["devDependencies", "@types/jest"], "value": "29.5.14" } }
+    ]
+  },
+  "bad-jest-package-json": {
+    "expect": [
+      "FAIL package.json:30 [jest-config] its \"jest\" key lacks resolver: 'react-native-reanimated/jest/resolver' for SDK 58"
+    ],
+    "ops": [
+      {
+        "$comment": "create-expo-app's default: the Jest config lives in package.json \"jest\", without the resolver.",
+        "delete": "jest.config.js"
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["jest"],
+          "value": {
+            "preset": "jest-expo/ios",
+            "moduleNameMapper": {
+              "^react-native/asset-registry$": "<rootDir>/node_modules/react-native/src/asset-registry.js",
+              "^@/(.*)$": "<rootDir>/src/$1"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "bad-jest-resolver-commented-out": {
+    "expect": ["FAIL jest.config.js:1 [jest-config] lacks resolver: 'react-native-reanimated/jest/resolver' for SDK 58"],
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "  resolver: 'react-native-reanimated/jest/resolver',\n",
+          "with": "  // resolver: 'react-native-reanimated/jest/resolver',\n"
+        }
+      }
+    ]
+  },
+  "bad-jest-resolver-missing": {
+    "expect": ["FAIL jest.config.js:1 [jest-config] lacks resolver: 'react-native-reanimated/jest/resolver' for SDK 58"],
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "  resolver: 'react-native-reanimated/jest/resolver',\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-plugin-js": {
+    "expect": [
+      "FAIL plugins/with-variant-marker.ts:4 [config-plugin-import] imports 'expo/config-plugins.js', but on SDK 58 config plugins import 'expo/config-plugins'",
+      "config-plugins.js.js"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "plugins/with-variant-marker.ts",
+          "find": "import type { ConfigPlugin } from 'expo/config-plugins';",
+          "with": "import type { ConfigPlugin } from 'expo/config-plugins.js';"
+        }
+      }
+    ]
+  },
+  "bad-react-19-2": {
+    "expect": [
+      "FAIL package.json:1 [module-map] react is \"19.2.3\"",
+      "FAIL package.json:1 [core-pins] the app uses react 19.2.3, but SDK 58 ships React 19.3"
+    ],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "react"], "value": "19.2.3" } }]
+  },
+  "bad-removed-api": {
+    "expect": [
+      "FAIL src/features/tasks/defer-work.ts:2 [removed-rn-api] uses InteractionManager, removed in React Native 0.88 (SDK 58)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/defer-work.ts",
+          "content": "// src/features/tasks/defer-work.ts\nimport { InteractionManager } from 'react-native';\n\nexport function deferWork(task: () => void): void {\n  InteractionManager.runAfterInteractions(task);\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-scene-helper-left": {
+    "expect": [
+      "FAIL scripts/config/scene-support.ts:33 [scene-support] ios.enableSceneSupport is set up on SDK 58, where it is a no-op",
+      "FAIL scripts/config/scene-support.test.ts:8 [scene-support]"
+    ],
+    "base": ["@tests/bases/app-57", "@tests/bases/sdk-58", { "templates": true, "firstLinePath": true }],
+    "extends": null,
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/vendored-skill/SKILL.md",
+          "content": "---\nname: vendored-skill\ndescription: A planted skill folder; its files hold findings on purpose and must stay invisible.\n---\n\n# vendored-skill\n"
+        }
+      },
+      {
+        "write": {
+          "file": "skills/demo-skill/SKILL.md",
+          "content": "---\nname: demo-skill\ndescription: A planted skill folder; its files hold findings on purpose and must stay invisible.\n---\n\n# demo-skill\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/third-party-skill/SKILL.md",
+          "content": "---\nname: third-party-skill\ndescription: A planted skill folder; its files hold findings on purpose and must stay invisible.\n---\n\n# third-party-skill\n"
+        }
+      }
+    ]
+  },
+  "bad-scene-leftover": {
+    "expect": ["FAIL app.config.ts:7 [scene-support] ios.enableSceneSupport is set up on SDK 58, where it is a no-op"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "return ['expo-router',",
+          "with": "return [['expo-build-properties', { ios: { enableSceneSupport: true } }], 'expo-router',"
+        }
+      }
+    ]
+  },
+  "bad-skia-approval": {
+    "expect": [
+      "FAIL package.json:1 [skia-approval] allowScripts still approves @shopify/react-native-skia@2.6.2, but Skia 2.13.1 has no install script (removed in 2.6.5)"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["allowScripts"],
+          "value": { "@shopify/react-native-skia@2.6.2": true }
+        }
+      }
+    ]
+  },
+  "bad-stale-reanimated-override": {
+    "expect": ["FAIL package.json:1 [overrides] overrides.react-native-reanimated is 4.5.1 but the app uses 4.7.0"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["overrides"], "value": { "react-native-reanimated": "4.5.1" } } }
+    ]
+  },
+  "bad-test-helper-plugin-js": {
+    "expect": [
+      "FAIL test/config-plugins/run-mod.ts:2 [config-plugin-import] imports 'expo/config-plugins.js', but on SDK 58 config plugins import 'expo/config-plugins'",
+      "FAIL test/config-plugins/run-mod.ts:3 [config-plugin-import]",
+      "config-plugins.js.js"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "test/config-plugins/run-mod.ts",
+          "content": "// test/config-plugins/run-mod.ts\nimport type { ExportedConfig } from 'expo/config-plugins.js';\nimport { withPlugins } from 'expo/config-plugins.js';\n\nexport const runAll = (config: ExportedConfig): ExportedConfig => withPlugins(config, []);\n"
+        }
+      }
+    ]
+  },
+  "bad-unknown-sdk": {
+    "expect": [
+      "FAIL package.json:1 [sdk-unknown] no expectations for Expo SDK 59 in this skill or in contracts/expo-sdk-lines.json"
+    ],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo"], "value": "~59.0.1" } }]
+  },
+  "pass-jest-double-quotes": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "Prettier's default double quotes: the Jest config lines still count.",
+        "replace": { "file": "jest.config.js", "find": "'", "with": "\"", "all": true }
+      }
+    ]
+  },
+  "pass-jest-package-json": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "delete": "jest.config.js" },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["jest"],
+          "value": {
+            "preset": "jest-expo/ios",
+            "moduleNameMapper": {
+              "^react-native/asset-registry$": "<rootDir>/node_modules/react-native/src/asset-registry.js",
+              "^@/(.*)$": "<rootDir>/src/$1"
+            },
+            "resolver": "react-native-reanimated/jest/resolver"
+          }
+        }
+      }
+    ]
+  },
+  "pass-next-map-stale": {
+    "expect": [
+      "note     the skill's expo-sdk-58-next-module-map.json was read from the pre-release expo 58.0.3, but the app installs expo 58.0.5 (package-lock.json): module-map and duplicate-native are skipped",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "$comment": "SDK 58 is stable and the app is on 58.0.5 with React Native 0.88.0: the 58.0.3 pre-release map must not judge it.",
+        "json": { "file": "package.json", "path": ["dependencies", "expo"], "value": "~58.0.5" }
+      },
+      {
+        "json": { "file": "package-lock.json", "path": ["packages", "node_modules/expo", "version"], "value": "58.0.5" }
+      },
+      { "json": { "file": "package.json", "path": ["dependencies", "react-native"], "value": "0.88.0" } },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/react-native", "version"],
+          "value": "0.88.0"
+        }
+      },
+      {
+        "json": { "file": "package.json", "path": ["devDependencies", "@react-native/jest-preset"], "value": "0.88.0" }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["devDependencies", "@react-native/eslint-plugin"],
+          "value": "0.88.0"
+        }
+      }
+    ]
+  },
+  "pass-repo-sdk-line": {
+    "expect": ["sdk-lines SDK 58 from contracts/expo-sdk-lines.json (replaces this skill's entry)", "RESULT: PASS"],
+    "base": [
+      "@tests/bases/app-57",
+      "@tests/bases/sdk-58",
+      { "from": "@skill/examples/expo-sdk-lines.json", "to": "contracts/expo-sdk-lines.json" }
+    ],
+    "extends": null,
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/vendored-skill/SKILL.md",
+          "content": "---\nname: vendored-skill\ndescription: A planted skill folder; its files hold findings on purpose and must stay invisible.\n---\n\n# vendored-skill\n"
+        }
+      },
+      {
+        "write": {
+          "file": "skills/demo-skill/SKILL.md",
+          "content": "---\nname: demo-skill\ndescription: A planted skill folder; its files hold findings on purpose and must stay invisible.\n---\n\n# demo-skill\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/third-party-skill/SKILL.md",
+          "content": "---\nname: third-party-skill\ndescription: A planted skill folder; its files hold findings on purpose and must stay invisible.\n---\n\n# third-party-skill\n"
+        }
+      }
+    ]
+  }
+}

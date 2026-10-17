@@ -1,0 +1,401 @@
+{
+  "bad-allow-unknown": {
+    "expect": [
+      "reports/stryker/mutation.json [allow-unknown] --allow 999 matches no mutant in the report",
+      "(accepted as equivalent with --allow)"
+    ],
+    "args": "{dir} --changed src/core/task-filter.ts --allow 11 --allow 999",
+    "ops": []
+  },
+  "bad-changed-code-not-mutated": {
+    "expect": ["src/features/reminders/reminder-delay.ts [changed-not-mutated] is not in the mutation report"],
+    "args": "{dir} --changed src/features/reminders/reminder-delay.ts",
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/reminders/reminder-delay.ts",
+          "lines": [
+            "// src/features/reminders/reminder-delay.ts",
+            "import type { Reminder } from './reminder-types';",
+            "",
+            "/** Runtime code next to types: Stryker has mutants to make here, so the file must be in the report. */",
+            "export function delayOf(reminder: Reminder, nowMs: number): number {",
+            "  return reminder.atMs - nowMs;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-changed-not-mutated": {
+    "expect": ["src/features/reminders/snooze-policy.ts [changed-not-mutated] is not in the mutation report"],
+    "args": "{dir} --changed src/features/reminders/snooze-policy.ts",
+    "ops": []
+  },
+  "bad-score": {
+    "expect": [
+      "reports/stryker/mutation.json [mutation-score] mutation score 64.3% is below the break threshold 75%",
+      "note src/data/task-repository.ts:30 0 survived, 4 without coverage"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "reports/stryker/mutation.json",
+          "path": ["files", "src/data/task-repository.ts"],
+          "value": {
+            "language": "typescript",
+            "source": "",
+            "mutants": [
+              {
+                "id": "20",
+                "mutatorName": "BlockStatement",
+                "replacement": "{}",
+                "status": "NoCoverage",
+                "static": false,
+                "coveredBy": [],
+                "location": { "start": { "line": 30, "column": 3 }, "end": { "line": 30, "column": 20 } }
+              },
+              {
+                "id": "21",
+                "mutatorName": "BlockStatement",
+                "replacement": "{}",
+                "status": "NoCoverage",
+                "static": false,
+                "coveredBy": [],
+                "location": { "start": { "line": 31, "column": 3 }, "end": { "line": 31, "column": 20 } }
+              },
+              {
+                "id": "22",
+                "mutatorName": "BlockStatement",
+                "replacement": "{}",
+                "status": "NoCoverage",
+                "static": false,
+                "coveredBy": [],
+                "location": { "start": { "line": 32, "column": 3 }, "end": { "line": 32, "column": 20 } }
+              },
+              {
+                "id": "23",
+                "mutatorName": "BlockStatement",
+                "replacement": "{}",
+                "status": "NoCoverage",
+                "static": false,
+                "coveredBy": [],
+                "location": { "start": { "line": 33, "column": 3 }, "end": { "line": 33, "column": 20 } }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "bad-static-file-nightly": {
+    "expect": [
+      "src/features/tasks/task-list.ts:13 [no-valid-mutant] none of its 2 mutants was tested (Ignored: Static mutant",
+      "mutation score 90.0% (9 detected of 10 valid mutants; 13 in the report; break 75%)"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "reports/stryker/mutation.json",
+          "path": ["files", "src/features/tasks/task-list.ts"],
+          "value": {
+            "language": "typescript",
+            "source": "",
+            "mutants": [
+              {
+                "id": "40",
+                "mutatorName": "ConditionalExpression",
+                "replacement": "true",
+                "status": "Ignored",
+                "statusReason": "Static mutant (and \"ignoreStatic\" was enabled)",
+                "static": true,
+                "location": { "start": { "line": 13, "column": 9 }, "end": { "line": 13, "column": 39 } }
+              },
+              {
+                "id": "41",
+                "mutatorName": "UnaryOperator",
+                "replacement": "+1",
+                "status": "Ignored",
+                "statusReason": "Static mutant (and \"ignoreStatic\" was enabled)",
+                "static": true,
+                "location": { "start": { "line": 14, "column": 33 }, "end": { "line": 14, "column": 35 } }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "bad-static-only": {
+    "expect": [
+      "mutation score n/a (0 valid mutants; 3 in the report; break 75%)",
+      "reports/stryker/mutation.json [no-valid-mutant] none of the 3 mutants in the report was tested, so no score was measured",
+      "src/features/tasks/task-list.ts:13 [no-valid-mutant] none of its 3 mutants was tested (Ignored: Static mutant"
+    ],
+    "args": "{dir} --changed src/features/tasks/task-list.ts",
+    "ops": [
+      {
+        "write": {
+          "file": "reports/stryker/mutation.json",
+          "json": {
+            "$comment": "A real Stryker 10 report, trimmed: the test called sortTasks in a module-level const, so every mutant is static and ignoreStatic skipped it (Stryker printed: Final mutation score of NaN is greater than or equal to break threshold 75).",
+            "schemaVersion": "1.0",
+            "thresholds": { "high": 90, "low": 80, "break": 75 },
+            "projectRoot": "/repo",
+            "files": {
+              "src/features/tasks/task-list.ts": {
+                "language": "typescript",
+                "source": "",
+                "mutants": [
+                  {
+                    "id": "4",
+                    "mutatorName": "ConditionalExpression",
+                    "replacement": "true",
+                    "status": "Ignored",
+                    "statusReason": "Static mutant (and \"ignoreStatic\" was enabled)",
+                    "static": true,
+                    "location": { "end": { "column": 39, "line": 13 }, "start": { "column": 9, "line": 13 } }
+                  },
+                  {
+                    "id": "6",
+                    "mutatorName": "EqualityOperator",
+                    "replacement": "first.isDone === second.isDone",
+                    "status": "Ignored",
+                    "statusReason": "Static mutant (and \"ignoreStatic\" was enabled)",
+                    "static": true,
+                    "location": { "end": { "column": 39, "line": 13 }, "start": { "column": 9, "line": 13 } }
+                  },
+                  {
+                    "id": "8",
+                    "mutatorName": "UnaryOperator",
+                    "replacement": "+1",
+                    "status": "Ignored",
+                    "statusReason": "Static mutant (and \"ignoreStatic\" was enabled)",
+                    "static": true,
+                    "location": { "end": { "column": 35, "line": 14 }, "start": { "column": 33, "line": 14 } }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "bad-static-with-compile-error": {
+    "expect": [
+      "src/features/tasks/task-list.ts:13 [no-valid-mutant] none of its 2 mutants was tested (Ignored, CompileError"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "reports/stryker/mutation.json",
+          "path": ["files", "src/features/tasks/task-list.ts"],
+          "value": {
+            "language": "typescript",
+            "source": "",
+            "mutants": [
+              {
+                "id": "40",
+                "mutatorName": "ConditionalExpression",
+                "replacement": "true",
+                "status": "Ignored",
+                "statusReason": "Static mutant (and \"ignoreStatic\" was enabled)",
+                "static": true,
+                "location": { "start": { "line": 13, "column": 9 }, "end": { "line": 13, "column": 39 } }
+              },
+              {
+                "id": "41",
+                "mutatorName": "UnaryOperator",
+                "replacement": "+1",
+                "status": "CompileError",
+                "statusReason": "src/features/tasks/task-list.ts(14,33): error TS2365: Operator '+' cannot be applied to types.",
+                "static": false,
+                "location": { "start": { "line": 14, "column": 33 }, "end": { "line": 14, "column": 35 } }
+              }
+            ]
+          }
+        },
+        "$comment": "One static mutant next to one that failed to compile: the static one was skipped, not rejected by the types, so the file still has no tested mutant (no-valid-mutant)."
+      }
+    ]
+  },
+  "bad-survivor-in-changed": {
+    "expect": [
+      "src/features/reminders/reminder-policy.ts:57 [survivor] EqualityOperator mutant 12 survived: \"lastSentMs >= nowMs\"",
+      "src/features/reminders/reminder-policy.ts:70 [no-coverage] ConditionalExpression mutant 13 was never run by a test"
+    ],
+    "args": "{dir} --changed src/features/reminders/reminder-policy.ts",
+    "ops": [
+      {
+        "json": {
+          "file": "reports/stryker/mutation.json",
+          "path": ["files", "src/features/reminders/reminder-policy.ts", "mutants", 6],
+          "value": {
+            "id": "12",
+            "mutatorName": "EqualityOperator",
+            "replacement": "lastSentMs >= nowMs",
+            "status": "Survived",
+            "static": false,
+            "coveredBy": ["1"],
+            "location": { "start": { "line": 57, "column": 3 }, "end": { "line": 57, "column": 20 } }
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "reports/stryker/mutation.json",
+          "path": ["files", "src/features/reminders/reminder-policy.ts", "mutants", 7],
+          "value": {
+            "id": "13",
+            "mutatorName": "ConditionalExpression",
+            "replacement": "true",
+            "status": "NoCoverage",
+            "static": false,
+            "coveredBy": [],
+            "location": { "start": { "line": 70, "column": 3 }, "end": { "line": 70, "column": 20 } }
+          }
+        }
+      }
+    ]
+  },
+  "error-missing-report": {
+    "expect": ["ERROR [bad-input] nothing to check: reports/stryker/missing.json does not exist"],
+    "args": "{dir} --report reports/stryker/missing.json",
+    "ops": []
+  },
+  "pass-type-rejected-file": {
+    "expect": [
+      "note src/core/result.ts all 3 of its mutants failed to compile (CompileError)",
+      "mutation score 90.0%",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "$comment": "From a real Stryker 10 run on the canonical src/core/result.ts (2026-10-10): the TypeScript checker rejected all 12 mutants (3 kept). The types rule out every change, so the file is a note, not a no-valid-mutant failure.",
+        "json": {
+          "file": "reports/stryker/mutation.json",
+          "path": ["files", "src/core/result.ts"],
+          "value": {
+            "language": "typescript",
+            "source": "",
+            "mutants": [
+              {
+                "id": "r0",
+                "mutatorName": "BlockStatement",
+                "replacement": "{}",
+                "status": "CompileError",
+                "statusReason": "src/core/result.ts(12,44): error TS2355: A function whose declared type is neither 'undefined', 'void', nor 'any' must return a value.\n",
+                "static": false,
+                "location": { "end": { "column": 2, "line": 14 }, "start": { "column": 66, "line": 12 } }
+              },
+              {
+                "id": "r1",
+                "mutatorName": "ObjectLiteral",
+                "replacement": "{}",
+                "status": "CompileError",
+                "statusReason": "src/core/result.ts(13,3): error TS2322: Type '{}' is not assignable to type 'Result<TValue, never>'.\n",
+                "static": false,
+                "location": { "end": { "column": 29, "line": 13 }, "start": { "column": 10, "line": 13 } }
+              },
+              {
+                "id": "r2",
+                "mutatorName": "BooleanLiteral",
+                "replacement": "false",
+                "status": "CompileError",
+                "statusReason": "src/core/result.ts(13,23): error TS2353: Object literal may only specify known properties, and 'value' does not exist in type '{ readonly ok: false; readonly error: never; }'.\n",
+                "static": false,
+                "location": { "end": { "column": 20, "line": 13 }, "start": { "column": 16, "line": 13 } }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "pass-type-rejected-only": {
+    "expect": [
+      "note src/core/result.ts all 3 of its mutants failed to compile (CompileError)",
+      "mutation score n/a (0 valid mutants; 3 in the report; break 75%)",
+      "RESULT: PASS"
+    ],
+    "args": "{dir} --changed src/core/result.ts",
+    "ops": [
+      {
+        "write": {
+          "file": "reports/stryker/mutation.json",
+          "json": {
+            "$comment": "A real Stryker 10 report, trimmed: npx stryker run --mutate src/core/result.ts, where every mutant failed to compile (Stryker printed a score of NaN). Nothing is left for a test to kill, so the run passes with a note.",
+            "schemaVersion": "1.0",
+            "thresholds": { "high": 90, "low": 80, "break": 75 },
+            "projectRoot": "/repo",
+            "files": {
+              "src/core/result.ts": {
+                "language": "typescript",
+                "source": "",
+                "mutants": [
+                  {
+                    "id": "r0",
+                    "mutatorName": "BlockStatement",
+                    "replacement": "{}",
+                    "status": "CompileError",
+                    "statusReason": "src/core/result.ts(12,44): error TS2355: A function whose declared type is neither 'undefined', 'void', nor 'any' must return a value.\n",
+                    "static": false,
+                    "location": { "end": { "column": 2, "line": 14 }, "start": { "column": 66, "line": 12 } }
+                  },
+                  {
+                    "id": "r1",
+                    "mutatorName": "ObjectLiteral",
+                    "replacement": "{}",
+                    "status": "CompileError",
+                    "statusReason": "src/core/result.ts(13,3): error TS2322: Type '{}' is not assignable to type 'Result<TValue, never>'.\n",
+                    "static": false,
+                    "location": { "end": { "column": 29, "line": 13 }, "start": { "column": 10, "line": 13 } }
+                  },
+                  {
+                    "id": "r2",
+                    "mutatorName": "BooleanLiteral",
+                    "replacement": "false",
+                    "status": "CompileError",
+                    "statusReason": "src/core/result.ts(13,23): error TS2353: Object literal may only specify known properties, and 'value' does not exist in type '{ readonly ok: false; readonly error: never; }'.\n",
+                    "static": false,
+                    "location": { "end": { "column": 20, "line": 13 }, "start": { "column": 16, "line": 13 } }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "pass-types-only": {
+    "expect": [
+      "note src/features/reminders/reminder-types.ts holds only types: Stryker has nothing to mutate",
+      "RESULT: PASS"
+    ],
+    "args": "{dir} --changed src/features/reminders/reminder-types.ts",
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/reminders/reminder-types.ts",
+          "lines": [
+            "// src/features/reminders/reminder-types.ts",
+            "// Types only: Stryker makes no mutant here, so its report leaves the file out.",
+            "import type { TaskId } from '@/core/task';",
+            "",
+            "export type Reminder = {",
+            "  readonly taskId: TaskId;",
+            "  readonly atMs: number;",
+            "};",
+            "",
+            "/** Why a reminder was not scheduled. */",
+            "export interface ReminderSkip {",
+            "  readonly reason: 'quiet-hours' | 'daily-limit';",
+            "}"
+          ]
+        }
+      }
+    ]
+  }
+}

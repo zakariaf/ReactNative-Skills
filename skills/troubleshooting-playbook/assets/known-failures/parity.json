@@ -1,0 +1,208 @@
+{
+  "area": "parity",
+  "entries": [
+    {
+      "id": "parity-capture-unstable",
+      "topic": "App capture",
+      "symptom": "A screenshot caught mid-animation, or the capture fails [unstable]: the screen never held still for 300 ms",
+      "cause": "The capture ran before the screen settled, or a loop (withRepeat, a timer, a blinking caret, a polling spinner) keeps running because it ignores reduce motion",
+      "fix": "Capture until two screenshots in a row are identical; route every loop through useReduceMotion() so the parity launch rests it (never a capture-only branch); never waive it or raise the settle time for a loop",
+      "match": [
+        "\\[unstable\\]",
+        "never held still for \\d+ ms"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "design-visual-parity"
+    },
+    {
+      "id": "parity-hierarchy-other-device",
+      "topic": "App capture",
+      "symptom": "The capture stops with \"hierarchy from another device\", or maestro hierarchy shows another screen or language than the one launched",
+      "cause": "Maestro reached another session's simulator or emulator: a call named no --device, or two sessions' drivers shared one port",
+      "fix": "Name the device on every call (maestro --device <id> with its own --driver-host-port, simctl by UDID, adb -s <serial>) and use your own <project>-parity device; the capture proves each dump by its launch nonce",
+      "match": [
+        "hierarchy from another (?:device|simulator)"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "design-visual-parity"
+    },
+    {
+      "id": "parity-app-died-during-capture",
+      "topic": "App capture",
+      "symptom": "\"hierarchy from another device\" although your own device and port were used, and the rejected hierarchy lists only the home screen (SpringBoard, the launcher); or the device log says \"RPC timeout. Apparently deadlocked\"",
+      "cause": "The app was not running: it crashed or aborted after launch (on a saturated machine, for example an audio engine abort when coreaudiod times out), so the launch nonce never reached the dump",
+      "fix": "Read the rejected hierarchy first: home-screen ids mean the app died. Find the crash (iOS crash reports in DiagnosticReports, Android adb -s <serial> logcat -d -s AndroidRuntime:E ReactNativeJS:V), fix it or capture on an idle machine, then capture again with the same build",
+      "match": [
+        "Apparently deadlocked",
+        "rejected\\.hier\\.json.{0,80}SpringBoard"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "design-visual-parity"
+    },
+    {
+      "id": "parity-modal-root-hides-siblings",
+      "topic": "App capture",
+      "symptom": "Every capture of a dialog frame fails screen-not-reached: the root testID (the scrim) is not on screen, although the dialog is visible",
+      "cause": "accessibilityViewIsModal sits on an inner view (the dialog card), so iOS drops its siblings and the modal root's testID from the accessibility tree that Maestro reads",
+      "fix": "Put accessibilityViewIsModal on the modal root (the Scrim; VoiceOver still stays inside the dialog) and render the launch marker as its first child (ui-component-library owns the Scrim)",
+      "match": [
+        "the root testID \\S*scrim\\S* is not on screen"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "design-visual-parity",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "parity-scroll-clamped-before-insets",
+      "topic": "App capture",
+      "symptom": "A tall screen captured at a deep scroll offset stops short: scroll-mismatch",
+      "cause": "The ScrollView laid out before the safe-area insets arrived, so iOS clamped the offset to a smaller maximum; a scroll made only in onContentSizeChange never runs again",
+      "fix": "Scroll from both onContentSizeChange and onLayout, without animation (the screen body's scrollToY fed by useFrameScrollTarget())",
+      "match": [
+        "\\[scroll-mismatch\\]"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "design-visual-parity"
+    },
+    {
+      "id": "parity-status-bar-breadcrumb",
+      "topic": "App capture",
+      "symptom": "The status bar shows a back breadcrumb (\"◀ <other app>\") in a screenshot",
+      "cause": "The app was opened from another app (a deep link, Settings, Safari), so iOS draws a way back to it",
+      "fix": "Terminate the other app and launch this one cleanly by bundle id on your own simulator (simctl launch <udid>); never open parity frames through a deep link on iOS",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "design-visual-parity",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "parity-status-bar-a11y-clock",
+      "topic": "App capture",
+      "symptom": "maestro hierarchy reports the real time and battery although the status bar is overridden",
+      "cause": "xcrun simctl status_bar override changes only the pixels, not the accessibility tree",
+      "fix": "Leave the status bar band (the top safe area) out of element checks; compare it on pixels only",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "design-visual-parity",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "parity-home-indicator",
+      "topic": "App capture",
+      "symptom": "The design shows a home indicator that the simulator screenshot lacks",
+      "cause": "simctl io screenshot includes the Dynamic Island but never the home indicator",
+      "fix": "Hide the home indicator in the design render; do not mask the bottom of both images",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "design-visual-parity",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "parity-fractional-frame",
+      "topic": "Design capture",
+      "symptom": "A design reference renders a few pixels taller or wider than the device screen (1206x2625 for a 1206x2622 screen)",
+      "cause": "An element screenshot of an in-flow frame sat on a fractional CSS offset",
+      "fix": "Pin the frame at (0,0) with position: fixed and clip a page screenshot to the device size",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "design-visual-parity"
+    },
+    {
+      "id": "parity-design-frame-size",
+      "topic": "Design capture",
+      "symptom": "Every element is the same few points lower (or higher) than in the design",
+      "cause": "The design frame uses another device geometry (point size, status bar, safe-area top) than the capture device",
+      "fix": "Render the design at the capture device's geometry (its point size and safe top) and mask the top safe area",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "design-visual-parity"
+    },
+    {
+      "id": "parity-global-diff-gate",
+      "topic": "Comparison",
+      "symptom": "A 1 pt shift, a lighter font weight or a wrong string passes a whole-screen pixel-percentage gate; a colour change is invisible in the heatmap",
+      "cause": "Whole-screen pixel-difference and SSIM noise floors overlap real defects, and a loose colour threshold misses a changed hex",
+      "fix": "Gate per element by testID: geometry within 2 pt, exact text, fill within 3 per channel, text ink metrics, aligned crop structure; report global numbers for information only",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "design-visual-parity"
+    },
+    {
+      "id": "parity-line-height-offset",
+      "topic": "Comparison",
+      "symptom": "Text sits 1 to 2 pt lower or higher than in the design while its glyphs match",
+      "cause": "React Native places text inside its line height differently from CSS half-leading",
+      "fix": "Keep the 2 pt position tolerance for text and compare ink width and height; never move text with a transform or padding to match",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "design-visual-parity"
+    },
+    {
+      "id": "parity-dashed-edge-structure",
+      "topic": "Comparison",
+      "symptom": "check-parity fails [structure] with 1 to 2 pt blobs along a dashed border that no style change removes",
+      "cause": "React Native on iOS draws borderStyle dashed with its own dash length and phase, which no style sets, so the dashes never line up with the browser render",
+      "fix": "Record a platform waiver for that element (rule structure, this cause) in a Gate-Change commit and name it in the report; never redraw the edge or widen the tolerance. A structure failure on a solid edge is a real difference",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "design-visual-parity",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "parity-widened-tolerance",
+      "topic": "Process",
+      "symptom": "A screen passes parity only after a tolerance was raised or a reference was rendered again",
+      "cause": "Widening a tolerance or regenerating a reference to clear a failure hides the defect",
+      "fix": "Restore the tolerance and the reference and fix the app; a real platform difference becomes a reviewed waiver",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "design-visual-parity"
+    },
+    {
+      "id": "parity-unread-sheets",
+      "topic": "Process",
+      "symptom": "Automated parity passed, but a person still found wrong icons, shadows, alignment or mirroring",
+      "cause": "Machines cannot judge icons, shadows, optical alignment or RTL mirroring, and the side-by-side sheets were never looked at",
+      "fix": "Look at every side-by-side sheet and record the sign-off tied to the sheet's hash",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "design-visual-parity"
+    },
+    {
+      "id": "parity-signoff-date-utc",
+      "topic": "Process",
+      "symptom": "A sign-off or report drafted shortly after midnight carries yesterday's date",
+      "cause": "The date came from the UTC calendar day (toISOString().slice(0, 10)) instead of the local day",
+      "fix": "Write the local calendar day (or pass the day explicitly); correct a drafted date before committing the ledger (dates-streaks-and-statistics owns the local-day rule)",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "design-visual-parity"
+    }
+  ]
+}

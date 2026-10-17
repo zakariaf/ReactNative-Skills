@@ -1,0 +1,13 @@
+{
+  "$schema": "./navigation.schema.json",
+  "$comment": "The app's route table, read by navigation-and-routing's check-navigation.mjs. A route change starts here, then the code follows. Route ids are route file paths under the routes folder (src/app) without the extension; home is the href of the first screen. Filled for the starting app: the Tasks screen in the (app) group and the not-found route.",
+  "router": "expo-router",
+  "home": "/",
+  "routes": ["(app)/index", "+not-found"],
+  "protected": [],
+  "guarded": [],
+  "modals": [],
+  "paramParsers": {},
+  "debugRoutes": [],
+  "placeholders": []
+}

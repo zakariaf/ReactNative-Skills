@@ -1,0 +1,23 @@
+{
+  "$comment": "The catalog keys the Pig example names, with an English text and an RTL example (Arabic).",
+  "en": {
+    "pig.continue.extra-turns": "Clear the streak and get more turns",
+    "pig.hud.endless": "Turns left {turnsLeft, number}",
+    "pig.hud.target": "{banked, number} / {target, number} · Turns left {turnsLeft, number}",
+    "pig.lose.bust-streak": "Too many busts in a row",
+    "pig.lose.out-of-turns": "No turns left",
+    "pig.stats.best-turn": "Best turn",
+    "pig.stats.dice-rolled": "Dice rolled",
+    "pig.stats.points-banked": "Points banked"
+  },
+  "ar": {
+    "pig.continue.extra-turns": "امسح السلسلة واحصل على أدوار إضافية",
+    "pig.hud.endless": "الأدوار المتبقية {turnsLeft, number}",
+    "pig.hud.target": "{banked, number} / {target, number} · الأدوار المتبقية {turnsLeft, number}",
+    "pig.lose.bust-streak": "خسارات متتالية كثيرة",
+    "pig.lose.out-of-turns": "لم تبق أدوار",
+    "pig.stats.best-turn": "أفضل دور",
+    "pig.stats.dice-rolled": "رميات النرد",
+    "pig.stats.points-banked": "النقاط المحفوظة"
+  }
+}

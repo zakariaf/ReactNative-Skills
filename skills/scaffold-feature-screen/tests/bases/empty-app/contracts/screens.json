@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "screens": [
+    {
+      "id": "home",
+      "name": "Home",
+      "presentation": "route",
+      "route": "src/app/(app)/index.tsx",
+      "model": "src/features/home/use-home-model.ts",
+      "view": "src/features/home/home-screen.tsx",
+      "states": [
+        {
+          "id": "default"
+        }
+      ],
+      "elements": [
+        {
+          "testID": "home.screen",
+          "role": "none",
+          "component": "View"
+        }
+      ]
+    }
+  ]
+}

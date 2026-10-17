@@ -1,0 +1,50 @@
+{
+  "base": [
+    "@tests/bases/app",
+    {
+      "templates": true,
+      "firstLinePath": true,
+      "fill": {
+        "__GAME_ID__": "lights-out",
+        "__GAME_PASCAL__": "LightsOut",
+        "__GAME_CAMEL__": "lightsOut",
+        "__GAME_CONST__": "LIGHTS_OUT"
+      }
+    },
+    {
+      "from": "@skill/examples/pig"
+    },
+    {
+      "from": "@skill/examples/arena-chase"
+    }
+  ],
+  "ops": [
+    {
+      "json": {
+        "file": "reports/sim/arena-chase.json",
+        "path": [
+          "rulesFingerprint"
+        ],
+        "value": "08665fb3d5b63af0fbae978064683bddbee6d4f32106a14393f307a9f5ac554e"
+      }
+    },
+    {
+      "json": {
+        "file": "reports/sim/lights-out.json",
+        "path": [
+          "rulesFingerprint"
+        ],
+        "value": "832388a1198a841294963c250873b12e96dcbb412b493e0714597f89ba85f1c3"
+      }
+    },
+    {
+      "json": {
+        "file": "reports/sim/pig.json",
+        "path": [
+          "rulesFingerprint"
+        ],
+        "value": "4b247f58c2ba67a5e27c45b14d7ddcfd343eafc5a6a9b10002384fddcc7f9637"
+      }
+    }
+  ]
+}

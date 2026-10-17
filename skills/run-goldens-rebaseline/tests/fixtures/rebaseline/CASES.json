@@ -1,0 +1,135 @@
+{
+  "bad-assertions-red": {
+    "args": "--assertions",
+    "ops": [
+      { "json": { "file": "fake-jest/assertions.json", "path": ["success"], "value": false } },
+      { "json": { "file": "fake-jest/assertions.json", "path": ["numFailedTests"], "value": 1 } }
+    ]
+  },
+  "bad-proof-before-triage": { "args": "--proof", "ops": [{ "delete": "reports/rebaseline/triage.json" }] },
+  "bad-proof-red": { "args": "--proof", "ops": [] },
+  "bad-start-contract-orphan": {
+    "args": "--start --restart --reason intended-ring-redesign --git-status status.txt",
+    "ops": [
+      { "write": { "file": "status.txt", "content": "" } },
+      {
+        "write": {
+          "file": "src/features/tasks/tasks-moved.golden.test.ts.snap.ios",
+          "content": "// Jest Snapshot v1, https://goo.gl/fbAQLP\n\nexports[`[contract] digestNotificationId goldens names the digest of the inbox list on 2026-10-03 1`] = `\"digest:inbox:2026-10-03\"`;\n"
+        }
+      }
+    ]
+  },
+  "bad-start-dirty-goldens": {
+    "args": "--start --restart --reason intended-ring-redesign --git-status status.txt",
+    "ops": [
+      {
+        "write": {
+          "file": "status.txt",
+          "lines": [" M src/features/tasks/tasks-digest.golden.test.ts.snap.ios", " M src/features/tasks/task-list.ts"]
+        }
+      }
+    ]
+  },
+  "bad-start-stale-install": {
+    "args": "--start --restart --reason intended-ring-redesign --git-status status.txt",
+    "ops": [
+      { "write": { "file": "status.txt", "content": "" } },
+      { "json": { "file": "node_modules/jest-image-snapshot/package.json", "path": ["version"], "value": "6.4.0" } }
+    ]
+  },
+  "bad-triage-before-assertions": { "args": "--triage", "ops": [{ "delete": "reports/rebaseline/assertions.json" }] },
+  "bad-triage-contract": {
+    "args": "--triage",
+    "ops": [
+      {
+        "json": {
+          "file": "fake-jest/golden.json",
+          "path": ["testResults", 0, "assertionResults", 3, "status"],
+          "value": "failed"
+        }
+      }
+    ]
+  },
+  "bad-update-contract": {
+    "args": "--update src/features/tasks/tasks-digest.golden.test.ts",
+    "ops": [
+      {
+        "json": {
+          "file": "reports/rebaseline/triage.json",
+          "path": ["testResults", 0, "assertionResults", 2, "status"],
+          "value": "failed"
+        }
+      }
+    ]
+  },
+  "bad-update-no-triage": {
+    "args": "--update src/features/tasks/tasks-digest.golden.test.ts",
+    "ops": [{ "delete": "reports/rebaseline/triage.json" }]
+  },
+  "bad-update-preview": {
+    "args": "--update src/features/tasks/tasks-digest.golden.test.ts",
+    "ops": [
+      {
+        "write": {
+          "file": "fake-jest/list.txt",
+          "lines": ["test/goldens/progress-ring.golden.test.ts", "src/features/tasks/tasks-digest.golden.test.ts"]
+        }
+      }
+    ]
+  },
+  "bad-update-red": {
+    "args": "--update src/features/tasks/tasks-digest.golden.test.ts",
+    "ops": [
+      { "json": { "file": "fake-jest/update.json", "path": ["success"], "value": false } },
+      { "json": { "file": "fake-jest/update.json", "path": ["numFailedTests"], "value": 1 } }
+    ]
+  },
+  "bad-update-track-obsolete": {
+    "args": "--update src/features/tasks/tasks-digest.golden.test.ts",
+    "ops": [{ "write": { "file": "ENV.txt", "lines": ["JEST_IMAGE_SNAPSHOT_TRACK_OBSOLETE=1"] } }]
+  },
+  "bad-update-unplanned": { "args": "--update src/features/tasks/tasks-summary.golden.test.ts", "ops": [] },
+  "error-dry-run-restart": { "args": "--start --dry-run --restart --reason intended-ring-redesign", "ops": [] },
+  "error-start-in-progress": { "args": "--start --reason intended-ring-redesign", "ops": [] },
+  "error-start-no-reason": { "args": "--start --restart", "ops": [] },
+  "error-two-steps": { "args": "--triage --proof", "ops": [] },
+  "error-update-not-golden": { "args": "--update src/features/tasks/task-list.ts", "ops": [] },
+  "pass-assertions": { "args": "--assertions", "ops": [] },
+  "pass-no-jest": {
+    "args": "--proof",
+    "ops": [{ "json": { "file": "package.json", "path": ["devDependencies", "jest"], "delete": true } }]
+  },
+  "pass-proof": {
+    "args": "--proof",
+    "ops": [{ "rename": { "from": "fake-jest/proof.json", "to": "fake-jest/golden.json", "overwrite": true } }]
+  },
+  "pass-start": {
+    "args": "--start --restart --reason intended-ring-redesign --git-status status.txt",
+    "ops": [{ "write": { "file": "status.txt", "content": "" } }]
+  },
+  "pass-start-dry-run": {
+    "args": "--start --dry-run --reason intended-ring-redesign --git-status status.txt",
+    "ops": [{ "write": { "file": "status.txt", "content": "" } }]
+  },
+  "pass-start-lists-orphans": {
+    "args": "--start --restart --reason intended-ring-redesign --git-status status.txt",
+    "ops": [
+      { "write": { "file": "status.txt", "content": "" } },
+      {
+        "write": {
+          "file": "src/features/tasks/tasks-filter.golden.test.ts.snap.ios",
+          "content": "exports[`filterTasks goldens keeps open tasks 1`] = `\"open 2\"`;\n"
+        }
+      }
+    ]
+  },
+  "pass-start-track-obsolete-note": {
+    "args": "--start --restart --reason intended-ring-redesign --git-status status.txt",
+    "ops": [
+      { "write": { "file": "ENV.txt", "lines": ["JEST_IMAGE_SNAPSHOT_TRACK_OBSOLETE=1"] } },
+      { "write": { "file": "status.txt", "content": "" } }
+    ]
+  },
+  "pass-triage": { "args": "--triage", "ops": [] }
+}

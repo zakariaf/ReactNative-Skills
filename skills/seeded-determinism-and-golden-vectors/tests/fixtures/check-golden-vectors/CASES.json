@@ -1,0 +1,1287 @@
+{
+  "bad-contract-shape": {
+    "expect": ["contracts/seeded-generators.json:7 [contract-shape] daily-focus: missing \"regenerate\""],
+    "ops": [
+      {
+        "json": { "file": "contracts/seeded-generators.json", "path": ["generators", 0, "regenerate"], "delete": true }
+      }
+    ]
+  },
+  "bad-generator-pure": {
+    "expect": [
+      "src/features/daily-focus/daily-focus-generator.ts:1 [generator-pure] cannot be imported in plain Node, so it is not pure"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/daily-focus/daily-focus-generator.ts",
+          "find": "import { dailySeed } from '@/core/dates/daily-seed';",
+          "with": "import { Platform } from 'react-native';\n\nimport { dailySeed } from '@/core/dates/daily-seed';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/daily-focus/daily-focus-generator.ts",
+          "find": "  return output.itemIds.join(' ');",
+          "with": "  return `${Platform.OS} ${output.itemIds.join(' ')}`;"
+        }
+      }
+    ]
+  },
+  "bad-generator-removed": {
+    "$comment": "The shipped generator's whole entry deleted (\"generators\": []): without the committed baseline this would print NOT APPLICABLE and pass.",
+    "expect": [
+      "contracts/seeded-generators.json:4 [version-cutover] generator daily-focus recorded in committed/contracts/seeded-generators.json is gone: a shipped generator is retired with a migration of its stored outcomes"
+    ],
+    "args": "{dir} --today 2026-10-03 --committed-dir committed",
+    "extends": "pass-shipped-app",
+    "ops": [{ "json": { "file": "contracts/seeded-generators.json", "path": ["generators"], "value": [] } }]
+  },
+  "bad-generator-renamed": {
+    "$comment": "The id renamed (contract and vectors file) together with the refilled catalog fix: the rename does not escape the frozen checks, because the entry keeps its module and is compared with the committed one.",
+    "expect": [
+      "daily-focus-2: compared with daily-focus in committed/contracts/seeded-generators.json (same module): treated as a rename",
+      "src/features/daily-focus/daily-focus.vectors.json:7 [vectors-frozen] 2026-01-01 at version 1 was 87871c93"
+    ],
+    "args": "{dir} --today 2026-10-03 --committed-dir committed",
+    "extends": "pass-shipped-app",
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/seeded-generators.json",
+          "path": ["generators", 0, "id"],
+          "value": "daily-focus-2"
+        }
+      },
+      {
+        "json": {
+          "file": "src/features/daily-focus/daily-focus.vectors.json",
+          "path": ["generator"],
+          "value": "daily-focus-2"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/daily-focus/daily-focus-generator.ts",
+          "find": "'focus-12'",
+          "with": "'focus-13'"
+        }
+      },
+      {
+        "replace": {
+          "file": "scripts/oracles/daily-focus-oracle.ts",
+          "find": "`focus-${String(index + 1).padStart(2, '0')}`,\n);",
+          "with": "`focus-${String(index + 1).padStart(2, '0')}`,\n).map((id) => (id === 'focus-12' ? 'focus-13' : id));"
+        }
+      },
+      {
+        "json": {
+          "file": "src/features/daily-focus/daily-focus.vectors.json",
+          "path": ["rows", 0, "fingerprint"],
+          "value": "4c5ec97c"
+        }
+      },
+      {
+        "json": {
+          "file": "src/features/daily-focus/daily-focus.vectors.json",
+          "path": ["rows", 0, "summary"],
+          "value": "focus-13 focus-08 focus-09"
+        }
+      },
+      {
+        "json": {
+          "file": "src/features/daily-focus/daily-focus.vectors.json",
+          "path": ["rows", 2, "fingerprint"],
+          "value": "cf2eb3f7"
+        }
+      },
+      {
+        "json": {
+          "file": "src/features/daily-focus/daily-focus.vectors.json",
+          "path": ["rows", 2, "summary"],
+          "value": "focus-13 focus-08 focus-01"
+        }
+      }
+    ]
+  },
+  "bad-generator-retired-no-migration": {
+    "$comment": "A \"retired\" entry for a generator whose outcomes the committed contract says are stored, with no migration: the stored rows would point at a generator that no longer exists.",
+    "expect": [
+      "contracts/seeded-generators.json:4 [version-cutover] generator daily-focus stored outcomes (committed/contracts/seeded-generators.json names \"src/data/daily-focus/daily-focus-outcome-repository.ts\"), but its \"retired\" entry names no migration"
+    ],
+    "args": "{dir} --today 2026-10-03 --committed-dir committed",
+    "extends": "pass-generator-retired",
+    "ops": [
+      {
+        "json": { "file": "contracts/seeded-generators.json", "path": ["retired", 0, "migration"], "literalNull": true }
+      }
+    ]
+  },
+  "bad-no-auto-bless": {
+    "expect": [
+      "package.json:7 [no-auto-bless] the \"verify\" script runs the daily-focus vectors regeneration",
+      "lefthook.yml:4 [no-auto-bless] lefthook.yml runs the daily-focus vectors regeneration"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "vectors:update"],
+          "value": "node scripts/oracles/update-daily-focus-vectors.ts"
+        }
+      },
+      { "json": { "file": "package.json", "path": ["scripts", "verify"], "value": "pnpm vectors:update && pnpm test" } },
+      {
+        "write": {
+          "file": "lefthook.yml",
+          "content": "pre-commit:\n  jobs:\n    - name: vectors\n      run: node scripts/oracles/update-daily-focus-vectors.ts\n"
+        }
+      }
+    ]
+  },
+  "bad-no-auto-bless-agent-hook": {
+    "$comment": "An agent hook regenerates the vectors after every edit (a gate that blesses its own output); the permissions entry naming the same command runs nothing and stays silent.",
+    "expect": [
+      ".claude/settings.json:9 [no-auto-bless] the .claude/settings.json hook runs the daily-focus vectors regeneration",
+      "check-golden-vectors: 1 generators checked, 1 problems, 1 skipped"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": ".claude/settings.json",
+          "lines": [
+            "{",
+            "  \"permissions\": {",
+            "    \"allow\": [\"Bash(node scripts/oracles/update-daily-focus-vectors.ts)\"]",
+            "  },",
+            "  \"hooks\": {",
+            "    \"PostToolUse\": [",
+            "      {",
+            "        \"matcher\": \"Edit|Write\",",
+            "        \"hooks\": [{ \"type\": \"command\", \"command\": \"node scripts/oracles/update-daily-focus-vectors.ts\" }]",
+            "      }",
+            "    ]",
+            "  }",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-no-auto-bless-chain": {
+    "$comment": "The gate reaches the regeneration through a chain of package scripts: verify -> refresh -> vectors:update, and CI runs refresh with yarn.",
+    "expect": [
+      "package.json:7 [no-auto-bless] the \"verify\" script runs the daily-focus vectors regeneration (node scripts/oracles/update-daily-focus-vectors.ts) through refresh -> vectors:update",
+      ".github/workflows/ci.yml:8 [no-auto-bless] .github/workflows/ci.yml runs the daily-focus vectors regeneration (node scripts/oracles/update-daily-focus-vectors.ts) through refresh -> vectors:update"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "vectors:update"],
+          "value": "node scripts/oracles/update-daily-focus-vectors.ts"
+        }
+      },
+      { "json": { "file": "package.json", "path": ["scripts", "refresh"], "value": "npm run vectors:update" } },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "verify"],
+          "value": "npm run -s refresh && npm run -s test"
+        }
+      },
+      {
+        "write": {
+          "file": ".github/workflows/ci.yml",
+          "lines": [
+            "name: ci",
+            "on: [push]",
+            "jobs:",
+            "  test:",
+            "    runs-on: ubuntu-latest",
+            "    steps:",
+            "      - uses: actions/checkout@v5",
+            "      - run: yarn refresh",
+            "      - run: yarn test"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-no-auto-bless-eas": {
+    "$comment": "Expo's own CI (an EAS Workflow) and a simple-git-hooks pre-commit hook in package.json both regenerate the vectors.",
+    "expect": [
+      ".eas/workflows/pr.yml:9 [no-auto-bless] .eas/workflows/pr.yml runs the daily-focus vectors regeneration (node scripts/oracles/update-daily-focus-vectors.ts): a gate that rewrites what it checks verifies nothing",
+      "package.json:11 [no-auto-bless] the \"simple-git-hooks\" pre-commit hook runs the daily-focus vectors regeneration"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": ".eas/workflows/pr.yml",
+          "lines": [
+            "name: Pull request",
+            "on:",
+            "  pull_request: {}",
+            "jobs:",
+            "  verify:",
+            "    steps:",
+            "      - uses: eas/checkout",
+            "      - uses: eas/install_node_modules",
+            "      - run: node scripts/oracles/update-daily-focus-vectors.ts",
+            "      - run: npm test"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["simple-git-hooks"],
+          "value": { "pre-commit": "node scripts/oracles/update-daily-focus-vectors.ts && npx lint-staged" }
+        }
+      }
+    ]
+  },
+  "bad-no-auto-bless-hooks": {
+    "$comment": "lint-staged (a list of commands, one through a package script), husky 4's package.json hooks and CircleCI all regenerate the vectors.",
+    "expect": [
+      ".circleci/config.yml:9 [no-auto-bless] .circleci/config.yml runs the daily-focus vectors regeneration (node scripts/oracles/update-daily-focus-vectors.ts) through vectors:update",
+      "package.json:14 [no-auto-bless] the \"lint-staged\" task for \"*.json\" runs the daily-focus vectors regeneration (node scripts/oracles/update-daily-focus-vectors.ts) through vectors:update",
+      "package.json:19 [no-auto-bless] the \"husky\" pre-push hook runs the daily-focus vectors regeneration"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "vectors:update"],
+          "value": "node scripts/oracles/update-daily-focus-vectors.ts"
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["lint-staged"],
+          "value": { "*.json": ["prettier --write", "npm run vectors:update"] }
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["husky"],
+          "value": { "hooks": { "pre-push": "node scripts/oracles/update-daily-focus-vectors.ts" } }
+        }
+      },
+      {
+        "write": {
+          "file": ".circleci/config.yml",
+          "lines": [
+            "version: 2.1",
+            "jobs:",
+            "  test:",
+            "    docker:",
+            "      - image: cimg/node:26.4",
+            "    steps:",
+            "      - checkout",
+            "      - run: npm ci",
+            "      - run: pnpm vectors:update",
+            "      - run: npm test"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-no-auto-bless-workspace-root": {
+    "$comment": "A workspaces repo checked once per app (apps/mobile as the root). The app's package.json has a vectors:update script; the repo root's CI workflow and husky hook run it with npm's --workspace and --prefix flags. Those files live above the app folder, so the checker reads the workspace root's gates too.",
+    "expect": [
+      "../../.github/workflows/ci.yml:9 [no-auto-bless] ../../.github/workflows/ci.yml runs the daily-focus vectors regeneration (node scripts/oracles/update-daily-focus-vectors.ts) through vectors:update",
+      "../../.husky/pre-commit:1 [no-auto-bless] ../../.husky/pre-commit runs the daily-focus vectors regeneration (node scripts/oracles/update-daily-focus-vectors.ts) through vectors:update"
+    ],
+    "args": "{dir}/apps/mobile --today 2026-10-03",
+    "ops": [
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      { "rename": { "from": "contracts", "to": "apps/mobile/contracts" } },
+      { "rename": { "from": "scripts", "to": "apps/mobile/scripts" } },
+      { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+      { "rename": { "from": "tsconfig.json", "to": "apps/mobile/tsconfig.json" } },
+      { "json": { "file": "apps/mobile/package.json", "path": ["name"], "value": "@acme/mobile" } },
+      {
+        "json": {
+          "file": "apps/mobile/package.json",
+          "path": ["scripts", "vectors:update"],
+          "value": "node scripts/oracles/update-daily-focus-vectors.ts"
+        }
+      },
+      {
+        "write": {
+          "file": "package.json",
+          "json": {
+            "name": "acme",
+            "private": true,
+            "workspaces": ["apps/*"],
+            "scripts": { "test": "npm test --workspaces" }
+          }
+        }
+      },
+      {
+        "write": {
+          "file": ".github/workflows/ci.yml",
+          "lines": [
+            "name: ci",
+            "on: [push]",
+            "jobs:",
+            "  test:",
+            "    runs-on: ubuntu-latest",
+            "    steps:",
+            "      - uses: actions/checkout@v5",
+            "      - run: npm ci",
+            "      - run: npm run vectors:update --workspace apps/mobile",
+            "      - run: npm test"
+          ]
+        }
+      },
+      { "write": { "file": ".husky/pre-commit", "lines": ["npm --prefix apps/mobile run vectors:update"] } }
+    ]
+  },
+  "bad-oracle-command": {
+    "expect": [
+      "src/features/daily-focus/daily-focus.vectors.json:4 [oracle-independent] \"oracle\" is a command (python3 scripts/oracles/daily-focus-oracle.py), not a file"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "src/features/daily-focus/daily-focus.vectors.json",
+          "path": ["oracle"],
+          "value": "python3 scripts/oracles/daily-focus-oracle.py"
+        }
+      }
+    ]
+  },
+  "bad-oracle-independent": {
+    "expect": [
+      "scripts/oracles/daily-focus-oracle.ts:7 [oracle-independent] the oracle imports @/core/rng/sfc32 from src/"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/oracles/daily-focus-oracle.ts",
+          "find": "const U32 = 0xffff_ffffn;",
+          "with": "import { seedRng } from '@/core/rng/sfc32';\n\nconst U32 = 0xffff_ffffn;"
+        }
+      }
+    ]
+  },
+  "bad-oracle-independent-transitive": {
+    "$comment": "The oracle imports a local helper that re-exports the app's own RNG and draws: one file of indirection must not hide shared code.",
+    "expect": [
+      "scripts/oracles/rng-helper.ts:2 [oracle-independent] the oracle reaches src/core/rng/sfc32.ts through scripts/oracles/daily-focus-oracle.ts -> scripts/oracles/rng-helper.ts -> src/core/rng/sfc32.ts",
+      "scripts/oracles/rng-helper.ts:3 [oracle-independent] the oracle reaches src/core/rng/seeded-draws.ts through scripts/oracles/daily-focus-oracle.ts -> scripts/oracles/rng-helper.ts -> src/core/rng/seeded-draws.ts"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/oracles/rng-helper.ts",
+          "content": "// scripts/oracles/rng-helper.ts\nexport { nextInt, seedRng } from '../../src/core/rng/sfc32.ts';\nexport { drawSample } from '../../src/core/rng/seeded-draws.ts';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "scripts/oracles/daily-focus-oracle.ts",
+          "find": "const U32 = 0xffff_ffffn;",
+          "with": "import { drawSample, seedRng } from './rng-helper.ts';\n\nexport const viaHelper = [drawSample, seedRng];\n\nconst U32 = 0xffff_ffffn;"
+        }
+      }
+    ]
+  },
+  "bad-outcome-version": {
+    "$comment": "The generated ids are stored and the version is not: history cannot be replayed and the content has two sources.",
+    "expect": [
+      "src/data/daily-focus/daily-focus-outcome-repository.ts:1 [outcome-version] the stored daily-focus outcome has no generatorVersion field"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/daily-focus/daily-focus-outcome-repository.ts",
+          "content": "// src/data/daily-focus/daily-focus-outcome-repository.ts\nexport type FocusOutcome = {\n  readonly dateKey: string;\n  readonly itemIds: readonly string[];\n  readonly completedIds: readonly string[];\n};\n"
+        }
+      }
+    ]
+  },
+  "bad-repeatable-run": {
+    "$comment": "The shared catalog is shuffled in place \"to save an allocation\": each call starts from the last call's order.",
+    "expect": [
+      "src/features/daily-focus/daily-focus-generator.ts:63 [repeatable-run] generateDailyFocus('2026-01-01', 1) returns different output on another call"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/daily-focus/daily-focus-generator.ts",
+          "find": "import { drawSample } from '@/core/rng/seeded-draws';",
+          "with": "import { drawSample, shuffle } from '@/core/rng/seeded-draws';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/daily-focus/daily-focus-generator.ts",
+          "find": "const CATALOG_V1: readonly string[] = [",
+          "with": "const CATALOG_V1: string[] = ["
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/daily-focus/daily-focus-generator.ts",
+          "find": "  const { value } = drawSample(CATALOG_V1, PICKS_V1, state);",
+          "with": "  CATALOG_V1.splice(0, CATALOG_V1.length, ...shuffle(CATALOG_V1, state).value);\n  const { value } = drawSample(CATALOG_V1, PICKS_V1, state);"
+        }
+      }
+    ]
+  },
+  "bad-runtime-ambient": {
+    "$comment": "A helper outside the seeded paths reads Math.random: the text scan cannot see it, the runtime trap does.",
+    "expect": [
+      "src/features/daily-focus/daily-focus-generator.ts:63 [runtime-ambient] generateDailyFocus() called Math.random while generating a vector row"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/lib/tie-break.ts",
+          "content": "// src/lib/tie-break.ts\nexport function tieBreak(): number {\n  return Math.random() < 2 ? 0 : 1;\n}\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/daily-focus/daily-focus-generator.ts",
+          "find": "import { seedRng } from '@/core/rng/sfc32';",
+          "with": "import { seedRng } from '@/core/rng/sfc32';\nimport { tieBreak } from '@/lib/tie-break';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/daily-focus/daily-focus-generator.ts",
+          "find": "  const state = seedRng(dailySeed(key, DAILY_FOCUS_SALT));",
+          "with": "  const state = seedRng(dailySeed(key, DAILY_FOCUS_SALT) + tieBreak());"
+        }
+      }
+    ]
+  },
+  "bad-runtime-inexact": {
+    "$comment": "A helper calls Math.exp while every row is drawn: Jest stays green while iOS libm, Android Bionic and V8 may disagree in the last bit. The runtime trap catches the call wherever it lives (a package from node_modules too).",
+    "expect": [
+      "src/features/daily-focus/daily-focus-generator.ts:63 [runtime-ambient] generateDailyFocus() called Math.exp while generating a vector row"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/lib/weights.ts",
+          "lines": [
+            "// src/lib/weights.ts",
+            "export function itemWeight(index: number): number {",
+            "  return Math.round(1000 * Math.exp(-index / 4));",
+            "}"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/daily-focus/daily-focus-generator.ts",
+          "find": "import { seedRng } from '@/core/rng/sfc32';",
+          "with": "import { seedRng } from '@/core/rng/sfc32';\nimport { itemWeight } from '@/lib/weights';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/daily-focus/daily-focus-generator.ts",
+          "find": "  const state = seedRng(dailySeed(key, DAILY_FOCUS_SALT));",
+          "with": "  const state = seedRng(dailySeed(key, DAILY_FOCUS_SALT) + itemWeight(key.length));"
+        }
+      }
+    ]
+  },
+  "bad-salt-changed-committed": {
+    "$comment": "The salt changed in the code and the contract together (so the two agree), and the rows were refilled: only the committed contract still knows the shipped salt.",
+    "expect": [
+      "contracts/seeded-generators.json:11 [salt-frozen] daily-focus: the salt is 795560989, but committed/contracts/seeded-generators.json records the shipped salt 3141592653: a committed salt never changes"
+    ],
+    "args": "{dir} --today 2026-10-03 --committed-dir committed",
+    "extends": "pass-cutover-example",
+    "ops": [
+      {
+        "json": {
+          "file": "committed/contracts/seeded-generators.json",
+          "path": ["generators", 0, "salt"],
+          "value": 3141592653
+        }
+      }
+    ]
+  },
+  "bad-salt-frozen": {
+    "$comment": "A \"harmless\" salt tweak changes every day of the generator.",
+    "expect": [
+      "src/features/daily-focus/daily-focus-generator.ts:18 [salt-frozen] DAILY_FOCUS_SALT is 795560990; the contract records the shipped salt 795560989"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/daily-focus/daily-focus-generator.ts",
+          "find": "0x2f6b4c1d",
+          "with": "0x2f6b4c1e"
+        }
+      }
+    ]
+  },
+  "bad-salt-shared": {
+    "$comment": "A second generator copied from the first keeps its salt: the two outputs move together every day.",
+    "expect": ["[salt-frozen] notes uses the salt 795560989 of daily-focus"],
+    "ops": [
+      {
+        "copy": {
+          "from": "src/features/daily-focus/daily-focus-generator.ts",
+          "to": "src/features/notes/notes-generator.ts"
+        }
+      },
+      {
+        "copy": {
+          "from": "src/features/daily-focus/daily-focus.vectors.json",
+          "to": "src/features/notes/notes.vectors.json"
+        }
+      },
+      {
+        "copy": {
+          "from": "src/features/daily-focus/daily-focus-vectors.test.ts",
+          "to": "src/features/notes/notes-vectors.test.ts"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/notes/notes-vectors.test.ts",
+          "find": "./daily-focus.vectors.json",
+          "with": "./notes.vectors.json"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/notes/notes.vectors.json",
+          "find": "\"generator\": \"daily-focus\"",
+          "with": "\"generator\": \"notes\""
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/seeded-generators.json",
+          "path": ["generators", 1],
+          "value": {
+            "id": "notes",
+            "module": "src/features/notes/notes-generator.ts",
+            "generate": "generateDailyFocus",
+            "summarize": "summarizeDailyFocus",
+            "keyKind": "date",
+            "salt": 795560989,
+            "saltExport": "DAILY_FOCUS_SALT",
+            "versionsExport": "DAILY_FOCUS_VERSIONS",
+            "versions": [{ "version": 1, "from": null }],
+            "vectors": "src/features/notes/notes.vectors.json",
+            "outcome": null,
+            "regenerate": "node scripts/oracles/update-notes-vectors.ts"
+          }
+        }
+      }
+    ]
+  },
+  "bad-salt-template-shipped": {
+    "$comment": "The committed contract still holds the template salt, but the committed rows are the app's own, not the template's seven: something other than the template shipped under that salt, so the template exception no longer applies and the salt is frozen.",
+    "expect": [
+      "contracts/seeded-generators.json:12 [salt-frozen] daily-focus: the salt is 1511506921, but committed/contracts/seeded-generators.json records the shipped salt 795560989 (the template salt, but the committed rows are no longer the template's: it shipped)"
+    ],
+    "args": "{dir} --today 2026-10-03 --committed-dir committed",
+    "extends": "pass-template-rows-refilled",
+    "ops": [
+      {
+        "copy": {
+          "from": "src/features/daily-focus/daily-focus.vectors.json",
+          "to": "committed/src/features/daily-focus/daily-focus.vectors.json"
+        }
+      }
+    ]
+  },
+  "bad-text-key-cutover": {
+    "$comment": "The share-code generator defaults to the newest version: a version 1 code opened without its version shows the receiver a version 2 pack.",
+    "expect": [
+      "src/features/starter-pack/starter-pack-generator.ts:57 [version-cutover] generateStarterPack('7KQ2') without a version returns version 2, but the row's key was made with version 1 (and 2 more rows)"
+    ],
+    "extends": "pass-text-key",
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/starter-pack/starter-pack-generator.ts",
+          "find": "export function generateStarterPack(code: string, version: number): StarterPack {",
+          "with": "export function generateStarterPack(\n  code: string,\n  version: number = latestVersion(STARTER_PACK_VERSIONS),\n): StarterPack {"
+        }
+      }
+    ]
+  },
+  "bad-text-key-dated": {
+    "$comment": "A text-keyed generator given a cutover date: a share code has no date to route on.",
+    "expect": [
+      "contracts/seeded-generators.json:29 [version-cutover] starter-pack: version 2: a text-keyed generator has no cutover key"
+    ],
+    "extends": "pass-text-key",
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/seeded-generators.json",
+          "path": ["generators", 1, "versions", 1, "from"],
+          "value": "2027-03-01"
+        }
+      }
+    ]
+  },
+  "bad-vectors-cover": {
+    "expect": [
+      "src/features/daily-focus/daily-focus.vectors.json:1 [vectors-cover] the rows lack a leap day (YYYY-02-29)"
+    ],
+    "ops": [
+      { "json": { "file": "src/features/daily-focus/daily-focus.vectors.json", "path": ["rows", 5], "delete": true } }
+    ]
+  },
+  "bad-vectors-file": {
+    "expect": [
+      "src/features/daily-focus/daily-focus.vectors.json:7 [vectors-file] row \"2026-01-01\": fingerprint \"3fd9ac7\" is not 8 lowercase hex digits"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "src/features/daily-focus/daily-focus.vectors.json",
+          "path": ["rows", 0, "fingerprint"],
+          "value": "3fd9ac7"
+        }
+      }
+    ]
+  },
+  "bad-vectors-match": {
+    "$comment": "A shipped version edited in place: two catalog entries swapped.",
+    "expect": [
+      "src/features/daily-focus/daily-focus.vectors.json:7 [vectors-match] 2026-01-01 at version 1 now fingerprints"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/daily-focus/daily-focus-generator.ts",
+          "find": "  'item-03',\n  'item-04',",
+          "with": "  'item-04',\n  'item-03',"
+        }
+      }
+    ]
+  },
+  "bad-vectors-refilled": {
+    "$comment": "A typo fix in a shipped catalog ('focus-12' -> 'focus-13'), made in the generator and the oracle together, with the two affected rows' values deleted and refilled by the update script. Generator, oracle, rows and tests all agree (vectors-match passes); only the committed vectors still hold what users saw.",
+    "expect": [
+      "src/features/daily-focus/daily-focus.vectors.json:7 [vectors-frozen] 2026-01-01 at version 1 was 87871c93 \"focus-12 focus-08 focus-09\" in committed/src/features/daily-focus/daily-focus.vectors.json and is now 4c5ec97c \"focus-13 focus-08 focus-09\": a committed row never changes",
+      "src/features/daily-focus/daily-focus.vectors.json:21 [vectors-frozen] 2026-12-31 at version 1 was 8d8e7838 \"focus-12 focus-08 focus-01\""
+    ],
+    "args": "{dir} --today 2026-10-03 --committed-dir committed",
+    "extends": "pass-shipped-app",
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/daily-focus/daily-focus-generator.ts",
+          "find": "'focus-12'",
+          "with": "'focus-13'"
+        }
+      },
+      {
+        "replace": {
+          "file": "scripts/oracles/daily-focus-oracle.ts",
+          "find": "`focus-${String(index + 1).padStart(2, '0')}`,\n);",
+          "with": "`focus-${String(index + 1).padStart(2, '0')}`,\n).map((id) => (id === 'focus-12' ? 'focus-13' : id));"
+        }
+      },
+      {
+        "json": {
+          "file": "src/features/daily-focus/daily-focus.vectors.json",
+          "path": ["rows", 0, "fingerprint"],
+          "value": "4c5ec97c"
+        }
+      },
+      {
+        "json": {
+          "file": "src/features/daily-focus/daily-focus.vectors.json",
+          "path": ["rows", 0, "summary"],
+          "value": "focus-13 focus-08 focus-09"
+        }
+      },
+      {
+        "json": {
+          "file": "src/features/daily-focus/daily-focus.vectors.json",
+          "path": ["rows", 2, "fingerprint"],
+          "value": "cf2eb3f7"
+        }
+      },
+      {
+        "json": {
+          "file": "src/features/daily-focus/daily-focus.vectors.json",
+          "path": ["rows", 2, "summary"],
+          "value": "focus-13 focus-08 focus-01"
+        }
+      }
+    ]
+  },
+  "bad-vectors-row-deleted": {
+    "$comment": "A committed row deleted from the vectors file (here the historical key, which no coverage rule needs): the proof that the shipped output still reproduces is gone.",
+    "expect": [
+      "src/features/daily-focus/daily-focus.vectors.json:5 [vectors-frozen] 2026-09-26 at version 1 (85843766 \"focus-02 focus-05 focus-10\") is recorded in committed/src/features/daily-focus/daily-focus.vectors.json but is gone from the rows: a committed row is never deleted"
+    ],
+    "args": "{dir} --today 2026-10-03 --committed-dir committed",
+    "extends": "pass-shipped-app",
+    "ops": [
+      { "json": { "file": "src/features/daily-focus/daily-focus.vectors.json", "path": ["rows", 1], "delete": true } }
+    ]
+  },
+  "bad-vectors-test": {
+    "expect": [
+      "src/features/daily-focus/daily-focus.vectors.json:1 [vectors-test] no test in src/features/daily-focus/ imports daily-focus.vectors.json"
+    ],
+    "ops": [{ "delete": "src/features/daily-focus/daily-focus-vectors.test.ts" }]
+  },
+  "bad-version-cutover": {
+    "$comment": "The cutover table changed in code but not in the contract (and version 2 was never written).",
+    "expect": ["src/features/daily-focus/daily-focus-generator.ts:21 [version-cutover] DAILY_FOCUS_VERSIONS in code is"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/daily-focus/daily-focus-generator.ts",
+          "find": "export const DAILY_FOCUS_VERSIONS: readonly GeneratorVersion[] = [{ version: 1, from: null }];",
+          "with": "export const DAILY_FOCUS_VERSIONS: readonly GeneratorVersion[] = [\n  { version: 1, from: null },\n  { version: 2, from: '2027-03-01' },\n];"
+        }
+      }
+    ]
+  },
+  "bad-version-cutover-deleted": {
+    "$comment": "The committed contract records a version 3 that the contract (and the code) no longer has: keys and stored outcomes made with version 3 could not be replayed.",
+    "expect": [
+      "contracts/seeded-generators.json:6 [version-cutover] daily-focus: version 3 (from \"2027-09-01\") is recorded in committed/contracts/seeded-generators.json but is gone: a committed cutover never moves or disappears"
+    ],
+    "args": "{dir} --today 2026-10-03 --committed-dir committed",
+    "extends": "pass-cutover-example",
+    "ops": [
+      {
+        "copy": {
+          "from": "contracts/seeded-generators.json",
+          "to": "committed/contracts/seeded-generators.json",
+          "overwrite": true
+        }
+      },
+      {
+        "json": {
+          "file": "committed/contracts/seeded-generators.json",
+          "path": ["generators", 0, "versions", 2],
+          "value": { "version": 3, "from": "2027-09-01" }
+        }
+      }
+    ]
+  },
+  "bad-version-cutover-moved": {
+    "$comment": "The committed contract has version 2 from 2027-02-01; the code and the contract now say 2027-03-01. A committed cutover never moves, in either direction: keys between the two dates were (or will be) served by another version on some devices.",
+    "expect": [
+      "contracts/seeded-generators.json:6 [version-cutover] daily-focus: version 2 now starts \"2027-03-01\", but committed/contracts/seeded-generators.json records \"2027-02-01\": a committed cutover never moves or disappears; append a new version with a future date"
+    ],
+    "args": "{dir} --today 2026-10-03 --committed-dir committed",
+    "extends": "pass-cutover-example",
+    "ops": [
+      {
+        "json": {
+          "file": "committed/contracts/seeded-generators.json",
+          "path": ["generators", 0, "versions", 1],
+          "value": { "version": 2, "from": "2027-02-01" }
+        }
+      }
+    ]
+  },
+  "bad-version-cutover-retroactive": {
+    "$comment": "Version 2 is not in the committed contract yet and its cutover (2027-03-01) is not after today: keys users already saw would change on update.",
+    "expect": [
+      "contracts/seeded-generators.json:6 [version-cutover] daily-focus: version 2 starts 2027-03-01, on or before today (2027-03-15), and committed/contracts/seeded-generators.json does not record it yet"
+    ],
+    "args": "{dir} --today 2027-03-15 --committed-dir committed",
+    "extends": "pass-cutover-example",
+    "ops": []
+  },
+  "bad-version-table": {
+    "expect": [
+      "contracts/seeded-generators.json:7 [version-cutover] daily-focus: version 2 needs a civil-date cutover key"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/seeded-generators.json",
+          "path": ["generators", 0, "versions", 1],
+          "value": { "version": 2, "from": "2027-02-30" }
+        }
+      }
+    ]
+  },
+  "error-contract-json": {
+    "expect": ["ERROR [bad-input] contracts/seeded-generators.json is not valid JSON"],
+    "ops": [{ "write": { "file": "contracts/seeded-generators.json", "content": "{ \"generators\": [ \n" } }]
+  },
+  "error-no-contract": {
+    "expect": ["ERROR [bad-input] nothing to check: contracts/seeded-generators.json does not exist"],
+    "ops": [{ "delete": "contracts/seeded-generators.json" }]
+  },
+  "pass-cutover-example": {
+    "$comment": "The shipped cutover example on the templates. The committed baseline (committed/) is version 1 as it shipped: the contract without version 2 and the template's seven rows. Version 2 is new since then and starts after --today, and every committed row is still there, so it passes.",
+    "expect": ["check-golden-vectors: 1 generators checked, 0 problems", "RESULT: PASS"],
+    "args": "{dir} --today 2026-10-03 --committed-dir committed",
+    "base": [
+      "@tests/bases/app",
+      {
+        "templates": true,
+        "firstLinePath": true,
+        "fill": {
+          "__FEATURE__": "daily-focus",
+          "__FEATURE_PASCAL__": "DailyFocus",
+          "__FEATURE_CAMEL__": "dailyFocus",
+          "__FEATURE_CONST__": "DAILY_FOCUS"
+        }
+      },
+      { "from": "@skill/examples/daily-focus-cutover", "firstLinePath": true },
+      {
+        "from": "@skill/examples/daily-focus-cutover/daily-focus.vectors.json",
+        "to": "src/features/daily-focus/daily-focus.vectors.json"
+      },
+      { "from": "@skill/examples/daily-focus-cutover/seeded-generators.json", "to": "contracts/seeded-generators.json" },
+      { "from": "@skill/examples/daily-focus-outcomes", "firstLinePath": true }
+    ],
+    "ops": [
+      { "copy": { "from": "contracts/seeded-generators.json", "to": "committed/contracts/seeded-generators.json" } },
+      {
+        "json": {
+          "file": "committed/contracts/seeded-generators.json",
+          "path": ["generators", 0, "versions", 1],
+          "delete": true
+        }
+      },
+      {
+        "copy": {
+          "from": "src/features/daily-focus/daily-focus.vectors.json",
+          "to": "committed/src/features/daily-focus/daily-focus.vectors.json"
+        }
+      },
+      {
+        "json": {
+          "file": "committed/src/features/daily-focus/daily-focus.vectors.json",
+          "path": ["rows", 11],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "committed/src/features/daily-focus/daily-focus.vectors.json",
+          "path": ["rows", 10],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "committed/src/features/daily-focus/daily-focus.vectors.json",
+          "path": ["rows", 9],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "committed/src/features/daily-focus/daily-focus.vectors.json",
+          "path": ["rows", 8],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "committed/src/features/daily-focus/daily-focus.vectors.json",
+          "path": ["rows", 7],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "pass-generator-retired": {
+    "$comment": "The feature is removed with the developer's approval: the entry is gone, a \"retired\" entry names the migration that drops its stored outcomes, and the migration exists.",
+    "expect": [
+      "daily-focus: retired (Daily focus removed in 3.0; outcomes dropped by migration 7 (approved by the developer).); committed/contracts/seeded-generators.json still records it",
+      "NOT APPLICABLE: contracts/seeded-generators.json declares no seeded generators (\"generators\": [])"
+    ],
+    "args": "{dir} --today 2026-10-03 --committed-dir committed",
+    "extends": "pass-shipped-app",
+    "ops": [
+      { "json": { "file": "contracts/seeded-generators.json", "path": ["generators"], "value": [] } },
+      {
+        "json": {
+          "file": "contracts/seeded-generators.json",
+          "path": ["retired"],
+          "value": [
+            {
+              "id": "daily-focus",
+              "migration": "src/data/migrations/0007-drop-daily-focus-outcomes.ts",
+              "note": "Daily focus removed in 3.0; outcomes dropped by migration 7 (approved by the developer)."
+            }
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/data/migrations/0007-drop-daily-focus-outcomes.ts",
+          "lines": [
+            "// src/data/migrations/0007-drop-daily-focus-outcomes.ts",
+            "export const DROP_DAILY_FOCUS_OUTCOMES = 'DROP TABLE IF EXISTS daily_focus_outcomes';"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-no-auto-bless-paths-filter": {
+    "$comment": "Gate files that name the update script only as a file filter: a workflow that runs a review job when the vectors tooling changes (paths:), and a lefthook job whose glob: names it but whose command only verifies. Neither runs the regeneration.",
+    "expect": ["check-golden-vectors: 1 generators checked, 0 problems, 1 skipped", "RESULT: PASS"],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "vectors:update"],
+          "value": "node scripts/oracles/update-daily-focus-vectors.ts"
+        }
+      },
+      {
+        "write": {
+          "file": ".github/workflows/vectors-review.yml",
+          "lines": [
+            "name: vectors-review",
+            "on:",
+            "  pull_request:",
+            "    paths:",
+            "      - 'scripts/oracles/update-daily-focus-vectors.ts'",
+            "      - 'src/features/**/*.vectors.json'",
+            "    branches: [main]",
+            "jobs:",
+            "  verify:",
+            "    runs-on: ubuntu-latest",
+            "    steps:",
+            "      - uses: actions/checkout@v5",
+            "      - run: npx jest scripts/oracles src/features --ci"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "lefthook.yml",
+          "lines": [
+            "pre-commit:",
+            "  jobs:",
+            "    - name: vectors-verify",
+            "      glob: 'scripts/oracles/update-daily-focus-vectors.ts'",
+            "      run: npx jest scripts/oracles --ci"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-no-generators": {
+    "expect": ["NOT APPLICABLE: contracts/seeded-generators.json declares no seeded generators (\"generators\": [])"],
+    "ops": [{ "json": { "file": "contracts/seeded-generators.json", "path": ["generators"], "value": [] } }]
+  },
+  "pass-outcome-recorded": {
+    "expect": ["check-golden-vectors: 1 generators checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/daily-focus/daily-focus-outcome-repository.ts",
+          "content": "// src/data/daily-focus/daily-focus-outcome-repository.ts\nexport type FocusOutcome = {\n  readonly dateKey: string;\n  readonly generatorVersion: number;\n  readonly completedIds: readonly string[];\n};\n"
+        }
+      }
+    ]
+  },
+  "pass-shipped-app": {
+    "$comment": "An app that shipped daily-focus with its own salt (0x5a17c3e9) and catalog (focus-01 ... focus-12), rows filled by the oracle. committed/ holds the contract and vectors as committed: identical, so it passes. The frozen-state cases extend it.",
+    "expect": ["check-golden-vectors: 1 generators checked, 0 problems, 1 skipped", "RESULT: PASS"],
+    "args": "{dir} --today 2026-10-03 --committed-dir committed",
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/daily-focus/daily-focus-generator.ts",
+          "find": "0x2f6b4c1d",
+          "with": "0x5a17c3e9"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/daily-focus/daily-focus-generator.ts",
+          "find": "'item-",
+          "with": "'focus-",
+          "all": true
+        }
+      },
+      { "replace": { "file": "scripts/oracles/daily-focus-oracle.ts", "find": "0x2f6b_4c1dn", "with": "0x5a17_c3e9n" } },
+      { "replace": { "file": "scripts/oracles/daily-focus-oracle.ts", "find": "`item-${", "with": "`focus-${" } },
+      {
+        "replace": {
+          "file": "src/features/daily-focus/daily-focus-generator.test.ts",
+          "find": "/^item-\\d{2}$/",
+          "with": "/^focus-\\d{2}$/"
+        }
+      },
+      { "json": { "file": "contracts/seeded-generators.json", "path": ["generators", 0, "salt"], "value": 1511506921 } },
+      {
+        "json": {
+          "file": "src/features/daily-focus/daily-focus.vectors.json",
+          "path": ["rows"],
+          "value": [
+            {
+              "key": "2026-01-01",
+              "version": 1,
+              "fingerprint": "87871c93",
+              "summary": "focus-12 focus-08 focus-09",
+              "note": "first key the app pins"
+            },
+            {
+              "key": "2026-09-26",
+              "version": 1,
+              "fingerprint": "85843766",
+              "summary": "focus-02 focus-05 focus-10",
+              "note": "historical key users have seen"
+            },
+            {
+              "key": "2026-12-31",
+              "version": 1,
+              "fingerprint": "8d8e7838",
+              "summary": "focus-12 focus-08 focus-01",
+              "note": "year end"
+            },
+            {
+              "key": "2027-01-01",
+              "version": 1,
+              "fingerprint": "1403c0dc",
+              "summary": "focus-02 focus-09 focus-01",
+              "note": "year start (rollover pair)"
+            },
+            {
+              "key": "2028-02-28",
+              "version": 1,
+              "fingerprint": "45a88622",
+              "summary": "focus-05 focus-02 focus-04",
+              "note": "day before a leap day"
+            },
+            {
+              "key": "2028-02-29",
+              "version": 1,
+              "fingerprint": "87d62a20",
+              "summary": "focus-10 focus-06 focus-01",
+              "note": "leap day"
+            },
+            {
+              "key": "2028-03-01",
+              "version": 1,
+              "fingerprint": "fb2cac4c",
+              "summary": "focus-02 focus-03 focus-11",
+              "note": "day after a leap day"
+            }
+          ]
+        }
+      },
+      { "copy": { "from": "contracts/seeded-generators.json", "to": "committed/contracts/seeded-generators.json" } },
+      {
+        "copy": {
+          "from": "src/features/daily-focus/daily-focus.vectors.json",
+          "to": "committed/src/features/daily-focus/daily-focus.vectors.json"
+        }
+      }
+    ]
+  },
+  "pass-template-rows-refilled": {
+    "$comment": "Workflow step 6: the committed contract and vectors are still the template's (salt 795560989, the seven template rows). Setting the app's own salt and catalog and refilling every row changes committed values, which is allowed only because they are the template's.",
+    "expect": ["check-golden-vectors: 1 generators checked, 0 problems, 1 skipped", "RESULT: PASS"],
+    "args": "{dir} --today 2026-10-03 --committed-dir committed",
+    "ops": [
+      { "copy": { "from": "contracts/seeded-generators.json", "to": "committed/contracts/seeded-generators.json" } },
+      {
+        "copy": {
+          "from": "src/features/daily-focus/daily-focus.vectors.json",
+          "to": "committed/src/features/daily-focus/daily-focus.vectors.json"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/daily-focus/daily-focus-generator.ts",
+          "find": "0x2f6b4c1d",
+          "with": "0x5a17c3e9"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/daily-focus/daily-focus-generator.ts",
+          "find": "'item-",
+          "with": "'focus-",
+          "all": true
+        }
+      },
+      { "replace": { "file": "scripts/oracles/daily-focus-oracle.ts", "find": "0x2f6b_4c1dn", "with": "0x5a17_c3e9n" } },
+      { "replace": { "file": "scripts/oracles/daily-focus-oracle.ts", "find": "`item-${", "with": "`focus-${" } },
+      {
+        "replace": {
+          "file": "src/features/daily-focus/daily-focus-generator.test.ts",
+          "find": "/^item-\\d{2}$/",
+          "with": "/^focus-\\d{2}$/"
+        }
+      },
+      { "json": { "file": "contracts/seeded-generators.json", "path": ["generators", 0, "salt"], "value": 1511506921 } },
+      {
+        "json": {
+          "file": "src/features/daily-focus/daily-focus.vectors.json",
+          "path": ["rows"],
+          "value": [
+            {
+              "key": "2026-01-01",
+              "version": 1,
+              "fingerprint": "87871c93",
+              "summary": "focus-12 focus-08 focus-09",
+              "note": "first key the app pins"
+            },
+            {
+              "key": "2026-09-26",
+              "version": 1,
+              "fingerprint": "85843766",
+              "summary": "focus-02 focus-05 focus-10",
+              "note": "historical key users have seen"
+            },
+            {
+              "key": "2026-12-31",
+              "version": 1,
+              "fingerprint": "8d8e7838",
+              "summary": "focus-12 focus-08 focus-01",
+              "note": "year end"
+            },
+            {
+              "key": "2027-01-01",
+              "version": 1,
+              "fingerprint": "1403c0dc",
+              "summary": "focus-02 focus-09 focus-01",
+              "note": "year start (rollover pair)"
+            },
+            {
+              "key": "2028-02-28",
+              "version": 1,
+              "fingerprint": "45a88622",
+              "summary": "focus-05 focus-02 focus-04",
+              "note": "day before a leap day"
+            },
+            {
+              "key": "2028-02-29",
+              "version": 1,
+              "fingerprint": "87d62a20",
+              "summary": "focus-10 focus-06 focus-01",
+              "note": "leap day"
+            },
+            {
+              "key": "2028-03-01",
+              "version": 1,
+              "fingerprint": "fb2cac4c",
+              "summary": "focus-02 focus-03 focus-11",
+              "note": "day after a leap day"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "pass-template-salt-replaced": {
+    "$comment": "The committed contract still holds the template salt 795560989 for starter-pack (copied from the template, not yet released); replacing it is Workflow step 6, so it is the one committed salt that may change.",
+    "expect": ["check-golden-vectors: 2 generators checked, 0 problems, 1 skipped", "RESULT: PASS"],
+    "args": "{dir} --committed-dir committed",
+    "extends": "pass-text-key",
+    "ops": [
+      { "copy": { "from": "contracts/seeded-generators.json", "to": "committed/contracts/seeded-generators.json" } },
+      {
+        "json": {
+          "file": "committed/contracts/seeded-generators.json",
+          "path": ["generators", 1, "salt"],
+          "value": 795560989
+        }
+      }
+    ]
+  },
+  "pass-text-key": {
+    "$comment": "A share-code generator next to the date-keyed template: keyKind text, versions 1 and 2 both from null, every row generated with the version it carries, rows from the Python oracle.",
+    "expect": ["check-golden-vectors: 2 generators checked, 0 problems, 1 skipped", "RESULT: PASS"],
+    "base": [
+      "@tests/bases/app",
+      {
+        "templates": true,
+        "firstLinePath": true,
+        "fill": {
+          "__FEATURE__": "daily-focus",
+          "__FEATURE_PASCAL__": "DailyFocus",
+          "__FEATURE_CAMEL__": "dailyFocus",
+          "__FEATURE_CONST__": "DAILY_FOCUS"
+        }
+      },
+      { "from": "@skill/examples/starter-pack-share-code", "firstLinePath": true },
+      {
+        "from": "@skill/examples/starter-pack-share-code/starter-pack.vectors.json",
+        "to": "src/features/starter-pack/starter-pack.vectors.json"
+      }
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/starter-pack/starter-pack-vectors.test.ts",
+          "lines": [
+            "// src/features/starter-pack/starter-pack-vectors.test.ts",
+            "import { fingerprint } from '@/core/rng/fingerprint';",
+            "",
+            "import { generateStarterPack, summarizeStarterPack } from './starter-pack-generator';",
+            "import vectors from './starter-pack.vectors.json';",
+            "",
+            "describe('starter-pack golden vectors', () => {",
+            "  it.each(vectors.rows)('reproduces $key at version $version ($note)', (row) => {",
+            "    const pack = generateStarterPack(row.key, row.version);",
+            "    expect(pack.version).toBe(row.version);",
+            "    expect(summarizeStarterPack(pack)).toBe(row.summary);",
+            "    expect(fingerprint(pack)).toBe(row.fingerprint);",
+            "  });",
+            "});"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/seeded-generators.json",
+          "path": ["generators", 1],
+          "value": {
+            "id": "starter-pack",
+            "module": "src/features/starter-pack/starter-pack-generator.ts",
+            "generate": "generateStarterPack",
+            "summarize": "summarizeStarterPack",
+            "keyKind": "text",
+            "salt": 1814008741,
+            "saltExport": "STARTER_PACK_SALT",
+            "versionsExport": "STARTER_PACK_VERSIONS",
+            "versions": [{ "version": 1, "from": null }, { "version": 2, "from": null }],
+            "vectors": "src/features/starter-pack/starter-pack.vectors.json",
+            "outcome": null,
+            "regenerate": "python3 scripts/oracles/starter-pack-oracle.py --fill"
+          }
+        }
+      },
+      {
+        "write": {
+          "file": ".github/workflows/ci.yml",
+          "lines": [
+            "name: ci",
+            "on: [push]",
+            "jobs:",
+            "  test:",
+            "    runs-on: ubuntu-latest",
+            "    steps:",
+            "      - uses: actions/checkout@v5",
+            "      - run: python3 scripts/oracles/starter-pack-oracle.py",
+            "      - run: npm test"
+          ]
+        }
+      }
+    ]
+  }
+}

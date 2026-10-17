@@ -1,0 +1,230 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "contracts/screens.json",
+  "description": "The app's screen contract for screen-contracts' check-screens.mjs and list-screen.mjs. Paths are repo-relative. A testID is <scope>.<element>[.<part-or-key>...] in kebab segments; a {camelCase} segment stands for a data key (one id per item).",
+  "type": "object",
+  "required": ["version", "screens"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "version": { "const": 1 },
+    "references": {
+      "description": "Folder of the approved design frames; a state's reference names a file in it. Default design/screens.",
+      "type": "string"
+    },
+    "sourceCatalog": {
+      "description": "The source-language catalog the copy keys are checked against. Default <i18nDir>/catalogs/<SOURCE_LANGUAGE>.json.",
+      "type": "string"
+    },
+    "componentCatalog": {
+      "description": "The component catalogue whose parts the checker derives. Default <contractsDir>/component-library.json when it exists.",
+      "type": "string"
+    },
+    "components": {
+      "description": "Parts a component derives from its testID, for components outside the catalogue (or to override one).",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "parts": { "type": "array", "items": { "type": "string" } },
+          "keyed": {
+            "description": "One child per data item: <testID>.<key>[.<part>].",
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "policies": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "primaryAction": {
+          "description": "At most `max` of these JSX elements per file: the one obvious action of a screen.",
+          "type": "object",
+          "required": ["match"],
+          "additionalProperties": false,
+          "properties": {
+            "max": { "type": "integer", "minimum": 1 },
+            "match": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["component", "prop", "value"],
+                "additionalProperties": false,
+                "properties": {
+                  "component": { "type": "string" },
+                  "prop": { "type": "string" },
+                  "value": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "adSlot": {
+          "description": "The ad slot components and the only screens that may render them.",
+          "type": "object",
+          "required": ["components", "screens"],
+          "additionalProperties": false,
+          "properties": {
+            "components": { "type": "array", "items": { "type": "string" } },
+            "screens": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "modalRoots": {
+          "description": "Components that keep VoiceOver and TalkBack inside an overlay. Default Modal and Scrim.",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "retiredKeys": {
+          "description": "Copy keys that must no longer be used, each with the key that replaced it.",
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    },
+    "ignoredRoutes": {
+      "description": "Route files that are not a screen of their own (a redirect), each with the reason.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["file", "why"],
+        "additionalProperties": false,
+        "properties": {
+          "file": { "type": "string" },
+          "why": { "type": "string" }
+        }
+      }
+    },
+    "screens": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/screen" }
+    }
+  },
+  "$defs": {
+    "screen": {
+      "type": "object",
+      "required": ["id", "presentation", "view", "states", "elements"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+        "name": { "type": "string" },
+        "presentation": {
+          "enum": ["route", "modal-route", "overlay", "dialog", "sheet", "embedded"]
+        },
+        "route": {
+          "description": "The Expo Router file (route and modal-route).",
+          "type": "string"
+        },
+        "model": {
+          "description": "The model hook, use-<feature>-model.ts (route and modal-route).",
+          "type": "string"
+        },
+        "view": { "description": "The pure view.", "type": "string" },
+        "test": {
+          "description": "The view test. Default: the view with .test.tsx.",
+          "type": "string"
+        },
+        "code": {
+          "description": "Folders (src/features/lists/), shallow folders (src/features/settings/*) or files holding the screen's code. Default: the view's folder.",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "scopes": {
+          "description": "First testID segments this screen owns. Default: [id].",
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" }
+        },
+        "states": {
+          "description": "Every state, the default first. drawn: false marks a state the design does not draw (Chosen), with its why.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+              "drawn": { "type": "boolean" },
+              "why": { "type": "string" },
+              "reference": {
+                "description": "The design frame of this state, a file in the references folder.",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "elements": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/element" }
+        },
+        "notes": { "type": "string" }
+      }
+    },
+    "element": {
+      "type": "object",
+      "required": ["testID"],
+      "additionalProperties": false,
+      "properties": {
+        "testID": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*(\\.([a-z0-9]+(-[a-z0-9]+)*|\\{[a-z][A-Za-z0-9]*\\}))+$"
+        },
+        "role": {
+          "description": "What screen readers announce: button, switch, checkbox, header, text, image, list, none ...",
+          "type": "string"
+        },
+        "component": {
+          "description": "The component that draws it (a library component, AppText, View, FlatList).",
+          "type": "string"
+        },
+        "kind": {
+          "description": "A variant of the component (secondary, large ...), free text.",
+          "type": "string"
+        },
+        "text": {
+          "description": "The copy key of its visible text.",
+          "type": ["string", "null"]
+        },
+        "a11yLabel": {
+          "description": "The copy key of its accessible name when that differs from the text.",
+          "type": ["string", "null"]
+        },
+        "textVia": {
+          "description": "The module that renders the key instead of the screen (a shared formatter).",
+          "type": "string"
+        },
+        "states": {
+          "description": "Only in these states. Default: every state.",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "requires": {
+          "description": "A capability the element depends on (an entitlement, a feature flag), free text.",
+          "type": "string"
+        },
+        "parent": {
+          "description": "Screenshot reach: the accessible element it sits inside (crop-only).",
+          "type": "string"
+        },
+        "a11yHidden": {
+          "description": "Screenshot reach: hidden from screen readers (crop-only).",
+          "type": "boolean"
+        },
+        "coveredBy": {
+          "description": "Screenshot reach: the reachable element whose crop judges its pixels.",
+          "type": "string"
+        },
+        "checks": {
+          "description": "Screenshot checks for design-visual-parity (bounds, text, fill, crop).",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "note": { "type": "string" }
+      }
+    }
+  }
+}

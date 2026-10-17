@@ -1,0 +1,10 @@
+{
+  "name": "tasks-fixture",
+  "private": true,
+  "main": "index.ts",
+  "dependencies": {
+    "expo": "~57.0.26",
+    "expo-router": "~57.0.24",
+    "expo-splash-screen": "~57.0.9"
+  }
+}

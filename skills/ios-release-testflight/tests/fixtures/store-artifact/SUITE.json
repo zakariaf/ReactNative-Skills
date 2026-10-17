@@ -1,0 +1,4 @@
+{
+  "$comment": "An unpacked production .app (Payload/Tasks.app) inside the repo it came from; the selftest passes --app (or zips Payload into --ipa).",
+  "base": "@tests/bases/app"
+}

@@ -1,0 +1,12 @@
+{
+  "base": [
+    "@tests/bases/app",
+    {
+      "templates": true,
+      "firstLinePath": true
+    },
+    {
+      "from": "@skill/examples/v0002-pending"
+    }
+  ]
+}

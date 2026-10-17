@@ -1,0 +1,15 @@
+# .maestro/flows/smoke/01-add-task.yaml
+appId: ${APP_ID}
+name: Adding a task shows it in the list
+tags: [smoke]
+---
+- launchApp:
+    clearState: true
+- runFlow: ../../subflows/grant-notifications.yaml
+- tapOn:
+    id: 'tasks.add-button'
+- assertVisible:
+    id: 'tasks.task-row.task-1'
+- assertVisible:
+    id: 'tasks.title'
+    text: 'Tasks'

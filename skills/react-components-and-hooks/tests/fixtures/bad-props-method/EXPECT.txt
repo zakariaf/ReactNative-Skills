@@ -1,0 +1,3 @@
+[props-readonly] TaskRowProps.onToggle is a method signature
+src/features/tasks/components/task-row.tsx:11
+RESULT: FAIL (1 problems)

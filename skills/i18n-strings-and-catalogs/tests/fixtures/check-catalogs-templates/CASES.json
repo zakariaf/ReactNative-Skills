@@ -1,0 +1,6 @@
+{
+  "bad-missing-key": {
+    "expect": ["[P1 missing-key]", "src/i18n/catalogs/ar.json:1", "tasks.page: missing in ar"],
+    "ops": [{ "json": { "file": "src/i18n/catalogs/ar.json", "path": ["tasks.page"], "delete": true } }]
+  }
+}

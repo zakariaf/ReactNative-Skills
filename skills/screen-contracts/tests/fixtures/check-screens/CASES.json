@@ -1,0 +1,775 @@
+{
+  "bad-ad-slot": {
+    "expect": ["[ad-slot-not-allowed] lists renders or imports the ad slot AdBannerSlot"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/lists/lists-screen.tsx",
+          "find": "import { usePageBottomPadding } from '@/ui/use-page-bottom-padding';",
+          "with": "import { AdBannerSlot } from '@/features/ads/ad-banner-slot';\nimport { usePageBottomPadding } from '@/ui/use-page-bottom-padding';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/lists/lists-screen.tsx",
+          "find": "      {state.kind === 'empty' &&",
+          "with": "      <AdBannerSlot placement=\"lists\" />\n      {state.kind === 'empty' &&"
+        }
+      }
+    ]
+  },
+  "bad-block-no-audit": {
+    "expect": [
+      "FAIL src/features/lists/delete-list-dialog/delete-list-dialog.test.tsx:71 [state-test-audit] delete-list-dialog test \"cancels with the cancel button\" renders the screen but never audits it"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/lists/delete-list-dialog/delete-list-dialog.test.tsx",
+          "find": "    expect(onCancel).toHaveBeenCalledTimes(1);\n    expect(findInaccessiblePressables(screen.container)).toStrictEqual([]);\n",
+          "with": "    expect(onCancel).toHaveBeenCalledTimes(1);\n",
+          "occurrence": 1
+        }
+      }
+    ]
+  },
+  "bad-component-base": {
+    "expect": ["[missing-testid] lists lists.summary-card.title", "pass testID=\"lists.summary-card\" to SummaryCard"],
+    "extends": "pass-derived-parts",
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/lists/components/lists-header.tsx",
+          "find": "testID=\"lists.summary-card\"",
+          "with": "testID=\"lists.sumary-card\""
+        }
+      }
+    ]
+  },
+  "bad-contract-invalid": {
+    "expect": ["[contract-invalid] screen \"lists\" state \"empty\" is not drawn by the design but gives no \"why\""],
+    "ops": [
+      { "json": { "file": "contracts/screens.json", "path": ["screens", 1, "states", 1, "why"], "delete": true } }
+    ]
+  },
+  "bad-contract-missing": {
+    "expect": ["FAIL contracts/screens.json [contract-missing]"],
+    "ops": [{ "delete": "contracts/screens.json" }]
+  },
+  "bad-contract-scope": {
+    "expect": ["[contract-invalid] screen \"delete-list-dialog\" element lists.dialog-title is outside its scopes"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 2, "elements", 2, "testID"],
+          "value": "lists.dialog-title"
+        }
+      }
+    ]
+  },
+  "bad-missing-copy-key": {
+    "expect": ["[missing-copy-key] lists never uses the copy key \"lists.empty.body\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/lists/use-lists-model.ts",
+          "find": "emptyBody: t('lists.empty.body'),",
+          "with": "emptyBody: t('lists.empty.title'),"
+        }
+      }
+    ]
+  },
+  "bad-missing-testid": {
+    "expect": ["[missing-testid] lists lists.empty-title (AppText, states empty) is set nowhere"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/lists/components/lists-empty-body.tsx",
+          "find": "<AppText testID=\"lists.empty-title\" variant=\"title\" isHeader>",
+          "with": "<AppText variant=\"title\" isHeader>"
+        }
+      }
+    ]
+  },
+  "bad-model-hook-missing": {
+    "expect": ["FAIL src/features/lists/use-lists-screen-model.ts [model-hook-missing] lists's model hook"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 1, "model"],
+          "value": "src/features/lists/use-lists-screen-model.ts"
+        }
+      }
+    ]
+  },
+  "bad-model-hook-test": {
+    "expect": ["FAIL src/features/lists/use-lists-model.ts [model-hook-test] lists's model hook has no test next to it"],
+    "ops": [{ "delete": "src/features/lists/use-lists-model.test.tsx" }]
+  },
+  "bad-no-audit": {
+    "expect": [
+      "FAIL src/features/tasks/tasks-screen.test.tsx [state-test-audit] tasks's view test never audits the rendered screen"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.test.tsx",
+          "find": "    expect(findInaccessiblePressables(screen.container)).toStrictEqual([]);\n",
+          "with": "",
+          "count": 2
+        }
+      }
+    ]
+  },
+  "bad-no-test": {
+    "expect": ["[screen-test-missing] lists has no view test (src/features/lists/lists-screen.test.tsx)"],
+    "ops": [{ "delete": "src/features/lists/lists-screen.test.tsx" }]
+  },
+  "bad-overlay-layer-no-back": {
+    "expect": [
+      "[overlay-no-back] delete-list-dialog is a dialog outside Modal and the modal roots with no Android back handling"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/lists/delete-list-dialog/delete-list-dialog.tsx",
+          "find": "    <Modal\n",
+          "with": "    <Overlay\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/lists/delete-list-dialog/delete-list-dialog.tsx",
+          "find": "</Modal>",
+          "with": "</Overlay>"
+        }
+      }
+    ]
+  },
+  "bad-overlay-no-back": {
+    "expect": [
+      "FAIL src/features/lists/delete-list-dialog/delete-list-dialog.tsx:67 [overlay-no-back] delete-list-dialog's <Modal> has no onRequestClose"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/lists/delete-list-dialog/delete-list-dialog.tsx",
+          "find": "      onRequestClose={props.onCancel}\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-overlay-noop-back": {
+    "expect": ["[overlay-no-back] delete-list-dialog's <Modal> passes an onRequestClose that does nothing"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/lists/delete-list-dialog/delete-list-dialog.tsx",
+          "find": "      onRequestClose={props.onCancel}\n",
+          "with": "      onRequestClose={() => {}}\n"
+        }
+      }
+    ]
+  },
+  "bad-overlay-not-modal": {
+    "expect": [
+      "[overlay-not-modal] delete-list-dialog is a dialog drawn over another screen but keeps no screen reader inside it"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/lists/delete-list-dialog/delete-list-dialog.tsx",
+          "find": "    <Modal\n",
+          "with": "    <Overlay\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/lists/delete-list-dialog/delete-list-dialog.tsx",
+          "find": "</Modal>",
+          "with": "</Overlay>"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/lists/delete-list-dialog/delete-list-dialog.tsx",
+          "find": " accessibilityViewIsModal>",
+          "with": ">"
+        }
+      }
+    ]
+  },
+  "bad-pattern-typo": {
+    "expect": [
+      "FAIL src/features/lists/components/list-summary-row.tsx:49 [unknown-testid] pattern `lists.list-rows.${…}` matches no testID of lists"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/lists/components/list-summary-row.tsx",
+          "find": "`lists.list-row.${String(list.id)}`",
+          "with": "`lists.list-rows.${String(list.id)}`"
+        }
+      }
+    ]
+  },
+  "bad-reference-image-missing": {
+    "expect": ["[reference-image-missing] lists state \"default\" names design/screens/lists-default.png"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 1, "states", 0, "reference"],
+          "value": "lists-default.png"
+        }
+      }
+    ]
+  },
+  "bad-retired-copy-key": {
+    "expect": [
+      "FAIL src/features/lists/use-lists-model.ts:59 [retired-copy-key] t('lists.error.body') is retired",
+      "[retired-copy-key] lists lists.error-note still shows the retired key \"lists.error.body\""
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["policies", "retiredKeys"],
+          "value": { "lists.error.body": "lists.error.message" }
+        }
+      }
+    ]
+  },
+  "bad-route-no-hook": {
+    "expect": ["FAIL src/app/(app)/lists.tsx [route-model-hook] lists's route file never calls useListsModel()"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/(app)/lists.tsx",
+          "find": "const model = useListsModel();",
+          "with": "const model = readListsModelSomehow();"
+        }
+      }
+    ]
+  },
+  "bad-screen-not-built": {
+    "expect": ["[screen-not-built] delete-list-dialog (Delete list) has no code"],
+    "ops": [{ "delete": "src/features/lists/delete-list-dialog" }]
+  },
+  "bad-screen-unlisted": {
+    "expect": ["FAIL src/app/(app)/about.tsx [screen-unlisted]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/(app)/about.tsx",
+          "content": "// src/app/(app)/about.tsx\nexport default function AboutRoute(): null {\n  return null;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-state-untested": {
+    "expect": ["[state-untested] lists state \"error\" has no view-test block named for it"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/lists/lists-screen.test.tsx",
+          "find": "shows the error state with its message and the retry button",
+          "with": "shows the message and the retry button"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/lists/lists-screen.test.tsx",
+          "find": "retries from the error state when the button is pressed",
+          "with": "retries when the button is pressed"
+        }
+      }
+    ]
+  },
+  "bad-test-names-no-id": {
+    "expect": [
+      "FAIL src/features/tasks/tasks-screen.test.tsx [screen-test-missing] tasks's view test never names one of its testIDs"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.test.tsx",
+          "find": "    for (const testID of ['tasks.list', 'tasks.summary', 'tasks.task-row.task-1']) {\n      expect(screen.getByTestId(testID, HIDDEN)).toBeOnTheScreen();\n    }\n",
+          "with": "    expect(screen.getByText('1 open task')).toBeOnTheScreen();\n"
+        }
+      }
+    ]
+  },
+  "bad-testid-untested": {
+    "expect": [
+      "FAIL src/features/lists/lists-screen.test.tsx [testid-untested] lists's view test never names lists.retry-button"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/lists/lists-screen.test.tsx",
+          "find": "'lists.error-note', 'lists.retry-button']",
+          "with": "'lists.error-note']"
+        }
+      }
+    ]
+  },
+  "bad-two-primary": {
+    "expect": [
+      "FAIL src/features/lists/components/lists-actions.tsx:9 [one-primary-action] 2 primary actions in one file (at most 1)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/lists/components/lists-actions.tsx",
+          "content": "// src/features/lists/components/lists-actions.tsx\nimport { Button } from '@/ui/button';\n\nexport function ListsActions(props: { readonly onAdd: () => void; readonly onImport: () => void }): React.JSX.Element {\n  return (\n    <>\n      <Button testID=\"lists.retry-button\" variant=\"primary\" label=\"\" onPress={props.onAdd} />\n      {/* a second \"go\" on the same screen */}\n      <Button testID=\"lists.retry-button\" variant={'primary'} label=\"\" onPress={props.onImport} />\n    </>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-unknown-copy-key": {
+    "expect": ["[unknown-copy-key] lists lists.empty-title shows \"lists.empty.titel\""],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 1, "elements", 4, "text"],
+          "value": "lists.empty.titel"
+        }
+      }
+    ]
+  },
+  "bad-unknown-testid": {
+    "expect": [
+      "FAIL src/features/lists/components/lists-error-body.tsx:38 [unknown-testid] \"lists.error-spacer\" is not in the contract for lists"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/lists/components/lists-error-body.tsx",
+          "find": "<View style={styles.grow} />",
+          "with": "<View testID=\"lists.error-spacer\" style={styles.grow} />"
+        }
+      }
+    ]
+  },
+  "bad-wrong-screen": {
+    "expect": [
+      "FAIL src/features/lists/components/lists-empty-body.tsx:20 [testid-wrong-screen] \"tasks.summary\" belongs to tasks, not to lists"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/lists/components/lists-empty-body.tsx",
+          "find": "testID=\"lists.empty-body\"",
+          "with": "testID=\"tasks.summary\""
+        }
+      }
+    ]
+  },
+  "error-contract-json": {
+    "expect": ["ERROR [bad-input] the screen contract contracts/screens.json is not valid JSON"],
+    "ops": [{ "write": { "file": "contracts/screens.json", "content": "{ \"version\": 1, \"screens\": [\n" } }]
+  },
+  "error-unknown-screen": {
+    "expect": ["ERROR [bad-input] unknown screen \"settings\""],
+    "args": "{dir} --screen settings"
+  },
+  "pass-catalog-missing": {
+    "expect": [
+      "SKIP src/i18n/catalogs/en.json [unknown-copy-key] not yet created (i18n-strings-and-catalogs creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "src/i18n/catalogs/en.json" }]
+  },
+  "pass-catalogue": {
+    "expect": ["check-screens: 3 screens checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/component-library.json",
+          "json": {
+            "components": [
+              { "name": "SummaryCard", "file": "summary-card.tsx", "role": "none", "parts": ["title", "value"] },
+              { "name": "SegmentedControl", "file": "segmented-control.tsx", "role": "radiogroup", "parts": ["label"] },
+              { "name": "Sheet", "file": "sheet.tsx", "role": "none", "modalRoot": true }
+            ]
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 1, "elements", 8],
+          "value": { "testID": "lists.summary-card", "role": "none", "component": "SummaryCard", "states": ["default"] }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 1, "elements", 9],
+          "value": {
+            "testID": "lists.summary-card.title",
+            "role": "text",
+            "component": "AppText",
+            "states": ["default"],
+            "parent": "lists.summary-card"
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 1, "elements", 10],
+          "value": {
+            "testID": "lists.summary-card.value",
+            "role": "text",
+            "component": "AppText",
+            "states": ["default"],
+            "a11yHidden": true,
+            "coveredBy": "lists.summary-card"
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 1, "elements", 11],
+          "value": {
+            "testID": "lists.sort-control",
+            "role": "tablist",
+            "component": "SegmentedControl",
+            "states": ["default"]
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 1, "elements", 12],
+          "value": {
+            "testID": "lists.sort-control.{sortKey}",
+            "role": "tab",
+            "component": "SegmentedControl",
+            "states": ["default"]
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 1, "elements", 13],
+          "value": {
+            "testID": "lists.sort-control.{sortKey}.label",
+            "role": "text",
+            "component": "AppText",
+            "states": ["default"]
+          }
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/lists/components/lists-header.tsx",
+          "content": "// src/features/lists/components/lists-header.tsx\nimport { SegmentedControl } from '@/ui/segmented-control';\nimport { SummaryCard } from '@/ui/summary-card';\n\nexport function ListsHeader(props: { readonly count: string; readonly label: string }): React.JSX.Element {\n  return (\n    <>\n      <SummaryCard testID=\"lists.summary-card\" title={props.label} value={props.count} />\n      <SegmentedControl testID=\"lists.sort-control\" segments={[]} />\n    </>\n  );\n}\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/lists/lists-screen.test.tsx",
+          "find": "      'lists.list-row.1.delete-button',\n",
+          "with": "      'lists.list-row.1.delete-button',\n      'lists.summary-card',\n      'lists.summary-card.title',\n      'lists.summary-card.value',\n      'lists.sort-control',\n      'lists.sort-control.name',\n      'lists.sort-control.name.label',\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/lists/delete-list-dialog/delete-list-dialog.tsx",
+          "find": "    <Modal\n",
+          "with": "    <Sheet\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/lists/delete-list-dialog/delete-list-dialog.tsx",
+          "find": "</Modal>",
+          "with": "</Sheet>"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/lists/delete-list-dialog/delete-list-dialog.tsx",
+          "find": " accessibilityViewIsModal>",
+          "with": ">"
+        }
+      }
+    ]
+  },
+  "pass-derived-parts": {
+    "expect": ["check-screens: 3 screens checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["components"],
+          "value": {
+            "SummaryCard": { "parts": ["title", "value"] },
+            "SegmentedControl": { "parts": ["label"], "keyed": true }
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 1, "elements", 8],
+          "value": { "testID": "lists.summary-card", "role": "none", "component": "SummaryCard", "states": ["default"] }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 1, "elements", 9],
+          "value": {
+            "testID": "lists.summary-card.title",
+            "role": "text",
+            "component": "AppText",
+            "states": ["default"],
+            "parent": "lists.summary-card"
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 1, "elements", 10],
+          "value": {
+            "testID": "lists.summary-card.value",
+            "role": "text",
+            "component": "AppText",
+            "states": ["default"],
+            "a11yHidden": true,
+            "coveredBy": "lists.summary-card"
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 1, "elements", 11],
+          "value": {
+            "testID": "lists.sort-control",
+            "role": "tablist",
+            "component": "SegmentedControl",
+            "states": ["default"]
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 1, "elements", 12],
+          "value": {
+            "testID": "lists.sort-control.{sortKey}",
+            "role": "tab",
+            "component": "SegmentedControl",
+            "states": ["default"]
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 1, "elements", 13],
+          "value": {
+            "testID": "lists.sort-control.{sortKey}.label",
+            "role": "text",
+            "component": "AppText",
+            "states": ["default"]
+          }
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/lists/components/lists-header.tsx",
+          "content": "// src/features/lists/components/lists-header.tsx\nimport { SegmentedControl } from '@/ui/segmented-control';\nimport { SummaryCard } from '@/ui/summary-card';\n\nexport function ListsHeader(props: { readonly count: string; readonly label: string }): React.JSX.Element {\n  return (\n    <>\n      <SummaryCard testID=\"lists.summary-card\" title={props.label} value={props.count} />\n      <SegmentedControl testID=\"lists.sort-control\" segments={[]} />\n    </>\n  );\n}\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/lists/lists-screen.test.tsx",
+          "find": "      'lists.list-row.1.delete-button',\n",
+          "with": "      'lists.list-row.1.delete-button',\n      'lists.summary-card',\n      'lists.summary-card.title',\n      'lists.summary-card.value',\n      'lists.sort-control',\n      'lists.sort-control.name',\n      'lists.sort-control.name.label',\n"
+        }
+      }
+    ]
+  },
+  "pass-installed-skills": {
+    "expect": ["check-screens: 3 screens checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/planted/SKILL.md",
+          "content": "---\nname: planted\ndescription: An installed skill.\n---\n"
+        }
+      },
+      {
+        "write": {
+          "file": ".agents/skills/planted/src/app/extra.tsx",
+          "content": "export default function Extra(): null {\n  return null;\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "skills/planted/src/app/extra.tsx",
+          "content": "export default function Extra(): null {\n  return null;\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/(app)/vendor-kit/SKILL.md",
+          "content": "---\nname: vendor-kit\ndescription: An installed skill (its fixtures plant bugs on purpose).\n---\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/(app)/vendor-kit/planted.tsx",
+          "content": "// a planted route an installed skill carries: never a screen of this app\nexport default function Planted(): null {\n  return null;\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/lists/vendored/SKILL.md",
+          "content": "---\nname: vendored\ndescription: An installed skill inside a feature folder.\n---\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/lists/vendored/planted.tsx",
+          "content": "// planted ids that must stay silent\nexport const PLANTED = ['lists.invented-id', 'tasks.summary'];\n"
+        }
+      }
+    ]
+  },
+  "pass-modal-route": {
+    "expect": ["check-screens: 3 screens checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "contracts/screens.json", "path": ["screens", 2, "presentation"], "value": "modal-route" } },
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 2, "route"],
+          "value": "src/app/(app)/lists.tsx"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/lists/delete-list-dialog/delete-list-dialog.tsx",
+          "find": "    <Modal\n",
+          "with": "    <Sheet\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/lists/delete-list-dialog/delete-list-dialog.tsx",
+          "find": "</Modal>",
+          "with": "</Sheet>"
+        }
+      }
+    ]
+  },
+  "pass-not-applicable": {
+    "expect": ["NOT APPLICABLE: no contracts/screens.json", "RESULT: PASS"],
+    "args": "{dir}",
+    "ops": [{ "delete": "contracts/screens.json" }]
+  },
+  "pass-one-screen": {
+    "expect": ["check-screens: 1 screens checked, 0 problems", "RESULT: PASS"],
+    "args": "{dir} --screen delete-list-dialog"
+  },
+  "pass-overlay-layer-aria-modal": {
+    "expect": ["check-screens: 3 screens checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/lists/delete-list-dialog/delete-list-dialog.tsx",
+          "find": "    <Modal\n",
+          "with": "    <Overlay\n"
+        },
+        "$comment": "aria-modal, React Native's alias of accessibilityViewIsModal, keeps the screen reader inside the layer too."
+      },
+      {
+        "replace": {
+          "file": "src/features/lists/delete-list-dialog/delete-list-dialog.tsx",
+          "find": "</Modal>",
+          "with": "</Overlay>"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/lists/delete-list-dialog/delete-list-dialog.tsx",
+          "find": "  const theme = useTheme();\n",
+          "with": "  const theme = useTheme();\n  useBackHandler(props.onCancel);\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/lists/delete-list-dialog/delete-list-dialog.tsx",
+          "find": "style={styles.scrim} accessibilityViewIsModal>",
+          "with": "style={styles.scrim} aria-modal>"
+        }
+      }
+    ]
+  },
+  "pass-overlay-layer-back": {
+    "expect": ["check-screens: 3 screens checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/lists/delete-list-dialog/delete-list-dialog.tsx",
+          "find": "    <Modal\n",
+          "with": "    <Overlay\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/lists/delete-list-dialog/delete-list-dialog.tsx",
+          "find": "</Modal>",
+          "with": "</Overlay>"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/lists/delete-list-dialog/delete-list-dialog.tsx",
+          "find": "  const theme = useTheme();\n",
+          "with": "  const theme = useTheme();\n  useBackHandler(props.onCancel);\n"
+        }
+      }
+    ]
+  },
+  "pass-reference-image": {
+    "expect": ["check-screens: 3 screens checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 1, "states", 0, "reference"],
+          "value": "lists-default.png"
+        }
+      },
+      { "png": { "files": ["design/screens/lists-default.png"], "width": 40, "height": 80, "fill": "#ffffff" } }
+    ]
+  },
+  "pass-render-item": {
+    "expect": ["check-screens: 3 screens checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/lists/delete-list-dialog/delete-list-dialog.test.tsx",
+          "find": "describe('DeleteListDialog', () => {\n",
+          "with": "describe('DeleteListDialog', () => {\n  it('builds no row through renderItem (not a render of the screen)', () => {\n    const renderItem = (item: string): string => item;\n    expect(renderItem('row')).toBe('row');\n  });\n\n"
+        }
+      }
+    ]
+  }
+}

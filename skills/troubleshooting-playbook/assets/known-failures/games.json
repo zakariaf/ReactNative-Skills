@@ -1,0 +1,106 @@
+{
+  "area": "games",
+  "entries": [
+    {
+      "id": "games-cross-engine-determinism",
+      "topic": "Determinism",
+      "symptom": "A replay or bot run recorded in Jest diverges on the device (or between iOS and Android)",
+      "cause": "Hermes computes Math.sin, cos, exp, atan2 and pow with the platform C library; V8 uses its own",
+      "fix": "Rules, simulations, geometry and daily generation use only + - * /, Math.sqrt, Math.imul, floor, round, abs, min, max and an integer PRNG (sfc32); lint bans the rest there",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "seeded-determinism-and-golden-vectors"
+    },
+    {
+      "id": "games-create-finished",
+      "topic": "Rules",
+      "symptom": "A level starts already won or lost",
+      "cause": "The game's create() returned a finished state",
+      "fix": "Fix create(); the engine contract test requires every level to start in play",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "game-rules-engine"
+    },
+    {
+      "id": "games-daily-salt-shared",
+      "topic": "Levels",
+      "symptom": "Two games' daily levels follow the same seed sequence",
+      "cause": "A game copied the template daily salt",
+      "fix": "Derive the salt from the game id (FNV-1a of the id); the level checker reports a shared salt",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "level-generation-and-solvers"
+    },
+    {
+      "id": "games-tunnelling",
+      "topic": "Real-time",
+      "symptom": "A fast ball passes through a wall, or a corner hit bounces wrong",
+      "cause": "Discrete steps skip thin obstacles at high speed",
+      "fix": "Use swept collision tests, a small fixed step, and properties such as \"never leaves the arena\" and \"energy never increases\"",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "realtime-game-loop"
+    },
+    {
+      "id": "games-sim-kit-alloc",
+      "topic": "Real-time",
+      "symptom": "A real-time simulation drops frames or triggers garbage collection",
+      "cause": "Vector helpers return new objects on every call; a UI-thread tick must allocate nothing",
+      "fix": "Write the maths with plain numbers inside the step functions",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "realtime-game-loop"
+    },
+    {
+      "id": "games-spatial-hash-stride",
+      "topic": "Real-time",
+      "symptom": "Collisions are missed or land in the wrong cell, with no error",
+      "cause": "The spatial hash expects two numbers per entity, but the body array holds four (x, y, vx, vy)",
+      "fix": "Pass positions with stride 2, never the raw body array",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "realtime-game-loop"
+    },
+    {
+      "id": "games-balance-report-stale",
+      "topic": "Balance",
+      "symptom": "The balance check fails [report-stale] although the rules did not change",
+      "cause": "The report fingerprint covers the game's logic, the simulation file and the shared files they import; one of them changed, or the local report predates the change",
+      "fix": "Rerun npm run test:sim and the balance check; never edit the report by hand",
+      "match": [
+        "\\[report-stale\\]"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "game-balance-and-bots"
+    },
+    {
+      "id": "games-board-freeze-after-resume",
+      "topic": "Real-time",
+      "symptom": "After an interruption (a full-screen ad, a background trip) the canvas stays on one frame until the next input",
+      "cause": "A race between the resume and the next scene push: the UI frame for the old scene reported done and stopped the new scene before its first frame",
+      "fix": "Tag frame-done messages with their run and ignore stale ones; hold pushes while not runnable; record a frame on every resume. Prove it with a device flow that asserts the scene settles",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "game-session-host"
+    },
+    {
+      "id": "games-stranded-run",
+      "topic": "Session",
+      "symptom": "A lost run with no continue available never shows its result",
+      "cause": "The run waited for the user to take or decline a continue offer that was hidden",
+      "fix": "End the run at once when the offer is unavailable (\"never strand a finished run\"), with a test for each unavailable reason (offline, no ad, no entitlement)",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "game-session-host"
+    }
+  ]
+}

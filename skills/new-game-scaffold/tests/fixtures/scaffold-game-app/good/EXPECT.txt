@@ -1,0 +1,9 @@
+edit contracts/games.json (+ lights-out)
+new  apps/lights-out/package.json
+new  apps/lights-out/app.config.ts
+new  apps/lights-out/app-settings.ts
+new  apps/lights-out/.gitignore
+new  apps/lights-out/src/i18n/catalogs/ar.json
+new  apps/lights-out/assets/fonts/BrandSans-Regular.ttf
+would write 12 files for lights-out
+app apps/lights-out: the links and ad ids are placeholders

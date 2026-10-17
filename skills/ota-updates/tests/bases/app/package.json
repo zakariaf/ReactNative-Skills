@@ -1,0 +1,20 @@
+{
+  "name": "tasks",
+  "version": "1.0.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start",
+    "lint": "eslint . --max-warnings 0",
+    "verify": "node scripts/quality/run-verify.ts",
+    "prepare": "node scripts/hooks/install-git-hooks.ts",
+    "ota:preflight": "node scripts/ota/update-preflight.ts"
+  },
+  "dependencies": {
+    "expo": "~57.0.26",
+    "expo-router": "~57.0.24",
+    "expo-updates": "~57.0.24",
+    "react": "19.2.3",
+    "react-native": "0.86.3"
+  }
+}

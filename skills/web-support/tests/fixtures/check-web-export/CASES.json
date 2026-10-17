@@ -1,0 +1,135 @@
+{
+  "bad-contract": {
+    "expect": ["contracts/web.json:1 [web-contract] output must be one of"],
+    "ops": [{ "json": { "file": "contracts/web.json", "path": ["output"], "value": "spa" } }]
+  },
+  "bad-entry-bundle": {
+    "expect": ["dist/_expo/static/js/web [export-entry] the export has no web bundle"],
+    "ops": [{ "delete": "dist/_expo/static/js/web/index-3f2a.js" }]
+  },
+  "bad-entry-index": {
+    "expect": ["dist/index.html [export-entry] the export has no index.html"],
+    "ops": [{ "delete": "dist/index.html" }]
+  },
+  "bad-headers": {
+    "expect": ["dist/_expo/.routes.json [export-headers]", "does not carry both cross-origin isolation headers"],
+    "ops": [
+      {
+        "json": {
+          "file": "dist/_expo/.routes.json",
+          "path": ["headers", "Cross-Origin-Embedder-Policy"],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "bad-headers-browser-skipped": {
+    "expect": [
+      "dist/_expo/.routes.json [export-headers]",
+      "check-web-export: browser smoke not run: fix the export problems first"
+    ],
+    "args": ". --browser auto",
+    "ops": [
+      {
+        "json": {
+          "file": "dist/_expo/.routes.json",
+          "path": ["headers", "Cross-Origin-Embedder-Policy"],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "bad-headers-credentialless": {
+    "expect": [
+      "dist/_expo/.routes.json [export-headers]",
+      "Cross-Origin-Embedder-Policy: credentialless, which Safari and every iOS browser ignore"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "dist/_expo/.routes.json",
+          "path": ["headers", "Cross-Origin-Embedder-Policy"],
+          "value": "credentialless"
+        }
+      }
+    ]
+  },
+  "bad-headers-no-manifest": {
+    "expect": ["dist/_expo/.routes.json [export-headers]", "the export has no _expo/.routes.json"],
+    "ops": [{ "delete": "dist/_expo/.routes.json" }]
+  },
+  "bad-routes": {
+    "expect": ["dist/settings.html [export-routes]", "has no page for /settings"],
+    "ops": [{ "delete": "dist/settings.html" }]
+  },
+  "bad-source-maps": {
+    "expect": ["dist/_expo/static/js/web/index-3f2a.js.map [export-source-maps]", "publish the app's source"],
+    "ops": [
+      {
+        "write": {
+          "file": "dist/_expo/static/js/web/index-3f2a.js.map",
+          "content": "{\"version\":3,\"sources\":[\"src/app/index.tsx\"],\"mappings\":\"\"}\n"
+        }
+      }
+    ]
+  },
+  "bad-wasm": {
+    "expect": ["dist/assets [export-wasm]", "holds no .wasm asset"],
+    "ops": [{ "delete": "dist/assets/wa-sqlite.7ca566fb.wasm" }]
+  },
+  "error-browser-missing": {
+    "expect": ["ERROR [bad-input] --browser /nonexistent/chrome does not exist"],
+    "args": ". --browser /nonexistent/chrome",
+    "ops": []
+  },
+  "error-no-contract": {
+    "expect": ["ERROR [bad-input] contracts/web.json does not exist"],
+    "ops": [{ "delete": "contracts/web.json" }]
+  },
+  "error-no-dist": {
+    "expect": ["ERROR [bad-input] nothing to check: dist does not exist", "npx expo export --platform web"],
+    "ops": [{ "delete": "dist" }]
+  },
+  "error-timeout": {
+    "expect": ["ERROR [bad-input] --timeout soon is not a whole number"],
+    "args": ". --timeout soon",
+    "ops": []
+  },
+  "pass-folder-index": {
+    "expect": ["RESULT: PASS"],
+    "ops": [{ "rename": { "from": "dist/settings.html", "to": "dist/settings/index.html" } }]
+  },
+  "pass-platforms-without-web": {
+    "expect": ["NOT APPLICABLE: the app config platforms (ios, android) leave out web"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "  slug: 'tasks',\n",
+          "with": "  slug: 'tasks',\n  platforms: ['ios', 'android'],\n"
+        }
+      }
+    ]
+  },
+  "pass-single-static-host": {
+    "expect": ["check-web-export: 2 routes checked, 0 problems"],
+    "ops": [
+      { "delete": ["dist/settings.html", "dist/_expo/.routes.json"] },
+      { "replace": { "file": "app.config.ts", "find": "output: 'static'", "with": "output: 'single'" } },
+      { "json": { "file": "contracts/web.json", "path": ["output"], "value": "single" } },
+      { "json": { "file": "contracts/web.json", "path": ["host"], "value": "static-host" } }
+    ]
+  },
+  "pass-source-maps-published": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "contracts/web.json", "path": ["publishSourceMaps"], "value": true } },
+      {
+        "write": {
+          "file": "dist/_expo/static/js/web/index-3f2a.js.map",
+          "content": "{\"version\":3,\"sources\":[],\"mappings\":\"\"}\n"
+        }
+      }
+    ]
+  }
+}

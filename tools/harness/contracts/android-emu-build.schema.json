@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "android-emu-build",
+  "description": "The app's facts for Release Android emulator builds. Read by scripts/build/build-android-emu.ts and by the android-emulator-build skill's checkers. Every key is optional.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "avdPrefix": {
+      "description": "Emulators are AVDs named <avdPrefix>-<purpose>; only prefixed AVDs are created, stopped or deleted, and tooling may name no other AVD. Default: the package.json name in kebab case.",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "device": {
+      "description": "The avdmanager hardware profile of a newly created AVD, and the screenshot size check-emu-screenshot expects. Default: pixel_8 (1080 x 2400).",
+      "type": "string",
+      "minLength": 1
+    },
+    "systemImage": {
+      "description": "A system image other than the pinned one (system-images;android-36;google_apis;<host ABI>), for example one already installed. Its ABI must be the ABI the build targets.",
+      "type": "string",
+      "pattern": "^system-images;android-\\d+;[\\w-]+;(arm64-v8a|x86_64)$"
+    },
+    "appId": {
+      "description": "The production applicationId; development and preview must be <appId>.dev and <appId>.preview. Default: only the suffix is checked.",
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)+$"
+    },
+    "postPrebuild": {
+      "description": "npm scripts run from the repo root after every prebuild (an audit that reads android/); the preflight refuses a missing one. Default: none.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "targetSdk": {
+      "description": "The targetSdkVersion every APK carries. Default: ANDROID_API in scripts/android/toolchain.ts, else 36.",
+      "type": "integer",
+      "minimum": 24
+    },
+    "minSdk": {
+      "description": "The minSdkVersion every APK carries (never below 24, the React Native 0.86 floor). Default: only the floor is checked.",
+      "type": "integer",
+      "minimum": 24
+    },
+    "permissions": {
+      "description": "Every uses-permission the merged manifest may carry. A permission a library adds at Gradle merge time and this list lacks fails check-apk. The seed is what the Expo SDK 57 prebuild template always adds (INTERNET, SYSTEM_ALERT_WINDOW, VIBRATE, READ/WRITE_EXTERNAL_STORAGE up to API 32): keep each one on purpose or remove it with android.blockedPermissions. A name after the app's own package is written ${applicationId}.NAME and resolves per variant; an app-own signature permission the APK declares (androidx.core's DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION) needs no entry. Absent: not checked (check-apk prints what it found).",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^(?:\\$\\{applicationId\\}(?:\\.[A-Za-z]\\w*)*|[A-Za-z][\\w.]*)\\.[A-Z_0-9]+$"
+      },
+      "uniqueItems": true
+    },
+    "application": {
+      "description": "Attributes of the <application> element with an exact value, without the android: prefix, for example { \"allowBackup\": false }.",
+      "type": "object",
+      "additionalProperties": { "type": ["string", "number", "boolean"] }
+    },
+    "abi": {
+      "description": "The ABI an APK must hold native libraries for (lib/<abi>/). Default: arm64-v8a or x86_64, either one.",
+      "enum": ["arm64-v8a", "x86_64"]
+    },
+    "readyLog": {
+      "description": "A logcat line the test build writes once its first screen is interactive: { tag, contains }. null: the run waits for a still screen.",
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tag", "contains"],
+          "properties": {
+            "tag": { "type": "string", "minLength": 1 },
+            "contains": { "type": "string", "minLength": 1 }
+          }
+        }
+      ]
+    }
+  }
+}

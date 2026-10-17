@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "component-library.schema.json",
+  "title": "Component library catalogue",
+  "description": "contracts/component-library.json: the app's shared UI components and the facts the ui-component-library checkers read. The checkers stay strict; the facts belong to the app.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["components"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "uiDir": {
+      "type": "string",
+      "description": "The shared components folder, repo-relative. Default: the layout's uiDir (src/ui), or rn-skills.config.json."
+    },
+    "exclude": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Globs (relative to uiDir) of folders other skills own: the accessibility hooks, the icon set, the motion moments, the list-detail layout, the feedback ladder. Default [\"a11y/**\", \"icons/**\", \"motion/**\", \"adaptive/**\", \"feedback/**\"]."
+    },
+    "specs": {
+      "description": "Generated component measurements, or false when components take every size from the theme tokens and named constants.",
+      "oneOf": [
+        { "const": false },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "tokens": {
+              "type": "string",
+              "description": "The token file. Default design/tokens.json."
+            },
+            "block": {
+              "type": "string",
+              "description": "The token file's key that holds the component groups. Default components."
+            },
+            "out": {
+              "type": "string",
+              "description": "The generated JSON. Default <uiDir>/component-specs.json."
+            },
+            "module": {
+              "type": "string",
+              "description": "The typed import of it. Default <uiDir>/component-specs.ts."
+            },
+            "asRenderedBorders": {
+              "type": "boolean",
+              "description": "Floor CSS borders as a browser draws them (2.5 -> 2), only when the approved design references are browser renders. Default false."
+            },
+            "overrides": {
+              "type": "array",
+              "description": "Values that differ from the token file, each with the reason (the design rule or decision).",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["path", "value", "why"],
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "description": "Dotted path in the components block (chip.radius)."
+                  },
+                  "value": { "type": "number" },
+                  "why": { "type": "string", "minLength": 10 }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "prerequisites": {
+      "type": "array",
+      "description": "Files of other skills the components import; a missing one is a problem. Default: the theme modules, AppText, PressableSurface, the press feedback context, the render helper and the pressable audit. {themeDir}, {uiDir} and {testDir} are filled from the layout.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["file", "owner"],
+        "properties": {
+          "file": { "type": "string" },
+          "owner": { "type": "string" },
+          "mustContain": { "type": "string", "description": "A marker an up-to-date copy holds." },
+          "why": { "type": "string" }
+        }
+      }
+    },
+    "ownedElsewhere": {
+      "type": "array",
+      "description": "Single files in the ui folder that other skills create and keep, added to the defaults ({uiDir}/screen-frame.tsx and {uiDir}/subtree-error-boundary.tsx: react-components-and-hooks; {uiDir}/physical-direction-view.tsx: rtl-and-direction; {uiDir}/screen-body.tsx: screen-contracts; {uiDir}/ad-banner-slot.tsx: admob-ads-and-consent). Never discovered, never unlisted; listing one under components checks it after all.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["file", "owner"],
+        "properties": {
+          "file": {
+            "type": "string",
+            "description": "Repo-relative; {uiDir} is filled from the layout."
+          },
+          "owner": { "type": "string", "description": "The skill that creates and keeps it." }
+        }
+      }
+    },
+    "pressHosts": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "The only ui files that may import Pressable, a Touchable or a gesture-handler button, each running the press feedback. Default [\"pressable-surface.tsx\"]."
+    },
+    "components": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "file"],
+        "properties": {
+          "name": { "type": "string", "pattern": "^[A-Z][A-Za-z0-9]*$" },
+          "file": { "type": "string", "pattern": "\\.tsx$", "description": "Relative to uiDir." },
+          "role": { "type": "string", "description": "Documentation: the accessibility role." },
+          "notes": { "type": "string" },
+          "testID": {
+            "enum": ["required", "optional", "none"],
+            "description": "required (default): a required testID prop; optional: decorative parts whose owner passes <owner>.<part>; none."
+          },
+          "parts": {
+            "type": "array",
+            "items": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+            "description": "Part ids the component derives from its testID (`${testID}.label`)."
+          },
+          "hidesItself": {
+            "type": "boolean",
+            "description": "A decorative part that hides itself from VoiceOver and TalkBack."
+          },
+          "mayRotate": {
+            "type": "boolean",
+            "description": "May use a rotate transform (a drawn glyph, a decorative tilt)."
+          },
+          "mayShadow": {
+            "type": "boolean",
+            "description": "May cast a static shadow (it floats: a dialog, a toast, a thumb)."
+          },
+          "inPairCell": {
+            "type": "boolean",
+            "description": "Sits in a cell of a row or grid: grows with flexGrow, never flex: 1."
+          },
+          "modalRoot": {
+            "type": "boolean",
+            "description": "The overlay root: the only place for accessibilityViewIsModal; closes on Android back."
+          },
+          "drawnUnderline": {
+            "type": "boolean",
+            "description": "Draws its underline as a bar (no textDecorationLine)."
+          },
+          "holdFill": {
+            "type": "boolean",
+            "description": "A hold-to-confirm fill that must sit in a track pinned to the face edges."
+          },
+          "scatter": {
+            "type": "boolean",
+            "description": "A decorative scatter placed by start offsets: lays out left to right."
+          }
+        }
+      }
+    },
+    "mockOnly": {
+      "type": "array",
+      "description": "Design stand-ins the app never builds (an ad box, an OS sheet).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "why"],
+        "properties": {
+          "name": { "type": "string" },
+          "file": { "type": "string" },
+          "why": { "type": "string" }
+        }
+      }
+    }
+  }
+}

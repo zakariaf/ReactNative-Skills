@@ -1,0 +1,12 @@
+{
+  "contracts": [
+    {
+      "id": "digest-notification-id",
+      "test": "src/features/tasks/tasks-digest.golden.test.ts",
+      "why": "Installed versions cancel and replace the scheduled digest notification by this identifier."
+    }
+  ],
+  "goldenPaths": ["**/*.vectors.json"],
+  "contractMarkers": ["[contract]"],
+  "maxPixelTolerance": 0.001
+}

@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "i18n-contract.schema.json",
+  "title": "contracts/i18n.json",
+  "description": "The app's translation policy, read by the i18n-strings-and-catalogs checkers and scripts/i18n/. The languages themselves live in src/i18n/languages.ts.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$comment": { "type": "string" },
+    "$schema": { "type": "string" },
+    "untranslatedPrefixes": {
+      "description": "Key prefixes whose texts stay the source text in every language (developer-only screens).",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "default": []
+    },
+    "reviewLanguages": {
+      "description": "Languages whose drafted texts go on the non-blocking review queue.",
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$" },
+      "default": []
+    },
+    "isolatedFormatters": {
+      "description": "Functions whose result already carries bidi isolates (nested-isolates rule).",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "default": ["formatDayMonth", "formatWeekdayDayMonth"]
+    },
+    "catalogs": {
+      "description": "When multi-package: package catalog folders and their key prefixes.",
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["dir", "keyPrefix"],
+        "properties": {
+          "dir": { "type": "string", "description": "Repo-relative folder holding <lang>.json for every language." },
+          "keyPrefix": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+          "sourceDir": { "type": "string", "description": "Repo-relative source folder whose '<keyPrefix>.' literals must exist in the catalog." }
+        }
+      }
+    }
+  }
+}

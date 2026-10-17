@@ -1,0 +1,8 @@
+{
+  "Simulator Target Bundle": "com.example.tasks.dev",
+  "aps": {
+    "alert": { "title": "Task assigned", "body": "A task was assigned to you" },
+    "sound": "default"
+  },
+  "body": { "kind": "task-assigned", "taskId": "t-1" }
+}

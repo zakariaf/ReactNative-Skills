@@ -1,0 +1,71 @@
+{
+ "numFailedTestSuites": 0,
+ "numFailedTests": 0,
+ "numPassedTests": 5,
+ "numTotalTestSuites": 1,
+ "numTotalTests": 5,
+ "numRuntimeErrorTestSuites": 0,
+ "snapshot": {
+  "added": 0,
+  "didUpdate": true,
+  "failure": false,
+  "filesAdded": 0,
+  "filesRemoved": 0,
+  "filesRemovedList": [],
+  "filesUnmatched": 0,
+  "filesUpdated": 1,
+  "matched": 3,
+  "total": 5,
+  "unchecked": 0,
+  "uncheckedKeysByFile": [],
+  "unmatched": 0,
+  "updated": 2
+ },
+ "startTime": 1791900030000,
+ "success": true,
+ "testResults": [
+  {
+   "name": "src/features/tasks/tasks-digest.golden.test.ts",
+   "status": "passed",
+   "startTime": 1791900030100,
+   "endTime": 1791900030500,
+   "assertionResults": [
+    {
+     "ancestorTitles": [
+      "planDigest goldens"
+     ],
+     "title": "groups the sample list on 2026-10-03",
+     "status": "passed"
+    },
+    {
+     "ancestorTitles": [
+      "planDigest goldens"
+     ],
+     "title": "groups the sample list on 2026-12-31",
+     "status": "passed"
+    },
+    {
+     "ancestorTitles": [
+      "[contract] digestNotificationId goldens"
+     ],
+     "title": "names the digest of the inbox list on 2026-10-03",
+     "status": "passed"
+    },
+    {
+     "ancestorTitles": [
+      "[contract] digestNotificationId goldens"
+     ],
+     "title": "names the digest of the inbox list on 2026-12-31",
+     "status": "passed"
+    },
+    {
+     "ancestorTitles": [
+      "[contract] digestNotificationId goldens"
+     ],
+     "title": "names the digest of the inbox list on 2027-01-01",
+     "status": "passed"
+    }
+   ]
+  }
+ ]
+}

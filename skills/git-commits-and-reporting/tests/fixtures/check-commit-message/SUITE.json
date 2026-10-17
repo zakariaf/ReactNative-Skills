@@ -1,0 +1,4 @@
+{
+  "base": "good",
+  "ops": [{ "mkdir": "src/features/tasks" }, { "mkdir": "src/ui" }]
+}

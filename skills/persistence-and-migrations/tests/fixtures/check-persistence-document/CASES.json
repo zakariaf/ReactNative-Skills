@@ -1,0 +1,216 @@
+{
+  "bad-doc-delete-slots": {
+    "expect": ["[quarantine-not-delete]", "src/data/document/clear-document.ts:5", "deletes document slots"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/document/clear-document.ts",
+          "content": "// src/data/document/clear-document.ts\nimport type { SqlDriver } from '@/data/sql-driver';\n\nexport function clearDocument(driver: SqlDriver): void {\n  driver.run('DELETE FROM document_slots', []);\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-doc-fixture-edited": {
+    "expect": [
+      "[fixture-frozen]",
+      "src/data/document/fixtures/app-document-v1.full.json",
+      "app-document-v1.full.json changed"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/document/fixtures/app-document-v1.full.json",
+          "find": "\"tasksCompleted\": 412",
+          "with": "\"tasksCompleted\": 413"
+        }
+      }
+    ]
+  },
+  "bad-doc-fixture-untested": {
+    "expect": ["[fixture-untested]", "app-document-v1.full is not in FIXTURES"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/document/fixtures/document-fixtures.test.ts",
+          "find": "  { name: 'app-document-v1.full', version: 1, json: appDocumentV1Full },\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-doc-ignores-read-only": {
+    "expect": ["[validate-before-write]", "update() ignores plan.isReadOnly"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/document/document-service.ts",
+          "find": "      if (isReadOnly) {\n        doc = next; // a newer build's document plays on in memory and is never written\n        return false;\n      }\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-doc-latest-not-bumped": {
+    "expect": ["[schema-version]", "LATEST_DOCUMENT_VERSION is not 2 (the highest app-document-vN.ts)"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/document/schema/app-document-v2.ts",
+          "content": "// src/data/document/schema/app-document-v2.ts\nimport * as v from 'valibot';\n\nimport { APP_DOCUMENT_V1 } from '@/data/document/schema/app-document-v1';\n\nexport const APP_DOCUMENT_V2 = v.strictObject({ ...APP_DOCUMENT_V1.entries, schemaVersion: v.literal(2) });\n"
+        }
+      }
+    ]
+  },
+  "bad-doc-loose-schema": {
+    "expect": ["[schema-strict]", "src/data/document/schema/document-sections-v1.ts", "uses v.object"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/document/schema/document-sections-v1.ts",
+          "find": "export const ONBOARDING_V1 = v.strictObject({",
+          "with": "export const ONBOARDING_V1 = v.object({"
+        }
+      }
+    ]
+  },
+  "bad-doc-missing-file": {
+    "expect": ["[missing-file]", "src/data/document/document-load-plan.test.ts", "every branch of the load plan"],
+    "ops": [{ "delete": "src/data/document/document-load-plan.test.ts" }]
+  },
+  "bad-doc-missing-step": {
+    "expect": ["[migration-chain]", "no document step v1 -> v2", "[fixture-missing]", "no app-document-v2.minimal.json"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/document/schema/app-document-v2.ts",
+          "content": "// src/data/document/schema/app-document-v2.ts\nimport * as v from 'valibot';\n\nimport { APP_DOCUMENT_V1 } from '@/data/document/schema/app-document-v1';\n\nexport const APP_DOCUMENT_V2 = v.strictObject({ ...APP_DOCUMENT_V1.entries, schemaVersion: v.literal(2) });\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/document/schema/app-document.ts",
+          "find": "export const LATEST_DOCUMENT_VERSION = 1;\nexport const LATEST_DOCUMENT_SCHEMA = APP_DOCUMENT_V1;",
+          "with": "export const LATEST_DOCUMENT_VERSION = 2;\nexport const LATEST_DOCUMENT_SCHEMA = APP_DOCUMENT_V2;"
+        }
+      }
+    ]
+  },
+  "bad-doc-no-guard": {
+    "expect": ["[validate-before-write]", "update() does not guard the protected sections (premium)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/document/document-service.ts",
+          "find": "const next = keepPremiumUnlessRevoked(doc, recipe(doc));",
+          "with": "const next = recipe(doc);"
+        }
+      }
+    ]
+  },
+  "bad-doc-no-slots-migration": {
+    "expect": ["[migration-chain]", "no migration creates the document_slots table"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/migrations/v0002-create-document-slots.ts",
+          "find": "CREATE TABLE document_slots (",
+          "with": "CREATE TABLE doc_slots ("
+        }
+      }
+    ]
+  },
+  "bad-doc-not-transactional": {
+    "expect": [
+      "[transaction-write]",
+      "src/data/document/sqlite-document-store.ts",
+      "write() does not run inside driver.transaction"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/document/sqlite-document-store.ts",
+          "find": "      driver.transaction(() => {\n        if (slots.current !== undefined) upsert(driver, 'current', slots.current);\n        if (slots.backup !== undefined) upsert(driver, 'backup', slots.backup);\n      });",
+          "with": "      if (slots.current !== undefined) upsert(driver, 'current', slots.current);\n      if (slots.backup !== undefined) upsert(driver, 'backup', slots.backup);"
+        }
+      }
+    ]
+  },
+  "bad-doc-protected-reset": {
+    "expect": [
+      "[protected-reset]",
+      "src/data/document/reset-document.ts",
+      "a reset writes the protected section premium"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/document/reset-document.ts",
+          "find": "return { ...doc, stats: fresh.stats };",
+          "with": "return { ...doc, stats: fresh.stats, premium: fresh.premium };"
+        }
+      }
+    ]
+  },
+  "bad-doc-slots-not-strict": {
+    "expect": ["[pragmas]", "src/data/document/document-tables.ts", "document table document_slots is not STRICT"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/document/document-tables.ts",
+          "find": "  payload        TEXT    NOT NULL\n) STRICT;",
+          "with": "  payload        TEXT    NOT NULL\n);"
+        }
+      }
+    ]
+  },
+  "bad-doc-step-impure": {
+    "expect": [
+      "[migration-pure]",
+      "src/data/document/migrations/v1-to-v2.ts:2",
+      "imports @/data/document/schema/default-app-document at run time"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/document/migrations/v1-to-v2.ts",
+          "content": "// src/data/document/migrations/v1-to-v2.ts\nimport { DEFAULT_SETTINGS } from '@/data/document/schema/default-app-document';\n\nimport type { DocumentMigration } from './document-migrations';\n\nexport const V1_TO_V2: DocumentMigration = { from: 1, migrate: (doc) => ({ ...doc, settings: DEFAULT_SETTINGS }) };\n"
+        }
+      }
+    ]
+  },
+  "bad-doc-unvalidated-write": {
+    "expect": ["[validate-before-write]", "the document is not validated before it is written"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/document/document-service.ts",
+          "find": "const checked = validateAppDocument(next);",
+          "with": "const checked = { doc: next } as const;"
+        }
+      }
+    ]
+  },
+  "bad-doc-version-literal": {
+    "expect": ["[schema-version]", "app-document-v1.ts does not pin schemaVersion: v.literal(1)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/document/schema/app-document-v1.ts",
+          "find": "schemaVersion: v.literal(1),",
+          "with": "schemaVersion: v.number(),"
+        }
+      }
+    ]
+  },
+  "bad-doc-write-outside": {
+    "expect": ["[write-outside-service]", "src/stores/settings-store.ts:5", "writes document slots directly"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/stores/settings-store.ts",
+          "content": "// src/stores/settings-store.ts\nimport type { DocumentStore, SlotRecord } from '@/data/document/document-store';\n\nexport function saveSettings(store: DocumentStore, record: SlotRecord): void {\n  store.write({ current: record });\n}\n"
+        }
+      }
+    ]
+  }
+}

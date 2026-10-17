@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`[contract] digestNotificationId goldens names the digest of the inbox list on 2026-10-03 1`] = `"digest:inbox:2026-10-03"`;
+
+exports[`[contract] digestNotificationId goldens names the digest of the inbox list on 2026-12-31 1`] = `"digest:inbox:2026-12-31"`;
+
+exports[`[contract] digestNotificationId goldens names the digest of the inbox list on 2027-01-01 1`] = `"digest:inbox:2027-01-01"`;
+
+exports[`[contract] digestNotificationId goldens names the digest of the inbox list on 2028-02-29 1`] = `"digest:inbox:2028-02-29"`;
+
+exports[`planDigest goldens groups the sample list on 2026-10-03 1`] = `
+"today 2026-10-03 tasks 5 done 1
+overdue: t1 Renew passport (2026-09-30)
+today: t2 Water the plants (2026-10-03)
+upcoming: t5 Send the invoice (2026-10-05), t3 Book the dentist (no date)"
+`;
+
+exports[`planDigest goldens groups the sample list on 2026-10-05 1`] = `
+"today 2026-10-05 tasks 5 done 1
+overdue: t1 Renew passport (2026-09-30), t2 Water the plants (2026-10-03)
+today: t5 Send the invoice (2026-10-05)
+upcoming: t3 Book the dentist (no date)"
+`;
+
+exports[`planDigest goldens groups the sample list on 2026-12-31 1`] = `
+"today 2026-12-31 tasks 5 done 1
+overdue: t1 Renew passport (2026-09-30), t2 Water the plants (2026-10-03), t5 Send the invoice (2026-10-05)
+today: -
+upcoming: t3 Book the dentist (no date)"
+`;
+
+exports[`planDigest goldens plans an empty list 1`] = `
+"today 2026-10-03 tasks 0 done 0
+overdue: -
+today: -
+upcoming: -"
+`;

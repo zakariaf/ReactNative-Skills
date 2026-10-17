@@ -1,0 +1,8 @@
+{
+  "base": ["@tests/bases/app", { "templates": true, "firstLinePath": true }],
+  "ops": [
+    { "write": { "file": ".agents/skills/some-skill/SKILL.md", "content": "---\nname: some-skill\ndescription: An installed skill; its planted findings stay silent.\n---\n" } },
+    { "write": { "file": "skills/vendored/SKILL.md", "content": "---\nname: vendored\ndescription: A skills/ folder; its planted findings stay silent.\n---\n" } },
+    { "write": { "file": "src/vendor/kit/SKILL.md", "content": "---\nname: kit\ndescription: A vendored skill folder inside the app; its planted findings stay silent.\n---\n" } }
+  ]
+}

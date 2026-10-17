@@ -1,0 +1,19 @@
+{
+  "forms.check.checking": "Checking…",
+  "forms.check.pending": "Still checking. Save again once it’s done.",
+  "forms.check.unavailable": "This couldn’t be checked right now. Try again in a moment.",
+  "forms.field.invalid": "Check this field",
+  "forms.keyboard.done": "Done",
+  "forms.submit.fix-fields": "Some fields need a fix before you can save.",
+  "task-editor.estimate.label": "Estimate in minutes",
+  "task-editor.estimate.not-a-number": "Enter whole minutes",
+  "task-editor.estimate.out-of-range": "This estimate is outside the allowed range",
+  "task-editor.notes.label": "Notes",
+  "task-editor.notes.too-long": "These notes are too long",
+  "task-editor.save.failed": "The task wasn’t saved. Your text is still here, so try again.",
+  "task-editor.submit": "Add task",
+  "task-editor.title.duplicate": "An open task already has this title",
+  "task-editor.title.label": "Title",
+  "task-editor.title.required": "Give the task a title",
+  "task-editor.title.too-long": "This title is too long"
+}

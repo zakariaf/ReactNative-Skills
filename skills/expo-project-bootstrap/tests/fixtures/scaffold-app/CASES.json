@@ -1,0 +1,116 @@
+{
+  "bad-compare": {
+    "expect": ["FAIL package.json [differs] is missing"],
+    "args": "{dir} --app-id com.acme.tasks --name Tasks --compare",
+    "ops": []
+  },
+  "bad-conflict": {
+    "expect": ["FAIL tsconfig.base.json [conflict] exists with different content"],
+    "ops": [{ "write": { "file": "tsconfig.base.json", "lines": ["{ \"compilerOptions\": { \"strict\": false } }"] } }]
+  },
+  "bad-leftover": {
+    "expect": [
+      "FAIL app.json [leftover] is a template leftover",
+      "FAIL src/components/ [leftover] is a template leftover",
+      "FAIL scripts/reset-project.js [leftover]",
+      "FAIL assets/images/react-logo.png [leftover] is a template leftover: the template's demo art",
+      "FAIL assets/expo.icon/ [leftover] is a template leftover",
+      "FAIL eslint.config.js [leftover] is a template leftover: a second ESLint config"
+    ],
+    "ops": [
+      { "write": { "file": "app.json", "content": "{ \"expo\": { \"name\": \"HelloWorld\" } }\n" } },
+      { "write": { "file": "src/components/themed-text.tsx", "content": "export const themed = 1;\n" } },
+      { "write": { "file": "scripts/reset-project.js", "content": "// reset\n" } },
+      { "png": { "files": ["assets/images/react-logo.png"], "width": 32, "height": 32, "fill": "#61DAFB" } },
+      { "write": { "file": "assets/expo.icon/icon.json", "content": "{ \"fill\": \"automatic\" }\n" } },
+      { "write": { "file": "eslint.config.js", "content": "module.exports = [];\n" } }
+    ]
+  },
+  "bad-root-manifest": {
+    "expect": ["FAIL package.json [conflict] exists with different content (beyond the allowScripts approvals)"],
+    "ops": [
+      {
+        "write": {
+          "file": "package.json",
+          "content": "{ \"name\": \"old-draft\", \"version\": \"0.0.1\", \"private\": true }\n"
+        }
+      }
+    ]
+  },
+  "bad-settings": {
+    "expect": ["FAIL .claude/settings.json [conflict] permissions.deny has rules the gates do not list: Bash(rm -rf *)"],
+    "ops": [
+      {
+        "write": {
+          "file": ".claude/settings.json",
+          "content": "{ \"permissions\": { \"deny\": [\"Bash(rm -rf *)\"] } }\n"
+        }
+      }
+    ]
+  },
+  "error-invalid-app-id": {
+    "expect": ["ERROR [bad-input] --app-id: tasks is not a valid iOS bundle id"],
+    "args": "{dir} --app-id tasks --name Tasks",
+    "ops": []
+  },
+  "error-kotlin-keyword-id": {
+    "expect": ["ERROR [bad-input] --app-id com.acme.fun: id part \"fun\" is a Kotlin or Java keyword"],
+    "args": "{dir} --app-id com.acme.fun --name Tasks",
+    "ops": []
+  },
+  "error-missing-options": {
+    "expect": ["ERROR [bad-input] pass --app-id <reverse-dns> and --name <display name>"],
+    "args": "{dir}",
+    "ops": []
+  },
+  "error-replace-unknown": {
+    "expect": ["ERROR [bad-input] --replace nope.json names no file the templates produce"],
+    "args": "{dir} --app-id com.acme.tasks --name Tasks --replace nope.json",
+    "ops": []
+  },
+  "pass-apostrophe-name": {
+    "expect": ["app: Tom's (com.acme.tasks, slug toms, scheme toms)", "RESULT: PASS"],
+    "args": "{dir} --app-id com.acme.tasks --name Tom's",
+    "ops": []
+  },
+  "pass-claude-md-import-added": {
+    "expect": ["plan  merge    CLAUDE.md (gains the @AGENTS.md import as its first line)"],
+    "ops": [{ "write": { "file": "CLAUDE.md", "lines": ["Project notes for Claude Code."] } }]
+  },
+  "pass-claude-md-kept": {
+    "expect": ["plan  same     CLAUDE.md (kept: it already imports @AGENTS.md)"],
+    "ops": [{ "write": { "file": "CLAUDE.md", "lines": ["@AGENTS.md", "", "Project notes for Claude Code."] } }]
+  },
+  "pass-image-kept": {
+    "expect": [
+      "plan  same     assets/images/favicon.png (kept: the app already has this image)",
+      "plan  same     assets/images/splash-icon.png (kept: the app already has this image)"
+    ],
+    "ops": [
+      {
+        "png": {
+          "files": ["assets/images/favicon.png", "assets/images/splash-icon.png"],
+          "width": 48,
+          "height": 48,
+          "fill": "#208AEF"
+        }
+      }
+    ]
+  },
+  "pass-settings-merged": {
+    "expect": ["plan  merge    .claude/settings.json (merged)"],
+    "ops": [
+      {
+        "write": {
+          "file": ".claude/settings.json",
+          "content": "{\n  \"enabledPlugins\": { \"expo@claude-plugins-official\": true },\n  \"permissions\": { \"allow\": [\"Bash(npm run lint)\"] }\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-template-app-id": {
+    "expect": ["NOTE --app-id com.example.tasks is a placeholder: the ship gates refuse it", "RESULT: PASS"],
+    "args": "{dir} --app-id com.example.tasks --name Tasks",
+    "ops": []
+  }
+}

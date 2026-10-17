@@ -1,0 +1,3 @@
+[effect-cleanup] the useEffect body is a bare subscribe or timer call
+src/features/tasks/use-refresh-on-change.ts:7
+RESULT: FAIL (1 problems)

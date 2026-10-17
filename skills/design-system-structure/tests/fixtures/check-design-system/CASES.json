@@ -1,0 +1,1479 @@
+{
+  "bad-app-json-extended-light": {
+    "expect": [
+      "app.json:4 [color-scheme-config] userInterfaceStyle is \"light\", not \"automatic\"",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "app.config.ts",
+          "content": "// app.config.ts (fixture): Expo's dynamic config extending app.json.\nimport type { ConfigContext, ExpoConfig } from 'expo/config';\n\nconst FONTS = './assets/fonts';\n\nexport default ({ config }: ConfigContext): ExpoConfig => ({\n  ...config,\n  name: 'Tasks',\n  slug: 'tasks',\n  plugins: [\n    'expo-router',\n    [\n      'expo-font',\n      {\n        fonts: [\n          `${FONTS}/NotoSans-Regular.ttf`,\n          `${FONTS}/NotoSans-Bold.ttf`,\n          `${FONTS}/NotoSansArabic-Regular.ttf`,\n          `${FONTS}/NotoSansArabic-Bold.ttf`,\n        ],\n      },\n    ],\n  ],\n});\n"
+        }
+      },
+      {
+        "write": {
+          "file": "app.json",
+          "content": "{\n  \"expo\": {\n    \"name\": \"Tasks\",\n    \"userInterfaceStyle\": \"light\"\n  }\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-balanced-closure": {
+    "expect": ["[balanced-display] the balance search sets its state from a closure", "src/ui/use-balanced-wrap.ts:"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/use-balanced-wrap.ts",
+          "find": "      setMeasure((previous) => {\n        const current = forText(previous, text);\n        return isStale(current, lineWidths) ? previous : advance({ ...current, lineWidths });\n      });\n",
+          "with": "      if (!isStale(measure, lineWidths)) setMeasure(advance({ ...measure, lineWidths }));\n"
+        }
+      }
+    ]
+  },
+  "bad-color-scheme": {
+    "expect": [
+      "app.config.ts:9 [color-scheme-config] userInterfaceStyle is \"light\", not \"automatic\"",
+      "package.json [color-scheme-config] expo-system-ui is not a dependency"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "  userInterfaceStyle: 'automatic',\n",
+          "with": "  userInterfaceStyle: 'light',\n"
+        }
+      },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-system-ui"], "delete": true } }
+    ]
+  },
+  "bad-color-scheme-ios-override": {
+    "expect": [
+      "app.config.ts:10 [color-scheme-config] ios.userInterfaceStyle is \"light\", not \"automatic\", so the dark palette never follows the phone on iOS"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "  userInterfaceStyle: 'automatic',\n",
+          "with": "  userInterfaceStyle: 'automatic',\n  ios: { bundleIdentifier: 'com.acme.tasks', userInterfaceStyle: 'light' },\n"
+        }
+      }
+    ]
+  },
+  "bad-color-scheme-missing": {
+    "expect": ["[color-scheme-config] userInterfaceStyle is not \"automatic\" for ios (Expo's default is light)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "  userInterfaceStyle: 'automatic',\n",
+          "with": "  android: { userInterfaceStyle: 'automatic' },\n"
+        }
+      }
+    ]
+  },
+  "bad-color-tokens": {
+    "expect": ["[color-tokens-fields] ColorTokens lacks the core role focus", "src/theme/theme-types.ts:"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/theme-types.ts",
+          "find": "  /** The focus indicator (keyboard, switch access, a tapped disabled control). */\n  readonly focus: string;\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-contract-missing": {
+    "expect": ["[contract-missing]", "contracts/design-system.json"],
+    "ops": [{ "delete": "contracts/design-system.json" }]
+  },
+  "bad-contrast-contract-pair": {
+    "expect": [
+      "[palette-contrast] PALETTE.light: textMuted on primary is 1.10:1, needs 4.5:1",
+      "[palette-contrast] PALETTE.dark: textMuted on primary is 1.06:1, needs 4.5:1",
+      "src/theme/palette.ts:"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/contrast.json",
+          "json": {
+            "palettes": [
+              {
+                "name": "app",
+                "file": "src/theme/palette.ts",
+                "export": "PALETTE",
+                "sets": ["light", "dark"],
+                "optionalSets": ["colorBlind.light", "colorBlind.dark"],
+                "base": "background",
+                "edge": "border",
+                "text": [
+                  ["text", "background"],
+                  ["text", "surface"],
+                  ["text", "sunken"],
+                  ["textMuted", "background"],
+                  ["textMuted", "surface"],
+                  ["textMuted", "sunken"],
+                  ["onPrimary", "primary"],
+                  ["danger", "surface"],
+                  ["danger", "dangerSurface"],
+                  ["text", "dangerSurface"],
+                  ["success", "surface"],
+                  ["warning", "surface"],
+                  ["text", "separator"],
+                  ["textMuted", "primary"]
+                ],
+                "graphics": [
+                  ["border", "background"],
+                  ["border", "surface"],
+                  ["focus", "background"],
+                  ["focus", "surface"]
+                ],
+                "shapes": [["primary", "background"], ["primary", "surface"]],
+                "distinct": []
+              }
+            ],
+            "exceptions": []
+          }
+        }
+      }
+    ]
+  },
+  "bad-core-pair-exception": {
+    "expect": [
+      "[palette-contrast] PALETTE.light: focus on background is 1.93:1, needs 3:1 (a core pair); the exception in contracts/contrast.json (the focus ring is pale by brand choice) cannot accept it: a core pair cannot be excepted",
+      "src/theme/palette.ts:"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/contrast.json",
+          "json": {
+            "palettes": [
+              {
+                "name": "app",
+                "file": "src/theme/palette.ts",
+                "export": "PALETTE",
+                "sets": ["light", "dark"],
+                "base": "background",
+                "edge": "border",
+                "text": [["text", "background"], ["textMuted", "background"], ["onPrimary", "primary"]],
+                "graphics": [["border", "background"]],
+                "shapes": [["primary", "background"]]
+              }
+            ],
+            "exceptions": [
+              {
+                "palette": "app",
+                "set": "light",
+                "fg": "focus",
+                "bg": "background",
+                "reason": "the focus ring is pale by brand choice",
+                "approvedBy": "the developer"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "replace": {
+          "file": "design/tokens.json",
+          "find": "\"focus\": \"{color.primitive.blue.45}\"",
+          "with": "\"focus\": \"{color.primitive.blue.77}\""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/theme/palette.ts",
+          "find": "  focus: '#1C4DB5', // blue.45\n",
+          "with": "  focus: '#8AB4FF', // blue.77\n"
+        }
+      }
+    ]
+  },
+  "bad-font-family": {
+    "expect": [
+      "[font-family] fonts.ts names 'Noto Sans', but no bundled font file is called Noto Sans.ttf",
+      "src/theme/fonts.ts:"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/fonts.ts",
+          "find": "  latin: {\n    regular: 'NotoSans-Regular',\n",
+          "with": "  latin: {\n    regular: 'Noto Sans',\n"
+        }
+      }
+    ]
+  },
+  "bad-font-family-system": {
+    "expect": [
+      "src/theme/fonts.ts:1 [font-family] fonts.ts names NotoSans-Regular, NotoSans-Bold, NotoSansArabic-Regular, NotoSansArabic-Bold, but the contract says \"fonts\": \"system\"",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [{ "json": { "file": "contracts/design-system.json", "path": ["fonts"], "value": "system" } }]
+  },
+  "bad-font-files": {
+    "expect": [
+      "assets/fonts/NotoSansArabic-Bold.ttf [font-files] a font the contract bundles is missing",
+      "assets/fonts/NotoSans-Regular.ttf [font-files] the font file differs from the one the contract pins (sha256)",
+      "assets/fonts [font-files] no licence text for Noto Sans Arabic (NotoSansArabic-OFL.txt)"
+    ],
+    "ops": [
+      { "delete": ["assets/fonts/NotoSansArabic-Bold.ttf", "assets/fonts/NotoSansArabic-OFL.txt"] },
+      {
+        "json": {
+          "file": "contracts/design-system.json",
+          "path": ["fonts", "files", 0, "sha256"],
+          "value": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      }
+    ]
+  },
+  "bad-font-plugin": {
+    "expect": ["[font-plugin] the expo-font entry does not embed NotoSansArabic-Bold.ttf", "app.config.ts:"],
+    "ops": [
+      { "replace": { "file": "app.config.ts", "find": "          `${FONTS}/NotoSansArabic-Bold.ttf`,\n", "with": "" } }
+    ]
+  },
+  "bad-font-plugin-missing": {
+    "expect": ["app.config.ts [font-plugin] no expo-font config plugin entry embeds the fonts"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "  plugins: [\n    'expo-router',\n    [\n      'expo-font',\n      {\n        fonts: [\n          `${FONTS}/NotoSans-Regular.ttf`,\n          `${FONTS}/NotoSans-Bold.ttf`,\n          `${FONTS}/NotoSansArabic-Regular.ttf`,\n          `${FONTS}/NotoSansArabic-Bold.ttf`,\n        ],\n      },\n    ],\n  ],\n",
+          "with": "  plugins: ['expo-router'],\n"
+        }
+      },
+      { "replace": { "file": "app.config.ts", "find": "const FONTS = './assets/fonts';\n\n", "with": "" } }
+    ]
+  },
+  "bad-font-postscript": {
+    "expect": [
+      "assets/fonts/NotoSans-Bold.ttf:1 [font-family] the PostScript name inside the file is \"NotoSans-BoldItalic\", not 'NotoSans-Bold'"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "assets/fonts/NotoSans-Bold.ttf",
+          "base64": "AAEAAAADAAAAAAAAaGVhZAAAAAAAAAA8AAAANmhoZWEAAAAAAAAAdAAAACRuYW1lAAAAAAAAAJgAAAA4AAEAAAAAAAAAAAAAXw889QAAA+gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAABC3+2wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABABIAAwABBAkABgAmAAAATgBvAHQAbwBTAGEAbgBzAC0AQgBvAGwAZABJAHQAYQBsAGkAYw=="
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/design-system.json",
+          "path": ["fonts", "files", 1, "sha256"],
+          "value": "d2bd7af19a58c4fc22a1d6cd1da6d614047e85f5a53242edec5ad0fb9484a74e"
+        }
+      }
+    ]
+  },
+  "bad-font-script-coverage": {
+    "expect": [
+      "src/theme/fonts.ts:48 [font-script-coverage] src/i18n/languages.ts lists 'ja' (Japanese script), but LANGUAGE_SCRIPTS has no 'ja'",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/i18n/languages.ts",
+          "content": "// src/i18n/languages.ts (fixture): Japanese ships, but LANGUAGE_SCRIPTS sends it to the bundled Latin family.\nexport const LANGUAGES = ['en', 'ar', 'ja'] as const;\nexport type Language = (typeof LANGUAGES)[number];\n"
+        }
+      }
+    ]
+  },
+  "bad-font-sha-unrecorded": {
+    "expect": ["contracts/design-system.json [font-files] NotoSans-Bold.ttf has no recorded sha256"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/design-system.json",
+          "path": ["fonts", "files", 1, "sha256"],
+          "value": "record it: shasum -a 256 assets/fonts/NotoSans-Bold.ttf"
+        }
+      }
+    ]
+  },
+  "bad-font-unused": {
+    "expect": [
+      "src/theme/fonts.ts:23 [font-family] the contract bundles NotoSans-Regular.ttf, NotoSans-Bold.ttf, NotoSansArabic-Regular.ttf, NotoSansArabic-Bold.ttf, but every script of SCRIPT_FONTS is null",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/fonts.ts",
+          "find": "export const SCRIPT_FONTS: Readonly<Record<ScriptKey, ScriptFamilies | null>> = {\n  latin: {\n    regular: 'NotoSans-Regular',\n    medium: 'NotoSans-Regular',\n    semibold: 'NotoSans-Bold',\n    bold: 'NotoSans-Bold',\n  },\n  arabic: {\n    regular: 'NotoSansArabic-Regular',\n    medium: 'NotoSansArabic-Regular',\n    semibold: 'NotoSansArabic-Bold',\n    bold: 'NotoSansArabic-Bold',\n  },\n};",
+          "with": "export const SCRIPT_FONTS: Readonly<Record<ScriptKey, ScriptFamilies | null>> = {\n  latin: null,\n  arabic: null,\n};"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/theme/fonts.ts",
+          "find": "  'NotoSansArabic-Regular': { unitsPerEm: 1000, ascender: 1374, descender: -738 },\n  'NotoSansArabic-Bold': { unitsPerEm: 1000, ascender: 1374, descender: -738 },\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-glyph-nudge": {
+    "expect": ["[no-glyph-nudge] paddingTop moves the text box to nudge its glyphs", "src/theme/use-text-style.ts:"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/use-text-style.ts",
+          "find": "    fontSize: style.fontSize,\n",
+          "with": "    fontSize: style.fontSize,\n    // The bold Latin family sat 1 pt low against the mockup: pull it up.\n    paddingTop: font.isTallScript ? 0 : 1,\n"
+        }
+      }
+    ]
+  },
+  "bad-greedy-display": {
+    "expect": ["[balanced-display] AppText wraps display text greedily", "src/ui/app-text.tsx:"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/app-text.tsx",
+          "find": "  const balance = useBalancedWrap(style.face === 'display', props.children, align);\n",
+          "with": "  const balance = useBalancedWrap(false, props.children, align);\n"
+        }
+      }
+    ]
+  },
+  "bad-guard-scale-one": {
+    "expect": [
+      "[tall-script-overflow-guard] AppText has no overflow guard for tall scripts (missing the font scale in guardFor(...) (its fontScale argument is 1, not useFontScale())",
+      "src/ui/app-text.tsx:"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/app-text.tsx",
+          "find": "  const guard = guardFor(textStyle, fontScale);\n",
+          "with": "  const guard = guardFor(textStyle, 1);\n"
+        }
+      }
+    ]
+  },
+  "bad-guard-unscaled": {
+    "expect": [
+      "[tall-script-overflow-guard] AppText has no overflow guard for tall scripts (missing the font scale (useFontScale)",
+      "src/ui/app-text.tsx:"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/app-text.tsx",
+          "find": "  const fontScale = useFontScale();\n",
+          "with": "  const fontScale = 1;\n"
+        }
+      }
+    ]
+  },
+  "bad-line-height-fraction": {
+    "expect": [
+      "[line-height-grid] the line height is not snapped to the device pixel grid",
+      "src/theme/use-text-style.ts:",
+      "[line-height-grid] snapToGrid(18.2, 3) is 18.2, the 3x pixel grid says 55/3"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/use-text-style.ts",
+          "find": "    lineHeight: snapToPixels(style.fontSize * ratio * fontScale) / fontScale,\n",
+          "with": "    lineHeight: style.fontSize * ratio * fontScale,\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/theme/type-styles.ts",
+          "find": "  return Math.round(points * pixelRatio) / pixelRatio;\n",
+          "with": "  return pixelRatio > 0 ? points : 0;\n"
+        }
+      }
+    ]
+  },
+  "bad-line-height-unscaled": {
+    "expect": ["[line-height-grid] the line height is snapped at the unscaled size", "src/theme/use-text-style.ts:"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/use-text-style.ts",
+          "find": "    lineHeight: snapToPixels(style.fontSize * ratio * fontScale) / fontScale,\n",
+          "with": "    lineHeight: snapToPixels(style.fontSize * ratio),\n"
+        }
+      }
+    ]
+  },
+  "bad-module-load": {
+    "expect": ["[theme-module-load]", "src/theme/motion.ts:1"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/motion.ts",
+          "find": "/** cubic-bezier control points (x1, y1, x2, y2). */\n",
+          "with": "import { Platform } from 'react-native';\n\n/** cubic-bezier control points (x1, y1, x2, y2). */\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/theme/motion.ts",
+          "find": "  pressIn: 70,\n",
+          "with": "  pressIn: Platform.OS === 'android' ? 80 : 70,\n"
+        }
+      }
+    ]
+  },
+  "bad-motion-mismatch": {
+    "expect": ["[theme-mismatch] MOTION_MS.pressIn is 90, the token file says 70", "src/theme/motion.ts:"],
+    "ops": [{ "replace": { "file": "src/theme/motion.ts", "find": "  pressIn: 70,\n", "with": "  pressIn: 90,\n" } }]
+  },
+  "bad-navigation-provider-only": {
+    "expect": [
+      "src/app/_layout.tsx [theme-provider-mounted] no runtime file renders AppThemeProvider from src/theme/theme-provider.tsx",
+      "expo-router's ThemeProvider is the navigation theme, not this one"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/_layout.tsx",
+          "content": "// src/app/_layout.tsx (fixture): the Expo SDK 57 template's root layout. Its ThemeProvider is\n// expo-router's navigation theme; the app's own provider is never mounted.\nimport { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';\nimport { useColorScheme } from 'react-native';\n\nimport { TextLocaleProvider } from '@/theme/text-locale';\n\nconst LOCALE = { language: 'en', direction: 'ltr' } as const;\n\nexport default function RootLayout(): React.JSX.Element {\n  const colorScheme = useColorScheme();\n  return (\n    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>\n      <TextLocaleProvider value={LOCALE}>\n        <Stack />\n      </TextLocaleProvider>\n    </ThemeProvider>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-navigation-theme-component-outside": {
+    "expect": [
+      "src/app/_layout.tsx:12 [navigation-theme-mapped] <ThemedNavigation> (it renders the navigation theme through src/features/root-navigator/themed-navigation.tsx) sits outside AppThemeProvider",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/root-navigator/themed-navigation.tsx",
+          "content": "// src/features/root-navigator/themed-navigation.tsx (fixture): wraps its children in the navigation theme.\nimport { NavigationThemeProvider } from '@/theme/navigation-theme';\n\nimport type { ReactNode } from 'react';\n\nexport function ThemedNavigation(props: { readonly children: ReactNode }): ReactNode {\n  return <NavigationThemeProvider>{props.children}</NavigationThemeProvider>;\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/_layout.tsx",
+          "content": "// src/app/_layout.tsx (fixture): the navigation theme component wraps the app theme, so it reads the default.\nimport { Stack } from 'expo-router';\n\nimport { ThemedNavigation } from '@/features/root-navigator/themed-navigation';\nimport { TextLocaleProvider } from '@/theme/text-locale';\nimport { AppThemeProvider } from '@/theme/theme-provider';\n\nconst LOCALE = { language: 'en', direction: 'ltr' } as const;\n\nexport default function RootLayout(): React.JSX.Element {\n  return (\n    <ThemedNavigation>\n      <AppThemeProvider preference=\"system\">\n        <TextLocaleProvider value={LOCALE}>\n          <Stack />\n        </TextLocaleProvider>\n      </AppThemeProvider>\n    </ThemedNavigation>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-navigation-theme-component-unrendered": {
+    "expect": [
+      "src/theme/navigation-theme.tsx:38 [navigation-theme-mapped] src/theme/navigation-theme.tsx maps the navigation theme and src/features/root-navigator/root-stack.tsx renders it, but neither the routes nor the app entry renders that file",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/root-navigator/root-stack.tsx",
+          "content": "// src/features/root-navigator/root-stack.tsx (fixture): the root Stack under the navigation theme, in\n// its own file because routes are leaves and the layout's providers fill the lint's JSX depth.\nimport { Stack } from 'expo-router';\n\nimport { NavigationThemeProvider } from '@/theme/navigation-theme';\n\nexport function RootStack(): React.JSX.Element {\n  return (\n    <NavigationThemeProvider>\n      <Stack screenOptions={{ headerShown: false }} />\n    </NavigationThemeProvider>\n  );\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/_layout.tsx",
+          "content": "// src/app/_layout.tsx (fixture): the layout renders a bare Stack; the root Stack component that carries\n// the navigation theme is never rendered.\nimport { Stack } from 'expo-router';\n\nimport { TextLocaleProvider } from '@/theme/text-locale';\nimport { AppThemeProvider } from '@/theme/theme-provider';\n\nconst LOCALE = { language: 'en', direction: 'ltr' } as const;\n\nexport default function RootLayout(): React.JSX.Element {\n  return (\n    <AppThemeProvider preference=\"system\">\n      <TextLocaleProvider value={LOCALE}>\n        <Stack />\n      </TextLocaleProvider>\n    </AppThemeProvider>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-navigation-theme-helper-outside": {
+    "expect": [
+      "src/app/_layout.tsx:21 [navigation-theme-mapped] <NavigationThemeProvider> sits outside AppThemeProvider, so it reads the theme context's default (the light theme)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/_layout.tsx",
+          "content": "// src/app/_layout.tsx (fixture): a helper declared below the layout wraps AppThemeProvider in the\n// navigation theme, so the navigation theme reads the theme context's default.\nimport { Stack } from 'expo-router';\n\nimport { NavigationThemeProvider } from '@/theme/navigation-theme';\nimport { AppThemeProvider } from '@/theme/theme-provider';\n\nimport type { ReactNode } from 'react';\n\nexport default function RootLayout(): React.JSX.Element {\n  return (\n    <ThemedNavigation>\n      <AppThemeProvider preference=\"system\">\n        <Stack />\n      </AppThemeProvider>\n    </ThemedNavigation>\n  );\n}\n\nconst ThemedNavigation = (props: { readonly children: ReactNode }): ReactNode => (\n  <NavigationThemeProvider>{props.children}</NavigationThemeProvider>\n);\n"
+        }
+      }
+    ]
+  },
+  "bad-navigation-theme-missing": {
+    "expect": [
+      "src/theme/navigation-theme.tsx:38 [navigation-theme-mapped] src/theme/navigation-theme.tsx maps the navigation theme, but no runtime file renders what it exports",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/_layout.tsx",
+          "content": "// src/app/_layout.tsx (fixture): the app theme is mounted, but the navigator keeps its own theme.\nimport { Stack } from 'expo-router';\n\nimport { TextLocaleProvider } from '@/theme/text-locale';\nimport { AppThemeProvider } from '@/theme/theme-provider';\n\nconst LOCALE = { language: 'en', direction: 'ltr' } as const;\n\nexport default function RootLayout(): React.JSX.Element {\n  return (\n    <AppThemeProvider preference=\"system\">\n      <TextLocaleProvider value={LOCALE}>\n        <Stack />\n      </TextLocaleProvider>\n    </AppThemeProvider>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-navigation-theme-none": {
+    "expect": [
+      "src/app/_layout.tsx:1 [navigation-theme-mapped] no runtime file gives the navigator (expo-router) the app theme's colours",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      { "delete": ["src/theme/navigation-theme.tsx", "src/theme/navigation-theme.test.tsx"] },
+      {
+        "write": {
+          "file": "src/app/_layout.tsx",
+          "content": "// src/app/_layout.tsx (fixture): the app theme is mounted, but the navigator keeps its own theme.\nimport { Stack } from 'expo-router';\n\nimport { TextLocaleProvider } from '@/theme/text-locale';\nimport { AppThemeProvider } from '@/theme/theme-provider';\n\nconst LOCALE = { language: 'en', direction: 'ltr' } as const;\n\nexport default function RootLayout(): React.JSX.Element {\n  return (\n    <AppThemeProvider preference=\"system\">\n      <TextLocaleProvider value={LOCALE}>\n        <Stack />\n      </TextLocaleProvider>\n    </AppThemeProvider>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-navigation-theme-outside": {
+    "expect": [
+      "src/app/_layout.tsx:9 [navigation-theme-mapped] <NavigationThemeProvider> sits outside AppThemeProvider, so it reads the theme context's default (the light theme)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/_layout.tsx",
+          "content": "// src/app/_layout.tsx (fixture): the navigation theme wraps the app theme, so it reads the default.\nimport { Stack } from 'expo-router';\n\nimport { NavigationThemeProvider } from '@/theme/navigation-theme';\nimport { AppThemeProvider } from '@/theme/theme-provider';\n\nexport default function RootLayout(): React.JSX.Element {\n  return (\n    <NavigationThemeProvider>\n      <AppThemeProvider preference=\"system\">\n        <Stack />\n      </AppThemeProvider>\n    </NavigationThemeProvider>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-navigation-theme-unmapped": {
+    "expect": [
+      "src/app/_layout.tsx:16 [navigation-theme-mapped] <ThemeProvider> gets navigationTheme (colorScheme === 'dark' ? DarkTheme : DefaultTheme), React Navigation's own light and dark themes",
+      "src/theme/navigation-theme.tsx:38 [navigation-theme-mapped] src/theme/navigation-theme.tsx maps the navigation theme, but no runtime file renders what it exports",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/_layout.tsx",
+          "content": "// src/app/_layout.tsx (fixture): the app theme outside, but the template's navigation theme kept as is.\nimport { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';\nimport { useColorScheme } from 'react-native';\n\nimport { TextLocaleProvider } from '@/theme/text-locale';\nimport { AppThemeProvider } from '@/theme/theme-provider';\n\nconst LOCALE = { language: 'en', direction: 'ltr' } as const;\n\nexport default function RootLayout(): React.JSX.Element {\n  const colorScheme = useColorScheme();\n  const navigationTheme = colorScheme === 'dark' ? DarkTheme : DefaultTheme;\n  return (\n    <AppThemeProvider preference=\"system\">\n      <TextLocaleProvider value={LOCALE}>\n        <ThemeProvider value={navigationTheme}>\n          <Stack />\n        </ThemeProvider>\n      </TextLocaleProvider>\n    </AppThemeProvider>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-no-overflow-guard": {
+    "expect": ["[tall-script-overflow-guard] AppText has no overflow guard for tall scripts", "src/ui/app-text.tsx:"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/app-text.tsx",
+          "find": "  const guard = guardFor(textStyle, fontScale);\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/ui/app-text.tsx",
+          "find": "      style={[textStyle, style.isTabular === true && TABULAR, color, balance.style, guard]}\n",
+          "with": "      style={[textStyle, style.isTabular === true && TABULAR, color, balance.style]}\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/ui/app-text.tsx",
+          "find": "      {...textProps(props, guard === null)}\n",
+          "with": "      {...textProps(props, true)}\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/ui/app-text.tsx",
+          "find": "  if (guard === null) return text;\n  // The wrapper keeps the design's line box and the testID (E2E tools measure this box).\n  return <View {...(props.testID === undefined ? {} : { testID: props.testID })}>{text}</View>;\n",
+          "with": "  return text;\n"
+        }
+      }
+    ]
+  },
+  "bad-palette-colorblind": {
+    "expect": ["[palette-colorblind] PALETTE.colorBlind changes no primary or status colour"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/palette.ts",
+          "find": "export const PALETTE: Palette = { light: LIGHT, dark: DARK };",
+          "with": "export const PALETTE: Palette = {\n  light: LIGHT,\n  dark: DARK,\n  colorBlind: { light: LIGHT, dark: DARK },\n};"
+        }
+      },
+      {
+        "json": {
+          "file": "design/tokens.json",
+          "path": ["color", "colorBlind"],
+          "value": { "light": "{color.light}", "dark": "{color.dark}" }
+        }
+      }
+    ]
+  },
+  "bad-palette-contrast": {
+    "expect": ["[palette-contrast] PALETTE.light: textMuted on background is 2.04:1, needs 4.5:1"],
+    "ops": [
+      {
+        "replace": {
+          "file": "design/tokens.json",
+          "find": "\"textMuted\": \"{color.primitive.neutral.46}\"",
+          "with": "\"textMuted\": \"{color.primitive.neutral.75}\""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/theme/palette.ts",
+          "find": "  textMuted: '#525866', // neutral.46\n",
+          "with": "  textMuted: '#A8AFBB', // neutral.75\n"
+        }
+      }
+    ]
+  },
+  "bad-palette-core-pair": {
+    "expect": [
+      "[palette-contrast] PALETTE.light: focus on background is 1.93:1, needs 3:1 (a core pair)",
+      "src/theme/palette.ts:",
+      "palette-contrast: PALETTE is judged by 8 pairs from contracts/contrast.json (palette \"app\") plus the core pairs"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/contrast.json",
+          "json": {
+            "palettes": [
+              {
+                "name": "app",
+                "file": "src/theme/palette.ts",
+                "export": "PALETTE",
+                "sets": ["light", "dark"],
+                "base": "background",
+                "edge": "border",
+                "text": [["text", "background"], ["textMuted", "background"], ["onPrimary", "primary"]],
+                "graphics": [["border", "background"]],
+                "shapes": [["primary", "background"]]
+              }
+            ],
+            "exceptions": []
+          }
+        }
+      },
+      {
+        "replace": {
+          "file": "design/tokens.json",
+          "find": "\"focus\": \"{color.primitive.blue.45}\"",
+          "with": "\"focus\": \"{color.primitive.blue.77}\""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/theme/palette.ts",
+          "find": "  focus: '#1C4DB5', // blue.45\n",
+          "with": "  focus: '#8AB4FF', // blue.77\n"
+        }
+      }
+    ]
+  },
+  "bad-palette-fill": {
+    "expect": ["[palette-fill] PALETTE.light: primary stands only 2.47:1 off background and off border"],
+    "ops": [
+      {
+        "replace": {
+          "file": "design/tokens.json",
+          "find": "\"primary\": \"{color.primitive.blue.49}\"",
+          "with": "\"primary\": \"#C9CED6\""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/theme/palette.ts",
+          "find": "  primary: '#2156C8', // blue.49\n",
+          "with": "  primary: '#C9CED6',\n"
+        }
+      }
+    ]
+  },
+  "bad-palette-hex": {
+    "expect": ["[palette-hex] PALETTE.light.surface is \"#fff\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/palette.ts",
+          "find": "  surface: '#FFFFFF', // neutral.100\n",
+          "with": "  surface: '#fff',\n"
+        }
+      }
+    ]
+  },
+  "bad-palette-invariant": {
+    "expect": [
+      "[palette-invariant] ACME_PALETTE.light.danger is #9F1D14, but danger is the same in every palette (PALETTE: #B42318)",
+      "src/theme/acme-palette.ts:"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/theme/acme-palette.ts",
+          "content": "// src/theme/acme-palette.ts: a white-label flavour that repaints the danger role.\nimport { PALETTE } from './palette';\n\nimport type { Palette } from './theme-types';\n\nexport const ACME_PALETTE: Palette = {\n  light: { ...PALETTE.light, danger: '#9F1D14' },\n  dark: PALETTE.dark,\n};\n"
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/design-system.json",
+          "path": ["palettes", 1],
+          "value": { "file": "src/theme/acme-palette.ts", "export": "ACME_PALETTE", "token": "color" }
+        }
+      }
+    ]
+  },
+  "bad-palette-mismatch": {
+    "expect": [
+      "[theme-mismatch] PALETTE.light.primary is \"#2156C9\", the token file says \"#2156C8\"",
+      "src/theme/palette.ts:"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/palette.ts",
+          "find": "  primary: '#2156C8', // blue.49\n",
+          "with": "  primary: '#2156C9', // blue.49\n"
+        }
+      }
+    ]
+  },
+  "bad-palette-missing": {
+    "expect": ["src/theme/acme-palette.ts [palette-missing]"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/design-system.json",
+          "path": ["palettes", 1],
+          "value": { "file": "src/theme/acme-palette.ts", "export": "ACME_PALETTE", "token": "color" }
+        }
+      }
+    ]
+  },
+  "bad-palette-shape": {
+    "expect": ["[palette-shape] PALETTE must export { light, dark }", "src/theme/palette.ts:"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/palette.ts",
+          "find": "export const PALETTE: Palette = { light: LIGHT, dark: DARK };",
+          "with": "export const PALETTE: Palette = { light: LIGHT, night: DARK };"
+        }
+      }
+    ]
+  },
+  "bad-proportional-digits": {
+    "expect": ["[tabular-digits] statValue has no isTabular: true", "src/theme/type-styles.ts:"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/type-styles.ts",
+          "find": "statValue: { ...display(30, [1.1, 1.45]), isTabular: true },",
+          "with": "statValue: display(30, [1.1, 1.45]),"
+        }
+      },
+      { "json": { "file": "design/tokens.json", "path": ["type", "styles", "statValue", "isTabular"], "delete": true } }
+    ]
+  },
+  "bad-provider-appearance": {
+    "expect": [
+      "src/theme/theme-provider.tsx:45 [theme-provider-behaviour] AppThemeProvider never calls Appearance.setColorScheme(...)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/theme-provider.tsx",
+          "find": "  useEffect(() => {\n    const scheme = appearanceSchemeFor(Platform.OS, preference);\n    if (scheme !== null) Appearance.setColorScheme(scheme);\n  }, [preference]);\n",
+          "with": "  useEffect(() => {\n    // Mirroring removed: the preference now only changes the app's own colours.\n    void Appearance;\n    void appearanceSchemeFor;\n  }, [preference]);\n"
+        }
+      }
+    ]
+  },
+  "bad-provider-not-mounted": {
+    "expect": [
+      "src/app/_layout.tsx [theme-provider-mounted] no runtime file renders AppThemeProvider from src/theme/theme-provider.tsx"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/_layout.tsx",
+          "content": "// src/app/_layout.tsx (fixture): the theme provider was dropped from the root.\nimport { Stack } from 'expo-router';\n\nimport { TextLocaleProvider } from '@/theme/text-locale';\n\nconst LOCALE = { language: 'en', direction: 'ltr' } as const;\n\nexport default function RootLayout(): React.JSX.Element {\n  return (\n    <TextLocaleProvider value={LOCALE}>\n      <Stack />\n    </TextLocaleProvider>\n  );\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/kit/SKILL.md",
+          "content": "---\nname: kit\ndescription: A vendored skill (its files are never scanned).\n---\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/kit/root.tsx",
+          "content": "// A vendored skill's example mounts the provider; it must not count.\nimport { AppThemeProvider } from '@/theme/theme-provider';\n\nexport const Root = () => <AppThemeProvider preference=\"system\" />;\n"
+        }
+      },
+      {
+        "write": {
+          "file": ".agents/skills/design-system-structure/SKILL.md",
+          "content": "---\nname: design-system-structure\ndescription: An installed copy (never scanned).\n---\n"
+        }
+      },
+      {
+        "write": {
+          "file": ".agents/skills/design-system-structure/examples/root-layout.tsx",
+          "content": "// src/app/_layout.tsx\nimport { AppThemeProvider } from '@/theme/theme-provider';\n\nexport const RootLayout = () => <AppThemeProvider preference=\"system\" />;\n"
+        }
+      }
+    ]
+  },
+  "bad-provider-root-view": {
+    "expect": [
+      "src/theme/theme-provider.tsx:45 [theme-provider-behaviour] AppThemeProvider never calls SystemUI.setBackgroundColorAsync(...)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/theme-provider.tsx",
+          "find": "    SystemUI.setBackgroundColorAsync(ground).catch((error: unknown) => {\n      reportPaintError(error);\n    });\n",
+          "with": "    void SystemUI;\n    void ground;\n    void reportPaintError;\n"
+        }
+      }
+    ]
+  },
+  "bad-pushed-by-transform": {
+    "expect": ["[pressed-by-layout] a pushed-in key is sunk by a transform", "src/ui/pressable-surface.tsx:"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/pressable-surface.tsx",
+          "find": "    const pressed = isSunk ? 0 : depth.get();\n",
+          "with": "    const pressed = isSunk ? 1 : depth.get();\n"
+        }
+      },
+      {
+        "replace": { "file": "src/ui/pressable-surface.tsx", "find": "    isSunk && { top: elevation },\n", "with": "" }
+      }
+    ]
+  },
+  "bad-react-navigation-not-mounted": {
+    "expect": [
+      "App.tsx [theme-provider-mounted] no runtime file renders AppThemeProvider from src/theme/theme-provider.tsx",
+      "App.tsx:11 [navigation-theme-mapped] <Navigation> gets DarkTheme, React Navigation's own light and dark themes",
+      "RESULT: FAIL (3 problems)"
+    ],
+    "ops": [
+      { "delete": "src/app/_layout.tsx" },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-router"], "delete": true } },
+      { "json": { "file": "package.json", "path": ["dependencies", "@react-navigation/native"], "value": "7.2.2" } },
+      { "json": { "file": "package.json", "path": ["main"], "value": "index.ts" } },
+      {
+        "write": {
+          "file": "index.ts",
+          "content": "// index.ts (fixture): the entry registers App.\nimport { registerRootComponent } from 'expo';\n\nimport { App } from './App';\n\nregisterRootComponent(App);\n"
+        }
+      },
+      {
+        "write": {
+          "file": "App.tsx",
+          "content": "// App.tsx (fixture): React Navigation without the app theme provider.\nimport { createNativeStackNavigator } from '@react-navigation/native-stack';\nimport { DarkTheme, createStaticNavigation } from '@react-navigation/native';\n\nimport type { ReactNode } from 'react';\n\nconst RootStack = createNativeStackNavigator({ screens: {} });\nconst Navigation = createStaticNavigation(RootStack);\n\nexport function App(): ReactNode {\n  return <Navigation theme={DarkTheme} />;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-scale": {
+    "expect": ["[theme-mismatch] RADII.md is 12, the token file says 10", "src/theme/tokens.ts:"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/tokens.ts",
+          "find": "export const RADII = { sm: 6, md: 10, lg: 16 } as const;",
+          "with": "export const RADII = { sm: 6, md: 12, lg: 16 } as const;"
+        }
+      }
+    ]
+  },
+  "bad-second-theme": {
+    "expect": [
+      "src/constants/theme.ts:2 [second-theme-system] a second theme system beside src/theme",
+      "src/hooks/use-theme.ts:6 [second-theme-system] a second theme system beside src/theme",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/constants/theme.ts",
+          "content": "// src/constants/theme.ts (fixture): the create-expo-app template's theme, left beside src/theme.\nexport const Colors = {\n  light: { text: '#000000', background: '#ffffff' },\n  dark: { text: '#ffffff', background: '#000000' },\n} as const;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/hooks/use-theme.ts",
+          "content": "// src/hooks/use-theme.ts (fixture): the template's second useTheme.\nimport { useColorScheme } from 'react-native';\n\nimport { Colors } from '@/constants/theme';\n\nexport function useTheme() {\n  const scheme = useColorScheme();\n  return Colors[scheme === 'dark' ? 'dark' : 'light'];\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-spring-mass": {
+    "expect": ["[spring-config-complete] SPRINGS.release leaves mass to the library default", "src/theme/motion.ts:"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/motion.ts",
+          "find": "  release: { damping: 14, stiffness: 420, mass: 1 },",
+          "with": "  release: { damping: 14, stiffness: 420 },"
+        }
+      },
+      { "json": { "file": "design/tokens.json", "path": ["motion", "spring", "release", "mass"], "delete": true } }
+    ]
+  },
+  "bad-tabular-mapping": {
+    "expect": [
+      "[tabular-digits] AppText does not map isTabular to fontVariant ['tabular-nums']",
+      "src/ui/app-text.tsx:"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/app-text.tsx",
+          "find": "const TABULAR: TextStyle = { fontVariant: ['tabular-nums'] };",
+          "with": "const TABULAR: TextStyle = { fontVariant: ['lining-nums'] };"
+        }
+      }
+    ]
+  },
+  "bad-tall-line-height": {
+    "expect": ["[tall-script-line-height] TYPE_STYLES.badge gives tall scripts 1.2, tighter than its base 1.3"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/type-styles.ts",
+          "find": "badge: text(12, 'bold', [1.3, 1.45]),",
+          "with": "badge: text(12, 'bold', [1.3, 1.2]),"
+        }
+      },
+      {
+        "replace": {
+          "file": "design/tokens.json",
+          "find": "\"lineHeight\": { \"base\": 1.3, \"tall\": 1.45 }",
+          "with": "\"lineHeight\": { \"base\": 1.3, \"tall\": 1.2 }"
+        }
+      }
+    ]
+  },
+  "bad-tall-metrics": {
+    "expect": [
+      "[tall-script-overflow-guard] TALL_SCRIPT_METRICS['NotoSansArabic-Regular'].ascender is 1100, the font file says 1374",
+      "src/theme/fonts.ts:"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/fonts.ts",
+          "find": "  'NotoSansArabic-Regular': { unitsPerEm: 1000, ascender: 1374, descender: -738 },",
+          "with": "  'NotoSansArabic-Regular': { unitsPerEm: 1000, ascender: 1100, descender: -738 },"
+        }
+      }
+    ]
+  },
+  "bad-tall-number-clip": {
+    "expect": ["[tall-script-line-height] statValue gives tall scripts 1.1, below the 1.45 the contract records"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/type-styles.ts",
+          "find": "statValue: { ...display(30, [1.1, 1.45]), isTabular: true },",
+          "with": "statValue: { ...display(30, [1.1, 1.1]), isTabular: true },"
+        }
+      },
+      {
+        "replace": {
+          "file": "design/tokens.json",
+          "find": "\"lineHeight\": { \"base\": 1.1, \"tall\": 1.45 }",
+          "with": "\"lineHeight\": { \"base\": 1.1, \"tall\": 1.1 }"
+        }
+      }
+    ]
+  },
+  "bad-text-locale": {
+    "expect": [
+      "src/app/_layout.tsx [text-locale-provided] the app has several scripts but no runtime file renders TextLocaleProvider from src/theme/text-locale.tsx"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/_layout.tsx",
+          "content": "// src/app/_layout.tsx (fixture): the text locale was never mounted.\nimport { Stack } from 'expo-router';\n\nimport { AppThemeProvider } from '@/theme/theme-provider';\n\nexport default function RootLayout(): React.JSX.Element {\n  return (\n    <AppThemeProvider preference=\"system\">\n      <Stack />\n    </AppThemeProvider>\n  );\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/i18n/messages.ts",
+          "content": "// src/i18n/messages.ts (fixture): the i18n folder exists, so the provider is due.\nexport const MESSAGES = {};\n"
+        }
+      }
+    ]
+  },
+  "bad-theme-file-missing": {
+    "expect": ["src/ui/pressable-surface.tsx [theme-file-missing]"],
+    "ops": [{ "delete": "src/ui/pressable-surface.tsx" }]
+  },
+  "bad-token-alias": {
+    "expect": ["[token-file] {color.primitive.blue.99} points to no token", "design/tokens.json:"],
+    "ops": [
+      {
+        "replace": {
+          "file": "design/tokens.json",
+          "find": "\"focus\": \"{color.primitive.blue.45}\"",
+          "with": "\"focus\": \"{color.primitive.blue.99}\""
+        }
+      }
+    ]
+  },
+  "bad-type-scale": {
+    "expect": ["[theme-mismatch] TYPE_SCALE.heading.fontSize is 21, the token file says 20", "src/theme/tokens.ts:"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/tokens.ts",
+          "find": "  heading: {\n    fontSize: 20,\n",
+          "with": "  heading: {\n    fontSize: 21,\n"
+        }
+      }
+    ]
+  },
+  "bad-type-style": {
+    "expect": [
+      "[theme-mismatch] TYPE_STYLES.rowDescription.fontSize is 15, the token file says 14",
+      "src/theme/type-styles.ts:"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/type-styles.ts",
+          "find": "rowDescription: text(14, 'regular', [1.3, 1.5]),",
+          "with": "rowDescription: text(15, 'regular', [1.3, 1.5]),"
+        }
+      }
+    ]
+  },
+  "bad-weight-by-family-missing": {
+    "expect": [
+      "[font-family] fonts.ts names 'NotoSans-Regular', but no expo-font entry declares fontFamily 'NotoSans-Regular'",
+      "src/theme/fonts.ts:"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/design-system.json", "path": ["fonts", "weightBy"], "value": "fontWeight" } }
+    ]
+  },
+  "error-bad-contract": {
+    "expect": ["ERROR [bad-input] contracts/design-system.json: unknown key \"palette\""],
+    "ops": [
+      { "json": { "file": "contracts/design-system.json", "path": ["palette"], "value": "src/theme/palette.ts" } }
+    ]
+  },
+  "error-contrast-contract": {
+    "expect": ["ERROR [bad-input] contracts/contrast.json has no valid \"palettes\" list"],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/contrast.json",
+          "json": { "palettes": [{ "file": "src/theme/palette.ts", "text": [["text"]] }] }
+        }
+      }
+    ]
+  },
+  "error-fonts-empty": {
+    "expect": [
+      "ERROR [bad-input] contracts/design-system.json: \"fonts.files\" is empty, so nothing is bundled: write \"fonts\": \"system\""
+    ],
+    "ops": [{ "json": { "file": "contracts/design-system.json", "path": ["fonts", "files"], "value": [] } }]
+  },
+  "error-fonts-null": {
+    "expect": [
+      "ERROR [bad-input] contracts/design-system.json: \"fonts\" is null: it must be \"system\" (the platform's font, nothing bundled) or { \"dir\", \"files\", \"licences\" } (bundled font files)"
+    ],
+    "ops": [{ "json": { "file": "contracts/design-system.json", "path": ["fonts"], "literalNull": true } }]
+  },
+  "error-fonts-undeclared": {
+    "expect": ["ERROR [bad-input] contracts/design-system.json: \"fonts\" is missing: declare \"system\""],
+    "ops": [{ "json": { "file": "contracts/design-system.json", "path": ["fonts"], "delete": true } }]
+  },
+  "error-no-theme": {
+    "expect": ["ERROR [bad-input] nothing to check: src/theme does not exist"],
+    "ops": [{ "delete": "src/theme" }]
+  },
+  "pass-app-json-extended": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "app.config.ts",
+          "content": "// app.config.ts (fixture): Expo's dynamic config extending app.json.\nimport type { ConfigContext, ExpoConfig } from 'expo/config';\n\nconst FONTS = './assets/fonts';\n\nexport default ({ config }: ConfigContext): ExpoConfig => ({\n  ...config,\n  name: 'Tasks',\n  slug: 'tasks',\n  plugins: [\n    'expo-router',\n    [\n      'expo-font',\n      {\n        fonts: [\n          `${FONTS}/NotoSans-Regular.ttf`,\n          `${FONTS}/NotoSans-Bold.ttf`,\n          `${FONTS}/NotoSansArabic-Regular.ttf`,\n          `${FONTS}/NotoSansArabic-Bold.ttf`,\n        ],\n      },\n    ],\n  ],\n});\n"
+        }
+      },
+      {
+        "write": {
+          "file": "app.json",
+          "content": "{\n  \"expo\": {\n    \"name\": \"Tasks\",\n    \"userInterfaceStyle\": \"automatic\"\n  }\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-color-scheme-const": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "  userInterfaceStyle: 'automatic',\n",
+          "with": "  userInterfaceStyle: UI_STYLE,\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "const FONTS = './assets/fonts';\n",
+          "with": "const FONTS = './assets/fonts';\nconst UI_STYLE = 'automatic';\n"
+        }
+      }
+    ]
+  },
+  "pass-contrast-contract": {
+    "expect": [
+      "palette-contrast: PALETTE is judged by 19 pairs from contracts/contrast.json (palette \"app\") plus the core pairs",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/contrast.json",
+          "json": {
+            "palettes": [
+              {
+                "name": "app",
+                "file": "src/theme/palette.ts",
+                "export": "PALETTE",
+                "sets": ["light", "dark"],
+                "optionalSets": ["colorBlind.light", "colorBlind.dark"],
+                "base": "background",
+                "edge": "border",
+                "text": [
+                  ["text", "background"],
+                  ["text", "surface"],
+                  ["text", "sunken"],
+                  ["textMuted", "background"],
+                  ["textMuted", "surface"],
+                  ["textMuted", "sunken"],
+                  ["onPrimary", "primary"],
+                  ["danger", "surface"],
+                  ["danger", "dangerSurface"],
+                  ["text", "dangerSurface"],
+                  ["success", "surface"],
+                  ["warning", "surface"],
+                  ["text", "separator"]
+                ],
+                "graphics": [
+                  ["border", "background"],
+                  ["border", "surface"],
+                  ["focus", "background"],
+                  ["focus", "surface"]
+                ],
+                "shapes": [["primary", "background"], ["primary", "surface"]],
+                "distinct": []
+              }
+            ],
+            "exceptions": []
+          }
+        }
+      }
+    ]
+  },
+  "pass-contrast-exception": {
+    "expect": [
+      "note: PALETTE.light: textMuted on primary is 1.10:1, needs 4.5:1 (accepted by an exception in contracts/contrast.json: decorative caption on the brand banner, mirrored by an icon; approved by the developer)",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/contrast.json",
+          "json": {
+            "palettes": [
+              {
+                "name": "app",
+                "file": "src/theme/palette.ts",
+                "export": "PALETTE",
+                "sets": ["light", "dark"],
+                "optionalSets": ["colorBlind.light", "colorBlind.dark"],
+                "base": "background",
+                "edge": "border",
+                "text": [
+                  ["text", "background"],
+                  ["text", "surface"],
+                  ["text", "sunken"],
+                  ["textMuted", "background"],
+                  ["textMuted", "surface"],
+                  ["textMuted", "sunken"],
+                  ["onPrimary", "primary"],
+                  ["danger", "surface"],
+                  ["danger", "dangerSurface"],
+                  ["text", "dangerSurface"],
+                  ["success", "surface"],
+                  ["warning", "surface"],
+                  ["text", "separator"],
+                  ["textMuted", "primary"]
+                ],
+                "graphics": [
+                  ["border", "background"],
+                  ["border", "surface"],
+                  ["focus", "background"],
+                  ["focus", "surface"]
+                ],
+                "shapes": [["primary", "background"], ["primary", "surface"]],
+                "distinct": []
+              }
+            ],
+            "exceptions": [
+              {
+                "palette": "app",
+                "set": "light",
+                "fg": "textMuted",
+                "bg": "primary",
+                "reason": "decorative caption on the brand banner, mirrored by an icon",
+                "approvedBy": "the developer"
+              },
+              {
+                "palette": "app",
+                "set": "dark",
+                "fg": "textMuted",
+                "bg": "primary",
+                "reason": "decorative caption on the brand banner, mirrored by an icon",
+                "approvedBy": "the developer"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "pass-font-script-coverage": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/i18n/languages.ts",
+          "content": "// src/i18n/languages.ts (fixture): every non-Latin language has a script decision (Japanese: the system font).\nexport const LANGUAGES = ['en', 'ar', 'sr-Latn', 'fr', 'ja'] as const;\nexport type Language = (typeof LANGUAGES)[number];\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/theme/fonts.ts",
+          "find": "export type ScriptKey = 'latin' | 'arabic';",
+          "with": "export type ScriptKey = 'latin' | 'arabic' | 'japanese';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/theme/fonts.ts",
+          "find": "    bold: 'NotoSansArabic-Bold',\n  },\n};",
+          "with": "    bold: 'NotoSansArabic-Bold',\n  },\n  japanese: null,\n};"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/theme/fonts.ts",
+          "find": "  ur: 'arabic',\n};",
+          "with": "  ur: 'arabic',\n  ja: 'japanese',\n};"
+        }
+      }
+    ]
+  },
+  "pass-navigation-theme-component-file": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/root-navigator/root-stack.tsx",
+          "content": "// src/features/root-navigator/root-stack.tsx (fixture): the root Stack under the navigation theme, in\n// its own file because routes are leaves and the layout's providers fill the lint's JSX depth.\nimport { Stack } from 'expo-router';\n\nimport { NavigationThemeProvider } from '@/theme/navigation-theme';\n\nexport function RootStack(): React.JSX.Element {\n  return (\n    <NavigationThemeProvider>\n      <Stack screenOptions={{ headerShown: false }} />\n    </NavigationThemeProvider>\n  );\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/_layout.tsx",
+          "content": "// src/app/_layout.tsx (fixture): the layout renders the root Stack component inside the app theme.\nimport { RootStack } from '@/features/root-navigator/root-stack';\nimport { TextLocaleProvider } from '@/theme/text-locale';\nimport { AppThemeProvider } from '@/theme/theme-provider';\n\nconst LOCALE = { language: 'en', direction: 'ltr' } as const;\n\nexport default function RootLayout(): React.JSX.Element {\n  return (\n    <AppThemeProvider preference=\"system\">\n      <TextLocaleProvider value={LOCALE}>\n        <RootStack />\n      </TextLocaleProvider>\n    </AppThemeProvider>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-navigation-theme-helper": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/_layout.tsx",
+          "content": "// src/app/_layout.tsx (fixture): the providers nest deeper than jsx-max-depth allows, so the root\n// Stack and its navigation theme sit in a helper declared above the layout and rendered inside\n// AppThemeProvider.\nimport { Stack } from 'expo-router';\n\nimport { NavigationThemeProvider } from '@/theme/navigation-theme';\nimport { TextLocaleProvider } from '@/theme/text-locale';\nimport { AppThemeProvider } from '@/theme/theme-provider';\n\nconst LOCALE = { language: 'en', direction: 'ltr' } as const;\n\nfunction RootStack(): React.JSX.Element {\n  return (\n    <NavigationThemeProvider>\n      <Stack screenOptions={{ headerShown: false }} />\n    </NavigationThemeProvider>\n  );\n}\n\nexport default function RootLayout(): React.JSX.Element {\n  return (\n    <AppThemeProvider preference=\"system\">\n      <TextLocaleProvider value={LOCALE}>\n        <RootStack />\n      </TextLocaleProvider>\n    </AppThemeProvider>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-navigation-theme-inline": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/_layout.tsx",
+          "content": "// src/app/_layout.tsx (fixture): the navigation theme is mapped inline, from the app theme.\nimport { Stack, ThemeProvider } from 'expo-router';\n\nimport { toNavigationTheme } from '@/theme/navigation-theme';\nimport { TextLocaleProvider } from '@/theme/text-locale';\nimport { AppThemeProvider } from '@/theme/theme-provider';\nimport { useTheme } from '@/theme/use-theme';\n\nimport type { ReactNode } from 'react';\n\nconst LOCALE = { language: 'en', direction: 'ltr' } as const;\n\nfunction Navigator(): ReactNode {\n  const theme = useTheme();\n  return (\n    <ThemeProvider value={toNavigationTheme(theme)}>\n      <Stack />\n    </ThemeProvider>\n  );\n}\n\nexport default function RootLayout(): React.JSX.Element {\n  return (\n    <AppThemeProvider preference=\"system\">\n      <TextLocaleProvider value={LOCALE}>\n        <Navigator />\n      </TextLocaleProvider>\n    </AppThemeProvider>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-not-yet-created": {
+    "expect": [
+      "SKIP app.config.ts [font-plugin] not yet created (expo-project-bootstrap creates it)",
+      "SKIP app.config.ts [color-scheme-config] not yet created (expo-project-bootstrap creates it)",
+      "SKIP src/app/_layout.tsx [theme-provider-mounted] not yet created (expo-project-bootstrap creates it)",
+      "SKIP src/app/_layout.tsx [navigation-theme-mapped] not yet created (expo-project-bootstrap creates it)",
+      "SKIP src/i18n [text-locale-provided] not yet created (i18n-strings-and-catalogs creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": ["app.config.ts", "src/app/_layout.tsx"] }]
+  },
+  "pass-other-styling-system": {
+    "expect": [
+      "NOT APPLICABLE: nativewind is in package.json and src/theme does not exist: the app styles through nativewind"
+    ],
+    "ops": [
+      { "delete": "src/theme" },
+      { "json": { "file": "package.json", "path": ["dependencies", "nativewind"], "value": "4.2.1" } }
+    ]
+  },
+  "pass-press-without-sink": {
+    "expect": [
+      "pressed-by-layout: PRESS.kind is not sink and the press surface has no sink look, so no state sits pushed in",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/pressable-surface.tsx",
+          "content": "// src/ui/pressable-surface.tsx (fixture): an app that kept only the dim look.\nimport { Pressable } from 'react-native';\n\nimport type { ReactNode } from 'react';\n\nexport function PressableSurface(props: { readonly onPress: () => void; readonly children: ReactNode }): ReactNode {\n  return (\n    <Pressable onPress={props.onPress} style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>\n      {props.children}\n    </Pressable>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-react-navigation": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "delete": "src/app/_layout.tsx" },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-router"], "delete": true } },
+      { "json": { "file": "package.json", "path": ["dependencies", "@react-navigation/native"], "value": "7.2.2" } },
+      { "json": { "file": "package.json", "path": ["main"], "value": "index.ts" } },
+      {
+        "write": {
+          "file": "index.ts",
+          "content": "// index.ts (fixture): the entry registers App.\nimport { registerRootComponent } from 'expo';\n\nimport { App } from './App';\n\nregisterRootComponent(App);\n"
+        }
+      },
+      {
+        "write": {
+          "file": "App.tsx",
+          "content": "// App.tsx (fixture): React Navigation's static API, no expo-router.\nimport { createNativeStackNavigator } from '@react-navigation/native-stack';\nimport { createStaticNavigation } from '@react-navigation/native';\n\nimport { toNavigationTheme } from '@/theme/navigation-theme';\nimport { TextLocaleProvider } from '@/theme/text-locale';\nimport { AppThemeProvider } from '@/theme/theme-provider';\nimport { useTheme } from '@/theme/use-theme';\n\nimport type { ReactNode } from 'react';\n\nconst RootStack = createNativeStackNavigator({ screens: {} });\nconst Navigation = createStaticNavigation(RootStack);\nconst LOCALE = { language: 'en', direction: 'ltr' } as const;\n\nfunction ThemedNavigation(): ReactNode {\n  const theme = useTheme();\n  return <Navigation theme={toNavigationTheme(theme)} />;\n}\n\nexport function App(): ReactNode {\n  return (\n    <AppThemeProvider preference=\"system\">\n      <TextLocaleProvider value={LOCALE}>\n        <ThemedNavigation />\n      </TextLocaleProvider>\n    </AppThemeProvider>\n  );\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-react-navigation-not-yet-created": {
+    "expect": [
+      "SKIP App.tsx [theme-provider-mounted] not yet created (expo-project-bootstrap creates it)",
+      "SKIP App.tsx [navigation-theme-mapped] not yet created (expo-project-bootstrap creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      { "delete": "src/app/_layout.tsx" },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-router"], "delete": true } },
+      { "json": { "file": "package.json", "path": ["dependencies", "@react-navigation/native"], "value": "7.2.2" } },
+      { "json": { "file": "package.json", "path": ["main"], "value": "index.ts" } }
+    ]
+  },
+  "pass-root-routes": {
+    "expect": ["check-design-system:", "RESULT: PASS"],
+    "ops": [
+      { "rename": { "from": "src/app", "to": "app" } },
+      {
+        "replace": {
+          "file": "app/_layout.tsx",
+          "find": "// src/app/_layout.tsx (fixture)",
+          "with": "// app/_layout.tsx (fixture)"
+        }
+      },
+      {
+        "write": {
+          "file": "src/i18n/direction.ts",
+          "content": "// src/i18n/direction.ts\nexport const DIRECTION = 'ltr' as const;\n"
+        }
+      }
+    ]
+  },
+  "pass-shipped-templates": {
+    "$comment": "The templates exactly as shipped (the system font, contract fonts \"system\"), with the base app's config and root layout but not its bundled-font fonts.ts and contract.",
+    "expect": [
+      "tall-script-overflow-guard: arabic uses the system font, which has no font file to read metrics from, so no guard is computed for it",
+      "font rules: the contract says \"fonts\": \"system\", so no file, pin, licence or expo-font entry is checked",
+      "RESULT: PASS"
+    ],
+    "base": [
+      { "templates": true, "firstLinePath": true },
+      { "from": "@tests/bases/app", "exclude": ["src/theme/**", "contracts/**", "assets/**"] }
+    ],
+    "extends": null,
+    "ops": []
+  },
+  "pass-src-dot": {
+    "expect": ["check-design-system:", "RESULT: PASS"],
+    "ops": [
+      { "write": { "file": "rn-skills.config.json", "json": { "srcDir": "." } } },
+      { "json": { "file": "tsconfig.json", "path": ["compilerOptions", "paths", "@/*"], "value": ["./*"] } },
+      { "rename": { "from": "src/theme", "to": "theme" } },
+      { "rename": { "from": "src/ui", "to": "ui" } },
+      { "rename": { "from": "src/app", "to": "app" } },
+      { "replace": { "file": "contracts/design-system.json", "find": "src/theme/", "with": "theme/", "all": true } },
+      {
+        "write": {
+          "file": "i18n/direction.ts",
+          "content": "// i18n/direction.ts\nexport const DIRECTION = 'ltr' as const;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "test/render-with-providers.tsx",
+          "content": "// test/render-with-providers.tsx\nimport { AppThemeProvider } from '@/theme/theme-provider';\n\nexport const Wrapper = () => <AppThemeProvider preference=\"system\" />;\n"
+        }
+      }
+    ]
+  },
+  "pass-system-font": {
+    "expect": [
+      "tall-script-overflow-guard: arabic uses the system font, which has no font file to read metrics from, so no guard is computed for it",
+      "font rules: the contract says \"fonts\": \"system\", so no file, pin, licence or expo-font entry is checked",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/design-system.json", "path": ["fonts"], "value": "system" } },
+      {
+        "replace": {
+          "file": "src/theme/fonts.ts",
+          "find": "export const SCRIPT_FONTS: Readonly<Record<ScriptKey, ScriptFamilies | null>> = {\n  latin: {\n    regular: 'NotoSans-Regular',\n    medium: 'NotoSans-Regular',\n    semibold: 'NotoSans-Bold',\n    bold: 'NotoSans-Bold',\n  },\n  arabic: {\n    regular: 'NotoSansArabic-Regular',\n    medium: 'NotoSansArabic-Regular',\n    semibold: 'NotoSansArabic-Bold',\n    bold: 'NotoSansArabic-Bold',\n  },\n};",
+          "with": "export const SCRIPT_FONTS: Readonly<Record<ScriptKey, ScriptFamilies | null>> = {\n  latin: null,\n  arabic: null,\n};"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/theme/fonts.ts",
+          "find": "  'NotoSansArabic-Regular': { unitsPerEm: 1000, ascender: 1374, descender: -738 },\n  'NotoSansArabic-Bold': { unitsPerEm: 1000, ascender: 1374, descender: -738 },\n",
+          "with": ""
+        }
+      }
+    ]
+  }
+}

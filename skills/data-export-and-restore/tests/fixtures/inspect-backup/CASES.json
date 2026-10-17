@@ -1,0 +1,49 @@
+{
+  "bad-damaged": {
+    "expect": ["backup-v1.json:1 [backup-envelope] damaged: payloadSha256"],
+    "ops": [{ "json": { "file": "backup-v1.json", "path": ["payload", "lists", 0, "name"], "value": "Edited" } }]
+  },
+  "bad-newer-version": {
+    "expect": ["[backup-envelope] newer-version: schemaVersion 2 is newer than 1 (written by 1.0.0)"],
+    "ops": [{ "json": { "file": "backup-v1.json", "path": ["schemaVersion"], "value": 2 } }]
+  },
+  "bad-not-a-backup": {
+    "expect": ["[backup-envelope] not-a-backup: not JSON"],
+    "ops": [
+      {
+        "write": {
+          "file": "backup-v1.json",
+          "lines": ["list,title,done,created_at", "Home,Buy milk,false,2026-09-21T14:15:20.000Z"]
+        }
+      }
+    ]
+  },
+  "bad-truncated": {
+    "expect": ["[backup-envelope] damaged: not JSON"],
+    "ops": [{ "replace": { "file": "backup-v1.json", "find": "\"payload\": {", "with": "\"payload\": {\"lists\": [" } }]
+  },
+  "bad-wrong-format": {
+    "expect": ["[backup-envelope] not-a-backup: format \"tasks.backup\" is not \"notes.backup\""],
+    "args": "{dir}/backup-v1.json --format notes.backup",
+    "ops": []
+  },
+  "error-bad-schema": {
+    "expect": ["ERROR [bad-input] --schema must be a positive integer"],
+    "args": "{dir}/backup-v1.json --schema zero",
+    "ops": []
+  },
+  "error-missing-file": { "expect": ["ERROR [bad-input] nothing to check:"], "args": "{dir}/missing.json", "ops": [] },
+  "pass-any-format": { "expect": ["rows: lists 3, tasks 8"], "args": "{dir}/backup-v1.json", "ops": [] },
+  "pass-bom": {
+    "expect": [
+      "header: format tasks.backup, formatVersion 1, schemaVersion 1, written by 1.0.0 at 2026-10-10T08:00:00.000Z",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "$comment": "An editor saved the backup with a UTF-8 byte order mark: the app's checkEnvelope drops it, so inspect-backup gives the same verdict.",
+        "replace": { "file": "backup-v1.json", "find": "^\\{", "regex": true, "with": "﻿{" }
+      }
+    ]
+  }
+}

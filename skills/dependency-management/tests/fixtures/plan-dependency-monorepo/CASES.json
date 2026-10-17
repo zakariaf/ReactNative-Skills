@@ -1,0 +1,51 @@
+{
+  "bad-not-in-table": {
+    "expect": ["[not-in-table] left-pad is not in the dependency policy"],
+    "args": "left-pad .",
+    "ops": []
+  },
+  "error-bad-peer-of": {
+    "expect": [
+      "ERROR [bad-input] --peer-of packages/nope is not a shared workspace (shared: packages/core, packages/ui)"
+    ],
+    "args": "expo-haptics . --peer-of packages/nope",
+    "ops": []
+  },
+  "pass-peer-of-shared": {
+    "expect": [
+      "package  expo-haptics ~57.0.3 (Expo-managed; belongs in the apps' dependencies)",
+      "step 2   add \"expo-haptics\": \"*\" to packages/ui/package.json peerDependencies and \"expo-haptics\": \"57.0.3\" to the root package.json overrides",
+      "step 3   (cd apps/notes && npx expo install expo-haptics@~57.0.3)",
+      "step 4   (cd apps/tasks && npx expo install expo-haptics@~57.0.3)",
+      "in every Expo app: npx expo install --check && npx expo-doctor"
+    ],
+    "args": "expo-haptics . --peer-of packages/ui",
+    "ops": [
+      { "json": { "file": "apps/tasks/package.json", "path": ["dependencies", "expo-haptics"], "delete": true } },
+      { "json": { "file": "apps/notes/package.json", "path": ["dependencies", "expo-haptics"], "delete": true } },
+      { "json": { "file": "packages/ui/package.json", "path": ["peerDependencies", "expo-haptics"], "delete": true } },
+      { "json": { "file": "package.json", "path": ["overrides", "expo-haptics"], "delete": true } }
+    ]
+  },
+  "pass-remove": {
+    "expect": ["step 1   npm uninstall zustand -w apps/notes", "step 2   npm uninstall zustand -w apps/tasks"],
+    "args": "zustand . --remove",
+    "ops": []
+  },
+  "pass-where-list": {
+    "expect": [
+      "package  zustand 5.0.15 (exact npm pin; belongs in the apps' dependencies or packages/core/package.json)",
+      "step 2   npm install zustand@5.0.15 -w apps/notes -w apps/tasks -w packages/core"
+    ],
+    "args": "zustand . --today 2026-10-03",
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/dependency-policy.json",
+          "path": ["packages", "zustand", "where"],
+          "value": ["app", "packages/core"]
+        }
+      }
+    ]
+  }
+}

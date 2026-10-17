@@ -1,0 +1,22 @@
+{
+  "$schema": "./app-art.schema.json",
+  "$comment": "The code-drawn app art: where scripts/art/render-app-art.ts writes each image (the production icons feed app-variants-and-environment's badged development and preview copies), which images may be absent, how much of an iOS icon the mark covers, and check-icons' allow-lists. Every key is optional; these are the defaults. An app that needs only the allow-lists keeps just the icons key: check-app-art then does not apply.",
+  "outputs": {
+    "light": "assets/icons/production/icon.png",
+    "dark": "assets/icons/production/icon-dark.png",
+    "tinted": "assets/icons/production/icon-tinted.png",
+    "androidForeground": "assets/icons/production/android-foreground.png",
+    "androidBackground": "assets/icons/production/android-background.png",
+    "androidMonochrome": "assets/icons/production/android-monochrome.png",
+    "splash": "assets/images/splash-icon.png",
+    "splashDark": "assets/images/splash-icon-dark.png",
+    "playIcon": "assets/store/play-icon.png",
+    "featureGraphic": "assets/store/feature-graphic.png"
+  },
+  "optional": ["featureGraphic"],
+  "glyphArea": 0.62,
+  "icons": {
+    "allowImages": [],
+    "allowPackages": []
+  }
+}

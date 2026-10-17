@@ -1,0 +1,14 @@
+{
+  "en": {
+    "list-detail.empty.body": "This list has no tasks yet.",
+    "list-detail.error.body": "The tasks could not be read. Try again.",
+    "list-detail.not-found.body": "This list no longer exists.",
+    "list-detail.retry-button.label": "Try again"
+  },
+  "ar": {
+    "list-detail.empty.body": "لا توجد مهام في هذه القائمة بعد.",
+    "list-detail.error.body": "تعذّرت قراءة المهام. حاول مرة أخرى.",
+    "list-detail.not-found.body": "لم تعد هذه القائمة موجودة.",
+    "list-detail.retry-button.label": "حاول مرة أخرى"
+  }
+}

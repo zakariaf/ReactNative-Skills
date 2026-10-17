@@ -1,0 +1,31 @@
+{
+  "$schema": "./permissions.schema.json",
+  "$comment": "The permissions this app asks for, one entry each (permissions-and-system-prompts). App Tracking Transparency is not listed: admob-ads-and-consent asks it through the ConsentPort.",
+  "permissions": [
+    {
+      "kind": "camera",
+      "feature": "Take a photo and attach it to a task",
+      "askedFrom": "src/features/task-photo/use-task-photo-model.ts",
+      "platforms": ["ios", "android"],
+      "purposeKey": "permissions.camera.usage-description",
+      "shouldExplainFirst": false,
+      "explain": {
+        "title": "permissions.camera.explain.title",
+        "body": "permissions.camera.explain.body",
+        "continue": "permissions.continue",
+        "dismiss": "permissions.not-now"
+      },
+      "settings": {
+        "title": "permissions.camera.settings.title",
+        "body": "permissions.camera.settings.body",
+        "open": "permissions.open-settings",
+        "dismiss": "permissions.close"
+      },
+      "unavailable": {
+        "title": "permissions.camera.unavailable.title",
+        "body": "permissions.camera.unavailable.body",
+        "dismiss": "permissions.close"
+      }
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "$comment": "When multi-package: two Expo apps (apps/tasks, apps/notes), a shared package that imports expo-haptics (packages/ui) and a pure one (packages/core), under the seed policy and the .npmrc template.",
+  "base": [
+    "@tests/bases/monorepo",
+    {
+      "templates": true,
+      "firstLinePath": true
+    }
+  ],
+  "renames": {
+    "dot-npmrc": ".npmrc"
+  },
+  "ops": [
+    {
+      "$comment": "Installed and vendored skills (a folder with a SKILL.md) hold planted imports and manifests: the repo scan never reads them.",
+      "write": {
+        "file": ".agents/skills/vendored-skill/SKILL.md",
+        "content": "---\nname: vendored-skill\ndescription: A planted skill folder; its files hold findings on purpose and must stay invisible.\n---\n\n# vendored-skill\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/demo-skill/SKILL.md",
+        "content": "---\nname: demo-skill\ndescription: A planted skill folder; its files hold findings on purpose and must stay invisible.\n---\n\n# demo-skill\n"
+      }
+    },
+    {
+      "write": {
+        "file": "vendor/third-party-skill/SKILL.md",
+        "content": "---\nname: third-party-skill\ndescription: A planted skill folder; its files hold findings on purpose and must stay invisible.\n---\n\n# third-party-skill\n"
+      }
+    }
+  ]
+}

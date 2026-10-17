@@ -1,0 +1,4 @@
+{
+  "$comment": "Stand-in for the quality-gates skill's file: only the a11y block this checker reads.",
+  "a11y": { "minTouchPt": 44 }
+}

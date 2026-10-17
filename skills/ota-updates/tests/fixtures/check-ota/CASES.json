@@ -1,0 +1,542 @@
+{
+  "bad-adapter-dev-client": {
+    "expect": [
+      "FAIL src/services/updates/expo-updates-adapter.ts:",
+      "[adapter-enabled-guard] checkForUpdateAsync without mapping ERR_NOT_AVAILABLE_IN_DEV_CLIENT"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/updates/expo-updates-adapter.ts",
+          "find": "  'ERR_NOT_AVAILABLE_IN_DEV_CLIENT',\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-adapter-enabled-guard": {
+    "expect": [
+      "FAIL src/services/updates/expo-updates-adapter.ts:",
+      "[adapter-enabled-guard] checkForUpdateAsync without reading Updates.isEnabled"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/updates/expo-updates-adapter.ts",
+          "find": "  if (!Updates.isEnabled) return err(DISABLED);\n",
+          "with": "",
+          "count": 3
+        }
+      }
+    ]
+  },
+  "bad-build-channel": {
+    "expect": ["[build-channel] build profile production (APP_VARIANT production) bakes channel \"prod\""],
+    "ops": [{ "json": { "file": "eas.json", "path": ["build", "production", "channel"], "value": "prod" } }]
+  },
+  "bad-build-channel-environment": {
+    "expect": ["[build-channel] build profile preview builds channel preview with environment production"],
+    "ops": [{ "json": { "file": "eas.json", "path": ["build", "preview", "environment"], "value": "production" } }]
+  },
+  "bad-build-channel-missing": {
+    "expect": [
+      "[build-channel] build profile preview (EAS Build's default environment preview) bakes no channel into its binaries",
+      "[build-channel] build profile production (EAS Build's default environment production) bakes no channel into its binaries"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "eas.json",
+          "lines": [
+            "{",
+            "  \"cli\": { \"version\": \">= 24.10.0\", \"appVersionSource\": \"remote\" },",
+            "  \"build\": {",
+            "    \"development\": { \"developmentClient\": true, \"distribution\": \"internal\" },",
+            "    \"preview\": { \"distribution\": \"internal\" },",
+            "    \"production\": { \"autoIncrement\": true }",
+            "  },",
+            "  \"submit\": { \"production\": {} }",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-build-channel-no-env": {
+    "expect": ["[build-channel] build profile production (environment production) bakes channel \"prod\""],
+    "ops": [
+      { "json": { "file": "eas.json", "path": ["build", "production", "env"], "delete": true } },
+      { "json": { "file": "eas.json", "path": ["build", "production", "channel"], "value": "prod" } }
+    ]
+  },
+  "bad-build-channel-no-profile": {
+    "expect": ["[build-channel] no build profile builds the preview variant"],
+    "ops": [
+      { "json": { "file": "eas.json", "path": ["build", "preview-simulator"], "delete": true } },
+      { "json": { "file": "eas.json", "path": ["build", "preview"], "delete": true } }
+    ]
+  },
+  "bad-build-channel-unknown-variant": {
+    "expect": [
+      "[build-channel] build profile staging (APP_VARIANT staging) builds a variant that is not one of development, preview, production"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "eas.json",
+          "path": ["build", "staging"],
+          "value": {
+            "distribution": "internal",
+            "channel": "staging",
+            "env": { "APP_VARIANT": "staging", "EXPO_PUBLIC_APP_VARIANT": "staging" }
+          }
+        }
+      }
+    ]
+  },
+  "bad-cross-channel-republish": {
+    "expect": ["[cross-channel-republish] eas update:republish to another channel"],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "ota:promote"],
+          "value": "eas update:republish --channel preview --destination-channel production"
+        }
+      }
+    ]
+  },
+  "bad-emergency-launch": {
+    "expect": ["FAIL src/services/updates/expo-updates-adapter.ts:1 [emergency-launch]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/updates/expo-updates-adapter.ts",
+          "find": "    isEmergencyLaunch: Updates.isEmergencyLaunch,\n",
+          "with": "    isEmergencyLaunch: false,\n"
+        }
+      }
+    ]
+  },
+  "bad-error-recovery": {
+    "expect": ["[error-recovery] updates.checkAutomatically is NEVER"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    ...updatesConfig(EAS_PROJECT_ID),\n",
+          "with": "    ...updatesConfig(EAS_PROJECT_ID),\n    updates: { ...updatesConfig(EAS_PROJECT_ID).updates, checkAutomatically: 'NEVER' },\n"
+        }
+      }
+    ]
+  },
+  "bad-fingerprint-broken": {
+    "expect": ["FAIL fingerprint.config.js:1 [fingerprint-scripts] does not load"],
+    "ops": [
+      {
+        "write": {
+          "file": "fingerprint.config.js",
+          "content": "// fingerprint.config.js\nmodule.exports = require('./fingerprint-rules.js');\n"
+        }
+      }
+    ]
+  },
+  "bad-fingerprint-scripts": {
+    "expect": ["FAIL fingerprint.config.js [fingerprint-scripts] no fingerprint.config.js"],
+    "ops": [{ "delete": "fingerprint.config.js" }]
+  },
+  "bad-fingerprint-scripts-all": {
+    "expect": ["FAIL fingerprint.config.js:1 [fingerprint-scripts] skips every package.json script"],
+    "ops": [
+      {
+        "replace": {
+          "file": "fingerprint.config.js",
+          "find": "    'ExpoConfigVersions',\n",
+          "with": "    'ExpoConfigVersions',\n    'PackageJsonScriptsAll',\n"
+        }
+      }
+    ]
+  },
+  "bad-fingerprint-scripts-prepare": {
+    "expect": ["FAIL fingerprint.config.js:1 [fingerprint-scripts] drops the lifecycle scripts preprepare, postprepare"],
+    "ops": [
+      {
+        "replace": {
+          "file": "fingerprint.config.js",
+          "find": "/^(?:pre|post)?(?:install|prepare)$|^eas-build-/",
+          "with": "/^(?:pre|post)?install$|^prepare$|^eas-build-/"
+        }
+      }
+    ]
+  },
+  "bad-gates-first": {
+    "expect": ["FAIL .github/workflows/ota-update.yml:15 [gates-first]"],
+    "ops": [
+      { "replace": { "file": ".github/workflows/ota-update.yml", "find": "      - run: npm run verify\n", "with": "" } }
+    ]
+  },
+  "bad-gates-first-eas-job": {
+    "expect": [
+      "FAIL .eas/workflows/preview-update.yml:25 [gates-first] EAS Workflows update job that needs no gate job",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".eas/workflows/preview-update.yml",
+          "find": "    if: ${{ needs.get_ios_build.outputs.build_id && needs.get_android_build.outputs.build_id }}\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-launch-nonblocking": {
+    "expect": ["[launch-nonblocking] updates.fallbackToCacheTimeout is 30000"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    ...updatesConfig(EAS_PROJECT_ID),\n",
+          "with": "    ...updatesConfig(EAS_PROJECT_ID),\n    updates: { ...updatesConfig(EAS_PROJECT_ID).updates, fallbackToCacheTimeout: 30000 },\n"
+        }
+      }
+    ]
+  },
+  "bad-launch-nonblocking-module-scope": {
+    "expect": [
+      "[launch-nonblocking] updates.fallbackToCacheTimeout is 30000: every cold start waits on the network, up to that long, on a slow connection (production)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/config/build-variant.ts",
+          "content": "// src/config/build-variant.ts\n// Read once at module scope: each variant must be evaluated in a fresh module graph to see its own value.\nexport const BUILD_VARIANT = process.env.APP_VARIANT ?? 'development';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "import { updatesConfig } from './src/config/updates-config.ts';\n",
+          "with": "import { BUILD_VARIANT } from './src/config/build-variant.ts';\nimport { updatesConfig } from './src/config/updates-config.ts';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    ...updatesConfig(EAS_PROJECT_ID),\n",
+          "with": "    ...updatesConfig(EAS_PROJECT_ID),\n    updates: { ...updatesConfig(EAS_PROJECT_ID).updates, ...(BUILD_VARIANT === 'production' ? { fallbackToCacheTimeout: 30000 } : {}) },\n"
+        }
+      }
+    ]
+  },
+  "bad-rollback-manual": {
+    "expect": [
+      "FAIL .github/workflows/ota-update.yml:19 [rollback-manual] eas update:roll-back-to-embedded in a CI workflow"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ota-update.yml",
+          "find": "      # Raising",
+          "with": "      - run: eas update:roll-back-to-embedded --channel production --non-interactive\n      # Raising"
+        }
+      }
+    ]
+  },
+  "bad-runtime-override": {
+    "expect": ["[runtime-policy] android.runtimeVersion overrides"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "android: { package: identity.appId },",
+          "with": "android: { package: identity.appId, runtimeVersion: '1.2.0' },"
+        }
+      }
+    ]
+  },
+  "bad-runtime-policy": {
+    "expect": ["[runtime-policy] runtimeVersion is {\"policy\":\"appVersion\"} in preview"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    ...updatesConfig(EAS_PROJECT_ID),\n",
+          "with": "    ...updatesConfig(EAS_PROJECT_ID),\n    runtimeVersion: { policy: 'appVersion' },\n"
+        }
+      }
+    ]
+  },
+  "bad-staged-rollout": {
+    "expect": ["FAIL .github/workflows/ota-update.yml:16 [staged-rollout]"],
+    "ops": [
+      { "replace": { "file": ".github/workflows/ota-update.yml", "find": " --rollout-percentage 10", "with": "" } }
+    ]
+  },
+  "bad-staged-rollout-branch": {
+    "expect": [
+      "[staged-rollout] an update to store channel production through branch production without a first rollout step"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "ota:hotfix"],
+          "value": "node scripts/ota/update-preflight.ts --channel production --message hotfix --rollout 10 && eas update --branch production --environment production --message hotfix"
+        }
+      }
+    ]
+  },
+  "bad-staged-rollout-expression": {
+    "expect": [
+      "FAIL .github/workflows/ota-update.yml:16 [staged-rollout] eas update --channel ${{ inputs.channel }} with no --rollout-percentage"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ota-update.yml",
+          "find": "eas update --channel production --environment production",
+          "with": "eas update --channel ${{ inputs.channel }} --environment ${{ inputs.channel }}"
+        }
+      },
+      { "replace": { "file": ".github/workflows/ota-update.yml", "find": " --rollout-percentage 10", "with": "" } }
+    ]
+  },
+  "bad-staged-rollout-too-wide": {
+    "expect": ["[staged-rollout] an update to store channel production"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ota-update.yml",
+          "find": " --rollout-percentage 10",
+          "with": " --rollout-percentage=100"
+        }
+      }
+    ]
+  },
+  "bad-update-environment": {
+    "expect": ["FAIL .github/workflows/ota-update.yml:16 [update-environment] eas update without --environment"],
+    "ops": [
+      { "replace": { "file": ".github/workflows/ota-update.yml", "find": " --environment production", "with": "" } }
+    ]
+  },
+  "bad-update-environment-expression": {
+    "expect": [
+      "FAIL .github/workflows/ota-update.yml:16 [update-environment] channel ${{ inputs.channel }} published with environment production"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ota-update.yml",
+          "find": "eas update --channel production --environment production",
+          "with": "eas update --channel ${{ inputs.channel }} --environment production"
+        }
+      }
+    ]
+  },
+  "bad-update-environment-job": {
+    "expect": [
+      "FAIL .eas/workflows/preview-update.yml:26 [update-environment] EAS Workflows update job without environment"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".eas/workflows/preview-update.yml",
+          "find": "    type: update\n    environment: preview\n",
+          "with": "    type: update\n"
+        }
+      }
+    ]
+  },
+  "bad-update-environment-mismatch": {
+    "expect": ["[update-environment] channel production published with environment preview"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ota-update.yml",
+          "find": " --environment production",
+          "with": " --environment preview"
+        }
+      }
+    ]
+  },
+  "bad-update-preflight": {
+    "expect": ["FAIL scripts/ota/update-preflight.ts [update-preflight]"],
+    "ops": [{ "delete": "scripts/ota/update-preflight.ts" }]
+  },
+  "bad-update-target": {
+    "expect": ["[update-target] eas update without --channel (or --branch)"],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "ota:quick"],
+          "value": "npm run verify && eas update --auto --environment preview"
+        }
+      }
+    ]
+  },
+  "bad-updates-adapter": {
+    "expect": ["FAIL src/services/updates/expo-updates-adapter.ts [updates-adapter]"],
+    "ops": [{ "delete": "src/services/updates/expo-updates-adapter.ts" }]
+  },
+  "bad-updates-adapter-outside": {
+    "expect": [
+      "FAIL src/features/settings/use-restart-model.ts:2 [updates-adapter] imports expo-updates outside an adapter"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/settings/use-restart-model.ts",
+          "lines": [
+            "// src/features/settings/use-restart-model.ts",
+            "import * as Updates from 'expo-updates';",
+            "",
+            "/** Planted: a feature model that reads the native updater directly instead of the UpdatesPort. */",
+            "export function useRestartModel(): { readonly ready: boolean } {",
+            "  const { isUpdatePending } = Updates.useUpdates();",
+            "  return { ready: isUpdatePending };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-updates-config": {
+    "expect": ["FAIL app.config.ts:1 [updates-config]", "no variant sets updates.url"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    ...updatesConfig(EAS_PROJECT_ID),\n",
+          "with": "    runtimeVersion: { policy: 'fingerprint' },\n"
+        }
+      }
+    ]
+  },
+  "bad-updates-config-dev-dependency": {
+    "expect": ["FAIL package.json:1 [updates-config] expo-updates is a devDependency"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-updates"], "delete": true } },
+      { "json": { "file": "package.json", "path": ["devDependencies", "expo-updates"], "value": "~57.0.24" } }
+    ]
+  },
+  "bad-updates-config-no-package": {
+    "expect": ["[updates-config] updates.url is set but expo-updates is not a dependency"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-updates"], "delete": true } },
+      { "delete": ".github/workflows/ota-update.yml" },
+      { "delete": ".eas/workflows/preview-update.yml" }
+    ]
+  },
+  "bad-updates-off-publish": {
+    "expect": ["[updates-off-publish]", ".github/workflows/ota-update.yml:", ".eas/workflows/preview-update.yml:"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    ...updatesConfig(EAS_PROJECT_ID),\n",
+          "with": "    ...updatesConfig(EAS_PROJECT_ID),\n    updates: { enabled: false },\n"
+        }
+      }
+    ]
+  },
+  "bad-updates-url": {
+    "expect": ["[updates-url] updates.url names project 9b1f3c2a-4d5e-4f60-8a7b-1c2d3e4f5a6b"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "eas: { projectId: EAS_PROJECT_ID }",
+          "with": "eas: { projectId: '0e1a2b3c-4d5e-4f60-8a7b-9c0d1e2f3a4b' }"
+        }
+      }
+    ]
+  },
+  "error-config-throws": {
+    "expect": ["ERROR [bad-input] app.config.ts did not evaluate for APP_VARIANT=development"],
+    "ops": [
+      {
+        "write": {
+          "file": "app.config.ts",
+          "content": "// app.config.ts\nthrow new Error('APP_VARIANT=staging is not one of development|preview|production');\n"
+        }
+      }
+    ]
+  },
+  "error-no-package-json": {
+    "expect": ["ERROR [bad-input] nothing to check: no package.json"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "pass-eas-job-gated": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": ".eas/workflows/preview-update.yml",
+          "content": "# .eas/workflows/preview-update.yml\nname: Preview update\non:\n  workflow_dispatch: {}\njobs:\n  verify:\n    steps:\n      - uses: eas/checkout\n      - uses: eas/install_node_modules\n      - run: node scripts/ota/update-preflight.ts --channel preview --message 'Preview of main'\n  publish_preview:\n    needs:\n      - verify\n    type: update\n    environment: preview\n    params:\n      channel: preview\n      message: Preview of main\n"
+        }
+      }
+    ]
+  },
+  "pass-expo-config-import": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "import type { ConfigContext, ExpoConfig } from 'expo/config';",
+          "with": "import { ConfigContext, ExpoConfig } from 'expo/config';"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "from './src/config/updates-config.ts';",
+          "with": "from './src/config/updates-config';"
+        }
+      }
+    ]
+  },
+  "pass-no-eas-json": {
+    "expect": ["SKIP eas.json [build-channel] not yet created (eas-build-and-submit creates it)"],
+    "ops": [{ "delete": "eas.json" }]
+  },
+  "pass-no-expo": {
+    "expect": ["NOT APPLICABLE: package.json has no expo dependency"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo"], "delete": true } }]
+  },
+  "pass-no-expo-updates": {
+    "expect": ["NOT APPLICABLE: expo-updates is not in package.json dependencies"],
+    "ops": [
+      { "replace": { "file": "app.config.ts", "find": "    ...updatesConfig(EAS_PROJECT_ID),\n", "with": "" } },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-updates"], "delete": true } },
+      { "delete": [".github/workflows/ota-update.yml", ".eas/workflows/preview-update.yml"] }
+    ]
+  },
+  "pass-pr-branch": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "ota:pr-preview"],
+          "value": "npm run verify && eas update --branch pr-42 --environment preview --message \"PR 42\""
+        }
+      }
+    ]
+  },
+  "pass-updates-off": {
+    "expect": ["NOT APPLICABLE: updates.enabled is false in every shipping variant of app.config.ts"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    ...updatesConfig(EAS_PROJECT_ID),\n",
+          "with": "    updates: { enabled: false },\n"
+        }
+      },
+      { "delete": [".github/workflows/ota-update.yml", ".eas/workflows/preview-update.yml"] }
+    ]
+  }
+}

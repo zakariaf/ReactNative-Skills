@@ -1,0 +1,138 @@
+{
+ "frame": "premium-loading",
+ "device": "test-phone",
+ "kind": "state-card",
+ "size": {
+  "w": 160,
+  "h": 120
+ },
+ "background": "#FFFFFF",
+ "palettes": {
+  "dark": {
+   "#FFFFFF": "#111418",
+   "#1A1D23": "#F2F4F7",
+   "#F2F4F7": "#1E232B",
+   "#C9D1DC": "#3A4250",
+   "#4A5160": "#B8BFCC",
+   "#6B7280": "#9AA3B2",
+   "#2F6FED": "#5B8DF6",
+   "#1B3F8A": "#9DB8F9",
+   "#0B0D12": "#000000",
+   "#E8EEF9": "#202A3A",
+   "#C62828": "#FF8A80",
+   "#7A8599": "#5A6577"
+  }
+ },
+ "renders": [
+  {
+   "theme": "light",
+   "lang": "en"
+  }
+ ],
+ "elements": [
+  {
+   "testID": "premium.state.loading",
+   "rect": [
+    0,
+    0,
+    160,
+    120
+   ],
+   "fill": "#FFFFFF"
+  },
+  {
+   "testID": "premium.loading-label",
+   "rect": [
+    16,
+    16,
+    128,
+    16
+   ],
+   "runs": [
+    {
+     "text": "Loading the price",
+     "box": [
+      16,
+      16,
+      110,
+      16
+     ],
+     "color": "#4A5160",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      16,
+      19,
+      106,
+      10
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "premium.spinner",
+   "rect": [
+    70,
+    44,
+    20,
+    20
+   ],
+   "fill": "#2F6FED"
+  },
+  {
+   "testID": "premium.buy-button",
+   "rect": [
+    16,
+    76,
+    128,
+    30
+   ],
+   "fill": "#2F6FED",
+   "border": {
+    "w": 2,
+    "color": "#1B3F8A"
+   },
+   "label": "Buy",
+   "runs": [
+    {
+     "text": "Buy",
+     "box": [
+      68,
+      84,
+      24,
+      14
+     ],
+     "color": "#FFFFFF",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      68,
+      87,
+      22,
+      9
+     ]
+    }
+   ]
+  }
+ ],
+ "captures": [
+  {
+   "theme": "light",
+   "lang": "en",
+   "patch": {
+    "elements": {
+     "premium.state.loading": {
+      "dy": 90
+     },
+     "premium.loading-label": {
+      "dy": 90
+     },
+     "premium.spinner": {
+      "dy": 90
+     },
+     "premium.buy-button": {
+      "dy": 90
+     }
+    }
+   }
+  }
+ ]
+}

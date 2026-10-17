@@ -1,0 +1,6 @@
+# fixture queries
+build-metro-cache-variant	check-apk: production bundle still contains test-only code
+build-variant-mismatch	Error: EXPO_PUBLIC_APP_VARIANT=development must equal APP_VARIANT=production
+release-keychain-locked	TasksApp.app: errSecInternalComponent
+release-version-code-used	Error: Version code 14 has already been used.
+release-store-slow	processing takes longer than an hour at the store

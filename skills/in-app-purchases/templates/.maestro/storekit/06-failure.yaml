@@ -1,0 +1,18 @@
+# .maestro/storekit/06-failure.yaml — StoreKit Tier 2 flow, run only by scripts/storekit/storekit-harness.ts
+# right after testArmFail; outside .maestro/flows/, so the normal E2E run never runs it against an unarmed build.
+appId: ${APP_ID}
+name: A failed purchase shows the error state
+tags: [storekit]
+---
+- launchApp
+- runFlow:
+    file: ../subflows/debug-setup.yaml
+    env:
+      QUERY: 'premium=0&open=paywall'
+      WAIT_FOR: 'paywall.screen'
+- tapOn:
+    id: 'paywall.buy-button'
+- extendedWaitUntil:
+    visible:
+      id: 'paywall.state.error'
+    timeout: 15000

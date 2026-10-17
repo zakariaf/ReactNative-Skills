@@ -1,0 +1,278 @@
+{
+  "area": "e2e",
+  "entries": [
+    {
+      "id": "e2e-maestro-java",
+      "topic": "Toolchain",
+      "symptom": "maestro fails to start: Unable to locate a Java Runtime, or JAVA_HOME is not set",
+      "cause": "Maestro needs Java 17",
+      "fix": "Point JAVA_HOME at a JDK 17 for the process (/usr/libexec/java_home -v 17 on macOS, or Android Studio's bundled runtime); installing a JDK is a human step",
+      "match": [
+        "Unable to locate a Java Runtime",
+        "JAVA_HOME is not set"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "e2e-maestro"
+    },
+    {
+      "id": "e2e-maestro-airplane",
+      "topic": "Flows",
+      "symptom": "setAirplaneMode does nothing on the iOS simulator",
+      "cause": "iOS simulators have no airplane mode (the command works only on Android)",
+      "fix": "Simulate offline through the app's connectivity port (a debug link or test hook that fakes offline); keep setAirplaneMode only in Android-only flows",
+      "match": [
+        "setAirplaneMode"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "debug-menu-and-test-hooks",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "e2e-maestro-ai-commands",
+      "topic": "Flows",
+      "symptom": "A flow uses assertWithAI, assertNoDefectsWithAI or extractTextWithAI",
+      "cause": "They upload screenshots to a third-party service and are not deterministic",
+      "fix": "Assert testIDs and texts; look at the screenshots yourself",
+      "match": [
+        "assertWithAI",
+        "assertNoDefectsWithAI",
+        "extractTextWithAI"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "e2e-maestro"
+    },
+    {
+      "id": "e2e-maestro-upload",
+      "topic": "Flows",
+      "symptom": "A Maestro command sent the run off the machine (test --analyze, cloud, login, record without --local)",
+      "cause": "Those commands upload screens or results to a cloud service",
+      "fix": "Never use them in the repo tooling; the flow checker reports them",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "e2e-maestro"
+    },
+    {
+      "id": "e2e-maestro-tags-flag",
+      "topic": "Flows",
+      "symptom": "maestro test --tags is rejected",
+      "cause": "Maestro 2.10 has --include-tags and --exclude-tags, no --tags",
+      "fix": "Use --include-tags / --exclude-tags",
+      "match": [
+        "(^|\\s)--tags\\b"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "e2e-maestro"
+    },
+    {
+      "id": "e2e-maestro-subfolders",
+      "topic": "Flows",
+      "symptom": "Flows in sub-folders do not run",
+      "cause": "maestro test <folder> does not recurse into sub-folders",
+      "fix": "List the flow files explicitly (the runner does), flows in .maestro/flows/<suite>/<nn>-<name>.yaml",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "e2e-maestro"
+    },
+    {
+      "id": "e2e-maestro-evalscript-colon",
+      "topic": "Flows",
+      "symptom": "maestro check-syntax prints \"Parsing Failed at <line>:<col>\" on an evalScript line that holds a ternary (cond ? a : b)",
+      "cause": "A \": \" inside a plain YAML scalar starts a mapping, so the flow is not valid YAML",
+      "fix": "Quote the whole scalar or write the choice as arithmetic; never an unquoted \": \" in evalScript",
+      "match": [
+        "Parsing Failed at \\d+:\\d+"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "e2e-maestro"
+    },
+    {
+      "id": "e2e-maestro-screen-root",
+      "topic": "Flows",
+      "symptom": "A screenshot step waits and fails on a screen whose root testID differs from its name",
+      "cause": "The sub-flow waited for ${SCREEN}.screen while that screen renders another root",
+      "fix": "Pass the screen's root testID to the sub-flow explicitly",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "e2e-maestro"
+    },
+    {
+      "id": "e2e-maestro-text-match-case",
+      "topic": "Flows",
+      "symptom": "Element not found: Text matching regex: Open (a guard matched the wrong element first)",
+      "cause": "Maestro's text match ignores case and matches any visible text, so a guard such as when visible: 'Open' matched an ad's OPEN button",
+      "fix": "Match the exact system alert (\"Open in .*\\?\") or a testID, and make the tap after a guard optional",
+      "match": [
+        "Element not found: Text matching regex"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "e2e-maestro"
+    },
+    {
+      "id": "e2e-maestro-hierarchy-limits",
+      "topic": "Device",
+      "symptom": "maestro hierarchy misses testIDs",
+      "cause": "It lists only on-screen elements, hides children of accessible elements, and rounds bounds to whole points",
+      "fix": "Put testIDs on the accessible element (the Pressable), scroll to the element first, allow 1 pt",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "e2e-maestro"
+    },
+    {
+      "id": "e2e-maestro-launchapp-permissions",
+      "topic": "Device",
+      "symptom": "A permission or tracking prompt never appears in a flow, or the status already reads granted",
+      "cause": "launchApp grants every permission by default (the iOS tracking answer included)",
+      "fix": "Launch with permissions: { all: unset } in flows that test a prompt, or install fresh and launch with xcrun simctl launch / adb -s <serial> shell am start",
+      "match": [
+        "launchApp.*(ATT|tracking|permission)"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "e2e-maestro"
+    },
+    {
+      "id": "e2e-debug-link-before-ready",
+      "topic": "Device",
+      "symptom": "A debug link right after launchApp clearState is ignored (no language, data or screen applied), while the same link seconds later works",
+      "cause": "The app was launched without the URL and its JS had not started the link handler yet, so neither getInitialURL nor the url event delivered it",
+      "fix": "Start listening as early as the debug kit loads and queue links until the navigator is ready; the setup sub-flow waits for the first screen root before openLink. Never add a fixed sleep",
+      "match": [
+        "debug link (is )?(ignored|lost|not applied)"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "debug-menu-and-test-hooks"
+    },
+    {
+      "id": "e2e-hierarchy-other-device",
+      "topic": "Device",
+      "symptom": "maestro hierarchy shows another screen or language, or the run answers with another session's app",
+      "cause": "Maestro reached another session's device: the call named no --device, or two sessions' drivers shared a port",
+      "fix": "Name the device on every call: maestro --device <udid or serial> --driver-host-port <own port> <command> (maestroGlobalArgs()); simctl by UDID, adb -s <serial>",
+      "match": [
+        "hierarchy shows another (screen|language)",
+        "hierarchy from another simulator"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "e2e-maestro"
+    },
+    {
+      "id": "e2e-driver-port-shared",
+      "topic": "Device",
+      "symptom": "A Maestro run fails to connect to its driver (port 7001 in use, Failed to connect)",
+      "cause": "The call used the default driver port, which another session's driver on the same machine already listens on",
+      "fix": "Give every run its own --driver-host-port (the maestro-args helper picks a free one)",
+      "match": [
+        "port 7001",
+        "driver-host-port"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "e2e-maestro"
+    },
+    {
+      "id": "e2e-hierarchy-500-hang",
+      "topic": "Device",
+      "symptom": "UnknownFailure(errorResponse=Request for viewHierarchy failed, code: 500), then the Maestro process stays alive and the runner waits for ever",
+      "cause": "The iOS driver could not answer a hierarchy request on an overloaded machine; Maestro's main thread died but its JVM kept running",
+      "fix": "Stop that Maestro process only (it names your device and port), wait until the load average is below twice the cores, rerun; run screenshot matrices alone, never beside a Release build",
+      "match": [
+        "Request for viewHierarchy failed, code: 500"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "e2e-maestro",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "e2e-app-stopped-after-flow",
+      "topic": "Device",
+      "symptom": "A memory or footprint step after the flows finds no app process",
+      "cause": "Maestro 2.10 stops the app when a test ends",
+      "fix": "Relaunch the app by UDID or serial after the flows, wait for its pid, then measure",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "performance-budgets"
+    },
+    {
+      "id": "e2e-busy-machine-timeouts",
+      "topic": "Device",
+      "symptom": "Flows time out at random steps (relaunches never answer, StoreKit or system sheets appear late)",
+      "cause": "The machine is overloaded (load average far above the core count), so a correct app times out",
+      "fix": "Rerun alone once the load average is below twice the cores; never raise every timeout",
+      "match": [
+        "load average"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "e2e-maestro"
+    },
+    {
+      "id": "e2e-socket-sampler-other-device",
+      "topic": "Device",
+      "symptom": "The runtime network check reports sockets the app never opens, while every flow passes",
+      "cause": "The sampler watched every process with the app's name on the machine, another session's copy included",
+      "fix": "Sample only the processes of your own simulator or emulator (by UDID or serial)",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "privacy-and-store-declarations"
+    },
+    {
+      "id": "e2e-network-guard-blocks-metro",
+      "topic": "Device",
+      "symptom": "A Debug test build fails most flows at once and LogBox covers the app: a blocked websocket or fetch to localhost:8081",
+      "cause": "The test build's network guard blocked the Debug build's own Metro (the bundle and the HMR websocket)",
+      "fix": "Let only a __DEV__ build reach localhost, 127.0.0.1 or [::1]; a Release build still blocks everything",
+      "match": [
+        "ws://localhost:\\d+/hot"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "privacy-and-store-declarations"
+    },
+    {
+      "id": "e2e-ads-test-close-early",
+      "topic": "Device",
+      "symptom": "A flow taps a test ad's close key, but the ad stays on screen (\"Test mode\" still visible)",
+      "cause": "Google's test full-screen ads ignore a close tap until the key is ready",
+      "fix": "Tap the close key again while \"Test mode\" is still visible (runFlow when visible), then assert the app",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "admob-ads-and-consent"
+    },
+    {
+      "id": "e2e-android-adb-reverse",
+      "topic": "Device",
+      "symptom": "A Debug Android build on the emulator shows \"Unable to load script\" or cannot reach Metro",
+      "cause": "The emulator reaches the machine at 10.0.2.2, not localhost, unless the port is reversed",
+      "fix": "adb -s <serial> reverse tcp:8081 tcp:8081, or test a Release build (the evidence build is Release)",
+      "match": [
+        "Unable to load script"
+      ],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "android-emulator-build",
+      "platforms": [
+        "android"
+      ]
+    }
+  ]
+}

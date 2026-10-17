@@ -1,0 +1,68 @@
+{
+  "base": [
+    "@tests/bases/app",
+    {
+      "templates": true,
+      "firstLinePath": true,
+      "fill": {
+        "__AVD_PREFIX__": "tasks",
+        "__APP_ID__": "com.acme.tasks"
+      }
+    }
+  ],
+  "ops": [
+    {
+      "json": {
+        "file": "contracts/android-emu-build.json",
+        "path": [
+          "postPrebuild"
+        ],
+        "value": [
+          "audit:android"
+        ]
+      }
+    },
+    {
+      "write": {
+        "file": ".agents/skills/decoy/SKILL.md",
+        "content": "---\nname: decoy\ndescription: Planted findings that every scan must skip.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": ".agents/skills/decoy/scripts/reset.sh",
+        "content": "adb kill-server\nsudo update-alternatives --set java /usr/lib/jvm/java-21\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/decoy/SKILL.md",
+        "content": "---\nname: decoy\ndescription: Planted findings that every scan must skip.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/decoy/reset.sh",
+        "content": "adb -e shell pm clear com.acme.tasks\nemulator -avd Pixel_8\n"
+      }
+    },
+    {
+      "write": {
+        "file": "scripts/vendor/kit/SKILL.md",
+        "content": "---\nname: decoy\ndescription: Planted findings that every scan must skip.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "scripts/vendor/kit/boot.ts",
+        "content": "spawnSync('adb', ['install', 'kit.apk']);\nspawnSync('emulator', ['-no-window']);\n"
+      }
+    },
+    {
+      "write": {
+        "file": "android/scripts/reset.sh",
+        "content": "./gradlew installRelease\npkill -f qemu-system\n"
+      }
+    }
+  ]
+}

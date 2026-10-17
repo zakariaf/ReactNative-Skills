@@ -1,0 +1,35 @@
+# .maestro/flows/deep-links.yaml (example: cold and warm links; e2e-maestro owns the runner and layout)
+# Run on a named device: maestro --device <udid-or-serial> test .maestro/flows/deep-links.yaml \
+#   -e APP_ID=com.example.tasks.preview -e APP_SCHEME=tasks-preview -e APP_NAME="Tasks (Preview)"
+appId: ${APP_ID}
+---
+# Cold start: the link launches the stopped app and opens the task.
+- stopApp
+- openLink: ${APP_SCHEME}://tasks/task-7
+# iOS asks once per simulator before a custom scheme opens an app from outside.
+- runFlow:
+    when:
+      visible: 'Open in "${APP_NAME}"'
+    commands:
+      - tapOn: Open
+- assertVisible:
+    id: task-detail.screen
+# Warm start, refused link: the current screen stays as it is. A relaunch, not `back`, returns to the
+# list: Maestro's back command runs on Android and Web only (docs.maestro.dev, checked 2026-10-14).
+- stopApp
+- launchApp
+- assertVisible:
+    id: tasks.screen
+- openLink: ${APP_SCHEME}://settings/delete-account
+- assertVisible:
+    id: tasks.screen
+# Android verified link: autoVerify skips the chooser (Android only; iOS ignores it).
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - openLink:
+          link: https://preview.tasks.example.com/tasks/task-7
+          autoVerify: true
+      - assertVisible:
+          id: task-detail.screen

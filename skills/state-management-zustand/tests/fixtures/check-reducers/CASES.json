@@ -1,0 +1,262 @@
+{
+  "bad-case": {
+    "expect": ["[reducer-case]", "tasksReducer: replace-clears-failure: $.loadFailure: expected null"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/tasks-reducer.ts",
+          "find": "      return { ...state, tasks: action.tasks, loadFailure: null };",
+          "with": "      return { ...state, tasks: action.tasks };"
+        }
+      }
+    ]
+  },
+  "bad-cases-invalid": {
+    "expect": [
+      "[reducer-cases-invalid]",
+      "src/stores/lists-reducer-cases.ts:1",
+      "reducer \"listReducer\" is not an export of the reducer file",
+      "no case pins a change that changes nothing"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/lists-reducer-cases.ts",
+          "find": "  reducer: 'listsReducer',",
+          "with": "  reducer: 'listReducer',"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/stores/lists-reducer-cases.ts",
+          "find": "    { rule: 'add-list-once', action: { type: 'add-list', list: GROCERIES }, same: true },\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-cases-missing": {
+    "expect": [
+      "[reducer-cases-missing]",
+      "src/stores/tasks-reducer.ts:1",
+      "tasks-reducer.ts has no tasks-reducer-cases.ts"
+    ],
+    "ops": [{ "delete": "src/stores/tasks-reducer-cases.ts" }]
+  },
+  "bad-impure-load": {
+    "expect": ["[module-load]", "src/stores/tasks-reducer.ts:1", "cannot be imported"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/tasks-reducer.ts",
+          "find": "import type { Task, TaskFailure } from '@/data/tasks/task-repository';\n",
+          "with": "import { Platform } from 'react-native';\n\nimport type { Task, TaskFailure } from '@/data/tasks/task-repository';\n\nexport const PLATFORM = Platform.OS;\n"
+        }
+      }
+    ]
+  },
+  "bad-mutating": {
+    "expect": [
+      "[reducer-mutates]",
+      "src/stores/lists-reducer.ts:23",
+      "listsReducer: add-list-appends: changed its input"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/lists-reducer.ts",
+          "find": "        : { ...state, lists: [...state.lists, action.list] };",
+          "with": "        : (state.lists as TaskList[]).push(action.list) > 0\n          ? state\n          : state;"
+        }
+      }
+    ]
+  },
+  "bad-no-op-new-object": {
+    "expect": [
+      "[reducer-no-op-new-object]",
+      "src/stores/tasks-reducer.ts:31",
+      "tasksReducer: set-done-unchanged-is-a-no-op: returned a new object"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/tasks-reducer.ts",
+          "find": "  if (task === undefined || task.isDone === isDone) return state;",
+          "with": "  if (task === undefined) return state;"
+        }
+      }
+    ]
+  },
+  "bad-nondeterministic": {
+    "expect": ["[reducer-nondeterministic]", "listsReducer: replace-clears-failure: gave a different result"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/lists-reducer.ts",
+          "find": "export const DEFAULT_LISTS_STATE: ListsState = { lists: [], loadFailure: null };",
+          "with": "export const DEFAULT_LISTS_STATE: ListsState = { lists: [], loadFailure: null };\n\nlet replaced = 0;"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/stores/lists-reducer.ts",
+          "find": "      return { ...state, lists: action.lists, loadFailure: null };",
+          "with": "      replaced += 1;\n      return { ...state, lists: action.lists, loadFailure: null, replaced };"
+        }
+      }
+    ]
+  },
+  "bad-rules-bound-case": {
+    "expect": ["[reducer-case]", "boardSessionReducer: press-toggles-neighbours: $.moves: expected 1, got 0"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/stores/session/board-session-reducer.ts",
+          "content": "// src/stores/session/board-session-reducer.ts\nimport type { BoardRules } from './board-rules';\n\nexport type BoardSession = { readonly cells: readonly boolean[]; readonly moves: number };\nexport type BoardAction = { readonly type: 'press'; readonly cell: number };\n\nexport function boardSessionReducer(rules: BoardRules, session: BoardSession, action: BoardAction): BoardSession {\n  if (action.cell < 0 || action.cell >= rules.size) return session;\n  return { cells: rules.press(session.cells, action.cell), moves: session.moves };\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/session/board-rules.ts",
+          "content": "// src/stores/session/board-rules.ts\nexport type BoardRules = { readonly size: number; readonly press: (cells: readonly boolean[], cell: number) => readonly boolean[] };\n\nexport const TOGGLE_RULES: BoardRules = {\n  size: 3,\n  press: (cells, cell) => cells.map((on, index) => (Math.abs(index - cell) <= 1 ? !on : on)),\n};\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/session/board-session-reducer-cases.ts",
+          "content": "// src/stores/session/board-session-reducer-cases.ts\nimport type { ReducerCases } from '@/stores/reducer-cases';\n\nimport type { BoardAction, BoardSession } from './board-session-reducer';\n\nexport { TOGGLE_RULES } from './board-rules';\n\nexport const BOARD_SESSION_REDUCER_CASES: ReducerCases<BoardSession, BoardAction> = {\n  reducer: 'boardSessionReducer',\n  rules: 'TOGGLE_RULES',\n  initial: { cells: [false, false, false], moves: 0 },\n  cases: [\n    { rule: 'press-toggles-neighbours', action: { type: 'press', cell: 0 }, expect: { cells: [true, true, false], moves: 1 } },\n    { rule: 'press-outside-is-a-no-op', action: { type: 'press', cell: 7 }, same: true },\n  ],\n};\n"
+        }
+      }
+    ]
+  },
+  "bad-rules-bound-missing": {
+    "expect": ["[reducer-cases-invalid]", "rules \"FLIP_RULES\" is not an export of the cases or reducer file"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/stores/session/board-session-reducer.ts",
+          "content": "// src/stores/session/board-session-reducer.ts\nimport type { BoardRules } from './board-rules';\n\nexport type BoardSession = { readonly cells: readonly boolean[]; readonly moves: number };\nexport type BoardAction = { readonly type: 'press'; readonly cell: number };\n\nexport function boardSessionReducer(rules: BoardRules, session: BoardSession, action: BoardAction): BoardSession {\n  if (action.cell < 0 || action.cell >= rules.size) return session;\n  return { cells: rules.press(session.cells, action.cell), moves: session.moves + 1 };\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/session/board-rules.ts",
+          "content": "// src/stores/session/board-rules.ts\nexport type BoardRules = { readonly size: number; readonly press: (cells: readonly boolean[], cell: number) => readonly boolean[] };\n\nexport const TOGGLE_RULES: BoardRules = {\n  size: 3,\n  press: (cells, cell) => cells.map((on, index) => (Math.abs(index - cell) <= 1 ? !on : on)),\n};\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/session/board-session-reducer-cases.ts",
+          "content": "// src/stores/session/board-session-reducer-cases.ts\nimport type { ReducerCases } from '@/stores/reducer-cases';\n\nimport type { BoardAction, BoardSession } from './board-session-reducer';\n\nexport { TOGGLE_RULES } from './board-rules';\n\nexport const BOARD_SESSION_REDUCER_CASES: ReducerCases<BoardSession, BoardAction> = {\n  reducer: 'boardSessionReducer',\n  rules: 'FLIP_RULES',\n  initial: { cells: [false, false, false], moves: 0 },\n  cases: [\n    { rule: 'press-toggles-neighbours', action: { type: 'press', cell: 0 }, expect: { cells: [true, true, false], moves: 1 } },\n    { rule: 'press-outside-is-a-no-op', action: { type: 'press', cell: 7 }, same: true },\n  ],\n};\n"
+        }
+      }
+    ]
+  },
+  "bad-session-command": {
+    "expect": ["[session-command]", "src/stores/session/undoable-session-reducer.ts", "apply-command records the state"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/session/undoable-session-reducer.ts",
+          "find": "    revision: session.revision + 1,\n",
+          "with": "    revision: session.revision,\n",
+          "occurrence": 1
+        }
+      }
+    ]
+  },
+  "bad-session-finished": {
+    "expect": ["[session-finished]", "a finished session ignores commands and undo"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/session/undoable-session-reducer.ts",
+          "find": "  return rules.isFinished(state) ? 'finished' : 'active';",
+          "with": "  return rules.isFinished(state) && state === undefined ? 'finished' : 'active';"
+        }
+      }
+    ]
+  },
+  "bad-session-mutates": {
+    "expect": ["[reducer-mutates]", "the input session is never changed"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/session/undoable-session-reducer.ts",
+          "find": "    case 'pause':\n      return session.status === 'active' ? { ...session, status: 'paused' } : session;",
+          "with": "    case 'pause':\n      (session.log as TCommand[]).length = 0;\n      return session.status === 'active' ? { ...session, status: 'paused' } : session;"
+        }
+      }
+    ]
+  },
+  "bad-session-paused": {
+    "expect": ["[session-paused]", "a command while paused"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/session/undoable-session-reducer.ts",
+          "find": "  if (session.status !== 'active') return session;\n  const state = rules.apply(session.state, command);",
+          "with": "  if (session.status === 'finished') return session;\n  const state = rules.apply(session.state, command);"
+        }
+      }
+    ]
+  },
+  "bad-session-undo": {
+    "expect": ["[session-undo]", "undo steps back exactly one command", "a second undo beyond max 1"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/session/undoable-session-reducer.ts",
+          "find": "      return session.undoCount < rules.undo.max;",
+          "with": "      return true;"
+        }
+      }
+    ]
+  },
+  "error-no-src": { "expect": ["ERROR [bad-input]", "nothing to check"], "ops": [{ "delete": "src" }] },
+  "pass-no-reducers": {
+    "expect": ["NOT APPLICABLE: no reducers"],
+    "ops": [{ "delete": ["src/stores", "src/features"] }]
+  },
+  "pass-no-zustand": {
+    "expect": ["NOT APPLICABLE: zustand is not in package.json"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "zustand"], "delete": true } }]
+  },
+  "pass-owned-elsewhere": {
+    "expect": [
+      "SKIP src/stores/settings/settings-reducer-cases.ts [reducer-cases-missing] not yet created (settings-and-preferences creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/stores/settings/settings-reducer.ts",
+          "content": "// src/stores/settings/settings-reducer.ts\nexport type Settings = { readonly theme: 'system' | 'light' | 'dark' };\nexport type SettingsAction = { readonly type: 'set-theme'; readonly theme: Settings['theme'] };\n\nexport function settingsReducer(settings: Settings, action: SettingsAction): Settings {\n  return settings.theme === action.theme ? settings : { ...settings, theme: action.theme };\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-rules-bound": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/stores/session/board-session-reducer.ts",
+          "content": "// src/stores/session/board-session-reducer.ts\nimport type { BoardRules } from './board-rules';\n\nexport type BoardSession = { readonly cells: readonly boolean[]; readonly moves: number };\nexport type BoardAction = { readonly type: 'press'; readonly cell: number };\n\nexport function boardSessionReducer(rules: BoardRules, session: BoardSession, action: BoardAction): BoardSession {\n  if (action.cell < 0 || action.cell >= rules.size) return session;\n  return { cells: rules.press(session.cells, action.cell), moves: session.moves + 1 };\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/session/board-rules.ts",
+          "content": "// src/stores/session/board-rules.ts\nexport type BoardRules = { readonly size: number; readonly press: (cells: readonly boolean[], cell: number) => readonly boolean[] };\n\nexport const TOGGLE_RULES: BoardRules = {\n  size: 3,\n  press: (cells, cell) => cells.map((on, index) => (Math.abs(index - cell) <= 1 ? !on : on)),\n};\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/session/board-session-reducer-cases.ts",
+          "content": "// src/stores/session/board-session-reducer-cases.ts\nimport type { ReducerCases } from '@/stores/reducer-cases';\n\nimport type { BoardAction, BoardSession } from './board-session-reducer';\n\nexport { TOGGLE_RULES } from './board-rules';\n\nexport const BOARD_SESSION_REDUCER_CASES: ReducerCases<BoardSession, BoardAction> = {\n  reducer: 'boardSessionReducer',\n  rules: 'TOGGLE_RULES',\n  initial: { cells: [false, false, false], moves: 0 },\n  cases: [\n    { rule: 'press-toggles-neighbours', action: { type: 'press', cell: 0 }, expect: { cells: [true, true, false], moves: 1 } },\n    { rule: 'press-outside-is-a-no-op', action: { type: 'press', cell: 7 }, same: true },\n  ],\n};\n"
+        }
+      }
+    ]
+  }
+}

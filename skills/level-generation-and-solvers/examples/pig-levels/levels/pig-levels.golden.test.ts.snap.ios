@@ -1,0 +1,40 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`[contract] pig daily goldens keeps the frozen daily start for 2026-09-28 1`] = `
+"seed 1306357553 difficulty 45 target 60 turns 12 busts 3
+rolls 1,6,5,5,5,1,4,2"
+`;
+
+exports[`[contract] pig daily goldens keeps the frozen daily start for 2026-12-31 1`] = `
+"seed 3894846863 difficulty 45 target 60 turns 12 busts 3
+rolls 5,4,6,6,5,6,4,6"
+`;
+
+exports[`[contract] pig daily goldens keeps the frozen daily start for 2027-01-01 1`] = `
+"seed 503069035 difficulty 45 target 60 turns 12 busts 3
+rolls 2,4,5,1,2,6,2,2"
+`;
+
+exports[`pig level table goldens keeps the frozen start of level 1 1`] = `
+"seed 1956431190 difficulty 0 target 40 turns 10 busts 3
+rolls 4,3,2,6,6,1,5,1
+{"kind":"score","thresholds":[40,103,123]}"
+`;
+
+exports[`pig level table goldens keeps the frozen start of level 20 1`] = `
+"seed 2883233802 difficulty 48 target 60 turns 12 busts 3
+rolls 4,2,6,2,5,3,1,1
+{"kind":"score","thresholds":[60,124,148]}"
+`;
+
+exports[`pig level table goldens keeps the frozen start of level 21 1`] = `
+"seed 3074002369 difficulty 50 target 80 turns 14 busts 3
+rolls 2,5,6,4,6,2,3,3
+{"kind":"score","thresholds":[80,160,192]}"
+`;
+
+exports[`pig level table goldens keeps the frozen start of level 40 1`] = `
+"seed 2082127306 difficulty 99 target 100 turns 16 busts 3
+rolls 1,2,4,2,1,3,6,2
+{"kind":"score","thresholds":[100,153,183]}"
+`;

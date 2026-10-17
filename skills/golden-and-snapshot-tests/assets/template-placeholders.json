@@ -1,0 +1,4 @@
+{
+  "$comment": "Values verify-templates and the self-test fill into the templates: the Tasks app's digest. Replace them with the feature you pin.",
+  "__FEATURE__": "tasks"
+}

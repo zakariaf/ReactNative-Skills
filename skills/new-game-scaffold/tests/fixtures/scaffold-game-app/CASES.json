@@ -1,0 +1,86 @@
+{
+  "bad-app-conflict": {
+    "expect": ["FAIL apps/lights-out/app.config.ts [conflict] exists with other content"],
+    "ops": [
+      {
+        "write": {
+          "file": "apps/lights-out/app.config.ts",
+          "lines": ["// apps/lights-out/app.config.ts", "export default { name: 'Lights Out' };"]
+        }
+      }
+    ]
+  },
+  "bad-not-lockstep": {
+    "expect": [
+      "FAIL apps/tile-match/package.json [deps-lockstep] dependencies differ from apps/sliding-puzzle/package.json"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "apps/tile-match/package.json",
+          "lines": [
+            "{",
+            "  \"name\": \"@acme/tile-match\",",
+            "  \"version\": \"1.0.0\",",
+            "  \"private\": true,",
+            "  \"main\": \"index.ts\",",
+            "  \"dependencies\": {",
+            "    \"expo\": \"~57.0.26\",",
+            "    \"react\": \"19.2.0\",",
+            "    \"react-native\": \"0.86.3\"",
+            "  }",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "error-apps-block": {
+    "expect": ["ERROR [bad-input] contracts/games.json apps.bundlePrefix must be a lowercase reverse-DNS prefix"],
+    "ops": [{ "json": { "file": "contracts/games.json", "path": ["apps", "bundlePrefix"], "value": "Com.Example" } }]
+  },
+  "error-no-workspaces": {
+    "expect": ["ERROR [bad-input] the root package.json \"workspaces\" does not include apps/*"],
+    "ops": [{ "json": { "file": "package.json", "path": ["workspaces"], "delete": true } }]
+  },
+  "error-unknown-ad-unit": {
+    "expect": ["ERROR [bad-input] apps.adUnits lists video, which has no sample id"],
+    "ops": [{ "json": { "file": "contracts/games.json", "path": ["apps", "adUnits"], "value": ["banner", "video"] } }]
+  },
+  "pass-add-missing-app": {
+    "expect": [
+      "keep apps/lights-out/app.config.ts: exists with other content (--add-missing never changes a value)",
+      "new  apps/lights-out/app-settings.ts",
+      "wrote 11 files"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "apps/lights-out/app.config.ts",
+          "lines": ["// apps/lights-out/app.config.ts", "export default { name: 'Lights Out' };"]
+        }
+      }
+    ]
+  },
+  "pass-add-missing-real-entry": {
+    "expect": ["new  apps/lights-out/app-settings.ts", "wrote 11 files"],
+    "ops": [
+      {
+        "write": {
+          "file": "apps/lights-out/index.ts",
+          "lines": [
+            "// apps/lights-out/index.ts",
+            "// The real entry (app-startup-and-bootstrap): the forced Intl polyfills first, expo-router/entry last.",
+            "import '@/i18n/intl-polyfills';",
+            "",
+            "import 'expo-router/entry';"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-first-app": {
+    "expect": ["new  apps/lights-out/package.json", "would write 12 files"],
+    "ops": [{ "delete": "apps/sliding-puzzle" }]
+  }
+}

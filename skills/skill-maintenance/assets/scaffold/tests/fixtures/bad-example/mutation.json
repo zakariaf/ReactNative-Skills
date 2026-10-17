@@ -1,0 +1,9 @@
+[
+  {
+    "replace": {
+      "file": "src/example.ts",
+      "find": "  return Math.min(max, Math.max(min, value));\n",
+      "with": "  const marker = '__FILL_PATTERN__';\n  return Math.min(max, Math.max(min, value + marker.length * 0));\n"
+    }
+  }
+]

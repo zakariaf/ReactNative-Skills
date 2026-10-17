@@ -1,0 +1,21 @@
+{
+  "id": "test-phone",
+  "platform": "ios",
+  "name": "Self-test phone (160 x 300 pt @3x)",
+  "deviceType": "com.apple.CoreSimulator.SimDeviceType.iPhone-16-Pro",
+  "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5",
+  "runtimeVersion": "26.5",
+  "simulatorName": "tasks-parity",
+  "points": { "width": 160, "height": 300 },
+  "scale": 3,
+  "pixels": { "width": 480, "height": 900 },
+  "safeArea": { "top": 20, "bottom": 10 },
+  "masks": [
+    { "x": 0, "y": 0, "width": 160, "height": 20 },
+    { "x": 0, "y": 290, "width": 160, "height": 10 }
+  ],
+  "systemLocale": "en_US",
+  "contentSize": "large",
+  "statusBarOverride": { "time": "9:41", "dataNetwork": "wifi", "wifiMode": "active", "wifiBars": "3", "cellularMode": "active", "cellularBars": "4", "operatorName": "", "batteryState": "discharging", "batteryLevel": "100" },
+  "languages": { "ar": { "appleLanguages": "(ar)", "appleLocale": "ar" } }
+}

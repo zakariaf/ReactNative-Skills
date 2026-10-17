@@ -1,0 +1,21 @@
+# .maestro/ads-smoke/02-relaunch.yaml
+# Step 2, after step 1 on the same install: stop and start the app outside Maestro
+#   iOS: xcrun simctl terminate <udid> <bundle id>; xcrun simctl launch <udid> <bundle id>
+#   Android: adb -s <serial> shell am force-stop <package>; adb -s <serial> shell monkey -p <package> 1
+# Neither the primer, Google's form nor Apple's prompt comes back; the banner loads.
+appId: ${APP_ID}
+name: Ads smoke 2 - a relaunch asks nothing again and shows the banner
+tags: [ads-smoke]
+---
+- extendedWaitUntil:
+    visible:
+      id: 'tasks.list'
+    timeout: 30000
+- assertNotVisible:
+    id: 'consent.primer-continue-button'
+# system-ui: Google's form button; it must not come back.
+- assertNotVisible: 'Consent'
+- extendedWaitUntil:
+    visible:
+      id: 'tasks.banner-ad'
+    timeout: 60000

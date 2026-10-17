@@ -1,0 +1,13 @@
+{
+  "$comment": "Fixture app: golden-and-snapshot-tests' contract register, with the template game's daily goldens.",
+  "contracts": [
+    {
+      "id": "lights-out-daily-goldens",
+      "test": "src/games/lights-out/levels/lights-out-levels.golden.test.ts",
+      "why": "Every player gets the same daily level on the same date."
+    }
+  ],
+  "goldenPaths": [],
+  "contractMarkers": ["[contract]"],
+  "maxPixelTolerance": 0.001
+}

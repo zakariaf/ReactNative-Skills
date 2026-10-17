@@ -1,0 +1,4 @@
+{
+  "version": 1,
+  "testOnlyFolders": ["src/features/debug/", "src/services/test-hooks/", "src/features/parity/"]
+}

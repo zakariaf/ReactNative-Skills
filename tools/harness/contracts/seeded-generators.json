@@ -1,0 +1,5 @@
+{
+  "$comment": "The register of every seeded generator: shipped salts and cutover tables are frozen facts here, so a change in code shows up as a checker failure. Read by check-determinism.mjs (paths) and check-golden-vectors.mjs. An app with no seeded generator keeps \"generators\": [].",
+  "paths": [],
+  "generators": []
+}

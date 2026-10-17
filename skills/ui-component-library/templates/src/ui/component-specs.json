@@ -1,0 +1,236 @@
+{
+  "button": {
+    "minHeight": 48,
+    "minHeightLarge": 56,
+    "paddingBlock": 8,
+    "paddingInline": 16,
+    "gap": 8,
+    "radius": 10,
+    "border": 2,
+    "icon": 20,
+    "rowMinBasis": 120
+  },
+  "textButton": {
+    "paddingBlock": 8,
+    "paddingInline": 8,
+    "underlineThickness": 2,
+    "underlineOffset": 2
+  },
+  "iconButton": {
+    "size": 48,
+    "sizeSmall": 44,
+    "radius": 10,
+    "icon": 24
+  },
+  "checkbox": {
+    "box": 24,
+    "radius": 6,
+    "border": 2
+  },
+  "checkMark": {
+    "width": 6,
+    "height": 11,
+    "stroke": 2
+  },
+  "chevron": {
+    "size": 8,
+    "stroke": 2
+  },
+  "toggle": {
+    "width": 52,
+    "height": 32,
+    "radius": 16,
+    "border": 2,
+    "knob": 22,
+    "knobInset": 3
+  },
+  "segmentedControl": {
+    "minHeight": 44,
+    "gap": 4,
+    "radius": 10,
+    "border": 2,
+    "paddingBlock": 4,
+    "paddingInline": 4,
+    "labelGap": 4
+  },
+  "slider": {
+    "height": 44,
+    "minWidth": 120,
+    "trackHeight": 6,
+    "trackRadius": 3,
+    "thumb": 28,
+    "thumbBorder": 2
+  },
+  "progressBar": {
+    "height": 8,
+    "minWidth": 60,
+    "radius": 4
+  },
+  "radio": {
+    "size": 24,
+    "border": 2,
+    "dot": 12
+  },
+  "optionCard": {
+    "minHeight": 56,
+    "paddingBlock": 12,
+    "paddingInline": 16,
+    "gap": 12,
+    "radius": 10
+  },
+  "list": {
+    "radius": 16,
+    "border": 1
+  },
+  "sectionHeader": {
+    "paddingTop": 16,
+    "paddingBottom": 4,
+    "paddingInline": 16,
+    "gap": 8,
+    "icon": 16
+  },
+  "row": {
+    "minHeight": 52,
+    "paddingBlock": 12,
+    "paddingInline": 16,
+    "gap": 12,
+    "separator": 1,
+    "labelGap": 2,
+    "subRowIndent": 60
+  },
+  "iconTile": {
+    "size": 32,
+    "radius": 6,
+    "icon": 20,
+    "sizeLarge": 64,
+    "radiusLarge": 16,
+    "iconLarge": 36
+  },
+  "card": {
+    "radius": 16,
+    "border": 1,
+    "padding": 16,
+    "paddingCompact": 12,
+    "gap": 12
+  },
+  "cardHeader": {
+    "gap": 12
+  },
+  "callout": {
+    "gap": 12,
+    "icon": 20,
+    "iconNudge": 2
+  },
+  "badge": {
+    "paddingBlock": 2,
+    "paddingInline": 8,
+    "gap": 4,
+    "radius": 6,
+    "icon": 14,
+    "maxTilt": 8
+  },
+  "chip": {
+    "paddingBlock": 4,
+    "paddingInline": 12,
+    "gap": 4,
+    "radius": 6,
+    "border": 1,
+    "icon": 14
+  },
+  "appBar": {
+    "minHeight": 56,
+    "paddingInline": 4,
+    "gap": 4
+  },
+  "scrim": {
+    "paddingBlock": 24,
+    "paddingInline": 16
+  },
+  "dialog": {
+    "radius": 16,
+    "paddingTop": 24,
+    "paddingInline": 24,
+    "paddingBottom": 16,
+    "gap": 12,
+    "elevation": 8,
+    "buttonRowGap": 12,
+    "buttonRowMarginTop": 8
+  },
+  "toast": {
+    "paddingBlock": 12,
+    "paddingInline": 16,
+    "radius": 10,
+    "gap": 12,
+    "icon": 20,
+    "stackGap": 8,
+    "drop": 16,
+    "border": 1
+  },
+  "emptyState": {
+    "gap": 12,
+    "paddingBlock": 32
+  },
+  "pagerDots": {
+    "dot": 8,
+    "activeWidth": 20,
+    "gap": 8
+  },
+  "statGrid": {
+    "gap": 12,
+    "cellPadding": 12,
+    "radius": 10,
+    "cellGap": 2
+  },
+  "barChart": {
+    "height": 120,
+    "bar": 16,
+    "gap": 8,
+    "radius": 6,
+    "minBar": 2,
+    "labelGap": 4
+  },
+  "busy": {
+    "block": 8,
+    "radius": 2,
+    "gap": 4,
+    "hop": 6
+  },
+  "tileButton": {
+    "minHeight": 88,
+    "paddingBlock": 12,
+    "paddingInline": 8,
+    "gap": 8,
+    "radius": 10,
+    "icon": 28
+  },
+  "toggleTile": {
+    "minHeight": 88,
+    "paddingBlock": 8,
+    "paddingInline": 4,
+    "gap": 4,
+    "radius": 10,
+    "icon": 24,
+    "stateGap": 2
+  },
+  "navCard": {
+    "minHeight": 64,
+    "paddingBlock": 12,
+    "paddingInline": 16,
+    "gap": 12,
+    "labelGap": 2,
+    "radius": 10
+  },
+  "actionCard": {
+    "minHeight": 56,
+    "paddingBlock": 8,
+    "paddingInline": 16,
+    "gap": 12,
+    "radius": 10
+  },
+  "confetti": {
+    "band": 64,
+    "piece": 10,
+    "radius": 2,
+    "fall": 32
+  }
+}

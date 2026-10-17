@@ -1,0 +1,608 @@
+{
+  "$comment": "The library catalogue: every skill with its category, plugin (core or games) and manual (side-effecting run-* runbook) flag, plus a one-line summary. tools/build-catalog.mjs and the index skill (build-index.mjs --catalog) read it; never edit the files they generate.",
+  "categories": [
+    {
+      "key": "start-here",
+      "label": "Start here"
+    },
+    {
+      "key": "process",
+      "label": "How every change is made"
+    },
+    {
+      "key": "setup",
+      "label": "Project setup & code rules"
+    },
+    {
+      "key": "ui",
+      "label": "UI, design & interaction"
+    },
+    {
+      "key": "navigation",
+      "label": "Navigation & app lifecycle"
+    },
+    {
+      "key": "data",
+      "label": "State & data"
+    },
+    {
+      "key": "i18n-a11y-perf",
+      "label": "Languages, access & speed"
+    },
+    {
+      "key": "platform",
+      "label": "Platform features"
+    },
+    {
+      "key": "money-privacy",
+      "label": "Monetization, privacy & observability"
+    },
+    {
+      "key": "testing",
+      "label": "Testing"
+    },
+    {
+      "key": "release",
+      "label": "Build, release & delivery"
+    },
+    {
+      "key": "games",
+      "label": "Games (optional plugin)"
+    }
+  ],
+  "skills": [
+    {
+      "name": "react-native-conventions-index",
+      "category": "start-here",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "The front door: house rules, a generated task-to-skills table, build orders for a new app and a new feature, how to load skills and report."
+    },
+    {
+      "name": "tdd-workflow",
+      "category": "process",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Red-green-refactor for RN/Expo: test names, layer order, the evidence each change needs, never editing a test to pass."
+    },
+    {
+      "name": "quality-gates",
+      "category": "process",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "check:fast and verify scripts, git hooks (lefthook), Claude Code hooks, the guardrail, and fixing a failing gate without weakening it."
+    },
+    {
+      "name": "git-commits-and-reporting",
+      "category": "process",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Conventional Commits with trailers (Gate-Change), release tags, the plain-language change report with evidence, stop-and-ask messages."
+    },
+    {
+      "name": "spec-traceability",
+      "category": "process",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Requirement IDs in a spec file, quoted by the first failing test, referenced in commits and reports, with a checker that finds untraced or dangling IDs."
+    },
+    {
+      "name": "troubleshooting-playbook",
+      "category": "process",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "A catalogue of known RN/Expo/Xcode/Gradle/Jest/Metro failures with causes and fixes, a symptom lookup, and a pitfall scanner."
+    },
+    {
+      "name": "skill-maintenance",
+      "category": "process",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Writing and changing agent skills to this standard: scaffold, descriptions that route, self-tested checkers, validation and routing evals."
+    },
+    {
+      "name": "expo-project-bootstrap",
+      "category": "setup",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Create a new Expo app from empty with the canonical stack, every config file, scripts and gates proven green; monorepo variant fenced."
+    },
+    {
+      "name": "architecture-and-boundaries",
+      "category": "setup",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Where code goes: the src/ layout, dependency zones checked by a script, ports and adapters for every side effect, the composition root."
+    },
+    {
+      "name": "typescript-and-lint-rules",
+      "category": "setup",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "The strict tsconfig set, the ESLint flat config, size and complexity limits, forbidden patterns, TSDoc, and how to split code that grows."
+    },
+    {
+      "name": "naming-conventions",
+      "category": "setup",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Names of files, identifiers, hooks, handlers, routes, testIDs, message keys, scripts, env vars and packages."
+    },
+    {
+      "name": "dependency-management",
+      "category": "setup",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Adding, upgrading and removing packages: npx expo install, exact pins, release-age policy, install scripts, licence audit, expo-doctor."
+    },
+    {
+      "name": "expo-sdk-upgrade",
+      "category": "setup",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "A runbook to move to the next Expo SDK (and Xcode/Android toolchain) safely: triggers, breaking changes, re-verification."
+    },
+    {
+      "name": "expo-prebuild-and-config-plugins",
+      "category": "setup",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Continuous Native Generation: app.config.ts as the single source, config plugins (local ones tested), never editing ios/android by hand, when to leave prebuild."
+    },
+    {
+      "name": "app-variants-and-environment",
+      "category": "setup",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "APP_VARIANT development/preview/production: ids, names and icons per variant, EXPO_PUBLIC_* is public, secrets only in EAS/CI, test-only code stripped from store builds."
+    },
+    {
+      "name": "scaffold-feature-screen",
+      "category": "setup",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Stand up one feature: Expo Router route, pure screen view, model hook, components, tests, message keys and typed params, proven complete by a script."
+    },
+    {
+      "name": "react-components-and-hooks",
+      "category": "ui",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "React rules for components and hooks: props, model hooks, effects only for outside systems, React Compiler, selectors, Pressable, lists, safe areas, error boundaries."
+    },
+    {
+      "name": "design-system-structure",
+      "category": "ui",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Token-agnostic design system: two-tier tokens, light/dark sets, ThemeProvider and makeStyles, AppText type roles, motion tokens, a no-raw-values checker."
+    },
+    {
+      "name": "ui-component-library",
+      "category": "ui",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Shared UI components: anatomy, sizes from tokens, every state, accessibility, a required testID with derived part ids, and tests for each."
+    },
+    {
+      "name": "screen-contracts",
+      "category": "ui",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "A screen contract per screen (layout, components, testIDs, copy keys, states) in contracts/screens.json, and a checker that proves built screens match it."
+    },
+    {
+      "name": "ui-states-and-feedback",
+      "category": "ui",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "The non-happy paths: loading, empty, filtered-empty, error with retry and offline states, delayed skeletons, toast/banner/dialog ladder, Undo over confirm."
+    },
+    {
+      "name": "forms-and-input",
+      "category": "ui",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Forms with react-hook-form and valibot: field components, sync and async validation, focus chain, keyboard handling, autofill hints, error text from message keys."
+    },
+    {
+      "name": "adaptive-layout",
+      "category": "ui",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Layouts that adapt by window size, not device: size classes, two-pane list-detail, readable widths, insets, orientation, tablets and foldables."
+    },
+    {
+      "name": "motion-and-animation",
+      "category": "ui",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Motion with Reanimated 4: a declared moment catalog, motion tokens, interruptible animations, reduce motion everywhere, bounded celebration."
+    },
+    {
+      "name": "audio-and-haptics-feedback",
+      "category": "ui",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Sound effects and haptics: a cue table, when each plays, throttling, respecting silent mode and the user setting, synthesized sounds, testing."
+    },
+    {
+      "name": "icons-app-icon-and-splash",
+      "category": "ui",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Icons, app icon and splash drawn in code: an icon set as paths, rasterized assets for iOS and Android adaptive icons, splash config, store art."
+    },
+    {
+      "name": "skia-canvas-rendering",
+      "category": "ui",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Drawing with Skia: a layout model, pictures and timelines, a frame clock, shared values, text on canvas, lifecycle, and pixel goldens."
+    },
+    {
+      "name": "canvas-gestures-and-hit-testing",
+      "category": "ui",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Taps, swipes, drags and aim on a canvas turned into typed commands, with hit-testing that shares the renderer layout."
+    },
+    {
+      "name": "design-visual-parity",
+      "category": "ui",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Proves each built screen matches its approved design screenshot in light/dark and LTR/RTL, with a capture, compare and sign-off loop."
+    },
+    {
+      "name": "design-review-workflow",
+      "category": "ui",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "An end-of-build design and QA sweep: every screen x theme x direction x text size x reduce motion x device, graded findings, a dated sign-off."
+    },
+    {
+      "name": "navigation-and-routing",
+      "category": "navigation",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Expo Router: file routes, layouts, typed routes and params, protected groups, modals, back handling, not-found; React Navigation 7 static as an appendix."
+    },
+    {
+      "name": "deep-links-and-universal-links",
+      "category": "navigation",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Custom schemes, iOS universal links (AASA) and Android app links (assetlinks), routing incoming links, untrusted params, cold vs warm start, tests."
+    },
+    {
+      "name": "app-startup-and-bootstrap",
+      "category": "navigation",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "The root startup order: polyfills, error net, config, storage open and hydrate, i18n, theme, providers, routes; splash held until ready; flush on background."
+    },
+    {
+      "name": "settings-and-preferences",
+      "category": "navigation",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "One settings model: saved fields, the settings screen rows, the effect of each setting, persistence, and resets that never touch settings."
+    },
+    {
+      "name": "state-management-zustand",
+      "category": "data",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Client state with Zustand 5: one store per domain, pure reducers, selectors and useShallow, persist-before-publish, and the server-state split."
+    },
+    {
+      "name": "networking-and-server-state",
+      "category": "data",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Server state with TanStack Query over a typed ApiClient port: validated responses, query keys, retries, cancellation, optimistic updates, online/focus managers, offline."
+    },
+    {
+      "name": "auth-and-secure-storage",
+      "category": "data",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Sign-in and sessions: tokens in expo-secure-store, single-flight refresh, protected route groups, OAuth with PKCE, Sign in with Apple, logout that clears everything."
+    },
+    {
+      "name": "persistence-and-migrations",
+      "category": "data",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Local data on expo-sqlite through a SqlDriver port: tables and repositories, transactions, WAL, forward-only migrations tested on node:sqlite, backups, kill test."
+    },
+    {
+      "name": "run-migration",
+      "category": "data",
+      "plugin": "core",
+      "manual": true,
+      "oneLine": "The ritual for shipping a schema migration: snapshot first, bump by one, append-only steps, every from-to path tested, forced-failure restore."
+    },
+    {
+      "name": "data-export-and-restore",
+      "category": "data",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Portable data: a versioned, checksummed backup envelope, all-or-nothing restore, safe CSV, share and pick files behind a port, round-trip tests."
+    },
+    {
+      "name": "error-handling-typed-results",
+      "category": "data",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "A Result/failure spine: errors converted at boundaries, exhaustive handling, failure codes mapped to messages, a global error net, never losing user data."
+    },
+    {
+      "name": "async-safety",
+      "category": "data",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "No silent async failure: no floating promises, synchronous handlers, effect races and stale responses cancelled, listeners and timers cleaned up."
+    },
+    {
+      "name": "dates-streaks-and-statistics",
+      "category": "data",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Calendar-day logic: local date keys, an injected clock, DST and time zones, streak rules, and statistics summaries, all pure and tested."
+    },
+    {
+      "name": "value-objects-money-and-units",
+      "category": "data",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Values stored canonically: integer minor units with ISO-4217 exponents, units and UTC instants, formatting only at the edge, allocation without lost cents."
+    },
+    {
+      "name": "seeded-determinism-and-golden-vectors",
+      "category": "data",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Output every device must compute identically: one seeded PRNG, civil-date keys, regenerate-not-store, versioned cutovers, golden vectors from an independent oracle."
+    },
+    {
+      "name": "i18n-strings-and-catalogs",
+      "category": "i18n-a11y-perf",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Every visible string through react-intl catalogs: semantic keys, ICU plurals, Intl polyfills, catalog parity checks, translation workflow."
+    },
+    {
+      "name": "rtl-and-direction",
+      "category": "i18n-a11y-perf",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Right-to-left layout: logical styles, direction switch and reload, mirroring rules, digits, bidi isolation, testing RTL on iOS and Android."
+    },
+    {
+      "name": "accessibility-as-code",
+      "category": "i18n-a11y-perf",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Accessibility as a checked property: roles and names, 44pt targets, text scaling to 200%, contrast, reduce motion, VoiceOver and TalkBack checks."
+    },
+    {
+      "name": "performance-budgets",
+      "category": "i18n-a11y-perf",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Measured budgets for cold start, frames, lists, storage writes, bundle size and memory on iOS and Android, and how to measure each."
+    },
+    {
+      "name": "local-notifications",
+      "category": "platform",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "On-device reminders with expo-notifications: the database as source of truth, one idempotent sync, DST-safe schedules, iOS 64 cap, Android channels."
+    },
+    {
+      "name": "push-notifications",
+      "category": "platform",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Remote push with expo-notifications: permission in context, token lifecycle and server contract, channels, taps mapped to typed screens (never URLs), foreground handling, testing."
+    },
+    {
+      "name": "permissions-and-system-prompts",
+      "category": "platform",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Asking for OS permissions from the press, with an explain sheet, denied vs blocked handling, the Settings hand-off, translated purpose strings and Android runtime rules (ATT: admob-ads-and-consent)."
+    },
+    {
+      "name": "media-images-and-files",
+      "category": "platform",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Images and files: expo-image with sizing and caching, picking and capturing media, the file system, sharing, memory and permission rules."
+    },
+    {
+      "name": "background-tasks",
+      "category": "platform",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Work outside the foreground: expo-background-task and task manager, OS limits on iOS and Android, idempotent short jobs, testing."
+    },
+    {
+      "name": "native-modules-and-new-architecture",
+      "category": "platform",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Native code on the New Architecture: a local Expo module behind a port, Turbo Modules and codegen, checking library compatibility, testing."
+    },
+    {
+      "name": "web-support",
+      "category": "platform",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Running the app on the web with react-native-web: platform files, modules that are missing on web, layout and input differences, testing."
+    },
+    {
+      "name": "admob-ads-and-consent",
+      "category": "money-privacy",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "AdMob banners, interstitials and rewarded ads behind a port, UMP consent then ATT, ad pacing policy, test ids, and store declarations."
+    },
+    {
+      "name": "in-app-purchases",
+      "category": "money-privacy",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "In-app purchases with expo-iap behind a port: a Premium entitlement, every purchase state, restore, refunds and revocation, StoreKit and Play testing."
+    },
+    {
+      "name": "privacy-and-store-declarations",
+      "category": "money-privacy",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Privacy proof: network only through the API port (or offline-only), SDK inventory, iOS privacy manifest, App Privacy and Data safety answers, secrets."
+    },
+    {
+      "name": "crash-reporting-and-observability",
+      "category": "money-privacy",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Crash reporting with Sentry behind a port: source maps and symbols per build, release and dist naming, PII scrubbing, consent, breadcrumbs."
+    },
+    {
+      "name": "analytics-and-consent",
+      "category": "money-privacy",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Product analytics behind a port: a typed event schema, consent before any SDK starts, ATT, and store declarations that match what is collected."
+    },
+    {
+      "name": "unit-and-component-tests",
+      "category": "testing",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Jest with jest-expo and RNTL 14: projects, renderWithProviders, root mocks, async queries by role, fast-check properties, coverage and mutation testing."
+    },
+    {
+      "name": "golden-and-snapshot-tests",
+      "category": "testing",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Data and pixel goldens that change only on purpose: where they live, tolerances, the -u policy, the Gate-Change trailer, no component-tree snapshots."
+    },
+    {
+      "name": "run-goldens-rebaseline",
+      "category": "testing",
+      "plugin": "core",
+      "manual": true,
+      "oneLine": "The only sanctioned way to overwrite goldens: real assertions green first, one file at a time, every diff inspected, orphans deleted, proven without the flag."
+    },
+    {
+      "name": "e2e-maestro",
+      "category": "testing",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "End-to-end flows with Maestro on iOS simulators and Android emulators: testIDs, state setup by deep link, offline simulation, the screenshot matrix."
+    },
+    {
+      "name": "debug-menu-and-test-hooks",
+      "category": "testing",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Test-only code that never ships: a test-build gate, a debug deep-link registry, simulated clock and connectivity, and a check that store builds strip it all."
+    },
+    {
+      "name": "ios-simulator-build",
+      "category": "release",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Release builds on the iOS simulator: prebuild, xcodebuild, install, launch and screenshot, per variant, with the toolchain pinned and the device named."
+    },
+    {
+      "name": "android-emulator-build",
+      "category": "release",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Release builds on the Android emulator: prebuild, Gradle, install, launch and screenshot, per variant, with the JDK/SDK pinned and the device named."
+    },
+    {
+      "name": "eas-build-and-submit",
+      "category": "release",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "EAS Build and Submit: eas.json profiles, credentials, remote versions, fingerprints, submitting to TestFlight and Play internal testing with gates first."
+    },
+    {
+      "name": "ios-release-testflight",
+      "category": "release",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Shipping iOS: signing, archive, export, validate and upload to TestFlight (EAS or the local lane), build numbers, the store-artifact gate, human steps."
+    },
+    {
+      "name": "android-release-play",
+      "category": "release",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Shipping Android: upload key and Play App Signing, AAB, versionCode, tracks and staged rollout, Data safety, target SDK and 16 KB pages, the artifact gate."
+    },
+    {
+      "name": "ota-updates",
+      "category": "release",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Over-the-air updates with expo-updates and EAS Update: runtime versions from fingerprints, channels, staged rollout and rollback, never shipping native changes OTA."
+    },
+    {
+      "name": "ci-pipeline-and-gates",
+      "category": "release",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "CI on GitHub Actions: pinned toolchain, caches, the same gates as local verify, Android and iOS jobs, E2E lanes, secrets and concurrency."
+    },
+    {
+      "name": "game-rules-engine",
+      "category": "games",
+      "plugin": "games",
+      "manual": false,
+      "oneLine": "A game's rules as a pure deterministic engine behind a game contract: state, moves, events, seeded randomness, property tests."
+    },
+    {
+      "name": "level-generation-and-solvers",
+      "category": "games",
+      "plugin": "games",
+      "manual": false,
+      "oneLine": "Generated levels proven solvable by a solver: par, stars, packs, difficulty metrics, and the daily level from a date seed."
+    },
+    {
+      "name": "game-session-host",
+      "category": "games",
+      "plugin": "games",
+      "manual": false,
+      "oneLine": "Hosting a game in an app: the game screen, pause and resume, undo and hints, results, save points and progress."
+    },
+    {
+      "name": "game-balance-and-bots",
+      "category": "games",
+      "plugin": "games",
+      "manual": false,
+      "oneLine": "Headless bots and simulations: difficulty curves, balance bands, tuning constants, and a fun-within-seconds test."
+    },
+    {
+      "name": "realtime-game-loop",
+      "category": "games",
+      "plugin": "games",
+      "manual": false,
+      "oneLine": "Real-time play: a fixed-step loop on the UI thread, simulate-then-replay phases, recorded inputs and replay tests."
+    },
+    {
+      "name": "new-game-scaffold",
+      "category": "games",
+      "plugin": "games",
+      "manual": false,
+      "oneLine": "Start a new game from a script with its declaration and catalog keys (or a white-label app), proven complete at the end."
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "$comment": "Read by app-startup-and-bootstrap's check-startup. The app's facts about its startup; every key is optional and falls back to the default check-startup --help prints. Paths are repo-relative.",
+  "rootLayout": "src/app/_layout.tsx",
+  "appRoot": "src/features/root-navigator/app-root.tsx",
+  "rootStack": "src/features/root-navigator/root-stack.tsx",
+  "appRootOrder": [
+    "ServicesProvider|AppProviders",
+    "AppDataProvider",
+    "QueryProvider",
+    "SettingsStoreProvider",
+    "StoresProvider",
+    "PreferencesRoot",
+    "I18nProvider",
+    "AppThemeProvider",
+    "TextLocaleProvider",
+    "RootStack"
+  ],
+  "rootStackOrder": [
+    "GestureHandlerRootView",
+    "KeyboardProvider",
+    "MotionConfig|RootMotion",
+    "NavigationThemeProvider",
+    "SessionProvider",
+    "AppFeedback|FeedbackProvider",
+    "AdsRoot",
+    "GamesRoot",
+    "AppStack|Stack"
+  ],
+  "maxBlockingMs": 3000,
+  "lifecycleFiles": ["src/features/root-navigator/use-flush-on-background.ts"],
+  "openCalls": ["openDeviceData"]
+}

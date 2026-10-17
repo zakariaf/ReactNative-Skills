@@ -1,0 +1,18 @@
+{
+  "$schema": "./architecture.schema.json",
+  "$comment": "contracts/architecture.json of a repo with two apps (apps/phone, apps/tablet) and four packages. core is pure, ui holds shared components and their adapters, tooling and config-plugins run in Node.",
+  "vendorSdks": {
+    "expo-notifications": "LocalNotificationsPort and PushPort"
+  },
+  "allowedImports": [],
+  "packages": [
+    { "name": "core", "pure": true },
+    { "name": "ui" },
+    { "name": "tooling", "world": "node" },
+    {
+      "name": "config-plugins",
+      "world": "node",
+      "exports": { "./*": "./src/*", "./plugins/*": "./plugins/*" }
+    }
+  ]
+}

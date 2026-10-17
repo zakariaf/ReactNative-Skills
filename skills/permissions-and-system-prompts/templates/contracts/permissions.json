@@ -1,0 +1,5 @@
+{
+  "$schema": "./permissions.schema.json",
+  "$comment": "The permissions this app asks for, one entry each (permissions-and-system-prompts). check-permissions.mjs proves every permission the code reads or requests is listed here, every entry is asked from askedFrom (a model hook with a test that covers a refusal and a block), its iOS purpose string and Android permission reach the build, and its copy keys exist in the source catalog. App Tracking Transparency is not listed: admob-ads-and-consent asks it through the ConsentPort.",
+  "permissions": []
+}

@@ -1,0 +1,29 @@
+{
+  "$schema": "./push.schema.json",
+  "$comment": "The harness's remote push facts (push-notifications' check-push.mjs reads them). The harness has no accounts and no push server yet: requiresAccount false, and the registry's registrar answers every call 'unavailable' (nothing leaves the device). A server fills server.* and replaces that registrar.",
+  "provider": "expo",
+  "requiresAccount": false,
+  "kinds": ["task-assigned", "list-shared", "announcement"],
+  "channels": [
+    {
+      "id": "general",
+      "importance": "default"
+    },
+    {
+      "id": "task-updates",
+      "importance": "high"
+    }
+  ],
+  "defaultChannel": "general",
+  "files": {
+    "message": "src/core/push/push-message.ts",
+    "channels": "src/services/push/push-channels.ts"
+  },
+  "server": {
+    "dataValues": "strings",
+    "maxPayloadBytes": 4096,
+    "registerEndpoint": "PUT /push/registrations/{token}",
+    "unregisterEndpoint": "DELETE /push/registrations/{token}",
+    "dropOn": ["DeviceNotRegistered", "session-revoked", "session-expired", "not-seen-270-days"]
+  }
+}

@@ -1,0 +1,8 @@
+[
+  { "from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs" },
+  { "from": "scripts/lib/object-literal.mjs", "to": "scripts/lib/object-literal.mjs" },
+  { "from": "repo-templates/src/stores/settings/", "to": "templates/src/stores/settings/" },
+  { "from": "repo-templates/src/services/settings-storage/settings-storage-port.ts", "to": "templates/src/services/settings-storage/settings-storage-port.ts" },
+  { "from": "repo-templates/src/services/settings-storage/fake-settings-storage.ts", "to": "templates/src/services/settings-storage/fake-settings-storage.ts" },
+  { "from": "repo-templates/src/services/settings-storage/fake-settings-storage.test.ts", "to": "templates/src/services/settings-storage/fake-settings-storage.test.ts" }
+]

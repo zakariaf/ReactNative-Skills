@@ -1,0 +1,4 @@
+[
+  { "from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs" },
+  { "from": "repo-templates/scripts/git/requirement-ref.json", "to": "assets/requirement-ref.json" }
+]

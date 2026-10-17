@@ -1,0 +1,505 @@
+{
+  "bad-ad-hoc-command": {
+    "expect": [".github/workflows/ci.yml:46 [ad-hoc-command]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "run: npm run verify",
+          "with": "run: npm run verify && npx jest --ci"
+        }
+      }
+    ]
+  },
+  "bad-android-no-kvm": {
+    "expect": [".github/workflows/devices.yml:28 [lane-runner]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/devices.yml",
+          "find": "      - name: Let the emulator use KVM\n        run: |\n          echo 'KERNEL==\"kvm\", GROUP=\"kvm\", MODE=\"0666\", OPTIONS+=\"static_node=kvm\"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules\n          sudo udevadm control --reload-rules\n          sudo udevadm trigger --name-match=kvm\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-android-on-macos": {
+    "expect": [".github/workflows/devices.yml:28 [lane-runner]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/devices.yml",
+          "find": "runs-on: ubuntu-24.04",
+          "with": "runs-on: macos-26"
+        }
+      }
+    ]
+  },
+  "bad-device-action": {
+    "expect": [".github/workflows/devices.yml:93 [raw-device-command]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/devices.yml",
+          "find": "      - name: Use the image's JDK 17 (Maestro needs 17; the image default is newer)\n",
+          "with": "      - name: Select Xcode for the whole machine\n        uses: maxim-lobanov/setup-xcode@60606e260d2fc5762a71e64e74b2174e8ea3c8bd # v1.6.0\n      - name: Use the image's JDK 17 (Maestro needs 17; the image default is newer)\n"
+        }
+      }
+    ]
+  },
+  "bad-device-lane-manual": {
+    "expect": [".github/workflows/devices.yml:9 [device-lane]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/devices.yml",
+          "find": "  schedule:\n    - cron: '17 3 * * *'\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-device-lane-missing": {
+    "expect": [".github/workflows:1 [device-lane]", "RESULT: FAIL"],
+    "ops": [{ "delete": ".github/workflows/devices.yml" }]
+  },
+  "bad-eas-interactive": {
+    "expect": [".github/workflows/release.yml:57 [eas-non-interactive]", "RESULT: FAIL"],
+    "ops": [{ "replace": { "file": ".github/workflows/release.yml", "find": " --non-interactive", "with": "" } }]
+  },
+  "bad-ios-on-linux": {
+    "expect": [".github/workflows/devices.yml:81 [lane-runner]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/devices.yml",
+          "find": "runs-on: macos-26",
+          "with": "runs-on: ubuntu-24.04"
+        }
+      }
+    ]
+  },
+  "bad-jdk-missing": {
+    "expect": [".github/workflows/devices.yml:79 [jdk-pin]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/devices.yml",
+          "find": "      - name: Use the image's JDK 17 (Maestro needs 17; the image default is newer)\n        run: echo \"JAVA_HOME=$JAVA_HOME_17_arm64\" >> \"$GITHUB_ENV\"\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-lane-opt-out-reason": {
+    "expect": ["contracts/ci.json:1 [lane-opt-out]", "RESULT: FAIL"],
+    "ops": [{ "json": { "file": "contracts/ci.json", "path": ["laneOptOuts"], "value": { "ios-e2e": "costly" } } }]
+  },
+  "bad-lane-opt-out-stale": {
+    "expect": ["contracts/ci.json:1 [lane-opt-out]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/ci.json",
+          "path": ["laneOptOuts"],
+          "value": { "ios-e2e": "macOS minutes cost about ten times Linux minutes." }
+        }
+      }
+    ]
+  },
+  "bad-node-no-setup": {
+    "expect": [".github/workflows/ci.yml:39 [node-pin]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "      - name: Set up Node from .nvmrc\n        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0\n        with:\n          node-version-file: .nvmrc\n          cache: npm\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-node-pin-file": {
+    "expect": [
+      ".github/workflows/ci.yml:38 [node-pin]",
+      ".github/workflows/devices.yml:35 [node-pin]",
+      ".github/workflows/devices.yml:88 [node-pin]",
+      ".github/workflows/release.yml:42 [node-pin]",
+      "RESULT: FAIL"
+    ],
+    "ops": [{ "delete": ".nvmrc" }]
+  },
+  "bad-node-version": {
+    "expect": [".github/workflows/ci.yml:38 [node-pin]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "node-version-file: .nvmrc",
+          "with": "node-version: 22"
+        }
+      }
+    ]
+  },
+  "bad-npm-ci-flag": {
+    "expect": [".github/workflows/ci.yml:44 [install-ci]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "run: npm ci",
+          "with": "run: npm ci --legacy-peer-deps"
+        }
+      }
+    ]
+  },
+  "bad-npm-install-global": {
+    "expect": [".github/workflows/release.yml:50 [install-ci]", "RESULT: FAIL"],
+    "ops": [{ "replace": { "file": ".github/workflows/release.yml", "find": "--min-release-age=7 ", "with": "" } }]
+  },
+  "bad-npx-eas": {
+    "expect": [".github/workflows/release.yml:57 [eas-cli-pinned]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/release.yml",
+          "find": "eas build --profile",
+          "with": "npx eas-cli@latest build --profile"
+        }
+      }
+    ]
+  },
+  "bad-raw-maestro": {
+    "expect": [".github/workflows/devices.yml:105 [raw-device-command]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/devices.yml",
+          "find": "run: npm run e2e:ios",
+          "with": "run: npm run e2e:ios && tools/maestro/bin/maestro hierarchy"
+        }
+      }
+    ]
+  },
+  "bad-release-nested-script": {
+    "expect": [
+      ".github/workflows/release.yml:11 [release-trigger] push starts a workflow that runs npm run ship (eas build)",
+      "RESULT: FAIL"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["scripts", "ship"], "value": "npm run -s store:build" } },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "store:build"],
+          "value": "eas build --profile production --platform all --non-interactive --auto-submit"
+        }
+      },
+      { "json": { "file": "package.json", "path": ["scripts", "loop:a"], "value": "npm run loop:b" } },
+      { "json": { "file": "package.json", "path": ["scripts", "loop:b"], "value": "npm run loop:a" } },
+      {
+        "replace": {
+          "file": ".github/workflows/release.yml",
+          "find": "on:\n  workflow_dispatch:\n",
+          "with": "on:\n  push:\n    branches: [main]\n  workflow_dispatch:\n"
+        }
+      },
+      {
+        "replace": {
+          "file": ".github/workflows/release.yml",
+          "find": "run: >-\n          eas build --profile production --platform \"$PLATFORM\" --non-interactive\n          --freeze-credentials --no-wait --message \"release from $GITHUB_SHA\"\n",
+          "with": "run: npm run loop:a && npm run ship\n"
+        }
+      }
+    ]
+  },
+  "bad-release-no-environment": {
+    "expect": [".github/workflows/release.yml:31 [release-environment]", "RESULT: FAIL"],
+    "ops": [
+      { "replace": { "file": ".github/workflows/release.yml", "find": "    environment: production\n", "with": "" } }
+    ]
+  },
+  "bad-release-npm-script": {
+    "expect": [
+      ".github/workflows/release.yml:11 [release-trigger] push starts a workflow that runs npm run release:eas",
+      "RESULT: FAIL"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "release:eas"],
+          "value": "node scripts/eas/release-preflight.ts && eas build --profile production --platform all --non-interactive --freeze-credentials --auto-submit"
+        }
+      },
+      {
+        "replace": {
+          "file": ".github/workflows/release.yml",
+          "find": "on:\n  workflow_dispatch:\n",
+          "with": "on:\n  push:\n    branches: [main]\n  workflow_dispatch:\n"
+        }
+      },
+      {
+        "replace": {
+          "file": ".github/workflows/release.yml",
+          "find": "run: >-\n          eas build --profile production --platform \"$PLATFORM\" --non-interactive\n          --freeze-credentials --no-wait --message \"release from $GITHUB_SHA\"\n",
+          "with": "run: npm run release:eas\n"
+        }
+      }
+    ]
+  },
+  "bad-release-on-push": {
+    "expect": [".github/workflows/release.yml:11 [release-trigger]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/release.yml",
+          "find": "on:\n  workflow_dispatch:\n",
+          "with": "on:\n  push:\n    branches: [main]\n  workflow_dispatch:\n"
+        }
+      }
+    ]
+  },
+  "bad-reports-missing": {
+    "expect": [".github/workflows/ci.yml:29 [reports-artifact]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": { "file": ".github/workflows/ci.yml", "find": "if: ${{ always() }}", "with": "if: ${{ success() }}" }
+      }
+    ]
+  },
+  "bad-script-missing": {
+    "expect": [".github/workflows/ci.yml:46 [script-missing]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "run: npm run verify",
+          "with": "run: npm run verify && npm run check:typos"
+        }
+      }
+    ]
+  },
+  "bad-sdk-licence": {
+    "expect": [".github/workflows/devices.yml:53 [sdk-licence]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/devices.yml",
+          "find": "      - name: Restore the Gradle caches\n",
+          "with": "      - name: Accept the SDK licences\n        run: yes | \"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager\" --licenses\n      - name: Restore the Gradle caches\n"
+        }
+      }
+    ]
+  },
+  "bad-variant-pair": {
+    "expect": [".github/workflows/release.yml:37 [variant-pair]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/release.yml",
+          "find": "    environment: production\n",
+          "with": "    environment: production\n    env:\n      APP_VARIANT: production\n"
+        }
+      }
+    ]
+  },
+  "bad-verify-cancels-main": {
+    "expect": [".github/workflows/ci.yml:21 [verify-gate]", "cancels runs on main", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "  cancel-in-progress: ${{ github.event_name == 'pull_request' }}\n",
+          "with": "  cancel-in-progress: true\n"
+        }
+      }
+    ]
+  },
+  "bad-verify-missing": {
+    "expect": [".github/workflows/ci.yml:8 [verify-gate]", "RESULT: FAIL"],
+    "ops": [
+      { "replace": { "file": ".github/workflows/ci.yml", "find": "run: npm run verify", "with": "run: npm test" } }
+    ]
+  },
+  "bad-verify-no-push": {
+    "expect": [".github/workflows/ci.yml:8 [verify-gate]", "RESULT: FAIL"],
+    "ops": [
+      { "replace": { "file": ".github/workflows/ci.yml", "find": "  push:\n    branches: [main]\n", "with": "" } }
+    ]
+  },
+  "bad-verify-paths-filter": {
+    "expect": [".github/workflows/ci.yml:10 [verify-gate]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "  pull_request:\n  push:",
+          "with": "  pull_request:\n    paths: ['src/**']\n  push:"
+        }
+      }
+    ]
+  },
+  "bad-verify-push-branch": {
+    "expect": [".github/workflows/ci.yml:11 [verify-gate]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "    branches: [main]\n",
+          "with": "    branches: [release]\n"
+        }
+      }
+    ]
+  },
+  "bad-verify-step-if": {
+    "expect": [".github/workflows/ci.yml:46 [verify-gate]", "RESULT: FAIL"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "      - name: Run every gate (npm run verify)\n",
+          "with": "      - name: Run every gate (npm run verify)\n        if: github.event_name == 'push'\n"
+        }
+      }
+    ]
+  },
+  "bad-workflows-ungated": {
+    "expect": ["quality-gates.json:2 [workflows-gated]", "RESULT: FAIL"],
+    "ops": [{ "json": { "file": "quality-gates.json", "path": ["gatedPaths"], "value": ["quality-gates.json"] } }]
+  },
+  "bad-yaml-syntax": {
+    "expect": [".github/workflows/devices.yml:79 [yaml-syntax]", "RESULT: FAIL"],
+    "ops": [{ "replace": { "file": ".github/workflows/devices.yml", "find": "  ios:\n", "with": "   ios:\n" } }]
+  },
+  "error-empty-workflows": {
+    "expect": ["ERROR [bad-input] nothing to check: .github/workflows/ holds no .yml file"],
+    "ops": [
+      { "delete": [".github/workflows/ci.yml", ".github/workflows/devices.yml", ".github/workflows/release.yml"] }
+    ]
+  },
+  "error-no-package-json": {
+    "expect": ["ERROR [bad-input] nothing to check: package.json not found"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "pass-fetch-depth": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "          persist-credentials: false\n",
+          "with": "          persist-credentials: false\n          # A gate inside verify compares with the target branch (origin/<base>): full history, no later git fetch.\n          fetch-depth: 0\n"
+        }
+      },
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "        run: npm run verify\n",
+          "with": "        run: npm run verify\n        env:\n          GATE_BASE: origin/${{ github.base_ref || 'main' }}\n"
+        }
+      }
+    ]
+  },
+  "pass-lane-opt-outs": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "delete": ".github/workflows/devices.yml" },
+      {
+        "json": {
+          "file": "contracts/ci.json",
+          "path": ["laneOptOuts"],
+          "value": {
+            "android-build": "Android builds run on EAS for every release; no emulator lane in CI yet.",
+            "android-e2e": "Android flows run before each release on a developer machine (android-emulator-build).",
+            "ios-build": "macOS minutes are not budgeted for this private repository; built locally before releases.",
+            "ios-e2e": "macOS minutes are not budgeted for this private repository; flows run locally before releases."
+          }
+        }
+      }
+    ]
+  },
+  "pass-multi-package": {
+    "expect": ["3 workflows checked, 0 problems", "RESULT: PASS"],
+    "args": "{dir} --app-dir apps/mobile",
+    "ops": [
+      {
+        "write": {
+          "file": "apps/mobile/package.json",
+          "json": {
+            "name": "mobile",
+            "private": true,
+            "scripts": {
+              "build:ios:sim": "node scripts/build/build-ios-sim.ts",
+              "build:android:emu": "node scripts/build/build-android-emu.ts",
+              "e2e:ios": "node scripts/e2e/run-e2e.ts --platform ios",
+              "e2e:android": "node scripts/e2e/run-e2e.ts --platform android"
+            }
+          }
+        }
+      },
+      { "json": { "file": "package.json", "path": ["scripts", "build:ios:sim"], "delete": true } },
+      { "json": { "file": "package.json", "path": ["scripts", "build:android:emu"], "delete": true } },
+      { "json": { "file": "package.json", "path": ["scripts", "e2e:ios"], "delete": true } },
+      { "json": { "file": "package.json", "path": ["scripts", "e2e:android"], "delete": true } },
+      {
+        "replace": {
+          "file": ".github/workflows/devices.yml",
+          "find": "run: npm run build:android:emu -- --variant preview",
+          "with": "run: npm run -w apps/mobile build:android:emu -- --variant preview"
+        }
+      },
+      {
+        "replace": {
+          "file": ".github/workflows/devices.yml",
+          "find": "run: npm run e2e:android\n",
+          "with": "run: npm run e2e:android --workspace apps/mobile\n"
+        }
+      },
+      {
+        "replace": {
+          "file": ".github/workflows/devices.yml",
+          "find": "run: npm run build:ios:sim -- --variant preview",
+          "with": "run: npm run --workspace=apps/mobile build:ios:sim -- --variant preview"
+        }
+      },
+      {
+        "replace": {
+          "file": ".github/workflows/devices.yml",
+          "find": "run: npm run e2e:ios\n",
+          "with": "run: npm run e2e:ios -w ./apps/mobile/\n"
+        }
+      }
+    ]
+  },
+  "pass-not-applicable": {
+    "expect": ["NOT APPLICABLE: no .github/workflows/ folder: this repo has no GitHub Actions CI", "RESULT: PASS"],
+    "ops": [{ "delete": ".github" }]
+  },
+  "pass-preflight-not-yet-created": {
+    "expect": [
+      "SKIP .github/workflows/release.yml [script-missing] scripts/eas/release-preflight.ts not yet created (eas-build-and-submit creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "scripts/eas/release-preflight.ts" }]
+  },
+  "pass-reports-not-cancelled": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "if: ${{ always() }}",
+          "with": "if: ${{ !cancelled() }}"
+        }
+      }
+    ]
+  },
+  "pass-script-not-yet-created": {
+    "expect": [
+      "SKIP .github/workflows/devices.yml [script-missing] npm script \"e2e:android\" not yet created (e2e-maestro creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "json": { "file": "package.json", "path": ["scripts", "e2e:android"], "delete": true } }]
+  }
+}

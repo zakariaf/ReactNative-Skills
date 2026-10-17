@@ -1,0 +1,1026 @@
+{
+  "bad-band-violated": {
+    "expect": [
+      "[band-violated]",
+      "test/sims/lights-out/balance-bands.json:19",
+      "greedy d0 winRate = 0.8 is outside 0.9..1"
+    ],
+    "ops": [{ "json": { "file": "reports/sim/lights-out.json", "path": ["cells", 3, "winRate"], "value": 0.8 } }]
+  },
+  "bad-bands-bad-metric": {
+    "expect": ["[bands-invalid]", "bands[0].metric is missing or invalid"],
+    "ops": [
+      { "json": { "file": "test/sims/lights-out/balance-bands.json", "path": ["bands", 0, "metric"], "value": "fun" } }
+    ]
+  },
+  "bad-bands-few-seeds": {
+    "expect": ["[bands-invalid]", "bands file.seedsPerCell is missing or invalid"],
+    "ops": [{ "json": { "file": "test/sims/lights-out/balance-bands.json", "path": ["seedsPerCell"], "value": 20 } }]
+  },
+  "bad-bands-missing": {
+    "expect": ["[bands-missing]", "test/sims/lights-out/balance-bands.json"],
+    "ops": [{ "delete": "test/sims/lights-out/balance-bands.json" }]
+  },
+  "bad-bands-other-game": {
+    "expect": [
+      "[bands-invalid]",
+      "test/sims/lights-out/balance-bands.json:2",
+      "gameId is \"pig\", expected \"lights-out\""
+    ],
+    "ops": [{ "json": { "file": "test/sims/lights-out/balance-bands.json", "path": ["gameId"], "value": "pig" } }]
+  },
+  "bad-bands-unknown-policy": {
+    "expect": ["[bands-invalid]", "curve names policy expert, which the grid does not run"],
+    "ops": [
+      { "json": { "file": "test/sims/lights-out/balance-bands.json", "path": ["curve", "policy"], "value": "expert" } }
+    ]
+  },
+  "bad-bot-clock": {
+    "expect": ["[sim-determinism]", "src/games/lights-out/testing/lights-out-bot.ts:50", "Date.now()"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/testing/lights-out-bot.ts",
+          "find": "return result.kind === 'won' ? result.score : 0;",
+          "with": "return result.kind === 'won' ? result.score + (Date.now() % 2) : 0;"
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/lights-out.json",
+          "path": ["rulesFingerprint"],
+          "value": "76770a079914a4aae9617e8fe2f53e922538500e00aaaeb419125e0518f1dd61"
+        }
+      }
+    ]
+  },
+  "bad-bot-hooks-missing": {
+    "expect": [
+      "[bot-missing]",
+      "src/games/lights-out/testing/lights-out-bot.ts",
+      "an event tagger (tag<Game>Event returning EventTag[])"
+    ],
+    "ops": [
+      { "delete": "src/games/lights-out/testing/lights-out-bot.ts" },
+      { "delete": "src/games/lights-out/testing/lights-out-bot.test.ts" },
+      {
+        "write": {
+          "file": "src/games/lights-out/testing/lights-out-testing.ts",
+          "content": "// src/games/lights-out/testing/lights-out-testing.ts\nimport type { BotPolicy } from '@/core/game/testing/play-bot';\nimport type { LightsOutMove, LightsOutState } from '@/games/lights-out/rules/lights-out-types';\n\n/** The starter bot: the first offered move. */\nexport const greedyBot: BotPolicy<LightsOutState, LightsOutMove> = (_state, moves, rng) => {\n  const move = moves[0];\n  if (move === undefined) throw new Error('no moves');\n  return { move, rng };\n};\n"
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/lights-out.json",
+          "path": ["rulesFingerprint"],
+          "value": "990d2c0b45305a3329b7164f4abd223db726b2500d2598ba672bd1b67048f0d9"
+        }
+      }
+    ]
+  },
+  "bad-bot-in-other-file-random": {
+    "expect": ["[sim-determinism]", "src/games/lights-out/testing/lights-out-openings.ts:4", "Math.random()"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/lights-out/testing/lights-out-openings.ts",
+          "content": "// src/games/lights-out/testing/lights-out-openings.ts\n/** Picks a scripted opening for the bot. */\nexport function pickOpening(count: number): number {\n  return Math.floor(Math.random() * count);\n}\n"
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/lights-out.json",
+          "path": ["rulesFingerprint"],
+          "value": "11dc8697662651add224003799afb60996757c173d22d7f789e67909a95ebbba"
+        }
+      }
+    ]
+  },
+  "bad-bot-missing": {
+    "expect": ["[bot-missing]", "src/games/lights-out/testing/lights-out-bot.ts"],
+    "ops": [
+      { "delete": "src/games/lights-out/testing/lights-out-bot.ts" },
+      {
+        "json": {
+          "file": "reports/sim/lights-out.json",
+          "path": ["rulesFingerprint"],
+          "value": "b06a17bda32b385d6fb28c9ebc5a895028ca158dc510fcfa99b555b98f094d09"
+        }
+      }
+    ]
+  },
+  "bad-cap-hit": {
+    "expect": ["[cap-hit]", "reports/sim/lights-out.json:122", "3 greedy d34 runs hit maxMoves"],
+    "ops": [{ "json": { "file": "reports/sim/lights-out.json", "path": ["cells", 4, "capHits"], "value": 3 } }]
+  },
+  "bad-core-import-changed": {
+    "expect": ["[report-stale]", "reports/sim/lights-out.json:3", "the src/core files they import"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/core/game-balance/sim-stats.ts",
+          "content": "// src/core/game-balance/sim-stats.ts\nimport type { BotTrace } from './trace-bot';\n\n/** How many early moves the first-payoff curve covers (move 1 … 10). */\nexport const FIRST_PAYOFF_MOVES = 10;\n\n/** One report cell: one bot policy at one difficulty over many seeds. Numbers are rounded to 4 places. */\nexport type SimCell = {\n  readonly policy: string;\n  readonly difficulty: number;\n  readonly runs: number;\n  readonly wins: number;\n  readonly capHits: number;\n  readonly winRate: number;\n  readonly medianMoves: number;\n  readonly p10Moves: number;\n  readonly p90Moves: number;\n  readonly medianScore: number;\n  readonly payoffPerRun: number;\n  readonly twistPerRun: number;\n  /** How the lost runs ended: lose reason key → count (keys sorted, so the JSON is stable). */\n  readonly lossReasons: Readonly<Record<string, number>>;\n  /** Share of runs whose first payoff came at or before move k, at index k - 1. */\n  readonly firstPayoffShare: readonly number[];\n};\n\n/** Four decimals: stable JSON, readable diffs, no float noise. */\nexport function round4(value: number): number {\n  return Math.round(value * 10000) / 10000;\n}\n\n/** Lower-interpolation percentile (p in 0…100) of a list of numbers; 0 for an empty list. */\nexport function percentile(values: readonly number[], p: number): number {\n  if (values.length === 0) return 0;\n  const sorted = [...values].sort((a, b) => a - b);\n  return Number(sorted[Math.floor((p / 100) * (sorted.length - 1))]);\n}\n\nfunction countLossReasons(traces: readonly BotTrace[]): Record<string, number> {\n  const reasons = traces.flatMap((trace) =>\n    trace.outcome.kind === 'lost' ? [trace.outcome.reasonKey] : [],\n  );\n  return Object.fromEntries(\n    [...new Set(reasons)]\n      .sort()\n      .map((key) => [key, reasons.filter((reason) => reason === key).length]),\n  );\n}\n\nfunction shareBy(traces: readonly BotTrace[], move: number): number {\n  const hits = traces.filter((trace) => (trace.firstAt.payoff ?? Infinity) <= move).length;\n  return round4(hits / traces.length);\n}\n\n/** Summarises the traces of one policy at one difficulty into a report cell. */\nexport function summarizeCell(\n  policy: string,\n  difficulty: number,\n  traces: readonly BotTrace[],\n): SimCell {\n  if (traces.length === 0) throw new RangeError('summarizeCell needs at least one run');\n  const moves = traces.map((trace) => trace.moves);\n  const wins = traces.filter((trace) => trace.outcome.kind === 'won').length;\n  const total = (pick: (trace: BotTrace) => number): number =>\n    traces.reduce((sum, trace) => sum + pick(trace), 0);\n  return {\n    policy,\n    difficulty,\n    runs: traces.length,\n    wins,\n    capHits: traces.filter((trace) => trace.isCapped).length,\n    winRate: round4(wins / traces.length),\n    medianMoves: percentile(moves, 50),\n    p10Moves: percentile(moves, 10),\n    p90Moves: percentile(moves, 90),\n    medianScore: percentile(\n      traces.map((trace) => trace.score),\n      50,\n    ),\n    payoffPerRun: round4(total((trace) => trace.counts.payoff) / traces.length),\n    twistPerRun: round4(total((trace) => trace.counts.twist) / traces.length),\n    lossReasons: countLossReasons(traces),\n    firstPayoffShare: Array.from({ length: FIRST_PAYOFF_MOVES }, (_, index) =>\n      shareBy(traces, index + 1),\n    ),\n  };\n}\n// A comment is enough: the sims import this file.\n"
+        }
+      }
+    ]
+  },
+  "bad-curve-flat": {
+    "expect": ["[curve]", "test/sims/lights-out/balance-bands.json:46", "from d34 to d67"],
+    "ops": [{ "json": { "file": "reports/sim/lights-out.json", "path": ["cells", 5, "winRate"], "value": 0.5 } }]
+  },
+  "bad-endless-bad-block": {
+    "expect": [
+      "[bands-invalid]",
+      "endless.difficulty must be 100 (ENDLESS_DIFFICULTY)",
+      "endless.bands[0].metric is missing or invalid"
+    ],
+    "ops": [
+      { "json": { "file": "test/sims/pig/balance-bands.json", "path": ["endless", "difficulty"], "value": 75 } },
+      {
+        "json": {
+          "file": "test/sims/pig/balance-bands.json",
+          "path": ["endless", "bands", 0, "metric"],
+          "value": "winRate"
+        }
+      }
+    ]
+  },
+  "bad-endless-band-violated": {
+    "expect": [
+      "[band-violated]",
+      "test/sims/pig/balance-bands.json:64",
+      "endless holdAt20 d100 medianMoves = 9 is outside 45..100"
+    ],
+    "ops": [{ "json": { "file": "reports/sim/pig.json", "path": ["cells", 9, "medianMoves"], "value": 9 } }]
+  },
+  "bad-endless-cap-hit": {
+    "expect": ["[cap-hit]", "test/sims/pig/balance-bands.json:56", "2 endless holdAt20 d100 runs hit maxMoves 400"],
+    "ops": [{ "json": { "file": "reports/sim/pig.json", "path": ["cells", 9, "capHits"], "value": 2 } }]
+  },
+  "bad-endless-cell-missing": {
+    "expect": ["[report-cell-missing]", "no endless holdAt20 d100 cell in the report"],
+    "ops": [{ "json": { "file": "reports/sim/pig.json", "path": ["cells", 9], "delete": true } }]
+  },
+  "bad-endless-in-grid": {
+    "expect": [
+      "[bands-invalid]",
+      "grid.holdAt20 must list level difficulties 0..99 (the endless run has its own block)"
+    ],
+    "ops": [{ "json": { "file": "test/sims/pig/balance-bands.json", "path": ["grid", "holdAt20", 4], "value": 100 } }]
+  },
+  "bad-endless-won": {
+    "expect": ["[endless-won]", "test/sims/pig/balance-bands.json:56", "4 endless holdAt20 d100 runs were won"],
+    "ops": [
+      { "json": { "file": "reports/sim/pig.json", "path": ["cells", 9, "wins"], "value": 4 } },
+      { "json": { "file": "reports/sim/pig.json", "path": ["cells", 9, "winRate"], "value": 0.04 } }
+    ]
+  },
+  "bad-fingerprint-scope": {
+    "expect": [
+      "[fingerprint-scope]",
+      "src/games/lights-out/rules/bonus.ts:2",
+      "imports @/games/lights-out/words/bonus-table"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/lights-out/words/bonus-table.ts",
+          "content": "// src/games/lights-out/words/bonus-table.ts\nexport const BONUS = [1, 2, 3] as const;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/lights-out/rules/bonus.ts",
+          "content": "// src/games/lights-out/rules/bonus.ts\nimport { BONUS } from '@/games/lights-out/words/bonus-table';\n\nexport const firstBonus = (): number => BONUS[0];\n"
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/lights-out.json",
+          "path": ["rulesFingerprint"],
+          "value": "f127ef44c0b7e25a6fa60a7a8e3c28326b8e2a1420a721381f9e01b8b488b46b"
+        }
+      }
+    ]
+  },
+  "bad-fingerprint-scope-relative": {
+    "expect": [
+      "[fingerprint-scope]",
+      "src/games/lights-out/testing/lights-out-view-bot.ts:3",
+      "imports ../canvas/cells"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/lights-out/testing/lights-out-view-bot.ts",
+          "content": "// src/games/lights-out/testing/lights-out-view-bot.ts\nimport type { Cells } from '../canvas/cells';\nimport { cellCount } from '../canvas/cells';\n\nexport const count = (cells: Cells): number => cellCount(cells);\n"
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/lights-out.json",
+          "path": ["rulesFingerprint"],
+          "value": "e357125d655a0e8ffab296aca573e4ec46ee02f8c4ccbb35c278a46702473c02"
+        }
+      }
+    ]
+  },
+  "bad-fingerprint-scope-service": {
+    "expect": [
+      "[fingerprint-scope]",
+      "src/games/lights-out/rules/today.ts:2",
+      "imports @/services/clock/system-clock-adapter"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/lights-out/rules/today.ts",
+          "content": "// src/games/lights-out/rules/today.ts\nimport { systemClock } from '@/services/clock/system-clock-adapter';\n\nexport const today = (): number => systemClock.now();\n"
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/lights-out.json",
+          "path": ["rulesFingerprint"],
+          "value": "31c3f996c8a9adaefba9148ba2d10eb84af4a093570050b3e53f2e4a1376ffae"
+        }
+      }
+    ]
+  },
+  "bad-harness-missing": {
+    "expect": ["[harness-missing]", "src/core/game-balance/trace-bot.ts"],
+    "ops": [
+      { "delete": "src/core/game-balance/trace-bot.ts" },
+      {
+        "json": {
+          "file": "reports/sim/arena-chase.json",
+          "path": ["rulesFingerprint"],
+          "value": "961bd86eb82d6102e0085f99f5a8ed070fab1910cb2db8400fffecdba9c8eaae"
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/lights-out.json",
+          "path": ["rulesFingerprint"],
+          "value": "4598cc160580f0a1057e77574df3439919f05c7cf3b37a3bd0f2a8a6927ded77"
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/pig.json",
+          "path": ["rulesFingerprint"],
+          "value": "e8c6ee3f2213263a94263422c03c30a6c9142f51e81c51eae1986304df5f0a23"
+        }
+      }
+    ]
+  },
+  "bad-harness-test-missing": {
+    "expect": ["[harness-missing]", "test/sims/write-sim-report.test.ts"],
+    "ops": [{ "delete": "test/sims/write-sim-report.test.ts" }]
+  },
+  "bad-kit-without-play-bot": {
+    "expect": [
+      "[harness-missing]",
+      "src/core/game/testing/play-bot.ts",
+      "the game kit (src/core/game) exists but its play-bot.ts is missing"
+    ],
+    "ops": [
+      { "delete": "src/core/game/testing/play-bot.ts" },
+      {
+        "json": {
+          "file": "reports/sim/arena-chase.json",
+          "path": ["rulesFingerprint"],
+          "value": "3be72d5eac6f71f3007bf0c8bb8adc47ff1418f3c6292d6a72fe978d5b496443"
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/lights-out.json",
+          "path": ["rulesFingerprint"],
+          "value": "43397ceb85f6da869b0cb436d7aac043015127493040822daa0e26132b584f21"
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/pig.json",
+          "path": ["rulesFingerprint"],
+          "value": "3344be6d599def0b88727f36c9f2bf7e8b275f6d30c0aa5c1db8c871fc76069b"
+        }
+      }
+    ]
+  },
+  "bad-level-plan-changed-after-report": {
+    "expect": ["[report-stale]", "reports/sim/lights-out.json:3"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/lights-out/levels/lights-out-level-plan.ts",
+          "content": "// src/games/lights-out/levels/lights-out-level-plan.ts\nexport const LEVEL_PLAN = { rows: 4 } as const;\n"
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/lights-out.json",
+          "path": ["rulesFingerprint"],
+          "value": "d466245af31b48c3061b26d67532587e4041a0ec7328bb7dc603ba41cecedea5"
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/lights-out/levels/pack-1.json",
+          "content": "{\n  \"pack\": 1,\n  \"levels\": [{ \"seed\": 101, \"difficulty\": 0, \"par\": 3 }]\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/lights-out/levels/pack-2.json",
+          "content": "{\n  \"pack\": 2,\n  \"levels\": [{ \"seed\": 202, \"difficulty\": 45, \"par\": 6 }]\n}\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/games/lights-out/levels/lights-out-level-plan.ts",
+          "find": "rows: 4",
+          "with": "rows: 5"
+        }
+      }
+    ]
+  },
+  "bad-lookahead-weak": {
+    "expect": [
+      "[skill-gap]",
+      "test/sims/lights-out/balance-bands.json:52",
+      "lookahead does not beat greedy by 0.15 winRate at d34"
+    ],
+    "ops": [{ "json": { "file": "reports/sim/lights-out.json", "path": ["cells", 6, "winRate"], "value": 0.62 } }]
+  },
+  "bad-no-sim-config": {
+    "expect": ["[sim-config]", "jest.sim.config.js", "no jest.sim.config.js"],
+    "ops": [{ "delete": "jest.sim.config.js" }]
+  },
+  "bad-no-sim-script": {
+    "expect": ["[sim-config]", "package.json:5", "no \"test:sim\" script"],
+    "ops": [{ "json": { "file": "package.json", "path": ["scripts", "test:sim"], "value": "jest --ci" } }]
+  },
+  "bad-realtime-game-unchecked": {
+    "expect": [
+      "[sim-missing]",
+      "dodge-lite has no bot simulation",
+      "[bot-missing]",
+      "src/games/dodge-lite/testing/dodge-lite-bot.ts",
+      "[tuning-missing]",
+      "src/games/dodge-lite/rules/dodge-lite-tuning.ts",
+      "[bands-missing]",
+      "[report-missing]"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/dodge-lite/sim/dodge-lite-sim.ts",
+          "content": "// src/games/dodge-lite/sim/dodge-lite-sim.ts\n'worklet';\n\nexport function stepDodgeLite(sim: { tick: number }): void {\n  sim.tick += 1;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-realtime-report-stale": {
+    "expect": ["[report-stale]", "reports/sim/arena-chase.json:3"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/arena-chase/sim/arena-chase-tuning.ts",
+          "find": "chaserSpeed: 150,",
+          "with": "chaserSpeed: 160,"
+        }
+      }
+    ]
+  },
+  "bad-realtime-slow-payoff": {
+    "expect": [
+      "[first-payoff]",
+      "test/sims/arena-chase/balance-bands.json:67",
+      "only 0.5 of dodge d0 runs reach the first payoff within 1 moves"
+    ],
+    "ops": [
+      { "json": { "file": "reports/sim/arena-chase.json", "path": ["cells", 4, "firstPayoffShare", 0], "value": 0.5 } }
+    ]
+  },
+  "bad-realtime-tuning-undocumented": {
+    "expect": ["[tuning-undocumented]", "src/games/arena-chase/sim/arena-chase-tuning.ts:42"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/arena-chase/sim/arena-chase-tuning.ts",
+          "find": "  /** A pulse throws every chaser this close back to the edge (larger is easier). */\n",
+          "with": ""
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/arena-chase.json",
+          "path": ["rulesFingerprint"],
+          "value": "301cfce5f74af1d4085d7de0f6fe352435438ea89a150344d5fcec59d069681e"
+        }
+      }
+    ]
+  },
+  "bad-release-approved-without-date": {
+    "expect": ["[bands-invalid]", "approved bands need approvedOn as YYYY-MM-DD"],
+    "args": "{dir} --release",
+    "ops": [{ "json": { "file": "test/sims/lights-out/balance-bands.json", "path": ["status"], "value": "approved" } }]
+  },
+  "bad-report-cell-missing": {
+    "expect": ["[report-cell-missing]", "no lookahead d34 cell"],
+    "ops": [{ "json": { "file": "reports/sim/lights-out.json", "path": ["cells", 6], "delete": true } }]
+  },
+  "bad-report-few-seeds": {
+    "expect": ["[report-invalid]", "reports/sim/lights-out.json:4", "report ran 50 seeds"],
+    "ops": [{ "json": { "file": "reports/sim/lights-out.json", "path": ["seedsPerCell"], "value": 50 } }]
+  },
+  "bad-report-invalid": {
+    "expect": ["[report-invalid]", "cells[0].winRate is missing or invalid"],
+    "ops": [{ "json": { "file": "reports/sim/lights-out.json", "path": ["cells", 0, "winRate"], "delete": true } }]
+  },
+  "bad-report-missing": {
+    "expect": ["[report-missing]", "reports/sim/lights-out.json"],
+    "ops": [{ "delete": "reports/sim/lights-out.json" }]
+  },
+  "bad-report-other-game": {
+    "expect": ["[report-invalid]", "reports/sim/lights-out.json:2", "the report is for \"pig\""],
+    "ops": [{ "json": { "file": "reports/sim/lights-out.json", "path": ["gameId"], "value": "pig" } }]
+  },
+  "bad-report-stale": {
+    "expect": ["[report-stale]", "reports/sim/lights-out.json:3"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/rules/lights-out-tuning.ts",
+          "find": "  movesPerPress: 3,",
+          "with": "  movesPerPress: 4,"
+        }
+      }
+    ]
+  },
+  "bad-rules-changed-after-report": {
+    "expect": ["[report-stale]", "reports/sim/lights-out.json:3", "not the generated pack-*.json"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/lights-out/levels/lights-out-level-plan.ts",
+          "content": "// src/games/lights-out/levels/lights-out-level-plan.ts\nexport const LEVEL_PLAN = { rows: 4 } as const;\n"
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/lights-out.json",
+          "path": ["rulesFingerprint"],
+          "value": "d466245af31b48c3061b26d67532587e4041a0ec7328bb7dc603ba41cecedea5"
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/lights-out/levels/pack-1.json",
+          "content": "{\n  \"pack\": 1,\n  \"levels\": [{ \"seed\": 101, \"difficulty\": 0, \"par\": 3 }]\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/lights-out/levels/pack-2.json",
+          "content": "{\n  \"pack\": 2,\n  \"levels\": [{ \"seed\": 202, \"difficulty\": 45, \"par\": 6 }]\n}\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/games/lights-out/rules/lights-out-tuning.ts",
+          "find": "  movesPerPress: 3,",
+          "with": "  movesPerPress: 4,"
+        }
+      }
+    ]
+  },
+  "bad-sim-config-not-node": {
+    "expect": ["[sim-config]", "jest.sim.config.js:1", "not a plain-Node config"],
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.sim.config.js",
+          "find": "testEnvironment: 'node'",
+          "with": "testEnvironment: 'jsdom'"
+        }
+      }
+    ]
+  },
+  "bad-sim-in-app": {
+    "expect": ["[sim-location]", "src/games/lights-out/rules/quick.sim.test.ts:2"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/lights-out/rules/quick.sim.test.ts",
+          "content": "// src/games/lights-out/rules/quick.sim.test.ts\nimport { writeFileSync } from 'node:fs';\n\ndescribe('quick', () => {\n  it('writes', () => {\n    writeFileSync('x', 'y');\n  });\n});\n"
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/lights-out.json",
+          "path": ["rulesFingerprint"],
+          "value": "1e7f9f03fe15c703787057c6ea99711c015a6673a961613ff934eee64b19354f"
+        }
+      }
+    ]
+  },
+  "bad-sim-missing": {
+    "expect": ["[sim-missing]", "lights-out has no bot simulation"],
+    "ops": [
+      { "delete": "test/sims/lights-out/balance.sim.test.ts" },
+      {
+        "json": {
+          "file": "reports/sim/lights-out.json",
+          "path": ["rulesFingerprint"],
+          "value": "e6d90683a6e17b4992fcd9f8546176b798c3beee494b05380e520e4f89aecb62"
+        }
+      }
+    ]
+  },
+  "bad-sim-no-bands": {
+    "expect": ["[sim-harness]", "does not assert bandProblems"],
+    "ops": [
+      {
+        "replace": {
+          "file": "test/sims/lights-out/balance.sim.test.ts",
+          "find": "expect(bandProblems(report, BANDS)).toStrictEqual([]);",
+          "with": "expect(report.cells.length).toBeGreaterThan(0);"
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/lights-out.json",
+          "path": ["rulesFingerprint"],
+          "value": "3a49efe84daa479b349cabab88a165b7d70e4e15133189e20eb2eb9e07a4392a"
+        }
+      }
+    ]
+  },
+  "bad-sim-no-report": {
+    "expect": ["[sim-harness]", "test/sims/lights-out/balance.sim.test.ts:1", "does not write reports/sim/<id>.json"],
+    "ops": [
+      {
+        "replace": {
+          "file": "test/sims/lights-out/balance.sim.test.ts",
+          "find": "    writeSimReport(report);\n",
+          "with": ""
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/lights-out.json",
+          "path": ["rulesFingerprint"],
+          "value": "2e9e8cb38813f4d256f441d127f9883f37c04f6a86591009b2e6b3227fe78592"
+        }
+      }
+    ]
+  },
+  "bad-sim-own-harness": {
+    "expect": [
+      "[sim-harness]",
+      "test/sims/lights-out/balance.sim.test.ts:1",
+      "does not play through the balance harness (src/core/game-balance"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "test/sims/lights-out/balance.sim.test.ts",
+          "find": "'@/core/game-balance/",
+          "with": "'./local-",
+          "all": true
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/lights-out.json",
+          "path": ["rulesFingerprint"],
+          "value": "8b58cf363a89eab7f647fb2c6dd18915668da3d20583e25767583c9c10d643e9"
+        }
+      }
+    ]
+  },
+  "bad-sim-random": {
+    "expect": ["[sim-determinism]", "test/sims/lights-out/balance.sim.test.ts:36", "Math.random()"],
+    "ops": [
+      {
+        "replace": {
+          "file": "test/sims/lights-out/balance.sim.test.ts",
+          "find": "const GAME_ID = 'lights-out';\n",
+          "with": "const GAME_ID = 'lights-out';\nconst JITTER = Math.random();\nvoid JITTER;\n"
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/lights-out.json",
+          "path": ["rulesFingerprint"],
+          "value": "4b36b15e97c2e04ceb6d1ddef03168112de2a6979a6ab29ce3e4c3862a805f32"
+        }
+      }
+    ]
+  },
+  "bad-sim-seeds-shifted": {
+    "expect": [
+      "[sim-seeds]",
+      "test/sims/lights-out/balance.sim.test.ts:52",
+      "plays seed index + 101, not 1..seedsPerCell"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "test/sims/lights-out/balance.sim.test.ts",
+          "find": "      seed: index + 1,",
+          "with": "      seed: index + 101,"
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/lights-out.json",
+          "path": ["rulesFingerprint"],
+          "value": "81f6cd0726cd130298f414a0cd7eaa05568a200f24bc5e98e7fc752e98b1817c"
+        }
+      }
+    ]
+  },
+  "bad-sim-skip": {
+    "expect": ["[sim-determinism]", "test/sims/lights-out/balance.sim.test.ts:96", "skipped or focused"],
+    "ops": [
+      {
+        "replace": {
+          "file": "test/sims/lights-out/balance.sim.test.ts",
+          "find": "  it('stays inside every band",
+          "with": "  it.skip('stays inside every band"
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/lights-out.json",
+          "path": ["rulesFingerprint"],
+          "value": "a36c5ead941d06722612abdbb386ffed161177fbc2602d263bd06b964b7f99fd"
+        }
+      }
+    ]
+  },
+  "bad-sims-in-npm-test": {
+    "expect": ["[sim-config]", "jest.config.js:1", "npm test does not ignore"],
+    "ops": [{ "replace": { "file": "jest.config.js", "find": ", '\\\\.sim\\\\.test\\\\.'", "with": "" } }]
+  },
+  "bad-skill-gap": {
+    "expect": [
+      "[skill-gap]",
+      "test/sims/lights-out/balance-bands.json:52",
+      "greedy does not beat random by 0.15 winRate at d34"
+    ],
+    "ops": [{ "json": { "file": "reports/sim/lights-out.json", "path": ["cells", 1, "winRate"], "value": 0.57 } }]
+  },
+  "bad-slow-payoff": {
+    "expect": [
+      "[first-payoff]",
+      "test/sims/lights-out/balance-bands.json:59",
+      "only 0.4 of greedy d0 runs reach the first payoff within 3 moves"
+    ],
+    "ops": [
+      { "json": { "file": "reports/sim/lights-out.json", "path": ["cells", 3, "firstPayoffShare", 2], "value": 0.4 } }
+    ]
+  },
+  "bad-tuning-missing": {
+    "expect": ["[tuning-missing]", "src/games/lights-out/rules/lights-out-tuning.ts"],
+    "ops": [
+      { "delete": "src/games/lights-out/rules/lights-out-tuning.ts" },
+      {
+        "json": {
+          "file": "reports/sim/lights-out.json",
+          "path": ["rulesFingerprint"],
+          "value": "edf7cf465c7d15160291d3faf9f75cd33652ea31c671620c702233eb645c5006"
+        }
+      }
+    ]
+  },
+  "bad-tuning-undocumented": {
+    "expect": [
+      "[tuning-undocumented]",
+      "src/games/lights-out/rules/lights-out-tuning.ts:31",
+      "knob \"movesPerPress: 3,\" has no comment"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/rules/lights-out-tuning.ts",
+          "find": "  /** Moves the player gets per scramble press (more = kinder). */\n",
+          "with": ""
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/lights-out.json",
+          "path": ["rulesFingerprint"],
+          "value": "d71994d56e116eed81388f48f5dd72a56c18f0aa0aabb8b2a48d4e232e679b23"
+        }
+      }
+    ]
+  },
+  "bad-weak-twist": {
+    "expect": ["[twist]", "test/sims/lights-out/balance-bands.json:65", "the twist happens 0.25 times"],
+    "ops": [{ "json": { "file": "reports/sim/lights-out.json", "path": ["cells", 4, "twistPerRun"], "value": 0.25 } }]
+  },
+  "bad-wrapped-tuning-undocumented": {
+    "expect": ["[tuning-undocumented]", "src/games/pig/rules/pig-tuning.ts:42", "knob \"maxBusts: 5,\" has no comment"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/pig/rules/pig-tuning.ts",
+          "content": "// src/games/pig/rules/pig-tuning.ts\n// Every balance number of Pig, after the balance pass (game-balance-and-bots, tuning-playbook.md\n// \"Worked example\"): maxBusts 3 -> 5, then the turn budget per row 10/12/14/16 -> 7/9/10/11. The\n// endless run has its own row (no target: never won) and knobsFor checks isEndlessDifficulty first.\nimport { isEndlessDifficulty, rowFor } from '@/core/game/difficulty';\n\nexport type PigKnobs = {\n  /** Points to bank to win (higher = harder; 0: the endless run, no target, never won). */\n  readonly target: number;\n  /** Turns a run may use; a hold or a bust ends a turn (fewer = harder). */\n  readonly maxTurns: number;\n};\n\n/** Level rows, easiest first: a higher target with relatively fewer turns needs riskier turns. */\nconst LEVEL_ROWS = [\n  {\n    target: 40,\n    maxTurns: 7,\n  },\n  {\n    target: 60,\n    maxTurns: 9,\n  },\n  {\n    target: 80,\n    maxTurns: 10,\n  },\n  {\n    target: 100,\n    maxTurns: 11,\n  },\n] as const satisfies readonly PigKnobs[];\n\n/** The endless run: bank as much as you can before the turns or your luck run out. */\nconst ENDLESS_ROW: PigKnobs = { target: 0, maxTurns: 20 };\n\nexport const TUNING = {\n  /** Faces of the die (more = longer, calmer turns). */\n  dieFaces: 6,\n  /** The face that busts the turn. */\n  bustFace: 1,\n  maxBusts: 5,\n  /** Points per unused turn added to the banked points when the target is reached. */\n  pointsPerSpareTurn: 10,\n  /** Turns the one continue gives back after running out of turns (more = kinder). */\n  continueTurns: 3,\n  /** Per-difficulty knobs (the table above). */\n  levelRows: LEVEL_ROWS,\n  /** The endless run's knobs (difficulty 100). */\n  endlessRow: ENDLESS_ROW,\n} as const;\n\n/** The knobs of a difficulty 0..100: the endless row at 100, else the level row rowFor picks. */\nexport function knobsFor(difficulty: number): PigKnobs {\n  if (isEndlessDifficulty(difficulty)) return TUNING.endlessRow;\n  const row = rowFor(difficulty, TUNING.levelRows.length);\n  // A reduce over the non-empty table: no unreachable `?? table[0]` branch for the coverage gate.\n  return TUNING.levelRows.reduce((picked, knobs, index) => (index === row ? knobs : picked));\n}\n"
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/pig.json",
+          "path": ["rulesFingerprint"],
+          "value": "1be6dfbc2c7855fed0b010bacf083224e93d90e180f20056f2248f7291a4f7c5"
+        }
+      }
+    ]
+  },
+  "bad-writer-outdated": {
+    "expect": ["[harness-outdated]", "test/sims/write-sim-report.ts:1", "no fingerprintFiles export"],
+    "ops": [
+      {
+        "replace": {
+          "file": "test/sims/write-sim-report.ts",
+          "find": "export function fingerprintFiles(",
+          "with": "function fingerprintFiles("
+        }
+      }
+    ]
+  },
+  "error-games-dir-outside": {
+    "expect": ["ERROR [bad-input]", "--games-dir must be a repo-relative folder"],
+    "args": "{dir} --games-dir ../games"
+  },
+  "error-missing-root": { "expect": ["ERROR [bad-input]", "nothing to check"], "args": "{dir}/no-such-app" },
+  "error-unknown-game": {
+    "expect": ["ERROR [bad-input]", "no src/games/chess/rules or sim folder"],
+    "args": "{dir} --game chess"
+  },
+  "pass-before-the-kit": {
+    "expect": [
+      "SKIP src/core/game/testing/play-bot.ts [harness-missing] not yet created (game-rules-engine creates it)"
+    ],
+    "ops": [
+      { "delete": "src/core/game" },
+      {
+        "json": {
+          "file": "reports/sim/arena-chase.json",
+          "path": ["rulesFingerprint"],
+          "value": "6397e314aadb48180050ec7f233457cff487fcb0eb0f4dcd4b3dae4acf795621"
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/lights-out.json",
+          "path": ["rulesFingerprint"],
+          "value": "9ab3d97e9c1a6d42f0bec61b37f11a97fa7a940c91a9a57892d5f1d84eb7f8df"
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/pig.json",
+          "path": ["rulesFingerprint"],
+          "value": "fc4bbe5b3608ac3c91c6f6e0bb78028ca9b2805ec603b02665738bfd32bf68ad"
+        }
+      }
+    ]
+  },
+  "pass-core-growth": {
+    "expect": ["check-balance: 17 harness files and games checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/core/canvas/particles.ts",
+          "content": "// src/core/canvas/particles.ts\nexport const PARTICLES = 12;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/core/game/levels.ts",
+          "content": "// src/core/game/levels.ts\nexport type LevelId = number;\n"
+        }
+      }
+    ]
+  },
+  "pass-games-dir": {
+    "expect": ["check-balance: 17 harness files and games checked, 0 problems"],
+    "ops": [
+      { "rename": { "from": "src/games", "to": "src/play" } },
+      { "write": { "file": "rn-skills.config.json", "content": "{ \"gamesDir\": \"src/play\" }\n" } },
+      {
+        "replace": {
+          "file": "src/play/arena-chase/testing/arena-chase-bot.test.ts",
+          "find": "'@/games/",
+          "with": "'@/play/",
+          "all": true
+        }
+      },
+      {
+        "replace": {
+          "file": "src/play/arena-chase/testing/arena-chase-bot.ts",
+          "find": "'@/games/",
+          "with": "'@/play/",
+          "all": true
+        }
+      },
+      {
+        "replace": {
+          "file": "src/play/lights-out/testing/lights-out-bot.test.ts",
+          "find": "'@/games/",
+          "with": "'@/play/",
+          "all": true
+        }
+      },
+      {
+        "replace": {
+          "file": "src/play/lights-out/testing/lights-out-bot.ts",
+          "find": "'@/games/",
+          "with": "'@/play/",
+          "all": true
+        }
+      },
+      {
+        "replace": {
+          "file": "src/play/pig/testing/pig-bot.test.ts",
+          "find": "'@/games/",
+          "with": "'@/play/",
+          "all": true
+        }
+      },
+      { "replace": { "file": "src/play/pig/testing/pig-bot.ts", "find": "'@/games/", "with": "'@/play/", "all": true } },
+      {
+        "replace": {
+          "file": "test/sims/arena-chase/balance.sim.test.ts",
+          "find": "'@/games/",
+          "with": "'@/play/",
+          "all": true
+        }
+      },
+      {
+        "replace": {
+          "file": "test/sims/lights-out/balance.sim.test.ts",
+          "find": "'@/games/",
+          "with": "'@/play/",
+          "all": true
+        }
+      },
+      {
+        "replace": { "file": "test/sims/pig/balance.sim.test.ts", "find": "'@/games/", "with": "'@/play/", "all": true }
+      },
+      {
+        "json": {
+          "file": "reports/sim/arena-chase.json",
+          "path": ["rulesFingerprint"],
+          "value": "4e73a8bd5c5ee2e39bc44fbd668caaeb12adfdc921242f549352936ffb30ce9e"
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/lights-out.json",
+          "path": ["rulesFingerprint"],
+          "value": "ed97612bed4eeaea95488e36c76fa1eff2b56afd13aaad959566c89458164951"
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/pig.json",
+          "path": ["rulesFingerprint"],
+          "value": "89a5949820e29b25247e2d515591edc65796ccb2fbcf8a119258671dd5a732c5"
+        }
+      }
+    ]
+  },
+  "pass-installed-skills": {
+    "expect": ["check-balance: 17 harness files and games checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/other-skill/src/games/planted/rules/create.ts",
+          "content": "export const r = Math.random();\n"
+        }
+      },
+      {
+        "write": {
+          "file": "skills/other-skill/test/sims/planted/balance.sim.test.ts",
+          "content": "import { writeFileSync } from 'node:fs';\nit.skip('x', () => writeFileSync('a', 'b'));\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/tools/bundled-skill/SKILL.md",
+          "content": "---\nname: bundled-skill\ndescription: A vendored skill folder.\n---\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/tools/bundled-skill/quick.sim.test.ts",
+          "content": "import { readFileSync } from 'node:fs';\nvoid readFileSync;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/vendored/SKILL.md",
+          "content": "---\nname: vendored\ndescription: A vendored skill folder.\n---\n"
+        }
+      },
+      { "write": { "file": "src/games/vendored/rules/create.ts", "content": "export const s = Math.random();\n" } }
+    ]
+  },
+  "pass-no-game": {
+    "expect": ["NOT APPLICABLE: the app has no game (no src/games/<game-id>/ folder with rules/ or sim/)"],
+    "ops": [
+      { "delete": "src/games" },
+      {
+        "json": {
+          "file": "reports/sim/arena-chase.json",
+          "path": ["rulesFingerprint"],
+          "value": "f4d69d73157769c332bb02f28bbc12910fd337cfaaf89b02f532dff2cda9ca68"
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/lights-out.json",
+          "path": ["rulesFingerprint"],
+          "value": "184cc41ff8014e19f6e7b7e564588b5264ed9cbeec19c8dfd1c4383e9a32bff7"
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/pig.json",
+          "path": ["rulesFingerprint"],
+          "value": "93d413b2159ed57ebb8883c0fc47c82ad6f1e9a3ce82b85498e0d5c33b121017"
+        }
+      }
+    ]
+  },
+  "pass-one-game": {
+    "expect": ["check-balance: 15 harness files and games checked, 0 problems"],
+    "args": "{dir} --game pig"
+  },
+  "pass-packs-after-sims": {
+    "expect": ["check-balance: 17 harness files and games checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/lights-out/levels/lights-out-level-plan.ts",
+          "content": "// src/games/lights-out/levels/lights-out-level-plan.ts\n/** The level table's rows (a fixture stand-in for the real plan). */\nexport const LEVEL_PLAN = { rows: 4 } as const;\n"
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/lights-out.json",
+          "path": ["rulesFingerprint"],
+          "value": "24a4181a207c2a9aeef1bf39ccd583e7ab1ccb9da805e162d84532beff7daa23"
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/lights-out/levels/pack-1.json",
+          "content": "{\n  \"pack\": 1,\n  \"levels\": [{ \"seed\": 101, \"difficulty\": 0, \"par\": 3 }]\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/lights-out/levels/pack-2.json",
+          "content": "{\n  \"pack\": 2,\n  \"levels\": [{ \"seed\": 202, \"difficulty\": 45, \"par\": 6 }]\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-release-proposed": {
+    "expect": [
+      "HUMAN CHECK (not blocking)",
+      "test/sims/lights-out/balance-bands.json:3 [bands-unapproved]",
+      "Play-test lights-out on an iPhone and an Android phone",
+      "Nothing waits for it.",
+      "RESULT: PASS"
+    ],
+    "args": "{dir} --release"
+  },
+  "pass-wrapped-table": {
+    "expect": ["check-balance: 17 harness files and games checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/pig/rules/pig-tuning.ts",
+          "content": "// src/games/pig/rules/pig-tuning.ts\n// Every balance number of Pig, after the balance pass (game-balance-and-bots, tuning-playbook.md\n// \"Worked example\"): maxBusts 3 -> 5, then the turn budget per row 10/12/14/16 -> 7/9/10/11. The\n// endless run has its own row (no target: never won) and knobsFor checks isEndlessDifficulty first.\nimport { isEndlessDifficulty, rowFor } from '@/core/game/difficulty';\n\nexport type PigKnobs = {\n  /** Points to bank to win (higher = harder; 0: the endless run, no target, never won). */\n  readonly target: number;\n  /** Turns a run may use; a hold or a bust ends a turn (fewer = harder). */\n  readonly maxTurns: number;\n};\n\n/** Level rows, easiest first: a higher target with relatively fewer turns needs riskier turns. */\nconst LEVEL_ROWS = [\n  {\n    target: 40,\n    maxTurns: 7,\n  },\n  {\n    target: 60,\n    maxTurns: 9,\n  },\n  {\n    target: 80,\n    maxTurns: 10,\n  },\n  {\n    target: 100,\n    maxTurns: 11,\n  },\n] as const satisfies readonly PigKnobs[];\n\n/** The endless run: bank as much as you can before the turns or your luck run out. */\nconst ENDLESS_ROW: PigKnobs = { target: 0, maxTurns: 20 };\n\nexport const TUNING = {\n  /** Faces of the die (more = longer, calmer turns). */\n  dieFaces: 6,\n  /** The face that busts the turn. */\n  bustFace: 1,\n  /** Busts in a row that end the run (fewer = harsher on pushing your luck). */\n  maxBusts: 5,\n  /** Points per unused turn added to the banked points when the target is reached. */\n  pointsPerSpareTurn: 10,\n  /** Turns the one continue gives back after running out of turns (more = kinder). */\n  continueTurns: 3,\n  /** Per-difficulty knobs (the table above). */\n  levelRows: LEVEL_ROWS,\n  /** The endless run's knobs (difficulty 100). */\n  endlessRow: ENDLESS_ROW,\n} as const;\n\n/** The knobs of a difficulty 0..100: the endless row at 100, else the level row rowFor picks. */\nexport function knobsFor(difficulty: number): PigKnobs {\n  if (isEndlessDifficulty(difficulty)) return TUNING.endlessRow;\n  const row = rowFor(difficulty, TUNING.levelRows.length);\n  // A reduce over the non-empty table: no unreachable `?? table[0]` branch for the coverage gate.\n  return TUNING.levelRows.reduce((picked, knobs, index) => (index === row ? knobs : picked));\n}\n"
+        }
+      },
+      {
+        "json": {
+          "file": "reports/sim/pig.json",
+          "path": ["rulesFingerprint"],
+          "value": "315bc540e67ef1f5d45fbb275610d59e9f67aa2019e7bd6f470f829c697712f5"
+        }
+      }
+    ]
+  }
+}

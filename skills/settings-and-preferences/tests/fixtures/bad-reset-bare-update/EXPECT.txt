@@ -1,0 +1,4 @@
+[reset-publish]
+resetAllProgress is written with a bare .update()
+src/features/preferences/use-data-resets.ts:15
+nothing writes resetAllProgress inside a updateAndPublish(...) call

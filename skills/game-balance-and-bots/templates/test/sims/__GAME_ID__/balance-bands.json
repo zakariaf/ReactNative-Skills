@@ -1,0 +1,72 @@
+{
+  "gameId": "__GAME_ID__",
+  "status": "proposed",
+  "approvedOn": null,
+  "seedsPerCell": 100,
+  "maxMoves": 400,
+  "grid": {
+    "random": [0, 34, 67],
+    "greedy": [0, 34, 67],
+    "lookahead": [34]
+  },
+  "bands": [
+    {
+      "policy": "greedy",
+      "difficulty": 0,
+      "metric": "winRate",
+      "min": 0.9,
+      "max": 1,
+      "why": "The first row (3x3 boards) is the warm-up: a reasonable player wins them (1.0 measured)."
+    },
+    {
+      "policy": "greedy",
+      "difficulty": 67,
+      "metric": "winRate",
+      "min": 0.15,
+      "max": 0.5,
+      "why": "The hardest row (5x5 boards) is hard (0.31 measured), yet a reasonable player still wins some."
+    },
+    {
+      "policy": "random",
+      "difficulty": 0,
+      "metric": "winRate",
+      "min": 0,
+      "max": 0.2,
+      "why": "Random presses rarely clear even a 3x3 board (0.09 measured): the choice of cell matters."
+    },
+    {
+      "policy": "greedy",
+      "difficulty": 34,
+      "metric": "medianMoves",
+      "min": 3,
+      "max": 15,
+      "why": "A 4x4 level takes a handful of presses (median 5), never a single one."
+    }
+  ],
+  "curve": {
+    "policy": "greedy",
+    "metric": "winRate",
+    "direction": "down",
+    "minStep": 0.1
+  },
+  "skillGap": {
+    "difficulty": 34,
+    "metric": "winRate",
+    "order": ["random", "greedy", "lookahead"],
+    "better": "higher",
+    "minStep": 0.15
+  },
+  "firstPayoff": {
+    "policy": "greedy",
+    "difficulty": 0,
+    "withinMoves": 3,
+    "minShare": 0.9
+  },
+  "twist": {
+    "policy": "greedy",
+    "difficulty": 34,
+    "minPerRun": 1
+  },
+  "endless": null,
+  "notes": "The template game (Lights Out with a move budget, game-rules-engine's template): three tuning rows on the 0..100 scale sampled at their lower bounds (0/34/67), 100 seeds. Greedy wins 1.0/0.57/0.31, random 0.09 at the first row, lookahead 0.93 at the middle one; the greedy bot clears every easiest board within two presses, and presses that toggle four or five cells (the twist) come 3.5 times per 4x4 level. Plain 'fewest lit cells' won only 0.56 of the easiest boards (it walks away from the finishing cross; the testing spec's starter bot, first move on ties, won 0.5), so the bot's evaluation values a board one press from dark, as a person would. A game with an endless mode replaces endless: null with its own block (policy, difficulty 100, bands on medianMoves, medianScore and twistPerRun). A new game sets every band from its own first sim run and says here, in plain words, why."
+}

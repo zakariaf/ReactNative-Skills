@@ -1,0 +1,14 @@
+{
+  "name": "tasks-app",
+  "private": true,
+  "main": "expo-router/entry",
+  "dependencies": {
+    "@tanstack/react-query": "5.104.0",
+    "expo": "~57.0.26",
+    "expo-network": "~57.0.2",
+    "expo-router": "~57.0.24",
+    "react": "19.2.3",
+    "react-native": "0.86.3",
+    "valibot": "1.5.0"
+  }
+}

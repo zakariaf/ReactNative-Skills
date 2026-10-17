@@ -1,0 +1,4 @@
+report: com.example.tasks 1.0.0 (12) on iPhone17,1 (ios 26.5)
+cold start: median 820 ms of 5 launches (limit 1000 ms)
+storage write: p95 0.9 ms over 300 writes
+RESULT: PASS

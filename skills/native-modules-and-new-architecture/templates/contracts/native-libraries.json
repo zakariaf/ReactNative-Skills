@@ -1,0 +1,5 @@
+{
+  "$schema": "./native-libraries.schema.json",
+  "$comment": "Decisions about native dependencies that do not run on the New Architecture natively (no Expo module config, no codegenConfig): each runs through React Native's interop layer. check-native-libraries.mjs reads this file; native-modules-and-new-architecture owns it.",
+  "libraries": {}
+}

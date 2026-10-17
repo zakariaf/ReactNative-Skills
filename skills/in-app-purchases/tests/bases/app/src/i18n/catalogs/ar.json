@@ -1,0 +1,22 @@
+{
+  "paywall.title": "نص",
+  "paywall.subtitle": "نص",
+  "paywall.buy-button": "اشترِ Premium مقابل {priceText}",
+  "paywall.loading": "نص",
+  "paywall.purchasing": "نص",
+  "paywall.store-unavailable": "نص",
+  "paywall.pending": "نص",
+  "paywall.error": "نص",
+  "paywall.try-again": "نص",
+  "paywall.save-failed": "نص",
+  "paywall.success.title": "نص",
+  "paywall.owned": "نص",
+  "paywall.restore-button": "نص",
+  "paywall.restoring": "نص",
+  "paywall.restore-success": "نص",
+  "paywall.restore-empty": "نص",
+  "paywall.restore-failed": "نص",
+  "settings.premium.buy": "اشترِ Premium مقابل {priceText}",
+  "settings.premium.no-price": "نص",
+  "tasks.title": "المهام"
+}

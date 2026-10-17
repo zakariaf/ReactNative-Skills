@@ -1,0 +1,18 @@
+{
+  "bad-missing-reference": {
+    "expect": ["[files-exist]", "store-listing-texts/SKILL.md", "[link-resolve]"],
+    "ops": [{ "delete": "store-listing-texts/references/background.md" }]
+  },
+  "bad-runbook-no-ask": {
+    "expect": ["[fm-dmi-runbook]", "run-list-export/SKILL.md"],
+    "ops": [
+      {
+        "replace": {
+          "file": "run-list-export/SKILL.md",
+          "find": "3. Stop and ask the developer before __FILL_THE_IRREVERSIBLE_STEP__; go on only after a clear yes.\n",
+          "with": "3. Do __FILL_THE_IRREVERSIBLE_STEP__.\n"
+        }
+      }
+    ]
+  }
+}

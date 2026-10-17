@@ -1,0 +1,392 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "visual-parity.schema.json",
+  "title": "The app's visual-parity contract (design-visual-parity)",
+  "description": "The done set, the paths, the mockup adapter, the layout facts, the measured type-role floors, the app's facts and the per-frame settings the parity scripts read. The design frames themselves are the screen-contract states with a \"reference\".",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "themes", "languages", "devices", "mockup", "frames"],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "$comment": {
+      "type": "string"
+    },
+    "version": {
+      "const": 1
+    },
+    "screensContract": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$)).+$",
+      "description": "The screen contract (default contracts/screens.json)."
+    },
+    "referencesDir": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$)).+$",
+      "description": "References, device profiles, manifest, fixture (default design/parity)."
+    },
+    "waivers": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$)).+$",
+      "description": "The waiver file (default <referencesDir>/waivers.json)."
+    },
+    "signoff": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$)).+$",
+      "description": "The sign-off ledger (default <referencesDir>/signoff.json)."
+    },
+    "runsDir": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$)).+$",
+      "description": "Run folders, git-ignored (default .parity)."
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$)).+$",
+      "description": "The summary a report's Design match line names (default reports/parity/summary.json)."
+    },
+    "themes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": ["light", "dark"]
+      }
+    },
+    "languages": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$"
+      }
+    },
+    "rtlLanguages": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "devices": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+      },
+      "description": "Device profile ids: <referencesDir>/devices/<id>.json."
+    },
+    "mockup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file"],
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$)).+$",
+          "description": "The approved mockup (static HTML and CSS)."
+        },
+        "htmlAttributes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Attributes set on <html>: templates with {theme}, {lang}, {dir}."
+        },
+        "query": {
+          "type": "string",
+          "pattern": "^\\?",
+          "description": "A query template appended to the file URL."
+        },
+        "css": {
+          "type": "string",
+          "description": "CSS added to every render (hide showcase chrome only)."
+        },
+        "fonts": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$)).+$",
+          "description": "The folder of the app's font files the mockup loads; hashed into the manifest."
+        }
+      }
+    },
+    "launch": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "scheme": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9+.-]*$"
+        },
+        "ios": {
+          "type": "string",
+          "description": "The captured build's bundle identifier."
+        },
+        "android": {
+          "type": "string",
+          "description": "The captured build's application id."
+        }
+      }
+    },
+    "harness": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dir": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$)).+$"
+        },
+        "fixture": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$)).+$"
+        }
+      }
+    },
+    "layout": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "fixedHeaderPt": {
+          "type": "number",
+          "minimum": 0
+        },
+        "pinnedComponents": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Za-z0-9]*$"
+          }
+        },
+        "dialogComponents": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Za-z0-9]*$"
+          }
+        }
+      }
+    },
+    "textRoleFloors": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "propertyNames": {
+          "pattern": "^\\d+$"
+        },
+        "additionalProperties": {
+          "type": "object",
+          "required": ["floor", "probe"],
+          "properties": {
+            "floor": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "probe": {
+              "type": "string",
+              "minLength": 20
+            }
+          }
+        }
+      }
+    },
+    "facts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["values", "design", "app"],
+      "properties": {
+        "values": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "minItems": 2
+          }
+        },
+        "design": {
+          "type": "object"
+        },
+        "app": {
+          "type": "object"
+        }
+      }
+    },
+    "frames": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "$comment": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": ["phone", "phone-tall", "state-card"]
+          },
+          "root": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*(\\.[a-z0-9]+(-[a-z0-9]+)*)+$"
+          },
+          "settleMs": {
+            "type": "integer",
+            "minimum": 1000,
+            "maximum": 60000
+          },
+          "keys": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              }
+            }
+          },
+          "masks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "modal": {
+            "type": "object",
+            "required": ["reachedBy", "hidden"],
+            "properties": {
+              "reachedBy": {
+                "type": "string"
+              },
+              "hidden": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "probe": {
+            "type": "object",
+            "required": ["region"],
+            "properties": {
+              "region": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
+              "element": {
+                "type": "string"
+              },
+              "above": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "testID": {
+                "type": "string",
+                "description": "The probe element's testID (default parity.probe.<region>; a skia canvas: <prefix>.canvas-layout)."
+              }
+            }
+          },
+          "appDrawn": {
+            "type": "string"
+          },
+          "designMasks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["selector", "as", "why"],
+              "properties": {
+                "selector": {
+                  "type": "string"
+                },
+                "as": {
+                  "type": "string"
+                },
+                "why": {
+                  "type": "string",
+                  "minLength": 20
+                }
+              }
+            }
+          },
+          "when": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "minProperties": 1,
+              "additionalProperties": {
+                "type": ["boolean", "string", "number"]
+              }
+            }
+          },
+          "variants": {
+            "type": "object",
+            "propertyNames": {
+              "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+            },
+            "additionalProperties": {
+              "type": "object",
+              "required": ["when", "reason", "derive"],
+              "properties": {
+                "when": {
+                  "type": "object",
+                  "minProperties": 1,
+                  "additionalProperties": {
+                    "type": ["boolean", "string", "number"]
+                  }
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 10
+                },
+                "scope": {
+                  "enum": ["frame", "background"]
+                },
+                "derive": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "hide": {
+                        "type": "string"
+                      },
+                      "style": {
+                        "type": "string"
+                      },
+                      "css": {
+                        "type": "object"
+                      },
+                      "text": {
+                        "type": "string"
+                      },
+                      "texts": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

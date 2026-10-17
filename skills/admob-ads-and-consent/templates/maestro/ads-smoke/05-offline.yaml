@@ -1,0 +1,27 @@
+# .maestro/ads-smoke/05-offline.yaml
+# Step 5, after step 4 (same install). Simulated offline (the debug switch every ConnectivityPort
+# reader follows): no banner, no rewarded offer, a finished break shows no ad and no message. Then
+# back online.
+appId: ${APP_ID}
+name: Ads smoke 5 - offline shows no ad, no offer and no message
+tags: [ads-smoke]
+---
+- runFlow:
+    file: ../subflows/debug-setup.yaml
+    env:
+      QUERY: 'offline=1&open=tasks'
+      WAIT_FOR: 'tasks.list'
+- waitForAnimationToEnd
+- assertNotVisible:
+    id: 'tasks.banner-ad'
+- assertNotVisible:
+    id: 'tasks.theme-offer-button'
+- tapOn:
+    id: 'tasks.review-done-button'
+# system-ui: Google's test ads carry a "Test mode" label; none may show offline.
+- assertNotVisible: 'Test mode'
+- runFlow:
+    file: ../subflows/debug-setup.yaml
+    env:
+      QUERY: 'offline=0&open=tasks'
+      WAIT_FOR: 'tasks.list'

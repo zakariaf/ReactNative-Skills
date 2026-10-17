@@ -1,0 +1,37 @@
+{
+  "manifest": {
+    "package": "com.acme.tasks",
+    "versionCode": 15,
+    "versionName": "1.4.0",
+    "minSdk": 24,
+    "targetSdk": 36,
+    "debuggable": false,
+    "usesCleartextTraffic": false,
+    "permissions": [
+      "android.permission.INTERNET",
+      "android.permission.ACCESS_NETWORK_STATE",
+      "com.google.android.gms.permission.AD_ID",
+      "com.acme.tasks.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+    ],
+    "metaData": {
+      "com.google.android.gms.ads.APPLICATION_ID": "ca-app-pub-7356100422874109~5193461228"
+    }
+  },
+  "libs": {
+    "base/lib/arm64-v8a/libhermes.so": "elf16k",
+    "base/lib/x86_64/libhermes.so": "elf16k",
+    "base/lib/armeabi-v7a/libhermes.so": "elf16k"
+  },
+  "assets": {
+    "base/assets/index.android.bundle": "__d(function(){var tasks=[];},0);",
+    "base/assets/app.config": {
+      "name": "Tasks",
+      "slug": "tasks",
+      "version": "1.4.0",
+      "android": { "package": "com.acme.tasks", "versionCode": 15 },
+      "extra": { "appVariant": "production", "supportUrl": "https://tasks.acme.dev/help" }
+    }
+  },
+  "bundleConfig": { "uncompressNativeLibraries": true, "alignment": "16K" },
+  "signature": "upload"
+}

@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ios-sim-build.schema.json",
+  "title": "iOS simulator build contract",
+  "description": "The app's own facts for Release simulator builds. Read by scripts/build/build-ios-sim.ts (simulatorPrefix, deviceType, postPrebuild, readyMarker, linkFlow, maestroBin) and by the ios-simulator-build skill's check-sim-setup.mjs (all keys) and check-sim-app.mjs (appId, usageStrings, infoPlist, deploymentTarget, usesNonExemptEncryption). The Xcode pin lives in scripts/ios/toolchain.ts, never here. Unknown keys are refused.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "simulatorPrefix": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "Simulators are named <simulatorPrefix>-<purpose> (tasks-smoke). Only simulators with this prefix are ever shut down or deleted. Default: the package.json name in kebab case."
+    },
+    "deviceType": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The simulator model a new <prefix>-<purpose> device is created with (xcrun simctl list devicetypes). Default: iPhone 17 Pro Max."
+    },
+    "appId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)+$",
+      "description": "The production bundle identifier. Development and preview builds carry <appId>.dev and <appId>.preview (app-variants-and-environment). Without it check-sim-app checks only the suffix per variant."
+    },
+    "postPrebuild": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true,
+      "description": "npm scripts the build runs from the repo root right after every prebuild, for example a privacy-manifest audit that reads ios/Pods. The preflight fails (exit 2, nothing built) when one is missing or its file does not exist. Default: none."
+    },
+    "usageStrings": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^NS[A-Za-z]+UsageDescription$" },
+      "uniqueItems": true,
+      "description": "Usage-description keys every build must carry, in Info.plist and in every language the app is localized into (NSCameraUsageDescription, NSUserTrackingUsageDescription, ...). Keys already present in the built Info.plist are checked in every language too."
+    },
+    "infoPlist": {
+      "type": "object",
+      "additionalProperties": { "type": ["string", "number", "boolean"] },
+      "description": "Info.plist keys with the exact value every build must carry, for example { \"CADisableMinimumFrameDurationOnPhone\": true } for 120 Hz on ProMotion phones."
+    },
+    "deploymentTarget": {
+      "type": "string",
+      "pattern": "^\\d+(\\.\\d+)?$",
+      "description": "The MinimumOSVersion the built app must carry, written like the built-in app.config.ts ios.deploymentTarget it mirrors: MAJOR.MINOR (\"18.6\") or a major alone (\"26\", compared as 26.0). Set it in app.config.ts ios.deploymentTarget; the expo-build-properties option is deprecated since SDK 56. Never below the Expo SDK floor (16.4 on SDK 57)."
+    },
+    "usesNonExemptEncryption": {
+      "type": "boolean",
+      "description": "The ITSAppUsesNonExemptEncryption value a production build must carry (app.config.ts ios.config.usesNonExemptEncryption). Without the key App Store Connect asks the export-compliance question for every upload."
+    },
+    "readyMarker": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["file", "contains"],
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Path inside the app's data container (simctl get_app_container <udid> <bundle id> data)."
+        },
+        "contains": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Text the file holds once the first screen is interactive."
+        }
+      },
+      "description": "A file the test build writes when its first screen is interactive: the build's ready signal. Without it the build waits for two identical screenshots after at least 3 s."
+    },
+    "linkFlow": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The Maestro sub-flow --link runs: it opens ${LINK}, accepts iOS's \"Open in ...?\" prompt and waits for ${WAIT_FOR} (e2e-maestro creates it). Default: .maestro/subflows/open-link.yaml."
+    },
+    "maestroBin": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The Maestro binary --link runs. Default: maestro (on PATH)."
+    }
+  }
+}

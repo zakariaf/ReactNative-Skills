@@ -1,0 +1,23 @@
+{
+  "$schema": "./push.schema.json",
+  "$comment": "The app's remote push facts, shared with the server that sends notifications. Read by push-notifications' check-push.mjs. Edit them for this app; the checker stays strict.",
+  "provider": "expo",
+  "requiresAccount": true,
+  "kinds": ["task-assigned", "list-shared", "announcement"],
+  "channels": [
+    { "id": "general", "importance": "default" },
+    { "id": "task-updates", "importance": "high" }
+  ],
+  "defaultChannel": "general",
+  "files": {
+    "message": "src/core/push/push-message.ts",
+    "channels": "src/services/push/push-channels.ts"
+  },
+  "server": {
+    "dataValues": "strings",
+    "maxPayloadBytes": 4096,
+    "registerEndpoint": "PUT /push/registrations/{token}",
+    "unregisterEndpoint": "DELETE /push/registrations/{token}",
+    "dropOn": ["DeviceNotRegistered", "session-revoked", "session-expired", "not-seen-270-days"]
+  }
+}

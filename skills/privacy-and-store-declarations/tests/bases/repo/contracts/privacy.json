@@ -1,0 +1,114 @@
+{
+  "$schema": "./privacy.schema.json",
+  "profile": "api-port",
+  "networkModules": [],
+  "linkFiles": [],
+  "sdks": {
+    "react-native-google-mobile-ads": {
+      "why": "banner ads on the task list for free users",
+      "pods": [
+        "Google-Mobile-Ads-SDK",
+        "GoogleUserMessagingPlatform"
+      ],
+      "maven": [
+        "com.google.android.gms:play-services-ads",
+        "com.google.android.gms:play-services-measurement-sdk-api",
+        "com.google.android.ump:"
+      ],
+      "tracking": true,
+      "collects": [
+        {
+          "type": "device-id",
+          "linked": true,
+          "tracking": true,
+          "purposes": [
+            "third-party-advertising",
+            "developer-advertising",
+            "analytics"
+          ],
+          "shared": true
+        },
+        {
+          "type": "coarse-location",
+          "linked": true,
+          "tracking": false,
+          "purposes": [
+            "third-party-advertising",
+            "developer-advertising",
+            "analytics",
+            "app-functionality"
+          ]
+        },
+        {
+          "type": "advertising-data",
+          "linked": true,
+          "tracking": false,
+          "purposes": [
+            "third-party-advertising",
+            "developer-advertising"
+          ]
+        },
+        {
+          "type": "crash-data",
+          "linked": false,
+          "tracking": false,
+          "purposes": [
+            "analytics"
+          ]
+        }
+      ]
+    },
+    "expo-iap": {
+      "why": "the Premium unlock through the App Store and Google Play",
+      "pods": [
+        "openiap"
+      ],
+      "collects": []
+    },
+    "expo-notifications": {
+      "why": "reminders and task-assigned pushes",
+      "maven": [
+        "com.google.firebase:",
+        "com.google.android.gms:play-services-cloud-messaging"
+      ],
+      "collects": [
+        {
+          "type": "device-id",
+          "linked": true,
+          "tracking": false,
+          "purposes": [
+            "app-functionality"
+          ]
+        }
+      ]
+    }
+  },
+  "app": {
+    "collects": [
+      {
+        "type": "email-address",
+        "linked": true,
+        "tracking": false,
+        "purposes": [
+          "app-functionality",
+          "account-management"
+        ]
+      },
+      {
+        "type": "user-id",
+        "linked": true,
+        "tracking": false,
+        "purposes": [
+          "app-functionality"
+        ]
+      }
+    ]
+  },
+  "permissionAnswers": {
+    "camera": "not-collected: task photos stay on the device unless the person shares them"
+  },
+  "accountDeletion": {
+    "inApp": "src/app/(app)/delete-account.tsx",
+    "webUrl": "https://tasks.acme.app/delete-account"
+  }
+}

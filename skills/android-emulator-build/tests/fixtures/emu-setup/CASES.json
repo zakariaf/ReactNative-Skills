@@ -1,0 +1,408 @@
+{
+  "bad-adb-const-list": {
+    "expect": ["scripts/tools/reinstall.ts:6 [adb-device] adb install runs without -s <serial>"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/tools/reinstall.ts",
+          "content": "import { spawnSync } from 'node:child_process';\n\nconst ADB = 'adb';\n\nexport function reinstall(apk: string): void {\n  spawnSync(ADB, ['install', '-r', apk]);\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-adb-emulator-flag": {
+    "expect": ["scripts/tools/reset-app.ts:3 [adb-device] adb -e runs without -s <serial>"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/tools/reset-app.ts",
+          "content": "import { spawnSync } from 'node:child_process';\n\nspawnSync('adb', ['-e', 'shell', 'pm', 'clear', 'com.acme.tasks.preview']);\n"
+        }
+      }
+    ]
+  },
+  "bad-adb-no-serial-shell": {
+    "expect": ["scripts/smoke.sh:2 [adb-device] adb install runs without -s <serial>"],
+    "ops": [
+      {
+        "write": { "file": "scripts/smoke.sh", "content": "#!/bin/sh\nadb install build/android-emu/app-preview.apk\n" }
+      }
+    ]
+  },
+  "bad-adb-path-list": {
+    "expect": ["scripts/tools/install.ts:4 [adb-device] adb install runs without -s <serial>"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/tools/install.ts",
+          "content": "import { execFileSync } from 'node:child_process';\n\nexport function install(adbPath: string, apk: string): void {\n  execFileSync(adbPath, ['install', apk]);\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-adb-string": {
+    "expect": ["scripts/tools/unlock.ts:3 [adb-device] adb shell runs without -s <serial>"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/tools/unlock.ts",
+          "content": "import { execSync } from 'node:child_process';\n\nexecSync('adb shell input keyevent 82');\n"
+        }
+      }
+    ]
+  },
+  "bad-avdmanager-foreign": {
+    "expect": ["scripts/tools/avd.ts:3 [emulator-avd] avdmanager deletes the AVD \"Pixel_8_API_36\", outside tasks-*"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/tools/avd.ts",
+          "content": "import { execFileSync } from 'node:child_process';\n\nexecFileSync('avdmanager', ['delete', 'avd', '--name', 'Pixel_8_API_36']);\n"
+        }
+      }
+    ]
+  },
+  "bad-build-plan-debug": {
+    "expect": ["[emu-build-args]", "lacks :app:assembleRelease", "the build plan runs assembleDebug"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/build/emu-build-plan.ts",
+          "find": "    ':app:assembleRelease',\n",
+          "with": "    ':app:assembleDebug',\n"
+        }
+      }
+    ]
+  },
+  "bad-build-plan-missing": {
+    "expect": ["scripts/build/emu-build-plan.ts [emu-build-args] the build plan is missing"],
+    "ops": [{ "delete": "scripts/build/emu-build-plan.ts" }]
+  },
+  "bad-build-plan-one-abi": {
+    "expect": ["scripts/build/emu-build-plan.ts:1 [emu-build-args]", "lacks -PreactNativeArchitectures="],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/build/emu-build-plan.ts",
+          "find": "    `-PreactNativeArchitectures=${abi}`,\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-build-prereq-file": {
+    "expect": [
+      "scripts/audit/audit-android.ts [build-prereqs]",
+      "does not exist, and the build runs it through \"audit:android\""
+    ],
+    "ops": [{ "delete": "scripts/audit/audit-android.ts" }]
+  },
+  "bad-build-prereq-missing": {
+    "expect": ["package.json [build-prereqs]", "scripts[\"audit:android\"] is missing"],
+    "ops": [{ "json": { "file": "package.json", "path": ["scripts", "audit:android"], "delete": true } }]
+  },
+  "bad-contract-min-above-target": {
+    "expect": ["[contract]", "\"minSdk\" 36 is above \"targetSdk\" 35"],
+    "ops": [
+      { "json": { "file": "contracts/android-emu-build.json", "path": ["minSdk"], "value": 36 } },
+      { "json": { "file": "contracts/android-emu-build.json", "path": ["targetSdk"], "value": 35 } }
+    ]
+  },
+  "bad-contract-placeholder": {
+    "expect": ["[contract]", "template placeholder __APP_ID__"],
+    "ops": [{ "json": { "file": "contracts/android-emu-build.json", "path": ["appId"], "value": "__APP_ID__" } }]
+  },
+  "bad-contract-type": {
+    "expect": ["[contract]", "\"targetSdk\" is \"36\""],
+    "ops": [{ "json": { "file": "contracts/android-emu-build.json", "path": ["targetSdk"], "value": "36" } }]
+  },
+  "bad-contract-unknown-key": {
+    "expect": ["[contract]", "unknown key \"simulatorPrefix\""],
+    "ops": [{ "json": { "file": "contracts/android-emu-build.json", "path": ["simulatorPrefix"], "value": "tasks" } }]
+  },
+  "bad-eas-run-android": {
+    "expect": ["[adb-device] eas build:run -p android installs on the first running emulator"],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "emu:latest"],
+          "value": "eas build:run -p android --latest"
+        }
+      }
+    ]
+  },
+  "bad-emulator-foreign-avd": {
+    "expect": ["scripts/emulator.sh:2 [emulator-avd] launches the AVD \"Pixel_8_API_36\", outside tasks-*"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/emulator.sh",
+          "content": "#!/bin/sh\nemulator -avd Pixel_8_API_36 -port 5560 -no-window &\n"
+        }
+      }
+    ]
+  },
+  "bad-emulator-no-avd": {
+    "expect": ["scripts/emulator.sh:2 [emulator-avd] launches an emulator without -avd <name>"],
+    "ops": [{ "write": { "file": "scripts/emulator.sh", "content": "#!/bin/sh\nemulator -no-window -port 5560 &\n" } }]
+  },
+  "bad-gitignore": {
+    "expect": [".gitignore [gitignore] does not ignore android/"],
+    "ops": [{ "replace": { "file": ".gitignore", "find": "/android\n", "with": "" } }]
+  },
+  "bad-gradle-install": {
+    "expect": ["scripts/install.sh:2 [shared-machine] a Gradle install task installs on every connected device"],
+    "ops": [
+      { "write": { "file": "scripts/install.sh", "content": "#!/bin/sh\ncd android && ./gradlew installRelease\n" } }
+    ]
+  },
+  "bad-gradle-install-list": {
+    "expect": [
+      "scripts/e2e/install-latest.ts:5 [shared-machine] the Gradle task :app:installRelease installs on every connected device"
+    ],
+    "ops": [
+      {
+        "$comment": "a Gradle install task as a Node argument list installs on every connected device",
+        "write": {
+          "file": "scripts/e2e/install-latest.ts",
+          "content": "// scripts/e2e/install-latest.ts\nimport { spawnSync } from 'node:child_process';\n\nexport function installLatest(): void {\n  spawnSync('./gradlew', ['--no-daemon', ':app:installRelease'], { cwd: 'android', stdio: 'inherit' });\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-gradle-stop": {
+    "expect": ["[shared-machine] gradlew --stop stops every Gradle daemon"],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "clean:gradle"],
+          "value": "cd android && ./gradlew --stop"
+        }
+      }
+    ]
+  },
+  "bad-jenv-global": {
+    "expect": ["scripts/setup-java.sh:2 [no-global-switch] switches the JDK for the whole machine"],
+    "ops": [{ "write": { "file": "scripts/setup-java.sh", "content": "#!/bin/sh\njenv global 17\n" } }]
+  },
+  "bad-kill-server": {
+    "expect": ["scripts/reset-adb.sh:2 [shared-machine] restarts the adb server"],
+    "ops": [
+      { "write": { "file": "scripts/reset-adb.sh", "content": "#!/bin/sh\nadb kill-server\nadb start-server\n" } }
+    ]
+  },
+  "bad-licenses": {
+    "expect": ["scripts/setup-sdk.sh:2 [no-global-switch] accepts the Android SDK licences from tooling"],
+    "ops": [{ "write": { "file": "scripts/setup-sdk.sh", "content": "#!/bin/sh\nyes | sdkmanager --licenses\n" } }]
+  },
+  "bad-metro-no-cache-key": {
+    "expect": ["metro.config.js:1 [metro-cache-key]", "not keyed on the EXPO_PUBLIC_* values"],
+    "ops": [
+      {
+        "replace": {
+          "file": "metro.config.js",
+          "find": "config.cacheVersion = publicEnvCacheVersion(process.env);\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-npm-script": {
+    "expect": ["package.json [npm-script]", "\"expo run:android --variant release\""],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "build:android:emu"],
+          "value": "expo run:android --variant release"
+        }
+      }
+    ]
+  },
+  "bad-pkill": {
+    "expect": ["scripts/cleanup.sh:2 [shared-machine] kills emulators, adb, Java or Gradle by name"],
+    "ops": [{ "write": { "file": "scripts/cleanup.sh", "content": "#!/bin/sh\npkill -f qemu-system-aarch64\n" } }]
+  },
+  "bad-pkill-list": {
+    "expect": ["scripts/e2e/reset-devices.ts:5 [shared-machine] pkill kills emulators, adb, Java or Gradle by name"],
+    "ops": [
+      {
+        "$comment": "pkill as a Node argument list kills every session's emulator",
+        "write": {
+          "file": "scripts/e2e/reset-devices.ts",
+          "content": "// scripts/e2e/reset-devices.ts\nimport { execFileSync } from 'node:child_process';\n\nexport function resetDevices(): void {\n  execFileSync('pkill', ['-f', 'qemu-system']);\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-signing": {
+    "expect": ["scripts/build/emu-build-plan.ts:54 [emu-signing]", "names signing material (android.injected.signing)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/build/emu-build-plan.ts",
+          "find": "    '--console=plain',\n",
+          "with": "    '--console=plain',\n    '-Pandroid.injected.signing.store.file=/keys/upload.jks',\n"
+        }
+      }
+    ]
+  },
+  "bad-sudo": {
+    "expect": ["[no-global-switch] runs sudo"],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "setup:android"],
+          "value": "sudo sdkmanager 'platforms;android-36'"
+        }
+      }
+    ]
+  },
+  "bad-toolchain-catalog": {
+    "expect": [
+      "scripts/android/toolchain.ts:15 [toolchain-pin] ANDROID_API is 36, but React Native builds with compileSdk 37",
+      "BUILD_TOOLS_VERSION is 36.0.0, but React Native builds with buildTools 37.0.0"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "node_modules/react-native/gradle/libs.versions.toml",
+          "content": "[versions]\nminSdk = \"24\"\ntargetSdk = \"37\"\ncompileSdk = \"37\"\nbuildTools = \"37.0.0\"\n"
+        }
+      }
+    ]
+  },
+  "bad-toolchain-dynamic": {
+    "expect": ["[toolchain-pin]", "JDK_MAJOR not pinned as a literal"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/android/toolchain.ts",
+          "find": "export const JDK_MAJOR = 17;",
+          "with": "export const JDK_MAJOR = Number(process.env['JDK'] ?? 17);"
+        }
+      }
+    ]
+  },
+  "bad-toolchain-env": {
+    "expect": ["[toolchain-pin]", "does not set ANDROID_HOME"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/android/toolchain.ts",
+          "find": "    ANDROID_HOME: folders.androidHome,\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-toolchain-jdk": {
+    "expect": [
+      "scripts/android/toolchain.ts:13 [toolchain-pin] JDK_MAJOR is 21, but React Native's Gradle plugin compiles with jvmToolchain(17)"
+    ],
+    "ops": [
+      {
+        "$comment": "React Native's Gradle plugin compiles with JDK 17; a JDK 21 pin disagrees",
+        "write": {
+          "file": "node_modules/@react-native/gradle-plugin/react-native-gradle-plugin/build.gradle.kts",
+          "content": "java { targetCompatibility = JavaVersion.VERSION_11 }\n\nkotlin { jvmToolchain(17) }\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "scripts/android/toolchain.ts",
+          "find": "export const JDK_MAJOR = 17;",
+          "with": "export const JDK_MAJOR = 21;"
+        }
+      }
+    ]
+  },
+  "bad-toolchain-missing": {
+    "expect": ["scripts/android/toolchain.ts [toolchain-pin]", "the toolchain module is missing"],
+    "ops": [{ "delete": "scripts/android/toolchain.ts" }]
+  },
+  "bad-variant-env": {
+    "expect": ["[variant-env]", "sets a variant variable on its own"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/build/build-android-emu.ts",
+          "find": "const env = { ...toolchain.env, ...variantEnv(options.variant) };",
+          "with": "const env = { ...toolchain.env, APP_VARIANT: options.variant };"
+        }
+      }
+    ]
+  },
+  "error-bad-app-dir": { "expect": ["ERROR [bad-input]", "apps/missing"], "args": "{dir} --app-dir apps/missing" },
+  "error-contract-malformed": {
+    "expect": ["ERROR [bad-input] contracts/android-emu-build.json is not valid JSON"],
+    "ops": [{ "write": { "file": "contracts/android-emu-build.json", "content": "{ \"avdPrefix\": \"tasks\",\n" } }]
+  },
+  "error-no-package-json": {
+    "expect": ["ERROR [bad-input] nothing to check: no package.json in the repo root"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "pass-app-dir": {
+    "expect": ["check-emu-setup:", "0 problems"],
+    "args": "{dir} --app-dir apps/mobile",
+    "ops": [
+      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["apps/*"] } },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "build:android:emu"],
+          "value": "node scripts/build/build-android-emu.ts --app-dir apps/mobile"
+        }
+      },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo"], "delete": true } },
+      {
+        "write": {
+          "file": "apps/mobile/package.json",
+          "json": { "name": "@acme/mobile", "private": true, "dependencies": { "expo": "~57.0.26" } }
+        }
+      },
+      { "rename": { "from": "metro.config.js", "to": "apps/mobile/metro.config.js" } },
+      { "rename": { "from": "app.config.ts", "to": "apps/mobile/app.config.ts" } }
+    ]
+  },
+  "pass-command-strings": {
+    "expect": ["check-emu-setup:", "0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/tools/emulator-safe.ts",
+          "content": "// scripts/tools/emulator-safe.ts\nimport { execFileSync, execSync } from 'node:child_process';\n\nimport { adbArgs } from '../android/adb-args.ts';\n\nexport function safeCalls(adbPath: string, serial: string): void {\n  execSync('adb -s emulator-5556 shell getprop sys.boot_completed');\n  execSync('adb devices');\n  execSync('emulator -list-avds');\n  execSync('emulator -avd tasks-e2e -port 5560 -no-window');\n  execSync('avdmanager delete avd -n tasks-old');\n  execFileSync(adbPath, ['-s', serial, 'install', 'app.apk']);\n  execFileSync(adbPath, adbArgs(serial, 'shell', 'pidof', 'com.acme.tasks'));\n  execFileSync('adb', ['-s', serial, 'emu', 'kill']);\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "scripts/emulator-safe.sh",
+          "content": "#!/bin/sh\nadb -s \"$SERIAL\" install build/android-emu/app-preview.apk\nadb -s emulator-5556 emu kill\nemulator -avd \"$AVD\" -port 5560 &\nemulator @tasks-smoke -no-window &\navdmanager create avd -n tasks-e2e -k \"$IMAGE\" -d pixel_8\n./gradlew --no-daemon :app:assembleRelease\n"
+        }
+      }
+    ]
+  },
+  "pass-no-contract": {
+    "expect": ["check-emu-setup:", "0 problems"],
+    "ops": [{ "delete": ["contracts/android-emu-build.json", "contracts/android-emu-build.schema.json"] }]
+  },
+  "pass-not-expo": {
+    "expect": ["NOT APPLICABLE: package.json has no expo dependency"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo"], "delete": true } }]
+  },
+  "pass-toolchain-jdk-plugin": {
+    "expect": ["check-emu-setup:", "0 problems"],
+    "ops": [
+      {
+        "$comment": "the installed Gradle plugin's jvmToolchain(17) agrees with JDK_MAJOR = 17",
+        "write": {
+          "file": "node_modules/@react-native/gradle-plugin/react-native-gradle-plugin/build.gradle.kts",
+          "content": "java { targetCompatibility = JavaVersion.VERSION_11 }\n\nkotlin { jvmToolchain(17) }\n"
+        }
+      }
+    ]
+  }
+}

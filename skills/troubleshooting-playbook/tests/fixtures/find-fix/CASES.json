@@ -1,0 +1,91 @@
+{
+  "$comment": "find-fix against this skill's own catalogue. The suite args are the repo root (the case folder, or root.txt's path inside it) and one --text per line of query.txt; a case's args are appended.",
+  "bad-log-unknown": {
+    "expect": ["[no-known-fix]", "nothing known matches log"],
+    "args": "--log {dir}/build.log",
+    "ops": [
+      { "delete": "query.txt" },
+      { "write": { "file": "build.log", "content": "the quantum flux capacitor is misaligned\n" } }
+    ]
+  },
+  "bad-platform-filtered": {
+    "expect": ["[no-known-fix]"],
+    "args": "--platform ios",
+    "ops": [{ "write": { "file": "query.txt", "content": "INSTALL_FAILED_NO_MATCHING_ABIS\n" } }]
+  },
+  "bad-unknown-id": {
+    "expect": ["[no-known-fix]", "no catalogue entry no-such-entry"],
+    "args": "--id no-such-entry",
+    "ops": [{ "delete": "query.txt" }]
+  },
+  "bad-unknown-text": {
+    "expect": ["[no-known-fix]", "nothing known matches text"],
+    "ops": [{ "write": { "file": "query.txt", "content": "the quantum flux capacitor is misaligned (code 88)\n" } }]
+  },
+  "error-missing-log": {
+    "expect": ["ERROR [bad-input]", "missing.log does not exist"],
+    "args": "--log {dir}/missing.log",
+    "ops": [{ "delete": "query.txt" }]
+  },
+  "error-missing-root": {
+    "expect": ["ERROR [bad-input]", "repo root", "no-such-repo does not exist"],
+    "ops": [{ "write": { "file": "root.txt", "content": "no-such-repo\n" } }]
+  },
+  "error-nothing-to-look-up": {
+    "expect": ["nothing to look up: pass --text, --log or --id"],
+    "ops": [{ "delete": "query.txt" }]
+  },
+  "error-unknown-area": {
+    "expect": ["--area plumbing is not an area of the catalogue"],
+    "args": "--area plumbing",
+    "ops": []
+  },
+  "pass-applies-to-mismatch": {
+    "expect": [
+      "MATCH? deps-jest-30 [documented | keyword match",
+      "may not apply here (jest-expo 58.0.1 is outside 57.x)"
+    ],
+    "ops": [
+      { "write": { "file": "query.txt", "content": "Jest 30 breaks the jest-expo preset\n" } },
+      { "json": { "file": "package.json", "path": ["devDependencies", "jest-expo"], "value": "58.0.1" } }
+    ]
+  },
+  "pass-area": { "expect": ["MATCH release-keychain-locked"], "args": "--area release", "ops": [] },
+  "pass-id": {
+    "expect": ["MATCH build-metro-cache-variant"],
+    "args": "--id build-metro-cache-variant",
+    "ops": [{ "delete": "query.txt" }]
+  },
+  "pass-keyword-lead-never-stops": {
+    "expect": [
+      "MATCH runtime-no-bundle-url [documented] ios only",
+      "MATCH? release-ship-placeholder [verified | keyword match: confirm the symptom before acting]"
+    ],
+    "ops": [{ "write": { "file": "query.txt", "content": "No bundle URL present\n" } }]
+  },
+  "pass-keywords": {
+    "expect": ["MATCH? services-banner-never-shows [documented | keyword match: confirm the symptom before acting]"],
+    "ops": [{ "write": { "file": "query.txt", "content": "banner never appears\n" } }]
+  },
+  "pass-log": {
+    "expect": ["log ", "MATCH release-keychain-locked"],
+    "args": "--log {dir}/build.log",
+    "ops": [{ "delete": "query.txt" }]
+  },
+  "pass-platform": {
+    "expect": ["MATCH android-no-matching-abis"],
+    "args": "--platform android",
+    "ops": [{ "write": { "file": "query.txt", "content": "INSTALL_FAILED_NO_MATCHING_ABIS\n" } }]
+  },
+  "pass-two-queries": {
+    "expect": ["MATCH android-older-sdk", "MATCH ios-xcode-licence [verified | stop and ask a human] ios only"],
+    "ops": [
+      {
+        "write": {
+          "file": "query.txt",
+          "content": "INSTALL_FAILED_OLDER_SDK\nYou have not agreed to the Xcode license agreements\n"
+        }
+      }
+    ]
+  }
+}

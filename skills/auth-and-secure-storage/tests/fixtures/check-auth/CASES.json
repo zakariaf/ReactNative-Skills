@@ -1,0 +1,841 @@
+{
+  "bad-account-deletion": {
+    "expect": ["contracts/auth.json:10 [account-deletion]"],
+    "ops": [{ "delete": "src/app/(app)/delete-account.tsx" }]
+  },
+  "bad-apple-sign-in": {
+    "expect": ["src/services/apple-sign-in/expo-apple-sign-in-adapter.tsx:69 [apple-sign-in]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/apple-sign-in/expo-apple-sign-in-adapter.tsx",
+          "find": "      nonce: hashed,\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-apple-sign-in-config": {
+    "expect": ["app.config.ts:1 [apple-sign-in]"],
+    "ops": [{ "replace": { "file": "app.config.ts", "find": "    'expo-apple-authentication',\n", "with": "" } }]
+  },
+  "bad-contract": { "expect": ["contracts/auth.json:1 [contract]"], "ops": [{ "delete": "contracts/auth.json" }] },
+  "bad-contract-secrets-only-signs-in": {
+    "expect": [
+      "contracts/auth.json:3 [contract] signIn is false, but src/services/oauth/auth-session-oauth-adapter.ts imports expo-auth-session",
+      "contracts/auth.json:3 [contract] signIn is false, but src/services/apple-sign-in/expo-apple-sign-in-adapter.tsx imports expo-apple-authentication",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/auth.json",
+          "lines": ["{", "  \"$schema\": \"./auth.schema.json\",", "  \"signIn\": false", "}"]
+        }
+      }
+    ]
+  },
+  "bad-contract-server-steps": {
+    "expect": ["contracts/auth.json:", "[contract] serverSignOutSteps must be a list"],
+    "ops": [{ "json": { "file": "contracts/auth.json", "path": ["serverSignOutSteps"], "value": "push-registration" } }]
+  },
+  "bad-contract-shape": {
+    "expect": ["contracts/auth.json:11 [contract]"],
+    "ops": [{ "json": { "file": "contracts/auth.json", "path": ["signOutSteps"], "value": "query-cache" } }]
+  },
+  "bad-contract-sign-in-type": {
+    "expect": ["[contract] signIn must be true or false", "RESULT: FAIL (1 problems)"],
+    "ops": [{ "json": { "file": "contracts/auth.json", "path": ["signIn"], "value": "no" } }]
+  },
+  "bad-fresh-install-wipe": {
+    "expect": ["src/services/secure-storage/expo-secure-store-adapter.ts:1 [fresh-install-wipe]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/session/session-manager.ts",
+          "find": "  const marker = m.deps.installMarker.isPresent();\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/session/session-manager.ts",
+          "find": "  if (marker.ok && !marker.value) return startFreshInstall(m);\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-fresh-install-wipe-secrets-only": {
+    "expect": [
+      "src/services/secure-storage/expo-secure-store-adapter.ts:1 [fresh-install-wipe] nothing wipes the secure store on a fresh install: the iOS Keychain outlives an uninstall, so a reinstall finds the previous install's secrets",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "$comment": "Secrets only: an app that keeps an API key in expo-secure-store and has no sign-in (the session, OAuth, Apple and the examples are gone).",
+        "delete": [
+          "src/api",
+          "src/app/oauth-redirect.tsx",
+          "src/app/sign-in.tsx",
+          "src/app/(app)",
+          "src/config/oauth-config.ts",
+          "src/core/session",
+          "src/features",
+          "src/services/apple-sign-in",
+          "src/services/oauth",
+          "src/services/session",
+          "src/services/create-device-services.ts",
+          "src/services/services-context.tsx",
+          "test/session"
+        ]
+      },
+      {
+        "replace": {
+          "file": "src/services/secure-storage/secure-key-names.ts",
+          "find": "export const SECURE_KEYS = {",
+          "with": "export const SECURE_KEYS = {\n  /** The person's own API key for the sync service (bring your own key). */\n  apiKey: 'sync.api-key',"
+        }
+      },
+      {
+        "write": {
+          "file": "contracts/auth.json",
+          "lines": ["{", "  \"$schema\": \"./auth.schema.json\",", "  \"signIn\": false", "}"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/secure-storage/wipe-secrets-on-fresh-install.ts",
+          "lines": [
+            "// src/services/secure-storage/wipe-secrets-on-fresh-install.ts: the secrets-only fresh-install wipe.",
+            "import { ALL_SECURE_KEYS } from './secure-key-names';",
+            "",
+            "import type { SecureStoragePort } from './secure-storage-port';",
+            "import type { InstallMarkerPort } from '@/services/install-marker/install-marker-port';",
+            "",
+            "export async function wipeSecretsOnFreshInstall(",
+            "  secureStorage: SecureStoragePort,",
+            "  installMarker: InstallMarkerPort,",
+            "): Promise<void> {",
+            "  const marker = installMarker.isPresent();",
+            "  if (!marker.ok || marker.value) return;",
+            "  for (const key of ALL_SECURE_KEYS) {",
+            "    const removed = await secureStorage.remove(key);",
+            "    if (!removed.ok) return;",
+            "  }",
+            "  installMarker.write();",
+            "}"
+          ]
+        }
+      },
+      { "delete": "src/services/secure-storage/wipe-secrets-on-fresh-install.ts" }
+    ]
+  },
+  "bad-oauth-ephemeral": {
+    "expect": ["src/services/oauth/auth-session-oauth-adapter.ts:109 [oauth-ephemeral]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/oauth/auth-session-oauth-adapter.ts",
+          "find": "preferEphemeralSession: true",
+          "with": "preferEphemeralSession: false"
+        }
+      }
+    ]
+  },
+  "bad-oauth-pkce": {
+    "expect": ["src/services/oauth/auth-session-oauth-adapter.ts:106 [oauth-pkce]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/oauth/auth-session-oauth-adapter.ts",
+          "find": "usePKCE: true",
+          "with": "usePKCE: false"
+        }
+      }
+    ]
+  },
+  "bad-oauth-pkce-secret": {
+    "expect": ["src/config/oauth-config.ts:37 [oauth-pkce]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/oauth-config.ts",
+          "find": "return { issuer, clientId, scheme: appScheme(), scopes: OAUTH_SCOPES };",
+          "with": "return { issuer, clientId, clientSecret: 's3cret', scheme: appScheme(), scopes: OAUTH_SCOPES };"
+        }
+      }
+    ]
+  },
+  "bad-oauth-pkce-verifier": {
+    "expect": ["src/services/oauth/auth-session-oauth-adapter.ts:116 [oauth-pkce]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/oauth/auth-session-oauth-adapter.ts",
+          "find": "            extraParams: { code_verifier: request.codeVerifier ?? '' },\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-protected-groups": {
+    "expect": ["contracts/auth.json:5 [protected-groups]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-stack.tsx",
+          "find": "      <Stack.Protected guard={guards.isSignedIn}>\n        <Stack.Screen name=\"(app)\" />\n      </Stack.Protected>",
+          "with": "      <Stack.Screen name=\"(app)\" />"
+        }
+      }
+    ]
+  },
+  "bad-protected-groups-no-layout": {
+    "expect": ["contracts/auth.json:5 [protected-groups]"],
+    "ops": [{ "delete": "src/app/(app)/_layout.tsx" }]
+  },
+  "bad-protected-groups-redirect-to": {
+    "expect": ["src/features/root-navigator/app-stack.tsx:29 [protected-groups]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-stack.tsx",
+          "find": "<Stack.Protected guard={guards.isSignedOut}>",
+          "with": "<Stack.Protected guard={guards.isSignedOut} redirectTo=\"/sign-in\">"
+        }
+      }
+    ]
+  },
+  "bad-secure-keys": {
+    "expect": ["src/services/secure-storage/secure-key-names.ts:13 [secure-keys]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/secure-storage/secure-key-names.ts",
+          "find": "sessionMeta: 'auth.session-meta'",
+          "with": "sessionMeta: 'auth session meta'"
+        }
+      }
+    ]
+  },
+  "bad-secure-keys-no-wipe": {
+    "expect": ["src/services/secure-storage/secure-key-names.ts:7 [secure-keys]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/session/session-vault.ts",
+          "find": "import { ALL_SECURE_KEYS, SECURE_KEYS } from",
+          "with": "import { SECURE_KEYS } from"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/session/session-vault.ts",
+          "find": "for (const key of ALL_SECURE_KEYS)",
+          "with": "for (const key of [SECURE_KEYS.accessToken, SECURE_KEYS.refreshToken])"
+        }
+      }
+    ]
+  },
+  "bad-secure-store-call": {
+    "expect": ["src/services/secure-storage/expo-secure-store-adapter.ts:48 [secure-store-call]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/secure-storage/expo-secure-store-adapter.ts",
+          "find": "SecureStore.getItemAsync(key, SECURE_STORE_OPTIONS)",
+          "with": "SecureStore.getItemAsync(key)"
+        }
+      }
+    ]
+  },
+  "bad-secure-store-call-always": {
+    "expect": ["src/services/secure-storage/expo-secure-store-adapter.ts:22 [secure-store-call]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/secure-storage/expo-secure-store-adapter.ts",
+          "find": "keychainAccessible: SecureStore.AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY",
+          "with": "keychainAccessible: SecureStore.ALWAYS"
+        }
+      }
+    ]
+  },
+  "bad-secure-store-call-sync": {
+    "expect": ["src/services/secure-storage/expo-secure-store-adapter.ts:48 [secure-store-call]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/secure-storage/expo-secure-store-adapter.ts",
+          "find": "attemptAsync(() => SecureStore.getItemAsync(key, SECURE_STORE_OPTIONS), failure('read', key))",
+          "with": "Promise.resolve(attempt(() => SecureStore.getItem(key, SECURE_STORE_OPTIONS), failure('read', key)))"
+        }
+      }
+    ]
+  },
+  "bad-secure-store-plugin": {
+    "expect": ["app.config.ts:1 [secure-store-plugin]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    ['expo-secure-store', { faceIDPermission: false }],\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-secure-store-plugin-backup-off": {
+    "expect": ["app.config.ts:14 [secure-store-plugin]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "{ faceIDPermission: false }",
+          "with": "{ faceIDPermission: false, configureAndroidBackup: false }"
+        }
+      }
+    ]
+  },
+  "bad-sign-out-steps": {
+    "expect": ["src/features/root-navigator/create-app-session.ts:26 [sign-out-steps]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/create-app-session.ts",
+          "find": "      queryCacheStep(data.queryCache),\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-sign-out-steps-no-session": {
+    "expect": ["contracts/auth.json:7 [sign-out-steps]"],
+    "ops": [{ "delete": "src/features/root-navigator/create-app-session.ts" }]
+  },
+  "bad-sign-out-steps-server": {
+    "expect": [
+      "src/features/root-navigator/create-app-session.ts:",
+      "[sign-out-steps] serverSignOutSteps step \"push-registration\""
+    ],
+    "ops": [
+      { "json": { "file": "contracts/auth.json", "path": ["serverSignOutSteps"], "value": ["push-registration"] } }
+    ]
+  },
+  "bad-single-flight-interceptor": {
+    "expect": ["src/api/refresh-on-401.ts:9 [single-flight-refresh]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/api/refresh-on-401.ts",
+          "lines": [
+            "// src/api/refresh-on-401.ts: an interceptor that refreshes per request (planted).",
+            "export async function refreshOn401(",
+            "  baseUrl: string,",
+            "  stored: { readonly refreshToken: string },",
+            "  send: () => Promise<Response>,",
+            "): Promise<Response> {",
+            "  const first = await send();",
+            "  if (first.status !== 401) return first;",
+            "  await fetch(baseUrl + '/auth/refresh', {",
+            "    method: 'POST',",
+            "    body: JSON.stringify({ token: stored.refreshToken }),",
+            "  });",
+            "  return send();",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-single-flight-refresh": {
+    "expect": ["src/features/tasks/use-refresh.ts:5 [single-flight-refresh]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-refresh.ts",
+          "lines": [
+            "// src/features/tasks/use-refresh.ts: refreshes on its own (planted).",
+            "import type { OauthPort } from '@/services/oauth/oauth-port';",
+            "",
+            "export function refreshNow(oauth: OauthPort, tokens: { readonly refreshToken: string }) {",
+            "  return oauth.refresh(tokens.refreshToken);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-single-flight-unshared": {
+    "expect": ["src/services/session/session-manager.ts:230 [single-flight-refresh]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/session/session-manager.ts",
+          "find": "return singleFlight(m.refreshing, () => runRefresh(m));",
+          "with": "return runRefresh(m);"
+        }
+      }
+    ]
+  },
+  "bad-token-in-log": {
+    "expect": ["src/features/sign-in/use-sign-in-model.ts:42 [token-in-log]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/sign-in/use-sign-in-model.ts",
+          "find": "    const { idToken } = grant.value;",
+          "with": "    console.warn('signed in', grant.value.accessToken);\n    const { idToken } = grant.value;"
+        }
+      }
+    ]
+  },
+  "bad-token-in-log-bearer": {
+    "expect": ["src/features/sign-in/use-sign-in-model.ts:42 [token-in-log]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/sign-in/use-sign-in-model.ts",
+          "find": "    const { idToken } = grant.value;",
+          "with": "    console.log('Bearer ' + String(Date.now()));\n    const { idToken } = grant.value;"
+        }
+      }
+    ]
+  },
+  "bad-token-in-log-grant": {
+    "expect": ["src/features/sign-in/use-sign-in-model.ts:42 [token-in-log]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/sign-in/use-sign-in-model.ts",
+          "find": "    const { idToken } = grant.value;",
+          "with": "    console.warn('signed in', grant);\n    const { idToken } = grant.value;"
+        }
+      }
+    ]
+  },
+  "bad-token-in-log-secrets-only": {
+    "expect": ["src/services/secure-storage/save-api-key.ts:7 [token-in-log]", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "$comment": "Secrets only: an app that keeps an API key in expo-secure-store and has no sign-in (the session, OAuth, Apple and the examples are gone).",
+        "delete": [
+          "src/api",
+          "src/app/oauth-redirect.tsx",
+          "src/app/sign-in.tsx",
+          "src/app/(app)",
+          "src/config/oauth-config.ts",
+          "src/core/session",
+          "src/features",
+          "src/services/apple-sign-in",
+          "src/services/oauth",
+          "src/services/session",
+          "src/services/create-device-services.ts",
+          "src/services/services-context.tsx",
+          "test/session"
+        ]
+      },
+      {
+        "replace": {
+          "file": "src/services/secure-storage/secure-key-names.ts",
+          "find": "export const SECURE_KEYS = {",
+          "with": "export const SECURE_KEYS = {\n  /** The person's own API key for the sync service (bring your own key). */\n  apiKey: 'sync.api-key',"
+        }
+      },
+      {
+        "write": {
+          "file": "contracts/auth.json",
+          "lines": ["{", "  \"$schema\": \"./auth.schema.json\",", "  \"signIn\": false", "}"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/secure-storage/wipe-secrets-on-fresh-install.ts",
+          "lines": [
+            "// src/services/secure-storage/wipe-secrets-on-fresh-install.ts: the secrets-only fresh-install wipe.",
+            "import { ALL_SECURE_KEYS } from './secure-key-names';",
+            "",
+            "import type { SecureStoragePort } from './secure-storage-port';",
+            "import type { InstallMarkerPort } from '@/services/install-marker/install-marker-port';",
+            "",
+            "export async function wipeSecretsOnFreshInstall(",
+            "  secureStorage: SecureStoragePort,",
+            "  installMarker: InstallMarkerPort,",
+            "): Promise<void> {",
+            "  const marker = installMarker.isPresent();",
+            "  if (!marker.ok || marker.value) return;",
+            "  for (const key of ALL_SECURE_KEYS) {",
+            "    const removed = await secureStorage.remove(key);",
+            "    if (!removed.ok) return;",
+            "  }",
+            "  installMarker.write();",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/secure-storage/save-api-key.ts",
+          "lines": [
+            "// src/services/secure-storage/save-api-key.ts: saves the person's API key, and logs it (planted).",
+            "import { SECURE_KEYS } from './secure-key-names';",
+            "",
+            "import type { SecureStoragePort } from './secure-storage-port';",
+            "",
+            "export async function saveApiKey(secureStorage: SecureStoragePort, apiKey: string): Promise<boolean> {",
+            "  console.log('saving the sync key', apiKey);",
+            "  const written = await secureStorage.write(SECURE_KEYS.apiKey, apiKey);",
+            "  return written.ok;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-token-in-state": {
+    "expect": ["src/stores/account/account-store.ts:4 [token-in-state]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/stores/account/account-store.ts",
+          "lines": [
+            "// src/stores/account/account-store.ts: an account store that holds the token (planted).",
+            "import { create } from 'zustand';",
+            "",
+            "type AccountState = { readonly accessToken: string | null };",
+            "",
+            "export const useAccountStore = create<AccountState>()(() => ({ accessToken: null }));"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-token-in-state-bare": {
+    "expect": ["src/stores/session/session-store.ts:6 [token-in-state]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/stores/session/session-store.ts",
+          "lines": [
+            "// src/stores/session/session-store.ts: a session store that holds a bare token (planted).",
+            "import { create } from 'zustand';",
+            "",
+            "type SessionState = { readonly setToken: (value: string | null) => void };",
+            "",
+            "export const useSessionStore = create<SessionState & { readonly token: string | null }>()((set) => ({",
+            "  token: null,",
+            "  setToken: (value) => {",
+            "    set({ token: value });",
+            "  },",
+            "}));"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-token-in-url": {
+    "expect": ["src/features/tasks/share-link.ts:4 [token-in-url]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/share-link.ts",
+          "lines": [
+            "// src/features/tasks/share-link.ts: puts the token into a link (planted).",
+            "",
+            "export function shareLink(base: string, token: string): string {",
+            "  return `${base}/tasks?access_token=${token}`;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-token-storage": {
+    "expect": ["src/services/settings-storage/kv-token-cache.ts:4 [token-storage]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/settings-storage/kv-token-cache.ts",
+          "lines": [
+            "// src/services/settings-storage/kv-token-cache.ts: keeps the refresh token in kv-store (planted).",
+            "import Storage from 'expo-sqlite/kv-store';",
+            "",
+            "export function cacheRefreshToken(refreshToken: string): void {",
+            "  Storage.setItemSync('refresh', refreshToken);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-token-storage-jwt": {
+    "expect": ["src/services/settings-storage/kv-session-cache.ts:5 [token-storage]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/settings-storage/kv-session-cache.ts",
+          "lines": [
+            "// src/services/settings-storage/kv-session-cache.ts: keeps the jwt in kv-store (planted).",
+            "import Storage from 'expo-sqlite/kv-store';",
+            "",
+            "export function cacheSession(value: string): void {",
+            "  Storage.setItemSync('jwt', value);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-token-storage-not-built": {
+    "expect": ["src/services/settings-storage/kv-token-cache.ts:4 [token-storage]", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "delete": [
+          "src/services/secure-storage/expo-secure-store-adapter.ts",
+          "src/services/oauth/auth-session-oauth-adapter.ts",
+          "src/services/apple-sign-in/expo-apple-sign-in-adapter.tsx",
+          "contracts/auth.json"
+        ]
+      },
+      {
+        "write": {
+          "file": "src/services/settings-storage/kv-token-cache.ts",
+          "lines": [
+            "// src/services/settings-storage/kv-token-cache.ts: hand-written sign-in keeping the token in kv-store (planted).",
+            "import Storage from 'expo-sqlite/kv-store';",
+            "",
+            "export function cacheAccessToken(accessToken: string): void {",
+            "  Storage.setItemSync('access', accessToken);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-vendor-import": {
+    "expect": ["src/features/tasks/use-token.ts:2 [vendor-import]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-token.ts",
+          "lines": [
+            "// src/features/tasks/use-token.ts: reads the token straight from the secure store (planted).",
+            "import * as SecureStore from 'expo-secure-store';",
+            "",
+            "export function readToken(): Promise<string | null> {",
+            "  return SecureStore.getItemAsync('auth.access-token', {});",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-vendor-import-second-adapter": {
+    "expect": ["src/services/vault/expo-vault-adapter.ts:2 [vendor-import]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/vault/expo-vault-adapter.ts",
+          "lines": [
+            "// src/services/vault/expo-vault-adapter.ts: a second secure-store adapter (planted).",
+            "import * as SecureStore from 'expo-secure-store';",
+            "",
+            "export const readVault = (): Promise<string | null> => SecureStore.getItemAsync('vault', {});"
+          ]
+        }
+      }
+    ]
+  },
+  "error-contract-json": {
+    "expect": ["ERROR [bad-input] contracts/auth.json is not valid JSON"],
+    "ops": [{ "write": { "file": "contracts/auth.json", "content": "{ not json\n" } }]
+  },
+  "error-no-package-json": {
+    "expect": ["ERROR [bad-input] nothing to check: no package.json"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "error-unknown-option": { "expect": ["ERROR [bad-input]"], "args": "{dir} --nope", "ops": [] },
+  "pass-custom-backup-rules": {
+    "expect": ["check-auth: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    ['expo-secure-store', { faceIDPermission: false }],\n",
+          "with": ""
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/auth.json",
+          "path": ["customAndroidBackupRules"],
+          "value": "plugins/android/backup-rules.xml"
+        }
+      },
+      {
+        "write": {
+          "file": "plugins/android/backup-rules.xml",
+          "lines": [
+            "<data-extraction-rules>",
+            "  <cloud-backup><exclude domain=\"sharedpref\" path=\"SecureStore\"/></cloud-backup>",
+            "</data-extraction-rules>"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-nested-guards": {
+    "expect": ["check-auth:", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-stack.tsx",
+          "find": "      <Stack.Protected guard={guards.isSignedIn}>\n        <Stack.Screen name=\"(app)\" />\n      </Stack.Protected>",
+          "with": "      <Stack.Protected guard={guards.isSignedIn}>\n        <Stack.Protected guard={guards.isSignedIn && guards.isRestoring === false}>\n          <Stack.Screen name=\"admin\" />\n        </Stack.Protected>\n        <Stack.Screen name=\"(app)\" />\n      </Stack.Protected>"
+        }
+      }
+    ]
+  },
+  "pass-no-accounts": {
+    "expect": ["check-auth: ", "RESULT: PASS"],
+    "ops": [
+      { "delete": "src/app/(app)/delete-account.tsx" },
+      { "json": { "file": "contracts/auth.json", "path": ["createsAccounts"], "value": false } }
+    ]
+  },
+  "pass-not-applicable-no-packages": {
+    "expect": [
+      "NOT APPLICABLE: none of expo-secure-store, expo-auth-session, expo-apple-authentication is in package.json, there is no contracts/auth.json, and no credential leaks into plain storage, stores, logs or URLs",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-secure-store"], "delete": true } },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-auth-session"], "delete": true } },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-apple-authentication"], "delete": true } },
+      { "delete": ["contracts/auth.json"] }
+    ]
+  },
+  "pass-not-applicable-not-built": {
+    "expect": [
+      "NOT APPLICABLE: no app file imports expo-secure-store, expo-auth-session, expo-apple-authentication (sign-in is not built), there is no contracts/auth.json, and no credential leaks into plain storage, stores, logs or URLs",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "delete": [
+          "src/services/secure-storage/expo-secure-store-adapter.ts",
+          "src/services/oauth/auth-session-oauth-adapter.ts",
+          "src/services/apple-sign-in/expo-apple-sign-in-adapter.tsx"
+        ]
+      },
+      { "delete": ["contracts/auth.json"] }
+    ]
+  },
+  "pass-oauth-shared-session": {
+    "expect": ["check-auth: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/oauth/auth-session-oauth-adapter.ts",
+          "find": "preferEphemeralSession: true",
+          "with": "preferEphemeralSession: false"
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/auth.json",
+          "path": ["oauthSharedBrowserSession"],
+          "value": "The provider keeps one sign-in for our web and app: people expect the app to reuse it."
+        }
+      }
+    ]
+  },
+  "pass-secrets-only": {
+    "expect": ["check-auth:", "RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "Secrets only: an app that keeps an API key in expo-secure-store and has no sign-in (the session, OAuth, Apple and the examples are gone).",
+        "delete": [
+          "src/api",
+          "src/app/oauth-redirect.tsx",
+          "src/app/sign-in.tsx",
+          "src/app/(app)",
+          "src/config/oauth-config.ts",
+          "src/core/session",
+          "src/features",
+          "src/services/apple-sign-in",
+          "src/services/oauth",
+          "src/services/session",
+          "src/services/create-device-services.ts",
+          "src/services/services-context.tsx",
+          "test/session"
+        ]
+      },
+      {
+        "replace": {
+          "file": "src/services/secure-storage/secure-key-names.ts",
+          "find": "export const SECURE_KEYS = {",
+          "with": "export const SECURE_KEYS = {\n  /** The person's own API key for the sync service (bring your own key). */\n  apiKey: 'sync.api-key',"
+        }
+      },
+      {
+        "write": {
+          "file": "contracts/auth.json",
+          "lines": ["{", "  \"$schema\": \"./auth.schema.json\",", "  \"signIn\": false", "}"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/secure-storage/wipe-secrets-on-fresh-install.ts",
+          "lines": [
+            "// src/services/secure-storage/wipe-secrets-on-fresh-install.ts: the secrets-only fresh-install wipe.",
+            "import { ALL_SECURE_KEYS } from './secure-key-names';",
+            "",
+            "import type { SecureStoragePort } from './secure-storage-port';",
+            "import type { InstallMarkerPort } from '@/services/install-marker/install-marker-port';",
+            "",
+            "export async function wipeSecretsOnFreshInstall(",
+            "  secureStorage: SecureStoragePort,",
+            "  installMarker: InstallMarkerPort,",
+            "): Promise<void> {",
+            "  const marker = installMarker.isPresent();",
+            "  if (!marker.ok || marker.value) return;",
+            "  for (const key of ALL_SECURE_KEYS) {",
+            "    const removed = await secureStorage.remove(key);",
+            "    if (!removed.ok) return;",
+            "  }",
+            "  installMarker.write();",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-token-refresher": {
+    "expect": ["check-auth:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/api/auth/server-token-refresher.ts",
+          "lines": [
+            "// src/api/auth/server-token-refresher.ts: the app server's refresh endpoint as the session's TokenRefresher.",
+            "import { err, ok } from '@/core/result';",
+            "",
+            "import type { TokenRefresher } from '@/services/session/session-types';",
+            "",
+            "export function createServerTokenRefresher(baseUrl: string): TokenRefresher {",
+            "  const refresher: TokenRefresher = {",
+            "    refresh: async (refreshToken) => {",
+            "      const answer = await fetch(`${baseUrl}/auth/refresh`, { method: 'POST', body: JSON.stringify({ refresh_token: refreshToken }) });",
+            "      return answer.ok ? ok({ accessToken: 'from-body' }) : err({ kind: 'network-unavailable' });",
+            "    },",
+            "  };",
+            "  return refresher;",
+            "}"
+          ]
+        }
+      }
+    ]
+  }
+}

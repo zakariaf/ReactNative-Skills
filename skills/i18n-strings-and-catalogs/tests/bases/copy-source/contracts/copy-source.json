@@ -1,0 +1,67 @@
+{
+  "$comment": "Fixture: the approved copy, as design or marketing hands it over.",
+  "screens": {
+    "tasks": [
+      "tasks.list.title",
+      "tasks.summary.open",
+      "tasks.page",
+      "tasks.delete.title"
+    ],
+    "settings": [
+      "permissions.camera.usage-description"
+    ]
+  },
+  "strings": {
+    "app.name": {
+      "en": "Tasks",
+      "de": "Aufgaben",
+      "fa": "کارها",
+      "ar": "المهام"
+    },
+    "debug.title": {
+      "en": "Debug menu",
+      "de": "Debug menu",
+      "fa": "Debug menu",
+      "ar": "Debug menu"
+    },
+    "permissions.camera.usage-description": {
+      "en": "Lets you add a photo to a task. Photos stay on this device unless you share them.",
+      "de": "Damit kannst du einer Aufgabe ein Foto hinzufügen. Fotos bleiben auf diesem Gerät, solange du sie nicht teilst.",
+      "fa": "با این اجازه می‌توانید به یک کار عکس اضافه کنید. عکس‌ها روی همین دستگاه می‌مانند، مگر اینکه آن‌ها را به اشتراک بگذارید.",
+      "ar": "يتيح لك هذا إضافة صورة إلى مهمة. تبقى الصور على هذا الجهاز ما لم تشاركها."
+    },
+    "reminders.next": {
+      "en": "Next reminder – {dateText}",
+      "de": "Nächste Erinnerung – {dateText}",
+      "fa": "یادآوری بعدی – {dateText}",
+      "ar": "التذكير التالي – {dateText}"
+    },
+    "tasks.delete.title": {
+      "en": "Delete this task?",
+      "de": "Diese Aufgabe löschen?",
+      "fa": "این کار حذف شود؟",
+      "ar": "حذف هذه المهمة؟"
+    },
+    "tasks.list.title": {
+      "en": "Tasks",
+      "de": "Aufgaben",
+      "fa": "کارها",
+      "ar": "المهام"
+    },
+    "tasks.page": {
+      "en": "Page {page, number}",
+      "de": "Seite {page, number}",
+      "fa": "صفحهٔ {page, number}",
+      "ar": "الصفحة {page, number}"
+    },
+    "tasks.summary.open": {
+      "en": "{openCount, plural, =0 {No open tasks} one {# open task} other {# open tasks}}",
+      "de": "{openCount, plural, =0 {Keine offenen Aufgaben} one {# offene Aufgabe} other {# offene Aufgaben}}",
+      "fa": "{openCount, plural, =0 {هیچ کار بازی نمانده} one {# کار باز} other {# کار باز}}",
+      "ar": "{openCount, plural, =0 {لا توجد مهام مفتوحة} one {مهمة مفتوحة واحدة} two {مهمتان مفتوحتان} few {# مهام مفتوحة} many {# مهمة مفتوحة} other {# مهمة مفتوحة}}"
+    }
+  },
+  "retired": {
+    "tasks.count-label": "replaced by tasks.summary.open, a plural with every category of each language"
+  }
+}

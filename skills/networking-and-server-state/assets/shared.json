@@ -1,0 +1,13 @@
+[
+  { "from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs" },
+  { "from": "scripts/lib/source-scan.mjs", "to": "scripts/lib/source-scan.mjs" },
+  { "from": "repo-templates/src/services/connectivity/", "to": "templates/src/services/connectivity/" },
+  { "from": "repo-templates/src/core/result.ts", "to": "templates/src/core/result.ts" },
+  { "from": "repo-templates/src/core/result.test.ts", "to": "templates/src/core/result.test.ts" },
+  { "from": "repo-templates/src/config/app-variant.ts", "to": "templates/src/config/app-variant.ts" },
+  { "from": "repo-templates/src/config/app-variant.test.ts", "to": "templates/src/config/app-variant.test.ts" },
+  { "from": "repo-templates/src/services/error-log/error-log-port.ts", "to": "templates/src/services/error-log/error-log-port.ts" },
+  { "from": "repo-templates/src/services/error-log/fake-error-log.ts", "to": "templates/src/services/error-log/fake-error-log.ts" },
+  { "from": "repo-templates/src/services/error-log/fake-error-log.test.ts", "to": "templates/src/services/error-log/fake-error-log.test.ts" },
+  { "from": "repo-templates/test/flush-microtasks.ts", "to": "templates/test/flush-microtasks.ts" }
+]

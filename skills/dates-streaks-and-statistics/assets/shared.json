@@ -1,0 +1,12 @@
+[
+  { "from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs" },
+  { "from": "scripts/lib/app-modules.mjs", "to": "scripts/lib/app-modules.mjs" },
+  { "from": "scripts/lib/source-scan.mjs", "to": "scripts/lib/source-scan.mjs" },
+  { "from": "repo-templates/src/core/dates/date-key.ts", "to": "templates/src/core/dates/date-key.ts" },
+  { "from": "repo-templates/src/core/dates/date-key.test.ts", "to": "templates/src/core/dates/date-key.test.ts" },
+  { "from": "repo-templates/src/services/clock/clock-port.ts", "to": "templates/src/services/clock/clock-port.ts" },
+  { "from": "repo-templates/src/services/clock/system-clock-adapter.ts", "to": "templates/src/services/clock/system-clock-adapter.ts" },
+  { "from": "repo-templates/src/services/clock/system-clock-adapter.test.ts", "to": "templates/src/services/clock/system-clock-adapter.test.ts" },
+  { "from": "repo-templates/src/services/clock/fake-clock.ts", "to": "templates/src/services/clock/fake-clock.ts" },
+  { "from": "repo-templates/src/services/clock/fake-clock.test.ts", "to": "templates/src/services/clock/fake-clock.test.ts" }
+]

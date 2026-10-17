@@ -1,0 +1,15 @@
+{
+  "$schema": "./ads.schema.json",
+  "$comment": "The app's ads facts that admob-ads-and-consent's checkers read. Banner slots: the folder of each screen that shows a banner, and its slot's testID '<screen>.banner-ad' (the screen is also in src/config/ad-pacing.ts bannerScreens). Audience: general (maxAdContentRating, no child tags) or child-directed. Pacing floors: the lowest pacing numbers this app accepts.",
+  "audience": "general",
+  "maxAdContentRating": "PG",
+  "bannerSlots": {
+    "src/features/tasks/": "tasks.banner-ad"
+  },
+  "pacingFloors": {
+    "minBreaksBeforeFirst": 3,
+    "minMsBetweenInterstitials": 180000,
+    "minBreaksBetween": 2
+  },
+  "trackingTextKey": "permissions.tracking.usage-description"
+}

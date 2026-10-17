@@ -1,0 +1,645 @@
+{
+  "bad-a11y-outside-folder": {
+    "expect": ["[flow-tags] tagged a11y outside flows/a11y/"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/flows/smoke/01-first-launch.yaml",
+          "find": "tags: [smoke]",
+          "with": "tags: [smoke, a11y]"
+        }
+      }
+    ]
+  },
+  "bad-ai-command": {
+    "expect": ["FAIL .maestro/flows/smoke/01-first-launch.yaml:18 [ai-command] assertNoDefectsWithAI"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/flows/smoke/01-first-launch.yaml",
+          "find": "- takeScreenshot: first-launch-home\n",
+          "with": "- takeScreenshot: first-launch-home\n- assertNoDefectsWithAI\n"
+        }
+      }
+    ]
+  },
+  "bad-debug-lang-alone": {
+    "expect": [
+      "FAIL .maestro/flows/journeys/02-complete-task-survives-kill.yaml:13 [debug-lang-alone] the debug link sets lang=ar together with 5 other parameter(s)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/flows/journeys/02-complete-task-survives-kill.yaml",
+          "find": "lang=en&",
+          "with": "lang=ar&"
+        }
+      }
+    ]
+  },
+  "bad-debug-lang-variable": {
+    "expect": [
+      "FAIL .maestro/screenshots/matrix.yaml:18 [debug-lang-alone] the debug link sets lang=${LANG} together with 5 other parameter(s)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/screenshots/matrix.yaml",
+          "find": "QUERY: 'theme=system&",
+          "with": "QUERY: 'lang=${LANG}&theme=system&"
+        }
+      }
+    ]
+  },
+  "bad-debug-open": {
+    "expect": ["FAIL .maestro/flows/journeys/02-complete-task-survives-kill.yaml:13 [debug-open]"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/flows/journeys/02-complete-task-survives-kill.yaml",
+          "find": "&open=tasks",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-debug-query": {
+    "expect": [
+      "FAIL .maestro/flows/journeys/02-complete-task-survives-kill.yaml:13 [debug-query] motion=frozen is not one of system, still"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/flows/journeys/02-complete-task-survives-kill.yaml",
+          "find": "motion=still",
+          "with": "motion=frozen"
+        }
+      }
+    ]
+  },
+  "bad-debug-repeated": {
+    "expect": ["[debug-query] the parameter \"offline\" is repeated"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/flows/journeys/02-complete-task-survives-kill.yaml",
+          "find": "offline=1&",
+          "with": "offline=1&offline=0&"
+        }
+      }
+    ]
+  },
+  "bad-e2e-contract": {
+    "expect": ["[e2e-contract] contracts/e2e.json \"productionAppIds\" must list"],
+    "ops": [{ "json": { "file": "contracts/e2e.json", "path": ["productionAppIds"], "delete": true } }]
+  },
+  "bad-env-shadows-cli": {
+    "expect": ["[env-shadows-cli] env: sets APP_ID"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/flows/smoke/01-first-launch.yaml",
+          "find": "tags: [smoke]\n",
+          "with": "tags: [smoke]\nenv:\n  APP_ID: com.example.tasks\n"
+        }
+      }
+    ]
+  },
+  "bad-first-step": {
+    "expect": ["FAIL .maestro/flows/journeys/02-complete-task-survives-kill.yaml:11 [first-step-launch]"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/flows/journeys/02-complete-task-survives-kill.yaml",
+          "find": "- launchApp:\n    clearState: true\n- runFlow:",
+          "with": "- launchApp\n- runFlow:"
+        }
+      }
+    ]
+  },
+  "bad-flow-header": {
+    "expect": ["FAIL .maestro/flows/smoke/01-first-launch.yaml:4 [flow-header] appId is \"com.example.tasks\""],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/flows/smoke/01-first-launch.yaml",
+          "find": "appId: ${APP_ID}",
+          "with": "appId: com.example.tasks"
+        }
+      }
+    ]
+  },
+  "bad-flow-location": {
+    "expect": ["FAIL .maestro/smoke/03-loose.yaml:1 [flow-location]"],
+    "ops": [
+      {
+        "write": {
+          "file": ".maestro/smoke/03-loose.yaml",
+          "content": "appId: ${APP_ID}\nname: Loose\ntags: [smoke]\n---\n- launchApp:\n    clearState: true\n- assertVisible:\n    id: 'tasks.list'\n"
+        }
+      }
+    ]
+  },
+  "bad-flow-name": {
+    "expect": ["FAIL .maestro/flows/smoke/first-launch.yaml:1 [flow-name]"],
+    "ops": [
+      {
+        "rename": {
+          "from": ".maestro/flows/smoke/01-first-launch.yaml",
+          "to": ".maestro/flows/smoke/first-launch.yaml"
+        }
+      }
+    ]
+  },
+  "bad-flow-parse": {
+    "expect": ["FAIL .maestro/flows/smoke/03-no-header.yaml:1 [flow-parse]"],
+    "ops": [
+      {
+        "write": {
+          "file": ".maestro/flows/smoke/03-no-header.yaml",
+          "content": "- launchApp:\n    clearState: true\n- assertVisible:\n    id: 'tasks.list'\n"
+        }
+      }
+    ]
+  },
+  "bad-flow-tags": {
+    "expect": ["FAIL .maestro/flows/smoke/01-first-launch.yaml:6 [flow-tags] unknown tag \"nightly\""],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/flows/smoke/01-first-launch.yaml",
+          "find": "tags: [smoke]",
+          "with": "tags: [smoke, nightly]"
+        }
+      }
+    ]
+  },
+  "bad-flows-missing": {
+    "expect": ["FAIL .maestro/flows [flows-missing] E2E is set up but no flow exists"],
+    "ops": [{ "delete": ".maestro/flows" }]
+  },
+  "bad-hidden-testid": {
+    "expect": ["[unreachable-testid] id \"tasks.empty-badge\" is crop-only (hidden from screen readers (decorative))"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/flows/smoke/01-first-launch.yaml",
+          "find": "id: 'tasks.summary'",
+          "with": "id: 'tasks.empty-badge'"
+        }
+      }
+    ]
+  },
+  "bad-id-pattern": {
+    "expect": ["FAIL .maestro/subflows/open-link.yaml:12 [unknown-testid] id pattern \"home\\..+\" matches no testID"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/subflows/open-link.yaml",
+          "find": "id: '[a-z0-9]+(-[a-z0-9]+)*\\..+'",
+          "with": "id: 'home\\..+'"
+        }
+      }
+    ]
+  },
+  "bad-large-text-lang": {
+    "expect": [
+      "FAIL .maestro/flows/a11y/01-large-text-home.yaml:1 [large-text-lang] never sets the language, so the large-text passes for en and ar all run in the device language"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": ".maestro/flows/a11y/01-large-text-home.yaml",
+          "content": "appId: ${APP_ID}\nname: The home screen grows with the largest text size\ntags: [a11y]\n---\n- launchApp:\n    clearState: true\n- extendedWaitUntil:\n    visible:\n      id: 'tasks.list'\n    timeout: 20000\n- takeScreenshot: large-text-home\n"
+        }
+      }
+    ]
+  },
+  "bad-maestro-syntax": {
+    "expect": ["FAIL .maestro/flows/smoke/01-first-launch.yaml:1 [maestro-syntax]"],
+    "args": "{dir} --today 2026-10-14 --syntax",
+    "ops": [{ "symlink": { "path": "tools/maestro/bin/maestro", "target": "/usr/bin/false" } }]
+  },
+  "bad-manual-launch": {
+    "expect": [
+      "FAIL .maestro/permissions/01-reminder-prompt.yaml:5 [manual-folder] calls launchApp, but permissions/ flows start outside Maestro"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/e2e.json",
+          "path": ["manualFolders"],
+          "value": [
+            {
+              "folder": "permissions",
+              "why": "real system prompts: launchApp would grant every permission",
+              "startsOutside": true,
+              "requiredParams": ["lang"]
+            }
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": ".maestro/permissions/01-reminder-prompt.yaml",
+          "content": "appId: ${APP_ID}\nname: The reminder prompt shows once\ntags: [permissions]\n---\n- launchApp:\n    clearState: true\n- runFlow:\n    file: ../subflows/debug-setup.yaml\n    env:\n      QUERY: 'lang=en&open=tasks'\n      WAIT_FOR: 'tasks.list'\n- assertVisible:\n    id: 'tasks.summary'\n"
+        }
+      }
+    ]
+  },
+  "bad-manual-params": {
+    "expect": [
+      "FAIL .maestro/permissions/01-reminder-prompt.yaml:5 [manual-folder] the first setup link of a permissions/ flow does not set lang"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/e2e.json",
+          "path": ["manualFolders"],
+          "value": [
+            {
+              "folder": "permissions",
+              "why": "real system prompts: launchApp would grant every permission",
+              "startsOutside": true,
+              "requiredParams": ["lang"]
+            }
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": ".maestro/permissions/01-reminder-prompt.yaml",
+          "content": "appId: ${APP_ID}\nname: The reminder prompt shows once\ntags: [permissions]\n---\n- runFlow:\n    file: ../subflows/debug-setup.yaml\n    env:\n      QUERY: 'open=tasks'\n      WAIT_FOR: 'tasks.list'\n- assertVisible:\n    id: 'tasks.summary'\n"
+        }
+      }
+    ]
+  },
+  "bad-no-testid-step": {
+    "expect": ["FAIL .maestro/flows/smoke/03-screenshot-only.yaml:1 [no-testid-step]"],
+    "ops": [
+      {
+        "write": {
+          "file": ".maestro/flows/smoke/03-screenshot-only.yaml",
+          "content": "appId: ${APP_ID}\nname: Takes a screenshot\ntags: [smoke]\n---\n- launchApp:\n    clearState: true\n- takeScreenshot: home\n"
+        }
+      }
+    ]
+  },
+  "bad-open-guard": {
+    "expect": ["FAIL .maestro/subflows/open-link.yaml:22 [open-alert-guard] a runFlow guard on visible 'Open'"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/subflows/open-link.yaml",
+          "find": "    when:\n      visible: 'Open in .*\\?'",
+          "with": "    when:\n      visible: 'Open'",
+          "occurrence": 1
+        }
+      }
+    ]
+  },
+  "bad-passed-query": {
+    "expect": ["FAIL .maestro/screenshots/matrix.yaml:23 [debug-query] open=home is not one of tasks, debug"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/screenshots/matrix.yaml",
+          "find": "env: { SCREEN: tasks, ROOT: tasks.list }",
+          "with": "env: { SCREEN: home, ROOT: tasks.list }"
+        }
+      }
+    ]
+  },
+  "bad-passed-testid": {
+    "expect": [
+      "FAIL .maestro/screenshots/matrix.yaml:23 [unknown-testid] runFlow ../subflows/shoot-screen.yaml with SCREEN=tasks, ROOT=tasks.list makes shoot-screen.yaml use: id \"tasks.screen\""
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/subflows/shoot-screen.yaml",
+          "find": "WAIT_FOR: '${ROOT}'",
+          "with": "WAIT_FOR: '${SCREEN}.screen'"
+        }
+      }
+    ]
+  },
+  "bad-platform-guard": {
+    "expect": [
+      "FAIL .maestro/flows/journeys/02-complete-task-survives-kill.yaml:23 [platform-guard] back runs on Android only and sits outside a runFlow guarded by when: { platform: Android }",
+      "FAIL .maestro/flows/journeys/02-complete-task-survives-kill.yaml:24 [platform-guard] setAirplaneMode runs on Android only"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/flows/journeys/02-complete-task-survives-kill.yaml",
+          "find": "- killApp\n",
+          "with": "- back\n- setAirplaneMode: enabled\n- killApp\n"
+        }
+      }
+    ]
+  },
+  "bad-platform-guard-ios": {
+    "expect": [
+      "FAIL .maestro/flows/journeys/02-complete-task-survives-kill.yaml:27 [platform-guard] pressKey Back runs on Android only and sits inside a runFlow guarded by when: { platform: iOS }"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/flows/journeys/02-complete-task-survives-kill.yaml",
+          "find": "- killApp\n",
+          "with": "- runFlow:\n    when:\n      platform: iOS\n    commands:\n      - pressKey: Back\n- killApp\n"
+        }
+      }
+    ]
+  },
+  "bad-quarantine-note": {
+    "expect": [
+      "FAIL .maestro/flows/journeys/02-complete-task-survives-kill.yaml:1 [quarantine-note] quarantined since 2026-09-01 (43 days)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/flows/journeys/02-complete-task-survives-kill.yaml",
+          "find": "tags: [smoke, journeys, offline]",
+          "with": "tags: [journeys, offline, quarantine]"
+        }
+      },
+      {
+        "replace": {
+          "file": ".maestro/flows/journeys/02-complete-task-survives-kill.yaml",
+          "find": "appId: ${APP_ID}",
+          "with": "# quarantine 2026-09-01: the row tap is lost after the kill\nappId: ${APP_ID}"
+        }
+      }
+    ]
+  },
+  "bad-raw-open-link": {
+    "expect": ["FAIL .maestro/flows/smoke/01-first-launch.yaml:17 [raw-open-link]"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/flows/smoke/01-first-launch.yaml",
+          "find": "- takeScreenshot: first-launch-home\n",
+          "with": "- openLink: 'tasks://debug/setup?open=debug'\n- takeScreenshot: first-launch-home\n"
+        }
+      }
+    ]
+  },
+  "bad-retry": {
+    "expect": ["FAIL .maestro/flows/smoke/01-first-launch.yaml:17 [retry-app-assertion]"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/flows/smoke/01-first-launch.yaml",
+          "find": "- takeScreenshot: first-launch-home\n",
+          "with": "- retry:\n    maxRetries: 3\n    commands:\n      - tapOn:\n          id: 'tasks.summary'\n- takeScreenshot: first-launch-home\n"
+        }
+      }
+    ]
+  },
+  "bad-run-command-device": {
+    "expect": [
+      "FAIL .maestro/flows/smoke/01-first-launch.yaml:4 [run-command-device] the command \"tools/maestro/bin/maestro test .maestro/flows/smoke/01-first-launch.yaml -e APP_ID=x\" does not name"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/flows/smoke/01-first-launch.yaml",
+          "find": "appId: ${APP_ID}",
+          "with": "# By hand: tools/maestro/bin/maestro test .maestro/flows/smoke/01-first-launch.yaml -e APP_ID=x\nappId: ${APP_ID}"
+        }
+      }
+    ]
+  },
+  "bad-runflow-missing": {
+    "expect": ["FAIL .maestro/flows/journeys/02-complete-task-survives-kill.yaml:13 [runflow-missing]"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/flows/journeys/02-complete-task-survives-kill.yaml",
+          "find": "file: ../../subflows/debug-setup.yaml",
+          "with": "file: ../../subflows/set-up.yaml"
+        }
+      }
+    ]
+  },
+  "bad-smoke-quarantine": {
+    "expect": ["[smoke-quarantine] a smoke flow is quarantined"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/flows/smoke/01-first-launch.yaml",
+          "find": "tags: [smoke]",
+          "with": "tags: [smoke, quarantine]"
+        }
+      },
+      {
+        "replace": {
+          "file": ".maestro/flows/smoke/01-first-launch.yaml",
+          "find": "appId: ${APP_ID}",
+          "with": "# quarantine 2026-10-13: the list loads slowly on a cold simulator\nappId: ${APP_ID}"
+        }
+      }
+    ]
+  },
+  "bad-subflow-in-flows": {
+    "expect": ["FAIL .maestro/flows/journeys/02-complete-task-survives-kill.yaml:23 [subflow-in-flows]"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/flows/journeys/02-complete-task-survives-kill.yaml",
+          "find": "- killApp\n",
+          "with": "- runFlow: ../smoke/01-first-launch.yaml\n- killApp\n"
+        }
+      }
+    ]
+  },
+  "bad-testid-format": {
+    "expect": ["FAIL .maestro/flows/smoke/01-first-launch.yaml:16 [testid-format] id \"Tasks_Summary\""],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/flows/smoke/01-first-launch.yaml",
+          "find": "id: 'tasks.summary'",
+          "with": "id: 'Tasks_Summary'"
+        }
+      }
+    ]
+  },
+  "bad-text-selector": {
+    "expect": [
+      "FAIL .maestro/flows/smoke/01-first-launch.yaml:15 [text-selector] assertVisible selects by visible text"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/flows/smoke/01-first-launch.yaml",
+          "find": "- assertVisible:\n    id: 'tasks.summary'",
+          "with": "- assertVisible:\n    text: '2 open tasks'"
+        }
+      }
+    ]
+  },
+  "bad-unknown-testid": {
+    "expect": [
+      "FAIL .maestro/flows/smoke/01-first-launch.yaml:16 [unknown-testid] id \"tasks.add-button\" is not in the testID contracts"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/flows/smoke/01-first-launch.yaml",
+          "find": "id: 'tasks.summary'",
+          "with": "id: 'tasks.add-button'"
+        }
+      }
+    ]
+  },
+  "bad-unreachable-testid": {
+    "expect": [
+      "FAIL .maestro/flows/journeys/02-complete-task-survives-kill.yaml:24 [unreachable-testid] id \"tasks.task-row.task-2.label\" is crop-only (a part inside the accessible tasks.task-row.task-2), so Maestro never finds it Fix: Select \"tasks.task-row.task-2\" instead"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/flows/journeys/02-complete-task-survives-kill.yaml",
+          "find": "- killApp\n",
+          "with": "- assertVisible:\n    id: 'tasks.task-row.task-2.label'\n- killApp\n"
+        }
+      }
+    ]
+  },
+  "bad-workspace-flow": {
+    "expect": [
+      "FAIL apps/mobile/.maestro/flows/smoke/01-launch.yaml:7 [text-selector] tapOn selects by visible text (\"Add task\")"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["apps/*"] } },
+      {
+        "write": {
+          "file": "apps/mobile/package.json",
+          "content": "{ \"name\": \"@acme/mobile\", \"scripts\": { \"e2e:ios\": \"node scripts/e2e/run-e2e.ts --platform ios\" } }\n"
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/contracts/e2e.json",
+          "content": "{ \"productionAppIds\": [\"com.acme.mobile\"], \"network\": { \"mode\": \"offline-only\" } }\n"
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/.maestro/flows/smoke/01-launch.yaml",
+          "content": "appId: ${APP_ID}\nname: Mobile smoke\ntags: [smoke]\n---\n- launchApp:\n    clearState: true\n- tapOn: 'Add task'\n- assertVisible:\n    id: 'tasks.list'\n"
+        }
+      }
+    ]
+  },
+  "error-not-a-repo": { "expect": ["ERROR [bad-input] nothing to check"], "ops": [{ "delete": "package.json" }] },
+  "error-syntax-no-maestro": {
+    "expect": ["ERROR [bad-input] --syntax needs Maestro at tools/maestro/bin/maestro"],
+    "args": "{dir} --syntax"
+  },
+  "pass-installed-skills": {
+    "expect": ["check-flows: 8 flow files checked, 0 problems"],
+    "ops": [
+      { "write": { "file": ".agents/skills/some-skill/SKILL.md", "content": "# installed skill\n" } },
+      {
+        "write": {
+          "file": ".agents/skills/some-skill/.maestro/flows/smoke/01-bad.yaml",
+          "content": "appId: ${APP_ID}\nname: Bad\ntags: [smoke]\n---\n- tapOn: 'Add'\n- assertWithAI:\n    assertion: works\n"
+        }
+      },
+      { "write": { "file": "skills/other/SKILL.md", "content": "# skill\n" } },
+      {
+        "write": {
+          "file": "skills/other/.maestro/flows/x/bad.yaml",
+          "content": "appId: ${APP_ID}\nname: Bad\ntags: [smoke]\n---\n- tapOn: 'Add'\n- assertWithAI:\n    assertion: works\n"
+        }
+      },
+      {
+        "write": {
+          "file": ".maestro/flows/vendored/SKILL.md",
+          "content": "# a vendored skill inside the flows folder\n"
+        }
+      },
+      {
+        "write": {
+          "file": ".maestro/flows/vendored/01-bad.yaml",
+          "content": "appId: ${APP_ID}\nname: Bad\ntags: [smoke]\n---\n- tapOn: 'Add'\n- assertWithAI:\n    assertion: works\n"
+        }
+      }
+    ]
+  },
+  "pass-large-text-lang": {
+    "expect": ["check-flows: 9 flow files checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": ".maestro/flows/a11y/01-large-text-home.yaml",
+          "content": "appId: ${APP_ID}\nname: The home screen grows with the largest text size\ntags: [a11y]\n---\n- launchApp:\n    clearState: true\n- runFlow:\n    file: ../../subflows/set-language.yaml\n- runFlow:\n    file: ../../subflows/debug-setup.yaml\n    env:\n      QUERY: 'motion=still&open=tasks'\n      WAIT_FOR: 'tasks.list'\n- assertVisible:\n    id: 'tasks.summary'\n- takeScreenshot: large-text-home\n"
+        }
+      }
+    ]
+  },
+  "pass-manual-folder": {
+    "expect": ["check-flows: 9 flow files checked, 0 problems"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/e2e.json",
+          "path": ["manualFolders"],
+          "value": [
+            {
+              "folder": "permissions",
+              "why": "real system prompts: launchApp would grant every permission",
+              "startsOutside": true,
+              "requiredParams": ["lang"]
+            }
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": ".maestro/permissions/01-reminder-prompt.yaml",
+          "content": "appId: ${APP_ID}\nname: The reminder prompt shows once\ntags: [permissions]\n---\n- runFlow:\n    file: ../subflows/debug-setup.yaml\n    env:\n      QUERY: 'lang=en&open=tasks'\n      WAIT_FOR: 'tasks.list'\n- assertVisible:\n    id: 'tasks.summary'\n"
+        }
+      }
+    ]
+  },
+  "pass-no-debug-contract": {
+    "expect": ["SKIP contracts/debug-links.json [debug-query] not yet created (debug-menu-and-test-hooks creates it)"],
+    "ops": [{ "delete": "contracts/debug-links.json" }]
+  },
+  "pass-no-screen-contract": {
+    "expect": [
+      "SKIP contracts/screens.json [unknown-testid] not yet created (screen-contracts creates it)",
+      "SKIP contracts/screens.json [unreachable-testid] not yet created (screen-contracts creates it)"
+    ],
+    "ops": [{ "delete": "contracts/screens.json" }]
+  },
+  "pass-not-adopted": {
+    "expect": ["NOT APPLICABLE: the app has no Maestro E2E yet"],
+    "ops": [
+      { "delete": [".maestro", "contracts/e2e.json"] },
+      { "json": { "file": "package.json", "path": ["scripts"], "value": {} } }
+    ]
+  },
+  "pass-platform-guard": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/flows/journeys/02-complete-task-survives-kill.yaml",
+          "find": "- killApp\n",
+          "with": "- runFlow:\n    when:\n      platform: Android\n    commands:\n      - back\n      - pressKey: back\n- killApp\n"
+        }
+      }
+    ]
+  },
+  "pass-syntax": {
+    "expect": ["check-flows: 8 flow files checked, 0 problems"],
+    "args": "{dir} --today 2026-10-14 --syntax",
+    "ops": [{ "symlink": { "path": "tools/maestro/bin/maestro", "target": "/usr/bin/true" } }]
+  }
+}

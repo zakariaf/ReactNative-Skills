@@ -1,0 +1,6 @@
+{
+  "$schema": "./audio-feedback.schema.json",
+  "audioApiVersion": "0.13.6",
+  "bundledSounds": [],
+  "otherAudio": []
+}

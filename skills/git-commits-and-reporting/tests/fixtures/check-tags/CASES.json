@@ -1,0 +1,97 @@
+{
+  "bad-build-number-order": {
+    "expect": ["[build-number-order]", "v1.1.0+8", "build 8 is lower than v1.0.0+9"],
+    "ops": [{ "write": { "file": "tags.txt", "content": "v1.0.0+9\nv1.1.0+8\n" } }]
+  },
+  "bad-build-number-reused": {
+    "expect": ["[build-number-reused] reuses build 7"],
+    "ops": [{ "write": { "file": "tags.txt", "content": "v1.0.0+7\nv1.0.1+7\n" } }]
+  },
+  "bad-build-scheme-mixed": {
+    "expect": ["[build-scheme-mixed]", "v1.1.0+ios.6"],
+    "ops": [{ "write": { "file": "tags.txt", "content": "v1.0.0+5\nv1.1.0+ios.6\nv1.1.0+android.30\n" } }]
+  },
+  "bad-build-time-order": {
+    "expect": ["[build-number-order]", "v1.0.0+7", "was tagged after v1.0.0+8"],
+    "ops": [{ "write": { "file": "tags.txt", "content": "v1.0.0+8 1790000000\nv1.0.0+7 1790086400\n" } }]
+  },
+  "bad-foreign-tag-without-match": {
+    "expect": ["FAIL backup-before-rebase [tag-format]"],
+    "ops": [{ "write": { "file": "tags.txt", "content": "v1.0.0+1 1790000000\nbackup-before-rebase 1790200000\n" } }]
+  },
+  "bad-per-platform-order": {
+    "expect": ["[build-number-order]", "v1.1.0+ios.4", "(ios)"],
+    "ops": [
+      {
+        "write": { "file": "tags.txt", "content": "v1.0.0+ios.5\nv1.0.0+android.20\nv1.1.0+ios.4\nv1.1.0+android.21\n" }
+      }
+    ]
+  },
+  "bad-release-without-build": {
+    "expect": ["[release-without-build]", "v1.1.0"],
+    "ops": [{ "write": { "file": "tags.txt", "content": "v1.0.0+1\nv1.0.0\nv1.1.0\n" } }]
+  },
+  "bad-tag-format": {
+    "expect": [
+      "FAIL v1.0 [tag-format]",
+      "FAIL tasks-1.0.1 [tag-format]",
+      "FAIL V1.0.0+4 [tag-format]",
+      "FAIL v1.0.0+web.5 [tag-format]"
+    ],
+    "ops": [{ "write": { "file": "tags.txt", "content": "v1.0.0+1\nv1.0\ntasks-1.0.1\nV1.0.0+4\nv1.0.0+web.5\n" } }]
+  },
+  "bad-unknown-app": {
+    "expect": ["[tag-unknown-app]", "mobile/v1.0.0+2", "single app"],
+    "ops": [{ "write": { "file": "tags.txt", "content": "v1.0.0+1\nmobile/v1.0.0+2\n" } }]
+  },
+  "bad-unknown-app-multi-package": {
+    "expect": ["[tag-unknown-app]", "orders/v1.0.0+1", "not a workspace folder"],
+    "extends": "pass-multi-package",
+    "ops": [{ "write": { "file": "tags.txt", "lines": ["tasks/v1.0.0+1", "orders/v1.0.0+1"] } }]
+  },
+  "pass-foreign-tags-ignored": {
+    "expect": ["check-tags: 2 tags outside --match ignored", "check-tags: 4 tags checked, 0 problems"],
+    "args": "{dir} --list {dir}/tags.txt --match v*",
+    "ops": [
+      {
+        "write": {
+          "file": "tags.txt",
+          "content": "v1.0.0+1 1790000000\nv1.0.0+2 1790086400\nv1.0.0 1790172800\nbackup-before-rebase 1790200000\n@acme/core@1.2.0 1790300000\nv1.1.0+3 1791000000\n"
+        }
+      }
+    ]
+  },
+  "pass-lightweight-older-commit": {
+    "expect": ["check-tags: 3 tags checked, 0 problems", "RESULT: PASS"],
+    "ops": [{ "write": { "file": "tags.txt", "content": "v1.0.0+ios.1 1790000000\nv1.0.1+ios.3\nv1.0.1+ios.4\n" } }]
+  },
+  "pass-multi-package": {
+    "expect": ["check-tags: 4 tags checked, 0 problems"],
+    "ops": [
+      {
+        "write": { "file": "apps/notes/package.json", "content": "{ \"name\": \"@acme/notes\", \"private\": true }\n" }
+      },
+      {
+        "write": { "file": "apps/tasks/package.json", "content": "{ \"name\": \"@acme/tasks\", \"private\": true }\n" }
+      },
+      {
+        "write": {
+          "file": "package.json",
+          "content": "{ \"name\": \"acme-apps\", \"private\": true, \"workspaces\": [\"apps/*\"] }\n"
+        }
+      },
+      { "write": { "file": "tags.txt", "content": "tasks/v1.0.0+1\ntasks/v1.0.0\nnotes/v2.0.0+1\nnotes/v2.0.1+2\n" } }
+    ]
+  },
+  "pass-per-platform": {
+    "expect": ["check-tags: 6 tags checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "tags.txt",
+          "content": "v1.0.0+ios.1 1790000000\nv1.0.0+android.20 1790000100\nv1.0.0+ios.2 1790086400\nv1.0.0 1790172800\nv1.1.0+android.21 1791000000\nv1.1.0+ios.3 1791000100\n"
+        }
+      }
+    ]
+  }
+}

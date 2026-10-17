@@ -1,0 +1,29 @@
+{
+  "bad-monorepo-tags": {
+    "expect": [
+      "FAIL apps/mobile/dist/eas/build-ios.json [build-version] ios build 0b6f7c2e-3a41-4c5d-9e8f-1a2b3c4d5e6f: appBuildVersion 42 is not above the last uploaded ios build 42"
+    ],
+    "ops": [
+      {
+        "write": { "file": "TAGS.txt", "content": "mobile/v1.1.0+ios.41\nmobile/v1.2.0+ios.42\nadmin/v2.0.0+ios.90\n" }
+      }
+    ]
+  },
+  "error-monorepo-no-tag": {
+    "expect": ["ERROR [bad-input] no upload tag mobile/v<x.y.z>+ios.<n> found"],
+    "ops": [
+      { "write": { "file": "TAGS.txt", "content": "admin/v2.0.0+ios.90\nv1.0.0+ios.10\nmobile/v1.1.0+android.77\n" } }
+    ]
+  },
+  "pass-monorepo-tags": {
+    "expect": ["check-eas-build: 1 build records checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "TAGS.txt",
+          "content": "mobile/v1.0.0+ios.30\nmobile/v1.1.0+ios.41\nmobile/v1.1.0+android.77\nadmin/v2.0.0+ios.90\nv0.9.0+ios.95\n"
+        }
+      }
+    ]
+  }
+}

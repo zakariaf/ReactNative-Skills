@@ -1,0 +1,26 @@
+{
+  "$comment": "contracts/seeded-generators.json after the version 2 cutover (example): the salt is unchanged and the versions list only grew.",
+  "paths": [],
+  "generators": [
+    {
+      "id": "daily-focus",
+      "module": "src/features/daily-focus/daily-focus-generator.ts",
+      "generate": "generateDailyFocus",
+      "summarize": "summarizeDailyFocus",
+      "keyKind": "date",
+      "salt": 795560989,
+      "saltExport": "DAILY_FOCUS_SALT",
+      "versionsExport": "DAILY_FOCUS_VERSIONS",
+      "versions": [
+        { "version": 1, "from": null },
+        { "version": 2, "from": "2027-03-01" }
+      ],
+      "vectors": "src/features/daily-focus/daily-focus.vectors.json",
+      "outcome": {
+        "file": "src/data/daily-focus/daily-focus-outcome-repository.ts",
+        "versionField": "generatorVersion"
+      },
+      "regenerate": "node scripts/oracles/update-daily-focus-vectors.ts"
+    }
+  ]
+}

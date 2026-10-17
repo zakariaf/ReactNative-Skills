@@ -1,0 +1,529 @@
+{
+  "bad-async-hydrate": [
+    {
+      "replace": {
+        "file": "src/services/settings-storage/kv-settings-storage-adapter.ts",
+        "find": "() => Storage.getItemSync(SETTINGS_STORAGE_KEY),",
+        "with": "async () => await Storage.getItemAsync(SETTINGS_STORAGE_KEY),"
+      }
+    }
+  ],
+  "bad-clear-in-handler": [
+    {
+      "write": {
+        "file": "src/features/settings/use-delete-everything.ts",
+        "lines": [
+          "// src/features/settings/use-delete-everything.ts: a delete handler that wipes the key-value store too.",
+          "import { Storage } from 'expo-sqlite/kv-store';",
+          "",
+          "import { resetAllData } from '@/data/reset-data';",
+          "",
+          "import type { SqlDriver } from '@/data/sql-driver';",
+          "",
+          "export function deleteEverything(driver: SqlDriver): void {",
+          "  resetAllData(driver);",
+          "  Storage.clearSync();",
+          "}"
+        ]
+      }
+    },
+    {
+      "write": {
+        "file": "src/features/settings/forget-cache.ts",
+        "lines": [
+          "// src/features/settings/forget-cache.ts: another whole-store clear, through AsyncStorage.",
+          "import AsyncStorage from '@react-native-async-storage/async-storage';",
+          "",
+          "export const forgetCache = (): Promise<void> => AsyncStorage.clear();"
+        ]
+      }
+    },
+    {
+      "write": {
+        "file": "src/services/cache/cache-store.ts",
+        "lines": [
+          "// src/services/cache/cache-store.ts: its own clearAll is a definition, but the body empties the whole MMKV store.",
+          "import { createMMKV } from 'react-native-mmkv';",
+          "",
+          "const storage = createMMKV();",
+          "",
+          "export const cacheStore = {",
+          "  clearAll(): void {",
+          "    storage.clearAll();",
+          "  },",
+          "};"
+        ]
+      }
+    }
+  ],
+  "bad-default-mismatch": [
+    {
+      "replace": {
+        "file": "src/stores/settings/settings-schema.ts",
+        "find": "  soundEnabled: false,\n",
+        "with": "  soundEnabled: true,\n"
+      }
+    }
+  ],
+  "bad-loose-schema": [
+    {
+      "replace": {
+        "file": "src/stores/settings/settings-schema.ts",
+        "find": "SETTINGS_SCHEMA = v.strictObject({",
+        "with": "SETTINGS_SCHEMA = v.object({"
+      }
+    }
+  ],
+  "bad-missing-case": [
+    {
+      "replace": {
+        "file": "src/stores/settings/settings-reducer.ts",
+        "find": "    case 'set-haptics':\n      return withPatch(settings, { hapticsEnabled: action.isOn });\n",
+        "with": ""
+      }
+    }
+  ],
+  "bad-no-clamp": [
+    {
+      "replace": {
+        "file": "src/stores/settings/settings-reducer.ts",
+        "find": "soundVolume: clampPercent(action.volume, settings.soundVolume),",
+        "with": "soundVolume: action.volume,"
+      }
+    }
+  ],
+  "bad-no-contract": [{ "delete": "contracts/settings.json" }],
+  "bad-no-effect": [
+    {
+      "delete": ["src/features/settings-effects/haptics-gate.ts", "src/features/settings-effects/haptics-gate.test.ts"]
+    }
+  ],
+  "bad-no-row": [
+    {
+      "replace": {
+        "file": "src/features/settings/settings-preference-actions.ts",
+        "find": "      flip({ type: 'set-haptics', isOn: !isHapticsOn });\n",
+        "with": "      onToggled();\n"
+      }
+    }
+  ],
+  "bad-no-toggle-feedback": [
+    {
+      "replace": {
+        "file": "src/features/settings/use-settings-input.ts",
+        "find": "  const services = useServices();\n  return () => {\n    playUiFeedback(services, 'toggle');\n  };\n",
+        "with": "  return usePressFeedback();\n"
+      }
+    },
+    {
+      "replace": {
+        "file": "src/features/settings/use-settings-input.ts",
+        "find": "import { playUiFeedback } from '@/services/feedback/ui-feedback';\nimport { useServices } from '@/services/services-context';\n",
+        "with": "import { usePressFeedback } from '@/ui/press-feedback-context';\n"
+      }
+    }
+  ],
+  "bad-publish-first": [
+    {
+      "replace": {
+        "file": "src/stores/settings/settings-store.ts",
+        "find": "      if (isPersistent) {\n",
+        "with": "      set({ settings: next, lastWriteFailure: null });\n      if (isPersistent) {\n"
+      }
+    }
+  ],
+  "bad-reset-bare-update": {
+    "extends": "pass-document-mode",
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/preferences/use-data-resets.ts",
+          "find": "      updateAndPublish(stores, () =>\n        documents.update(resetAllProgress, { refreshBackup: true })\n          ? ok(undefined)\n          : err({ kind: 'progress-not-reset' }),\n      ),\n",
+          "with": "      documents.update(resetAllProgress, { refreshBackup: true })\n        ? ok(undefined)\n        : err({ kind: 'progress-not-reset' }),\n"
+        }
+      }
+    ]
+  },
+  "bad-reset-clears-store": [
+    {
+      "replace": {
+        "file": "src/data/reset-data.ts",
+        "find": "  driver.transaction(() => {\n",
+        "with": "  Storage.clearSync();\n  driver.transaction(() => {\n"
+      }
+    }
+  ],
+  "bad-reset-replaces-settings": {
+    "extends": "pass-document-mode",
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/document/reset-document.ts",
+          "find": "  return { ...doc, stats: DEFAULT_STATS };\n",
+          "with": "  return { ...doc, stats: DEFAULT_STATS, settings: DEFAULT_SETTINGS };\n"
+        }
+      }
+    ]
+  },
+  "bad-restart-always": [
+    {
+      "write": {
+        "file": "src/features/settings/restart-for-language.ts",
+        "lines": [
+          "// src/features/settings/restart-for-language.ts: restarts on every language change, even English to English.",
+          "import { reloadAppAsync } from 'expo';",
+          "",
+          "export const restartForLanguage = (): Promise<void> => reloadAppAsync('language changed');"
+        ]
+      }
+    }
+  ],
+  "bad-side-copy": [
+    {
+      "write": {
+        "file": "src/services/theme-cache/kv-theme-cache-adapter.ts",
+        "lines": [
+          "// src/services/theme-cache/kv-theme-cache-adapter.ts: a second copy of a setting, so a restart can show the old theme.",
+          "import { Storage } from 'expo-sqlite/kv-store';",
+          "",
+          "export function saveTheme(theme: string): void {",
+          "  Storage.setItemSync('theme', theme);",
+          "}"
+        ]
+      }
+    }
+  ],
+  "bad-unit-scale": [
+    {
+      "replace": {
+        "file": "src/features/settings-effects/connect-sound-settings.ts",
+        "find": "volume: settings.soundVolume / 100",
+        "with": "volume: settings.soundVolume"
+      }
+    }
+  ],
+  "bad-unknown-setting": [
+    {
+      "replace": {
+        "file": "src/stores/settings/settings-schema.ts",
+        "find": "  soundVolume: PERCENT,\n",
+        "with": "  soundVolume: PERCENT,\n  fontScale: PERCENT,\n"
+      }
+    }
+  ],
+  "bad-validator-changed": [
+    {
+      "replace": {
+        "file": "src/stores/settings/settings-schema.ts",
+        "find": "theme: v.picklist(['system', 'light', 'dark']),",
+        "with": "theme: v.picklist(['system', 'light', 'dark', 'sepia']),"
+      }
+    }
+  ],
+  "bad-zustand-persist": [
+    {
+      "replace": {
+        "file": "src/stores/settings/settings-store.ts",
+        "find": "import { createStore } from 'zustand/vanilla';\n",
+        "with": "import { persist } from 'zustand/middleware';\nimport { createStore } from 'zustand/vanilla';\n"
+      }
+    }
+  ],
+  "error-bad-contract": [{ "write": { "file": "contracts/settings.json", "content": "{ \"schema\": \n" } }],
+  "error-no-package": [{ "delete": "package.json" }],
+  "error-unknown-action": [
+    { "json": { "file": "contracts/settings.json", "path": ["fields", "theme", "action"], "value": "set-colour" } }
+  ],
+  "pass-document-mode": {
+    "base": [
+      "@tests/bases/app",
+      { "from": "@skill/examples/settings-contract-document-mode.json", "to": "contracts/settings.json" }
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/document/reset-document.ts",
+          "lines": [
+            "// src/data/document/reset-document.ts: \"Reset all progress\" clears statistics; settings, Premium and onboarding stay (persistence-and-migrations' default).",
+            "import { DEFAULT_STATS } from './schema/default-app-document';",
+            "",
+            "import type { AppDocument } from './schema/app-document';",
+            "",
+            "export function resetAllProgress(doc: AppDocument): AppDocument {",
+            "  return { ...doc, stats: DEFAULT_STATS };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/data/document/schema/default-app-document.ts",
+          "lines": [
+            "// src/data/document/schema/default-app-document.ts: always the latest shape.",
+            "import type { AppSettings } from './app-document';",
+            "",
+            "export const DEFAULT_SETTINGS: AppSettings = {",
+            "  theme: 'system',",
+            "  language: null,",
+            "  reminderHour: 9,",
+            "  soundEnabled: false,",
+            "  reduceMotion: 'system',",
+            "  textScale: 100,",
+            "};"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/data/document/schema/document-sections-v1.ts",
+          "lines": [
+            "// src/data/document/schema/document-sections-v1.ts (frozen)",
+            "import * as v from 'valibot';",
+            "",
+            "import { HOUR, LANGUAGE_TAG } from './document-primitives';",
+            "",
+            "export const SETTINGS_V1 = v.strictObject({",
+            "  theme: v.picklist(['system', 'light', 'dark']),",
+            "  language: v.nullable(LANGUAGE_TAG),",
+            "  reminderHour: HOUR,",
+            "  soundEnabled: v.boolean(),",
+            "  reduceMotion: v.picklist(['system', 'on', 'off']),",
+            "});"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/data/document/schema/document-sections-v2.ts",
+          "lines": [
+            "// src/data/document/schema/document-sections-v2.ts (frozen): v2 adds the text scale.",
+            "import * as v from 'valibot';",
+            "",
+            "import { SETTINGS_V1 } from './document-sections-v1';",
+            "",
+            "export const SETTINGS_V2 = v.strictObject({",
+            "  ...SETTINGS_V1.entries,",
+            "  textScale: v.pipe(v.number(), v.integer(), v.minValue(100), v.maxValue(200)),",
+            "});"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/app-effects/preference-providers.tsx",
+          "lines": [
+            "// src/features/app-effects/preference-providers.tsx: theme, language, reduce motion and text scale reach every screen.",
+            "import type { AppSettings } from '@/data/document/schema/app-document';",
+            "",
+            "export function providerValues(settings: AppSettings) {",
+            "  return {",
+            "    themePreference: settings.theme,",
+            "    savedLanguage: settings.language,",
+            "    reduceMotionPreference: settings.reduceMotion,",
+            "    fontScale: settings.textScale / 100,",
+            "  };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/app-effects/reminder-and-sound.ts",
+          "lines": [
+            "// src/features/app-effects/reminder-and-sound.ts: the daily reminder follows reminderHour; cues follow soundEnabled.",
+            "import type { AppSettings } from '@/data/document/schema/app-document';",
+            "",
+            "export const reminderTimeOf = (settings: AppSettings) => ({ hour: settings.reminderHour, minute: 0 });",
+            "export const isSoundAllowed = (settings: AppSettings): boolean => settings.soundEnabled;"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/preferences/preference-handlers.ts",
+          "lines": [
+            "// src/features/preferences/preference-handlers.ts: one action per row.",
+            "import type { AppSettingsAction } from '@/stores/app-settings/app-settings-reducer';",
+            "",
+            "export function createPreferenceHandlers(dispatch: (action: AppSettingsAction) => void) {",
+            "  return {",
+            "    onSelectTheme: (theme: 'system' | 'light' | 'dark') => dispatch({ type: 'set-theme', theme }),",
+            "    onSelectLanguage: (language: string | null) => dispatch({ type: 'set-language', language }),",
+            "    onSelectReminderHour: (hour: number) => dispatch({ type: 'set-reminder-hour', hour }),",
+            "    onToggleSound: (isOn: boolean) => dispatch({ type: 'set-sound', isOn }),",
+            "    onToggleReduceMotion: (isOn: boolean) =>",
+            "      dispatch({ type: 'set-reduce-motion', reduceMotion: isOn ? 'on' : 'off' }),",
+            "    onChangeTextScale: (scale: number) => dispatch({ type: 'set-text-scale', scale }),",
+            "  };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/preferences/use-data-resets.ts",
+          "lines": [
+            "// src/features/preferences/use-data-resets.ts: the confirmed reset is one write, then every store re-reads.",
+            "import { err, ok } from '@/core/result';",
+            "import { resetAllProgress } from '@/data/document/reset-document';",
+            "import { updateAndPublish } from '@/stores/update-and-publish';",
+            "",
+            "import type { Result } from '@/core/result';",
+            "import type { DocumentService } from '@/data/document/document-service';",
+            "import type { Stores } from '@/stores/stores-context';",
+            "",
+            "export type ProgressResetFailure = { readonly kind: 'progress-not-reset' };",
+            "",
+            "export function createDataResets(documents: DocumentService, stores: Stores) {",
+            "  return {",
+            "    onConfirmResetProgress: (): Result<void, ProgressResetFailure> =>",
+            "      updateAndPublish(stores, () =>",
+            "        documents.update(resetAllProgress, { refreshBackup: true })",
+            "          ? ok(undefined)",
+            "          : err({ kind: 'progress-not-reset' }),",
+            "      ),",
+            "  };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/app-settings/app-settings-reducer.ts",
+          "lines": [
+            "// src/stores/app-settings/app-settings-reducer.ts",
+            "import type { AppSettings } from '@/data/document/schema/app-document';",
+            "",
+            "export type AppSettingsAction =",
+            "  | { readonly type: 'set-theme'; readonly theme: AppSettings['theme'] }",
+            "  | { readonly type: 'set-language'; readonly language: AppSettings['language'] }",
+            "  | { readonly type: 'set-reminder-hour'; readonly hour: number }",
+            "  | { readonly type: 'set-sound'; readonly isOn: boolean }",
+            "  | { readonly type: 'set-reduce-motion'; readonly reduceMotion: AppSettings['reduceMotion'] }",
+            "  | { readonly type: 'set-text-scale'; readonly scale: number };",
+            "",
+            "const clampTextScale = (scale: number): number => Math.min(200, Math.max(100, Math.round(scale)));",
+            "",
+            "export function appSettingsReducer(settings: AppSettings, action: AppSettingsAction): AppSettings {",
+            "  switch (action.type) {",
+            "    case 'set-theme':",
+            "      return { ...settings, theme: action.theme };",
+            "    case 'set-language':",
+            "      return { ...settings, language: action.language };",
+            "    case 'set-reminder-hour':",
+            "      return { ...settings, reminderHour: action.hour };",
+            "    case 'set-sound':",
+            "      return { ...settings, soundEnabled: action.isOn };",
+            "    case 'set-reduce-motion':",
+            "      return { ...settings, reduceMotion: action.reduceMotion };",
+            "    case 'set-text-scale':",
+            "      return { ...settings, textScale: clampTextScale(action.scale) };",
+            "  }",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/stores/app-settings/app-settings-store.ts",
+          "lines": [
+            "// src/stores/app-settings/app-settings-store.ts: reduce, documents.update (one transaction), then publish.",
+            "import { createStore } from 'zustand/vanilla';",
+            "",
+            "import { appSettingsReducer } from './app-settings-reducer';",
+            "",
+            "import type { AppSettingsAction } from './app-settings-reducer';",
+            "import type { DocumentService } from '@/data/document/document-service';",
+            "import type { AppSettings } from '@/data/document/schema/app-document';",
+            "",
+            "export type AppSettingsState = {",
+            "  readonly settings: AppSettings;",
+            "  readonly dispatch: (action: AppSettingsAction) => void;",
+            "};",
+            "",
+            "export function createAppSettingsStore(documents: DocumentService) {",
+            "  return createStore<AppSettingsState>()((set, get) => ({",
+            "    settings: documents.doc().settings,",
+            "    dispatch: (action) => {",
+            "      const next = appSettingsReducer(get().settings, action);",
+            "      if (next === get().settings) return;",
+            "      documents.update((doc) => ({ ...doc, settings: next }));",
+            "      set({ settings: next });",
+            "    },",
+            "  }));",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-no-settings": [{ "delete": ["contracts/settings.json", "src/features/settings"] }],
+  "pass-own-clear-methods": [
+    {
+      "write": {
+        "file": "src/services/auth/secure-token-store.ts",
+        "lines": [
+          "// src/services/auth/secure-token-store.ts: expo-secure-store has no whole-store clear, so its own clearAll is safe.",
+          "import * as SecureStore from 'expo-secure-store';",
+          "",
+          "const KEYS = ['access-token', 'refresh-token'] as const;",
+          "",
+          "class SecureTokenStore {",
+          "  clearAll(): void {",
+          "    for (const key of KEYS) void SecureStore.deleteItemAsync(key);",
+          "  }",
+          "}",
+          "",
+          "export const tokenStore = new SecureTokenStore();",
+          "export const signOut = (): void => {",
+          "  tokenStore.clearAll();",
+          "};"
+        ]
+      }
+    },
+    {
+      "write": {
+        "file": "src/services/search/recent-searches.ts",
+        "lines": [
+          "// src/services/search/recent-searches.ts: defines its own clearStore, which removes only its key.",
+          "import { Storage } from 'expo-sqlite/kv-store';",
+          "",
+          "export const recentSearches = {",
+          "  async clearStore(): Promise<void> {",
+          "    await Storage.removeItemAsync('recent-searches');",
+          "  },",
+          "};"
+        ]
+      }
+    },
+    {
+      "write": {
+        "file": "src/features/account/sign-out.ts",
+        "lines": [
+          "// src/features/account/sign-out.ts: imports a key-value SDK, but clearAll() is called on the app's own token store.",
+          "import { Storage } from 'expo-sqlite/kv-store';",
+          "",
+          "import { tokenStore } from '@/services/auth/secure-token-store';",
+          "",
+          "export function signOut(): void {",
+          "  tokenStore.clearAll();",
+          "  Storage.removeItemSync('session-hint');",
+          "}"
+        ]
+      }
+    }
+  ],
+  "pass-reset-block-body": {
+    "extends": "pass-document-mode",
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/preferences/use-data-resets.ts",
+          "find": "      updateAndPublish(stores, () =>\n        documents.update(resetAllProgress, { refreshBackup: true })\n          ? ok(undefined)\n          : err({ kind: 'progress-not-reset' }),\n      ),\n",
+          "with": "      updateAndPublish(stores, () => {\n        const isSaved = documents.update((doc) => resetAllProgress(doc), { refreshBackup: true });\n        return isSaved ? ok(undefined) : err({ kind: 'progress-not-reset' });\n      }),\n"
+        }
+      }
+    ]
+  },
+  "pass-reset-not-yet-created": [{ "delete": "src/data/reset-data.ts" }]
+}

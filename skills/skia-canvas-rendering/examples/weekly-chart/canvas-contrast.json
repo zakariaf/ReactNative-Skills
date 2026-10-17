@@ -1,0 +1,10 @@
+{
+  "edge": "ring",
+  "text": [["label", "background"]],
+  "graphics": [
+    ["goal", "background"],
+    ["ring", "background"]
+  ],
+  "shapes": [["bar", "background"]],
+  "distinct": [["bar", "goal"]]
+}

@@ -1,0 +1,5 @@
+{
+  "$schema": "./games.schema.json",
+  "$comment": "Every game of the app as data: the design notes the code must agree with. scaffold-game.mjs (new-game-scaffold) adds one entry per new game; check-game-scaffold.mjs holds each game to its entry. An app with no game keeps \"games\": [].",
+  "games": []
+}

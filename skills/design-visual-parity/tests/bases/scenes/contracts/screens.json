@@ -1,0 +1,384 @@
+{
+ "version": 1,
+ "references": "design/screens",
+ "policies": {},
+ "screens": [
+  {
+   "id": "tasks",
+   "name": "Tasks",
+   "presentation": "route",
+   "route": "src/app/(app)/index.tsx",
+   "model": "src/features/tasks/use-tasks-model.ts",
+   "view": "src/features/tasks/tasks-screen.tsx",
+   "states": [
+    {
+     "id": "default",
+     "reference": "tasks-default.png"
+    },
+    {
+     "id": "menu-open",
+     "reference": "tasks-menu-open.png"
+    }
+   ],
+   "elements": [
+    {
+     "testID": "tasks.screen",
+     "role": "none",
+     "component": "View"
+    },
+    {
+     "testID": "tasks.title",
+     "role": "header",
+     "component": "AppText",
+     "text": "tasks.title",
+     "checks": [
+      "bounds",
+      "text"
+     ]
+    },
+    {
+     "testID": "tasks.add-button",
+     "role": "button",
+     "component": "PressableSurface",
+     "text": "tasks.add",
+     "checks": [
+      "bounds",
+      "text",
+      "fill"
+     ]
+    },
+    {
+     "testID": "tasks.add-button.icon",
+     "role": "image",
+     "component": "Icon",
+     "parent": "tasks.add-button",
+     "coveredBy": "tasks.add-button",
+     "checks": [
+      "crop"
+     ]
+    },
+    {
+     "testID": "tasks.summary",
+     "role": "text",
+     "component": "AppText",
+     "text": "tasks.summary.open",
+     "checks": [
+      "bounds",
+      "text"
+     ]
+    },
+    {
+     "testID": "tasks.task-row.{taskId}",
+     "role": "checkbox",
+     "component": "PressableSurface",
+     "checks": [
+      "bounds",
+      "text",
+      "fill"
+     ]
+    },
+    {
+     "testID": "tasks.task-row.{taskId}.check",
+     "role": "image",
+     "component": "Icon",
+     "a11yHidden": true,
+     "coveredBy": "tasks.task-row.{taskId}",
+     "checks": [
+      "crop"
+     ]
+    },
+    {
+     "testID": "tasks.footer-note",
+     "role": "text",
+     "component": "AppText",
+     "text": "tasks.synced",
+     "checks": [
+      "bounds",
+      "text"
+     ]
+    },
+    {
+     "testID": "tasks.menu",
+     "role": "none",
+     "component": "DialogCard",
+     "states": [
+      "menu-open"
+     ],
+     "checks": [
+      "bounds",
+      "fill"
+     ]
+    },
+    {
+     "testID": "tasks.menu.title",
+     "role": "header",
+     "component": "AppText",
+     "text": "tasks.menu.title",
+     "states": [
+      "menu-open"
+     ],
+     "checks": [
+      "bounds",
+      "text"
+     ]
+    },
+    {
+     "testID": "tasks.menu.close-button",
+     "role": "button",
+     "component": "PressableSurface",
+     "text": "tasks.menu.close",
+     "states": [
+      "menu-open"
+     ],
+     "checks": [
+      "bounds",
+      "text",
+      "fill"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "lists",
+   "name": "Lists",
+   "presentation": "route",
+   "route": "src/app/(app)/lists.tsx",
+   "model": "src/features/lists/use-lists-model.ts",
+   "view": "src/features/lists/lists-screen.tsx",
+   "states": [
+    {
+     "id": "default",
+     "reference": "lists-default.png"
+    }
+   ],
+   "elements": [
+    {
+     "testID": "lists.screen",
+     "role": "none",
+     "component": "View"
+    },
+    {
+     "testID": "lists.header",
+     "role": "none",
+     "component": "View",
+     "checks": [
+      "bounds",
+      "fill"
+     ]
+    },
+    {
+     "testID": "lists.title",
+     "role": "header",
+     "component": "AppText",
+     "text": "lists.title",
+     "checks": [
+      "bounds",
+      "text"
+     ]
+    },
+    {
+     "testID": "lists.list-row.{listId}",
+     "role": "none",
+     "component": "View",
+     "checks": [
+      "bounds",
+      "fill"
+     ]
+    },
+    {
+     "testID": "lists.list-row.{listId}.delete-button",
+     "role": "button",
+     "component": "PressableSurface",
+     "text": "lists.delete",
+     "checks": [
+      "bounds",
+      "text"
+     ]
+    },
+    {
+     "testID": "lists.bottom-bar",
+     "role": "none",
+     "component": "BottomBar",
+     "checks": [
+      "bounds",
+      "fill"
+     ]
+    },
+    {
+     "testID": "lists.new-button",
+     "role": "button",
+     "component": "PressableSurface",
+     "text": "lists.new",
+     "checks": [
+      "bounds",
+      "text",
+      "fill"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "premium",
+   "name": "Premium",
+   "presentation": "route",
+   "route": "src/app/(app)/premium.tsx",
+   "model": "src/features/premium/use-premium-model.ts",
+   "view": "src/features/premium/premium-screen.tsx",
+   "states": [
+    {
+     "id": "default"
+    },
+    {
+     "id": "loading",
+     "reference": "premium-loading.png"
+    }
+   ],
+   "elements": [
+    {
+     "testID": "premium.state.loading",
+     "role": "none",
+     "component": "View",
+     "states": [
+      "loading"
+     ]
+    },
+    {
+     "testID": "premium.loading-label",
+     "role": "text",
+     "component": "AppText",
+     "text": "premium.loading",
+     "states": [
+      "loading"
+     ],
+     "checks": [
+      "text"
+     ]
+    },
+    {
+     "testID": "premium.spinner",
+     "role": "image",
+     "component": "Spinner",
+     "a11yHidden": true,
+     "coveredBy": "premium.state.loading",
+     "states": [
+      "loading"
+     ],
+     "checks": [
+      "crop"
+     ]
+    },
+    {
+     "testID": "premium.buy-button",
+     "role": "button",
+     "component": "PressableSurface",
+     "text": "premium.buy",
+     "checks": [
+      "text",
+      "fill"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "map",
+   "name": "Map",
+   "presentation": "route",
+   "route": "src/app/(app)/map.tsx",
+   "model": "src/features/map/use-map-model.ts",
+   "view": "src/features/map/map-screen.tsx",
+   "states": [
+    {
+     "id": "default",
+     "reference": "map-default.png"
+    }
+   ],
+   "elements": [
+    {
+     "testID": "map.screen",
+     "role": "none",
+     "component": "View"
+    },
+    {
+     "testID": "map.title",
+     "role": "header",
+     "component": "AppText",
+     "text": "map.title",
+     "checks": [
+      "bounds",
+      "text"
+     ]
+    },
+    {
+     "testID": "map.canvas",
+     "role": "image",
+     "component": "MapCanvas",
+     "checks": [
+      "bounds"
+     ]
+    },
+    {
+     "testID": "map.legend",
+     "role": "text",
+     "component": "View",
+     "text": "map.legend",
+     "checks": [
+      "bounds",
+      "text",
+      "fill"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "onboarding",
+   "name": "Onboarding",
+   "presentation": "route",
+   "route": "src/app/onboarding.tsx",
+   "model": "src/features/onboarding/use-onboarding-model.ts",
+   "view": "src/features/onboarding/onboarding-screen.tsx",
+   "states": [
+    {
+     "id": "default",
+     "reference": "onboarding-default.png"
+    }
+   ],
+   "elements": [
+    {
+     "testID": "onboarding.screen",
+     "role": "none",
+     "component": "View"
+    },
+    {
+     "testID": "onboarding.picture",
+     "role": "image",
+     "component": "Picture",
+     "checks": [
+      "bounds",
+      "crop"
+     ]
+    },
+    {
+     "testID": "onboarding.title",
+     "role": "header",
+     "component": "AppText",
+     "text": "onboarding.title",
+     "checks": [
+      "bounds",
+      "text"
+     ]
+    },
+    {
+     "testID": "onboarding.next-button",
+     "role": "button",
+     "component": "PressableSurface",
+     "text": "onboarding.next",
+     "checks": [
+      "bounds",
+      "text",
+      "fill"
+     ]
+    }
+   ]
+  }
+ ]
+}

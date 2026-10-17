@@ -1,0 +1,7 @@
+{
+  "reminders.channel.reminders.description": "التذكيرات التي تضبطها لمهامك",
+  "reminders.channel.reminders.name": "التذكيرات",
+  "reminders.notification.body": "حان وقت «{labelText}»",
+  "reminders.notification.body-unlabelled": "حان وقت التذكير الذي ضبطته.",
+  "reminders.notification.title": "تذكير بمهمة"
+}

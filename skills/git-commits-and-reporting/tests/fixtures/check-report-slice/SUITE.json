@@ -1,0 +1,22 @@
+{
+  "base": [
+    {
+      "from": "@skill/examples/slice-evidence.md",
+      "to": "report.md"
+    }
+  ],
+  "ops": [
+    {
+      "write": {
+        "file": "src/i18n/catalogs/en.json",
+        "content": "{}\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/i18n/catalogs/ar.json",
+        "content": "{}\n"
+      }
+    }
+  ]
+}

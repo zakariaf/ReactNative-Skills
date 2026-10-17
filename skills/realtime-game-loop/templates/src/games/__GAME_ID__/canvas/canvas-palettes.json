@@ -1,0 +1,14 @@
+{
+  "light": {
+    "background": "#F4F1EA",
+    "player": "#0057B8",
+    "enemy": "#B34700",
+    "ring": "#14161C"
+  },
+  "dark": {
+    "background": "#14161C",
+    "player": "#56B4E9",
+    "enemy": "#E69F00",
+    "ring": "#F4F1EA"
+  }
+}

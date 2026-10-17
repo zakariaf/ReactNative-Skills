@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 2,
+  "appId": "tasks-app",
+  "settings": {
+    "theme": "system",
+    "language": null,
+    "reminderHour": 9,
+    "soundEnabled": true,
+    "reduceMotion": "system",
+    "textScale": 100
+  },
+  "onboarding": { "completed": false, "seenTips": [] },
+  "stats": {
+    "tasksCompleted": 0,
+    "streak": { "lastDate": null, "length": 0 },
+    "bestStreak": 0,
+    "days": {}
+  },
+  "premium": { "owned": false, "ownedSinceMs": null, "lastCheckedAtMs": null, "revokedAtMs": null }
+}

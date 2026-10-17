@@ -1,0 +1,9 @@
+{
+  "name": "arcade",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "new-game": "node scripts/games/new-game.ts"
+  }
+}

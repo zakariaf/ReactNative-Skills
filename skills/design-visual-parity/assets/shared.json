@@ -1,0 +1,7 @@
+[
+  {"from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs"},
+  {"from": "scripts/lib/source-scan.mjs", "to": "scripts/lib/source-scan.mjs"},
+  {"from": "scripts/lib/ts-literal.mjs", "to": "scripts/lib/ts-literal.mjs"},
+  {"from": "scripts/lib/app-modules.mjs", "to": "scripts/lib/app-modules.mjs"},
+  {"from": "repo-templates/src/test-only.ts", "to": "tests/bases/wired/src/test-only.ts"}
+]

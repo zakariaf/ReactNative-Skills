@@ -1,0 +1,18 @@
+{
+  "app.name": "المهام",
+  "lights-out.continue.more-moves": "احصل على حركات إضافية",
+  "lights-out.hud.moves": "الحركات {moves, number} / {maxMoves, number}",
+  "lights-out.lose.out-of-moves": "لم تبق حركات",
+  "lights-out.name": "إطفاء الأنوار",
+  "lights-out.stats.biggest-toggle": "أكبر تبديل",
+  "lights-out.stats.boards-cleared": "اللوحات المطفأة",
+  "lights-out.stats.cells-toggled": "الأنوار المبدّلة",
+  "pig.continue.extra-turns": "امسح السلسلة واحصل على أدوار إضافية",
+  "pig.hud.endless": "الأدوار المتبقية {turnsLeft, number}",
+  "pig.hud.target": "{banked, number} / {target, number} · الأدوار المتبقية {turnsLeft, number}",
+  "pig.lose.bust-streak": "خسارات متتالية كثيرة",
+  "pig.lose.out-of-turns": "لم تبق أدوار",
+  "pig.stats.best-turn": "أفضل دور",
+  "pig.stats.dice-rolled": "رميات النرد",
+  "pig.stats.points-banked": "النقاط المحفوظة"
+}

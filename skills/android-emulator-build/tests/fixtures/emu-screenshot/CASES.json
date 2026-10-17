@@ -1,0 +1,112 @@
+{
+  "bad-blank": {
+    "expect": [
+      "reports/android-emu/smoke-preview.png [blank-screen] 100.0% of the screen is #ffffff",
+      "reports/android-emu/smoke-production.png [blank-screen] 100.0% of the screen is #000000"
+    ],
+    "ops": [
+      {
+        "png": { "files": ["reports/android-emu/smoke-preview.png"], "width": 1080, "height": 2400, "fill": "#ffffff" }
+      },
+      {
+        "png": {
+          "files": ["reports/android-emu/smoke-production.png"],
+          "width": 1080,
+          "height": 2400,
+          "fill": "#000000"
+        }
+      }
+    ]
+  },
+  "bad-contract-device": {
+    "expect": ["reports/android-emu/smoke-preview.png [png-size] is 1080x2400, expected 1344x2992 (pixel_8_pro)"],
+    "ops": [{ "write": { "file": "contracts/android-emu-build.json", "json": { "device": "pixel_8_pro" } } }]
+  },
+  "bad-wrong-size": {
+    "expect": ["reports/android-emu/smoke-preview.png [png-size] is 1080x2340, expected 1080x2400 (pixel_8)"],
+    "ops": [
+      {
+        "png": {
+          "files": ["reports/android-emu/smoke-preview.png"],
+          "width": 1080,
+          "height": 2340,
+          "fill": "#fef7ff",
+          "rects": [
+            { "x": 60, "y": 187, "width": 960, "height": 140, "fill": "#1b1b1f" },
+            { "x": 60, "y": 468, "width": 960, "height": 117, "fill": "#e8def8" },
+            { "x": 60, "y": 702, "width": 960, "height": 117, "fill": "#e8def8" }
+          ]
+        }
+      }
+    ]
+  },
+  "error-no-input": {
+    "expect": ["ERROR [bad-input] nothing to check: pass screenshots or a folder of them"],
+    "args": "--root {dir}"
+  },
+  "error-not-png": {
+    "expect": ["ERROR [bad-input]", "is not a PNG this checker can read"],
+    "ops": [{ "write": { "file": "reports/android-emu/smoke-preview.png", "content": "not a png\n" } }]
+  },
+  "error-unknown-device": {
+    "expect": ["ERROR [bad-input] unknown AVD profile \"pixel_99\""],
+    "args": "--device pixel_99 {dir}/reports/android-emu"
+  },
+  "pass-contract-device": {
+    "expect": ["0 problems"],
+    "args": "--root {dir} {dir}/reports/android-emu",
+    "ops": [
+      { "write": { "file": "contracts/android-emu-build.json", "json": { "device": "small_phone" } } },
+      {
+        "png": {
+          "files": ["reports/android-emu/smoke-preview.png"],
+          "width": 720,
+          "height": 1280,
+          "fill": "#fef7ff",
+          "rects": [
+            { "x": 60, "y": 102, "width": 600, "height": 76, "fill": "#1b1b1f" },
+            { "x": 60, "y": 256, "width": 600, "height": 64, "fill": "#e8def8" },
+            { "x": 60, "y": 384, "width": 600, "height": 64, "fill": "#e8def8" }
+          ]
+        }
+      }
+    ]
+  },
+  "pass-landscape": {
+    "expect": ["0 problems"],
+    "ops": [
+      {
+        "png": {
+          "files": ["reports/android-emu/smoke-preview.png"],
+          "width": 2400,
+          "height": 1080,
+          "fill": "#fef7ff",
+          "rects": [
+            { "x": 60, "y": 86, "width": 2280, "height": 64, "fill": "#1b1b1f" },
+            { "x": 60, "y": 216, "width": 2280, "height": 54, "fill": "#e8def8" },
+            { "x": 60, "y": 324, "width": 2280, "height": 54, "fill": "#e8def8" }
+          ]
+        }
+      }
+    ]
+  },
+  "pass-size-option": {
+    "expect": ["0 problems"],
+    "args": "--size 720x1280 {dir}/reports/android-emu",
+    "ops": [
+      {
+        "png": {
+          "files": ["reports/android-emu/smoke-preview.png"],
+          "width": 720,
+          "height": 1280,
+          "fill": "#fef7ff",
+          "rects": [
+            { "x": 60, "y": 102, "width": 600, "height": 76, "fill": "#1b1b1f" },
+            { "x": 60, "y": 256, "width": 600, "height": 64, "fill": "#e8def8" },
+            { "x": 60, "y": 384, "width": 600, "height": 64, "fill": "#e8def8" }
+          ]
+        }
+      }
+    ]
+  }
+}

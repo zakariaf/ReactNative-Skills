@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Game levels",
+  "description": "The level layout of every game that ships levels (src/games/<id>/levels/), read by level-generation-and-solvers' check-levels.mjs. Required as soon as one game has a levels folder. A daily- or endless-only game is an entry with packCount 0, levelsPerPack 0 and no starRule.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["games"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "games": {
+      "description": "One entry per game with levels (packs, a daily level or an endless run); a game with none of them has no entry.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "packCount", "levelsPerPack", "daily", "endless"],
+        "properties": {
+          "id": {
+            "description": "The game id: kebab-case, the folder name under src/games.",
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+          },
+          "packCount": {
+            "description": "Number of packs: one pack-<n>.json file each; 0 for a daily- or endless-only game (no plan, no packs).",
+            "type": "integer",
+            "minimum": 0
+          },
+          "levelsPerPack": {
+            "description": "Levels in every pack (the plan's levelsPerPack); 0 exactly when packCount is 0.",
+            "type": "integer",
+            "minimum": 0
+          },
+          "starRule": {
+            "description": "How every level is rated: 'par' (puzzle games, an exact solver) or 'score' (thresholds; a witness proves games that draw during play). Required with packs; left out when packCount is 0.",
+            "enum": ["par", "score"]
+          },
+          "daily": {
+            "description": "True when the game has a daily level (LevelsSpec daily kind 'daily').",
+            "type": "boolean"
+          },
+          "endless": {
+            "description": "True when the game has an endless run (LevelsSpec endless kind 'endless' at difficulty 100).",
+            "type": "boolean"
+          }
+        },
+        "if": { "properties": { "packCount": { "const": 0 } }, "required": ["packCount"] },
+        "then": {
+          "properties": { "levelsPerPack": { "const": 0 } },
+          "not": { "required": ["starRule"] },
+          "anyOf": [
+            { "properties": { "daily": { "const": true } } },
+            { "properties": { "endless": { "const": true } } }
+          ]
+        },
+        "else": { "properties": { "levelsPerPack": { "minimum": 1 } }, "required": ["starRule"] }
+      },
+      "uniqueItems": true
+    }
+  }
+}

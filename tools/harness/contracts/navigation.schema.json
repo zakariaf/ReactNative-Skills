@@ -1,0 +1,188 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "contracts/navigation.json",
+  "description": "The app's route table for navigation-and-routing's check-navigation.mjs. Paths are repo-relative. With Expo Router a route id is the route file's path under the routes folder without its extension ('(app)/tasks/[taskId]'); with React Navigation's static API it is the screen name ('TaskDetail').",
+  "type": "object",
+  "required": ["router", "home", "routes"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "$comment": {
+      "type": "string"
+    },
+    "router": {
+      "description": "Which router the app uses. The checker applies that router's rules.",
+      "enum": ["expo-router", "react-navigation"]
+    },
+    "home": {
+      "description": "The first screen: an href with Expo Router ('/'), a screen name with React Navigation ('Home'). Going back to it is dismissTo/popTo or back, never navigate or push.",
+      "type": "string",
+      "minLength": 1
+    },
+    "routes": {
+      "description": "Every route of the app, exactly once. Expo Router: every route file under the routes folder except _layout, +html, +native-intent, +middleware and +api files, platform variants counted once. React Navigation: every screen of the root static config (top-level screens and group screens).",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "protected": {
+      "description": "Expo Router: every Stack.Protected (or Tabs.Protected) group the navigator files render. `file` is the repo path of the file that writes the group (a layout, or a component a layout renders such as src/features/root-navigator/app-stack.tsx); `guard` is the text of the guard expression ('isSignedIn', '!isSignedIn'); `screens` are the `name`s of every Screen inside the group, nested groups included.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["file", "guard", "screens"],
+        "additionalProperties": false,
+        "properties": {
+          "file": {
+            "type": "string",
+            "minLength": 1
+          },
+          "guard": {
+            "type": "string",
+            "minLength": 1
+          },
+          "screens": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "groups": {
+      "description": "React Navigation static API: the groups of the root static config, in order (the first group whose if hook is true gives the initial screen), each with its `if` hook and screens in order.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "if", "screens"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "if": {
+            "type": "string",
+            "minLength": 1
+          },
+          "screens": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "guarded": {
+      "description": "Routes whose screen holds unsaved or in-progress work. `hook` is the repo path of the file that blocks removal with usePreventRemove (the feature's model hook, or a hook it imports). \"gesture\": \"off\" also turns the iOS back swipe off (gestureEnabled and fullScreenGestureEnabled false) for a screen where even starting the swipe is wrong (a live session, a canvas that pans sideways).",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["route", "hook"],
+        "additionalProperties": false,
+        "properties": {
+          "route": {
+            "type": "string",
+            "minLength": 1
+          },
+          "hook": {
+            "type": "string",
+            "minLength": 1
+          },
+          "gesture": {
+            "enum": ["off"]
+          }
+        }
+      }
+    },
+    "modals": {
+      "description": "Routes presented modally: their Screen options set presentation (modal, formSheet, pageSheet, fullScreenModal, transparentModal, containedModal or containedTransparentModal).",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "paramParsers": {
+      "description": "Expo Router: every route with a dynamic segment ([taskId], [...rest]) mapped to the repo path of the file that parses its params with valibot.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "debugRoutes": {
+      "description": "Test-build routes. Expo Router: route ids; each renders through TEST_ONLY and sits in a protected group. React Navigation: { route, file } with the file of the component that renders TEST_ONLY; the screen sits in a group with an if hook.",
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "string",
+            "minLength": 1
+          },
+          {
+            "type": "object",
+            "required": ["route", "file"],
+            "additionalProperties": false,
+            "properties": {
+              "route": {
+                "type": "string",
+                "minLength": 1
+              },
+              "file": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        ]
+      }
+    },
+    "placeholders": {
+      "description": "Routes that render the placeholder screen while their real screen is not built yet. check-navigation --release fails while any is left.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "placeholderComponent": {
+      "description": "The placeholder's component name (default PlaceholderScreen).",
+      "type": "string",
+      "minLength": 1
+    },
+    "jsStack": {
+      "description": "true allows the JavaScript stack (expo-router/js-stack, @react-navigation/stack). Default false: the native stack.",
+      "type": "boolean"
+    },
+    "navigatorFile": {
+      "description": "React Navigation: the root static config (default src/features/root-navigator/root-stack.tsx).",
+      "type": "string"
+    },
+    "containerFile": {
+      "description": "React Navigation: the only file that calls createStaticNavigation (default src/features/root-navigator/navigation-root.tsx).",
+      "type": "string"
+    },
+    "typesFile": {
+      "description": "React Navigation: the global RootParamList declaration (default src/features/root-navigator/react-navigation.d.ts).",
+      "type": "string"
+    },
+    "paramsFile": {
+      "description": "React Navigation: the route params types (default src/features/root-navigator/route-params.ts).",
+      "type": "string"
+    }
+  }
+}

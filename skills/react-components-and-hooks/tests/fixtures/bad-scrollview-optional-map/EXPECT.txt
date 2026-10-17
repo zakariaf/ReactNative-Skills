@@ -1,0 +1,3 @@
+[scrollview-list] ScrollView renders tasks?.map(...) with no stated bound
+src/features/tasks/components/recent-tasks.tsx:13
+RESULT: FAIL (1 problems)

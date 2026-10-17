@@ -1,0 +1,23 @@
+{
+  "$comment": "A filled inspection record for one cause: a @shopify/react-native-skia upgrade that changes how CanvasKit anti-aliases curved edges (the same rebaseline as approval-requests.md and the first message in rebaseline-commit.txt). Abridged: two of the twelve changed PNGs are shown; the real record has one entry per golden path that differs from before.json, and nothing else.",
+  "entries": [
+    {
+      "path": "test/goldens/charts/__image_snapshots__/weekly-chart-phone-0.png",
+      "change": "modified",
+      "verdict": "intended",
+      "note": "triage composite: red only along the bar edges (0.4% of pixels), the anti-aliasing change of the Skia upgrade; bar heights, labels and axis identical in the new PNG"
+    },
+    {
+      "path": "test/goldens/charts/__image_snapshots__/progress-ring-tablet-1.png",
+      "change": "modified",
+      "verdict": "intended",
+      "note": "triage composite: a one-pixel red halo on the inner and outer ring edges only (0.2%); stroke width, arc length and the centred percentage label unchanged in the new PNG"
+    },
+    {
+      "path": "test/goldens/charts/__image_snapshots__/streak-badge-golden-test-ts-draws-the-badge-1-snap.png",
+      "change": "deleted",
+      "verdict": "orphan",
+      "note": "the streak badge golden test was removed with the badge in an earlier commit; no test in the folder claims this image, so it was deleted with git rm"
+    }
+  ]
+}

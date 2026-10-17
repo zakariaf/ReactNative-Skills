@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Golden contracts",
+  "description": "The app's compatibility-contract goldens, extra golden paths and the approved pixel tolerance, read by the golden-and-snapshot-tests checkers. Optional while no golden test has a [contract] describe; required (check-goldens contract-unregistered) as soon as one does. Without it the marker is [contract], the golden paths are the defaults and the pixel tolerance is 0.001. It is itself a golden path: it belongs in quality-gates.json gatedPaths and changes only in a Gate-Change commit.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "$comment": {
+      "type": "string"
+    },
+    "contracts": {
+      "description": "Output every installed version must reproduce exactly (a stored or exchanged format, a derived identifier, a date-keyed pick). Each one is pinned by a golden test with a describe title that carries a contract marker. An app without such output keeps an empty list.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "test"],
+        "properties": {
+          "id": {
+            "description": "Kebab-case name of the contract.",
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+          },
+          "test": {
+            "description": "Repo-relative path of the *.golden.test.ts file that pins it.",
+            "type": "string",
+            "pattern": "^(?!/)(?!.*\\.\\./).+\\.golden\\.test\\.ts$"
+          },
+          "why": {
+            "description": "Who depends on the output staying identical (installed versions, other devices, files users keep).",
+            "type": "string"
+          }
+        }
+      },
+      "uniqueItems": true
+    },
+    "goldenPaths": {
+      "description": "Extra repo-relative globs that count as golden paths: they need a Gate-Change trailer (check-golden-changes) and must be in quality-gates.json gatedPaths (check-goldens). Examples: '**/*.vectors.json', 'src/data/**/fixtures/**'.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "contractMarkers": {
+      "description": "Text that marks a contract golden in its describe title and so in every snapshot key (default ['[contract]']). Add a marker only for goldens that already carry another one; never rename a contract title.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 3
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "maxPixelTolerance": {
+      "description": "The highest failureThreshold (percent type) the pixel matcher may hold: 0.001 (0.1% of pixels) by default. Raise it only after the reviewer agreed, together with the matcher, in a commit whose trailer says 'approved by <reviewer>'.",
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 0.05
+    }
+  }
+}

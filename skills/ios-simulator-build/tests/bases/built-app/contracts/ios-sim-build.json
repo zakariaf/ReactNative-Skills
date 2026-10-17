@@ -1,0 +1,8 @@
+{
+  "simulatorPrefix": "tasks",
+  "appId": "com.acme.tasks",
+  "usageStrings": [
+    "NSCameraUsageDescription"
+  ],
+  "usesNonExemptEncryption": false
+}

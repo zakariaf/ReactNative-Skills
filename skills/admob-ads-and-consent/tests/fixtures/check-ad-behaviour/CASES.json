@@ -1,0 +1,565 @@
+{
+  "bad-adapter-banner-before-init": {
+    "expect": ["[adapter-banner]", "no banner view before initialize"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/admob-ads-adapter.ts",
+          "find": "  const isReady = useSyncExternalStore(isInitialized.subscribe, isInitialized.get);\n  if (!isReady) return null;\n",
+          "with": "  useSyncExternalStore(isInitialized.subscribe, isInitialized.get);\n"
+        }
+      }
+    ]
+  },
+  "bad-adapter-eager-init": {
+    "expect": ["[adapter-init]", "creating the adapter touches the SDK"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/admob-ads-adapter.ts",
+          "find": "  const units = options.units === 'test' ? ADMOB_TEST_UNITS : options.units;",
+          "with": "  const units = options.units === 'test' ? ADMOB_TEST_UNITS : options.units;\n  void mobileAds().initialize();"
+        }
+      }
+    ]
+  },
+  "bad-adapter-init-order": {
+    "expect": ["[adapter-init]", "initialize() twice"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/admob-ads-adapter.ts",
+          "find": "      await mobileAds().setRequestConfiguration(REQUEST_CONFIGURATION);\n      await mobileAds().initialize();",
+          "with": "      await mobileAds().initialize();\n      await mobileAds().setRequestConfiguration(REQUEST_CONFIGURATION);"
+        }
+      }
+    ]
+  },
+  "bad-adapter-init-rejects": {
+    "expect": ["[adapter-init]", "a failed initialize is recorded, answers a failure and is tried again"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/admob-ads-adapter.ts",
+          "find": "    (thrown) => {\n      onError(thrown);\n      return INIT_FAILED;\n    },",
+          "with": "    (thrown) => {\n      onError(thrown);\n      throw thrown;\n    },"
+        }
+      }
+    ]
+  },
+  "bad-adapter-reward-on-close": {
+    "expect": ["[adapter-rewarded]", "closed without EARNED_REWARD"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/admob-ads-adapter.ts",
+          "find": "      settle(earned.get() ? 'rewarded' : 'dismissed');",
+          "with": "      settle('rewarded');"
+        }
+      }
+    ]
+  },
+  "bad-adapter-show-error-hangs": {
+    "expect": ["[adapter-interstitial]", "presentation fails (ERROR phase show, no CLOSED)", "never settled"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/admob-ads-adapter.ts",
+          "find": "    ad.addAdEventListener(AdEventType.ERROR, () => {\n      settle('unavailable');\n    });\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-adapter-status-loaded-flag": {
+    "expect": ["[adapter-rewarded-status]", "loading, ready, then unavailable once shown"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/admob-ads-adapter.ts",
+          "find": "  status.set('unavailable'); // shown once; ad-moments starts the next preload after it closes\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-ads-mode-pair": {
+    "expect": ["[ads-mode-matrix]", "APP_VARIANT=production with ADS_MODE=test"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/ads-config.ts",
+          "find": "  if (mode === 'test' && isStore) throw new Error('ADS_MODE=test in a production build');\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-att-ads-off": {
+    "expect": ["[consent-factory]", "ADS_MODE=off never shows Apple's tracking prompt"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/consent/consent-factory.ts",
+          "find": "  return adsMode === 'off' ? createDisabledConsent() : createAdmob();",
+          "with": "  if (adsMode === 'off') return { ...createDisabledConsent(), requestTracking: () => createAdmob().requestTracking() };\n  return createAdmob();"
+        }
+      }
+    ]
+  },
+  "bad-att-decline-no-ads": {
+    "expect": [
+      "[consent-order]",
+      "prepareAds with ATT declined earlier: ads still initialize",
+      "prepareAds when the user declines ATT now: ads still initialize"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/ad-gate.ts",
+          "find": "  await deps.consent.requestTracking(); // after Google's form, before the SDK can request an ad",
+          "with": "  const tracking = await deps.consent.requestTracking();\n  if (tracking !== 'authorized') return false;"
+        }
+      }
+    ]
+  },
+  "bad-att-over-task": {
+    "expect": ["[consent-moment-flow]", "no ATT prompt while no ad screen is open"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/consent-moment-flow.ts",
+          "find": "      if (state.openSlots === 0) {\n        await new Promise<void>((resolve) => state.adScreenWaiters.push(resolve));\n      }\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-banner-any-screen": {
+    "expect": ["[banner-rules]", "banner on task-editor"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/ad-policy.ts",
+          "find": "config.bannerScreens.includes(screen)",
+          "with": "screen !== ''"
+        }
+      }
+    ]
+  },
+  "bad-banner-onboarding": {
+    "expect": ["[banner-rules]", "banner while onboarding running"],
+    "ops": [
+      {
+        "replace": { "file": "src/services/ads/ad-policy.ts", "find": "    context.isOnboardingDone &&\n", "with": "" }
+      }
+    ]
+  },
+  "bad-child-directed-config": {
+    "expect": ["[adapter-init]", "initialize() twice"],
+    "ops": [
+      { "json": { "file": "contracts/ads.json", "path": ["audience"], "value": "child-directed" } },
+      { "json": { "file": "contracts/ads.json", "path": ["maxAdContentRating"], "value": "G" } }
+    ]
+  },
+  "bad-consent-factory-off": {
+    "expect": ["[consent-factory]", "ADS_MODE=off never asks Google UMP"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/consent/consent-factory.ts",
+          "find": "  return adsMode === 'off' ? createDisabledConsent() : createAdmob();",
+          "with": "  return createAdmob();"
+        }
+      }
+    ]
+  },
+  "bad-consent-no-fallback": {
+    "expect": ["[consent-adapter]", "refresh offline falls back to the cached answer"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/consent/admob-consent-adapter.ts",
+          "find": "    onError(error);\n    return cachedInfo(onError);",
+          "with": "    onError(error);\n    return UNKNOWN;"
+        }
+      }
+    ]
+  },
+  "bad-extra-foreign-manifest": {
+    "expect": ["[read-ads-extra]", "a production update on a preview binary serves no live ads"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/read-ads-extra.ts",
+          "find": "  return ids.length === 0 || ids.includes(nativeAppId) ? extra : NO_ADS;",
+          "with": "  return ids.length === 0 || ids.length > 0 ? extra : NO_ADS;"
+        }
+      }
+    ]
+  },
+  "bad-extra-partial-units": {
+    "expect": ["[read-ads-extra]", "one platform only"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/read-ads-extra.ts",
+          "find": "  return isUnitIds(ios) && isUnitIds(android) ? { ios, android } : null;",
+          "with": "  return isUnitIds(ios) ? { ios, android: ios } : null;"
+        }
+      }
+    ]
+  },
+  "bad-factory-ios-units-on-android": {
+    "expect": ["[ads-factory]", "ADS_MODE=live on android uses the android units"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/ads-factory.ts",
+          "find": "  const units = extra.adUnits?.[options.platform];",
+          "with": "  const units = extra.adUnits?.ios;"
+        }
+      }
+    ]
+  },
+  "bad-factory-off-requests": {
+    "expect": ["[ads-factory]", "ADS_MODE=off requests nothing and shows nothing"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/ads-factory.ts",
+          "find": "  if (extra.adsMode === 'off') return createDisabledAds();",
+          "with": "  if (extra.adsMode === 'off') return options.createAdmob('test');"
+        }
+      }
+    ]
+  },
+  "bad-first-threshold": {
+    "expect": ["[interstitial-rules]", "first interstitial after 3 finished breaks"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/ad-policy.ts",
+          "find": "  if (context.breaksCompletedTotal < config.minBreaksBeforeFirst) return false;",
+          "with": "  if (context.breaksCompletedTotal <= config.minBreaksBeforeFirst) return false;"
+        }
+      }
+    ]
+  },
+  "bad-flow-allows-before-init": {
+    "expect": ["[consent-moment-flow]", "banners are allowed only after the ATT answer and a finished initialize"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/consent-moment-flow.ts",
+          "find": "      // A refusal closes the banners at once; a yes waits for the ATT answer and initialize.\n      if (info.canRequestAds) return;\n      state.canRequestAds = false;",
+          "with": "      state.canRequestAds = info.canRequestAds;"
+        }
+      }
+    ]
+  },
+  "bad-flow-ignores-blur": {
+    "expect": [
+      "[consent-moment-flow]",
+      "a screen pushed over the list gets no primer, form or ATT when the network returns"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/consent-moment-flow.ts",
+          "find": "    if (state.phase !== 'idle' || state.openSlots === 0 || input === null) return;",
+          "with": "    if (state.phase !== 'idle' || input === null) return;"
+        }
+      }
+    ]
+  },
+  "bad-flow-stale-facts": {
+    "expect": ["[consent-moment-flow]", "facts that change while the gate decides are used"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/consent-moment-flow.ts",
+          "find": "        if (state.phase === 'idle' && state.input !== input) prepareIfDue();\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-flow-waits-without-primer": {
+    "expect": ["[consent-moment-flow]", "without a primer Google's form opens at once"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/consent-moment-flow.ts",
+          "find": "        if (!deps.hasPrimer) {\n          resolve();\n          return;\n        }\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-gate-init-first": {
+    "expect": ["[consent-order]", "prepareAds with consent: primer, form, ATT, then initialize"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/ad-gate.ts",
+          "find": "  const known = await deps.consent.refresh();",
+          "with": "  await deps.ads.initialize();\n  const known = await deps.consent.refresh();"
+        }
+      }
+    ]
+  },
+  "bad-gate-no-intro": {
+    "expect": ["[consent-order]", "prepareAds with consent: primer, form, ATT, then initialize"],
+    "ops": [{ "replace": { "file": "src/services/ads/ad-gate.ts", "find": "  await deps.showIntro();\n", "with": "" } }]
+  },
+  "bad-gate-onboarding": {
+    "expect": ["[consent-order]", "prepareAds during onboarding (no form, no ATT)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/ad-gate.ts",
+          "find": "  if (input.isPremium || !input.isAdsEnabled || !input.isOnboardingDone || !input.isOnline) {",
+          "with": "  if (input.isPremium || !input.isAdsEnabled || !input.isOnline) {"
+        }
+      }
+    ]
+  },
+  "bad-gate-preload-before-init": {
+    "expect": ["[consent-order]", "prepareAds with consent: primer, form, ATT, then initialize"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/ad-gate.ts",
+          "find": "  const initialized = await deps.ads.initialize();\n  if (!initialized.ok) return false; // recorded by the adapter; no ad loads without the SDK\n  deps.ads.preloadInterstitial();\n  deps.ads.preloadRewarded();",
+          "with": "  const initializing = deps.ads.initialize();\n  deps.ads.preloadInterstitial();\n  deps.ads.preloadRewarded();\n  if (!(await initializing).ok) return false;"
+        }
+      }
+    ]
+  },
+  "bad-hard-coded-numbers": {
+    "expect": ["[interstitial-rules]", "config 60 000 ms / 1 break after the last one"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/ad-policy.ts",
+          "find": "    elapsed >= config.minMsBetweenInterstitials &&",
+          "with": "    elapsed >= 180_000 &&"
+        }
+      }
+    ]
+  },
+  "bad-history-counts-failures": {
+    "expect": ["[ad-history]", "a failed break adds nothing"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/ad-history.ts",
+          "find": "  return outcome === 'success'\n    ? { ...history, breaksSinceInterstitial: history.breaksSinceInterstitial + 1 }\n    : history;",
+          "with": "  return { ...history, breaksSinceInterstitial: history.breaksSinceInterstitial + 1 };"
+        }
+      }
+    ]
+  },
+  "bad-history-on-unavailable": {
+    "expect": ["[fullscreen-lifecycle]", "an unavailable interstitial keeps the history"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/ad-moments.ts",
+          "find": "  return result === 'shown' ? recordInterstitialShown(request.trigger) : request.history;",
+          "with": "  return recordInterstitialShown(request.trigger);"
+        }
+      }
+    ]
+  },
+  "bad-live-id-in-test": {
+    "expect": ["[ads-config]", "test: sample app IDs on both platforms"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/ads-config.ts",
+          "find": "    iosAppId: isLive ? ids.ios.appId : GOOGLE_SAMPLE_APP_IDS.ios,",
+          "with": "    iosAppId: ids.ios.appId,"
+        }
+      }
+    ]
+  },
+  "bad-live-sample-units": {
+    "expect": ["[ads-config]", "live with a sample unit ID in extra throws"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/ads-config.ts",
+          "find": "  assertLiveIds(ids.android);\n  return { adsMode: mode",
+          "with": "  return { adsMode: mode"
+        }
+      }
+    ]
+  },
+  "bad-missing-module": {
+    "expect": ["[module-load]", "rewarded-offer.ts does not exist"],
+    "ops": [{ "delete": "src/services/ads/rewarded-offer.ts" }]
+  },
+  "bad-no-failure-break": {
+    "expect": ["[interstitial-rules]", "a second one in a row after failed breaks"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/ad-policy.ts",
+          "find": "  if (trigger.outcome === 'failure' && history.didLastInterstitialFollowFailure) return false;\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-no-resume-on-throw": {
+    "expect": ["[fullscreen-lifecycle]", "media resumes even when showing throws"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/fullscreen-ad.ts",
+          "find": "  lifecycle.suspend('fullscreen-ad');\n  try {\n    return await show();\n  } finally {\n    lifecycle.resume('fullscreen-ad');\n  }",
+          "with": "  lifecycle.suspend('fullscreen-ad');\n  const result = await show();\n  lifecycle.resume('fullscreen-ad');\n  return result;"
+        }
+      }
+    ]
+  },
+  "bad-offer-hidden-while-loading": {
+    "expect": ["[rewarded-offer-rules]", "a waiting perk, ad loading (shown in its loading state)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/rewarded-offer.ts",
+          "find": "  return status === 'loading' && perk.waitsWhileLoading ? 'loading' : 'hidden';",
+          "with": "  return 'hidden';"
+        }
+      }
+    ]
+  },
+  "bad-offer-not-loaded": {
+    "expect": ["[rewarded-offer-rules]", "a passing perk, nothing can come"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/rewarded-offer.ts",
+          "find": "  if (status === 'ready') return 'watch-ad';",
+          "with": "  if (status !== 'loading') return 'watch-ad';"
+        }
+      }
+    ]
+  },
+  "bad-offer-unavailable-perk": {
+    "expect": ["[rewarded-offer-rules]", "an unavailable perk, even for Premium"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/rewarded-offer.ts",
+          "find": "  if (!perk.isAvailable) return 'hidden';\n  if (context.isPremium || perk.freeAllowanceLeft > 0) return 'free';",
+          "with": "  if (context.isPremium || perk.freeAllowanceLeft > 0) return 'free';\n  if (!perk.isAvailable) return 'hidden';"
+        }
+      }
+    ]
+  },
+  "bad-or-caps": {
+    "expect": ["[interstitial-rules]", "179 999 ms after the last one"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/ad-policy.ts",
+          "find": "    elapsed >= config.minMsBetweenInterstitials &&",
+          "with": "    elapsed >= config.minMsBetweenInterstitials ||"
+        }
+      }
+    ]
+  },
+  "bad-reward-on-dismiss": {
+    "expect": ["[fullscreen-lifecycle]", "rewarded result \"dismissed\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/ads/ad-moments.ts",
+          "find": "  return result === 'rewarded';",
+          "with": "  return result !== 'unavailable';"
+        }
+      }
+    ]
+  },
+  "bad-tracking-asks-twice": {
+    "expect": ["[tracking-adapter]", "answered before: no prompt"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/consent/expo-tracking-consent-adapter.ts",
+          "find": "    if (current !== 'not-determined') return current; // asked before: Apple never asks twice\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "pass-child-directed": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "contracts/ads.json", "path": ["audience"], "value": "child-directed" } },
+      { "json": { "file": "contracts/ads.json", "path": ["maxAdContentRating"], "value": "G" } },
+      {
+        "replace": {
+          "file": "src/services/ads/admob-ads-adapter.ts",
+          "find": "const REQUEST_CONFIGURATION = { maxAdContentRating: MaxAdContentRating.PG };",
+          "with": "const REQUEST_CONFIGURATION = {\n  maxAdContentRating: MaxAdContentRating.G,\n  tagForChildDirectedTreatment: true,\n  tagForUnderAgeOfConsent: true,\n};"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    slug: 'tasks',",
+          "with": "    slug: 'tasks',\n    android: { blockedPermissions: ['com.google.android.gms.permission.AD_ID'] },"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    locales: { en: { ios: { NSUserTrackingUsageDescription: 'Lets the app show ads that match your interests.' } } },\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "      [\n        'expo-tracking-transparency',\n        { userTrackingPermission: 'Lets the app show ads that match your interests.' },\n      ],\n",
+          "with": ""
+        }
+      },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-tracking-transparency"], "delete": true } },
+      { "delete": "src/services/consent/expo-tracking-consent-adapter.ts" },
+      { "delete": "src/services/consent/expo-tracking-consent-adapter.test.ts" },
+      { "delete": "src/services/consent/expo-tracking-consent-adapter.android.test.ts" },
+      { "delete": "__mocks__/expo-tracking-transparency.ts" },
+      {
+        "replace": {
+          "file": "src/services/create-device-services.ts",
+          "find": "import { createExpoTrackingConsentAdapter } from '@/services/consent/expo-tracking-consent-adapter';\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/create-device-services.ts",
+          "find": "createAdmobConsentAdapter({\n        tracking: createExpoTrackingConsentAdapter({ onError }),\n        onError,\n      })",
+          "with": "createAdmobConsentAdapter({ tracking: null, onError })"
+        }
+      }
+    ]
+  },
+  "pass-consent-only": {
+    "expect": ["the ads scenarios do not apply yet; the consent scenarios ran", "RESULT: PASS"],
+    "ops": [{ "delete": "src/services/ads" }]
+  },
+  "pass-no-sdk": {
+    "expect": ["NOT APPLICABLE: react-native-google-mobile-ads and expo-tracking-transparency are not in package.json"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "react-native-google-mobile-ads"], "delete": true } },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-tracking-transparency"], "delete": true } }
+    ]
+  }
+}

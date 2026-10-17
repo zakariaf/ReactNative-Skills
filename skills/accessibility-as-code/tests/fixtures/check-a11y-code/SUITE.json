@@ -1,0 +1,11 @@
+{
+  "base": [{ "templates": true, "firstLinePath": true }, "@tests/bases/a11y-app"],
+  "ops": [
+    {
+      "write": {
+        "file": "src/vendor/kit/SKILL.md",
+        "content": "---\nname: kit\ndescription: A vendored skill folder inside the app; its planted findings stay silent.\n---\n"
+      }
+    }
+  ]
+}

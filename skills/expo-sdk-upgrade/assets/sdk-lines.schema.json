@@ -1,0 +1,310 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "expo-sdk-lines.schema.json",
+  "title": "Expo SDK lines",
+  "description": "The shape of this skill's assets/sdk-lines.json and of the app's optional contracts/expo-sdk-lines.json (an entry there replaces this skill's entry for the same SDK). check-sdk-alignment.mjs validates the app's file with the same rules (rule sdk-lines-contract); references/sdk-lines.md explains every key.",
+  "type": "object",
+  "required": [
+    "sdks"
+  ],
+  "properties": {
+    "$comment": {
+      "type": "string"
+    },
+    "$schema": {
+      "type": "string"
+    },
+    "verified": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "sdks": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[1-9][0-9]*$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/line"
+      }
+    }
+  },
+  "patternProperties": {
+    "^\\$": {}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "line": {
+      "type": "object",
+      "required": [
+        "status",
+        "expo",
+        "reactNative",
+        "react",
+        "typesReact",
+        "testRenderer",
+        "typescript",
+        "jest",
+        "typesJest",
+        "gestureHandlerMajor",
+        "skiaPostinstallUntil",
+        "configPluginsImport",
+        "jestConfigMustInclude",
+        "xcodeMin",
+        "xcodeMaxWithoutSceneSupport",
+        "sceneSupportMinExpo",
+        "android",
+        "removedApis",
+        "removedAppConfigKeys"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "description": "stable or pre-release, the version read and the date"
+        },
+        "expo": {
+          "type": "string",
+          "description": "the expo version the entry was read from"
+        },
+        "reactNative": {
+          "type": "string",
+          "description": "React Native version or major.minor line"
+        },
+        "react": {
+          "type": "string",
+          "description": "React line (major.minor)"
+        },
+        "typesReact": {
+          "type": "string"
+        },
+        "testRenderer": {
+          "type": "string"
+        },
+        "typescript": {
+          "type": "string"
+        },
+        "jest": {
+          "type": "string",
+          "description": "Jest line jest-expo of this SDK needs (major or major.minor)"
+        },
+        "typesJest": {
+          "type": "string",
+          "description": "exact @types/jest version"
+        },
+        "gestureHandlerMajor": {
+          "type": "integer"
+        },
+        "skiaPostinstallUntil": {
+          "type": "string",
+          "description": "first Skia version without an install script"
+        },
+        "configPluginsImport": {
+          "enum": [
+            "expo/config-plugins.js",
+            "expo/config-plugins"
+          ]
+        },
+        "jestConfigMustInclude": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "text",
+              "pattern",
+              "why",
+              "fix"
+            ],
+            "properties": {
+              "text": {
+                "type": "string",
+                "description": "the canonical line, shown in messages"
+              },
+              "pattern": {
+                "type": "string",
+                "description": "a JavaScript regular expression source matched against the Jest config with comments masked (accept either quote style and optional whitespace; package.json \"jest\" is matched as JSON)"
+              },
+              "why": {
+                "type": "string"
+              },
+              "fix": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "xcodeMin": {
+          "type": "string",
+          "description": "lowest Xcode that builds the SDK (docs.expo.dev versions table)"
+        },
+        "xcodeMax": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "optional: the newest Xcode major that can build this SDK at all (an SDK whose expo-build-properties has no ios.enableSceneSupport cannot adopt the scene life cycle the iOS 27 SDK needs); absent or null: no upper bound known"
+        },
+        "xcodeMaxWithoutSceneSupport": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "highest Xcode major that builds this SDK without ios.enableSceneSupport; null when the SDK handles the scene life cycle itself"
+        },
+        "sceneSupportMinExpo": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "first expo version whose expo-build-properties accepts ios.enableSceneSupport; null when the option is a no-op"
+        },
+        "minExpo": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "optional: the oldest expo release of this SDK an app may install (rule expo-min); see advisory"
+        },
+        "skipFrom": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "optional: SDK majors whose apps move straight to this SDK, skipping the ones between (check-sdk-trigger's default target)"
+        },
+        "advisory": {
+          "type": "string",
+          "description": "optional: why minExpo and skipFrom exist, with the source; shown in messages"
+        },
+        "ios": {
+          "type": "object",
+          "properties": {
+            "deploymentTarget": {
+              "type": "string",
+              "pattern": "^\\d+(\\.\\d+){0,2}$",
+              "description": "the lowest iOS the SDK supports (docs.expo.dev versions table); rule ios-deployment-target"
+            }
+          },
+          "additionalProperties": false
+        },
+        "android": {
+          "type": "object",
+          "required": [
+            "compileSdk",
+            "targetSdk",
+            "minSdk"
+          ],
+          "properties": {
+            "compileSdk": {
+              "type": "integer"
+            },
+            "targetSdk": {
+              "type": "integer"
+            },
+            "minSdk": {
+              "type": "integer"
+            },
+            "buildTools": {
+              "type": "string"
+            },
+            "agp": {
+              "type": "string"
+            },
+            "kotlin": {
+              "type": "string"
+            },
+            "ndk": {
+              "type": "string"
+            },
+            "jdk": {
+              "type": "integer"
+            }
+          },
+          "additionalProperties": false
+        },
+        "eas": {
+          "type": "object",
+          "properties": {
+            "iosImage": {
+              "type": "string"
+            },
+            "androidImage": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "removedApis": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "rule",
+              "scope",
+              "from",
+              "pattern",
+              "fix"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "rule": {
+                "enum": [
+                  "removed-rn-api",
+                  "removed-test-api"
+                ]
+              },
+              "scope": {
+                "enum": [
+                  "app",
+                  "test"
+                ]
+              },
+              "from": {
+                "type": "string"
+              },
+              "pattern": {
+                "type": "string",
+                "description": "a JavaScript regular expression source"
+              },
+              "fix": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "removedAppConfigKeys": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "key",
+              "pattern",
+              "since",
+              "fix"
+            ],
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "pattern": {
+                "type": "string"
+              },
+              "since": {
+                "type": "integer"
+              },
+              "fix": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "patternProperties": {
+        "^\\$": {}
+      },
+      "additionalProperties": false
+    }
+  }
+}

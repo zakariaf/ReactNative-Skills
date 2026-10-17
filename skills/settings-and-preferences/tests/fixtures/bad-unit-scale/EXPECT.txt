@@ -1,0 +1,3 @@
+[unit-scale]
+soundVolume (integer percent) is used without converting it
+src/features/settings-effects/connect-sound-settings.ts:

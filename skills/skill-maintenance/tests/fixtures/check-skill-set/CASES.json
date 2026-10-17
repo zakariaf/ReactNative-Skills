@@ -1,0 +1,242 @@
+{
+  "bad-average": {
+    "expect": ["[desc-average]", "over the 100 target", "longest:"],
+    "args": "{dir}/skills --average 100"
+  },
+  "bad-budget": { "expect": ["[listing-budget]", "over the 300 budget"], "args": "{dir}/skills --budget 300" },
+  "bad-budget-default": {
+    "expect": [
+      "[listing-budget]",
+      "names and descriptions of 11 listed skills total 20281 characters, over the 20000 budget (default at skillListingBudgetFraction 0.01)"
+    ],
+    "args": "{dir}",
+    "ops": [
+      { "write": { "file": "package.json", "content": "{ \"name\": \"tasks-app\", \"private\": true }\n" } },
+      {
+        "write": {
+          "file": ".agents/skills/vendor-kit-01/SKILL.md",
+          "content": "---\nname: vendor-kit-01\ndescription: Formats vendor widgets for a bundled kit. widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget g\n---\n\n# Vendor kit\n"
+        }
+      },
+      { "copy": { "from": ".agents/skills/vendor-kit-01", "to": ".agents/skills/vendor-kit-02" } },
+      { "copy": { "from": ".agents/skills/vendor-kit-01", "to": ".agents/skills/vendor-kit-03" } },
+      { "copy": { "from": ".agents/skills/vendor-kit-01", "to": ".agents/skills/vendor-kit-04" } },
+      { "copy": { "from": ".agents/skills/vendor-kit-01", "to": ".agents/skills/vendor-kit-05" } },
+      { "copy": { "from": ".agents/skills/vendor-kit-01", "to": ".agents/skills/vendor-kit-06" } },
+      { "copy": { "from": ".agents/skills/vendor-kit-01", "to": ".agents/skills/vendor-kit-07" } }
+    ]
+  },
+  "bad-duplicate": {
+    "expect": ["[desc-duplicate]", "task-lists-copy/SKILL.md:3", "has the same description as task-lists"],
+    "ops": [
+      {
+        "write": {
+          "file": "skills/task-lists-copy/SKILL.md",
+          "content": "---\nname: task-lists-copy\ndescription: Builds task list screens with sections, swipe actions and empty states. Use when a list of tasks is added or scrolls badly. Not for reminders (reminder-alerts).\n---\n\n# task-lists-copy\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "skills/tasks-index/SKILL.md",
+          "find": "| note-sync | sync |",
+          "with": "| note-sync | sync |\n| task-lists-copy | lists again |"
+        }
+      }
+    ]
+  },
+  "bad-index": {
+    "expect": ["[index-coverage]", "tasks-index/SKILL.md", "the index never names list-sharing"],
+    "ops": [
+      {
+        "write": {
+          "file": "skills/list-sharing/SKILL.md",
+          "content": "---\nname: list-sharing\ndescription: Shares task lists with other accounts through invites and roles. Use when a shared list loses a member. Not for syncing notes (note-sync).\n---\n\n# list-sharing\n"
+        }
+      }
+    ]
+  },
+  "bad-installed-collision": {
+    "expect": ["[desc-duplicate]", "task-lists/SKILL.md:3", "has the same description as vendor-lists"],
+    "args": "{dir}",
+    "ops": [
+      { "write": { "file": "package.json", "content": "{ \"name\": \"tasks-app\", \"private\": true }\n" } },
+      {
+        "write": {
+          "file": ".agents/skills/vendor-lists/SKILL.md",
+          "content": "---\nname: vendor-lists\ndescription: Builds task list screens with sections, swipe actions and empty states. Use when a list of tasks is added or scrolls badly. Not for reminders (reminder-alerts).\n---\n\n# vendor-lists\n"
+        }
+      }
+    ]
+  },
+  "bad-not-for": {
+    "expect": ["[not-for-unknown]", "ghost-skill", "[not-for-self]", "note-sync/SKILL.md:3"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/note-sync/SKILL.md",
+          "find": "Not for reminders (reminder-alerts).",
+          "with": "Not for offline storage (ghost-skill) or merges (note-sync)."
+        }
+      }
+    ]
+  },
+  "bad-overlap": {
+    "expect": ["[desc-overlap]", "shares", "task-boards", "[desc-lead]", "starts like"],
+    "ops": [
+      {
+        "write": {
+          "file": "skills/task-boards/SKILL.md",
+          "content": "---\nname: task-boards\ndescription: Builds task list screens with sections, swipe actions and drag reorder. Use when a board of tasks is added. Not for reminders (reminder-alerts).\n---\n\n# task-boards\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "skills/tasks-index/SKILL.md",
+          "find": "| note-sync | sync |",
+          "with": "| note-sync | sync |\n| task-boards | boards |"
+        }
+      }
+    ]
+  },
+  "error-one-skill": {
+    "expect": ["ERROR [bad-input]", "is one skill; this checks a set"],
+    "args": "{dir}/skills/task-lists"
+  },
+  "pass-budget-fraction": {
+    "expect": [
+      "listing: 11 listed skills (0 run-only, 7 installed), 20281 of 80000 characters (skillListingBudgetFraction 0.04 in .claude/settings.json)",
+      "RESULT: PASS"
+    ],
+    "args": "{dir}",
+    "ops": [
+      { "write": { "file": "package.json", "content": "{ \"name\": \"tasks-app\", \"private\": true }\n" } },
+      {
+        "write": {
+          "file": ".agents/skills/vendor-kit-01/SKILL.md",
+          "content": "---\nname: vendor-kit-01\ndescription: Formats vendor widgets for a bundled kit. widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget g\n---\n\n# Vendor kit\n"
+        }
+      },
+      { "copy": { "from": ".agents/skills/vendor-kit-01", "to": ".agents/skills/vendor-kit-02" } },
+      { "copy": { "from": ".agents/skills/vendor-kit-01", "to": ".agents/skills/vendor-kit-03" } },
+      { "copy": { "from": ".agents/skills/vendor-kit-01", "to": ".agents/skills/vendor-kit-04" } },
+      { "copy": { "from": ".agents/skills/vendor-kit-01", "to": ".agents/skills/vendor-kit-05" } },
+      { "copy": { "from": ".agents/skills/vendor-kit-01", "to": ".agents/skills/vendor-kit-06" } },
+      { "copy": { "from": ".agents/skills/vendor-kit-01", "to": ".agents/skills/vendor-kit-07" } },
+      {
+        "write": {
+          "file": ".claude/settings.json",
+          "content": "{\n  \"skillListingBudgetFraction\": 0.04,\n  \"permissions\": {\n    \"allow\": [\n      \"Bash(node skills/*/scripts/*)\"\n    ]\n  }\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-budget-fraction-local": {
+    "expect": [
+      "681 of 40000 characters (skillListingBudgetFraction 0.02 in .claude/settings.local.json)",
+      "RESULT: PASS"
+    ],
+    "args": "{dir}/skills",
+    "ops": [
+      { "write": { "file": "package.json", "content": "{ \"name\": \"tasks-app\", \"private\": true }\n" } },
+      {
+        "write": {
+          "file": ".claude/settings.json",
+          "content": "{\n  \"skillListingBudgetFraction\": 0.01,\n  \"permissions\": {\n    \"allow\": [\n      \"Bash(node skills/*/scripts/*)\"\n    ]\n  }\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": ".claude/settings.local.json",
+          "content": "{\n  \"skillListingBudgetFraction\": 0.02,\n  \"permissions\": {\n    \"allow\": [\n      \"Bash(node skills/*/scripts/*)\"\n    ]\n  }\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-budget-installed-over": {
+    "expect": [
+      "note: the installed skills alone take 22400 of the 20000-character listing budget (default at skillListingBudgetFraction 0.01); raise skillListingBudgetFraction in .claude/settings.json (0.04 gives 80000)",
+      "RESULT: PASS"
+    ],
+    "args": "{dir}",
+    "ops": [
+      { "write": { "file": "package.json", "content": "{ \"name\": \"tasks-app\", \"private\": true }\n" } },
+      {
+        "write": {
+          "file": ".agents/skills/vendor-kit-01/SKILL.md",
+          "content": "---\nname: vendor-kit-01\ndescription: Formats vendor widgets for a bundled kit. widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget gizmo sprocket widget gadget g\n---\n\n# Vendor kit\n"
+        }
+      },
+      { "copy": { "from": ".agents/skills/vendor-kit-01", "to": ".agents/skills/vendor-kit-02" } },
+      { "copy": { "from": ".agents/skills/vendor-kit-01", "to": ".agents/skills/vendor-kit-03" } },
+      { "copy": { "from": ".agents/skills/vendor-kit-01", "to": ".agents/skills/vendor-kit-04" } },
+      { "copy": { "from": ".agents/skills/vendor-kit-01", "to": ".agents/skills/vendor-kit-05" } },
+      { "copy": { "from": ".agents/skills/vendor-kit-01", "to": ".agents/skills/vendor-kit-06" } },
+      { "copy": { "from": ".agents/skills/vendor-kit-01", "to": ".agents/skills/vendor-kit-07" } },
+      { "copy": { "from": ".agents/skills/vendor-kit-01", "to": ".agents/skills/vendor-kit-08" } }
+    ]
+  },
+  "pass-expo-neighbour": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "skills/task-lists/SKILL.md",
+          "find": "Not for reminders (reminder-alerts).",
+          "with": "Not for reminders (reminder-alerts) or animation APIs (expo-animation)."
+        }
+      }
+    ]
+  },
+  "pass-installed-foreign": {
+    "expect": [
+      "note: vendor-dates (installed) hands off to vendor-zones, which is not in this set",
+      "listing: 5 listed skills (0 run-only, 1 installed)",
+      "RESULT: PASS"
+    ],
+    "args": "{dir}",
+    "ops": [
+      { "write": { "file": "package.json", "content": "{ \"name\": \"tasks-app\", \"private\": true }\n" } },
+      {
+        "write": {
+          "file": ".agents/skills/vendor-dates/SKILL.md",
+          "content": "---\nname: vendor-dates\ndescription: Formats dates, relative times and calendars for a vendored kit with many extra words many extra words many extra words many extra words many extra words many extra words many extra words many extra words many extra words many extra words many extra words many extra words . Use when a date shows wrong. Not for time zones (vendor-zones).\n---\n\n# vendor-dates\n"
+        }
+      }
+    ]
+  },
+  "pass-no-skills": {
+    "expect": ["NOT APPLICABLE: no project skills"],
+    "args": "{dir}/app",
+    "ops": [{ "write": { "file": "app/package.json", "content": "{ \"name\": \"tasks-app\", \"private\": true }\n" } }]
+  },
+  "pass-repo-only-installed": {
+    "expect": [
+      "NOT APPLICABLE: only installed skills (note-sync, reminder-alerts, task-lists, tasks-index under .agents/skills/), which their authors own: pass .agents/skills to check them",
+      "RESULT: PASS"
+    ],
+    "args": "{dir}",
+    "ops": [
+      { "write": { "file": "package.json", "content": "{ \"name\": \"tasks-app\", \"private\": true }\n" } },
+      { "rename": { "from": "skills", "to": ".agents/skills" } }
+    ]
+  },
+  "pass-runbook": {
+    "expect": ["listing: 4 listed skills (1 run-only)", "RESULT: PASS"],
+    "args": "{dir}/skills --budget 700",
+    "ops": [
+      {
+        "write": {
+          "file": "skills/run-list-export/SKILL.md",
+          "content": "---\nname: run-list-export\ndescription: Exports every task list to a CSV file and uploads it. Use when the developer names it. Not for syncing notes (note-sync).\ndisable-model-invocation: true\n---\n\n# Run list export\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "skills/tasks-index/SKILL.md",
+          "find": "| note-sync | sync |",
+          "with": "| note-sync | sync |\n| run-list-export | exports (run-only) |"
+        }
+      }
+    ]
+  }
+}

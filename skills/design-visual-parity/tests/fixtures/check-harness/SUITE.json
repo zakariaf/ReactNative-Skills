@@ -1,0 +1,14 @@
+{
+ "base": [
+  "@tests/bases/app",
+  {
+   "templates": true,
+   "firstLinePath": true
+  },
+  {
+   "from": "@skill/examples/screens.json",
+   "to": "contracts/screens.json"
+  },
+  "@tests/bases/wired"
+ ]
+}

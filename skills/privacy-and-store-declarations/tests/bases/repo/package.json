@@ -1,0 +1,23 @@
+{
+  "name": "tasks",
+  "version": "1.0.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "scripts": {
+    "audit:network": "node scripts/audit/audit-network.ts",
+    "audit:privacy": "node scripts/audit/audit-privacy.ts",
+    "export:audit": "APP_VARIANT=production EXPO_PUBLIC_APP_VARIANT=production expo export --platform ios --platform android --source-maps --output-dir dist-audit"
+  },
+  "dependencies": {
+    "expo": "~57.0.26",
+    "expo-router": "~57.0.24",
+    "react-native": "0.86.3",
+    "react-native-google-mobile-ads": "17.2.0",
+    "expo-iap": "5.8.0",
+    "expo-notifications": "~57.0.21",
+    "expo-tracking-transparency": "~57.0.2"
+  },
+  "devDependencies": {
+    "jest": "29.7.0"
+  }
+}

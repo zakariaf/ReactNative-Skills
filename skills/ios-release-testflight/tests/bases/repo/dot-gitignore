@@ -1,0 +1,12 @@
+node_modules/
+/ios
+/android
+build/
+reports/
+*.p8
+*.p12
+*.mobileprovision
+AuthKey_*
+ApiKey_*
+*.xcarchive
+*.ipa

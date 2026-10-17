@@ -1,0 +1,493 @@
+{
+  "bad-emu-demo-mode": {
+    "expect": ["[emu-demo-mode] demo mode is 0, not 1"],
+    "args": "--device test-android --check",
+    "ops": [
+      {
+        "write": {
+          "file": "design/parity/devices/test-android.json",
+          "json": {
+            "id": "test-android",
+            "platform": "android",
+            "name": "Self-test Android phone (160 x 300 dp @3x)",
+            "avd": {
+              "name": "tasks-parity",
+              "device": "pixel_7",
+              "systemImage": "system-images;android-36;google_apis;arm64-v8a",
+              "density": 480
+            },
+            "points": { "width": 160, "height": 300 },
+            "scale": 3,
+            "pixels": { "width": 480, "height": 900 },
+            "safeArea": { "top": 20, "bottom": 10 },
+            "masks": [{ "x": 0, "y": 0, "width": 160, "height": 20 }, { "x": 0, "y": 290, "width": 160, "height": 10 }],
+            "fontScale": "1.0"
+          }
+        }
+      },
+      {
+        "json": { "file": "contracts/visual-parity.json", "path": ["devices"], "value": ["test-phone", "test-android"] }
+      },
+      { "write": { "file": "scenario.json", "json": { "adb": { "size": "Physical size: 480x900", "demo": "0" } } } }
+    ]
+  },
+  "bad-emu-density": {
+    "expect": ["[emu-display-density] the display density is 420, not 480"],
+    "args": "--device test-android --check",
+    "ops": [
+      {
+        "write": {
+          "file": "design/parity/devices/test-android.json",
+          "json": {
+            "id": "test-android",
+            "platform": "android",
+            "name": "Self-test Android phone (160 x 300 dp @3x)",
+            "avd": {
+              "name": "tasks-parity",
+              "device": "pixel_7",
+              "systemImage": "system-images;android-36;google_apis;arm64-v8a",
+              "density": 480
+            },
+            "points": { "width": 160, "height": 300 },
+            "scale": 3,
+            "pixels": { "width": 480, "height": 900 },
+            "safeArea": { "top": 20, "bottom": 10 },
+            "masks": [{ "x": 0, "y": 0, "width": 160, "height": 20 }, { "x": 0, "y": 290, "width": 160, "height": 10 }],
+            "fontScale": "1.0"
+          }
+        }
+      },
+      {
+        "json": { "file": "contracts/visual-parity.json", "path": ["devices"], "value": ["test-phone", "test-android"] }
+      },
+      {
+        "write": {
+          "file": "scenario.json",
+          "json": { "adb": { "size": "Physical size: 480x900", "density": "Physical density: 420" } }
+        }
+      }
+    ]
+  },
+  "bad-emu-display-size": {
+    "expect": ["[emu-display-size] the display size is 1080x2400, not 480x900"],
+    "args": "--device test-android --check",
+    "ops": [
+      {
+        "write": {
+          "file": "design/parity/devices/test-android.json",
+          "json": {
+            "id": "test-android",
+            "platform": "android",
+            "name": "Self-test Android phone (160 x 300 dp @3x)",
+            "avd": {
+              "name": "tasks-parity",
+              "device": "pixel_7",
+              "systemImage": "system-images;android-36;google_apis;arm64-v8a",
+              "density": 480
+            },
+            "points": { "width": 160, "height": 300 },
+            "scale": 3,
+            "pixels": { "width": 480, "height": 900 },
+            "safeArea": { "top": 20, "bottom": 10 },
+            "masks": [{ "x": 0, "y": 0, "width": 160, "height": 20 }, { "x": 0, "y": 290, "width": 160, "height": 10 }],
+            "fontScale": "1.0"
+          }
+        }
+      },
+      {
+        "json": { "file": "contracts/visual-parity.json", "path": ["devices"], "value": ["test-phone", "test-android"] }
+      },
+      { "write": { "file": "scenario.json", "json": { "adb": {} } } }
+    ]
+  },
+  "bad-emu-font-scale": {
+    "expect": ["[emu-font-scale] the font scale is 1.3, not 1.0"],
+    "args": "--device test-android --check",
+    "ops": [
+      {
+        "write": {
+          "file": "design/parity/devices/test-android.json",
+          "json": {
+            "id": "test-android",
+            "platform": "android",
+            "name": "Self-test Android phone (160 x 300 dp @3x)",
+            "avd": {
+              "name": "tasks-parity",
+              "device": "pixel_7",
+              "systemImage": "system-images;android-36;google_apis;arm64-v8a",
+              "density": 480
+            },
+            "points": { "width": 160, "height": 300 },
+            "scale": 3,
+            "pixels": { "width": 480, "height": 900 },
+            "safeArea": { "top": 20, "bottom": 10 },
+            "masks": [{ "x": 0, "y": 0, "width": 160, "height": 20 }, { "x": 0, "y": 290, "width": 160, "height": 10 }],
+            "fontScale": "1.0"
+          }
+        }
+      },
+      {
+        "json": { "file": "contracts/visual-parity.json", "path": ["devices"], "value": ["test-phone", "test-android"] }
+      },
+      {
+        "write": {
+          "file": "scenario.json",
+          "json": { "adb": { "size": "Physical size: 480x900", "fontScale": "1.3" } }
+        }
+      }
+    ]
+  },
+  "bad-emu-missing": {
+    "expect": ["[emu-missing] no AVD named tasks-parity"],
+    "args": "--device test-android --check",
+    "ops": [
+      {
+        "write": {
+          "file": "design/parity/devices/test-android.json",
+          "json": {
+            "id": "test-android",
+            "platform": "android",
+            "name": "Self-test Android phone (160 x 300 dp @3x)",
+            "avd": {
+              "name": "tasks-parity",
+              "device": "pixel_7",
+              "systemImage": "system-images;android-36;google_apis;arm64-v8a",
+              "density": 480
+            },
+            "points": { "width": 160, "height": 300 },
+            "scale": 3,
+            "pixels": { "width": 480, "height": 900 },
+            "safeArea": { "top": 20, "bottom": 10 },
+            "masks": [{ "x": 0, "y": 0, "width": 160, "height": 20 }, { "x": 0, "y": 290, "width": 160, "height": 10 }],
+            "fontScale": "1.0"
+          }
+        }
+      },
+      {
+        "json": { "file": "contracts/visual-parity.json", "path": ["devices"], "value": ["test-phone", "test-android"] }
+      },
+      { "write": { "file": "scenario.json", "json": { "avds": [] } } }
+    ]
+  },
+  "bad-emu-navigation": {
+    "expect": ["[emu-navigation] the navigation mode is threebutton, not gestural"],
+    "args": "--device test-android --check",
+    "ops": [
+      {
+        "write": {
+          "file": "design/parity/devices/test-android.json",
+          "json": {
+            "id": "test-android",
+            "platform": "android",
+            "name": "Self-test Android phone (160 x 300 dp @3x)",
+            "avd": {
+              "name": "tasks-parity",
+              "device": "pixel_7",
+              "systemImage": "system-images;android-36;google_apis;arm64-v8a",
+              "density": 480
+            },
+            "points": { "width": 160, "height": 300 },
+            "scale": 3,
+            "pixels": { "width": 480, "height": 900 },
+            "safeArea": { "top": 20, "bottom": 10 },
+            "masks": [{ "x": 0, "y": 0, "width": 160, "height": 20 }, { "x": 0, "y": 290, "width": 160, "height": 10 }],
+            "fontScale": "1.0"
+          }
+        }
+      },
+      {
+        "json": { "file": "contracts/visual-parity.json", "path": ["devices"], "value": ["test-phone", "test-android"] }
+      },
+      {
+        "write": {
+          "file": "scenario.json",
+          "json": { "adb": { "size": "Physical size: 480x900", "navigation": "threebutton" } }
+        }
+      }
+    ]
+  },
+  "bad-emu-night-mode": {
+    "expect": ["[emu-night-mode] night mode is yes, not no"],
+    "args": "--device test-android --check",
+    "ops": [
+      {
+        "write": {
+          "file": "design/parity/devices/test-android.json",
+          "json": {
+            "id": "test-android",
+            "platform": "android",
+            "name": "Self-test Android phone (160 x 300 dp @3x)",
+            "avd": {
+              "name": "tasks-parity",
+              "device": "pixel_7",
+              "systemImage": "system-images;android-36;google_apis;arm64-v8a",
+              "density": 480
+            },
+            "points": { "width": 160, "height": 300 },
+            "scale": 3,
+            "pixels": { "width": 480, "height": 900 },
+            "safeArea": { "top": 20, "bottom": 10 },
+            "masks": [{ "x": 0, "y": 0, "width": 160, "height": 20 }, { "x": 0, "y": 290, "width": 160, "height": 10 }],
+            "fontScale": "1.0"
+          }
+        }
+      },
+      {
+        "json": { "file": "contracts/visual-parity.json", "path": ["devices"], "value": ["test-phone", "test-android"] }
+      },
+      {
+        "write": {
+          "file": "scenario.json",
+          "json": { "adb": { "size": "Physical size: 480x900", "night": "Night mode: yes" } }
+        }
+      }
+    ]
+  },
+  "bad-emu-not-running": {
+    "expect": ["[emu-not-running] the AVD tasks-parity is not running"],
+    "args": "--device test-android --check",
+    "ops": [
+      {
+        "write": {
+          "file": "design/parity/devices/test-android.json",
+          "json": {
+            "id": "test-android",
+            "platform": "android",
+            "name": "Self-test Android phone (160 x 300 dp @3x)",
+            "avd": {
+              "name": "tasks-parity",
+              "device": "pixel_7",
+              "systemImage": "system-images;android-36;google_apis;arm64-v8a",
+              "density": 480
+            },
+            "points": { "width": 160, "height": 300 },
+            "scale": 3,
+            "pixels": { "width": 480, "height": 900 },
+            "safeArea": { "top": 20, "bottom": 10 },
+            "masks": [{ "x": 0, "y": 0, "width": 160, "height": 20 }, { "x": 0, "y": 290, "width": 160, "height": 10 }],
+            "fontScale": "1.0"
+          }
+        }
+      },
+      {
+        "json": { "file": "contracts/visual-parity.json", "path": ["devices"], "value": ["test-phone", "test-android"] }
+      },
+      { "write": { "file": "scenario.json", "json": { "adb": { "running": false } } } }
+    ]
+  },
+  "bad-emu-wrong-image": {
+    "expect": [
+      "[emu-wrong-image] the AVD tasks-parity is made from system-images/android-35/google_apis/arm64-v8a/, not system-images/android-36/google_apis/arm64-v8a/"
+    ],
+    "args": "--device test-android --check",
+    "ops": [
+      {
+        "write": {
+          "file": "design/parity/devices/test-android.json",
+          "json": {
+            "id": "test-android",
+            "platform": "android",
+            "name": "Self-test Android phone (160 x 300 dp @3x)",
+            "avd": {
+              "name": "tasks-parity",
+              "device": "pixel_7",
+              "systemImage": "system-images;android-36;google_apis;arm64-v8a",
+              "density": 480
+            },
+            "points": { "width": 160, "height": 300 },
+            "scale": 3,
+            "pixels": { "width": 480, "height": 900 },
+            "safeArea": { "top": 20, "bottom": 10 },
+            "masks": [{ "x": 0, "y": 0, "width": 160, "height": 20 }, { "x": 0, "y": 290, "width": 160, "height": 10 }],
+            "fontScale": "1.0"
+          }
+        }
+      },
+      {
+        "json": { "file": "contracts/visual-parity.json", "path": ["devices"], "value": ["test-phone", "test-android"] }
+      },
+      { "write": { "file": "scenario.json", "json": { "adb": { "size": "Physical size: 480x900" } } } },
+      {
+        "write": {
+          "file": "fake-avd/tasks-parity.avd/config.ini",
+          "content": "AvdId=tasks-parity\nimage.sysdir.1=system-images/android-35/google_apis/arm64-v8a/\n"
+        }
+      }
+    ]
+  },
+  "bad-sim-appearance": {
+    "expect": ["[sim-appearance] appearance is \"dark\", not \"light\""],
+    "args": "--check",
+    "ops": [
+      {
+        "write": {
+          "file": "scenario.json",
+          "json": { "ui": { "appearance": "dark", "content_size": "large", "increase_contrast": "disabled" } }
+        }
+      }
+    ]
+  },
+  "bad-sim-content-size": {
+    "expect": ["[sim-content-size] content_size is \"extra-large\", not \"large\""],
+    "args": "--check",
+    "ops": [
+      {
+        "write": {
+          "file": "scenario.json",
+          "json": { "ui": { "appearance": "light", "content_size": "extra-large", "increase_contrast": "disabled" } }
+        }
+      }
+    ]
+  },
+  "bad-sim-duplicate": {
+    "expect": ["[sim-duplicate] 2 simulators are named tasks-parity"],
+    "args": "--check",
+    "ops": [
+      {
+        "write": {
+          "file": "scenario.json",
+          "json": {
+            "devices": {
+              "com.apple.CoreSimulator.SimRuntime.iOS-26-5": [
+                {
+                  "name": "tasks-parity",
+                  "udid": "11111111-2222-3333-4444-555555555555",
+                  "state": "Booted",
+                  "deviceTypeIdentifier": "com.apple.CoreSimulator.SimDeviceType.iPhone-16-Pro"
+                },
+                {
+                  "name": "tasks-parity",
+                  "udid": "99999999-2222-3333-4444-555555555555",
+                  "state": "Booted",
+                  "deviceTypeIdentifier": "com.apple.CoreSimulator.SimDeviceType.iPhone-16-Pro"
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "bad-sim-increase-contrast": {
+    "expect": ["[sim-increase-contrast] increase_contrast is \"enabled\", not \"disabled\""],
+    "args": "--check",
+    "ops": [
+      {
+        "write": {
+          "file": "scenario.json",
+          "json": { "ui": { "appearance": "light", "content_size": "large", "increase_contrast": "enabled" } }
+        }
+      }
+    ]
+  },
+  "bad-sim-locale": {
+    "expect": ["[sim-locale] AppleLocale is \"de_DE\", not en_US"],
+    "args": "--check",
+    "ops": [{ "write": { "file": "scenario.json", "json": { "locale": "de_DE" } } }]
+  },
+  "bad-sim-missing": {
+    "expect": ["[sim-missing] no tasks-parity simulator"],
+    "args": "--check",
+    "ops": [
+      {
+        "write": {
+          "file": "scenario.json",
+          "json": { "devices": { "com.apple.CoreSimulator.SimRuntime.iOS-26-5": [] } }
+        }
+      }
+    ]
+  },
+  "bad-sim-not-booted": {
+    "expect": ["[sim-not-booted] tasks-parity is Shutdown"],
+    "args": "--check",
+    "ops": [
+      {
+        "write": {
+          "file": "scenario.json",
+          "json": {
+            "devices": {
+              "com.apple.CoreSimulator.SimRuntime.iOS-26-5": [
+                {
+                  "name": "tasks-parity",
+                  "udid": "11111111-2222-3333-4444-555555555555",
+                  "state": "Shutdown",
+                  "deviceTypeIdentifier": "com.apple.CoreSimulator.SimDeviceType.iPhone-16-Pro"
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "bad-sim-status-bar": {
+    "expect": ["[sim-status-bar] the status bar is not overridden"],
+    "args": "--check",
+    "ops": [{ "write": { "file": "scenario.json", "json": { "statusBar": "" } } }]
+  },
+  "bad-sim-wrong-model": {
+    "expect": ["[sim-wrong-model] a simulator named tasks-parity"],
+    "args": "--check",
+    "ops": [
+      {
+        "write": {
+          "file": "scenario.json",
+          "json": {
+            "devices": {
+              "com.apple.CoreSimulator.SimRuntime.iOS-26-5": [
+                {
+                  "name": "tasks-parity",
+                  "udid": "11111111-2222-3333-4444-555555555555",
+                  "state": "Booted",
+                  "deviceTypeIdentifier": "com.apple.CoreSimulator.SimDeviceType.iPhone-16"
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "error-bad-name": { "expect": ["ERROR [bad-input] \"my-sim\" is not a parity device name"], "args": "--name my-sim" },
+  "error-no-contract": {
+    "expect": ["ERROR [bad-input] contracts/visual-parity.json does not exist"],
+    "ops": [{ "delete": "contracts/visual-parity.json" }]
+  },
+  "error-runtime-missing": {
+    "expect": ["ERROR [bad-input] the iOS 26.5 simulator runtime is not installed"],
+    "ops": [{ "write": { "file": "scenario.json", "json": { "runtimes": [] } } }]
+  },
+  "pass-android-check": {
+    "expect": ["serial emulator-5580"],
+    "args": "--device test-android --check",
+    "ops": [
+      {
+        "write": {
+          "file": "design/parity/devices/test-android.json",
+          "json": {
+            "id": "test-android",
+            "platform": "android",
+            "name": "Self-test Android phone (160 x 300 dp @3x)",
+            "avd": {
+              "name": "tasks-parity",
+              "device": "pixel_7",
+              "systemImage": "system-images;android-36;google_apis;arm64-v8a",
+              "density": 480
+            },
+            "points": { "width": 160, "height": 300 },
+            "scale": 3,
+            "pixels": { "width": 480, "height": 900 },
+            "safeArea": { "top": 20, "bottom": 10 },
+            "masks": [{ "x": 0, "y": 0, "width": 160, "height": 20 }, { "x": 0, "y": 290, "width": 160, "height": 10 }],
+            "fontScale": "1.0"
+          }
+        }
+      },
+      {
+        "json": { "file": "contracts/visual-parity.json", "path": ["devices"], "value": ["test-phone", "test-android"] }
+      },
+      { "write": { "file": "scenario.json", "json": { "adb": { "size": "Physical size: 480x900" } } } }
+    ]
+  },
+  "pass-check": { "expect": ["udid 11111111-2222-3333-4444-555555555555"], "args": "--check" }
+}

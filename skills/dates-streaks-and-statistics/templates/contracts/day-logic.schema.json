@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "day-logic.schema.json",
+  "title": "Day logic contract",
+  "description": "Where the app keeps its calendar-day logic. Read by the dates-streaks-and-statistics skill: check-streaks-and-stats.mjs runs each module named here (null: the app has no such module; a module whose dependency is null is refused) and check-calendar-code.mjs adds the modules and the dayCode globs to the code that must not read the wall clock, and the uiCode globs to the code that must not do day arithmetic. Paths are repo-relative. Unknown keys are refused.",
+  "type": "object",
+  "required": ["modules"],
+  "additionalProperties": false,
+  "$defs": {
+    "module": {
+      "description": "A repo-relative .ts file, or null when the app does not have this part.",
+      "oneOf": [{ "type": "string", "pattern": "^(?!/)(?!.*\\.\\./).+\\.ts$" }, { "type": "null" }]
+    },
+    "globs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    }
+  },
+  "properties": {
+    "$schema": { "type": "string" },
+    "modules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dayStreak",
+        "streakSummary",
+        "activityStats",
+        "statsSummary",
+        "recordCompletion"
+      ],
+      "allOf": [
+        {
+          "if": { "properties": { "streakSummary": { "type": "string" } } },
+          "then": { "properties": { "dayStreak": { "type": "string" } } }
+        },
+        {
+          "if": { "properties": { "statsSummary": { "type": "string" } } },
+          "then": { "properties": { "activityStats": { "type": "string" } } }
+        },
+        {
+          "if": { "properties": { "recordCompletion": { "type": "string" } } },
+          "then": {
+            "properties": {
+              "dayStreak": { "type": "string" },
+              "activityStats": { "type": "string" }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "dayStreak": {
+          "$ref": "#/$defs/module",
+          "description": "recordDay, currentStreak, isDayDone, recentDays, DAY_STREAK_KEEP_DAYS (streakOfDays when the app derives streaks from a kept history)"
+        },
+        "streakSummary": {
+          "$ref": "#/$defs/module",
+          "description": "buildStreakSummary (streakCountsOf when a statistics screen shows the streak counts); needs dayStreak"
+        },
+        "activityStats": {
+          "$ref": "#/$defs/module",
+          "description": "recordActivity, measureCounters, STATS_KEEP_DAYS"
+        },
+        "statsSummary": {
+          "$ref": "#/$defs/module",
+          "description": "buildStatsSummary, splitDuration, rateOf; needs activityStats (never the streaks folder)"
+        },
+        "recordCompletion": {
+          "$ref": "#/$defs/module",
+          "description": "recordCompletion; needs dayStreak and activityStats (an app without streaks sets it to null and calls recordActivity)"
+        }
+      }
+    },
+    "dayCode": {
+      "$ref": "#/$defs/globs",
+      "description": "More code that must receive time as values (no Date, Intl dates, toLocale*, Math.random)."
+    },
+    "uiCode": {
+      "$ref": "#/$defs/globs",
+      "description": "More code that only formats (no day arithmetic, no raw buckets); every .tsx file and use-*.ts hook under src/ is already included."
+    }
+  }
+}

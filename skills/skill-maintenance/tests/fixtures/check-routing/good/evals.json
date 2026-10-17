@@ -1,0 +1,32 @@
+{
+  "evals": [
+    {
+      "prompt": "swipe to complete on the task list screen stutters while scrolling",
+      "expect": "task-lists"
+    },
+    {
+      "prompt": "show an empty state when a list has no tasks yet",
+      "expect": "task-lists"
+    },
+    {
+      "prompt": "the reminder notification fires twice after I snooze it",
+      "expect": "reminder-alerts"
+    },
+    {
+      "prompt": "respect quiet hours for reminders on Android channels",
+      "expect": "reminder-alerts"
+    },
+    {
+      "prompt": "notes edited offline vanish after the next sync with the server",
+      "expect": "note-sync"
+    },
+    {
+      "prompt": "two devices edit the same note and the conflict merge loses text",
+      "expect": "note-sync"
+    },
+    {
+      "prompt": "What is 2 + 2?",
+      "expect": null
+    }
+  ]
+}

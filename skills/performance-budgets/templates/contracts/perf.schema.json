@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "performance contract",
+  "description": "The app's performance facts, read by the performance-budgets checker (check-perf-code.mjs). The budgets themselves live in quality-gates.json \"perf\".",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "layer": {
+      "description": "The on-device measurement layer (cold start, frame times, storage benchmark, perf log). Declared: every file and every wiring line is required (rules perf-layer, debug-perf-wired). Absent: the app measures nothing on devices yet, and the checker says so in a note.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["jsEntryFile", "firstScreenFiles"],
+      "properties": {
+        "jsEntryFile": {
+          "description": "The file whose startup function calls markJsEntry(perf.epochMs()) once, inside a function, never at module scope: the root layout (src/app/_layout.tsx) by default.",
+          "type": "string"
+        },
+        "firstScreenFiles": {
+          "description": "The model hook(s) of the first screen a launch shows, each calling useColdStartMark({ perf, perfLog, label, isReady }) with isReady true once its real data is on screen.",
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "testOnlyEntry": {
+          "description": "The test-only entry (debug-menu-and-test-hooks) that builds the perf log and the debug menu's Performance actions; default src/test-only-entry.ts.",
+          "type": "string"
+        },
+        "nativeModuleDir": {
+          "description": "The local Expo module that reads the process start time; default modules/process-start.",
+          "type": "string"
+        }
+      }
+    },
+    "canvasBudgetExempt": {
+      "description": "Screen files allowed more Skia canvases than perf.skiaCanvasesPerScreenMax, each with the measurement that justifies it.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["file", "reason"],
+        "properties": {
+          "file": { "type": "string" },
+          "reason": { "type": "string", "minLength": 10 }
+        }
+      }
+    }
+  }
+}

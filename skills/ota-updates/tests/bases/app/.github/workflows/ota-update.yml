@@ -1,0 +1,19 @@
+# .github/workflows/ota-update.yml
+name: OTA update
+on:
+  workflow_dispatch:
+    inputs:
+      message:
+        description: What the update fixes
+        required: true
+jobs:
+  production:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: npm ci
+      - run: npm run verify
+      - run: >-
+          eas update --channel production --environment production
+          --message "${{ inputs.message }}" --rollout-percentage 10 --non-interactive
+      # Raising the rollout, rolling back and pausing are a person's decisions (eas update:edit by hand).

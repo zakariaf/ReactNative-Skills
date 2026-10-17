@@ -1,0 +1,111 @@
+{
+  "$comment": "Third-party packages whose shipped code can open a connection, and why the app cannot reach that code (privacy-and-store-declarations). js: modules in the release JavaScript bundle (audit-bundle.mjs, npm run audit:network); native: autolinked native modules. A package the app uses to go online is a declared SDK in contracts/privacy.json instead (a declared SDK needs no entry here). Starting entries were found by the audit on 2026-10-14 in a fresh create-expo-app --template default@sdk-57 app (expo 57.0.29, react-native 0.86.3) and in the canonical-stack reference app (expo 57.0.26), so a package one of them lacks is a STALE note; an app adds its own packages' entries. A first-party file is never an entry. Changing this file needs the reviewer and a Gate-Change trailer (it is a gated path in quality-gates.json).",
+  "js": {
+    "react-native": {
+      "categories": ["webSocket", "remoteUrl", "fetch"],
+      "reason": "RN core: the WebSocket module and documentation links; app code reaches them only through the ApiClient port. Libraries/Core/Devtools/symbolicateStackTrace.js (shipped when a crash reporter such as @sentry/react-native imports it) posts a stack to the Metro dev server, which release builds do not have"
+    },
+    "whatwg-fetch": {
+      "categories": ["fetch", "xhr"],
+      "reason": "the fetch polyfill React Native installs; the app requests only through the ApiClient port"
+    },
+    "expo": {
+      "categories": ["fetch"],
+      "reason": "Expo's fetch implementation (expo/fetch, winter/fetch/fetch.ts); the app requests only through the ApiClient port"
+    },
+    "@expo/metro-runtime": {
+      "categories": ["fetch"],
+      "reason": "location/install.native.ts wraps the global fetch to resolve relative URLs; it adds no request of its own"
+    },
+    "@expo/devtools": {
+      "categories": ["webSocket"],
+      "reason": "the dev-tools plugin client expo re-exports; it connects only to a running dev server, which release builds never have"
+    },
+    "expo-asset": {
+      "categories": ["remoteUrl", "fileTransfer"],
+      "reason": "builds Expo CDN URLs and downloads remote assets (Asset.downloadAsync calls ExpoAsset.downloadAsync) only for assets served by a dev server or an update; release builds embed every asset and the app passes no remote source"
+    },
+    "expo-router": {
+      "categories": ["fetch", "remoteUrl"],
+      "reason": "loaders/utils.js fetches route data loaders only in a server-rendered web app; the URLs are href-parsing placeholders and doc comments"
+    },
+    "expo-linking": {
+      "categories": ["remoteUrl"],
+      "reason": "doc comments and the linking guide link in Schemes.js; no request is made"
+    },
+    "expo-image": {
+      "categories": ["remoteUrl"],
+      "reason": "an example URL in a doc comment (useImage.ts); the app passes only bundled or local image sources (a remote source in first-party code fails remote-url)"
+    },
+    "expo-file-system": {
+      "categories": ["remoteUrl", "fileTransfer"],
+      "reason": "its download and upload APIs (File.downloadFileAsync, upload tasks, the legacy downloadAsync) and example URLs in doc comments; first-party code may call them only in a networkModules file (audit-repo network-call), so nothing else reaches them"
+    },
+    "react-native-worklets": {
+      "categories": ["remoteUrl"],
+      "reason": "documentation links inside error messages; no request is made"
+    },
+    "react-native-reanimated": {
+      "categories": ["remoteUrl"],
+      "reason": "documentation links inside error and logger messages; no request is made"
+    }
+  },
+  "native": {
+    "react-native": {
+      "categories": ["urlSession", "webSocket", "httpClient", "webView"],
+      "reason": "RN networking, WebSocket and web view modules (iOS and Android); app code reaches them only through the ApiClient port"
+    },
+    "expo": {
+      "categories": ["urlSession", "httpClient"],
+      "reason": "Expo's fetch implementation and dev-server helpers; release builds request only through the ApiClient port"
+    },
+    "expo-modules-core": {
+      "categories": ["urlSession", "httpClient"],
+      "reason": "module infrastructure with dev-server helpers, unused in release builds"
+    },
+    "expo-modules-jsi": {
+      "categories": ["urlSession"],
+      "reason": "the match is a doc comment about URLSession delegates (JavaScriptPromise.swift); no network code"
+    },
+    "expo-asset": {
+      "categories": ["urlSession", "httpClient"],
+      "reason": "remote asset download path, unused: release builds embed every asset"
+    },
+    "expo-file-system": {
+      "categories": ["urlSession", "httpClient"],
+      "reason": "download and upload APIs; the app calls them only from a module listed in networkModules, or never"
+    },
+    "@expo/dom-webview": {
+      "categories": ["webView"],
+      "reason": "the DOM components runtime, unused unless the app renders a DOM component"
+    },
+    "@expo/log-box": {
+      "categories": ["urlSession", "httpClient", "webView"],
+      "reason": "the development error overlay, inactive in release builds"
+    },
+    "expo-constants": {
+      "categories": ["webView"],
+      "reason": "reads the user agent through a web view class; no network use"
+    },
+    "react-native-screens": {
+      "categories": ["webView"],
+      "reason": "detects a WebView inside a screen to set its layer type (Screen.kt); it loads nothing"
+    },
+    "react-native-worklets": {
+      "categories": ["httpClient"],
+      "reason": "WorkletsNetworkEventUtil (okhttp) backs fetch inside worklet runtimes; app code requests only through the ApiClient port"
+    },
+    "expo-image": {
+      "categories": ["urlSession", "httpClient"],
+      "reason": "SDWebImage (iOS) and Glide with OkHttp (Android) load an image over the network only for a remote source URI; the app passes only bundled or local sources (a remote source in first-party code fails remote-url)"
+    },
+    "@expo/ui": {
+      "categories": ["httpClient"],
+      "reason": "its Android image loader can fetch a remote image URI; the app passes local images only"
+    },
+    "expo-sharing": {
+      "categories": ["urlSession", "httpClient"],
+      "reason": "resolves the content of a URL shared into the app (ResolveUrlContentDetails.swift); an app that only shares local files out never reaches it (an app that accepts shared URLs declares expo-sharing as an SDK instead)"
+    }
+  }
+}

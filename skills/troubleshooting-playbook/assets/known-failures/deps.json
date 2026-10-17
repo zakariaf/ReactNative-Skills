@@ -1,0 +1,387 @@
+{
+  "area": "deps",
+  "entries": [
+    {
+      "id": "deps-release-age-etarget",
+      "topic": "Pinning",
+      "symptom": "npm install fails with ETARGET (No matching version found) for a version that exists",
+      "cause": "min-release-age=7 in .npmrc refuses versions younger than 7 days",
+      "fix": "Wait until the version is 7 days old, or pin the previous one; an exception goes only into a dated min-release-age-exclude block that expires (the dependency check enforces the date); never set min-release-age=0",
+      "match": [
+        "ETARGET"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "dependency-management"
+    },
+    {
+      "id": "deps-npmrc-release-age-override",
+      "topic": "Pinning",
+      "symptom": "A package younger than 7 days installs although .npmrc sets min-release-age=7",
+      "cause": "npm keeps the last value, so a later min-release-age=0 switches the policy off; a malformed exclude line is honoured too",
+      "fix": "One min-release-age line; exceptions only as min-release-age-exclude[]=<pkg>@<version> in the dated block; the dependency check in npm run verify catches both loopholes",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "dependency-management"
+    },
+    {
+      "id": "deps-expo-install-range",
+      "topic": "Pinning",
+      "symptom": "npx expo install writes ~57.0.x (or a caret range for a third-party package) despite save-exact=true",
+      "cause": "expo install writes the SDK range for Expo-managed packages and a caret for packages outside its map",
+      "fix": "Keep Expo's ~ ranges for SDK packages; change caret pins of packages outside Expo's module map (ads, IAP, audio libraries) to exact versions",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "dependency-management"
+    },
+    {
+      "id": "deps-expo-patch-younger-than-7-days",
+      "topic": "Pinning",
+      "symptom": "verify turns red with no change in the repo: expo install --check prints \"expected version: ~57.0.x\" or expo-doctor fails \"Patch version mismatches\"",
+      "cause": "Expo published a patch less than 7 days ago; the fix the tools print (install it) is refused by the release-age rule",
+      "fix": "The dependency check reads the publish time (npm view <pkg> time) and prints a warning with the due date instead of failing; on that date run npx expo install <pkg>@~<version> and update the versions table in the same commit; never add an exclude block for it",
+      "match": [
+        "Patch version mismatch",
+        "expected version: ~\\d+\\.\\d+\\.\\d+"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "dependency-management"
+    },
+    {
+      "id": "deps-expo-same-day-patch",
+      "topic": "Pinning",
+      "symptom": "The dependency check fails right after npx expo install: the installed SDK package is one patch above the versions table",
+      "cause": "A bare npx expo install takes a same-day patch from Expo's online versions list",
+      "fix": "Install with the table spec (npx expo install <pkg>@<table spec>); the newer patch stays a warning until it is 7 days old",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "dependency-management"
+    },
+    {
+      "id": "deps-typescript-eslint-two-copies",
+      "topic": "Pinning",
+      "symptom": "ESLint crashes: ConfigError: ... Key \"plugins\": Cannot redefine plugin \"@typescript-eslint\"",
+      "cause": "Two copies of @typescript-eslint/eslint-plugin: eslint-config-expo's caret range resolved a newer release while typescript-eslint nested its own",
+      "fix": "Pin every @typescript-eslint/* package to the typescript-eslint version with root overrides, npm install, and check npm ls @typescript-eslint/eslint-plugin shows one version",
+      "match": [
+        "Cannot redefine plugin \"@typescript-eslint\""
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "dependency-management"
+    },
+    {
+      "id": "deps-duplicate-native-peer",
+      "topic": "Pinning",
+      "symptom": "npx expo-doctor prints \"Found duplicates for <native module>\" (react-native-screens, react-native-safe-area-context ...)",
+      "cause": "Two versions of one native module in node_modules: a peer or a workspace pulled the newest release next to the one the app installs",
+      "fix": "Add a root override at the version the app installs (npx expo install chooses it), npm install, then npm ls <pkg> shows one copy",
+      "match": [
+        "Found duplicates for [\\w@/.-]+"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "dependency-management"
+    },
+    {
+      "id": "deps-hand-installed-rn",
+      "topic": "Held-back majors",
+      "symptom": "npm latest react or react-native differs from the SDK pins",
+      "cause": "Only the Expo SDK decides the React and React Native versions",
+      "fix": "Never install either by hand; npx expo install --fix",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "dependency-management"
+    },
+    {
+      "id": "deps-eslint-10-crash",
+      "topic": "Held-back majors",
+      "symptom": "ESLint 10: contextOrFilename.getFilename is not a function (eslint-plugin-react)",
+      "cause": "eslint-config-expo 57 pulls eslint-plugin-react and eslint-plugin-import releases whose peers stop at ESLint 9",
+      "fix": "Pin eslint 9.39.5; move only when eslint-config-expo ships ESLint-10-ready plugins",
+      "match": [
+        "getFilename is not a function"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "dependency-management",
+      "appliesTo": {
+        "eslint-config-expo": "57.x"
+      }
+    },
+    {
+      "id": "deps-typescript-7",
+      "topic": "Held-back majors",
+      "symptom": "TypeScript 7 installed: typescript-eslint and other tools break",
+      "cause": "TypeScript 7 ships no compiler API yet; typescript-eslint 8 peers typescript below 6.1; Expo pins ~6.0",
+      "fix": "Stay on TypeScript ~6.0.3 until typescript-eslint supports 7 and Expo lists it",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "dependency-management",
+      "appliesTo": {
+        "typescript-eslint": "8.x"
+      }
+    },
+    {
+      "id": "deps-jest-30",
+      "topic": "Held-back majors",
+      "symptom": "Jest 30 breaks the jest-expo preset",
+      "cause": "jest-expo 57 depends on Jest 29 packages; SDK 57 pins jest ~29.7",
+      "fix": "Stay on Jest 29.7 until the jest-expo of the SDK depends on Jest 30",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "dependency-management",
+      "appliesTo": {
+        "jest-expo": "57.x"
+      }
+    },
+    {
+      "id": "deps-test-renderer-1-3",
+      "topic": "Held-back majors",
+      "symptom": "Component tests fail oddly after installing @testing-library/react-native alone (npm ls shows test-renderer 1.3)",
+      "cause": "npm's automatic peer install picks test-renderer 1.3, which targets React 19.3 (SDK 58); SDK 57 is React 19.2, whose companion is test-renderer 1.2.0",
+      "fix": "Install both in one command: npm install --save-dev --save-exact @testing-library/react-native@14.0.1 test-renderer@1.2.0; npm ls test-renderer shows 1.2.0",
+      "match": [
+        "test-renderer@1\\.3"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "unit-and-component-tests",
+      "appliesTo": {
+        "expo": "57.x"
+      }
+    },
+    {
+      "id": "deps-rngh-legacy-tag",
+      "topic": "Held-back majors",
+      "symptom": "npm offers a newer react-native-gesture-handler 2.x (legacy tag) or 3.x",
+      "cause": "It is outside Expo SDK 57's ~2.32 range; Gesture Handler 3 renames the callbacks",
+      "fix": "Stay on what npx expo install picks; move with the SDK upgrade",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "dependency-management",
+      "appliesTo": {
+        "expo": "57.x"
+      }
+    },
+    {
+      "id": "deps-rn-plugin-stale",
+      "topic": "Held-back majors",
+      "symptom": "eslint-plugin-react-native blocks an ESLint upgrade",
+      "cause": "It has had no release for a long time and caps its peer range at ESLint 9",
+      "fix": "Drop the plugin when it blocks an upgrade; its rules are nice to have",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "dependency-management"
+    },
+    {
+      "id": "deps-approve-scripts-exit",
+      "topic": "Install scripts",
+      "symptom": "npm approve-scripts --allow-scripts-pending exits 0 even with unreviewed install scripts",
+      "cause": "The command reports but never fails",
+      "fix": "Fail unless its output says \"No packages with unreviewed install scripts.\" (the dependency check does)",
+      "match": [
+        "unreviewed install scripts"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "dependency-management"
+    },
+    {
+      "id": "deps-lefthook-postinstall",
+      "topic": "Install scripts",
+      "symptom": "npm flags lefthook's postinstall as an unreviewed install script, or lefthook writes lefthook.yml into an enclosing repo from a nested app",
+      "cause": "lefthook installs its hooks in postinstall, and from a nested folder it finds the outer repo's .git",
+      "fix": "Install hooks with the guarded prepare script (node scripts/hooks/install-git-hooks.ts) that installs only at the repo root; keep lefthook in allowScripts (npm 11.17 omits .bin/lefthook when its script is denied)",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "quality-gates"
+    },
+    {
+      "id": "deps-skia-postinstall",
+      "topic": "Install scripts",
+      "symptom": "The Skia install needs an approved install script",
+      "cause": "@shopify/react-native-skia downloads prebuilt binaries in an install step on SDK 57",
+      "fix": "Read the script, approve it in allowScripts, and drop the approval when an upgrade no longer has it",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "dependency-management",
+      "appliesTo": {
+        "@shopify/react-native-skia": "2.6.x"
+      }
+    },
+    {
+      "id": "deps-fsevents-install-script",
+      "topic": "Install scripts",
+      "symptom": "fsevents appears as a pending install script after an install",
+      "cause": "An optional macOS file-watcher dependency of Jest ships a node-gyp rebuild script (npm explain fsevents shows the path)",
+      "fix": "Approve it like the other known install scripts (it never ships in the app), then rerun the dependency check",
+      "match": [
+        "fsevents@\\d"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "dependency-management"
+    },
+    {
+      "id": "deps-npm-audit-fix",
+      "topic": "Packages",
+      "symptom": "npm install prints \"N moderate severity vulnerabilities\" and suggests npm audit fix",
+      "cause": "The advisories are usually in build tooling (config plugins, test tools) that never ships in the app",
+      "fix": "Never run npm audit fix (with --force it moves expo off the SDK); review each advisory and upgrade the owning package deliberately",
+      "match": [
+        "\\d+ (low|moderate|high) severity vulnerabilit"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "dependency-management"
+    },
+    {
+      "id": "deps-fresh-packages",
+      "topic": "Packages",
+      "symptom": "A just-published package (hours or days old) breaks after install",
+      "cause": "Brand-new releases of fast-moving packages (ads, IAP, audio) regularly ship regressions",
+      "fix": "Respect the 7-day release age, pin exactly, test risky ones on their test tiers, and note the rollback version",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "dependency-management"
+    },
+    {
+      "id": "deps-pre1-pinning",
+      "topic": "Packages",
+      "symptom": "A 0.x native package behaves differently after a minor bump, or npx expo install picks no version for it",
+      "cause": "It is pre-1.0 (0.x minors break) and outside Expo's module map",
+      "fix": "Pin the exact version, read the release notes on every bump, override its plugin defaults deliberately, and rerun the device smoke test",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "dependency-management"
+    },
+    {
+      "id": "deps-companion-types",
+      "topic": "Packages",
+      "symptom": "error TS7016: Could not find a declaration file for module '<package>'",
+      "cause": "The package was installed without its companion @types package",
+      "fix": "Install both in one command (npm install -D -E <package>@<v> @types/<package>@<v>)",
+      "match": [
+        "TS7016: Could not find a declaration file for module"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "dependency-management"
+    },
+    {
+      "id": "deps-fast-check-missing",
+      "topic": "Packages",
+      "symptom": "TS2307: Cannot find module 'fast-check' right after copying property tests",
+      "cause": "The property tests import fast-check, which a fresh app does not have",
+      "fix": "npm install -D -E fast-check@4.10.2 at the repo root, then review pending install scripts",
+      "match": [
+        "Cannot find module 'fast-check'"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "unit-and-component-tests"
+    },
+    {
+      "id": "deps-knip-skills-folder",
+      "topic": "knip",
+      "symptom": "knip reports hundreds of unlisted dependencies or unused files in a repo that holds installed skills",
+      "cause": "knip's Jest plugin falls back to test patterns anywhere in the repo, so it reads the skills' templates and fixtures",
+      "fix": "Ignore the agent skill folders (skills/**, .agents/**, .claude/** ...) in knip.json, as the canonical knip.json does; never a wider ignore",
+      "match": [
+        "Unlisted dependencies \\(\\d{3,}\\)"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "quality-gates"
+    },
+    {
+      "id": "deps-knip-expo-updates",
+      "topic": "knip",
+      "symptom": "knip reports expo-updates as unlisted or unused",
+      "cause": "knip's Expo plugin assumes an app ships expo-updates unless the config says otherwise",
+      "fix": "Wire OTA with ota-updates (updatesConfig()), or list expo-updates in ignoreDependencies with its reason until then",
+      "match": [
+        "expo-updates.{0,20}(unlisted|unused)",
+        "dependencies \\(\\d+\\)\\s+expo-updates"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "ota-updates"
+    },
+    {
+      "id": "deps-knip-plugin-only",
+      "topic": "knip",
+      "symptom": "knip reports a package as unused although the app needs it",
+      "cause": "The package is used only through an app.config.ts plugin entry or native code",
+      "fix": "Check that it is really used; then list it in ignoreDependencies with its reason (contracts/knip-ignores.json) and a Gate-Change trailer",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "quality-gates"
+    },
+    {
+      "id": "deps-knip-unlisted-binaries",
+      "topic": "knip",
+      "symptom": "knip reports \"Unlisted binaries\" (plutil, pgrep, sqlite3, footprint) in scripts/",
+      "cause": "The tooling starts macOS system tools by name; they are not npm packages",
+      "fix": "List them in ignoreBinaries with their reason; any other unlisted binary is a real finding (install it or stop calling it)",
+      "match": [
+        "Unlisted binaries"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "quality-gates"
+    },
+    {
+      "id": "deps-knip-root-mocks",
+      "topic": "knip",
+      "symptom": "knip reports unlisted dependencies inside __mocks__/",
+      "cause": "Root mocks import the real libraries' types and helpers",
+      "fix": "Make sure the library is a dependency of the app; a mock for a package the app does not use is deleted",
+      "match": [
+        "Unlisted dependencies.{0,60}__mocks__/"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "quality-gates"
+    },
+    {
+      "id": "deps-knip-test-only-exports",
+      "topic": "knip",
+      "symptom": "knip reports unused exports in src/test-only-entry.ts",
+      "cause": "Those exports are reached only through the gated require() in src/test-only.ts, which knip does not follow",
+      "fix": "Type the gate from the entry (typeof import of the entry, as the debug-menu template does) so knip sees every export as used; never ignore the file",
+      "match": [
+        "test-only-entry\\.ts"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "debug-menu-and-test-hooks"
+    },
+    {
+      "id": "deps-knip-template-api",
+      "topic": "knip",
+      "symptom": "knip reports unused exports of an adopted template's API that the app never calls",
+      "cause": "knip counts only imports; the app adopted a module but uses part of it",
+      "fix": "Delete what the app does not use, or use it; never add a knip ignore for app code",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "quality-gates"
+    }
+  ]
+}

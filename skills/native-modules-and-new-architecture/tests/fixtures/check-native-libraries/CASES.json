@@ -1,0 +1,420 @@
+{
+  "bad-doctor-check": {
+    "expect": [
+      "[doctor-check] expo.doctor.reactNativeDirectoryCheck.enabled is false",
+      "[doctor-check] expo-doctor excludes zustand from the React Native Directory check without a recorded decision",
+      "[doctor-check] expo-doctor excludes the pattern /^react-native-.*/"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["expo"],
+          "value": {
+            "doctor": {
+              "reactNativeDirectoryCheck": { "enabled": false, "exclude": ["zustand", "/^react-native-.*/"] }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "bad-library-entry": {
+    "expect": [
+      "[library-entry] the entry for react-native-legacy-picker lacks evidence, recheckBy",
+      "[library-entry] react-native-legacy-picker: decision \"replace\" names no replaceWith"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "react-native-legacy-picker"], "value": "2.4.0" } },
+      {
+        "write": {
+          "file": "node_modules/react-native-legacy-picker/package.json",
+          "json": { "name": "react-native-legacy-picker", "version": "2.4.0" }
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/react-native-legacy-picker/RNLegacyPicker.podspec",
+          "content": "Pod::Spec.new do |s| end\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/react-native-legacy-picker/android/build.gradle",
+          "content": "apply plugin: 'com.android.library'\n"
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/native-libraries.json",
+          "path": ["libraries", "react-native-legacy-picker"],
+          "value": {
+            "architecture": "interop",
+            "decision": "replace",
+            "reason": "The due-date wheel picker, until the replacement lands"
+          }
+        }
+      }
+    ]
+  },
+  "bad-library-legacy": {
+    "expect": [
+      "FAIL package.json:",
+      "[library-legacy] react-native-legacy-picker 2.4.0 ships native code without an Expo module config, codegenConfig or a Nitro marker"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "react-native-legacy-picker"], "value": "2.4.0" } },
+      {
+        "write": {
+          "file": "node_modules/react-native-legacy-picker/package.json",
+          "json": { "name": "react-native-legacy-picker", "version": "2.4.0" }
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/react-native-legacy-picker/RNLegacyPicker.podspec",
+          "content": "Pod::Spec.new do |s| end\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/react-native-legacy-picker/android/build.gradle",
+          "content": "apply plugin: 'com.android.library'\n"
+        }
+      }
+    ]
+  },
+  "bad-library-legacy-hoisted": {
+    "expect": [
+      "FAIL package.json:",
+      "[library-legacy] react-native-legacy-picker 2.4.0 ships native code",
+      "note: @react-native-masked-view/masked-view 0.3.2 runs through the interop layer (installed through expo-router"
+    ],
+    "args": "{dir}/apps/tasks --today 2026-10-14",
+    "ops": [
+      {
+        "$comment": "An npm-workspaces repo: the app in apps/tasks, every package hoisted to the root node_modules. The check runs on the app and still finds the hoisted packages.",
+        "rename": { "from": "package.json", "to": "apps/tasks/package.json" }
+      },
+      { "rename": { "from": "contracts", "to": "apps/tasks/contracts" } },
+      {
+        "write": { "file": "package.json", "json": { "name": "tasks-repo", "private": true, "workspaces": ["apps/*"] } }
+      },
+      {
+        "json": {
+          "file": "apps/tasks/package.json",
+          "path": ["dependencies", "react-native-legacy-picker"],
+          "value": "2.4.0"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/react-native-legacy-picker/package.json",
+          "json": { "name": "react-native-legacy-picker", "version": "2.4.0" }
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/react-native-legacy-picker/RNLegacyPicker.podspec",
+          "content": "Pod::Spec.new do |s| end\n"
+        }
+      }
+    ]
+  },
+  "bad-library-recheck": {
+    "expect": ["[library-recheck] react-native-legacy-picker: recheckBy 2026-09-30 has passed (today 2026-10-14)"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "react-native-legacy-picker"], "value": "2.4.0" } },
+      {
+        "write": {
+          "file": "node_modules/react-native-legacy-picker/package.json",
+          "json": { "name": "react-native-legacy-picker", "version": "2.4.0" }
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/react-native-legacy-picker/RNLegacyPicker.podspec",
+          "content": "Pod::Spec.new do |s| end\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/react-native-legacy-picker/android/build.gradle",
+          "content": "apply plugin: 'com.android.library'\n"
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/native-libraries.json",
+          "path": ["libraries", "react-native-legacy-picker"],
+          "value": {
+            "architecture": "interop",
+            "decision": "keep",
+            "reason": "The due-date wheel picker has no New Architecture alternative yet",
+            "evidence": "React Native Directory: newArchitecture false (2026-10-14); due-date screen tested on the iOS 26.5 simulator and an Android 16 emulator",
+            "recheckBy": "2026-09-30"
+          }
+        }
+      }
+    ]
+  },
+  "bad-library-stale": {
+    "expect": [
+      "[library-stale] react-native-safe-area-context 5.7.0 now runs on the New Architecture natively (codegenConfig)",
+      "[library-stale] react-native-old-maps has a decision but is not a direct dependency of the app"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/native-libraries.json",
+          "path": ["libraries", "react-native-safe-area-context"],
+          "value": {
+            "architecture": "interop",
+            "decision": "keep",
+            "reason": "The due-date wheel picker has no New Architecture alternative yet",
+            "evidence": "React Native Directory: newArchitecture false (2026-10-14); due-date screen tested on the iOS 26.5 simulator and an Android 16 emulator",
+            "recheckBy": "2027-01-14"
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/native-libraries.json",
+          "path": ["libraries", "react-native-old-maps"],
+          "value": {
+            "architecture": "interop",
+            "decision": "keep",
+            "reason": "The due-date wheel picker has no New Architecture alternative yet",
+            "evidence": "React Native Directory: newArchitecture false (2026-10-14); due-date screen tested on the iOS 26.5 simulator and an Android 16 emulator",
+            "recheckBy": "2027-01-14"
+          }
+        }
+      }
+    ]
+  },
+  "bad-library-stale-nitro": {
+    "expect": ["[library-stale] react-native-fast-kv 4.3.2 now runs on the New Architecture natively (a Nitro module)"],
+    "ops": [
+      {
+        "$comment": "An interop decision recorded for a Nitro module (by mistake, or before it moved to Nitro) is stale.",
+        "json": { "file": "package.json", "path": ["dependencies", "react-native-fast-kv"], "value": "4.3.2" }
+      },
+      {
+        "write": {
+          "file": "node_modules/react-native-fast-kv/package.json",
+          "json": {
+            "name": "react-native-fast-kv",
+            "version": "4.3.2",
+            "peerDependencies": { "react-native": "*", "react-native-nitro-modules": "*" }
+          }
+        }
+      },
+      { "write": { "file": "node_modules/react-native-fast-kv/nitro.json", "json": { "cxxNamespace": ["fastkv"] } } },
+      {
+        "write": {
+          "file": "node_modules/react-native-fast-kv/NitroFastKv.podspec",
+          "content": "Pod::Spec.new do |s| end\n"
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/native-libraries.json",
+          "path": ["libraries", "react-native-fast-kv"],
+          "value": {
+            "architecture": "interop",
+            "decision": "keep",
+            "reason": "Key-value storage for drafts",
+            "evidence": "Recorded before the 4.x release",
+            "recheckBy": "2027-01-14"
+          }
+        }
+      }
+    ]
+  },
+  "error-bad-contract": {
+    "expect": ["ERROR [bad-input] contracts/native-libraries.json does not parse"],
+    "ops": [{ "write": { "file": "contracts/native-libraries.json", "content": "{ \"libraries\": " } }]
+  },
+  "error-bad-today": {
+    "expect": ["ERROR [bad-input] --today 14.10.2026 is not YYYY-MM-DD"],
+    "args": "{dir} --today 14.10.2026",
+    "ops": []
+  },
+  "error-no-node-modules": {
+    "expect": ["ERROR [bad-input] nothing to check: node_modules is missing"],
+    "ops": [{ "delete": "node_modules" }]
+  },
+  "pass-dev-dependency-native": {
+    "expect": [
+      "note: devDependency e2e-runner 20.51.4 ships native code",
+      "not checked as test tooling",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "$comment": "A test-only devDependency that ships android/build.gradle (as an e2e runner does) is a note, not library-legacy.",
+        "json": { "file": "package.json", "path": ["devDependencies", "e2e-runner"], "value": "20.51.4" }
+      },
+      {
+        "write": {
+          "file": "node_modules/e2e-runner/package.json",
+          "json": { "name": "e2e-runner", "version": "20.51.4" }
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/e2e-runner/android/build.gradle",
+          "content": "apply plugin: 'com.android.library'\n"
+        }
+      }
+    ]
+  },
+  "pass-doctor-exclusion-recorded": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["expo"],
+          "value": { "doctor": { "reactNativeDirectoryCheck": { "exclude": ["react-native-safe-area-context"] } } }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/native-libraries.json",
+          "path": ["libraries", "react-native-safe-area-context"],
+          "value": {
+            "architecture": "new",
+            "decision": "keep",
+            "reason": "A patched private build the directory does not list",
+            "evidence": "codegenConfig present; insets tested on the iOS 26.5 simulator and an Android 16 emulator (2026-10-14)",
+            "recheckBy": "2027-01-14"
+          }
+        }
+      }
+    ]
+  },
+  "pass-library-recorded": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "react-native-legacy-picker"], "value": "2.4.0" } },
+      {
+        "write": {
+          "file": "node_modules/react-native-legacy-picker/package.json",
+          "json": { "name": "react-native-legacy-picker", "version": "2.4.0" }
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/react-native-legacy-picker/RNLegacyPicker.podspec",
+          "content": "Pod::Spec.new do |s| end\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/react-native-legacy-picker/android/build.gradle",
+          "content": "apply plugin: 'com.android.library'\n"
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/native-libraries.json",
+          "path": ["libraries", "react-native-legacy-picker"],
+          "value": {
+            "architecture": "interop",
+            "decision": "keep",
+            "reason": "The due-date wheel picker has no New Architecture alternative yet",
+            "evidence": "React Native Directory: newArchitecture false (2026-10-14); due-date screen tested on the iOS 26.5 simulator and an Android 16 emulator",
+            "recheckBy": "2027-01-14"
+          }
+        }
+      }
+    ]
+  },
+  "pass-nitro-module": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "Nitro modules ship a podspec and android/build.gradle but no codegenConfig: nitro.json or the react-native-nitro-modules dependency marks them as New Architecture only.",
+        "json": { "file": "package.json", "path": ["dependencies", "react-native-fast-kv"], "value": "4.3.2" }
+      },
+      { "json": { "file": "package.json", "path": ["dependencies", "react-native-fast-camera"], "value": "5.2.3" } },
+      { "json": { "file": "package.json", "path": ["dependencies", "react-native-nitro-modules"], "value": "0.37.1" } },
+      {
+        "write": {
+          "file": "node_modules/react-native-fast-kv/package.json",
+          "json": {
+            "name": "react-native-fast-kv",
+            "version": "4.3.2",
+            "peerDependencies": { "react": "*", "react-native": "*", "react-native-nitro-modules": "*" }
+          }
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/react-native-fast-kv/nitro.json",
+          "json": {
+            "cxxNamespace": ["fastkv"],
+            "ios": { "iosModuleName": "NitroFastKv" },
+            "android": { "androidNamespace": ["fastkv"], "androidCxxLibName": "NitroFastKv" }
+          }
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/react-native-fast-kv/NitroFastKv.podspec",
+          "content": "Pod::Spec.new do |s| end\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/react-native-fast-kv/android/build.gradle",
+          "content": "apply plugin: 'com.android.library'\n"
+        }
+      },
+      {
+        "$comment": "No nitro.json in the package: the peer dependency alone marks it.",
+        "write": {
+          "file": "node_modules/react-native-fast-camera/package.json",
+          "json": {
+            "name": "react-native-fast-camera",
+            "version": "5.2.3",
+            "peerDependencies": { "react-native": "*", "react-native-nitro-modules": "*" }
+          }
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/react-native-fast-camera/FastCamera.podspec",
+          "content": "Pod::Spec.new do |s| end\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/react-native-fast-camera/android/build.gradle",
+          "content": "apply plugin: 'com.android.library'\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/react-native-nitro-modules/package.json",
+          "json": {
+            "name": "react-native-nitro-modules",
+            "version": "0.37.1",
+            "codegenConfig": { "name": "NitroModulesSpec", "type": "modules", "jsSrcsDir": "./src" }
+          }
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/react-native-nitro-modules/NitroModules.podspec",
+          "content": "Pod::Spec.new do |s| end\n"
+        }
+      }
+    ]
+  },
+  "pass-not-react-native": {
+    "expect": ["NOT APPLICABLE: react-native is not a dependency in package.json"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "react-native"], "delete": true } }]
+  }
+}

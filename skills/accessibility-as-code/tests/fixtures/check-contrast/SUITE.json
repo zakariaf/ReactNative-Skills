@@ -1,0 +1,3 @@
+{
+  "base": [{ "templates": true, "firstLinePath": true }, "@tests/bases/contrast"]
+}

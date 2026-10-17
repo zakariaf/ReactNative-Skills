@@ -1,0 +1,697 @@
+{
+  "bad-ad-app-id-format": {
+    "expect": [
+      "Payload/Tasks.app/Info.plist [ad-app-id] GADApplicationIdentifier \"ca-app-pub-123~456\" is not an AdMob app id"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/Info.plist",
+          "find": "<key>GADApplicationIdentifier</key>\n\t<string>ca-app-pub-1234567890123456~6543210987</string>",
+          "with": "<key>GADApplicationIdentifier</key>\n\t<string>ca-app-pub-123~456</string>"
+        }
+      }
+    ]
+  },
+  "bad-bundle-com-example": {
+    "expect": [
+      "Payload/Tasks.app/Info.plist [bundle-id] CFBundleIdentifier com.example.tasks is the template bundle id (com.example.*)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/Info.plist",
+          "find": "<key>CFBundleIdentifier</key>\n\t<string>com.acme.tasks</string>",
+          "with": "<key>CFBundleIdentifier</key>\n\t<string>com.example.tasks</string>"
+        }
+      },
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/EXConstants.bundle/app.config",
+          "find": "\"bundleIdentifier\":\"com.acme.tasks\"",
+          "with": "\"bundleIdentifier\":\"com.example.tasks\""
+        }
+      }
+    ]
+  },
+  "bad-bundle-other-variant": {
+    "expect": [
+      "Payload/Tasks.app/Info.plist [bundle-id] CFBundleIdentifier is com.acme.tasks.preview, expected com.acme.tasks for a production build"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/Info.plist",
+          "find": "<key>CFBundleIdentifier</key>\n\t<string>com.acme.tasks</string>",
+          "with": "<key>CFBundleIdentifier</key>\n\t<string>com.acme.tasks.preview</string>"
+        }
+      },
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/EXConstants.bundle/app.config",
+          "find": "\"bundleIdentifier\":\"com.acme.tasks\"",
+          "with": "\"bundleIdentifier\":\"com.acme.tasks.preview\""
+        }
+      }
+    ]
+  },
+  "bad-dev-client-keys": {
+    "expect": ["Payload/Tasks.app/Info.plist [dev-client-keys] NSBonjourServices holds _expo._tcp"],
+    "ops": [
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/Info.plist",
+          "find": "\t<key>NSCameraUsageDescription</key>",
+          "with": "\t<key>NSBonjourServices</key>\n\t<array>\n\t\t<string>_expo._tcp</string>\n\t</array>\n\t<key>NSCameraUsageDescription</key>"
+        }
+      }
+    ]
+  },
+  "bad-encryption-contract": {
+    "expect": [
+      "Payload/Tasks.app/Info.plist [encryption-flag] ITSAppUsesNonExemptEncryption is true, the contract says false"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/Info.plist",
+          "find": "<key>ITSAppUsesNonExemptEncryption</key>\n\t<false/>",
+          "with": "<key>ITSAppUsesNonExemptEncryption</key>\n\t<true/>"
+        }
+      }
+    ]
+  },
+  "bad-forbidden-string": {
+    "expect": ["Payload/Tasks.app/main.jsbundle [forbidden-string] contains \"placeholder.screen\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/main.jsbundle",
+          "find": "\"app code only\";",
+          "with": "\"app code only\";\"placeholder.screen\";"
+        }
+      }
+    ]
+  },
+  "bad-gate-without-sentinel": {
+    "expect": [
+      "src/test-only.ts:1 [test-code] src/test-only.ts gates test-only code, but no test-only sentinel is known"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/test-only.ts",
+          "content": "// src/test-only.ts\nexport const installTestHooks = (): void => undefined;\n"
+        }
+      }
+    ]
+  },
+  "bad-get-task-allow": {
+    "expect": ["Payload/Tasks.app [get-task-allow] the entitlements grant get-task-allow"],
+    "ops": [
+      {
+        "replace": {
+          "file": "entitlements.plist",
+          "find": "<key>get-task-allow</key>\n\t<false/>",
+          "with": "<key>get-task-allow</key>\n\t<true/>"
+        }
+      }
+    ]
+  },
+  "bad-get-task-allow-rehearsal": {
+    "expect": [
+      "REHEARSAL: not a release gate",
+      "Payload/Tasks.app [get-task-allow] the entitlements grant get-task-allow"
+    ],
+    "args": "{dir} --app {dir}/Payload/Tasks.app --variant production --version 1.4.0 --build 14 --rehearsal --entitlements {dir}/entitlements.plist",
+    "ops": [
+      {
+        "replace": {
+          "file": "entitlements.plist",
+          "find": "<key>get-task-allow</key>\n\t<false/>",
+          "with": "<key>get-task-allow</key>\n\t<true/>"
+        }
+      }
+    ]
+  },
+  "bad-info-keys": {
+    "expect": [
+      "Payload/Tasks.app/Info.plist [encryption-flag] ITSAppUsesNonExemptEncryption is not set",
+      "Payload/Tasks.app/Info.plist [ats] NSAppTransportSecurity.NSAllowsArbitraryLoads is true"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/Info.plist",
+          "find": "\t<key>ITSAppUsesNonExemptEncryption</key>\n\t<false/>\n",
+          "with": "\t<key>NSAppTransportSecurity</key>\n\t<dict>\n\t\t<key>NSAllowsArbitraryLoads</key>\n\t\t<true/>\n\t</dict>\n"
+        }
+      }
+    ]
+  },
+  "bad-multi-package-gate-without-sentinel": {
+    "expect": [
+      "apps/mobile/src/test-only.ts:1 [test-code] apps/mobile/src/test-only.ts gates test-only code, but no test-only sentinel is known"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/ios-release.json", "path": ["appDir"], "value": "apps/mobile" } },
+      { "delete": "src/test-only.ts" },
+      {
+        "write": {
+          "file": "apps/mobile/src/test-only.ts",
+          "content": "// apps/mobile/src/test-only.ts\nexport const installTestHooks = (): void => undefined;\n"
+        }
+      }
+    ]
+  },
+  "bad-multi-package-sentinel": {
+    "expect": [
+      "Payload/Tasks.app/main.jsbundle [test-code] contains the test-only sentinel \"TASKS_TEST_BUILD_ONLY\" 1 time(s)"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/ios-release.json", "path": ["appDir"], "value": "apps/mobile" } },
+      { "rename": { "from": "src/test-only.ts", "to": "apps/mobile/src/test-only.ts" } },
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/main.jsbundle",
+          "find": "\"app code only\";",
+          "with": "\"app code only\";\"TASKS_TEST_BUILD_ONLY\";"
+        }
+      }
+    ]
+  },
+  "bad-preview-live-ad-id": {
+    "expect": [
+      "Payload/Tasks.app/Info.plist [ad-app-id] GADApplicationIdentifier is \"ca-app-pub-1234567890123456~6543210987\", expected Google's sample app id for an ads-test build"
+    ],
+    "args": "{dir} --app {dir}/Payload/Tasks.app --entitlements {dir}/entitlements.plist --variant preview --version 1.4.0 --build 14",
+    "ops": [
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/Info.plist",
+          "find": "<key>CFBundleIdentifier</key>\n\t<string>com.acme.tasks</string>",
+          "with": "<key>CFBundleIdentifier</key>\n\t<string>com.acme.tasks.preview</string>"
+        }
+      },
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/EXConstants.bundle/app.config",
+          "find": "\"bundleIdentifier\":\"com.acme.tasks\"",
+          "with": "\"bundleIdentifier\":\"com.acme.tasks.preview\""
+        }
+      },
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/EXConstants.bundle/app.config",
+          "find": "\"appVariant\":\"production\",\"adsMode\":\"live\",\"adUnits\":{\"ios\":{\"banner\":\"ca-app-pub-1234567890123456/1111111111\"}},",
+          "with": "\"appVariant\":\"preview\",\"adsMode\":\"test\","
+        }
+      },
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/main.jsbundle",
+          "find": "\"app code only\";",
+          "with": "\"app code only\";\"TASKS_TEST_BUILD_ONLY\";"
+        }
+      }
+    ]
+  },
+  "bad-preview-live-mode": {
+    "expect": ["[constants] extra.adsMode is \"live\", which a preview build never carries"],
+    "args": "{dir} --app {dir}/Payload/Tasks.app --entitlements {dir}/entitlements.plist --variant preview --version 1.4.0 --build 14",
+    "ops": [
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/Info.plist",
+          "find": "<key>CFBundleIdentifier</key>\n\t<string>com.acme.tasks</string>",
+          "with": "<key>CFBundleIdentifier</key>\n\t<string>com.acme.tasks.preview</string>"
+        }
+      },
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/EXConstants.bundle/app.config",
+          "find": "\"bundleIdentifier\":\"com.acme.tasks\"",
+          "with": "\"bundleIdentifier\":\"com.acme.tasks.preview\""
+        }
+      },
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/EXConstants.bundle/app.config",
+          "find": "\"appVariant\":\"production\",\"adsMode\":\"live\",\"adUnits\":{\"ios\":{\"banner\":\"ca-app-pub-1234567890123456/1111111111\"}},",
+          "with": "\"appVariant\":\"preview\",\"adsMode\":\"live\","
+        }
+      },
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/main.jsbundle",
+          "find": "\"app code only\";",
+          "with": "\"app code only\";\"TASKS_TEST_BUILD_ONLY\";"
+        }
+      }
+    ]
+  },
+  "bad-preview-without-sentinel": {
+    "expect": ["Payload/Tasks.app/main.jsbundle [test-code] lacks the test-only sentinel \"TASKS_TEST_BUILD_ONLY\""],
+    "args": "{dir} --app {dir}/Payload/Tasks.app --entitlements {dir}/entitlements.plist --variant preview --version 1.4.0 --build 14",
+    "ops": [
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/Info.plist",
+          "find": "<key>CFBundleIdentifier</key>\n\t<string>com.acme.tasks</string>",
+          "with": "<key>CFBundleIdentifier</key>\n\t<string>com.acme.tasks.preview</string>"
+        }
+      },
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/Info.plist",
+          "find": "<key>GADApplicationIdentifier</key>\n\t<string>ca-app-pub-1234567890123456~6543210987</string>",
+          "with": "<key>GADApplicationIdentifier</key>\n\t<string>ca-app-pub-3940256099942544~1458002511</string>"
+        }
+      },
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/EXConstants.bundle/app.config",
+          "find": "\"bundleIdentifier\":\"com.acme.tasks\"",
+          "with": "\"bundleIdentifier\":\"com.acme.tasks.preview\""
+        }
+      },
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/EXConstants.bundle/app.config",
+          "find": "\"appVariant\":\"production\",\"adsMode\":\"live\",\"adUnits\":{\"ios\":{\"banner\":\"ca-app-pub-1234567890123456/1111111111\"}},",
+          "with": "\"appVariant\":\"preview\",\"adsMode\":\"test\","
+        }
+      }
+    ]
+  },
+  "bad-privacy-host-example": {
+    "expect": [
+      "Payload/Tasks.app/EXConstants.bundle/app.config [ship-placeholder] EXConstants extra.privacyPolicyUrl is a placeholder domain (example.com)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/EXConstants.bundle/app.config",
+          "find": "\"supportEmail\":\"help@acme-tasks.app\"",
+          "with": "\"supportEmail\":\"help@acme-tasks.app\",\"privacyPolicyUrl\":\"https://example.com/privacy\""
+        }
+      }
+    ]
+  },
+  "bad-privacy-manifest-missing": {
+    "expect": ["Payload/Tasks.app/PrivacyInfo.xcprivacy [privacy-manifest] the privacy manifest is missing"],
+    "ops": [{ "delete": "Payload/Tasks.app/PrivacyInfo.xcprivacy" }]
+  },
+  "bad-rehearsal-off-placeholders": {
+    "expect": [
+      "REHEARSAL: not a release gate",
+      "src/config/admob-ids.ts:3 [ship-placeholder] src/config/admob-ids.ts (for the live build this production/off rehearsal stands in for) is the template AdMob app id"
+    ],
+    "args": "{dir} --app {dir}/Payload/Tasks.app --variant production --version 1.4.0 --build 14 --rehearsal --ads off",
+    "ops": [
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/Info.plist",
+          "find": "<key>GADApplicationIdentifier</key>\n\t<string>ca-app-pub-1234567890123456~6543210987</string>",
+          "with": "<key>GADApplicationIdentifier</key>\n\t<string>ca-app-pub-3940256099942544~1458002511</string>"
+        }
+      },
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/EXConstants.bundle/app.config",
+          "find": "\"adsMode\":\"live\",\"adUnits\":{\"ios\":{\"banner\":\"ca-app-pub-1234567890123456/1111111111\"}},",
+          "with": "\"adsMode\":\"off\","
+        }
+      },
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/EXConstants.bundle/app.config",
+          "find": "\"version\":\"1.4.0\",",
+          "with": "\"version\":\"1.4.0\",\"plugins\":[[\"react-native-google-mobile-ads\",{\"iosAppId\":\"ca-app-pub-3940256099942544~1458002511\"}]],"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/config/admob-ids.ts",
+          "find": "ca-app-pub-1234567890123456~6543210987",
+          "with": "ca-app-pub-0000000000000000~0000000001"
+        }
+      }
+    ]
+  },
+  "bad-sample-ad-id": {
+    "expect": [
+      "Payload/Tasks.app/Info.plist [ship-placeholder] Info.plist GADApplicationIdentifier is Google's sample AdMob app id"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/Info.plist",
+          "find": "<key>GADApplicationIdentifier</key>\n\t<string>ca-app-pub-1234567890123456~6543210987</string>",
+          "with": "<key>GADApplicationIdentifier</key>\n\t<string>ca-app-pub-3940256099942544~1458002511</string>"
+        }
+      }
+    ]
+  },
+  "bad-simulator-build": {
+    "expect": ["Payload/Tasks.app/Info.plist [identity] DTPlatformName is \"iphonesimulator\", expected iphoneos"],
+    "ops": [
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/Info.plist",
+          "find": "<key>DTPlatformName</key>\n\t<string>iphoneos</string>",
+          "with": "<key>DTPlatformName</key>\n\t<string>iphonesimulator</string>"
+        }
+      }
+    ]
+  },
+  "bad-stale-build-number": {
+    "expect": ["Payload/Tasks.app/Info.plist [identity] CFBundleVersion is \"14\", expected 15"],
+    "args": "{dir} --app {dir}/Payload/Tasks.app --entitlements {dir}/entitlements.plist --variant production --version 1.4.0 --build 15"
+  },
+  "bad-storekit-shipped": {
+    "expect": [
+      "Payload/Tasks.app/Products.storekit [test-artefacts]",
+      "Payload/Tasks.app/StoreKitTests.xctest [test-artefacts]"
+    ],
+    "ops": [
+      { "write": { "file": "Payload/Tasks.app/Products.storekit", "content": "{\"products\":[]}\n" } },
+      {
+        "write": {
+          "file": "Payload/Tasks.app/StoreKitTests.xctest/Info.plist",
+          "content": "<plist version=\"1.0\"><dict/></plist>\n"
+        }
+      }
+    ]
+  },
+  "bad-template-ad-units": {
+    "expect": [
+      "Payload/Tasks.app/EXConstants.bundle/app.config [ship-placeholder] EXConstants extra.adUnits.ios.banner is a template AdMob ad unit id (all-zero publisher)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/EXConstants.bundle/app.config",
+          "find": "\"banner\":\"ca-app-pub-1234567890123456/1111111111\"",
+          "with": "\"banner\":\"ca-app-pub-0000000000000000/0000000001\""
+        }
+      }
+    ]
+  },
+  "bad-test-code-shipped": {
+    "expect": [
+      "Payload/Tasks.app/main.jsbundle [test-code] contains the test-only sentinel \"TASKS_TEST_BUILD_ONLY\" 1 time(s)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/main.jsbundle",
+          "find": "\"app code only\";",
+          "with": "\"app code only\";\"TASKS_TEST_BUILD_ONLY\";"
+        }
+      }
+    ]
+  },
+  "bad-unfilled-token": {
+    "expect": [
+      "Payload/Tasks.app/EXConstants.bundle/app.config [ship-placeholder] EXConstants extra.apiUrl is an unfilled template placeholder (__NAME__)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/EXConstants.bundle/app.config",
+          "find": "\"supportEmail\":\"help@acme-tasks.app\"",
+          "with": "\"supportEmail\":\"help@acme-tasks.app\",\"apiUrl\":\"__API_URL__\""
+        }
+      }
+    ]
+  },
+  "bad-unfinished-marker": {
+    "expect": [
+      "docs/unfinished-screens.md [unfinished-marker] the repo the build came from still marks unfinished work"
+    ],
+    "ops": [{ "write": { "file": "docs/unfinished-screens.md", "content": "- settings screen\n" } }]
+  },
+  "bad-unsigned": {
+    "expect": ["Payload/Tasks.app [get-task-allow] the app is not signed (codesign -d failed)"],
+    "args": "{dir} --app {dir}/Payload/Tasks.app --variant production --version 1.4.0 --build 14"
+  },
+  "bad-usage-locale-missing": {
+    "expect": ["Payload/Tasks.app/ar.lproj/InfoPlist.strings [usage-strings]", "NSUserTrackingUsageDescription"],
+    "ops": [
+      {
+        "write": {
+          "file": "Payload/Tasks.app/ar.lproj/InfoPlist.strings",
+          "content": "\"NSCameraUsageDescription\" = \"أرفق صورة بالمهمة.\";\n"
+        }
+      }
+    ]
+  },
+  "bad-usage-string-missing": {
+    "expect": ["Payload/Tasks.app/Info.plist [usage-strings]", "NSCameraUsageDescription"],
+    "ops": [
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/Info.plist",
+          "find": "\t<key>NSCameraUsageDescription</key>\n\t<string>Attach a photo to a task.</string>\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-variant-mixed": {
+    "expect": [
+      "Payload/Tasks.app/EXConstants.bundle/app.config [constants] extra.appVariant is \"preview\", expected \"production\""
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/EXConstants.bundle/app.config",
+          "find": "\"appVariant\":\"production\"",
+          "with": "\"appVariant\":\"preview\""
+        }
+      }
+    ]
+  },
+  "bad-wrong-xcode": {
+    "expect": ["Payload/Tasks.app/Info.plist [identity] DTXcode is \"2700\", expected 2660 (Xcode 26.6)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/Info.plist",
+          "find": "<key>DTXcode</key>\n\t<string>2660</string>",
+          "with": "<key>DTXcode</key>\n\t<string>2700</string>"
+        }
+      }
+    ]
+  },
+  "error-ads-pair": {
+    "expect": ["--ads test is not allowed with --variant production"],
+    "args": "{dir} --app {dir}/Payload/Tasks.app --entitlements {dir}/entitlements.plist --variant production --version 1.4.0 --build 14 --ads test"
+  },
+  "error-no-app-id": {
+    "expect": ["no production bundle id: pass --app-id or create contracts/ios-release.json"],
+    "args": "{dir} --app {dir}/Payload/Tasks.app --entitlements {dir}/entitlements.plist --variant production --version 1.4.0 --build 14",
+    "ops": [{ "delete": "contracts/ios-release.json" }]
+  },
+  "error-rehearsal-off-no-ids": {
+    "expect": ["src/config/admob-ids.ts not found under the repo root"],
+    "args": "{dir} --app {dir}/Payload/Tasks.app --variant production --version 1.4.0 --build 14 --rehearsal --ads off",
+    "ops": [
+      { "delete": "src/config/admob-ids.ts" },
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/Info.plist",
+          "find": "<key>GADApplicationIdentifier</key>\n\t<string>ca-app-pub-1234567890123456~6543210987</string>",
+          "with": "<key>GADApplicationIdentifier</key>\n\t<string>ca-app-pub-3940256099942544~1458002511</string>"
+        }
+      },
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/EXConstants.bundle/app.config",
+          "find": "\"adsMode\":\"live\",\"adUnits\":{\"ios\":{\"banner\":\"ca-app-pub-1234567890123456/1111111111\"}},",
+          "with": "\"adsMode\":\"off\","
+        }
+      },
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/EXConstants.bundle/app.config",
+          "find": "\"version\":\"1.4.0\",",
+          "with": "\"version\":\"1.4.0\",\"plugins\":[[\"react-native-google-mobile-ads\",{\"iosAppId\":\"ca-app-pub-3940256099942544~1458002511\"}]],"
+        }
+      }
+    ]
+  },
+  "error-variant": {
+    "expect": ["--variant must be preview or production, got \"development\""],
+    "args": "{dir} --app {dir}/Payload/Tasks.app --entitlements {dir}/entitlements.plist --variant development --version 1.4.0 --build 14"
+  },
+  "pass-ipa": {
+    "expect": ["check-store-artifact: 1 production build checked, 0 problems"],
+    "args": "--ipa {dir}/Tasks.ipa --entitlements {dir}/entitlements.plist --variant production --version 1.4.0 --build 14"
+  },
+  "pass-keyless-rehearsal": {
+    "expect": [
+      "REHEARSAL: not a release gate",
+      "SKIP Payload/Tasks.app [get-task-allow] REHEARSAL: the app has no signature (CODE_SIGNING_ALLOWED=NO)",
+      "check-store-artifact: 1 production build checked, 0 problems, 1 skipped"
+    ],
+    "args": "{dir} --app {dir}/Payload/Tasks.app --variant production --version 1.4.0 --build 14 --rehearsal"
+  },
+  "pass-no-ads": {
+    "expect": ["check-store-artifact: 1 production build checked, 0 problems"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "react-native-google-mobile-ads"], "delete": true } },
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/Info.plist",
+          "find": "\t<key>GADApplicationIdentifier</key>\n\t<string>ca-app-pub-1234567890123456~6543210987</string>\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/EXConstants.bundle/app.config",
+          "find": "\"adsMode\":\"live\",\"adUnits\":{\"ios\":{\"banner\":\"ca-app-pub-1234567890123456/1111111111\"}},",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "pass-no-test-only-gate": {
+    "expect": [
+      "test-code: the app has no test-only gate and no sentinel",
+      "check-store-artifact: 1 production build checked, 0 problems"
+    ],
+    "ops": [{ "delete": "src/test-only.ts" }]
+  },
+  "pass-preview-build": {
+    "expect": ["check-store-artifact: 1 preview build checked, 0 problems"],
+    "args": "{dir} --app {dir}/Payload/Tasks.app --entitlements {dir}/entitlements.plist --variant preview --version 1.4.0 --build 14",
+    "ops": [
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/Info.plist",
+          "find": "<key>CFBundleIdentifier</key>\n\t<string>com.acme.tasks</string>",
+          "with": "<key>CFBundleIdentifier</key>\n\t<string>com.acme.tasks.preview</string>"
+        }
+      },
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/Info.plist",
+          "find": "<key>GADApplicationIdentifier</key>\n\t<string>ca-app-pub-1234567890123456~6543210987</string>",
+          "with": "<key>GADApplicationIdentifier</key>\n\t<string>ca-app-pub-3940256099942544~1458002511</string>"
+        }
+      },
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/EXConstants.bundle/app.config",
+          "find": "\"bundleIdentifier\":\"com.acme.tasks\"",
+          "with": "\"bundleIdentifier\":\"com.acme.tasks.preview\""
+        }
+      },
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/EXConstants.bundle/app.config",
+          "find": "\"appVariant\":\"production\",\"adsMode\":\"live\",\"adUnits\":{\"ios\":{\"banner\":\"ca-app-pub-1234567890123456/1111111111\"}},",
+          "with": "\"appVariant\":\"preview\",\"adsMode\":\"test\","
+        }
+      },
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/main.jsbundle",
+          "find": "\"app code only\";",
+          "with": "\"app code only\";\"TASKS_TEST_BUILD_ONLY\";"
+        }
+      }
+    ]
+  },
+  "pass-production-ads-off-default": {
+    "expect": ["check-store-artifact: 1 production build checked, 0 problems"],
+    "ops": [
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/Info.plist",
+          "find": "<key>GADApplicationIdentifier</key>\n\t<string>ca-app-pub-1234567890123456~6543210987</string>",
+          "with": "<key>GADApplicationIdentifier</key>\n\t<string>ca-app-pub-3940256099942544~1458002511</string>"
+        }
+      },
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/EXConstants.bundle/app.config",
+          "find": "\"adsMode\":\"live\",\"adUnits\":{\"ios\":{\"banner\":\"ca-app-pub-1234567890123456/1111111111\"}},",
+          "with": ""
+        }
+      },
+      { "json": { "file": "contracts/ios-release.json", "path": ["productionAdsMode"], "value": "off" } }
+    ]
+  },
+  "pass-rehearsal-off": {
+    "expect": [
+      "REHEARSAL: not a release gate",
+      "check-store-artifact: 1 production build checked, 0 problems, 1 skipped"
+    ],
+    "args": "{dir} --app {dir}/Payload/Tasks.app --variant production --version 1.4.0 --build 14 --rehearsal --ads off",
+    "ops": [
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/Info.plist",
+          "find": "<key>GADApplicationIdentifier</key>\n\t<string>ca-app-pub-1234567890123456~6543210987</string>",
+          "with": "<key>GADApplicationIdentifier</key>\n\t<string>ca-app-pub-3940256099942544~1458002511</string>"
+        }
+      },
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/EXConstants.bundle/app.config",
+          "find": "\"adsMode\":\"live\",\"adUnits\":{\"ios\":{\"banner\":\"ca-app-pub-1234567890123456/1111111111\"}},",
+          "with": "\"adsMode\":\"off\","
+        }
+      },
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/EXConstants.bundle/app.config",
+          "find": "\"version\":\"1.4.0\",",
+          "with": "\"version\":\"1.4.0\",\"plugins\":[[\"react-native-google-mobile-ads\",{\"iosAppId\":\"ca-app-pub-3940256099942544~1458002511\"}]],"
+        }
+      }
+    ]
+  },
+  "pass-rehearsal-store-ads-off": {
+    "expect": [
+      "REHEARSAL: not a release gate",
+      "check-store-artifact: 1 production build checked, 0 problems, 1 skipped"
+    ],
+    "args": "{dir} --app {dir}/Payload/Tasks.app --variant production --version 1.4.0 --build 14 --rehearsal --ads off",
+    "ops": [
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/Info.plist",
+          "find": "<key>GADApplicationIdentifier</key>\n\t<string>ca-app-pub-1234567890123456~6543210987</string>",
+          "with": "<key>GADApplicationIdentifier</key>\n\t<string>ca-app-pub-3940256099942544~1458002511</string>"
+        }
+      },
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/EXConstants.bundle/app.config",
+          "find": "\"adsMode\":\"live\",\"adUnits\":{\"ios\":{\"banner\":\"ca-app-pub-1234567890123456/1111111111\"}},",
+          "with": "\"adsMode\":\"off\","
+        }
+      },
+      {
+        "replace": {
+          "file": "Payload/Tasks.app/EXConstants.bundle/app.config",
+          "find": "\"version\":\"1.4.0\",",
+          "with": "\"version\":\"1.4.0\",\"plugins\":[[\"react-native-google-mobile-ads\",{\"iosAppId\":\"ca-app-pub-3940256099942544~1458002511\"}]],"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/config/admob-ids.ts",
+          "find": "ca-app-pub-1234567890123456~6543210987",
+          "with": "ca-app-pub-0000000000000000~0000000001"
+        }
+      },
+      { "json": { "file": "contracts/ios-release.json", "path": ["productionAdsMode"], "value": "off" } }
+    ]
+  }
+}

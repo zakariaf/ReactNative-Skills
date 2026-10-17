@@ -1,0 +1,7 @@
+{
+  "$comment": "Read by the i18n-strings-and-catalogs checkers and scripts/i18n/. The app's languages live in src/i18n/languages.ts; this file holds the translation policy.",
+  "untranslatedPrefixes": [],
+  "reviewLanguages": ["ar"],
+  "isolatedFormatters": ["formatDayMonth", "formatWeekdayDayMonth"],
+  "catalogs": []
+}

@@ -1,0 +1,79 @@
+{
+  "bad-drift-entitlement": {
+    "expect": ["[native-drift]", "ios.entitlements.com.apple.security.application-groups: added"],
+    "ops": [
+      {
+        "json": {
+          "file": "introspect.json",
+          "path": ["_internal", "modResults", "ios", "entitlements", "com.apple.security.application-groups"],
+          "value": ["group.com.example.tasks"]
+        }
+      }
+    ]
+  },
+  "bad-drift-permission": {
+    "expect": [
+      "FAIL contracts/native-config.json:",
+      "[native-drift]",
+      "android.permissions: added \"android.permission.ACCESS_FINE_LOCATION\""
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "introspect.json",
+          "path": ["_internal", "modResults", "android", "manifest", "manifest", "uses-permission", 6],
+          "value": { "$": { "android:name": "android.permission.ACCESS_FINE_LOCATION" } }
+        }
+      }
+    ]
+  },
+  "bad-drift-plist-changed": {
+    "expect": ["[native-drift]", "ios.infoPlist.CFBundleDisplayName: changed from \"Tasks\" to \"Tasks Pro\""],
+    "ops": [
+      {
+        "json": {
+          "file": "introspect.json",
+          "path": ["_internal", "modResults", "ios", "infoPlist", "CFBundleDisplayName"],
+          "value": "Tasks Pro"
+        }
+      }
+    ]
+  },
+  "bad-snapshot-json": {
+    "expect": ["contracts/native-config.json:1 [native-snapshot]", "not valid JSON"],
+    "ops": [{ "write": { "file": "contracts/native-config.json", "lines": ["{ \"variant\": \"production\", "] } }]
+  },
+  "bad-snapshot-missing": {
+    "expect": ["contracts/native-config.json:1 [native-snapshot]", "no native-config snapshot"],
+    "ops": [{ "delete": "contracts/native-config.json" }]
+  },
+  "bad-snapshot-variant": {
+    "expect": [
+      "FAIL contracts/native-config.json:",
+      "[native-snapshot]",
+      "written for \"production\", this run introspects \"development\""
+    ],
+    "args": "{dir} --from introspect.json --variant development",
+    "ops": []
+  },
+  "error-expo-not-installed": { "expect": ["ERROR [bad-input] Expo is not installed here"], "args": "{dir}", "ops": [] },
+  "error-from-missing": {
+    "expect": ["ERROR [bad-input] --from missing.json does not exist"],
+    "args": "{dir} --from missing.json",
+    "ops": []
+  },
+  "error-not-introspect": {
+    "expect": ["ERROR [bad-input] the introspection has no _internal.modResults"],
+    "args": "{dir} --from public.json",
+    "ops": [{ "write": { "file": "public.json", "lines": ["{ \"name\": \"Tasks\", \"slug\": \"tasks\" }"] } }]
+  },
+  "pass-not-expo": {
+    "expect": ["NOT APPLICABLE: expo is not a dependency in package.json"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo"], "delete": true } }]
+  },
+  "pass-write": {
+    "expect": ["wrote contracts/native-config.json (APP_VARIANT=production)", "RESULT: PASS"],
+    "args": "{dir} --from introspect.json --write",
+    "ops": []
+  }
+}

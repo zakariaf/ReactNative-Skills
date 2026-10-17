@@ -1,0 +1,50 @@
+{
+  "bad-drift": {
+    "expect": [
+      "FAIL src/ui/component-specs.json [specs-mismatch] differs: row.minHeight is 60, the derived spec is 52",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [{ "json": { "file": "src/ui/component-specs.json", "path": ["row", "minHeight"], "value": 60 } }]
+  },
+  "bad-missing": {
+    "expect": ["FAIL src/ui/component-specs.json [specs-mismatch] is missing", "RESULT: FAIL (1 problems)"],
+    "ops": [{ "delete": "src/ui/component-specs.json" }]
+  },
+  "bad-override-reason": {
+    "expect": [
+      "FAIL contracts/component-library.json [spec-override-reason] the override of chip.radius gives no reason",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/component-library.json",
+          "path": ["specs", "overrides"],
+          "value": [{ "path": "chip.radius", "value": 8 }]
+        }
+      }
+    ]
+  },
+  "error-bad-reference": {
+    "expect": ["ERROR [bad-input] token reference {radius.huge} points at nothing"],
+    "ops": [
+      { "json": { "file": "design/tokens.json", "path": ["components", "button", "radius"], "value": "{radius.huge}" } }
+    ]
+  },
+  "error-no-block": {
+    "expect": ["ERROR [bad-input] the token file has no \"components\" block"],
+    "ops": [{ "json": { "file": "design/tokens.json", "path": ["components"], "delete": true } }]
+  },
+  "error-no-token-file": {
+    "expect": ["ERROR [bad-input] token file not found: design/tokens.json"],
+    "ops": [{ "delete": "design/tokens.json" }]
+  },
+  "error-ui-dir-missing": {
+    "expect": ["ERROR [bad-input] nothing to check: src/ui does not exist"],
+    "ops": [{ "delete": ["src/ui", "contracts/component-library.json"] }]
+  },
+  "pass-specs-off": {
+    "expect": ["NOT APPLICABLE: contracts/component-library.json sets \"specs\": false", "RESULT: PASS"],
+    "ops": [{ "json": { "file": "contracts/component-library.json", "path": ["specs"], "value": false } }]
+  }
+}

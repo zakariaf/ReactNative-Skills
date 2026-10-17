@@ -1,0 +1,1944 @@
+{
+  "bad-accessibility-value": {
+    "expect": [
+      "[literal-prop-text]",
+      "src/features/tasks/tasks-screen.tsx:25",
+      "accessibilityValue={{ text: \"Half done\" }}"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "        onPress={onDelete}",
+          "with": "        accessibilityValue={{ text: 'Half done' }}\n        onPress={onDelete}"
+        }
+      }
+    ]
+  },
+  "bad-action-sheet-text": {
+    "expect": [
+      "[literal-prop-text]",
+      "src/features/tasks/task-actions.ts:6",
+      "ActionSheetIOS.showActionSheetWithOptions() gets literal text in options (\"Cancel\")",
+      "ActionSheetIOS.showActionSheetWithOptions() gets literal text in options (\"Delete\")",
+      "ActionSheetIOS.showActionSheetWithOptions() gets literal text as title (\"Task\")"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/task-actions.ts",
+          "lines": [
+            "// src/features/tasks/task-actions.ts (fixture: an iOS action sheet with literal options and title)",
+            "import { ActionSheetIOS } from 'react-native';",
+            "",
+            "export function showTaskActions(onDelete: () => void): void {",
+            "  ActionSheetIOS.showActionSheetWithOptions(",
+            "    { options: ['Cancel', 'Delete'], destructiveButtonIndex: 1, cancelButtonIndex: 0, title: 'Task' },",
+            "    (index) => {",
+            "      if (index === 1) onDelete();",
+            "    },",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-alert": {
+    "expect": ["[literal-prop-text]", "src/features/tasks/delete-task.ts:7", "Alert.alert() is given literal text"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/delete-task.ts",
+          "find": "Alert.alert(t('tasks.delete.title'), ",
+          "with": "Alert.alert('Delete this task?', "
+        }
+      }
+    ]
+  },
+  "bad-alert-body": {
+    "expect": [
+      "[literal-prop-text]",
+      "src/features/tasks/delete-task.ts:7",
+      "Alert.alert() is given literal text as its message"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/delete-task.ts",
+          "find": "t('tasks.delete.body')",
+          "with": "'This cannot be undone.'"
+        }
+      }
+    ]
+  },
+  "bad-alert-button": {
+    "expect": [
+      "[literal-prop-text]",
+      "src/features/tasks/delete-task.ts:8",
+      "Alert.alert() is given literal text as a button text (\"Cancel\")"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/delete-task.ts",
+          "find": "{ text: t('common.cancel'), style: 'cancel' }",
+          "with": "{ text: 'Cancel', style: 'cancel' }"
+        }
+      }
+    ]
+  },
+  "bad-alt-text": {
+    "expect": [
+      "[literal-prop-text]",
+      "src/features/tasks/tasks-screen.tsx:22",
+      "alt=\"Task photo\" is text that is not from t()"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "      <T id=\"tasks.page\" values={{ page }} />",
+          "with": "      <T id=\"tasks.page\" values={{ page }} />\n      <Image alt=\"Task photo\" source={{ uri: 'file:///task.jpg' }} />"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "import { Button, View } from 'react-native';",
+          "with": "import { Button, Image, View } from 'react-native';"
+        }
+      }
+    ]
+  },
+  "bad-announce-text": {
+    "expect": [
+      "[literal-prop-text]",
+      "src/features/tasks/announce-deleted.ts:5",
+      "AccessibilityInfo.announceForAccessibility() is given literal text ('Task deleted'): the screen reader speaks it",
+      "src/features/tasks/announce-deleted.ts:6",
+      "src/features/tasks/announce-deleted.ts:7",
+      "announce() is given literal text ('Saved')"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/announce-deleted.ts",
+          "lines": [
+            "// src/features/tasks/announce-deleted.ts (fixture: screen-reader announcements with literal text)",
+            "import { AccessibilityInfo } from 'react-native';",
+            "",
+            "export function announceDeleted(announce: (text: string) => void): void {",
+            "  AccessibilityInfo.announceForAccessibility('Task deleted');",
+            "  AccessibilityInfo.announceForAccessibilityWithOptions(`Deleted ${String(1)} task`, { queue: true });",
+            "  announce('Saved');",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-aria-description": {
+    "expect": [
+      "[literal-prop-text]",
+      "src/features/tasks/tasks-screen.tsx:25",
+      "aria-description=\"Deletes the task for good\" is text that is not from t()"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "        accessibilityLabel={t('tasks.delete.title')}",
+          "with": "        accessibilityLabel={t('tasks.delete.title')}\n        aria-description=\"Deletes the task for good\""
+        }
+      }
+    ]
+  },
+  "bad-aria-label": {
+    "expect": [
+      "[literal-prop-text]",
+      "src/features/tasks/tasks-screen.tsx:24",
+      "aria-label=\"Close\" is text that is not from t()"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "accessibilityLabel={t('tasks.delete.title')}",
+          "with": "aria-label=\"Close\""
+        }
+      }
+    ]
+  },
+  "bad-built-text": {
+    "expect": ["[literal-prop-text]", "src/features/tasks/tasks-screen.tsx:24", "accessibilityLabel=`Page ${page}`"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "accessibilityLabel={t('tasks.delete.title')}",
+          "with": "accessibilityLabel={`Page ${page}`}"
+        }
+      }
+    ]
+  },
+  "bad-conditional-literal": {
+    "expect": ["[literal-prop-text]", "src/features/tasks/tasks-screen.tsx:23", "title={…? 'Done'…}"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "title={isDone ? t('common.cancel') : t('common.delete')}",
+          "with": "title={isDone ? 'Done' : t('common.delete')}"
+        }
+      }
+    ]
+  },
+  "bad-count-branch": {
+    "expect": [
+      "[count-branch]",
+      "src/features/tasks/task-count-label.ts:7",
+      "\"openCount === 1 ? … : …\" picks a plural form in code",
+      "src/features/tasks/task-count-label.ts:8",
+      "\"items.length > 1 ? … : …\"",
+      "src/features/tasks/task-count-label.ts:9",
+      "\"1 !== countDone(items) ? … : …\"",
+      "Write one key with an ICU plural"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/task-count-label.ts",
+          "lines": [
+            "// src/features/tasks/task-count-label.ts (fixture: plural forms picked in code)",
+            "import type { TFunction } from '@/i18n/create-t';",
+            "",
+            "const countDone = (items: readonly string[]): number => items.filter((item) => item !== '').length;",
+            "",
+            "export function taskCountLabel(t: TFunction, openCount: number, items: readonly string[]): string {",
+            "  const first = openCount === 1 ? t('common.cancel') : t('common.delete');",
+            "  const second = items.length > 1 ? 'tasks' : 'task';",
+            "  const third = 1 !== countDone(items) ? t('common.delete') : t('common.cancel');",
+            "  return `${first}${second}${third}`;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-custom-text-prop": {
+    "expect": [
+      "[literal-prop-text]",
+      "src/features/tasks/components/task-empty.tsx:6",
+      "emptyText=\"No tasks yet\" is text that is not from t()"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-empty.tsx",
+          "lines": [
+            "// src/features/tasks/components/task-empty.tsx (fixture: a custom component prop named like text)",
+            "import { TaskList } from './task-list';",
+            "",
+            "export function TaskEmpty(): React.JSX.Element {",
+            "  return (",
+            "    <TaskList emptyText=\"No tasks yet\" items={[]} />",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-date-api": {
+    "expect": ["[date-format-api]", "src/features/tasks/due-label.ts:2", "toLocaleDateString"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/due-label.ts",
+          "lines": [
+            "export function dueLabel(due: Date): string {",
+            "  return due.toLocaleDateString('en', { day: 'numeric', month: 'short' });",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-datetimeformat-missing-language": {
+    "expect": [
+      "[polyfill-locales]",
+      "src/i18n/intl-polyfills.ts:1",
+      "missing @formatjs/intl-datetimeformat/locale-data/ar.js"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/i18n/format-time.ts",
+          "lines": [
+            "// src/i18n/format-time.ts (fixture: Intl.DateTimeFormat at the edge, explicit calendar and time zone)",
+            "import { localeTagFor } from './digits';",
+            "",
+            "import type { DigitStyle } from './digits';",
+            "import type { Language } from './languages';",
+            "",
+            "export function formatTimeOfDay(at: Date, input: { language: Language; digits: DigitStyle; timeZone: string }): string {",
+            "  const options = { calendar: 'gregory', hour: 'numeric', minute: '2-digit', timeZone: input.timeZone } as const;",
+            "  return new Intl.DateTimeFormat(localeTagFor(input.language, input.digits), options).format(at);",
+            "}"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/i18n/intl-polyfills.ts",
+          "find": "import '@formatjs/intl-numberformat/locale-data/ar.js';",
+          "with": "import '@formatjs/intl-numberformat/locale-data/ar.js';\nimport '@formatjs/intl-datetimeformat/polyfill-force.js';\nimport '@formatjs/intl-datetimeformat/locale-data/en.js';\nimport '@formatjs/intl-datetimeformat/add-golden-tz.js';"
+        }
+      }
+    ]
+  },
+  "bad-datetimeformat-polyfill-missing": {
+    "expect": [
+      "[intl-api]",
+      "src/i18n/format-time.ts:9",
+      "Intl.DateTimeFormat runs without its forced polyfill",
+      "import '@formatjs/intl-datetimeformat/polyfill-force.js'; import '@formatjs/intl-datetimeformat/locale-data/en.js'; import '@formatjs/intl-datetimeformat/locale-data/ar.js'; import '@formatjs/intl-datetimeformat/add-golden-tz.js';"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/i18n/format-time.ts",
+          "lines": [
+            "// src/i18n/format-time.ts (fixture: Intl.DateTimeFormat at the edge, explicit calendar and time zone)",
+            "import { localeTagFor } from './digits';",
+            "",
+            "import type { DigitStyle } from './digits';",
+            "import type { Language } from './languages';",
+            "",
+            "export function formatTimeOfDay(at: Date, input: { language: Language; digits: DigitStyle; timeZone: string }): string {",
+            "  const options = { calendar: 'gregory', hour: 'numeric', minute: '2-digit', timeZone: input.timeZone } as const;",
+            "  return new Intl.DateTimeFormat(localeTagFor(input.language, input.digits), options).format(at);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-default-value-text": {
+    "expect": [
+      "[literal-prop-text]",
+      "src/features/tasks/components/list-name-input.tsx:5",
+      "defaultValue=\"Untitled list\" is text that is not from t()"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/list-name-input.tsx",
+          "lines": [
+            "// src/features/tasks/components/list-name-input.tsx (fixture: a literal default value in a text field)",
+            "import { TextInput } from 'react-native';",
+            "",
+            "export function ListNameInput({ onChange }: { readonly onChange: (name: string) => void }): React.JSX.Element {",
+            "  return <TextInput defaultValue=\"Untitled list\" onChangeText={onChange} />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-dynamic-key": {
+    "expect": ["[dynamic-key]", "src/features/tasks/month-label.ts:4"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/month-label.ts",
+          "lines": [
+            "import type { TFunction } from '@/i18n/create-t';",
+            "",
+            "export function monthLabel(t: TFunction, month: number): string {",
+            "  return t(`date.month-short.${month}`);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-i18n-runtime-missing": {
+    "expect": ["[i18n-runtime]", "src/i18n/t-context.ts:1", "is missing"],
+    "ops": [{ "delete": "src/i18n/t-context.ts" }]
+  },
+  "bad-intl-api-display-names": {
+    "expect": [
+      "[intl-api]",
+      "src/features/settings/language-label.ts:5",
+      "Intl.DisplayNames is used outside src/i18n/",
+      "LANGUAGE_AUTONYMS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/settings/language-label.ts",
+          "lines": [
+            "// src/features/settings/language-label.ts (fixture)",
+            "import type { Language } from '@/i18n/languages';",
+            "",
+            "export function languageLabel(code: string, language: Language): string {",
+            "  return new Intl.DisplayNames(language, { type: 'language' }).of(code) ?? code;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-intl-api-list-format": {
+    "expect": [
+      "[intl-api]",
+      "src/features/tasks/assignee-list.ts:5",
+      "Intl.ListFormat is used outside src/i18n/",
+      "not a constructor"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/assignee-list.ts",
+          "lines": [
+            "// src/features/tasks/assignee-list.ts (fixture)",
+            "import type { Language } from '@/i18n/languages';",
+            "",
+            "export function assigneeList(names: readonly string[], language: Language): string {",
+            "  return new Intl.ListFormat(language, { type: 'conjunction' }).format(names);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-intl-api-plural-rules": {
+    "expect": [
+      "[intl-api]",
+      "src/features/tasks/badge-form.ts:5",
+      "Intl.PluralRules is used outside src/i18n/",
+      "picks a plural form in code"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/badge-form.ts",
+          "lines": [
+            "// src/features/tasks/badge-form.ts (fixture)",
+            "import type { Language } from '@/i18n/languages';",
+            "",
+            "export function badgeForm(openCount: number, language: Language): string {",
+            "  return new Intl.PluralRules(language).select(openCount);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-intl-api-relative-time": {
+    "expect": [
+      "[intl-api]",
+      "src/features/tasks/format-ago.ts:5",
+      "Intl.RelativeTimeFormat is used outside src/i18n/",
+      "not a constructor",
+      "catalog plural"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/format-ago.ts",
+          "lines": [
+            "// src/features/tasks/format-ago.ts (fixture: passes Jest on Node, throws on the phone)",
+            "import type { Language } from '@/i18n/languages';",
+            "",
+            "export function formatDoneAgo(days: number, language: Language): string {",
+            "  return new Intl.RelativeTimeFormat(language, { numeric: 'auto' }).format(-days, 'day');",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-intl-api-segmenter": {
+    "expect": ["[intl-api]", "src/features/tasks/title-length.ts:5", "Intl.Segmenter is used outside src/i18n/"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/title-length.ts",
+          "lines": [
+            "// src/features/tasks/title-length.ts (fixture)",
+            "import type { Language } from '@/i18n/languages';",
+            "",
+            "export function titleLength(title: string, language: Language): number {",
+            "  return [...new Intl.Segmenter(language, { granularity: 'grapheme' }).segment(title)].length;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-intl-api-unpolyfilled-display-names": {
+    "expect": [
+      "[intl-api]",
+      "src/i18n/region-name.ts:8",
+      "Intl.DisplayNames runs without its forced polyfill",
+      "import '@formatjs/intl-displaynames/polyfill-force.js';"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/i18n/region-name.ts",
+          "lines": [
+            "// src/i18n/region-name.ts (fixture)",
+            "import { localeTagFor } from './digits';",
+            "",
+            "import type { DigitStyle } from './digits';",
+            "import type { Language } from './languages';",
+            "",
+            "export function regionName(region: string, language: Language, digits: DigitStyle): string {",
+            "  return new Intl.DisplayNames(localeTagFor(language, digits), { type: 'region' }).of(region) ?? region;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-intl-api-unpolyfilled-list-format": {
+    "expect": [
+      "[intl-api]",
+      "src/i18n/format-list.ts:8",
+      "Intl.ListFormat runs without its forced polyfill",
+      "import '@formatjs/intl-listformat/polyfill-force.js';"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/i18n/format-list.ts",
+          "lines": [
+            "// src/i18n/format-list.ts (fixture)",
+            "import { localeTagFor } from './digits';",
+            "",
+            "import type { DigitStyle } from './digits';",
+            "import type { Language } from './languages';",
+            "",
+            "export function formatList(items: readonly string[], language: Language, digits: DigitStyle): string {",
+            "  return new Intl.ListFormat(localeTagFor(language, digits), { type: 'conjunction' }).format(items);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-intl-api-unpolyfilled-relative-time": {
+    "expect": [
+      "[intl-api]",
+      "src/i18n/format-relative.ts:8",
+      "Intl.RelativeTimeFormat runs without its forced polyfill",
+      "not a constructor",
+      "Install @formatjs/intl-relativetimeformat",
+      "import '@formatjs/intl-relativetimeformat/polyfill-force.js'; import '@formatjs/intl-relativetimeformat/locale-data/en.js'; import '@formatjs/intl-relativetimeformat/locale-data/ar.js';"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/i18n/format-relative.ts",
+          "lines": [
+            "// src/i18n/format-relative.ts (fixture: every unit from seconds to years, at the edge)",
+            "import { localeTagFor } from './digits';",
+            "",
+            "import type { DigitStyle } from './digits';",
+            "import type { Language } from './languages';",
+            "",
+            "export function formatRelative(value: number, unit: Intl.RelativeTimeFormatUnit, language: Language, digits: DigitStyle): string {",
+            "  return new Intl.RelativeTimeFormat(localeTagFor(language, digits), { numeric: 'auto' }).format(value, unit);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-intl-api-unpolyfilled-segmenter": {
+    "expect": [
+      "[intl-api]",
+      "src/i18n/graphemes.ts:5",
+      "Intl.Segmenter runs without its forced polyfill",
+      "import '@formatjs/intl-segmenter/polyfill-force.js';"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/i18n/graphemes.ts",
+          "lines": [
+            "// src/i18n/graphemes.ts (fixture)",
+            "import type { Language } from './languages';",
+            "",
+            "export function graphemeCount(text: string, language: Language): number {",
+            "  return [...new Intl.Segmenter(language, { granularity: 'grapheme' }).segment(text)].length;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-intl-datetime": {
+    "expect": ["[date-format-api]", "src/features/reminders/reminder-time.ts:1", "Intl.DateTimeFormat"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/reminders/reminder-time.ts",
+          "lines": [
+            "const TIME = new Intl.DateTimeFormat('en', { hour: 'numeric', minute: '2-digit' });",
+            "",
+            "export function reminderTime(at: Date): string {",
+            "  return TIME.format(at);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-intl-destructured": {
+    "expect": ["[intl-api]", "src/features/tasks/join-names.ts:2", "Intl.ListFormat is used outside src/i18n/"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/join-names.ts",
+          "lines": [
+            "// src/features/tasks/join-names.ts (fixture: an Intl API Hermes lacks, reached by destructuring)",
+            "const { ListFormat } = Intl;",
+            "",
+            "export function joinNames(names: readonly string[]): string {",
+            "  return new ListFormat('en').format(names);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-jest-moved-dir": {
+    "expect": [
+      "[jest-polyfills]",
+      "jest.config.js:5",
+      "setupFiles loads 'src/i18n/intl-polyfills.ts', but the i18n folder is src/localization",
+      "Point it at 'src/localization/intl-polyfills.ts'"
+    ],
+    "ops": [
+      { "rename": { "from": "src/i18n", "to": "src/localization" } },
+      { "write": { "file": "rn-skills.config.json", "json": { "i18nDir": "src/localization" } } },
+      {
+        "replace": {
+          "file": "scripts/i18n/app-languages.ts",
+          "find": "export const I18N_DIR = 'src/i18n';",
+          "with": "export const I18N_DIR = 'src/localization';"
+        }
+      },
+      {
+        "replace": {
+          "file": "index.ts",
+          "find": "import '@/i18n/intl-polyfills';",
+          "with": "import '@/localization/intl-polyfills';"
+        }
+      }
+    ]
+  },
+  "bad-jest-setup": {
+    "expect": ["[jest-polyfills]", "jest.config.js:10", "does not load intl-polyfills.ts"],
+    "ops": [{ "replace": { "file": "jest.config.js", "find": "setupFiles: POLYFILL_SETUP", "with": "setupFiles: []" } }]
+  },
+  "bad-jsx-literal-branch": {
+    "expect": ["[jsx-literal-text]", "src/features/tasks/tasks-screen.tsx:20", "'Many tasks'"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "<AppText testID=\"tasks.summary\">{summary}</AppText>",
+          "with": "<AppText testID=\"tasks.summary\">{isDone ? summary : 'Many tasks'}</AppText>"
+        }
+      }
+    ]
+  },
+  "bad-jsx-string-child": {
+    "expect": [
+      "[jsx-literal-text]",
+      "src/features/tasks/tasks-screen.tsx:20",
+      "the string literal {'Welcome back'} is rendered as text inside <AppText>"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "<AppText testID=\"tasks.summary\">{summary}</AppText>",
+          "with": "<AppText testID=\"tasks.summary\">{'Welcome back'}</AppText>"
+        }
+      }
+    ]
+  },
+  "bad-jsx-text": {
+    "expect": ["[jsx-literal-text]", "src/features/tasks/tasks-screen.tsx:20", "Welcome back"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "<AppText testID=\"tasks.summary\">{summary}</AppText>",
+          "with": "<AppText testID=\"tasks.summary\">Welcome back</AppText>"
+        }
+      }
+    ]
+  },
+  "bad-jsx-text-after-value": {
+    "expect": [
+      "[jsx-literal-text]",
+      "src/features/tasks/tasks-screen.tsx:20",
+      "text \"tasks left\" is written straight into <AppText>"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "<AppText testID=\"tasks.summary\">{summary}</AppText>",
+          "with": "<AppText testID=\"tasks.summary\">{page} tasks left</AppText>"
+        }
+      }
+    ]
+  },
+  "bad-key-cast": {
+    "expect": [
+      "[key-cast]",
+      "src/features/tasks/use-tasks-model.ts:22",
+      "\"as MessageKey\" turns an unchecked string into a message key"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "heading: t(PAGE_KEYS[1]),",
+          "with": "heading: t(String(openCount) as MessageKey),"
+        }
+      }
+    ]
+  },
+  "bad-key-cast-table": {
+    "expect": ["[key-cast]", "src/features/tasks/use-tasks-model.ts:8"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "['tasks.page', 'tasks.list.title'] as const satisfies readonly MessageKey[]",
+          "with": "['tasks.page', 'tasks.list.title'] as MessageKey[]"
+        }
+      }
+    ]
+  },
+  "bad-literal-label": {
+    "expect": ["[literal-prop-text]", "src/features/tasks/tasks-screen.tsx:24", "label=\"Settings\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "accessibilityLabel={t('tasks.delete.title')}",
+          "with": "label=\"Settings\""
+        }
+      }
+    ]
+  },
+  "bad-nav-title": {
+    "expect": ["[literal-prop-text]", "src/app/(app)/_layout.tsx:10", "navigation option title: 'Tasks'"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/(app)/_layout.tsx",
+          "find": "options={{ title: t('tasks.list.title') }}",
+          "with": "options={{ title: 'Tasks' }}"
+        }
+      }
+    ]
+  },
+  "bad-nested-isolates": {
+    "expect": [
+      "[nested-isolates]",
+      "src/features/tasks/use-tasks-model.ts:21",
+      "formatDayMonth(…) is passed into t() as a value",
+      "stripIsolates(formatDayMonth(…))"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "stripIsolates(formatDayMonth('2026-09-26', t))",
+          "with": "formatDayMonth('2026-09-26', t)"
+        }
+      }
+    ]
+  },
+  "bad-notification-content": {
+    "expect": [
+      "[literal-prop-text]",
+      "src/services/reminders/expo-reminders-adapter.ts:9",
+      "scheduleNotificationAsync() content gets literal text as title (\"Reminder\")"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/reminders/expo-reminders-adapter.ts",
+          "lines": [
+            "// src/services/reminders/expo-reminders-adapter.ts (fixture: a reminder notification)",
+            "import * as Notifications from 'expo-notifications';",
+            "",
+            "import type { TFunction } from '@/i18n/create-t';",
+            "",
+            "export async function scheduleReminder(t: TFunction, taskName: string, at: Date): Promise<string> {",
+            "  return Notifications.scheduleNotificationAsync({",
+            "    content: {",
+            "      title: 'Reminder',",
+            "      body: t('tasks.moved', { listName: taskName }),",
+            "    },",
+            "    trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: at },",
+            "  });",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-number-format": {
+    "expect": [
+      "[number-format-api]",
+      "src/features/tasks/badge-count.ts:2",
+      "Intl.NumberFormat('ar') picks its digits from CLDR's default"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/badge-count.ts",
+          "lines": [
+            "export function badgeCount(count: number): string {",
+            "  return new Intl.NumberFormat('ar').format(count);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-polyfill-entry-default": {
+    "expect": ["[polyfill-first]", "package.json:5", "the app entry is \"expo-router/entry\""],
+    "ops": [{ "json": { "file": "package.json", "path": ["main"], "value": "expo-router/entry" } }]
+  },
+  "bad-polyfill-first": {
+    "expect": ["[polyfill-first]", "index.ts:5", "the first import is \"expo-router/entry\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "index.ts",
+          "find": "import '@/i18n/intl-polyfills';\n\nimport 'expo-router/entry';",
+          "with": "import 'expo-router/entry';\n\nimport '@/i18n/intl-polyfills';"
+        }
+      }
+    ]
+  },
+  "bad-polyfill-locales": {
+    "expect": ["[polyfill-locales]", "unexpected @formatjs/intl-pluralrules/locale-data/fr.js"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/i18n/intl-polyfills.ts",
+          "find": "import '@formatjs/intl-pluralrules/locale-data/ar.js';",
+          "with": "import '@formatjs/intl-pluralrules/locale-data/ar.js';\nimport '@formatjs/intl-pluralrules/locale-data/fr.js';"
+        }
+      }
+    ]
+  },
+  "bad-polyfill-missing-file": {
+    "expect": [
+      "[polyfill-locales]",
+      "src/i18n/intl-polyfills.ts:1",
+      "unexpected @formatjs/intl-pluralrules/locale-data/pt-BR.js (not in the installed package: Metro and Jest fail with \"Cannot find module\")",
+      "pt-BR uses pt.js from @formatjs/intl-pluralrules, which has no pt-BR.js",
+      "Import exactly, in this order: @formatjs/intl-getcanonicallocales/polyfill.js, @formatjs/intl-locale/polyfill-force.js, @formatjs/intl-pluralrules/polyfill-force.js, @formatjs/intl-pluralrules/locale-data/en.js, @formatjs/intl-pluralrules/locale-data/ar.js, @formatjs/intl-pluralrules/locale-data/pt.js, @formatjs/intl-numberformat/polyfill-force.js, @formatjs/intl-numberformat/locale-data/en.js, @formatjs/intl-numberformat/locale-data/ar.js, @formatjs/intl-numberformat/locale-data/pt.js."
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-getcanonicallocales/package.json",
+          "json": { "name": "@formatjs/intl-getcanonicallocales", "version": "3.2.12" }
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-locale/package.json",
+          "json": { "name": "@formatjs/intl-locale", "version": "5.3.12" }
+        }
+      },
+      {
+        "replace": {
+          "file": "src/i18n/languages.ts",
+          "find": "export const LANGUAGES = ['en', 'ar'] as const;",
+          "with": "export const LANGUAGES = ['en', 'ar', 'pt-BR'] as const;"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-pluralrules/locale-data/ar.js",
+          "content": "// stub locale data (fixture)\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-pluralrules/locale-data/en.js",
+          "content": "// stub locale data (fixture)\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-pluralrules/locale-data/pt.js",
+          "content": "// stub locale data (fixture)\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-pluralrules/locale-data/pt-PT.js",
+          "content": "// stub locale data (fixture)\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-pluralrules/locale-data/zh.js",
+          "content": "// stub locale data (fixture)\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-numberformat/locale-data/ar.js",
+          "content": "// stub locale data (fixture)\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-numberformat/locale-data/en.js",
+          "content": "// stub locale data (fixture)\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-numberformat/locale-data/pt.js",
+          "content": "// stub locale data (fixture)\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-numberformat/locale-data/pt-PT.js",
+          "content": "// stub locale data (fixture)\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-numberformat/locale-data/zh.js",
+          "content": "// stub locale data (fixture)\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-numberformat/locale-data/zh-Hans.js",
+          "content": "// stub locale data (fixture)\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-numberformat/locale-data/zh-Hant.js",
+          "content": "// stub locale data (fixture)\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/i18n/intl-polyfills.ts",
+          "lines": [
+            "// src/i18n/intl-polyfills.ts (fixture: regional and script languages, truncation fallback per package)",
+            "import '@formatjs/intl-getcanonicallocales/polyfill.js';",
+            "import '@formatjs/intl-locale/polyfill-force.js';",
+            "import '@formatjs/intl-pluralrules/polyfill-force.js';",
+            "import '@formatjs/intl-pluralrules/locale-data/en.js';",
+            "import '@formatjs/intl-pluralrules/locale-data/ar.js';",
+            "import '@formatjs/intl-pluralrules/locale-data/pt-BR.js';",
+            "import '@formatjs/intl-numberformat/polyfill-force.js';",
+            "import '@formatjs/intl-numberformat/locale-data/en.js';",
+            "import '@formatjs/intl-numberformat/locale-data/ar.js';",
+            "import '@formatjs/intl-numberformat/locale-data/pt.js';"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-polyfill-missing-language": {
+    "expect": [
+      "[polyfill-locales]",
+      "missing @formatjs/intl-pluralrules/locale-data/fr.js, @formatjs/intl-numberformat/locale-data/fr.js"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/i18n/languages.ts",
+          "find": "['en', 'ar'] as const",
+          "with": "['en', 'ar', 'fr'] as const"
+        }
+      }
+    ]
+  },
+  "bad-polyfill-not-forced": {
+    "expect": ["[polyfill-locales]", "missing @formatjs/intl-pluralrules/polyfill-force.js"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/i18n/intl-polyfills.ts",
+          "find": "@formatjs/intl-pluralrules/polyfill-force.js",
+          "with": "@formatjs/intl-pluralrules/polyfill.js"
+        }
+      }
+    ]
+  },
+  "bad-polyfill-package-not-installed": {
+    "expect": [
+      "[polyfill-locales]",
+      "src/i18n/intl-polyfills.ts:26",
+      "@formatjs/intl-relativetimeformat is not installed (no node_modules/@formatjs/intl-relativetimeformat)",
+      "npm install -E @formatjs/intl-relativetimeformat@12.3.15"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-getcanonicallocales/package.json",
+          "json": { "name": "@formatjs/intl-getcanonicallocales", "version": "3.2.12" }
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-locale/package.json",
+          "json": { "name": "@formatjs/intl-locale", "version": "5.3.12" }
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-pluralrules/locale-data/en.js",
+          "content": "// stub locale data (fixture)\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-pluralrules/locale-data/ar.js",
+          "content": "// stub locale data (fixture)\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-numberformat/locale-data/en.js",
+          "content": "// stub locale data (fixture)\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-numberformat/locale-data/ar.js",
+          "content": "// stub locale data (fixture)\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/i18n/format-relative.ts",
+          "lines": [
+            "// src/i18n/format-relative.ts (fixture: every unit from seconds to years, at the edge)",
+            "import { localeTagFor } from './digits';",
+            "",
+            "import type { DigitStyle } from './digits';",
+            "import type { Language } from './languages';",
+            "",
+            "export function formatRelative(value: number, unit: Intl.RelativeTimeFormatUnit, language: Language, digits: DigitStyle): string {",
+            "  return new Intl.RelativeTimeFormat(localeTagFor(language, digits), { numeric: 'auto' }).format(value, unit);",
+            "}"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/i18n/intl-polyfills.ts",
+          "find": "import '@formatjs/intl-numberformat/locale-data/ar.js';",
+          "with": "import '@formatjs/intl-numberformat/locale-data/ar.js';\nimport '@formatjs/intl-relativetimeformat/polyfill-force.js';\nimport '@formatjs/intl-relativetimeformat/locale-data/en.js';\nimport '@formatjs/intl-relativetimeformat/locale-data/ar.js';"
+        }
+      }
+    ]
+  },
+  "bad-polyfill-partial-relative-time": {
+    "expect": [
+      "[polyfill-locales]",
+      "src/i18n/intl-polyfills.ts:1",
+      "missing @formatjs/intl-relativetimeformat/locale-data/ar.js"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/i18n/format-relative.ts",
+          "lines": [
+            "// src/i18n/format-relative.ts (fixture: every unit from seconds to years, at the edge)",
+            "import { localeTagFor } from './digits';",
+            "",
+            "import type { DigitStyle } from './digits';",
+            "import type { Language } from './languages';",
+            "",
+            "export function formatRelative(value: number, unit: Intl.RelativeTimeFormatUnit, language: Language, digits: DigitStyle): string {",
+            "  return new Intl.RelativeTimeFormat(localeTagFor(language, digits), { numeric: 'auto' }).format(value, unit);",
+            "}"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/i18n/intl-polyfills.ts",
+          "find": "import '@formatjs/intl-numberformat/locale-data/ar.js';",
+          "with": "import '@formatjs/intl-numberformat/locale-data/ar.js';\nimport '@formatjs/intl-relativetimeformat/polyfill-force.js';\nimport '@formatjs/intl-relativetimeformat/locale-data/en.js';"
+        }
+      }
+    ]
+  },
+  "bad-react-intl": {
+    "expect": ["[react-intl-import]", "src/features/tasks/tasks-screen.tsx:2"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "import { Button, View } from 'react-native';",
+          "with": "import { FormattedMessage } from 'react-intl';\nimport { Button, View } from 'react-native';"
+        }
+      }
+    ]
+  },
+  "bad-set-options-title": {
+    "expect": [
+      "[literal-prop-text]",
+      "src/features/tasks/use-edit-task-model.ts:8",
+      "navigation option title: 'Edit task' in setOptions()"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-edit-task-model.ts",
+          "lines": [
+            "// src/features/tasks/use-edit-task-model.ts (fixture: React Navigation 7 static API titles the screen from its model hook)",
+            "import { useNavigation } from '@react-navigation/native';",
+            "import { useLayoutEffect } from 'react';",
+            "",
+            "export function useEditTaskModel(): void {",
+            "  const navigation = useNavigation();",
+            "  useLayoutEffect(() => {",
+            "    navigation.setOptions({ title: 'Edit task' });",
+            "  }, [navigation]);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-share-message": {
+    "expect": [
+      "[literal-prop-text]",
+      "src/features/tasks/share-tasks.ts:5",
+      "Share.share() gets literal text as message (\"Look at my tasks\")"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/share-tasks.ts",
+          "lines": [
+            "// src/features/tasks/share-tasks.ts (fixture)",
+            "import { Share } from 'react-native';",
+            "",
+            "export async function shareTasks(url: string): Promise<void> {",
+            "  await Share.share({ message: 'Look at my tasks', url });",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-supported-locales-literal": {
+    "expect": [
+      "[supported-locales]",
+      "app.config.ts:19",
+      "supportedLocales lists [\"en\"], but LANGUAGES is [\"en\",\"ar\"]"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "  const { languages } = readAppLanguages(projectRoot);\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "import { readAppLanguages } from './scripts/i18n/app-languages.ts';\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "supportedLocales: { ios: languages, android: languages }",
+          "with": "supportedLocales: ['en']"
+        }
+      }
+    ]
+  },
+  "bad-supported-locales-literal-const": {
+    "expect": [
+      "[supported-locales]",
+      "app.config.ts:14",
+      "supportedLocales lists [\"en\"], but LANGUAGES is [\"en\",\"ar\"]"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "  const { languages } = readAppLanguages(projectRoot);\n",
+          "with": "  const { languages } = readAppLanguages(projectRoot);\n  const supportedLocales = { ios: ['en'], android: ['en'] };\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "{ supportedLocales: { ios: languages, android: languages } }",
+          "with": "{ supportedLocales }"
+        }
+      }
+    ]
+  },
+  "bad-supported-locales-missing": {
+    "expect": ["[supported-locales]", "app.config.ts:1", "does not list the expo-localization plugin"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": ", ['expo-localization', { supportedLocales: { ios: languages, android: languages } }]",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-supported-locales-not-passed": {
+    "expect": [
+      "[supported-locales]",
+      "app.config.ts:22",
+      "the expo-localization plugin entry has no supportedLocales option"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "  const { languages } = readAppLanguages(projectRoot);\n",
+          "with": "  const { languages } = readAppLanguages(projectRoot);\n  const supportedLocales = { ios: [...languages], android: [...languages] };\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "['expo-localization', { supportedLocales: { ios: languages, android: languages } }]",
+          "with": "'expo-localization'"
+        }
+      }
+    ]
+  },
+  "bad-system-text-auto-plugin": {
+    "expect": [
+      "[system-text-literal]",
+      "app.config.ts:21",
+      "expo-image-picker is installed, and prebuild applies its plugin even though app.config.ts does not list it",
+      "NSPhotoLibraryUsageDescription, NSMicrophoneUsageDescription with its English default"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "package.json",
+          "find": "\"expo-localization\": \"~57.0.2\",",
+          "with": "\"expo-image-picker\": \"~57.0.20\",\n    \"expo-localization\": \"~57.0.2\","
+        }
+      }
+    ]
+  },
+  "bad-system-text-calendar-write-only": {
+    "expect": [
+      "[system-text-literal]",
+      "app.config.ts:21",
+      "app.config.ts runs the expo-calendar plugin, so it writes NSCalendarsWriteOnlyAccessUsageDescription with its English default"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "plugins: ['expo-router', ",
+          "with": "plugins: ['expo-router', ['expo-calendar', { writeOnlyAccess: true, calendarPermission: false, remindersPermission: false }], "
+        }
+      }
+    ]
+  },
+  "bad-system-text-copy": {
+    "expect": ["[system-text-locales]", "app.config.ts:7", "repeats the text of permissions.camera.usage-description"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "const NATIVE_TEXT_KEYS = {",
+          "with": "const CAMERA_TEXT = 'Lets you add a photo to a task. Photos stay on this device unless you share them.';\nconst NATIVE_TEXT_KEYS = {"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "plugins: ['expo-router', ",
+          "with": "plugins: ['expo-router', ['expo-image-picker', { cameraPermission: CAMERA_TEXT, photosPermission: false, microphonePermission: false }], "
+        }
+      }
+    ]
+  },
+  "bad-system-text-literal-infoplist": {
+    "expect": [
+      "[system-text-literal]",
+      "app.config.ts:18",
+      "NSMicrophoneUsageDescription: 'Record voice notes for a task.' is a literal purpose string"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "infoPlist: { CFBundleAllowMixedLocalizations: true }",
+          "with": "infoPlist: { CFBundleAllowMixedLocalizations: true, NSMicrophoneUsageDescription: 'Record voice notes for a task.' }"
+        }
+      }
+    ]
+  },
+  "bad-system-text-literal-plugin": {
+    "expect": [
+      "[system-text-literal]",
+      "app.config.ts:21",
+      "cameraPermission: 'Allow Tasks to take photos.' is a literal purpose string"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "plugins: ['expo-router', ",
+          "with": "plugins: ['expo-router', ['expo-image-picker', { cameraPermission: 'Allow Tasks to take photos.', photosPermission: false, microphonePermission: false }], "
+        }
+      }
+    ]
+  },
+  "bad-system-text-locales": {
+    "expect": ["[system-text-locales]", "app.config.ts:1", "sets no \"locales\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    locales: nativeLocales(projectRoot, NATIVE_TEXT_KEYS),\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-system-text-not-localized": {
+    "expect": [
+      "[system-text-locales]",
+      "app.config.ts:21",
+      "sets NSMicrophoneUsageDescription (through microphonePermission), but NATIVE_TEXT_KEYS.usageDescriptions does not list it"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "plugins: ['expo-router', ",
+          "with": "plugins: ['expo-router', ['expo-image-picker', { microphonePermission: sourceText(projectRoot, 'permissions.camera.usage-description'), photosPermission: false }], "
+        }
+      }
+    ]
+  },
+  "bad-system-text-plugin-default": {
+    "expect": [
+      "[system-text-literal]",
+      "app.config.ts:21",
+      "app.config.ts runs the expo-camera plugin, so it writes NSMicrophoneUsageDescription with its English default"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "import { nativeLocales } from './scripts/i18n/native-locales.ts';",
+          "with": "import { nativeLocales, sourceText } from './scripts/i18n/native-locales.ts';"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "plugins: ['expo-router', ",
+          "with": "plugins: ['expo-router', ['expo-camera', { cameraPermission: sourceText(projectRoot, 'permissions.camera.usage-description') }], "
+        }
+      }
+    ]
+  },
+  "bad-system-text-unknown-key": {
+    "expect": [
+      "[unknown-key]",
+      "app.config.ts:11",
+      "NATIVE_TEXT_KEYS names \"permissions.microphone.usage-description\", which is not in src/i18n/catalogs/en.json",
+      "native-locales: the en catalog lacks permissions.microphone.usage-description",
+      "sourceText() names \"permissions.camera.purpose\""
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "usageDescriptions: { NSCameraUsageDescription: 'permissions.camera.usage-description' },",
+          "with": "usageDescriptions: {\n    NSCameraUsageDescription: 'permissions.camera.usage-description',\n    NSMicrophoneUsageDescription: 'permissions.microphone.usage-description',\n  },"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "import { nativeLocales } from './scripts/i18n/native-locales.ts';",
+          "with": "import { nativeLocales, sourceText } from './scripts/i18n/native-locales.ts';"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "plugins: ['expo-router', ",
+          "with": "plugins: ['expo-router', ['expo-image-picker', { cameraPermission: sourceText(projectRoot, 'permissions.camera.purpose'), photosPermission: false }], "
+        }
+      }
+    ]
+  },
+  "bad-system-text-variant-name": {
+    "expect": ["[system-text-locales]", "app.config.ts:21", "nativeLocales() gets no variantName"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "  const { languages } = readAppLanguages(projectRoot);\n",
+          "with": "  const variant = resolveAppVariant(process.env);\n  const { languages } = readAppLanguages(projectRoot);\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    name: 'Tasks',",
+          "with": "    name: variant === 'production' ? 'Tasks' : 'Tasks (Dev)',"
+        }
+      }
+    ]
+  },
+  "bad-tab-badge-text": {
+    "expect": [
+      "[literal-prop-text]",
+      "src/app/(app)/_layout.tsx",
+      "navigation option tabBarBadge: 'New' is text that is not from t()"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/(app)/_layout.tsx",
+          "find": "options={{ title: t('tasks.list.title') }}",
+          "with": "options={{ title: t('tasks.list.title'), tabBarBadge: 'New' }}"
+        }
+      }
+    ]
+  },
+  "bad-toast-text": {
+    "expect": [
+      "[literal-prop-text]",
+      "src/features/tasks/toast-saved.ts:5",
+      "ToastAndroid.show() is given literal text ('Task saved'): Android shows it as a toast",
+      "src/features/tasks/toast-saved.ts:6"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/toast-saved.ts",
+          "lines": [
+            "// src/features/tasks/toast-saved.ts (fixture: an Android toast with literal text)",
+            "import { ToastAndroid } from 'react-native';",
+            "",
+            "export function toastSaved(): void {",
+            "  ToastAndroid.show('Task saved', ToastAndroid.SHORT);",
+            "  ToastAndroid.showWithGravity('List renamed', ToastAndroid.SHORT, ToastAndroid.BOTTOM);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-tooling-dir": {
+    "expect": [
+      "[tooling-dir]",
+      "scripts/i18n/app-languages.ts:21",
+      "I18N_DIR is 'app/i18n', but the checkers read the i18n folder at src/i18n"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/i18n/app-languages.ts",
+          "find": "export const I18N_DIR = 'src/i18n';",
+          "with": "export const I18N_DIR = 'app/i18n';"
+        }
+      }
+    ]
+  },
+  "bad-unknown-key": {
+    "expect": ["[unknown-key]", "src/features/tasks/tasks-screen.tsx:19", "\"tasks.list.titel\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "<T id=\"tasks.list.title\" testID=\"tasks.title\" />",
+          "with": "<T id=\"tasks.list.titel\" testID=\"tasks.title\" />"
+        }
+      }
+    ]
+  },
+  "bad-verify-script-missing": {
+    "expect": ["[verify-script]", "package.json:6", "package.json has no \"i18n:verify\" script"],
+    "ops": [{ "json": { "file": "package.json", "path": ["scripts", "i18n:verify"], "delete": true } }]
+  },
+  "bad-verify-script-target": {
+    "expect": [
+      "[verify-script]",
+      "package.json:7",
+      "\"i18n:verify\" runs scripts/i18n/verify-catalogs.ts, which does not exist"
+    ],
+    "ops": [{ "delete": "scripts/i18n/verify-catalogs.ts" }]
+  },
+  "pass-action-sheet-t": {
+    "expect": ["check-i18n-code:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/task-actions.ts",
+          "lines": [
+            "// src/features/tasks/task-actions.ts (fixture: iOS action sheets whose options, title and message come from t())",
+            "import { ActionSheetIOS } from 'react-native';",
+            "",
+            "import type { TFunction } from '@/i18n/create-t';",
+            "",
+            "export function showTaskActions(t: TFunction, onDelete: () => void): void {",
+            "  ActionSheetIOS.showActionSheetWithOptions({ options: [t('common.cancel'), t('common.delete')], cancelButtonIndex: 0 }, () => {});",
+            "  ActionSheetIOS.showActionSheetWithOptions(",
+            "    {",
+            "      options: [",
+            "        t('common.cancel'),",
+            "        t('common.delete'),",
+            "      ],",
+            "      destructiveButtonIndex: 1,",
+            "      cancelButtonIndex: 0,",
+            "      title: t('tasks.list.title'),",
+            "    },",
+            "    (index) => {",
+            "      if (index === 1) onDelete();",
+            "    },",
+            "  );",
+            "}",
+            "",
+            "export function showListActions(t: TFunction, labels: readonly string[]): void {",
+            "  ActionSheetIOS.showActionSheetWithOptions({ options: [...labels, t('common.cancel')], cancelButtonIndex: labels.length }, () => {});",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-datetimeformat-polyfill": {
+    "expect": ["check-i18n-code:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/i18n/format-time.ts",
+          "lines": [
+            "// src/i18n/format-time.ts (fixture: Intl.DateTimeFormat at the edge, explicit calendar and time zone)",
+            "import { localeTagFor } from './digits';",
+            "",
+            "import type { DigitStyle } from './digits';",
+            "import type { Language } from './languages';",
+            "",
+            "export function formatTimeOfDay(at: Date, input: { language: Language; digits: DigitStyle; timeZone: string }): string {",
+            "  const options = { calendar: 'gregory', hour: 'numeric', minute: '2-digit', timeZone: input.timeZone } as const;",
+            "  return new Intl.DateTimeFormat(localeTagFor(input.language, input.digits), options).format(at);",
+            "}"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/i18n/intl-polyfills.ts",
+          "find": "import '@formatjs/intl-numberformat/locale-data/ar.js';",
+          "with": "import '@formatjs/intl-numberformat/locale-data/ar.js';\nimport '@formatjs/intl-datetimeformat/polyfill-force.js';\nimport '@formatjs/intl-datetimeformat/locale-data/en.js';\nimport '@formatjs/intl-datetimeformat/locale-data/ar.js';\nimport '@formatjs/intl-datetimeformat/add-golden-tz.js';"
+        }
+      }
+    ]
+  },
+  "pass-jsx-object-literals": {
+    "expect": ["check-i18n-code:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-header.tsx",
+          "lines": [
+            "// src/features/tasks/components/task-header.tsx (fixture: one-line conditional children with object and array literals, escaped whitespace, a ternary on a step number)",
+            "import { Image } from 'expo-image';",
+            "import { Link } from 'expo-router';",
+            "import { TextInput, View } from 'react-native';",
+            "",
+            "import { useT } from '@/i18n/t-context';",
+            "import { AppText } from '@/ui/app-text';",
+            "import { Icon } from '@/ui/icon';",
+            "",
+            "export type TaskHeaderProps = { readonly taskId: string | null; readonly avatarUri: string | null; readonly isDone: boolean; readonly step: number };",
+            "",
+            "const TONES = [{ key: 'open', tone: 'primary' }, { key: 'done', tone: 'muted' }] as const;",
+            "",
+            "export function TaskHeader({ taskId, avatarUri, isDone, step }: TaskHeaderProps): React.JSX.Element {",
+            "  const t = useT();",
+            "  return (",
+            "    <View>",
+            "      {taskId === null && <Link href={{ pathname: '/settings' }} replace />}",
+            "      {taskId !== null && <Link href={{ pathname: '/tasks/[id]', params: { id: taskId } }} />}",
+            "      {avatarUri !== null && <Image source={{ uri: avatarUri }} contentFit=\"cover\" />}",
+            "      {isDone ? <Icon name=\"check\" size={16} /> : <Icon name=\"circle\" size={16} />}",
+            "      {isDone && <View style={{ position: 'absolute' }} />}",
+            "      {[{ key: 'a', tone: 'primary' }].map((item) => <AppText key={item.key}>{t('tasks.list.title')}</AppText>)}",
+            "      {TONES.map((row) => (row.key === 'done' ? <Icon key={row.key} name=\"check\" /> : null))}",
+            "      <TextInput enterKeyHint=\"done\" placeholder={t('tasks.list.title')} />",
+            "      <AppText>{t('tasks.list.title')}{'\\n'}{t('common.cancel')}{'\\t'}{\"\\u00a0\"}</AppText>",
+            "      <AppText>{isDone ? '\\n' : ' '}</AppText>",
+            "      <AppText>{step === 1 ? t('common.cancel') : t('common.delete')}</AppText>",
+            "    </View>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-moved-i18n-dir": {
+    "expect": ["check-i18n-code:", "RESULT: PASS"],
+    "ops": [
+      { "rename": { "from": "src/i18n", "to": "src/localization" } },
+      { "write": { "file": "rn-skills.config.json", "json": { "i18nDir": "src/localization" } } },
+      {
+        "replace": {
+          "file": "scripts/i18n/app-languages.ts",
+          "find": "export const I18N_DIR = 'src/i18n';",
+          "with": "export const I18N_DIR = 'src/localization';"
+        }
+      },
+      {
+        "replace": {
+          "file": "index.ts",
+          "find": "import '@/i18n/intl-polyfills';",
+          "with": "import '@/localization/intl-polyfills';"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "const INTL_POLYFILLS = 'src/i18n/intl-polyfills.ts';",
+          "with": "const INTL_POLYFILLS = 'src/localization/intl-polyfills.ts';"
+        }
+      }
+    ]
+  },
+  "pass-not-yet-created": {
+    "expect": [
+      "SKIP jest.config.js [jest-polyfills] not yet created (unit-and-component-tests creates it)",
+      "SKIP app.config.ts [supported-locales] not yet created (expo-project-bootstrap creates it)",
+      "SKIP app.config.ts [system-text-locales] not yet created (expo-project-bootstrap creates it)",
+      "SKIP package.json [polyfill-first] not yet created (expo-project-bootstrap creates it)",
+      "SKIP package.json [verify-script] not yet created (expo-project-bootstrap creates it)"
+    ],
+    "ops": [{ "delete": ["jest.config.js", "app.config.ts", "package.json"] }]
+  },
+  "pass-number-format-tag": {
+    "expect": ["check-i18n-code:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/badge-count.ts",
+          "lines": [
+            "import { localeTagFor } from '@/i18n/digits';",
+            "",
+            "import type { DigitStyle } from '@/i18n/digits';",
+            "import type { Language } from '@/i18n/languages';",
+            "",
+            "export function badgeCount(count: number, language: Language, digits: DigitStyle): string {",
+            "  return new Intl.NumberFormat(localeTagFor(language, digits)).format(count);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-permission-plugin-options": {
+    "expect": ["check-i18n-code:", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "package.json",
+          "find": "\"expo-localization\": \"~57.0.2\",",
+          "with": "\"expo-image-picker\": \"~57.0.20\",\n    \"expo-localization\": \"~57.0.2\","
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "import { nativeLocales } from './scripts/i18n/native-locales.ts';",
+          "with": "import { nativeLocales, sourceText } from './scripts/i18n/native-locales.ts';"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "plugins: ['expo-router', ",
+          "with": "plugins: ['expo-router', ['expo-image-picker', { cameraPermission: sourceText(projectRoot, 'permissions.camera.usage-description'), photosPermission: false, microphonePermission: false }], "
+        }
+      }
+    ]
+  },
+  "pass-regional-languages": {
+    "expect": ["check-i18n-code:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-getcanonicallocales/package.json",
+          "json": { "name": "@formatjs/intl-getcanonicallocales", "version": "3.2.12" }
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-locale/package.json",
+          "json": { "name": "@formatjs/intl-locale", "version": "5.3.12" }
+        }
+      },
+      {
+        "replace": {
+          "file": "src/i18n/languages.ts",
+          "find": "export const LANGUAGES = ['en', 'ar'] as const;",
+          "with": "export const LANGUAGES = ['en', 'pt-BR', 'zh-Hant'] as const;"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-pluralrules/locale-data/ar.js",
+          "content": "// stub locale data (fixture)\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-pluralrules/locale-data/en.js",
+          "content": "// stub locale data (fixture)\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-pluralrules/locale-data/pt.js",
+          "content": "// stub locale data (fixture)\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-pluralrules/locale-data/pt-PT.js",
+          "content": "// stub locale data (fixture)\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-pluralrules/locale-data/zh.js",
+          "content": "// stub locale data (fixture)\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-numberformat/locale-data/ar.js",
+          "content": "// stub locale data (fixture)\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-numberformat/locale-data/en.js",
+          "content": "// stub locale data (fixture)\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-numberformat/locale-data/pt.js",
+          "content": "// stub locale data (fixture)\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-numberformat/locale-data/pt-PT.js",
+          "content": "// stub locale data (fixture)\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-numberformat/locale-data/zh.js",
+          "content": "// stub locale data (fixture)\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-numberformat/locale-data/zh-Hans.js",
+          "content": "// stub locale data (fixture)\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/@formatjs/intl-numberformat/locale-data/zh-Hant.js",
+          "content": "// stub locale data (fixture)\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/i18n/intl-polyfills.ts",
+          "lines": [
+            "// src/i18n/intl-polyfills.ts (fixture: regional and script languages, truncation fallback per package)",
+            "import '@formatjs/intl-getcanonicallocales/polyfill.js';",
+            "import '@formatjs/intl-locale/polyfill-force.js';",
+            "import '@formatjs/intl-pluralrules/polyfill-force.js';",
+            "import '@formatjs/intl-pluralrules/locale-data/en.js';",
+            "import '@formatjs/intl-pluralrules/locale-data/pt.js';",
+            "import '@formatjs/intl-pluralrules/locale-data/zh.js';",
+            "import '@formatjs/intl-numberformat/polyfill-force.js';",
+            "import '@formatjs/intl-numberformat/locale-data/en.js';",
+            "import '@formatjs/intl-numberformat/locale-data/pt.js';",
+            "import '@formatjs/intl-numberformat/locale-data/zh-Hant.js';"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-regional-languages-uninstalled": {
+    "expect": ["check-i18n-code:", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/i18n/languages.ts",
+          "find": "export const LANGUAGES = ['en', 'ar'] as const;",
+          "with": "export const LANGUAGES = ['en', 'pt-BR', 'zh-Hant'] as const;"
+        }
+      },
+      {
+        "write": {
+          "file": "src/i18n/intl-polyfills.ts",
+          "lines": [
+            "// src/i18n/intl-polyfills.ts (fixture: regional and script languages, truncation fallback per package)",
+            "import '@formatjs/intl-getcanonicallocales/polyfill.js';",
+            "import '@formatjs/intl-locale/polyfill-force.js';",
+            "import '@formatjs/intl-pluralrules/polyfill-force.js';",
+            "import '@formatjs/intl-pluralrules/locale-data/en.js';",
+            "import '@formatjs/intl-pluralrules/locale-data/pt.js';",
+            "import '@formatjs/intl-pluralrules/locale-data/zh.js';",
+            "import '@formatjs/intl-numberformat/polyfill-force.js';",
+            "import '@formatjs/intl-numberformat/locale-data/en.js';",
+            "import '@formatjs/intl-numberformat/locale-data/pt.js';",
+            "import '@formatjs/intl-numberformat/locale-data/zh-Hant.js';"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-relative-time-polyfill": {
+    "expect": ["check-i18n-code:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/i18n/format-relative.ts",
+          "lines": [
+            "// src/i18n/format-relative.ts (fixture: every unit from seconds to years, at the edge)",
+            "import { localeTagFor } from './digits';",
+            "",
+            "import type { DigitStyle } from './digits';",
+            "import type { Language } from './languages';",
+            "",
+            "export function formatRelative(value: number, unit: Intl.RelativeTimeFormatUnit, language: Language, digits: DigitStyle): string {",
+            "  return new Intl.RelativeTimeFormat(localeTagFor(language, digits), { numeric: 'auto' }).format(value, unit);",
+            "}"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/i18n/intl-polyfills.ts",
+          "find": "import '@formatjs/intl-numberformat/locale-data/ar.js';",
+          "with": "import '@formatjs/intl-numberformat/locale-data/ar.js';\nimport '@formatjs/intl-relativetimeformat/polyfill-force.js';\nimport '@formatjs/intl-relativetimeformat/locale-data/en.js';\nimport '@formatjs/intl-relativetimeformat/locale-data/ar.js';"
+        }
+      }
+    ]
+  },
+  "pass-supported-locales-const": {
+    "expect": ["check-i18n-code:", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "  const { languages } = readAppLanguages(projectRoot);\n",
+          "with": "  const { languages } = readAppLanguages(projectRoot);\n  const supportedLocales = { ios: [...languages], android: [...languages] };\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "{ supportedLocales: { ios: languages, android: languages } }",
+          "with": "{ supportedLocales }"
+        }
+      }
+    ]
+  },
+  "pass-supported-locales-literal": {
+    "expect": ["check-i18n-code:", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "  const { languages } = readAppLanguages(projectRoot);\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "import { readAppLanguages } from './scripts/i18n/app-languages.ts';\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "supportedLocales: { ios: languages, android: languages }",
+          "with": "supportedLocales: { ios: ['ar', 'en'], android: ['en', 'ar'] }"
+        }
+      }
+    ]
+  },
+  "pass-variant-name": {
+    "expect": ["check-i18n-code:", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "  const { languages } = readAppLanguages(projectRoot);\n",
+          "with": "  const variant = resolveAppVariant(process.env);\n  const variantName = (name: string): string => (variant === 'production' ? name : `${name} (Dev)`);\n  const { languages } = readAppLanguages(projectRoot);\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "nativeLocales(projectRoot, NATIVE_TEXT_KEYS)",
+          "with": "nativeLocales(projectRoot, NATIVE_TEXT_KEYS, { variantName })"
+        }
+      }
+    ]
+  }
+}

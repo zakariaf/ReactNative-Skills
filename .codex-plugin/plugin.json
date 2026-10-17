@@ -1,0 +1,21 @@
+{
+  "name": "react-native",
+  "version": "1.0.0",
+  "description": "Deep, self-verifying engineering skills for React Native apps built with Expo: architecture, TypeScript and lint rules, Expo Router, state, persistence, i18n and RTL, accessibility, testing, EAS builds and store releases, plus optional game skills. Every skill ends in a checker that prints RESULT: PASS.",
+  "author": {
+    "name": "Zakaria Fatahi"
+  },
+  "homepage": "https://github.com/zakariaf/ReactNative-Skills",
+  "repository": "https://github.com/zakariaf/ReactNative-Skills",
+  "license": "MIT",
+  "keywords": [
+    "react-native",
+    "expo",
+    "typescript",
+    "expo-router",
+    "testing",
+    "accessibility",
+    "skills"
+  ],
+  "skills": "./skills/"
+}

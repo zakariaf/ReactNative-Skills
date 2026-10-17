@@ -1,0 +1,3 @@
+[setting-effect]
+nothing outside the settings code reads hapticsEnabled
+contracts/settings.json:

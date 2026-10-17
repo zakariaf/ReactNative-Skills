@@ -1,0 +1,1282 @@
+{
+  "bad-canvas-rn-touch": {
+    "expect": [
+      "[canvas-rn-touch]",
+      "src/features/tasks/components/streak-card.tsx:8",
+      "<Pressable> wraps a <Canvas>",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/streak-card.tsx",
+          "lines": [
+            "// src/features/tasks/components/streak-card.tsx",
+            "// A card whose whole surface is one button, with a decorative sparkline drawn on a canvas.",
+            "import { Canvas } from '@shopify/react-native-skia';",
+            "import { Pressable } from 'react-native';",
+            "",
+            "export function StreakCard(props: { readonly onOpen: () => void }): React.JSX.Element {",
+            "  return (",
+            "    <Pressable accessibilityRole=\"button\" onPress={props.onOpen}>",
+            "      <Canvas accessible={false} />",
+            "    </Pressable>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-canvas-rn-touch-prop": {
+    "expect": [
+      "[canvas-rn-touch]",
+      "src/features/tasks/components/grid-peek.tsx:10",
+      "onTouchStart on <SurfaceCanvas> (the canvas)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/grid-peek.tsx",
+          "lines": [
+            "// src/features/tasks/components/grid-peek.tsx",
+            "// Planted: React Native touch on the canvas element itself, beside the gesture module.",
+            "import { SurfaceCanvas } from '@/canvas/surface-canvas';",
+            "",
+            "export function GridPeek(props: { readonly onPeek: () => void }): React.JSX.Element {",
+            "  return (",
+            "    <SurfaceCanvas",
+            "      picture={null}",
+            "      accessibilityLabel=\"tasks.progress-grid.summary\"",
+            "      onTouchStart={props.onPeek}",
+            "    />",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-canvas-rn-touch-without-kit": {
+    "expect": [
+      "[canvas-rn-touch]",
+      "src/features/stats/components/streak-card.tsx:8",
+      "<Pressable> wraps a <Canvas>",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "base": ["@tests/bases/app"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "        input={model.grid.input}\n",
+          "with": ""
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/stats/components/streak-card.tsx",
+          "lines": [
+            "// src/features/stats/components/streak-card.tsx",
+            "// A card whose whole surface is one button, with a decorative sparkline drawn on a canvas.",
+            "import { Canvas } from '@shopify/react-native-skia';",
+            "import { Pressable } from 'react-native';",
+            "",
+            "export function StreakCard(props: { readonly onOpen: () => void }): React.JSX.Element {",
+            "  return (",
+            "    <Pressable accessibilityRole=\"button\" onPress={props.onOpen}>",
+            "      <Canvas accessible={false} />",
+            "    </Pressable>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-custom-button-in-detector": {
+    "expect": [
+      "[pressable-in-detector]",
+      "src/features/tasks/components/grid-overlay.tsx:17",
+      "<DayChip>",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/grid-overlay.tsx",
+          "lines": [
+            "// src/features/tasks/components/grid-overlay.tsx",
+            "import { Canvas } from '@shopify/react-native-skia';",
+            "import { View } from 'react-native';",
+            "import { GestureDetector } from 'react-native-gesture-handler';",
+            "",
+            "import { DayChip } from '@/ui/day-chip';",
+            "",
+            "import type { ComponentProps } from 'react';",
+            "",
+            "type Props = { readonly gesture: ComponentProps<typeof GestureDetector>['gesture'] };",
+            "",
+            "export function GridOverlay(props: Props): React.JSX.Element {",
+            "  return (",
+            "    <GestureDetector gesture={props.gesture}>",
+            "      <View>",
+            "        <Canvas accessible={false} />",
+            "        <DayChip onPress={() => undefined} />",
+            "      </View>",
+            "    </GestureDetector>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/canvas-input.json",
+          "path": ["buttonComponents"],
+          "value": ["PressableSurface", "DayChip"]
+        }
+      }
+    ]
+  },
+  "bad-detector-around-canvas-component": {
+    "expect": ["[gesture-one-file]", "src/features/tasks/components/grid-drag.tsx:7", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/grid-view.tsx",
+          "lines": [
+            "// src/features/tasks/components/grid-view.tsx",
+            "import { Canvas } from '@shopify/react-native-skia';",
+            "",
+            "export function GridView(): React.JSX.Element {",
+            "  return <Canvas accessible={false} />;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/components/grid-drag.tsx",
+          "lines": [
+            "// src/features/tasks/components/grid-drag.tsx",
+            "import { Gesture, GestureDetector } from 'react-native-gesture-handler';",
+            "",
+            "import { GridView } from './grid-view';",
+            "",
+            "export function GridDrag(): React.JSX.Element {",
+            "  const drag = Gesture.Pan();",
+            "  return (",
+            "    <GestureDetector gesture={drag}>",
+            "      <GridView />",
+            "    </GestureDetector>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-detector-gesture-from-hook": {
+    "expect": [
+      "[gesture-one-file]",
+      "src/hooks/use-scrub-gesture.ts:5",
+      "Gesture.Pan",
+      "src/features/insights/components/trend-chart.tsx hands it to a canvas",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/hooks/use-scrub-gesture.ts",
+          "lines": [
+            "// src/hooks/use-scrub-gesture.ts",
+            "import { Gesture } from 'react-native-gesture-handler';",
+            "",
+            "export function useScrubGesture(): ReturnType<typeof Gesture.Pan> {",
+            "  return Gesture.Pan();",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/insights/components/trend-chart.tsx",
+          "lines": [
+            "// src/features/insights/components/trend-chart.tsx",
+            "import { Canvas } from '@shopify/react-native-skia';",
+            "import { GestureDetector } from 'react-native-gesture-handler';",
+            "",
+            "import { useScrubGesture } from '@/hooks/use-scrub-gesture';",
+            "",
+            "export function TrendChart(): React.JSX.Element {",
+            "  const scrub = useScrubGesture();",
+            "  return (",
+            "    <GestureDetector gesture={scrub}>",
+            "      <Canvas accessible={false} />",
+            "    </GestureDetector>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-gesture-in-feature": {
+    "expect": [
+      "[gesture-one-file]",
+      "src/features/tasks/use-day-swipe.ts:6",
+      "Gesture.Pan",
+      "a feature whose canvas takes touch",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-day-swipe.ts",
+          "lines": [
+            "// src/features/tasks/use-day-swipe.ts",
+            "// A hook beside the progress grid that builds its own pan for someone else to attach.",
+            "import { Gesture } from 'react-native-gesture-handler';",
+            "",
+            "export function useDaySwipe(): ReturnType<typeof Gesture.Pan> {",
+            "  return Gesture.Pan();",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-gesture-on-canvas-file": {
+    "expect": ["[gesture-one-file]", "src/ui/sparkline-scrubber.tsx:6", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/sparkline-scrubber.tsx",
+          "lines": [
+            "// src/ui/sparkline-scrubber.tsx",
+            "import { Canvas } from '@shopify/react-native-skia';",
+            "import { Gesture, GestureDetector } from 'react-native-gesture-handler';",
+            "",
+            "export function SparklineScrubber(): React.JSX.Element {",
+            "  const scrub = Gesture.Pan();",
+            "  return (",
+            "    <GestureDetector gesture={scrub}>",
+            "      <Canvas accessible={false} />",
+            "    </GestureDetector>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-gesture-without-kit": {
+    "expect": [
+      "[input-file-missing] input kit file is missing",
+      "src/canvas/gestures/use-canvas-gestures.ts",
+      "[gesture-one-file]",
+      "src/features/tasks/components/grid-tap.tsx:6",
+      "RESULT: FAIL (9 problems)"
+    ],
+    "base": ["@tests/bases/app"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "        input={model.grid.input}\n",
+          "with": ""
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/components/grid-tap.tsx",
+          "lines": [
+            "// src/features/tasks/components/grid-tap.tsx",
+            "import { Canvas } from '@shopify/react-native-skia';",
+            "import { Gesture, GestureDetector } from 'react-native-gesture-handler';",
+            "",
+            "export function GridTap(): React.JSX.Element {",
+            "  const tap = Gesture.Tap();",
+            "  return (",
+            "    <GestureDetector gesture={tap}>",
+            "      <Canvas accessible={false} />",
+            "    </GestureDetector>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-gesture-wraps-canvas": {
+    "expect": [
+      "[gesture-one-file]",
+      "src/features/tasks/components/day-swipe.tsx:6",
+      "Gesture.Pan",
+      "src/features/tasks/tasks-screen.tsx hands it to a canvas",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/day-swipe.tsx",
+          "lines": [
+            "// src/features/tasks/components/day-swipe.tsx",
+            "import { Gesture, GestureDetector } from 'react-native-gesture-handler';",
+            "",
+            "import type { ReactNode } from 'react';",
+            "",
+            "const swipe = Gesture.Pan();",
+            "",
+            "export function DaySwipe(props: { readonly children: ReactNode }): ReactNode {",
+            "  return <GestureDetector gesture={swipe}>{props.children}</GestureDetector>;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "lines": [
+            "// src/features/tasks/tasks-screen.tsx",
+            "// The screen renders the canvas with the gesture layer's input; it builds no gesture itself.",
+            "import { View } from 'react-native';",
+            "",
+            "import { SurfaceCanvas } from '@/canvas/surface-canvas';",
+            "",
+            "import { DaySwipe } from './components/day-swipe';",
+            "",
+            "import type { TasksModel } from './use-tasks-model';",
+            "",
+            "export function TasksScreen(props: { readonly model: TasksModel }): React.JSX.Element {",
+            "  const { model } = props;",
+            "  return (",
+            "    <View testID=\"tasks.screen\">",
+            "      <DaySwipe>",
+            "        <SurfaceCanvas picture={model.picture} input={model.grid.input} accessibilityLabel={model.gridLabel} />",
+            "      </DaySwipe>",
+            "    </View>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-hit-test-no-slop": {
+    "expect": ["[hit-test-slop]", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/gestures/use-canvas-gestures.ts",
+          "find": "const target = hitTest(layout.get(), event, HIT_SLOP);",
+          "with": "const target = hitTest(layout.get(), event);",
+          "occurrence": 1
+        }
+      }
+    ]
+  },
+  "bad-hover-every-move": {
+    "expect": ["[hover-on-change]", "onUpdate() hops to JS on every finger move", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/gestures/use-canvas-gestures.ts",
+          "find": "      const hasMoved = !isSameTarget(hover, previous.hover);\n      if (onHover !== undefined && hasMoved) scheduleOnRN(onHover, hover);\n",
+          "with": "      if (onHover !== undefined) scheduleOnRN(onHover, hover);\n"
+        }
+      }
+    ]
+  },
+  "bad-impure-intent": {
+    "expect": ["[intent-pure]", "imports the package react-native", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/intent-to-action.ts",
+          "find": "import { listDayActions } from '@/features/tasks/progress-grid-rules';",
+          "with": "import { Platform } from 'react-native';\n\nimport { listDayActions } from '@/features/tasks/progress-grid-rules';"
+        }
+      }
+    ]
+  },
+  "bad-input-gesture-from-hook": {
+    "expect": [
+      "[gesture-one-file]",
+      "src/ui/use-scrub-gesture.ts:5",
+      "src/features/insights/insights-screen.tsx hands it to a canvas",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/use-scrub-gesture.ts",
+          "lines": [
+            "// src/ui/use-scrub-gesture.ts",
+            "import { Gesture } from 'react-native-gesture-handler';",
+            "",
+            "export function useScrubGesture(): ReturnType<typeof Gesture.Pan> {",
+            "  return Gesture.Pan();",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/insights/insights-screen.tsx",
+          "lines": [
+            "// src/features/insights/insights-screen.tsx",
+            "import { useSharedValue } from 'react-native-reanimated';",
+            "",
+            "import { IDLE_POINTER } from '@/canvas/canvas-types';",
+            "import { SurfaceCanvas } from '@/canvas/surface-canvas';",
+            "import { useScrubGesture } from '@/ui/use-scrub-gesture';",
+            "",
+            "export function InsightsScreen(): React.JSX.Element {",
+            "  const pointer = useSharedValue(IDLE_POINTER);",
+            "  const input = { gesture: useScrubGesture(), pointer };",
+            "  return <SurfaceCanvas picture={null} input={input} accessibilityLabel=\"insights.trend.summary\" />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-input-missing": {
+    "expect": ["[input-file-missing]", "src/canvas/gestures/pan-intent.ts", "RESULT: FAIL (1 problems)"],
+    "ops": [{ "delete": "src/canvas/gestures/pan-intent.ts" }]
+  },
+  "bad-input-no-worklet": {
+    "expect": [
+      "[input-worklet]",
+      "src/canvas/gestures/pan-intent.ts:1",
+      "no file-level 'worklet'; directive",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [{ "replace": { "file": "src/canvas/gestures/pan-intent.ts", "find": "'worklet';\n\n", "with": "" } }]
+  },
+  "bad-input-worklet-import": {
+    "expect": [
+      "[input-worklet]",
+      "imports a value from src/canvas/canvas-types.ts, which is not a 'worklet' module",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/gestures/pan-intent.ts",
+          "find": "import { hitTest } from '@/canvas/canvas-layout';",
+          "with": "import { hitTest } from '@/canvas/canvas-layout';\nimport { IDLE_POINTER } from '@/canvas/canvas-types';"
+        }
+      }
+    ]
+  },
+  "bad-intent-missing-no-contract": {
+    "expect": ["[intent-to-action]", "src/features/tasks/canvas/intent-to-action.ts", "RESULT: FAIL (1 problems)"],
+    "ops": [{ "delete": ["src/features/tasks/canvas/intent-to-action.ts", "contracts/canvas-input.json"] }]
+  },
+  "bad-intent-no-test": {
+    "expect": [
+      "[intent-to-action]",
+      "src/features/tasks/canvas/intent-to-action.test.ts",
+      "has no test",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [{ "delete": "src/features/tasks/canvas/intent-to-action.test.ts" }]
+  },
+  "bad-intent-not-exhaustive": {
+    "expect": ["[intent-exhaustive]", "long-press, swipe, drag-end, aim", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/intent-to-action.ts",
+          "find": "    case 'long-press':\n    case 'swipe':\n    case 'drag-end':\n    case 'aim':\n      return null;",
+          "with": "    default:\n      return null;"
+        }
+      }
+    ]
+  },
+  "bad-intent-on-update": {
+    "expect": ["[intent-on-update]", "onUpdate() emits an intent", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/gestures/use-canvas-gestures.ts",
+          "find": "      pointer.set({ ...previous, x: aim.x, y: aim.y, hover });\n",
+          "with": "      pointer.set({ ...previous, x: aim.x, y: aim.y, hover });\n      if (hover !== null) scheduleOnRN(onIntent, { kind: 'tap', target: hover, selected: null });\n"
+        }
+      }
+    ]
+  },
+  "bad-intent-reads-store": {
+    "expect": [
+      "[intent-pure]",
+      "src/stores/tasks-store (UI, store, service, API or route code)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/intent-to-action.ts",
+          "find": "import { listDayActions } from '@/features/tasks/progress-grid-rules';",
+          "with": "import { listDayActions } from '@/features/tasks/progress-grid-rules';\nimport { useTasksStore } from '@/stores/tasks-store';"
+        }
+      }
+    ]
+  },
+  "bad-missing-intent": {
+    "expect": [
+      "[intent-to-action]",
+      "src/features/tasks/canvas/intent-to-action.ts",
+      "surface progress-grid takes touch",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [{ "delete": "src/features/tasks/canvas/intent-to-action.ts" }]
+  },
+  "bad-no-root-view": {
+    "expect": [
+      "[gesture-root]",
+      "src/app/_layout.tsx",
+      "no <GestureHandlerRootView> wraps the app",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "<GestureHandlerRootView style={styles.root}>",
+          "with": "<View style={styles.root}>"
+        }
+      },
+      { "replace": { "file": "src/app/_layout.tsx", "find": "</GestureHandlerRootView>", "with": "</View>" } },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "import { GestureHandlerRootView } from 'react-native-gesture-handler';\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-no-test-id": {
+    "expect": ["[gesture-test-id]", "Gesture.Tap() has no literal", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/gestures/use-canvas-gestures.ts",
+          "find": "    .withTestId('canvas.tap')\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-no-touch-test": {
+    "expect": ["[touch-target-test]", "src/features/tasks/canvas/hit-targets.test.ts", "RESULT: FAIL (1 problems)"],
+    "ops": [{ "delete": "src/features/tasks/canvas/hit-targets.test.ts" }]
+  },
+  "bad-pan-no-finalize": {
+    "expect": ["[pan-finalize]", "a pan gesture has no onFinalize", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/gestures/use-canvas-gestures.ts",
+          "find": "    })\n    .onFinalize(() => {\n      // Runs on success, failure and cancel (a call, the system back gesture): no stuck preview.\n      pointer.set(IDLE_POINTER);\n    });\n}",
+          "with": "    });\n}"
+        }
+      }
+    ]
+  },
+  "bad-pressable-in-detector": {
+    "expect": [
+      "[pressable-in-detector]",
+      "src/features/tasks/components/grid-overlay.tsx:17",
+      "<PressableSurface>",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/grid-overlay.tsx",
+          "lines": [
+            "// src/features/tasks/components/grid-overlay.tsx",
+            "import { Canvas } from '@shopify/react-native-skia';",
+            "import { View } from 'react-native';",
+            "import { GestureDetector } from 'react-native-gesture-handler';",
+            "",
+            "import { PressableSurface } from '@/ui/pressable-surface';",
+            "",
+            "import type { ComponentProps } from 'react';",
+            "",
+            "type Props = { readonly gesture: ComponentProps<typeof GestureDetector>['gesture'] };",
+            "",
+            "export function GridOverlay(props: Props): React.JSX.Element {",
+            "  return (",
+            "    <GestureDetector gesture={props.gesture}>",
+            "      <View>",
+            "        <Canvas accessible={false} />",
+            "        <PressableSurface accessibilityRole=\"button\" onPress={() => undefined} />",
+            "      </View>",
+            "    </GestureDetector>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-rngh-builders-on-v3": {
+    "expect": ["[rngh-api-version]", "legacy builder API", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "json": { "file": "package.json", "path": ["dependencies", "react-native-gesture-handler"], "value": "~3.2.1" }
+      }
+    ]
+  },
+  "bad-rngh-v3-api": {
+    "expect": [
+      "[rngh-api-version]",
+      "package.json declares react-native-gesture-handler ~2.32.0, but the gesture module uses the 3.x hook API",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/gestures/use-canvas-gestures.ts",
+          "find": "import { Gesture } from 'react-native-gesture-handler';",
+          "with": "import { Gesture, useTapGesture } from 'react-native-gesture-handler';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/canvas/gestures/use-canvas-gestures.ts",
+          "find": "const TAP_MAX_MS = 250;",
+          "with": "const TAP_MAX_MS = 250;\n\nexport const useTapHook = (): unknown => useTapGesture({ testID: 'canvas.tap-hook' });"
+        }
+      }
+    ]
+  },
+  "bad-rtl-in-gestures": {
+    "expect": ["[physical-coords]", "isMirrored", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/gestures/pan-intent.ts",
+          "find": "return { kind: 'aim', dx: release.translationX, dy: release.translationY };",
+          "with": "return { kind: 'aim', dx: layout.isMirrored ? -release.translationX : release.translationX, dy: release.translationY };"
+        }
+      }
+    ]
+  },
+  "bad-run-on-js": {
+    "expect": ["[worklets-api]", "uses the deprecated runOnJS", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/gestures/use-canvas-gestures.ts",
+          "find": "if (target !== null) scheduleOnRN(onIntent, { kind: 'tap', target, selected: null });",
+          "with": "if (target !== null) runOnJS(onIntent)({ kind: 'tap', target, selected: null });"
+        }
+      }
+    ]
+  },
+  "bad-surface-scope": {
+    "expect": ["[touch-target-test]", "src/features/planner/canvas/hit-targets.test.ts", "RESULT: FAIL (1 problems)"],
+    "args": "{dir} --surface planner",
+    "ops": [{ "delete": "src/features/planner/canvas/hit-targets.test.ts" }]
+  },
+  "bad-touch-min-below-gate": {
+    "expect": ["[touch-target-min]", "below the app's touch-target gate of 48 pt", "RESULT: FAIL (1 problems)"],
+    "ops": [{ "json": { "file": "quality-gates.json", "path": ["a11y", "minTouchPt"], "value": 48 } }]
+  },
+  "bad-value-accessor": {
+    "expect": ["[worklets-api]", "shared value pointer is accessed with .value", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/gestures/use-canvas-gestures.ts",
+          "find": "      pointer.set(IDLE_POINTER);\n    });",
+          "with": "      pointer.value = IDLE_POINTER;\n    });"
+        }
+      }
+    ]
+  },
+  "error-bad-contract": {
+    "expect": ["ERROR [bad-input] contracts/canvas-input.json: unknown keys: screens"],
+    "ops": [{ "json": { "file": "contracts/canvas-input.json", "path": ["screens"], "value": [] } }]
+  },
+  "error-contract-missing-dir": {
+    "expect": ["ERROR [bad-input]", "names the folder src/features/notes/canvas, which does not exist"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/canvas-input.json",
+          "path": ["surfaces", 0, "dir"],
+          "value": "src/features/notes/canvas"
+        }
+      }
+    ]
+  },
+  "error-unknown-surface": {
+    "expect": ["ERROR [bad-input] surface notes is not a canvas surface of this repo"],
+    "args": "{dir} --surface notes",
+    "ops": []
+  },
+  "pass-display-only-feature-gesture": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/stats/canvas/weekly-chart-surface.ts",
+          "lines": [
+            "// src/features/stats/canvas/weekly-chart-surface.ts",
+            "// A display-only surface: a weekly bar chart that takes no touch.",
+            "import { layoutWeeklyChart } from './layout-weekly-chart';",
+            "",
+            "export const weeklyChartSurface = { isMirroredInRtl: true, layout: layoutWeeklyChart };"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/stats/canvas/layout-weekly-chart.ts",
+          "lines": [
+            "// src/features/stats/canvas/layout-weekly-chart.ts",
+            "'worklet';",
+            "",
+            "import type { CanvasLayout } from '@/canvas/canvas-layout';",
+            "",
+            "export function layoutWeeklyChart(width: number, height: number): CanvasLayout {",
+            "  return { width, height, isMirrored: false, regions: [] };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/stats/stats-screen.tsx",
+          "lines": [
+            "// src/features/stats/stats-screen.tsx",
+            "// The chart is display-only: SurfaceCanvas without input.",
+            "import { View } from 'react-native';",
+            "",
+            "import { SurfaceCanvas } from '@/canvas/surface-canvas';",
+            "",
+            "import { SheetHandle } from './components/sheet-handle';",
+            "",
+            "export function StatsScreen(props: { readonly onClose: () => void }): React.JSX.Element {",
+            "  return (",
+            "    <View testID=\"stats.screen\">",
+            "      <SurfaceCanvas picture={null} accessibilityLabel=\"stats.weekly-chart.summary\" />",
+            "      <SheetHandle onClose={props.onClose} />",
+            "    </View>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/stats/components/sheet-handle.tsx",
+          "lines": [
+            "// src/features/stats/components/sheet-handle.tsx",
+            "// An ordinary control in the same feature as a display-only chart: fling down to close the sheet.",
+            "import { View } from 'react-native';",
+            "import { Directions, Gesture, GestureDetector } from 'react-native-gesture-handler';",
+            "import { scheduleOnRN } from 'react-native-worklets';",
+            "",
+            "export function SheetHandle(props: { readonly onClose: () => void }): React.JSX.Element {",
+            "  const fling = Gesture.Fling()",
+            "    .direction(Directions.DOWN)",
+            "    .onEnd(() => {",
+            "      scheduleOnRN(props.onClose);",
+            "    });",
+            "  return (",
+            "    <GestureDetector gesture={fling}>",
+            "      <View testID=\"stats.sheet-handle\" />",
+            "    </GestureDetector>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-display-only-not-applicable": {
+    "expect": ["NOT APPLICABLE: no canvas takes touch", "RESULT: PASS"],
+    "base": ["@tests/bases/app"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "        input={model.grid.input}\n",
+          "with": ""
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/stats/canvas/weekly-chart-surface.ts",
+          "lines": [
+            "// src/features/stats/canvas/weekly-chart-surface.ts",
+            "// A display-only surface: a weekly bar chart that takes no touch.",
+            "import { layoutWeeklyChart } from './layout-weekly-chart';",
+            "",
+            "export const weeklyChartSurface = { isMirroredInRtl: true, layout: layoutWeeklyChart };"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/stats/canvas/layout-weekly-chart.ts",
+          "lines": [
+            "// src/features/stats/canvas/layout-weekly-chart.ts",
+            "'worklet';",
+            "",
+            "import type { CanvasLayout } from '@/canvas/canvas-layout';",
+            "",
+            "export function layoutWeeklyChart(width: number, height: number): CanvasLayout {",
+            "  return { width, height, isMirrored: false, regions: [] };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/stats/stats-screen.tsx",
+          "lines": [
+            "// src/features/stats/stats-screen.tsx",
+            "// The chart is display-only: SurfaceCanvas without input.",
+            "import { View } from 'react-native';",
+            "",
+            "import { SurfaceCanvas } from '@/canvas/surface-canvas';",
+            "",
+            "import { SheetHandle } from './components/sheet-handle';",
+            "",
+            "export function StatsScreen(props: { readonly onClose: () => void }): React.JSX.Element {",
+            "  return (",
+            "    <View testID=\"stats.screen\">",
+            "      <SurfaceCanvas picture={null} accessibilityLabel=\"stats.weekly-chart.summary\" />",
+            "      <SheetHandle onClose={props.onClose} />",
+            "    </View>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/stats/components/sheet-handle.tsx",
+          "lines": [
+            "// src/features/stats/components/sheet-handle.tsx",
+            "// An ordinary control in the same feature as a display-only chart: fling down to close the sheet.",
+            "import { View } from 'react-native';",
+            "import { Directions, Gesture, GestureDetector } from 'react-native-gesture-handler';",
+            "import { scheduleOnRN } from 'react-native-worklets';",
+            "",
+            "export function SheetHandle(props: { readonly onClose: () => void }): React.JSX.Element {",
+            "  const fling = Gesture.Fling()",
+            "    .direction(Directions.DOWN)",
+            "    .onEnd(() => {",
+            "      scheduleOnRN(props.onClose);",
+            "    });",
+            "  return (",
+            "    <GestureDetector gesture={fling}>",
+            "      <View testID=\"stats.sheet-handle\" />",
+            "    </GestureDetector>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-exempt-card": {
+    "expect": ["NOT APPLICABLE: no canvas takes touch", "RESULT: PASS"],
+    "base": ["@tests/bases/app"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "        input={model.grid.input}\n",
+          "with": ""
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/stats/components/streak-card.tsx",
+          "lines": [
+            "// src/features/stats/components/streak-card.tsx",
+            "// A card whose whole surface is one button, with a decorative sparkline drawn on a canvas.",
+            "import { Canvas } from '@shopify/react-native-skia';",
+            "import { Pressable } from 'react-native';",
+            "",
+            "export function StreakCard(props: { readonly onOpen: () => void }): React.JSX.Element {",
+            "  return (",
+            "    <Pressable accessibilityRole=\"button\" onPress={props.onOpen}>",
+            "      <Canvas accessible={false} />",
+            "    </Pressable>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "contracts/canvas-input.json",
+          "lines": [
+            "{",
+            "  \"$comment\": \"No canvas takes touch yet: only the whole-card press around a decorative sparkline is exempt.\",",
+            "  \"gestureExempt\": [\"src/features/stats/components/streak-card.tsx\"]",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-feature-sheet-control": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/motion/moment-config.ts",
+          "lines": [
+            "// src/ui/motion/moment-config.ts",
+            "// Stand-in for motion-and-animation's moment config.",
+            "import type { WithSpringConfig } from 'react-native-reanimated';",
+            "",
+            "export function springOf(moment: { readonly damping: number }): WithSpringConfig {",
+            "  return { damping: moment.damping };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/ui/motion/motion-moments.ts",
+          "lines": [
+            "// src/ui/motion/motion-moments.ts",
+            "// Stand-in for motion-and-animation's motion moments.",
+            "export const MOTION_MOMENTS = { sheetSettle: { damping: 20 } } as const;"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-sheet.tsx",
+          "lines": [
+            "// src/features/tasks/components/task-sheet.tsx",
+            "// Example (a shape to imitate): gesture-driven motion. The finger writes the same shared value the",
+            "// release spring animates, so a new touch catches the sheet mid-flight; the release spring takes the",
+            "// finger's velocity, and closing is committed in onEnd (once), never per frame or in a callback.",
+            "// The app root needs GestureHandlerRootView (Expo Router's native Stack adds none).",
+            "// onClosed runs while the closing spring is still moving. A parent that unmounts the sheet there",
+            "// renders it inside <Animated.View exiting={isReducedMotion ? reducedExiting() : SlideOutDown...}>",
+            "// (timed from the moment's tokens) so the close still shows; otherwise it keeps the sheet mounted",
+            "// until the next open. Never delay the commit to an animation callback to save the motion.",
+            "import { Gesture, GestureDetector } from 'react-native-gesture-handler';",
+            "import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';",
+            "import { scheduleOnRN } from 'react-native-worklets';",
+            "",
+            "import { springOf } from '@/ui/motion/moment-config';",
+            "import { MOTION_MOMENTS } from '@/ui/motion/motion-moments';",
+            "",
+            "import type { ReactNode } from 'react';",
+            "",
+            "const SETTLE = springOf(MOTION_MOMENTS.sheetSettle);",
+            "",
+            "export type TaskSheetProps = {",
+            "  readonly height: number;",
+            "  readonly onClosed: () => void;",
+            "  readonly children: ReactNode;",
+            "};",
+            "",
+            "export function TaskSheet({ height, onClosed, children }: TaskSheetProps): ReactNode {",
+            "  const offset = useSharedValue(0);",
+            "  const pan = Gesture.Pan()",
+            "    .onUpdate((event) => {",
+            "      offset.set(Math.max(0, event.translationY));",
+            "    })",
+            "    .onEnd((event) => {",
+            "      const shouldClose = event.translationY > height / 3 || event.velocityY > height;",
+            "      offset.set(withSpring(shouldClose ? height : 0, { ...SETTLE, velocity: event.velocityY }));",
+            "      if (shouldClose) scheduleOnRN(onClosed);",
+            "    });",
+            "  const style = useAnimatedStyle(() => ({ transform: [{ translateY: offset.get() }] }));",
+            "  return (",
+            "    <GestureDetector gesture={pan}>",
+            "      <Animated.View style={style}>{children}</Animated.View>",
+            "    </GestureDetector>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "lines": [
+            "// src/features/tasks/tasks-screen.tsx",
+            "// The screen renders the canvas with the gesture layer's input; it builds no gesture itself.",
+            "import { View } from 'react-native';",
+            "",
+            "import { SurfaceCanvas } from '@/canvas/surface-canvas';",
+            "",
+            "import { TaskSheet } from './components/task-sheet';",
+            "",
+            "import type { TasksModel } from './use-tasks-model';",
+            "",
+            "export function TasksScreen(props: { readonly model: TasksModel; readonly onClosed: () => void }): React.JSX.Element {",
+            "  const { model } = props;",
+            "  return (",
+            "    <View testID=\"tasks.screen\">",
+            "      <SurfaceCanvas picture={model.picture} input={model.grid.input} accessibilityLabel={model.gridLabel} />",
+            "      <TaskSheet height={320} onClosed={props.onClosed}>",
+            "        <View testID=\"tasks.sheet\" />",
+            "      </TaskSheet>",
+            "    </View>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-gesture-exempt": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-row-swipe.ts",
+          "lines": [
+            "// src/features/tasks/use-row-swipe.ts",
+            "// The task row's swipe-to-archive pan: an ordinary UI control beside the canvas (it never reaches",
+            "// the canvas), built in a hook the rows attach, so it is listed in gestureExempt.",
+            "import { Gesture } from 'react-native-gesture-handler';",
+            "",
+            "export function useRowSwipe(): ReturnType<typeof Gesture.Pan> {",
+            "  return Gesture.Pan();",
+            "}"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/canvas-input.json",
+          "path": ["gestureExempt"],
+          "value": ["src/features/tasks/use-row-swipe.ts"]
+        }
+      }
+    ]
+  },
+  "pass-installed-skills": {
+    "expect": ["check-canvas-input:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/canvas-demo/SKILL.md",
+          "lines": ["---", "name: canvas-demo", "description: An installed skill whose fixtures plant bugs.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": ".agents/skills/canvas-demo/tests/fixtures/bad/src/features/notes/canvas/tap-layer.tsx",
+          "lines": [
+            "// planted: a canvas gesture outside the gesture module, a button inside the detector",
+            "import { Canvas } from '@shopify/react-native-skia';",
+            "import { Gesture, GestureDetector } from 'react-native-gesture-handler';",
+            "export const tap = Gesture.Tap();",
+            "export const Layer = () => (",
+            "  <GestureDetector gesture={tap}>",
+            "    <Canvas />",
+            "    <PrimaryButton onPress={() => undefined} />",
+            "  </GestureDetector>",
+            ");"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/canvas-demo/SKILL.md",
+          "lines": ["---", "name: canvas-demo", "description: An installed skill whose fixtures plant bugs.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/canvas-demo/src/canvas/gestures/pan-intent.ts",
+          "lines": ["// planted: no 'worklet' directive, runOnJS", "export { runOnJS } from 'react-native-worklets';"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/canvas/vendored/SKILL.md",
+          "lines": ["---", "name: vendored", "description: An installed skill whose fixtures plant bugs.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/canvas/vendored/tap-layer.tsx",
+          "lines": [
+            "// planted: a canvas gesture outside the gesture module, a button inside the detector",
+            "import { Canvas } from '@shopify/react-native-skia';",
+            "import { Gesture, GestureDetector } from 'react-native-gesture-handler';",
+            "export const tap = Gesture.Tap();",
+            "export const Layer = () => (",
+            "  <GestureDetector gesture={tap}>",
+            "    <Canvas />",
+            "    <PrimaryButton onPress={() => undefined} />",
+            "  </GestureDetector>",
+            ");"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-no-gesture-handler": {
+    "expect": [
+      "NOT APPLICABLE: react-native-gesture-handler is not in package.json and no canvas takes touch",
+      "RESULT: PASS"
+    ],
+    "base": ["@tests/bases/app"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "        input={model.grid.input}\n",
+          "with": ""
+        }
+      },
+      { "json": { "file": "package.json", "path": ["dependencies", "react-native-gesture-handler"], "delete": true } }
+    ]
+  },
+  "pass-not-applicable": {
+    "expect": ["NOT APPLICABLE: no canvas takes touch", "RESULT: PASS"],
+    "base": ["@tests/bases/app"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "        input={model.grid.input}\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "pass-realtime-host-detector": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/canvas/realtime/realtime-canvas-host.tsx",
+          "lines": [
+            "// src/canvas/realtime/realtime-canvas-host.tsx",
+            "// realtime-game-loop's host shape: it renders its own canvas inside a GestureDetector, and the stick",
+            "// gesture comes in as a prop built by the kit's makeStickGesture. Not a gesture outside the module.",
+            "import { Canvas } from '@shopify/react-native-skia';",
+            "import { GestureDetector } from 'react-native-gesture-handler';",
+            "import { useSharedValue } from 'react-native-reanimated';",
+            "",
+            "import type { ComposedGesture, GestureType } from 'react-native-gesture-handler';",
+            "import type { SharedValue } from 'react-native-reanimated';",
+            "",
+            "export type RealtimeCanvasHostProps = {",
+            "  readonly makeGesture: (command: SharedValue<number>) => ComposedGesture | GestureType;",
+            "};",
+            "",
+            "export function RealtimeCanvasHost(props: RealtimeCanvasHostProps): React.JSX.Element {",
+            "  const command = useSharedValue(0);",
+            "  return (",
+            "    <GestureDetector gesture={props.makeGesture(command)}>",
+            "      <Canvas accessible={false} />",
+            "    </GestureDetector>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/chase/chase-screen.tsx",
+          "lines": [
+            "// src/games/chase/chase-screen.tsx",
+            "import { makeStickGesture } from '@/canvas/gestures/use-canvas-gestures';",
+            "import { RealtimeCanvasHost } from '@/canvas/realtime/realtime-canvas-host';",
+            "",
+            "export function ChaseScreen(): React.JSX.Element {",
+            "  return <RealtimeCanvasHost makeGesture={makeStickGesture} />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-root-not-yet-created": {
+    "expect": [
+      "SKIP src/app/_layout.tsx [gesture-root] not yet created (app-startup-and-bootstrap creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "src/app/_layout.tsx" }]
+  },
+  "pass-stick-surface": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/chase/sim/chase-sim.ts",
+          "lines": ["// src/games/chase/sim/chase-sim.ts", "'worklet';", "", "export const STEP_MS = 1000 / 120;"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/chase/canvas/chase-surface.ts",
+          "lines": [
+            "// src/games/chase/canvas/chase-surface.ts",
+            "import { layoutChase } from './layout-chase';",
+            "",
+            "export const chaseSurface = { isMirroredInRtl: false, layout: layoutChase };"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/chase/canvas/layout-chase.ts",
+          "lines": [
+            "// src/games/chase/canvas/layout-chase.ts",
+            "'worklet';",
+            "",
+            "import { fitGrid } from '@/canvas/canvas-layout';",
+            "",
+            "import type { CanvasLayout } from '@/canvas/canvas-layout';",
+            "",
+            "export function layoutChase(width: number, height: number): CanvasLayout {",
+            "  const arena = fitGrid({ box: { x: 0, y: 0, width, height }, cols: 12, rows: 20 });",
+            "  return { width, height, isMirrored: false, regions: [{ id: 'arena', ...arena }] };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/chase/chase-screen.tsx",
+          "lines": [
+            "// src/games/chase/chase-screen.tsx",
+            "import { useSharedValue } from 'react-native-reanimated';",
+            "",
+            "import { makeStickGesture } from '@/canvas/gestures/use-canvas-gestures';",
+            "import { SurfaceCanvas } from '@/canvas/surface-canvas';",
+            "",
+            "export function ChaseScreen(): React.JSX.Element {",
+            "  const command = useSharedValue(0);",
+            "  return <SurfaceCanvas picture={null} input={{ gesture: makeStickGesture(command) }} accessibilityLabel=\"chase\" />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-surface-scope": {
+    "expect": ["RESULT: PASS"],
+    "args": "{dir} --surface progress-grid",
+    "ops": [{ "delete": "src/features/planner/canvas/hit-targets.test.ts" }]
+  }
+}

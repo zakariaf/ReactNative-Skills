@@ -1,0 +1,105 @@
+{
+  "bad-catalog-conflict": {
+    "expect": ["FAIL src/i18n/catalogs/en.json [conflict] lights-out.name has other text"],
+    "ops": [{ "json": { "file": "src/i18n/catalogs/en.json", "path": ["lights-out.name"], "value": "Lights-Out" } }]
+  },
+  "bad-conflict": {
+    "expect": ["FAIL contracts/games.json [conflict] the lights-out entry differs (hints)", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/games.json",
+          "path": ["games"],
+          "value": [
+            {
+              "id": "lights-out",
+              "name": "Lights Out",
+              "class": "turn-based",
+              "panMode": "none",
+              "levels": { "packs": 3, "levelsPerPack": 30 },
+              "daily": true,
+              "endless": false,
+              "hints": "solver",
+              "continue": "once",
+              "loseReasons": ["out-of-moves"]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "error-app-without-block": { "expect": ["ERROR [bad-input] contracts/games.json has no \"apps\" block"] },
+  "error-bad-id": { "expect": ["ERROR [bad-input] --game \"LightsOut\" is not a kebab-case game id"] },
+  "error-id-override": { "expect": ["ERROR [bad-input] --bundle-id com.acme.lights is not accepted"] },
+  "error-missing-hints": { "expect": ["ERROR [bad-input] --hints is required for a new game"] },
+  "error-reserved-id": { "expect": ["ERROR [bad-input] --game \"core\" is reserved"] },
+  "error-write-and-add-missing": { "expect": ["ERROR [bad-input] pass --write or --add-missing, not both"] },
+  "error-zero-packs": {
+    "expect": ["ERROR [bad-input] --levels 0x0 is not none or <packs>x<levels per pack> with at least one pack"]
+  },
+  "pass-add-missing": {
+    "expect": [
+      "keep src/i18n/catalogs/en.json: lights-out.name has other text (--add-missing never changes a value)",
+      "edit src/i18n/catalogs/en.json (+ 1 keys)",
+      "wrote 3 files"
+    ],
+    "ops": [{ "json": { "file": "src/i18n/catalogs/en.json", "path": ["lights-out.name"], "value": "Lights-Out" } }]
+  },
+  "pass-copy-source": {
+    "expect": ["edit src/i18n/catalogs/ar.json (+ 3 keys)", "edit src/i18n/catalogs/en.json (+ 3 keys)"],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/copy-source.json",
+          "content": "{\n  \"strings\": {\n    \"lights-out.name\": {\n      \"en\": \"Lights Out\",\n      \"ar\": \"أطفئ الأنوار\"\n    },\n    \"lights-out.goal\": {\n      \"en\": \"Turn every light off.\",\n      \"ar\": \"أطفئ كل الأنوار.\"\n    }\n  }\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-daily-only": {
+    "expect": [
+      "wrote 3 files for lights-out (turn-based, pan none, levels none, daily on, endless on, hints none, continue once",
+      "levels: no packs (daily on, endless on); level-generation-and-solvers adds { \"id\": \"lights-out\", \"packCount\": 0, \"levelsPerPack\": 0, \"daily\": true, \"endless\": true }",
+      "daily salt: 0x7c9e (31902)"
+    ]
+  },
+  "pass-declared-game": {
+    "expect": ["same contracts/games.json", "edit src/i18n/catalogs/en.json (+ 2 keys)", "wrote 2 files"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/games.json",
+          "path": ["games"],
+          "value": [
+            {
+              "id": "lights-out",
+              "name": "Lights Out",
+              "class": "turn-based",
+              "panMode": "none",
+              "levels": { "packs": 3, "levelsPerPack": 30 },
+              "daily": true,
+              "endless": false,
+              "hints": "none",
+              "continue": "once",
+              "loseReasons": ["out-of-moves"]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "pass-new-contract": {
+    "expect": ["new  contracts/games.json", "new  contracts/games.schema.json", "wrote 4 files"],
+    "ops": [{ "delete": "contracts" }]
+  },
+  "pass-no-catalogs": {
+    "expect": ["no catalogs in src/i18n/catalogs yet (i18n-strings-and-catalogs creates them)"],
+    "ops": [{ "delete": "src/i18n" }]
+  },
+  "pass-write": {
+    "expect": [
+      "wrote 3 files for lights-out",
+      "next: node <this skill>/scripts/check-game-scaffold.mjs . --game lights-out --stage scaffold"
+    ]
+  }
+}

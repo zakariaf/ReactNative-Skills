@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`[contract] digestNotificationId goldens names the digest of the inbox list on 2026-10-03 1`] = `"digest:inbox:2026-10-03"`;
+
+exports[`[contract] digestNotificationId goldens names the digest of the inbox list on 2026-12-31 1`] = `"digest:inbox:2026-12-31"`;
+
+exports[`[contract] digestNotificationId goldens names the digest of the inbox list on 2027-01-01 1`] = `"digest:inbox:2027-01-01"`;
+
+exports[`planDigest goldens groups the sample list on 2026-10-03 1`] = `
+"today 2026-10-03 done 1
+overdue: t1 Renew passport
+upcoming: t3 Book the dentist"
+`;
+
+exports[`planDigest goldens groups the sample list on 2026-12-31 1`] = `
+"today 2026-12-31 done 1
+overdue: t1 Renew passport, t3 Book the dentist
+upcoming: -"
+`;

@@ -1,0 +1,18 @@
+{
+  "identifier" : "PREMIUMHARNESS",
+  "nonRenewingSubscriptions" : [ ],
+  "products" : [
+    {
+      "displayPrice" : "__PRICE__",
+      "familyShareable" : false,
+      "internalID" : "900000001",
+      "localizations" : [ { "description" : "Unlock Premium.", "displayName" : "Premium", "locale" : "en_US" } ],
+      "productID" : "__PRODUCT_ID__",
+      "referenceName" : "Premium",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : { "_failTransactionsEnabled" : false, "_locale" : "en_US", "_storefront" : "USA", "_storeKitErrors" : [ ] },
+  "subscriptionGroups" : [ ],
+  "version" : { "major" : 2, "minor" : 0 }
+}

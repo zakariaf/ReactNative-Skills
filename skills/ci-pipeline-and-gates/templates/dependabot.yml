@@ -1,0 +1,16 @@
+# .github/dependabot.yml
+# Keeps the SHA-pinned actions current: Dependabot rewrites the commit SHA and the "# vX.Y.Z" comment
+# together, once a release is 7 days old (the same release age the .npmrc applies to npm packages).
+# npm packages are not listed: Expo SDK packages move together through `npx expo install`, which
+# dependency-management owns; a Dependabot bump of one of them breaks the SDK alignment.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns: ['*']

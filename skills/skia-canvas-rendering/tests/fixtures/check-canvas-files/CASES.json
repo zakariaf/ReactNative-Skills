@@ -1,0 +1,838 @@
+{
+  "bad-120hz-delete": {
+    "expect": ["plugins/with-frame-rate.ts:6 [plist-120hz]"],
+    "ops": [
+      {
+        "write": {
+          "file": "plugins/with-frame-rate.ts",
+          "lines": [
+            "// plugins/with-frame-rate.ts: planted bug, any file under plugins/ is read; this one deletes the key.",
+            "import { withInfoPlist, type ConfigPlugin } from 'expo/config-plugins';",
+            "",
+            "export const withFrameRate: ConfigPlugin = (config) =>",
+            "  withInfoPlist(config, (next) => {",
+            "    delete next.modResults['CADisableMinimumFrameDurationOnPhone'];",
+            "    return next;",
+            "  });"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-120hz-false": {
+    "expect": ["app.config.ts:12 [plist-120hz]", "iOS then caps the app at 60 fps on ProMotion iPhones"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    ios: { bundleIdentifier: 'com.example.tasks' },\n",
+          "with": "    ios: {\n      bundleIdentifier: 'com.example.tasks',\n      infoPlist: { CADisableMinimumFrameDurationOnPhone: false },\n    },\n"
+        }
+      }
+    ]
+  },
+  "bad-120hz-plist-missing": {
+    "expect": ["ios/Tasks/Info.plist:1 [plist-120hz]", "has no CADisableMinimumFrameDurationOnPhone key"],
+    "ops": [
+      {
+        "write": {
+          "file": "ios/Tasks.xcodeproj/project.pbxproj",
+          "lines": ["// !$*UTF8*$!", "{ archiveVersion = 1; objects = { }; rootObject = 0; }"]
+        }
+      },
+      {
+        "write": {
+          "file": "ios/Tasks/Info.plist",
+          "lines": [
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">",
+            "<plist version=\"1.0\">",
+            "<dict>",
+            "  <key>CFBundleDisplayName</key>",
+            "  <string>Tasks</string>",
+            "  <key>CFBundleIdentifier</key>",
+            "  <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>",
+            "</dict>",
+            "</plist>"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "ios/TasksWidget/Info.plist",
+          "lines": [
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">",
+            "<plist version=\"1.0\">",
+            "<dict>",
+            "  <key>CFBundleDisplayName</key>",
+            "  <string>Tasks</string>",
+            "  <key>CFBundleIdentifier</key>",
+            "  <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>",
+            "</dict>",
+            "</plist>"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-120hz-plugin-off": {
+    "expect": ["config/with-promotion.js:6 [plist-120hz]", "turns CADisableMinimumFrameDurationOnPhone off"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    android: { package: 'com.example.tasks' },\n",
+          "with": "    android: { package: 'com.example.tasks' },\n    plugins: ['./config/with-promotion.js'],\n"
+        }
+      },
+      {
+        "write": {
+          "file": "config/with-promotion.js",
+          "lines": [
+            "// config/with-promotion.js: planted bug, the plugin turns the template's 120 Hz key off.",
+            "const { withInfoPlist } = require('expo/config-plugins');",
+            "",
+            "module.exports = function withPromotion(config) {",
+            "  return withInfoPlist(config, (next) => {",
+            "    next.modResults.CADisableMinimumFrameDurationOnPhone = false;",
+            "    return next;",
+            "  });",
+            "};"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-contrast-cvd": {
+    "expect": [
+      "src/features/tasks/canvas/canvas-contrast.json:12 [cvd-separation]",
+      "light protanopia: done and glow are",
+      "light deuteranopia: done and glow are",
+      "light tritanopia: done and glow are"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/canvas-palettes.json",
+          "find": "\"glow\": \"#E8A317\"",
+          "with": "\"glow\": \"#3563D4\""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/canvas-contrast.json",
+          "find": "\"distinct\": [[\"done\", \"cell\"]]",
+          "with": "\"distinct\": [[\"done\", \"cell\", \"glow\"]]"
+        }
+      }
+    ]
+  },
+  "bad-contrast-declared-twice": {
+    "expect": [
+      "contracts/contrast.json:11 [contrast-declared-once]",
+      "declares src/features/tasks/canvas/canvas-palettes.json, the palettes of canvas surface progress-grid",
+      "two pair tables for one palette drift"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/contrast.json",
+          "lines": [
+            "{",
+            "  \"palettes\": [",
+            "    {",
+            "      \"name\": \"app\",",
+            "      \"file\": \"src/theme/palette.ts\",",
+            "      \"sets\": [\"light\", \"dark\"],",
+            "      \"text\": [[\"text\", \"background\"]]",
+            "    },",
+            "    {",
+            "      \"name\": \"progress-grid\",",
+            "      \"file\": \"./src/features/tasks/canvas/canvas-palettes.json\",",
+            "      \"sets\": [\"light\", \"dark\"],",
+            "      \"edge\": \"edge\",",
+            "      \"text\": [[\"label\", \"cell\"]]",
+            "    }",
+            "  ],",
+            "  \"exceptions\": []",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-contrast-gate-raised": {
+    "expect": [
+      "src/features/tasks/canvas/canvas-contrast.json:3 [text-contrast]",
+      "light: text label on cell is 12.38:1, below 13:1"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "quality-gates.json",
+          "lines": [
+            "{ \"a11y\": { \"minTouchPt\": 44, \"maxFontScale\": 2, \"textContrastMin\": 13, \"nonTextContrastMin\": 3, \"minCvdDistanceOk\": 0.07 } }"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-contrast-graphics": {
+    "expect": [
+      "src/features/tasks/canvas/canvas-contrast.json:5 [non-text-contrast]",
+      "light: graphics mark on done is",
+      "below 3:1 (WCAG 2.2 1.4.11)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/canvas-palettes.json",
+          "find": "\"mark\": \"#FFFFFF\"",
+          "with": "\"mark\": \"#6F8FE0\""
+        }
+      }
+    ]
+  },
+  "bad-contrast-no-pairs": {
+    "expect": [
+      "src/features/tasks/canvas/canvas-contrast.json:1 [contrast-file]",
+      "declares no text, graphics or shapes pair"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/canvas/canvas-contrast.json",
+          "lines": [
+            "{ \"edge\": \"edge\", \"text\": [], \"graphics\": [], \"shapes\": [], \"distinct\": [[\"done\", \"cell\"]] }"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-contrast-shape": {
+    "expect": [
+      "src/features/tasks/canvas/canvas-contrast.json:11 [shape-contrast]",
+      "light: shape glow on cell stands",
+      "off its edge background and its ground, below 3:1"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/canvas-contrast.json",
+          "find": "    [\"done\", \"cell\"]\n  ],",
+          "with": "    [\"done\", \"cell\"],\n    [\"glow\", \"cell\", \"background\"]\n  ],"
+        }
+      }
+    ]
+  },
+  "bad-contrast-text": {
+    "expect": [
+      "src/features/tasks/canvas/canvas-contrast.json:3 [text-contrast]",
+      "dark: text label on cell is",
+      "below 4.5:1 (WCAG 2.2 1.4.3)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/canvas-palettes.json",
+          "find": "\"label\": \"#F4F7FB\"",
+          "with": "\"label\": \"#46587A\""
+        }
+      }
+    ]
+  },
+  "bad-contrast-unknown-key": {
+    "expect": ["src/features/tasks/canvas/canvas-contrast.json:4 [contrast-file]", "has the unknown key \"grahpics\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/canvas-contrast.json",
+          "find": "\"graphics\": [",
+          "with": "\"grahpics\": ["
+        }
+      }
+    ]
+  },
+  "bad-contrast-unknown-token": {
+    "expect": [
+      "src/features/tasks/canvas/canvas-contrast.json:3 [contrast-file]",
+      "\"text\" entry [\"lable\",\"cell\"] names \"lable\", which canvas-palettes.json does not have"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/canvas-contrast.json",
+          "find": "\"text\": [[\"label\", \"cell\"]]",
+          "with": "\"text\": [[\"lable\", \"cell\"]]"
+        }
+      }
+    ]
+  },
+  "bad-draw-budget": {
+    "expect": [
+      "[draw-budget]",
+      "draw-call budget 1500 is above the cap of 1000",
+      "src/features/tasks/canvas/draw-progress-grid.test.ts:17"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/draw-progress-grid.test.ts",
+          "find": "DRAW_CALL_BUDGET = 250",
+          "with": "DRAW_CALL_BUDGET = 1500"
+        }
+      }
+    ]
+  },
+  "bad-draw-budget-unasserted": {
+    "expect": [
+      "[draw-budget]",
+      "the draw test asserts no draw-call budget",
+      "src/features/tasks/canvas/draw-progress-grid.test.ts:1"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/draw-progress-grid.test.ts",
+          "find": "toBeLessThanOrEqual(DRAW_CALL_BUDGET)",
+          "with": "toBeGreaterThan(0)"
+        }
+      }
+    ]
+  },
+  "bad-draw-budget-wrapped-over-cap": {
+    "expect": ["[draw-budget]", "draw-call budget 1500 is above the cap of 1000"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/draw-progress-grid.test.ts",
+          "find": "expect(totalCalls(recorded)).toBeLessThanOrEqual(DRAW_CALL_BUDGET);",
+          "with": "expect(totalCalls(recorded)).toBeLessThanOrEqual(\n      1500,\n    );"
+        }
+      }
+    ]
+  },
+  "bad-empty-surface": {
+    "expect": [
+      "src/canvas/canvas-types.ts [kit-file-missing]",
+      "scripts/quality/check-worklet-boundary.ts [kit-file-missing]",
+      "src/features/tasks/canvas/draw-*.ts [surface-file-missing]",
+      "src/features/tasks/canvas/progress-grid-surface.ts [surface-file-missing]",
+      "src/features/timer/canvas/draw-*.ts [surface-file-missing]",
+      "test/goldens/canvas/progress-grid.golden.test.ts [golden-test]",
+      "jest.config.js [jest-golden-project]"
+    ],
+    "ops": [{ "delete": ["src", "scripts", "test", "jest.config.js", "app.config.ts", "tsconfig.json"] }]
+  },
+  "bad-golden-baselines": {
+    "expect": ["[golden-baselines]", "1 baseline PNG(s) for progress-grid; 9 (3 sizes x 3 moments) are required"],
+    "ops": [
+      {
+        "delete": [
+          "test/goldens/canvas/__image_snapshots__/progress-grid-phone-portrait-0.png",
+          "test/goldens/canvas/__image_snapshots__/progress-grid-phone-portrait-0.5.png",
+          "test/goldens/canvas/__image_snapshots__/progress-grid-phone-portrait-1.png",
+          "test/goldens/canvas/__image_snapshots__/progress-grid-tablet-landscape-0.png",
+          "test/goldens/canvas/__image_snapshots__/progress-grid-tablet-landscape-0.5.png",
+          "test/goldens/canvas/__image_snapshots__/progress-grid-tablet-landscape-1.png",
+          "test/goldens/canvas/__image_snapshots__/progress-grid-small-0.5.png",
+          "test/goldens/canvas/__image_snapshots__/progress-grid-small-1.png"
+        ]
+      }
+    ]
+  },
+  "bad-golden-missing": {
+    "expect": [
+      "[golden-test]",
+      "test/goldens/canvas/progress-grid.golden.test.ts",
+      "the surface has no pixel golden test"
+    ],
+    "ops": [{ "delete": "test/goldens/canvas/progress-grid.golden.test.ts" }]
+  },
+  "bad-golden-moments": {
+    "expect": ["[golden-test]", "the golden does not render the moments 0, 0.5 and 1 of the timeline"],
+    "ops": [
+      {
+        "replace": {
+          "file": "test/goldens/canvas/progress-grid.golden.test.ts",
+          "find": "const MOMENTS = [0, 0.5, 1] as const;",
+          "with": "const MOMENTS = [1] as const;"
+        }
+      }
+    ]
+  },
+  "bad-golden-sizes": {
+    "expect": ["[golden-test]", "the golden renders 2 canvas size(s); 3 are required"],
+    "ops": [
+      {
+        "replace": {
+          "file": "test/goldens/canvas/progress-grid.golden.test.ts",
+          "find": "  { name: 'small', width: 320, height: 400 },\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-kit-import": {
+    "expect": [
+      "src/canvas/canvas-layout-probe.tsx:",
+      "[kit-import-unresolved] imports @/ui/app-text, but src/ui/app-text does not exist",
+      "design-system-structure"
+    ],
+    "ops": [{ "delete": "src/ui/app-text.tsx" }]
+  },
+  "bad-kit-import-app-active": {
+    "expect": [
+      "src/canvas/use-canvas-lifecycle.ts:4 [kit-import-unresolved] imports @/hooks/use-is-app-active, but src/hooks/use-is-app-active does not exist",
+      "react-components-and-hooks"
+    ],
+    "ops": [{ "delete": "src/hooks/use-is-app-active.ts" }]
+  },
+  "bad-kit-missing": {
+    "expect": ["src/canvas/scene.ts [kit-file-missing] canvas kit file is missing"],
+    "ops": [{ "delete": "src/canvas/scene.ts" }]
+  },
+  "bad-kit-package": {
+    "expect": [
+      "src/canvas/use-canvas-lifecycle.test.ts:3 [kit-import-unresolved] imports the package @testing-library/react-native",
+      "unit-and-component-tests"
+    ],
+    "ops": [
+      {
+        "json": { "file": "package.json", "path": ["devDependencies", "@testing-library/react-native"], "delete": true }
+      }
+    ]
+  },
+  "bad-kit-test-helper": {
+    "expect": [
+      "src/canvas/canvas-layout-probe.test.tsx:9 [kit-import-unresolved] imports @test/render-with-providers",
+      "unit-and-component-tests (the test helpers)"
+    ],
+    "ops": [{ "delete": "test/render-with-providers.tsx" }]
+  },
+  "bad-missing-contrast": {
+    "expect": ["src/features/tasks/canvas/canvas-contrast.json [surface-file-missing]"],
+    "ops": [{ "delete": "src/features/tasks/canvas/canvas-contrast.json" }]
+  },
+  "bad-missing-timeline": {
+    "expect": ["src/features/tasks/canvas/build-timeline.ts [surface-file-missing]"],
+    "ops": [{ "delete": "src/features/tasks/canvas/build-timeline.ts" }]
+  },
+  "bad-no-golden-project": {
+    "expect": ["jest.config.js [jest-golden-project] no Jest golden project on the Skia CanvasKit environment"],
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "      testEnvironment: '@shopify/react-native-skia/jestEnv.js',\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-no-reduced-test": {
+    "expect": ["src/features/tasks/canvas/build-timeline.test.ts:1 [timeline-reduced]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/build-timeline.test.ts",
+          "find": "'reduced'",
+          "with": "'full'",
+          "all": true
+        }
+      }
+    ]
+  },
+  "bad-palette-hex": {
+    "expect": ["src/features/timer/canvas/canvas-palettes.json:3 [palette-sets]", "\"dark.ring\" is \"blue\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/timer/canvas/canvas-palettes.json",
+          "find": "\"ring\": \"#7AA7FF\"",
+          "with": "\"ring\": \"blue\""
+        }
+      }
+    ]
+  },
+  "bad-palette-keys": {
+    "expect": ["src/features/tasks/canvas/canvas-palettes.json:1 [palette-sets]", "\"dark\" tokens"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/canvas-palettes.json",
+          "find": "\"dark\": {\n    \"background\"",
+          "with": "\"dark\": {\n    \"ground\""
+        }
+      }
+    ]
+  },
+  "bad-palette-undeclared-set": {
+    "expect": ["[palette-sets]", "palette sets not declared in contracts/canvas-surfaces.json: colorBlindDark"],
+    "ops": [
+      {
+        "json": {
+          "file": "src/features/tasks/canvas/canvas-palettes.json",
+          "path": ["colorBlindDark"],
+          "value": {
+            "background": "#000000",
+            "cell": "#1C1C1C",
+            "done": "#56B4E9",
+            "edge": "#FFFFFF",
+            "mark": "#000000",
+            "glow": "#F0E442",
+            "label": "#FFFFFF",
+            "hint": "#FFFFFF"
+          }
+        }
+      }
+    ]
+  },
+  "bad-probe-spills": {
+    "expect": ["src/canvas/canvas-layout-probe.tsx:111 [probe-contained]", "the frame style has no overflow: 'hidden'"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/canvas-layout-probe.tsx",
+          "find": "  frame: { flex: 1, overflow: 'hidden' },\n",
+          "with": "  frame: { flex: 1 },\n"
+        }
+      }
+    ]
+  },
+  "bad-reduced-in-comment": {
+    "expect": ["src/features/tasks/canvas/build-timeline.test.ts:1 [timeline-reduced]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/build-timeline.test.ts",
+          "find": "'reduced'",
+          "with": "'full'",
+          "all": true
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/build-timeline.test.ts",
+          "find": "// src/features/tasks/canvas/build-timeline.test.ts\n",
+          "with": "// src/features/tasks/canvas/build-timeline.test.ts\n// buildTimeline(BUSIEST, 'reduced') is still to be written\n"
+        }
+      }
+    ]
+  },
+  "bad-surface-glob-wildcard": {
+    "expect": ["[golden-test]", "test/goldens/canvas/progress-grid.golden.test.ts", "3 items (kit + 2 surfaces)"],
+    "ops": [
+      { "delete": ["contracts/canvas-surfaces.json", "test/goldens/canvas/progress-grid.golden.test.ts"] },
+      { "write": { "file": "rn-skills.config.json", "lines": ["{ \"canvasSurfaceDirs\": [\"**/canvas\"] }"] } }
+    ]
+  },
+  "bad-surface-object": {
+    "expect": [
+      "[surface-object]",
+      "the CanvasSurface object has no isMirroredInRtl",
+      "src/features/tasks/canvas/progress-grid-surface.ts:1"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/progress-grid-surface.ts",
+          "find": "  isMirroredInRtl: true,\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "error-bad-contract": {
+    "expect": ["ERROR [bad-input] contracts/canvas-surfaces.json: surfaces[0].id must be a kebab-case id"],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/canvas-surfaces.json",
+          "json": { "surfaces": [{ "id": "Progress Grid", "dir": "src/features/tasks/canvas" }] }
+        }
+      }
+    ]
+  },
+  "error-contract-opaque": {
+    "expect": ["ERROR [bad-input] contracts/canvas-surfaces.json: surfaces[0].opaque must be true or false"],
+    "ops": [{ "json": { "file": "contracts/canvas-surfaces.json", "path": ["surfaces", 0, "opaque"], "value": "no" } }]
+  },
+  "error-surface-glob-unmatched": {
+    "expect": ["ERROR [bad-input] the surface glob src/screens/*/canvas matches no surface folder on disk"],
+    "ops": [
+      {
+        "write": { "file": "rn-skills.config.json", "lines": ["{ \"canvasSurfaceDirs\": [\"src/screens/*/canvas\"] }"] }
+      }
+    ]
+  },
+  "error-unknown-surface": {
+    "expect": ["ERROR [bad-input] no canvas surface with id weekly-chart", "progress-grid, timer"],
+    "args": "{dir} --surface weekly-chart"
+  },
+  "pass-120hz-plist": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "ios/Tasks.xcodeproj/project.pbxproj",
+          "lines": ["// !$*UTF8*$!", "{ archiveVersion = 1; objects = { }; rootObject = 0; }"]
+        }
+      },
+      {
+        "write": {
+          "file": "ios/Tasks/Info.plist",
+          "lines": [
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">",
+            "<plist version=\"1.0\">",
+            "<dict>",
+            "  <key>CADisableMinimumFrameDurationOnPhone</key>",
+            "  <true/>",
+            "  <key>CFBundleDisplayName</key>",
+            "  <string>Tasks</string>",
+            "  <key>CFBundleIdentifier</key>",
+            "  <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>",
+            "</dict>",
+            "</plist>"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "ios/TasksWidget/Info.plist",
+          "lines": [
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">",
+            "<plist version=\"1.0\">",
+            "<dict>",
+            "  <key>CFBundleDisplayName</key>",
+            "  <string>Tasks</string>",
+            "  <key>CFBundleIdentifier</key>",
+            "  <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>",
+            "</dict>",
+            "</plist>"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-120hz-plugin": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    android: { package: 'com.example.tasks' },\n",
+          "with": "    android: { package: 'com.example.tasks' },\n    plugins: ['./config/with-promotion.js'],\n"
+        }
+      },
+      {
+        "write": {
+          "file": "config/with-promotion.js",
+          "lines": [
+            "// config/with-promotion.js: a local config plugin that restates the template's default (harmless).",
+            "const { withInfoPlist } = require('expo/config-plugins');",
+            "",
+            "module.exports = function withPromotion(config) {",
+            "  return withInfoPlist(config, (next) => {",
+            "    next.modResults['CADisableMinimumFrameDurationOnPhone'] = true;",
+            "    return next;",
+            "  });",
+            "};"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-contrast-contract-other-tables": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "write": { "file": "rn-skills.config.json", "lines": ["{ \"contrastContract\": \"design/contrast.json\" }"] } },
+      {
+        "write": {
+          "file": "design/contrast.json",
+          "lines": [
+            "{",
+            "  \"palettes\": [",
+            "    {",
+            "      \"name\": \"app\",",
+            "      \"file\": \"src/theme/palette.ts\",",
+            "      \"sets\": [\"light\", \"dark\"],",
+            "      \"text\": [[\"text\", \"background\"]]",
+            "    },",
+            "    {",
+            "      \"name\": \"tags\",",
+            "      \"file\": \"src/features/tasks/tag-colors.ts\",",
+            "      \"sets\": [\"light\", \"dark\"],",
+            "      \"graphics\": [[\"tag1\", \"background\"]]",
+            "    }",
+            "  ],",
+            "  \"exceptions\": []",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-contrast-translucent": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/canvas-palettes.json",
+          "find": "\"hint\": \"#14213D\"",
+          "with": "\"hint\": \"#14213DCC\""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/canvas-palettes.json",
+          "find": "\"hint\": \"#E6ECF5\"",
+          "with": "\"hint\": \"#E6ECF5CC\""
+        }
+      },
+      {
+        "write": {
+          "file": "quality-gates.json",
+          "lines": ["{ \"a11y\": { \"textContrastMin\": 3, \"nonTextContrastMin\": 2 } }"]
+        }
+      }
+    ]
+  },
+  "pass-convention": {
+    "expect": ["check-canvas-files: 3 items (kit + 2 surfaces) checked, 0 problems", "RESULT: PASS"],
+    "ops": [{ "delete": "contracts/canvas-surfaces.json" }]
+  },
+  "pass-draw-budget-wrapped": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/canvas/draw-progress-grid.test.ts",
+          "find": "toBeLessThanOrEqual(DRAW_CALL_BUDGET)",
+          "with": "toBeLessThanOrEqual(\n      DRAW_CALL_BUDGET,\n    )"
+        }
+      }
+    ]
+  },
+  "pass-installed-skills": {
+    "expect": ["check-canvas-files: 3 items (kit + 2 surfaces) checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      { "write": { "file": "rn-skills.config.json", "json": { "canvasSurfaceDirs": ["**/canvas"] } } },
+      {
+        "write": {
+          "file": ".agents/skills/canvas-demo/SKILL.md",
+          "lines": [
+            "---",
+            "name: demo",
+            "description: An installed skill whose fixtures plant incomplete surfaces.",
+            "---"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": ".agents/skills/canvas-demo/src/features/notes/canvas/draw-notes.ts",
+          "lines": [
+            "// planted: an incomplete surface (no palettes, no timeline, no surface object, no golden)",
+            "export const drawNotes = (): void => undefined;"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/chart-demo/SKILL.md",
+          "lines": [
+            "---",
+            "name: demo",
+            "description: An installed skill whose fixtures plant incomplete surfaces.",
+            "---"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/chart-demo/templates/src/features/charts/canvas/canvas-palettes.json",
+          "lines": ["{ \"light\": { \"bar\": \"blue\" } }"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/sketch-kit/SKILL.md",
+          "lines": [
+            "---",
+            "name: demo",
+            "description: An installed skill whose fixtures plant incomplete surfaces.",
+            "---"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/sketch-kit/canvas/draw-sketch.ts",
+          "lines": [
+            "// planted: a vendored skill inside the app source, never a surface",
+            "export const drawSketch = (): void => undefined;"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-no-skia": {
+    "expect": ["NOT APPLICABLE: @shopify/react-native-skia is not in package.json"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "@shopify/react-native-skia"], "delete": true } }
+    ]
+  },
+  "pass-palette-opt-in-set": {
+    "expect": ["check-canvas-files: 3 items (kit + 2 surfaces) checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "json": {
+          "file": "src/features/tasks/canvas/canvas-palettes.json",
+          "path": ["colorBlindDark"],
+          "value": {
+            "background": "#000000",
+            "cell": "#1C1C1C",
+            "done": "#56B4E9",
+            "edge": "#FFFFFF",
+            "mark": "#000000",
+            "glow": "#F0E442",
+            "label": "#FFFFFF",
+            "hint": "#FFFFFF"
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "src/features/timer/canvas/canvas-palettes.json",
+          "path": ["colorBlindDark"],
+          "value": { "background": "#000000", "ring": "#56B4E9" }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/canvas-surfaces.json",
+          "path": ["paletteSets"],
+          "value": ["light", "dark", "colorBlindDark"]
+        }
+      }
+    ]
+  },
+  "pass-surface-glob-overlaps-kit": {
+    "expect": ["check-canvas-files: 3 items (kit + 2 surfaces) checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      { "delete": "contracts/canvas-surfaces.json" },
+      { "write": { "file": "rn-skills.config.json", "lines": ["{ \"canvasSurfaceDirs\": [\"src/**/canvas\"] }"] } }
+    ]
+  },
+  "pass-surface-glob-wildcard": {
+    "expect": ["check-canvas-files: 3 items (kit + 2 surfaces) checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      { "delete": "contracts/canvas-surfaces.json" },
+      { "write": { "file": "rn-skills.config.json", "lines": ["{ \"canvasSurfaceDirs\": [\"**/canvas\"] }"] } }
+    ]
+  }
+}

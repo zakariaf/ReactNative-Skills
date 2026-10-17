@@ -1,0 +1,116 @@
+{
+  "bad-design-match-unsourced": {
+    "expect": ["[report-source]", "Design match: the new-task sheet"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": "- Coverage: lines 92.8% (gate 90), logic folders 96.4% (gate 95)   reports/coverage/coverage-summary.json\n",
+          "with": "- Coverage: lines 92.8% (gate 90), logic folders 96.4% (gate 95)   reports/coverage/coverage-summary.json\n- Design match: the new-task sheet matches its approved design baseline, light and dark\n"
+        }
+      }
+    ]
+  },
+  "bad-human-checks-blocking": {
+    "expect": ["report.md:14 [human-checks-listed]", "calls a human check blocking"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": "reopen it, still open",
+          "with": "reopen it; the release waits for it"
+        }
+      }
+    ]
+  },
+  "bad-human-checks-gated-on": {
+    "expect": ["report.md:14 [human-checks-listed]", "calls a human check blocking"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": "reopen it, still open",
+          "with": "reopen it; the release is gated on it"
+        }
+      }
+    ]
+  },
+  "bad-human-checks-missing": {
+    "expect": ["[human-checks-listed] \"Human checks (not blocking)\" is missing"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": "Human checks (not blocking)\n- On-device check: type a title, swipe the app away on a phone and reopen it, still open\n- Native-language review of changed texts: none pending from this slice\n\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-log-dump": {
+    "expect": [
+      "report.md:1 [outcome-first]",
+      "[technical-detail-early]",
+      "[evidence-line] no Evidence line",
+      "[checks-missing] no \"Checks\" list",
+      "[section-missing]",
+      "[human-checks-listed]"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "report.md",
+          "content": "$ npm test\nFAIL src/features/tasks/task-draft.test.ts\n  keeps the draft\n    Error: expected \"Buy milk\"\n      at Object.<anonymous> (src/features/tasks/task-draft.test.ts:14:5)\nTests: 1 failed, 213 passed, 214 total\n"
+        }
+      }
+    ]
+  },
+  "bad-no-users-section": {
+    "expect": ["[section-missing] \"What changed for users\" is missing"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": "What changed for users\n- The new-task sheet keeps an unsaved title across a restart (TASK-12).\n\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-unsourced-coverage": {
+    "expect": ["report.md:8 [report-source]", "Coverage: 100%"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": "- Coverage: lines 92.8% (gate 90), logic folders 96.4% (gate 95)   reports/coverage/coverage-summary.json\n",
+          "with": "- Coverage: 100%\n"
+        }
+      }
+    ]
+  },
+  "pass-human-check-names-a-gate": {
+    "expect": ["check-report: 23 report lines checked, 0 problems"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": "- On-device check: type a title, swipe the app away on a phone and reopen it, still open",
+          "with": "- On-device check: tick a few tasks on the preview build that passed every gate, on a phone, still open"
+        }
+      }
+    ]
+  },
+  "pass-pilot-slice": {
+    "expect": ["check-report: 24 report lines checked, 0 problems"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": "proves the draft is stored.\n",
+          "with": "proves the draft is stored.\n- The store archive passed only a --rehearsal run before signing; the signed archive follows the first upload.\n"
+        }
+      }
+    ]
+  }
+}

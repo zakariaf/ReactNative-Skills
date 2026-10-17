@@ -1,0 +1,16 @@
+# .maestro/storekit/07-store-unavailable.yaml — StoreKit Tier 2 flow, run only by scripts/storekit/storekit-harness.ts
+# with no arming step; outside .maestro/flows/, so the normal E2E run never runs it against an unarmed build.
+appId: ${APP_ID}
+name: Offline, the store is unavailable and BUY is disabled
+tags: [storekit]
+---
+- launchApp
+- runFlow:
+    file: ../subflows/debug-setup.yaml
+    env:
+      QUERY: 'premium=0&offline=1&open=paywall'
+      WAIT_FOR: 'paywall.screen'
+- extendedWaitUntil:
+    visible:
+      id: 'paywall.state.unavailable'
+    timeout: 15000

@@ -1,0 +1,17 @@
+{
+ "base": [
+  "@tests/bases/app",
+  "@tests/bases/scenes"
+ ],
+ "argsFile": "append",
+ "ops": [
+  {
+   "delete": [
+    "scenes/tasks-menu-open.json",
+    "scenes/premium-loading.json",
+    "scenes/map-default.json",
+    "scenes/onboarding-default.json"
+   ]
+  }
+ ]
+}

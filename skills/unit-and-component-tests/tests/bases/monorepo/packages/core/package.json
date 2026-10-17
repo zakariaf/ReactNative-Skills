@@ -1,0 +1,5 @@
+{
+  "name": "@acme/core",
+  "private": true,
+  "main": "src/sum.ts"
+}

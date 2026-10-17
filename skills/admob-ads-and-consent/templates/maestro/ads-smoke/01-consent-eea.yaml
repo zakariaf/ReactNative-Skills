@@ -1,0 +1,46 @@
+# .maestro/ads-smoke/01-consent-eea.yaml
+# Ads smoke test, step 1: by hand, on an ADS_MODE=test build (development or preview variant), never
+# in the regular E2E run (those builds use ADS_MODE=off). It needs the test-only debug link of
+# debug-menu-and-test-hooks (subflow debug-setup.yaml, query geo=). Start from a fresh install with
+# the tracking answer reset, launched outside Maestro (its launchApp grants the ATT answer on iOS):
+#   iOS:     xcrun simctl uninstall <udid> <bundle id>; xcrun simctl install <udid> <app>
+#            xcrun simctl privacy <udid> reset all <bundle id>; xcrun simctl launch <udid> <bundle id>
+#   Android: adb -s <serial> uninstall <package>; adb -s <serial> install <apk>
+#            adb -s <serial> shell monkey -p <package> 1
+#   maestro --device <udid or serial> --driver-host-port <port> test -e APP_ID=<bundle id> .maestro/ads-smoke/01-consent-eea.yaml
+# geo=eea makes Google's UMP answer as for a user in the EEA on any network: the app's primer, then
+# Google's form, then (iOS only) Apple's prompt, then the first banner on the task list.
+appId: ${APP_ID}
+name: Ads smoke 1 - EEA consent order, the primer, Google's form, Apple's prompt, then a banner
+tags: [ads-smoke]
+---
+- runFlow:
+    file: ../subflows/debug-setup.yaml
+    env:
+      QUERY: 'geo=eea&onboarding=done&open=tasks'
+      WAIT_FOR: 'consent.primer-continue-button'
+- tapOn:
+    id: 'consent.primer-continue-button'
+# system-ui: Google's UMP consent form (a web view from the AdMob console), not app text.
+- extendedWaitUntil:
+    visible: 'Consent'
+    timeout: 30000
+- waitForAnimationToEnd
+# system-ui: Google's form button.
+- tapOn: 'Consent'
+# Apple's tracking alert (iOS only; never in a child-directed app). It may appear while Google's form
+# is still drawn behind it: wait for the alert's own button, never for the form to disappear.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      # system-ui: Apple's tracking alert.
+      - extendedWaitUntil:
+          visible: 'Ask App Not to Track'
+          timeout: 30000
+      # system-ui: declining still serves ads, without the IDFA.
+      - tapOn: 'Ask App Not to Track'
+- extendedWaitUntil:
+    visible:
+      id: 'tasks.banner-ad'
+    timeout: 60000

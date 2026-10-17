@@ -1,0 +1,21 @@
+{
+  "$schema": "./navigation.schema.json",
+  "router": "expo-router",
+  "home": "/",
+  "routes": ["(app)/index", "(app)/tasks/[taskId]", "(app)/tasks/[taskId]/edit", "(app)/compose", "sign-in", "debug", "+not-found"],
+  "protected": [
+    { "file": "src/features/root-navigator/app-stack.tsx", "guard": "!isSignedIn", "screens": ["sign-in"] },
+    { "file": "src/features/root-navigator/app-stack.tsx", "guard": "isSignedIn", "screens": ["(app)"] },
+    { "file": "src/features/root-navigator/app-stack.tsx", "guard": "isTestBuild", "screens": ["debug"] }
+  ],
+  "guarded": [
+    { "route": "(app)/tasks/[taskId]/edit", "hook": "src/features/task-editor/use-task-editor-model.ts" }
+  ],
+  "modals": ["(app)/compose"],
+  "paramParsers": {
+    "(app)/tasks/[taskId]": "src/features/task-detail/task-detail-params.ts",
+    "(app)/tasks/[taskId]/edit": "src/features/task-detail/task-detail-params.ts"
+  },
+  "debugRoutes": ["debug"],
+  "placeholders": []
+}

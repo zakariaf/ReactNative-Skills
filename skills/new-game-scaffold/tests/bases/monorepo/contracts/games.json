@@ -1,0 +1,19 @@
+{
+  "$schema": "./games.schema.json",
+  "$comment": "When multi-package: one game = one white-label app. The apps block holds what every app shares.",
+  "games": [],
+  "apps": {
+    "dir": "apps",
+    "scope": "@acme",
+    "bundlePrefix": "com.example",
+    "products": ["premium"],
+    "locales": ["en", "ar"],
+    "composer": {
+      "import": "@acme/app-config/with-app-settings.ts",
+      "name": "withAppSettings",
+      "type": "AppSettings"
+    },
+    "fontsDir": "packages/brand/fonts",
+    "adUnits": ["banner", "rewarded"]
+  }
+}

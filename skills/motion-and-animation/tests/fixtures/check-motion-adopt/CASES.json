@@ -1,0 +1,14 @@
+{
+  "bad-placeholder-unfilled": {
+    "expect": ["[moment-files] screenPush.files still holds the template placeholder __ROOT_STACK_FILE__"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/motion/motion-moments.ts",
+          "find": "files: ['src/app/_layout.tsx']",
+          "with": "files: ['__ROOT_STACK_FILE__']"
+        }
+      }
+    ]
+  }
+}

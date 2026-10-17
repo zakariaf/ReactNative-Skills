@@ -1,0 +1,9 @@
+{
+  "a11y": {
+    "minTouchPt": 44,
+    "maxFontScale": 2,
+    "textContrastMin": 4.5,
+    "nonTextContrastMin": 3,
+    "minCvdDistanceOk": 0.07
+  }
+}

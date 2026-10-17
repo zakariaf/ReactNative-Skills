@@ -1,0 +1,133 @@
+{
+ "base": [
+  "@tests/bases/app",
+  "@tests/bases/scenes"
+ ],
+ "argsFile": "append",
+ "ops": [
+  {
+   "delete": [
+    "scenes/tasks-menu-open.json",
+    "scenes/premium-loading.json",
+    "scenes/map-default.json",
+    "scenes/onboarding-default.json"
+   ]
+  },
+  {
+   "json": {
+    "file": "scenes/tasks-default.json",
+    "path": [
+     "renders"
+    ],
+    "value": [
+     {
+      "theme": "light",
+      "lang": "en"
+     },
+     {
+      "theme": "light",
+      "lang": "ar"
+     },
+     {
+      "theme": "dark",
+      "lang": "en"
+     },
+     {
+      "theme": "dark",
+      "lang": "ar"
+     }
+    ]
+   }
+  },
+  {
+   "write": {
+    "file": "ledger.json",
+    "json": {
+     "version": 1,
+     "entries": [
+      {
+       "frame": "tasks-default",
+       "device": "test-phone",
+       "theme": "light",
+       "lang": "en",
+       "scrollY": 0,
+       "sheetSha256": "@sheet",
+       "date": "2026-10-01",
+       "looked": "@looked",
+       "eyeChecks": {
+        "icons": "match",
+        "pictures": "match",
+        "shadows": "match",
+        "alignment": "match",
+        "wrapping": "match",
+        "direction": "match",
+        "feel": "match"
+       },
+       "differences": []
+      },
+      {
+       "frame": "tasks-default",
+       "device": "test-phone",
+       "theme": "light",
+       "lang": "ar",
+       "scrollY": 0,
+       "sheetSha256": "@sheet",
+       "date": "2026-10-01",
+       "looked": "@looked",
+       "eyeChecks": {
+        "icons": "match",
+        "pictures": "match",
+        "shadows": "match",
+        "alignment": "match",
+        "wrapping": "match",
+        "direction": "match",
+        "feel": "match"
+       },
+       "differences": []
+      },
+      {
+       "frame": "tasks-default",
+       "device": "test-phone",
+       "theme": "dark",
+       "lang": "en",
+       "scrollY": 0,
+       "sheetSha256": "@sheet",
+       "date": "2026-10-01",
+       "looked": "@looked",
+       "eyeChecks": {
+        "icons": "match",
+        "pictures": "match",
+        "shadows": "match",
+        "alignment": "match",
+        "wrapping": "match",
+        "direction": "match",
+        "feel": "match"
+       },
+       "differences": []
+      },
+      {
+       "frame": "tasks-default",
+       "device": "test-phone",
+       "theme": "dark",
+       "lang": "ar",
+       "scrollY": 0,
+       "sheetSha256": "@sheet",
+       "date": "2026-10-01",
+       "looked": "@looked",
+       "eyeChecks": {
+        "icons": "match",
+        "pictures": "match",
+        "shadows": "match",
+        "alignment": "match",
+        "wrapping": "match",
+        "direction": "match",
+        "feel": "match"
+       },
+       "differences": []
+      }
+     ]
+    }
+   }
+  }
+ ]
+}

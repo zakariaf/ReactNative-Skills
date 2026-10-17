@@ -1,0 +1,576 @@
+{
+  "bad-content-test-counts-only": {
+    "expect": [
+      "FAIL test/sqlite/v0002-add-list-sort-order.test.ts:1 [content-test] the content test of version 2 never reads a stored value"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "test/sqlite/v0002-add-list-sort-order.test.ts",
+          "lines": [
+            "// test/sqlite/v0002-add-list-sort-order.test.ts: a content test that never reads a value (planted: counts and schema only).",
+            "import { readFileSync } from 'node:fs';",
+            "import { join } from 'node:path';",
+            "",
+            "import { migrateDatabase } from '@/data/migrations/migration-runner';",
+            "import { MIGRATIONS } from '@/data/migrations/migrations';",
+            "",
+            "import { countsOf } from './database-content';",
+            "import { createNodeSqliteSqlDriver } from './node-sqlite-sql-driver';",
+            "",
+            "const V1 = join(__dirname, '..', '..', 'src', 'data', 'migrations', 'fixtures', 'db-v1.sql');",
+            "",
+            "describe('v0002 add-list-sort-order', () => {",
+            "  it('keeps the row counts', () => {",
+            "    const driver = createNodeSqliteSqlDriver(':memory:');",
+            "    driver.exec(readFileSync(V1, 'utf8'));",
+            "    const before = countsOf(driver);",
+            "    expect(migrateDatabase(driver, MIGRATIONS).kind).toBe('migrated');",
+            "    // rowsOf(driver, 'lists') would read the values; this test never does.",
+            "    expect(countsOf(driver)).toStrictEqual(before);",
+            "  });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-content-test-missing": {
+    "expect": [
+      "FAIL test/sqlite/v0002-add-list-sort-order.test.ts:1 [content-test] version 2 (add-list-sort-order) has no content test"
+    ],
+    "ops": [{ "delete": "test/sqlite/v0002-add-list-sort-order.test.ts" }]
+  },
+  "bad-content-test-raw-count": {
+    "expect": [
+      "FAIL test/sqlite/v0002-add-list-sort-order.test.ts:1 [content-test] the content test of version 2 never reads a stored value"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "test/sqlite/v0002-add-list-sort-order.test.ts",
+          "lines": [
+            "// test/sqlite/v0002-add-list-sort-order.test.ts: a content test that only counts rows and reads the schema with raw SQL (planted).",
+            "import { readFileSync } from 'node:fs';",
+            "import { join } from 'node:path';",
+            "",
+            "import { migrateDatabase } from '@/data/migrations/migration-runner';",
+            "import { MIGRATIONS } from '@/data/migrations/migrations';",
+            "",
+            "import { createNodeSqliteSqlDriver } from './node-sqlite-sql-driver';",
+            "",
+            "const V1 = join(__dirname, '..', '..', 'src', 'data', 'migrations', 'fixtures', 'db-v1.sql');",
+            "",
+            "describe('v0002 add-list-sort-order', () => {",
+            "  it('keeps two lists and adds the column', () => {",
+            "    const driver = createNodeSqliteSqlDriver(':memory:');",
+            "    driver.exec(readFileSync(V1, 'utf8'));",
+            "    expect(migrateDatabase(driver, MIGRATIONS).kind).toBe('migrated');",
+            "    expect(driver.get('SELECT COUNT(*) AS n FROM lists', [])).toStrictEqual({ n: 3 });",
+            "    expect(driver.all(\"SELECT name FROM pragma_table_info('lists')\", [])).toContainEqual({ name: 'sort_order' });",
+            "    expect(driver.get(\"SELECT sql FROM sqlite_master WHERE name = 'lists'\", [])).not.toBeNull();",
+            "    driver.close();",
+            "  });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-content-test-wrong-fixture": {
+    "expect": [
+      "FAIL test/sqlite/v0002-add-list-sort-order.test.ts:1 [content-test] the content test of version 2 does not load db-v1.sql"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "test/sqlite/v0002-add-list-sort-order.test.ts",
+          "find": "'fixtures', 'db-v1.sql'",
+          "with": "'fixtures', 'db-v2.sql'"
+        }
+      }
+    ]
+  },
+  "bad-drill-no-snapshot": {
+    "expect": [
+      "FAIL src/data/app-database.ts:1 [restore-drill] no snapshot app.db.v1.bak was taken before migrating db-v1"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/app-database.ts",
+          "find": "driver.run('VACUUM INTO ?', [plan.snapshot]);",
+          "with": "driver.get('SELECT ?', [plan.snapshot]);"
+        }
+      }
+    ]
+  },
+  "bad-drill-previous-build": {
+    "expect": [
+      "FAIL src/data/app-database.ts:1 [restore-drill] the previous build (1 steps) opens db-v2 as \"migration-failed\", expected \"newer-version\""
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/app-database.ts",
+          "find": "    if (found > latest) return leave(driver, deps, { kind: 'newer-version', found });\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-drill-previous-build-bytes": {
+    "expect": [
+      "FAIL src/data/app-database.ts:1 [restore-drill] the previous build rewrote db-v2's bytes when it opened it (the rows are the same)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/app-database.ts",
+          "find": "    const found = readUserVersion(driver);\n",
+          "with": "    driver.exec('PRAGMA optimize');\n    const found = readUserVersion(driver);\n"
+        }
+      }
+    ]
+  },
+  "bad-drill-test-gutted": {
+    "expect": [
+      "FAIL test/sqlite/migration-restore-drill.test.ts:1 [path-tests] test/sqlite/migration-restore-drill.test.ts no longer forces a step to fail"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "test/sqlite/migration-restore-drill.test.ts",
+          "find": "    restoreSnapshotFiles(file(), snapshot, folder.file('kept'));\n",
+          "with": "    // the restore was taken out\n"
+        }
+      }
+    ]
+  },
+  "bad-every-path-fails-on-old-data": {
+    "expect": ["FAIL src/data/migrations/fixtures/db-v1.sql:1 [every-path] upgrading db-v1 to v2 fails at version 2"],
+    "ops": [
+      {
+        "$comment": "Runs on a fresh install (no lists yet) and fails on every phone that has list 1.",
+        "replace": {
+          "file": "src/data/migrations/v0002-add-list-sort-order.ts",
+          "find": "CREATE INDEX lists_by_sort_order",
+          "with": "INSERT INTO lists (id, name, created_at_ms) VALUES (1, 'Inbox', 0);\nCREATE INDEX lists_by_sort_order"
+        }
+      }
+    ]
+  },
+  "bad-every-path-rows": {
+    "expect": [
+      "FAIL src/data/migrations/fixtures/db-v1.sql:1 [every-path] upgrading db-v1 to v2 loses rows (tasks: 3 of 4)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/migrations/v0002-add-list-sort-order.ts",
+          "find": "ALTER TABLE lists ADD COLUMN",
+          "with": "DELETE FROM tasks WHERE is_done = 1;\nALTER TABLE lists ADD COLUMN"
+        }
+      }
+    ]
+  },
+  "bad-every-path-schema": {
+    "expect": [
+      "FAIL src/data/migrations/fixtures/db-v1.sql:1 [every-path] upgrading db-v1 to v2 does not give the schema of the frozen db-v2.sql: index lists_by_sort_order differs"
+    ],
+    "ops": [
+      {
+        "$comment": "The pending step changed after its fixture was frozen.",
+        "replace": {
+          "file": "src/data/migrations/v0002-add-list-sort-order.ts",
+          "find": "CREATE INDEX lists_by_sort_order ON lists (sort_order, id);",
+          "with": "CREATE INDEX lists_by_sort_order ON lists (sort_order);"
+        }
+      }
+    ]
+  },
+  "bad-fixture-does-not-load": {
+    "expect": [
+      "FAIL src/data/migrations/fixtures/db-v2.sql:1 [every-path] src/data/migrations/fixtures/db-v2.sql does not load into an empty database: CHECK constraint failed"
+    ],
+    "ops": [
+      { "replace": { "file": "src/data/migrations/fixtures/db-v2.sql", "find": "'Mum''s birthday 🎂'", "with": "''" } }
+    ]
+  },
+  "bad-hostile-rows": {
+    "expect": [
+      "FAIL src/data/migrations/fixtures/db-v2.sql:1 [hostile-rows] the frozen rows of pending version 2 lack an apostrophe (''), a non-ASCII letter (for example Arabic or an accented letter), an emoji"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/migrations/fixtures/db-v2.sql",
+          "find": "Mum''s birthday 🎂",
+          "with": "Mums birthday"
+        }
+      },
+      { "replace": { "file": "src/data/migrations/fixtures/db-v2.sql", "find": "kitchen''s", "with": "kitchens" } },
+      { "replace": { "file": "src/data/migrations/fixtures/db-v2.sql", "find": "شراء الحليب", "with": "Buy milk" } },
+      {
+        "replace": {
+          "file": "src/data/migrations/fixtures/db-v2.sql",
+          "find": "Send the report 📊",
+          "with": "Send the report"
+        }
+      }
+    ]
+  },
+  "bad-hostile-rows-empty-string": {
+    "expect": [
+      "FAIL src/data/migrations/fixtures/db-v2.sql:1 [hostile-rows] the frozen rows of pending version 2 lack an apostrophe ('')"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/migrations/fixtures/db-v2.sql",
+          "find": "'Mum''s birthday 🎂'",
+          "with": "'Mums birthday 🎂'"
+        }
+      },
+      { "replace": { "file": "src/data/migrations/fixtures/db-v2.sql", "find": "kitchen''s", "with": "kitchens" } },
+      {
+        "replace": {
+          "file": "src/data/migrations/fixtures/db-v2.sql",
+          "find": "'request timed out', NULL);",
+          "with": "'request timed out', '');"
+        }
+      }
+    ]
+  },
+  "bad-ledger-entry-removed": {
+    "expect": [
+      "FAIL contracts/schema-ledger.json:1 [ledger-append-only] v2 (add-list-sort-order) was removed since base-ledger.json"
+    ],
+    "args": "{dir} --base-ledger base-ledger.json",
+    "ops": [
+      {
+        "write": {
+          "file": "base-ledger.json",
+          "lines": [
+            "{",
+            "  \"$schema\": \"./schema-ledger.schema.json\",",
+            "  \"$comment\": \"Every database schema version that ever reached a device (store, TestFlight, Play testing, a preview build, an EAS Update), in order, with the sha256 of its step file and frozen fixture. Append only: record-shipped adds an entry when a build or update with a new version first leaves the machine.\",",
+            "  \"shipped\": [",
+            "    {",
+            "      \"version\": 1,",
+            "      \"name\": \"create-lists-and-tasks\",",
+            "      \"stepSha256\": \"448a853935900bcff7c0258edc03b5e1f0d6dd5b95894a64d85698dac7837338\",",
+            "      \"fixtureSha256\": \"08cc5e6b8ee8ff48de9cd3595301dc573c9d594eaa7cba8f07a935385b18e6fd\",",
+            "      \"firstShippedIn\": \"1.0.0 (1)\",",
+            "      \"shippedOn\": \"2026-09-14\"",
+            "    },",
+            "    {",
+            "      \"version\": 2,",
+            "      \"name\": \"add-list-sort-order\",",
+            "      \"stepSha256\": \"3cc859f32bd9a09e14ebeb92a175f5cdc7bd82c2d376911183bd42deda7e3fa0\",",
+            "      \"fixtureSha256\": \"cb7f80fcfcf41a5bc29a38714ef48a4c26240176e3e77117b1eb2a820af24c22\",",
+            "      \"firstShippedIn\": \"1.1.0 (12)\",",
+            "      \"shippedOn\": \"2026-10-14\"",
+            "    }",
+            "  ]",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-ledger-missing": {
+    "expect": ["FAIL contracts/schema-ledger.json:1 [ledger] contracts/schema-ledger.json does not exist"],
+    "ops": [{ "delete": "contracts/schema-ledger.json" }]
+  },
+  "bad-ledger-not-json": {
+    "expect": ["FAIL contracts/schema-ledger.json:1 [ledger] contracts/schema-ledger.json is not valid JSON"],
+    "ops": [
+      { "replace": { "file": "contracts/schema-ledger.json", "find": "\"shipped\": [", "with": "\"shipped\": [," } }
+    ]
+  },
+  "bad-ledger-rewritten": {
+    "expect": [
+      "FAIL contracts/schema-ledger.json:6 [ledger-append-only] v1 (create-lists-and-tasks) was changed since base-ledger.json"
+    ],
+    "args": "{dir} --base-ledger base-ledger.json",
+    "ops": [
+      {
+        "write": {
+          "file": "base-ledger.json",
+          "lines": [
+            "{",
+            "  \"$schema\": \"./schema-ledger.schema.json\",",
+            "  \"$comment\": \"Every database schema version that ever reached a device (store, TestFlight, Play testing, a preview build, an EAS Update), in order, with the sha256 of its step file and frozen fixture. Append only: record-shipped adds an entry when a build or update with a new version first leaves the machine.\",",
+            "  \"shipped\": [",
+            "    {",
+            "      \"version\": 1,",
+            "      \"name\": \"create-lists-and-tasks\",",
+            "      \"stepSha256\": \"448a853935900bcff7c0258edc03b5e1f0d6dd5b95894a64d85698dac7837338\",",
+            "      \"fixtureSha256\": \"08cc5e6b8ee8ff48de9cd3595301dc573c9d594eaa7cba8f07a935385b18e6fd\",",
+            "      \"firstShippedIn\": \"1.0.0 (1)\",",
+            "      \"shippedOn\": \"2026-09-14\"",
+            "    }",
+            "  ]",
+            "}"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/schema-ledger.json",
+          "path": ["shipped", 0, "firstShippedIn"],
+          "value": "1.0.0 (2)"
+        }
+      }
+    ]
+  },
+  "bad-ledger-shape": {
+    "expect": ["FAIL contracts/schema-ledger.json:6 [ledger] shipped[0]: shippedOn is not YYYY-MM-DD"],
+    "ops": [
+      {
+        "json": { "file": "contracts/schema-ledger.json", "path": ["shipped", 0, "shippedOn"], "value": "14 Sep 2026" }
+      }
+    ]
+  },
+  "bad-list-entry-misnamed": {
+    "expect": [
+      "FAIL src/data/migrations/migrations.ts:1 [bump-by-one] MIGRATIONS[1] is version 2 \"add-sort-order\", but step file 2 is v0002-add-list-sort-order.ts"
+    ],
+    "ops": [
+      {
+        "$comment": "The step object's name no longer matches its file: the list and the files disagree about what version 2 is.",
+        "replace": {
+          "file": "src/data/migrations/v0002-add-list-sort-order.ts",
+          "find": "name: 'add-list-sort-order',",
+          "with": "name: 'add-sort-order',"
+        }
+      }
+    ]
+  },
+  "bad-path-tests-missing": {
+    "expect": [
+      "FAIL test/sqlite/migration-paths.test.ts:1 [path-tests] test/sqlite/migration-paths.test.ts does not exist"
+    ],
+    "ops": [{ "delete": "test/sqlite/migration-paths.test.ts" }]
+  },
+  "bad-pending-fixture-missing": {
+    "expect": [
+      "FAIL src/data/migrations/fixtures/db-v2.sql:1 [pending-fixture] pending version 2 (add-list-sort-order) has no frozen fixture"
+    ],
+    "ops": [{ "delete": "src/data/migrations/fixtures/db-v2.sql" }]
+  },
+  "bad-pending-fixture-version": {
+    "expect": [
+      "FAIL src/data/migrations/fixtures/db-v2.sql:46 [pending-fixture] src/data/migrations/fixtures/db-v2.sql stamps user_version 3, expected 2"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/migrations/fixtures/db-v2.sql",
+          "find": "PRAGMA user_version = 2;",
+          "with": "PRAGMA user_version = 3;"
+        }
+      }
+    ]
+  },
+  "bad-shipped-fixture-edited": {
+    "expect": [
+      "FAIL src/data/migrations/fixtures/db-v1.sql:1 [shipped-frozen] the fixture of shipped version 1 changed after it was recorded"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/migrations/fixtures/db-v1.sql",
+          "find": "'Water the plants'",
+          "with": "'Water the garden'"
+        }
+      }
+    ]
+  },
+  "bad-shipped-step-edited": {
+    "expect": [
+      "FAIL src/data/migrations/v0001-create-lists-and-tasks.ts:1 [shipped-frozen] shipped step v1 (create-lists-and-tasks) changed after it reached a device"
+    ],
+    "ops": [
+      {
+        "$comment": "A comment-only edit: the schema stays the same, so only the ledger hash can see it.",
+        "replace": {
+          "file": "src/data/migrations/v0001-create-lists-and-tasks.ts",
+          "find": "STRICT tables reject a value of the wrong type.",
+          "with": "STRICT tables reject wrong types."
+        }
+      }
+    ]
+  },
+  "bad-shipped-step-renamed": {
+    "expect": [
+      "FAIL src/data/migrations/v0001-create-tasks.ts:1 [shipped-frozen] shipped version 1 was renamed from create-lists-and-tasks to create-tasks"
+    ],
+    "ops": [
+      {
+        "rename": {
+          "from": "src/data/migrations/v0001-create-lists-and-tasks.ts",
+          "to": "src/data/migrations/v0001-create-tasks.ts"
+        }
+      }
+    ]
+  },
+  "bad-step-imported-not-listed": {
+    "expect": [
+      "FAIL src/data/migrations/migrations.ts:1 [bump-by-one] step file v0002-add-list-sort-order.ts is not in MIGRATIONS (it lists 1 step): no build runs version 2",
+      "FAIL src/data/migrations/fixtures/db-v2.sql:1 [every-path] db-v2.sql is never replayed"
+    ],
+    "ops": [
+      {
+        "$comment": "Imported but left out of the array: the static import check passes, the loaded MIGRATIONS has one entry.",
+        "replace": {
+          "file": "src/data/migrations/migrations.ts",
+          "find": "[CREATE_LISTS_AND_TASKS, ADD_LIST_SORT_ORDER]",
+          "with": "[CREATE_LISTS_AND_TASKS]"
+        }
+      }
+    ]
+  },
+  "bad-step-not-in-list": {
+    "expect": [
+      "FAIL src/data/migrations/migrations.ts:1 [bump-by-one] step file v0002-add-list-sort-order.ts is not imported by migrations.ts: no build runs version 2",
+      "FAIL src/data/migrations/fixtures/db-v2.sql:1 [every-path] db-v2.sql is never replayed: MIGRATIONS ends at version 1"
+    ],
+    "ops": [
+      {
+        "$comment": "The step and its frozen db-v2.sql exist, but the list still ends at v1: no build runs v2 and the replay never loads db-v2.sql.",
+        "replace": {
+          "file": "src/data/migrations/migrations.ts",
+          "find": "import { ADD_LIST_SORT_ORDER } from './v0002-add-list-sort-order';\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/migrations/migrations.ts",
+          "find": "[CREATE_LISTS_AND_TASKS, ADD_LIST_SORT_ORDER]",
+          "with": "[CREATE_LISTS_AND_TASKS]"
+        }
+      }
+    ]
+  },
+  "bad-two-pending": {
+    "expect": [
+      "FAIL src/data/migrations/v0002-add-list-sort-order.ts:1 [bump-by-one] 2 versions are pending (v1, v2); a release adds one"
+    ],
+    "ops": [{ "json": { "file": "contracts/schema-ledger.json", "path": ["shipped"], "value": [] } }]
+  },
+  "bad-version-gap": {
+    "expect": [
+      "FAIL src/data/migrations/v0003-add-list-sort-order.ts:1 [bump-by-one] step files jump to version 3 after 1"
+    ],
+    "ops": [
+      {
+        "rename": {
+          "from": "src/data/migrations/v0002-add-list-sort-order.ts",
+          "to": "src/data/migrations/v0003-add-list-sort-order.ts"
+        }
+      }
+    ]
+  },
+  "error-base-ledger-missing": {
+    "expect": ["ERROR [bad-input] --base-ledger nope.json does not exist"],
+    "args": "{dir} --base-ledger nope.json",
+    "ops": []
+  },
+  "error-base-not-a-commit": {
+    "expect": ["ERROR [bad-input] --base no-such-ref is not a commit"],
+    "args": "{dir} --base no-such-ref",
+    "ops": []
+  },
+  "error-no-package": {
+    "expect": ["ERROR [bad-input] nothing to check: no package.json"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "error-root-option": { "expect": ["ERROR [bad-input]"], "args": "--root {dir}", "ops": [] },
+  "pass-base-first-ledger": {
+    "expect": ["ledger compared with base-ledger.json", "0 problems"],
+    "args": "{dir} --base-ledger base-ledger.json",
+    "ops": [{ "write": { "file": "base-ledger.json", "lines": ["{ \"shipped\": [] }"] } }]
+  },
+  "pass-base-unchanged": {
+    "expect": ["ledger compared with base-ledger.json", "0 problems"],
+    "args": "{dir} --base-ledger base-ledger.json",
+    "ops": [
+      {
+        "write": {
+          "file": "base-ledger.json",
+          "lines": [
+            "{",
+            "  \"$schema\": \"./schema-ledger.schema.json\",",
+            "  \"$comment\": \"Every database schema version that ever reached a device (store, TestFlight, Play testing, a preview build, an EAS Update), in order, with the sha256 of its step file and frozen fixture. Append only: record-shipped adds an entry when a build or update with a new version first leaves the machine.\",",
+            "  \"shipped\": [",
+            "    {",
+            "      \"version\": 1,",
+            "      \"name\": \"create-lists-and-tasks\",",
+            "      \"stepSha256\": \"448a853935900bcff7c0258edc03b5e1f0d6dd5b95894a64d85698dac7837338\",",
+            "      \"fixtureSha256\": \"08cc5e6b8ee8ff48de9cd3595301dc573c9d594eaa7cba8f07a935385b18e6fd\",",
+            "      \"firstShippedIn\": \"1.0.0 (1)\",",
+            "      \"shippedOn\": \"2026-09-14\"",
+            "    }",
+            "  ]",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-ledger-open-path": {
+    "expect": ["check-migration: 8 versions and replays checked, 0 problems"],
+    "ops": [
+      { "rename": { "from": "src/data/app-database.ts", "to": "src/data/open-database.ts" } },
+      { "json": { "file": "contracts/schema-ledger.json", "path": ["openPath"], "value": "src/data/open-database.ts" } }
+    ]
+  },
+  "pass-no-open-path": {
+    "expect": [
+      "SKIP src/data/app-database.ts [restore-drill] not yet created (persistence-and-migrations creates it)",
+      "0 problems, 1 skipped"
+    ],
+    "ops": [{ "delete": "src/data/app-database.ts" }]
+  },
+  "pass-no-replay": {
+    "expect": [
+      "node:sqlite rules skipped (--no-replay): every-path and restore-drill did not run",
+      "check-migration: 2 versions and replays checked, 0 problems"
+    ],
+    "args": "{dir} --no-replay",
+    "ops": []
+  },
+  "pass-not-applicable": {
+    "expect": [
+      "NOT APPLICABLE: expo-sqlite is not in package.json and there is no src/data/migrations/migrations.ts: the app has no SQLite database"
+    ],
+    "ops": [
+      { "delete": "src/data/migrations" },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-sqlite"], "delete": true } }
+    ]
+  },
+  "pass-preferences-only": {
+    "expect": ["NOT APPLICABLE: no src/data/migrations/migrations.ts: the app keeps no versioned SQLite database"],
+    "ops": [{ "delete": "src/data/migrations" }]
+  },
+  "pass-shipped-without-content-test": {
+    "expect": ["check-migration: 8 versions and replays checked, 0 problems"],
+    "ops": [
+      { "delete": "test/sqlite/v0002-add-list-sort-order.test.ts" },
+      {
+        "write": {
+          "file": "contracts/schema-ledger.json",
+          "content": "{\n  \"$schema\": \"./schema-ledger.schema.json\",\n  \"$comment\": \"Every database schema version that ever reached a device (store, TestFlight, Play testing, a preview build, an EAS Update), in order, with the sha256 of its step file and frozen fixture. Append only: record-shipped adds an entry when a build or update with a new version first leaves the machine.\",\n  \"shipped\": [\n    {\n      \"version\": 1,\n      \"name\": \"create-lists-and-tasks\",\n      \"stepSha256\": \"448a853935900bcff7c0258edc03b5e1f0d6dd5b95894a64d85698dac7837338\",\n      \"fixtureSha256\": \"08cc5e6b8ee8ff48de9cd3595301dc573c9d594eaa7cba8f07a935385b18e6fd\",\n      \"firstShippedIn\": \"1.0.0 (1)\",\n      \"shippedOn\": \"2026-09-14\"\n    },\n    {\n      \"version\": 2,\n      \"name\": \"add-list-sort-order\",\n      \"stepSha256\": \"3cc859f32bd9a09e14ebeb92a175f5cdc7bd82c2d376911183bd42deda7e3fa0\",\n      \"fixtureSha256\": \"cb7f80fcfcf41a5bc29a38714ef48a4c26240176e3e77117b1eb2a820af24c22\",\n      \"firstShippedIn\": \"1.1.0 (12)\",\n      \"shippedOn\": \"2026-10-14\",\n      \"contentTest\": \"shipped before the schema ledger was adopted\"\n    }\n  ]\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-v1-only": {
+    "expect": ["check-migration: 5 versions and replays checked, 0 problems"],
+    "base": ["@tests/bases/app", { "templates": true, "firstLinePath": true }],
+    "ops": []
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "base": [
+    "@tests/bases/app",
+    {
+      "templates": true,
+      "firstLinePath": true
+    },
+    {
+      "from": "@skill/examples",
+      "firstLinePath": true
+    }
+  ]
+}

@@ -1,0 +1,792 @@
+{
+  "$comment": "The canonical, verified stack (DECISIONS.md section 2). Skills cite these versions; node tools/check-stack-pins.mjs fails on a skill that states a different one. Each entry: version (what a fresh install resolves on the verified date), range (statements of this version that count as consistent: Expo's own specifier for SDK-bundled packages, the exact pin otherwise), spec (the package.json specifier skills write), names (how prose names it), how it was verified, and the command that re-verifies it. Refresh the whole table when Expo SDK 58 lands.",
+  "verified": "2026-10-03",
+  "sdk": 57,
+  "sources": {
+    "expoBundled": "node_modules/expo/bundledNativeModules.json of a fresh create-expo-app (expo 57.0.26) app, read 2026-10-03; refreshed 2026-10-17 from node_modules/expo/bundledNativeModules.json of expo 57.0.27 in tools/harness (the newest SDK 57 patch past the 7-day release age; 57.0.26 to 57.0.27 moves only patch specifiers of Expo modules)",
+    "expoTemplate": "package.json of the same fresh create-expo-app SDK 57 app",
+    "expoApi": "https://api.expo.dev/v2/versions/latest, sdkVersions[\"57.0.0\"] (relatedPackages, facebookReactNativeVersion), read 2026-10-03",
+    "npm": "npm view <package> version / npm view <package>@<range> version, run 2026-10-03 with npm 11.17",
+    "sourceApp": "cross-checked with the versions table of the production app the skills were generalized from (verified 2026-09-26)"
+  },
+  "releaseAgeDays": 7,
+  "releaseAgeNote": "published is the npm publish date of version. A version younger than releaseAgeDays on the verified date installs under a min-release-age=7 policy only from published + 7 days (or with a dated exclude); dependency-management owns that policy.",
+  "contrastWords": [
+    "not",
+    "never",
+    "no",
+    "avoid",
+    "instead",
+    "rather",
+    "until",
+    "unlike",
+    "rejected",
+    "breaks",
+    "broke",
+    "beta",
+    "alpha",
+    "preview",
+    "canary",
+    "nightly",
+    "next",
+    "upcoming",
+    "deprecated",
+    "removed",
+    "dropped",
+    "legacy",
+    "previous",
+    "prior",
+    "upgrade",
+    "upgrading",
+    "migrate",
+    "migrating",
+    "rollback",
+    "fallback",
+    "was",
+    "were",
+    "older",
+    "outside",
+    "vs",
+    "versus",
+    "replaces",
+    "replaced",
+    "since",
+    "peer"
+  ],
+  "packages": {
+    "expo": {
+      "version": "57.0.27",
+      "range": "~57.0.27",
+      "spec": "~57.0.27",
+      "accept": [
+        "57.0.26"
+      ],
+      "names": [
+        "expo",
+        "Expo"
+      ],
+      "published": "2026-10-06",
+      "how": "npx expo install --check in tools/harness on 2026-10-17: expo 57.0.30 (published 2026-10-15) is the newest SDK 57 patch and becomes installable under min-release-age=7 on 2026-10-23; 57.0.27 (2026-10-06) is the newest one past the release age, installed with npx expo install expo@~57.0.27 together with its bundledNativeModules.json specifiers; npm dist-tag latest = 57.0.30. 57.0.26 stays accepted: it was verified 2026-10-03 to 2026-10-16 and differs from 57.0.27 only in patch specifiers",
+      "verified": "2026-10-17",
+      "reverify": "npx expo install --check (in tools/harness); npm view expo@~57.0.27 version"
+    },
+    "expo-sdk": {
+      "version": "57",
+      "range": "57.x",
+      "package": false,
+      "names": [
+        "Expo SDK",
+        "SDK"
+      ],
+      "notAfter": [
+        "iOS",
+        "Android",
+        "macOS",
+        "watchOS",
+        "tvOS",
+        "visionOS",
+        "Xcode",
+        "Java",
+        "JDK",
+        "Platform",
+        "platform",
+        "Mobile",
+        "Ads",
+        "AdMob",
+        "Sentry",
+        "Firebase"
+      ],
+      "how": "the SDK of the fresh create-expo-app app; SDK 58 exists in api.expo.dev (expoVersion ~58.0.2, React Native 0.88.0-rc.3) and is not yet the default",
+      "verified": "2026-10-03",
+      "reverify": "npm view expo dist-tags --json (latest is the default SDK)"
+    },
+    "react-native": {
+      "version": "0.86.3",
+      "range": "0.86.3",
+      "spec": "0.86.3",
+      "names": [
+        "React Native",
+        "react-native",
+        "RN"
+      ],
+      "how": "Expo SDK 57 bundledNativeModules.json and api.expo.dev facebookReactNativeVersion; npm latest 0.87.1 is not for SDK 57",
+      "verified": "2026-10-03",
+      "reverify": "node -p \"require('expo/bundledNativeModules.json')['react-native']\""
+    },
+    "react": {
+      "version": "19.2.3",
+      "range": "19.2.3",
+      "spec": "19.2.3",
+      "names": [
+        "React",
+        "react"
+      ],
+      "how": "Expo SDK 57 bundledNativeModules.json; npm latest 19.3.0 belongs to SDK 58",
+      "verified": "2026-10-03",
+      "reverify": "node -p \"require('expo/bundledNativeModules.json').react\""
+    },
+    "typescript": {
+      "version": "6.0.3",
+      "range": "~6.0.3",
+      "spec": "6.0.3",
+      "names": [
+        "TypeScript",
+        "typescript",
+        "TS"
+      ],
+      "how": "api.expo.dev relatedPackages typescript ~6.0.3 (the template writes ~6.0.3; the house pins dev tools exactly inside Expo's range); npm latest 7.0.2 has no programmatic API and typescript-eslint supports <6.1.0",
+      "verified": "2026-10-03",
+      "reverify": "npm view typescript@~6.0.3 version"
+    },
+    "expo-router": {
+      "version": "57.0.25",
+      "range": "~57.0.25",
+      "spec": "~57.0.25",
+      "accept": [
+        "57.0.24"
+      ],
+      "names": [
+        "Expo Router",
+        "expo-router"
+      ],
+      "published": "2026-10-06",
+      "how": "npx expo install --check in tools/harness on 2026-10-17: expo 57.0.27 bundledNativeModules.json says ~57.0.25 (Expo online list ~57.0.28, published 2026-10-15, installable from 2026-10-23); 57.0.24 stays accepted (verified 2026-10-03)",
+      "verified": "2026-10-17",
+      "reverify": "node -p \"require('expo/bundledNativeModules.json')['expo-router']\" (in tools/harness)"
+    },
+    "react-native-reanimated": {
+      "version": "4.5.1",
+      "range": "4.5.1",
+      "spec": "4.5.1",
+      "names": [
+        "Reanimated",
+        "react-native-reanimated"
+      ],
+      "how": "Expo SDK 57 bundledNativeModules.json (exact 4.5.1); npm latest 4.7.1 is for SDK 58",
+      "verified": "2026-10-03",
+      "reverify": "node -p \"require('expo/bundledNativeModules.json')['react-native-reanimated']\""
+    },
+    "react-native-worklets": {
+      "version": "0.10.1",
+      "range": "0.10.1",
+      "spec": "0.10.1",
+      "names": [
+        "Worklets",
+        "react-native-worklets"
+      ],
+      "how": "Expo SDK 57 bundledNativeModules.json (exact 0.10.1)",
+      "verified": "2026-10-03",
+      "reverify": "node -p \"require('expo/bundledNativeModules.json')['react-native-worklets']\""
+    },
+    "react-native-gesture-handler": {
+      "version": "2.32.0",
+      "range": "~2.32.0",
+      "spec": "~2.32.0",
+      "names": [
+        "Gesture Handler",
+        "react-native-gesture-handler",
+        "RNGH"
+      ],
+      "how": "Expo SDK 57 bundledNativeModules.json (~2.32.0); npm view react-native-gesture-handler@~2.32.0 = 2.32.0; 3.x is SDK 58",
+      "verified": "2026-10-03",
+      "reverify": "npm view react-native-gesture-handler@~2.32.0 version"
+    },
+    "@shopify/react-native-skia": {
+      "version": "2.6.2",
+      "range": "2.6.2",
+      "spec": "2.6.2",
+      "names": [
+        "Skia",
+        "React Native Skia",
+        "@shopify/react-native-skia"
+      ],
+      "how": "Expo SDK 57 bundledNativeModules.json (exact 2.6.2); npm latest 2.14.0 is not for SDK 57",
+      "verified": "2026-10-03",
+      "reverify": "node -p \"require('expo/bundledNativeModules.json')['@shopify/react-native-skia']\""
+    },
+    "react-native-safe-area-context": {
+      "version": "5.7.0",
+      "range": "~5.7.0",
+      "spec": "~5.7.0",
+      "names": [
+        "react-native-safe-area-context"
+      ],
+      "how": "Expo SDK 57 bundledNativeModules.json (~5.7.0); installed 5.7.0 in the fresh app",
+      "verified": "2026-10-03",
+      "reverify": "npm view react-native-safe-area-context@~5.7.0 version"
+    },
+    "react-native-screens": {
+      "version": "4.26.2",
+      "range": "~4.26.0",
+      "spec": "~4.26.0",
+      "names": [
+        "react-native-screens"
+      ],
+      "how": "Expo SDK 57 bundledNativeModules.json (~4.26.0); installed 4.26.2 in the fresh app",
+      "verified": "2026-10-03",
+      "reverify": "npm view react-native-screens@~4.26.0 version"
+    },
+    "zustand": {
+      "version": "5.0.15",
+      "range": "5.0.15",
+      "spec": "5.0.15",
+      "names": [
+        "Zustand",
+        "zustand"
+      ],
+      "published": "2026-08-13",
+      "how": "npm view zustand version (latest); not in the Expo map, so pinned exactly",
+      "verified": "2026-10-03",
+      "reverify": "npm view zustand version"
+    },
+    "@tanstack/react-query": {
+      "version": "5.104.0",
+      "range": "5.104.0",
+      "spec": "5.104.0",
+      "names": [
+        "TanStack Query",
+        "React Query",
+        "@tanstack/react-query"
+      ],
+      "published": "2026-10-02",
+      "how": "Installed in tools/harness under the 7-day release-age policy (5.104.1 of 2026-10-02 is newer than 7 days on 2026-10-03). Re-verify: npm view @tanstack/react-query time --json",
+      "verified": "2026-10-03",
+      "reverify": "npm view @tanstack/react-query version"
+    },
+    "valibot": {
+      "version": "1.5.0",
+      "range": "1.5.0",
+      "spec": "1.5.0",
+      "names": [
+        "valibot",
+        "Valibot"
+      ],
+      "published": "2026-09-09",
+      "how": "npm view valibot version (latest); matches the source app's pin",
+      "verified": "2026-10-03",
+      "reverify": "npm view valibot version"
+    },
+    "react-hook-form": {
+      "version": "7.89.0",
+      "range": "7.89.0",
+      "spec": "7.89.0",
+      "names": [
+        "React Hook Form",
+        "react-hook-form"
+      ],
+      "published": "2026-09-26",
+      "how": "npm view react-hook-form version (latest 7.x; 8.0 is beta); peer react ^19",
+      "verified": "2026-10-03",
+      "reverify": "npm view react-hook-form version"
+    },
+    "@hookform/resolvers": {
+      "version": "5.9.1",
+      "range": "5.9.1",
+      "spec": "5.9.1",
+      "names": [
+        "@hookform/resolvers"
+      ],
+      "published": "2026-08-17",
+      "how": "npm view @hookform/resolvers version (latest); peer valibot >=0.31 || ^1",
+      "verified": "2026-10-03",
+      "reverify": "npm view @hookform/resolvers version"
+    },
+    "react-intl": {
+      "version": "12.1.3",
+      "range": "12.1.3",
+      "spec": "12.1.3",
+      "names": [
+        "react-intl"
+      ],
+      "published": "2026-09-24",
+      "how": "npm view react-intl version (latest); matches the source app's pin",
+      "verified": "2026-10-03",
+      "reverify": "npm view react-intl version"
+    },
+    "expo-sqlite": {
+      "version": "57.0.4",
+      "range": "~57.0.4",
+      "spec": "~57.0.4",
+      "accept": [
+        "57.0.3"
+      ],
+      "names": [
+        "expo-sqlite"
+      ],
+      "published": "2026-10-06",
+      "how": "npx expo install --check in tools/harness on 2026-10-17 expected ~57.0.4 (published 2026-10-06, past the 7-day release age); expo 57.0.27 bundledNativeModules.json says ~57.0.4 too; installed with npx expo install expo-sqlite@~57.0.4. 57.0.3 stays accepted: the skills' source readings were made on it, and the 57.0.3 to 57.0.4 tarball diff (2026-10-17) touches only prepared-statement locking and cursor ownership (step, getAll, reset, finalize; SQLiteStatement.ts), not the error strings, withTransactionSync, database paths, kv-store or the bundled SQLite they cite",
+      "verified": "2026-10-17",
+      "reverify": "node -p \"require('expo/bundledNativeModules.json')['expo-sqlite']\" (in tools/harness); npm view expo-sqlite@~57.0.4 version"
+    },
+    "expo-secure-store": {
+      "version": "57.0.4",
+      "range": "~57.0.4",
+      "spec": "~57.0.4",
+      "names": [
+        "expo-secure-store"
+      ],
+      "how": "Expo SDK 57 bundledNativeModules.json (~57.0.4)",
+      "verified": "2026-10-03",
+      "reverify": "npm view expo-secure-store@~57.0.4 version"
+    },
+    "expo-localization": {
+      "version": "57.0.2",
+      "range": "~57.0.2",
+      "spec": "~57.0.2",
+      "names": [
+        "expo-localization"
+      ],
+      "how": "Expo SDK 57 bundledNativeModules.json (~57.0.2)",
+      "verified": "2026-10-03",
+      "reverify": "npm view expo-localization@~57.0.2 version"
+    },
+    "expo-haptics": {
+      "version": "57.0.3",
+      "range": "~57.0.3",
+      "spec": "~57.0.3",
+      "names": [
+        "expo-haptics"
+      ],
+      "how": "Expo SDK 57 bundledNativeModules.json (~57.0.3)",
+      "verified": "2026-10-03",
+      "reverify": "npm view expo-haptics@~57.0.3 version"
+    },
+    "expo-notifications": {
+      "version": "57.0.22",
+      "range": "~57.0.22",
+      "spec": "~57.0.22",
+      "accept": [
+        "57.0.21"
+      ],
+      "names": [
+        "expo-notifications"
+      ],
+      "how": "npx expo install --check in tools/harness on 2026-10-17: expo 57.0.27 bundledNativeModules.json says ~57.0.22 (Expo online list ~57.0.23, published 2026-10-14, installable from 2026-10-22); 57.0.21 stays accepted (verified 2026-10-03)",
+      "verified": "2026-10-17",
+      "reverify": "node -p \"require('expo/bundledNativeModules.json')['expo-notifications']\" (in tools/harness)",
+      "published": "2026-10-06"
+    },
+    "expo-updates": {
+      "version": "57.0.25",
+      "range": "~57.0.25",
+      "spec": "~57.0.25",
+      "accept": [
+        "57.0.24"
+      ],
+      "names": [
+        "expo-updates"
+      ],
+      "published": "2026-10-06",
+      "how": "npx expo install --check in tools/harness on 2026-10-17: expo 57.0.27 bundledNativeModules.json says ~57.0.25 (Expo online list ~57.0.26, published 2026-10-12, installable from 2026-10-20); 57.0.24 stays accepted (verified 2026-10-03)",
+      "verified": "2026-10-17",
+      "reverify": "node -p \"require('expo/bundledNativeModules.json')['expo-updates']\" (in tools/harness)"
+    },
+    "expo-image": {
+      "version": "57.0.5",
+      "range": "~57.0.5",
+      "spec": "~57.0.5",
+      "names": [
+        "expo-image"
+      ],
+      "how": "Expo SDK 57 bundledNativeModules.json (~57.0.5) and the template dependency",
+      "verified": "2026-10-03",
+      "reverify": "npm view expo-image@~57.0.5 version"
+    },
+    "react-native-google-mobile-ads": {
+      "version": "17.2.0",
+      "range": "17.2.0",
+      "spec": "17.2.0",
+      "names": [
+        "react-native-google-mobile-ads"
+      ],
+      "published": "2026-09-25",
+      "how": "npm view react-native-google-mobile-ads version (latest); peer react-native >=0.86.0, expo >=47; not in the Expo map, so pinned exactly",
+      "verified": "2026-10-03",
+      "reverify": "npm view react-native-google-mobile-ads version"
+    },
+    "expo-iap": {
+      "version": "5.8.0",
+      "range": "5.8.0",
+      "spec": "5.8.0",
+      "names": [
+        "expo-iap"
+      ],
+      "published": "2026-09-26",
+      "how": "Installed in tools/harness under the 7-day release-age policy (5.8.2 of 2026-09-30 exists); not in the Expo map, so pinned exactly",
+      "verified": "2026-10-03",
+      "reverify": "npm view expo-iap version"
+    },
+    "@sentry/react-native": {
+      "version": "7.11.0",
+      "range": "~7.11.0",
+      "spec": "~7.11.0",
+      "names": [
+        "@sentry/react-native",
+        "Sentry React Native"
+      ],
+      "how": "Expo SDK 57 bundledNativeModules.json (~7.11.0); npm latest 8.29.0 is outside the SDK 57 map",
+      "verified": "2026-10-03",
+      "reverify": "node -p \"require('expo/bundledNativeModules.json')['@sentry/react-native']\""
+    },
+    "@shopify/flash-list": {
+      "version": "2.0.2",
+      "range": "2.0.2",
+      "spec": "2.0.2",
+      "names": [
+        "FlashList",
+        "@shopify/flash-list"
+      ],
+      "how": "Expo SDK 57 bundledNativeModules.json (exact 2.0.2); npm latest 2.3.3 is outside the SDK 57 map",
+      "verified": "2026-10-03",
+      "reverify": "node -p \"require('expo/bundledNativeModules.json')['@shopify/flash-list']\""
+    },
+    "react-native-keyboard-controller": {
+      "version": "1.21.9",
+      "range": "1.21.9",
+      "spec": "1.21.9",
+      "names": [
+        "react-native-keyboard-controller",
+        "Keyboard Controller"
+      ],
+      "how": "Expo SDK 57 bundledNativeModules.json (exact 1.21.9); npm latest 1.22.6 is outside the SDK 57 map",
+      "verified": "2026-10-03",
+      "reverify": "node -p \"require('expo/bundledNativeModules.json')['react-native-keyboard-controller']\""
+    },
+    "jest": {
+      "version": "29.7.0",
+      "range": "~29.7.0",
+      "spec": "29.7.0",
+      "names": [
+        "Jest",
+        "jest"
+      ],
+      "how": "api.expo.dev relatedPackages jest ~29.7.0 (pinned exactly inside that range, installed with npm); jest-expo 57 is built on Jest 29; npm latest 30.5.2 is not supported",
+      "verified": "2026-10-03",
+      "reverify": "npm view jest@~29.7.0 version"
+    },
+    "jest-expo": {
+      "version": "57.0.5",
+      "range": "~57.0.5",
+      "spec": "57.0.5",
+      "names": [
+        "jest-expo"
+      ],
+      "how": "Expo SDK 57 bundledNativeModules.json (~57.0.5); a dev tool, pinned exactly inside that range and installed with npm",
+      "verified": "2026-10-03",
+      "reverify": "npm view jest-expo@~57.0.5 version"
+    },
+    "@testing-library/react-native": {
+      "version": "14.0.1",
+      "range": "14.0.1",
+      "spec": "14.0.1",
+      "names": [
+        "React Native Testing Library",
+        "RNTL",
+        "@testing-library/react-native"
+      ],
+      "published": "2026-06-23",
+      "how": "npm view @testing-library/react-native version (latest); peer jest >=29, react >=19, test-renderer ^1",
+      "verified": "2026-10-03",
+      "reverify": "npm view @testing-library/react-native version"
+    },
+    "fast-check": {
+      "version": "4.10.2",
+      "range": "4.10.2",
+      "spec": "4.10.2",
+      "names": [
+        "fast-check"
+      ],
+      "published": "2026-09-19",
+      "how": "npm view fast-check version (latest)",
+      "verified": "2026-10-03",
+      "reverify": "npm view fast-check version"
+    },
+    "eslint": {
+      "version": "9.39.5",
+      "range": "9.39.5",
+      "spec": "9.39.5",
+      "names": [
+        "ESLint",
+        "eslint"
+      ],
+      "published": "2026-07-10",
+      "how": "npm dist-tag maintenance = 9.39.5; npm latest 10.12.0 breaks eslint-plugin-react inside eslint-config-expo 57 (source app finding)",
+      "verified": "2026-10-03",
+      "reverify": "npm view eslint@^9 version"
+    },
+    "typescript-eslint": {
+      "version": "8.70.1",
+      "range": "8.70.1",
+      "spec": "8.70.1",
+      "names": [
+        "typescript-eslint"
+      ],
+      "published": "2026-09-28",
+      "how": "Installed in tools/harness under the 7-day release-age policy (8.71.0 of 2026-09-28 exists); peer typescript >=4.8.4 <6.1.0, eslint ^9",
+      "verified": "2026-10-03",
+      "reverify": "npm view typescript-eslint version && npm view typescript-eslint peerDependencies"
+    },
+    "prettier": {
+      "version": "3.9.9",
+      "range": "3.9.9",
+      "spec": "3.9.9",
+      "names": [
+        "Prettier",
+        "prettier"
+      ],
+      "published": "2026-09-23",
+      "how": "npm view prettier version (latest; 4.0 is alpha)",
+      "verified": "2026-10-03",
+      "reverify": "npm view prettier version"
+    },
+    "eas-cli": {
+      "version": "24.10.0",
+      "range": "^24.10.0",
+      "spec": "^24.10.0",
+      "names": [
+        "eas-cli",
+        "EAS CLI"
+      ],
+      "published": "2026-10-02",
+      "how": "npm view eas-cli version (latest); run with npx eas-cli@latest or a global install; eas.json cli.version holds the minimum Install it globally with the policy flags (npm install -g --min-release-age=7 --ignore-scripts eas-cli@<x.y.z>) and call eas; npx eas-cli inside a repo with strict-allow-scripts stops with ESTRICTALLOWSCRIPTS. Under the 7-day release age 24.10.0 (published 2026-10-02) is installable from 2026-10-09.",
+      "verified": "2026-10-03",
+      "reverify": "npm view eas-cli version"
+    },
+    "@formatjs/intl-getcanonicallocales": {
+      "version": "3.2.12",
+      "range": "3.2.12",
+      "spec": "3.2.12",
+      "names": [
+        "@formatjs/intl-getcanonicallocales"
+      ],
+      "how": "Installed in tools/harness (exact pin; the version react-intl 12.1.3 resolves / the i18n skill verified)",
+      "verified": "2026-10-03",
+      "reverify": "npm view @formatjs/intl-getcanonicallocales version"
+    },
+    "@formatjs/intl-locale": {
+      "version": "5.3.12",
+      "range": "5.3.12",
+      "spec": "5.3.12",
+      "names": [
+        "@formatjs/intl-locale"
+      ],
+      "how": "Installed in tools/harness (exact pin; the version react-intl 12.1.3 resolves / the i18n skill verified)",
+      "verified": "2026-10-03",
+      "reverify": "npm view @formatjs/intl-locale version"
+    },
+    "@formatjs/intl-pluralrules": {
+      "version": "6.3.15",
+      "range": "6.3.15",
+      "spec": "6.3.15",
+      "names": [
+        "@formatjs/intl-pluralrules"
+      ],
+      "how": "Installed in tools/harness (exact pin; the version react-intl 12.1.3 resolves / the i18n skill verified)",
+      "verified": "2026-10-03",
+      "reverify": "npm view @formatjs/intl-pluralrules version"
+    },
+    "@formatjs/intl-numberformat": {
+      "version": "9.4.3",
+      "range": "9.4.3",
+      "spec": "9.4.3",
+      "names": [
+        "@formatjs/intl-numberformat"
+      ],
+      "how": "Installed in tools/harness (exact pin; the version react-intl 12.1.3 resolves / the i18n skill verified)",
+      "verified": "2026-10-03",
+      "reverify": "npm view @formatjs/intl-numberformat version"
+    },
+    "@formatjs/cli": {
+      "version": "6.16.32",
+      "range": "6.16.32",
+      "spec": "6.16.32",
+      "names": [
+        "@formatjs/cli"
+      ],
+      "how": "Installed in tools/harness devDependencies (published 2026-09-24); powers npm run i18n:verify",
+      "verified": "2026-10-03",
+      "reverify": "npm view @formatjs/cli version"
+    },
+    "@formatjs/icu-messageformat-parser": {
+      "version": "3.5.20",
+      "range": "3.5.20",
+      "spec": "3.5.20",
+      "names": [
+        "@formatjs/icu-messageformat-parser"
+      ],
+      "how": "Installed in tools/harness devDependencies (published 2026-09-19)",
+      "verified": "2026-10-03",
+      "reverify": "npm view @formatjs/icu-messageformat-parser version"
+    },
+    "eslint-plugin-formatjs": {
+      "version": "8.1.0",
+      "range": "8.1.0",
+      "spec": "8.1.0",
+      "names": [
+        "eslint-plugin-formatjs"
+      ],
+      "how": "Installed in tools/harness (exact pin; the version react-intl 12.1.3 resolves / the i18n skill verified)",
+      "verified": "2026-10-03",
+      "reverify": "npm view eslint-plugin-formatjs version"
+    },
+    "jest-image-snapshot": {
+      "version": "6.5.2",
+      "range": "6.5.2",
+      "spec": "6.5.2",
+      "names": [
+        "jest-image-snapshot"
+      ],
+      "how": "Installed in tools/harness devDependencies; the pixel-golden matcher",
+      "verified": "2026-10-03",
+      "reverify": "npm view jest-image-snapshot version"
+    }
+  },
+  "toolchain": {
+    "maestro": {
+      "version": "2.10.0",
+      "range": "~2.10.0",
+      "package": false,
+      "names": [
+        "Maestro",
+        "maestro"
+      ],
+      "how": "GitHub releases of mobile-dev-inc/maestro: cli-2.10.0 (2026-08-31) is the verified line; cli-2.11.0 was published 2026-09-29 and is not yet verified with this stack",
+      "verified": "2026-10-03",
+      "reverify": "curl -s https://api.github.com/repos/mobile-dev-inc/maestro/releases/latest | grep tag_name"
+    },
+    "node": {
+      "version": "26.4.0",
+      "range": ">=22.18.0",
+      "package": false,
+      "jsonKeys": [
+        "node"
+      ],
+      "names": [
+        "Node.js",
+        "Node",
+        "node",
+        "node-version"
+      ],
+      "assign": true,
+      "how": "minimum 22.18 (type stripping on by default, needed for app.config.ts and .ts scripts; skill scripts need only Node 22); projects pin 26.4.0 (the source app's .nvmrc; local node --version = v26.4.0)",
+      "verified": "2026-10-03",
+      "reverify": "node --version"
+    },
+    "npm": {
+      "version": "11.17.0",
+      "range": "^11.0.0",
+      "package": false,
+      "jsonKeys": [
+        "npm"
+      ],
+      "names": [
+        "npm"
+      ],
+      "how": "bundled with Node 26.4.0 (local npm --version = 11.17); 11.17 adds min-release-age-exclude",
+      "verified": "2026-10-03",
+      "reverify": "npm --version"
+    },
+    "xcode": {
+      "version": "26.6",
+      "range": "~26.6.0",
+      "package": false,
+      "names": [
+        "Xcode",
+        "XCODE_VERSION"
+      ],
+      "assign": true,
+      "how": "xcodebuild -version on the verification Mac: Xcode 26.6 (17F113); Apple requires Xcode 26 or newer for uploads",
+      "verified": "2026-10-03",
+      "reverify": "xcodebuild -version"
+    },
+    "ios-sdk": {
+      "version": "26.5",
+      "range": "~26.5.0",
+      "package": false,
+      "names": [
+        "iOS SDK"
+      ],
+      "how": "xcrun --sdk iphoneos --show-sdk-version with Xcode 26.6 = 26.5 (simulator SDK 26.5)",
+      "verified": "2026-10-03",
+      "reverify": "xcrun --sdk iphoneos --show-sdk-version"
+    },
+    "ios-deployment-target": {
+      "version": "16.4",
+      "range": ">=16.4.0",
+      "package": false,
+      "jsonKeys": [
+        "deploymentTarget"
+      ],
+      "names": [
+        "deploymentTarget",
+        "IPHONEOS_DEPLOYMENT_TARGET"
+      ],
+      "assign": true,
+      "how": "ExpoModulesCore.podspec of expo-modules-core 57.0.20 declares :ios => '16.4' (React Native 0.86 alone supports 15.1)",
+      "verified": "2026-10-03",
+      "reverify": "grep -A2 's.platforms' node_modules/expo-modules-core/ExpoModulesCore.podspec"
+    },
+    "jdk": {
+      "version": "17",
+      "range": "17.x",
+      "package": false,
+      "names": [
+        "JDK",
+        "OpenJDK",
+        "Java"
+      ],
+      "how": "@react-native/gradle-plugin 0.86 builds with kotlin jvmToolchain(17); local java -version = 17.0.11",
+      "verified": "2026-10-03",
+      "reverify": "grep -rn jvmToolchain node_modules/@react-native/gradle-plugin/*/build.gradle.kts"
+    },
+    "android-compile-sdk": {
+      "version": "36",
+      "range": "36.x",
+      "package": false,
+      "names": [
+        "compileSdkVersion",
+        "compileSdk"
+      ],
+      "assign": true,
+      "jsonKeys": [
+        "compileSdkVersion"
+      ],
+      "how": "react-native 0.86.3 gradle/libs.versions.toml compileSdk = 36, which the Expo root project plugin reads",
+      "verified": "2026-10-03",
+      "reverify": "grep compileSdk node_modules/react-native/gradle/libs.versions.toml"
+    },
+    "android-target-sdk": {
+      "version": "36",
+      "range": "36.x",
+      "package": false,
+      "names": [
+        "targetSdkVersion",
+        "targetSdk"
+      ],
+      "assign": true,
+      "jsonKeys": [
+        "targetSdkVersion"
+      ],
+      "how": "react-native 0.86.3 gradle/libs.versions.toml targetSdk = 36",
+      "verified": "2026-10-03",
+      "reverify": "grep targetSdk node_modules/react-native/gradle/libs.versions.toml"
+    },
+    "android-min-sdk": {
+      "version": "24",
+      "range": ">=24.0.0",
+      "package": false,
+      "names": [
+        "minSdkVersion",
+        "minSdk"
+      ],
+      "assign": true,
+      "jsonKeys": [
+        "minSdkVersion"
+      ],
+      "how": "react-native 0.86.3 gradle/libs.versions.toml minSdk = 24 (an app may raise it)",
+      "verified": "2026-10-03",
+      "reverify": "grep minSdk node_modules/react-native/gradle/libs.versions.toml"
+    }
+  },
+  "policy": "Versions are what tools/harness installs on the verified date under a 7-day minimum release age (npm min-release-age). Expo SDK runtime packages keep the ~ specifier npx expo install writes; dev tools in the Expo map (typescript, jest, jest-expo) are pinned exactly inside Expo range; packages outside the Expo map are pinned exactly."
+}

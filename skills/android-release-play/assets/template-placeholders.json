@@ -1,0 +1,4 @@
+{
+  "$comment": "Values verify-templates fills into this skill's templates (the harness's own identity).",
+  "__APP_ID__": "com.example.harness"
+}

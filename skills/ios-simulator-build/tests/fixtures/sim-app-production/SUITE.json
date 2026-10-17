@@ -1,0 +1,6 @@
+{
+  "base": [
+    "@tests/bases/built-app",
+    "@tests/bases/built-app-production"
+  ]
+}

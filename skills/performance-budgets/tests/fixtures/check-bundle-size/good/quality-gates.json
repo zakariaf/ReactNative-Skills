@@ -1,0 +1,6 @@
+{
+  "perf": {
+    "bundleJsBytesMax": 3000,
+    "bundleGrowthMaxRatio": 1.1
+  }
+}

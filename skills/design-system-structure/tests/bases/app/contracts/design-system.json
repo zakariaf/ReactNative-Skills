@@ -1,0 +1,38 @@
+{
+  "$schema": "./design-system.schema.json",
+  "tokens": "design/tokens.json",
+  "exports": [
+    { "file": "src/theme/tokens.ts", "name": "SPACING", "token": "spacing" },
+    { "file": "src/theme/tokens.ts", "name": "RADII", "token": "radius" },
+    { "file": "src/theme/tokens.ts", "name": "STROKE", "token": "stroke" },
+    { "file": "src/theme/tokens.ts", "name": "ELEVATION", "token": "elevation" },
+    { "file": "src/theme/tokens.ts", "name": "MIN_TOUCH", "token": "size.minTouch" },
+    { "file": "src/theme/tokens.ts", "name": "CONTENT_MAX_WIDTH", "token": "size.contentMaxWidth" },
+    { "file": "src/theme/tokens.ts", "name": "TYPE_SCALE", "token": "type.roles" },
+    { "file": "src/theme/type-styles.ts", "name": "TYPE_STYLES", "token": "type.styles" },
+    { "file": "src/theme/motion.ts", "name": "EASING", "token": "motion.easing" },
+    { "file": "src/theme/motion.ts", "name": "MOTION_MS", "token": "motion.duration" },
+    { "file": "src/theme/motion.ts", "name": "SPRINGS", "token": "motion.spring" },
+    { "file": "src/theme/tokens.ts", "name": "PRESS", "token": "press" }
+  ],
+  "palettes": [{ "file": "src/theme/palette.ts", "export": "PALETTE", "token": "color" }],
+  "invariantFields": ["danger", "success", "warning", "focus"],
+  "text": {
+    "tabularStyles": ["number", "statValue"],
+    "minTallLineHeight": { "statValue": 1.45 }
+  },
+  "fonts": {
+    "dir": "assets/fonts",
+    "files": [
+      { "file": "NotoSans-Regular.ttf", "family": "Noto Sans", "sha256": "8e8d6667ead143baa41331a2c62da73f1c6a1f574a5ea414caab49f0bb1094c8" },
+      { "file": "NotoSans-Bold.ttf", "family": "Noto Sans", "sha256": "986a8347dec47899e4fb107a57df5c4a1823ba17dad7ba2eeb318386feac88e6" },
+      { "file": "NotoSansArabic-Regular.ttf", "family": "Noto Sans Arabic", "sha256": "92bfec36b41f530a9bfa494f536b2b4d6231af90b6ebdecdb9edb14fb0eb780a" },
+      { "file": "NotoSansArabic-Bold.ttf", "family": "Noto Sans Arabic", "sha256": "80ae8b31770b32ec86553b9e02977e4babec17d487e16f5096fd59d924a13967" }
+    ],
+    "licences": { "Noto Sans": "NotoSans-OFL.txt", "Noto Sans Arabic": "NotoSansArabic-OFL.txt" }
+  },
+  "rawValues": {
+    "allowColors": ["src/theme/**"],
+    "policy": { "noGradients": false, "maxRadius": null }
+  }
+}

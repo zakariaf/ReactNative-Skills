@@ -1,0 +1,848 @@
+{
+  "bad-api-client": {
+    "expect": ["FAIL src/api/api-failure.ts:1 [api-client] src/api/api-failure.ts must export the ApiFailure union"],
+    "ops": [{ "delete": "src/api/api-failure.ts" }]
+  },
+  "bad-api-client-second-transport": {
+    "expect": [
+      "FAIL src/api/upload-client.ts:3 [api-client] a second fetch transport (the first is src/api/fetch-api-cli"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/api/upload-client.ts",
+          "lines": [
+            "// src/api/upload-client.ts: uploads attachments (planted: a second file that calls fetch).",
+            "export function uploadAttachment(url: string, body: Blob): Promise<Response> {",
+            "  return fetch(url, { method: 'PUT', body });",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-base-url": {
+    "expect": [
+      "FAIL src/api/tasks/task-share-link.ts:2 [base-url] a URL literal in the API layer (https://tasks.example.app):"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/api/tasks/task-share-link.ts",
+          "lines": [
+            "// src/api/tasks/task-share-link.ts: the public link of a task (planted: a hard-coded origin).",
+            "const ORIGIN = 'https://tasks.example.app';",
+            "",
+            "export function shareLinkOf(id: string): string {",
+            "  return `${ORIGIN}/t/${encodeURIComponent(id)}`;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-cleartext": {
+    "expect": ["FAIL app.config.ts:9 [cleartext] NSAllowsArbitraryLoads: true switches App Transport Security"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "infoPlist: { NSAllowsLocalNetworking: true }",
+          "with": "infoPlist: { NSAppTransportSecurity: { NSAllowsArbitraryLoads: true } }"
+        }
+      }
+    ]
+  },
+  "bad-cleartext-url": {
+    "expect": [
+      "FAIL src/config/environment.ts:27 [cleartext] a cleartext URL (http://api.tasks.example): release builds b"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/environment.ts",
+          "find": "    apiBaseUrl: parseApiBaseUrl(process.env.EXPO_PUBLIC_API_URL, variant),",
+          "with": "    apiBaseUrl: parseApiBaseUrl(process.env.EXPO_PUBLIC_API_URL ?? 'http://api.tasks.example', variant),"
+        }
+      }
+    ]
+  },
+  "bad-connectivity-port": {
+    "expect": [
+      "FAIL src/services/connectivity/connectivity-port.ts:1 [connectivity-port] no ConnectivityPort: the onlineManager, offline banners, ads"
+    ],
+    "ops": [{ "delete": "src/services/connectivity/connectivity-port.ts" }]
+  },
+  "bad-connectivity-port-direct": {
+    "expect": [
+      "FAIL src/api/query-managers.ts:7 [connectivity-port] the onlineManager listens to expo-network directly: a second"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/api/query-managers.ts",
+          "find": "import { focusManager, onlineManager } from '@tanstack/react-query';",
+          "with": "import { focusManager, onlineManager } from '@tanstack/react-query';\nimport { addNetworkStateListener } from 'expo-network';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/api/query-managers.ts",
+          "find": "    return connectivity.subscribe(setOnline);",
+          "with": "    const subscription = addNetworkStateListener((state) => {\n      setOnline(state.isConnected === true);\n    });\n    return () => {\n      subscription.remove();\n    };"
+        }
+      }
+    ]
+  },
+  "bad-connectivity-port-feature": {
+    "expect": [
+      "FAIL src/features/tasks/use-offline-banner.ts:2 [connectivity-port] expo-network imported outside src/services/connectivity/*-adapter.ts"
+    ],
+    "ops": [
+      {
+        "$comment": "A feature hook subscribing to expo-network itself instead of reading the ConnectivityPort.",
+        "write": {
+          "file": "src/features/tasks/use-offline-banner.ts",
+          "lines": [
+            "// src/features/tasks/use-offline-banner.ts",
+            "import { useNetworkState } from 'expo-network';",
+            "",
+            "export function useOfflineBanner(): boolean {",
+            "  return useNetworkState().isConnected === false;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-managers-wired": {
+    "expect": [
+      "FAIL src/app/_layout.tsx:1 [managers-wired] no app file renders <QueryProvider>: the client is never mou"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-providers.tsx",
+          "find": "        <QueryProvider client={queryClient} connectivity={services.connectivity}>",
+          "with": "        <QueryClientProvider client={queryClient}>"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-providers.tsx",
+          "find": "        </QueryProvider>",
+          "with": "        </QueryClientProvider>"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-providers.tsx",
+          "find": "import { QueryProvider } from '@/api/query-provider';\n",
+          "with": "import { QueryClientProvider } from '@tanstack/react-query';\n"
+        }
+      }
+    ]
+  },
+  "bad-managers-wired-focus": {
+    "expect": [
+      "FAIL src/api/query-managers.ts:1 [managers-wired] nothing feeds TanStack's focusManager: returning to the app"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/api/query-managers.ts",
+          "find": "  focusManager.setEventListener((setFocused) => {",
+          "with": "  appStateFocus.listen((setFocused) => {"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/api/query-managers.ts",
+          "find": "    focusManager.setEventListener(() => undefined);\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/api/query-managers.ts",
+          "find": "    focusManager.setFocused(undefined);\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-mutation-cache": {
+    "expect": [
+      "FAIL src/api/tasks/task-mutations.ts:68 [mutation-cache] a mutation that never touches the cache: every list and deta"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/api/tasks/task-mutations.ts",
+          "find": "      onSuccess: () => queryClient.invalidateQueries({ queryKey: taskKeys.lists() }),\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-mutation-cache-helper": {
+    "expect": ["FAIL src/api/tasks/task-mutations.ts:69 [mutation-cache] a mutation that never touches the cache"],
+    "ops": [
+      {
+        "$comment": "The helper onSuccess calls touches no cache: following it must not hide the missing effect.",
+        "write": {
+          "file": "src/api/tasks/task-cache.ts",
+          "lines": [
+            "// src/api/tasks/task-cache.ts",
+            "export function noteTaskCreated(id: string): string {",
+            "  return `created ${id}`;",
+            "}"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/api/tasks/task-mutations.ts",
+          "find": "import { taskKeys } from './task-keys';\n",
+          "with": "import { noteTaskCreated } from './task-cache';\nimport { taskKeys } from './task-keys';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/api/tasks/task-mutations.ts",
+          "find": "      onSuccess: () => queryClient.invalidateQueries({ queryKey: taskKeys.lists() }),\n",
+          "with": "      onSuccess: (task) => noteTaskCreated(task.id),\n"
+        }
+      }
+    ]
+  },
+  "bad-network-call": {
+    "expect": [
+      "FAIL src/features/tasks/ping-server.ts:3 [network-call] fetch() outside the ApiClient: network calls live in src/api"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/ping-server.ts",
+          "lines": [
+            "// src/features/tasks/ping-server.ts: asks whether the server is up (planted: fetch outside the ApiClient).",
+            "export async function pingServer(url: string): Promise<boolean> {",
+            "  const response = await fetch(url, { method: 'HEAD' });",
+            "  return response.ok;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-network-call-client": {
+    "expect": [
+      "FAIL src/api/tasks/task-export.ts:2 [network-call] import of axios: the app has one HTTP client, the ApiClient"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/api/tasks/task-export.ts",
+          "lines": [
+            "// src/api/tasks/task-export.ts: downloads the CSV export (planted: a second HTTP client).",
+            "import axios from 'axios';",
+            "",
+            "export async function downloadExport(path: string): Promise<string> {",
+            "  const response = await axios.get<string>(path);",
+            "  return response.data;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-network-call-global": {
+    "expect": [
+      "FAIL src/services/create-device-services.ts:24 [network-call] fetch (the global, passed on) outside the ApiClient: network"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/create-device-services.ts",
+          "find": "api: createFetchApiClient({ baseUrl: environment.apiBaseUrl, fetch: deviceFetch, errorLog }),",
+          "with": "api: createFetchApiClient({ baseUrl: environment.apiBaseUrl, fetch, errorLog }),"
+        }
+      }
+    ]
+  },
+  "bad-network-mode": {
+    "expect": [
+      "FAIL src/api/tasks/task-queries.ts:43 [network-mode] networkMode 'always' runs requests while offline: they fail,"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/api/tasks/task-queries.ts",
+          "find": "      queryKey: taskKeys.detail(id),",
+          "with": "      queryKey: taskKeys.detail(id),\n      networkMode: 'always',"
+        }
+      }
+    ]
+  },
+  "bad-online-manager-reachability": {
+    "expect": ["FAIL src/api/query-managers.ts:47 [connectivity-port] the onlineManager is fed from reachability"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/api/query-managers.ts",
+          "find": "    setOnline(connectivity.isOnline());\n    return connectivity.subscribe(setOnline);",
+          "with": "    setOnline(connectivity.reachability() === 'reachable');\n    return connectivity.subscribeReachability((reachability) => {\n      setOnline(reachability === 'reachable');\n    });"
+        }
+      }
+    ]
+  },
+  "bad-optimistic-rollback": {
+    "expect": [
+      "FAIL src/api/tasks/task-mutations.ts:51 [optimistic-rollback] no onError restores the snapshot: a refused write stays on s"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/api/tasks/task-mutations.ts",
+          "find": "      onError: (_error, _input, snapshot) => {\n        for (const [key, tasks] of snapshot?.lists ?? []) queryClient.setQueryData(key, tasks);\n      },\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-optimistic-rollback-cancel": {
+    "expect": [
+      "FAIL src/api/tasks/task-mutations.ts:51 [optimistic-rollback] onMutate does not cancelQueries first: a refetch in flight o"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/api/tasks/task-mutations.ts",
+          "find": "        await queryClient.cancelQueries({ queryKey: taskKeys.all });\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-persist-cache": {
+    "expect": [
+      "FAIL src/api/persisted-query-client.tsx:13 [persist-cache] a persisted query cache without buster: after a schema chang",
+      "FAIL src/api/persisted-query-client.tsx:13 [persist-cache] a persisted query cache without maxAge"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/api/persisted-query-client.tsx",
+          "lines": [
+            "// src/api/persisted-query-client.tsx: planted (a persisted cache without buster and maxAge).",
+            "import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';",
+            "import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';",
+            "import Storage from 'expo-sqlite/kv-store';",
+            "",
+            "import type { QueryClient } from '@tanstack/react-query';",
+            "import type { JSX, ReactNode } from 'react';",
+            "",
+            "const persister = createAsyncStoragePersister({ storage: Storage });",
+            "",
+            "export function PersistedQueryProvider(props: { readonly client: QueryClient; readonly children: ReactNode }): JSX.Element {",
+            "  return (",
+            "    <PersistQueryClientProvider client={props.client} persistOptions={{ persister }}>",
+            "      {props.children}",
+            "    </PersistQueryClientProvider>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-query-client": {
+    "expect": [
+      "FAIL src/features/root-navigator/app-root.tsx:64 [query-client] a QueryClient created in the body of AppRoot: every render makes a new, empty cache"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/app-root.tsx",
+          "find": "  const [app] = useState(() => startApp(services));",
+          "with": "  const [started] = useState(() => startApp(services));\n  const app = { ...started, queryClient: createQueryClient({ errorLog: services.errorLog }) };"
+        }
+      }
+    ]
+  },
+  "bad-query-client-module": {
+    "expect": [
+      "FAIL src/api/shared-query-client.ts:5 [query-client] a QueryClient created at module level: it outlives logout, F"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/api/shared-query-client.ts",
+          "lines": [
+            "// src/api/shared-query-client.ts: planted (a QueryClient created at import time).",
+            "import { createQueryClient } from './create-query-client';",
+            "import { createMemoryErrorLogAdapter } from '@/services/error-log/memory-error-log-adapter';",
+            "",
+            "export const sharedQueryClient = createQueryClient({ errorLog: createMemoryErrorLogAdapter({ clock: { nowMs: () => 0 } }) });"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-query-hook-home": {
+    "expect": [
+      "FAIL src/features/tasks/components/open-count.tsx:12 [query-hook-home] useQuery in src/features/tasks/components/open-count.tsx: se"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/open-count.tsx",
+          "lines": [
+            "// src/features/tasks/components/open-count.tsx: the open-task badge (planted: a component reads server state).",
+            "import { useQuery } from '@tanstack/react-query';",
+            "",
+            "import { taskQueries } from '@/api/tasks/task-queries';",
+            "import { useServices } from '@/services/services-context';",
+            "import { AppText } from '@/ui/app-text';",
+            "",
+            "import type { JSX } from 'react';",
+            "",
+            "export function OpenCount(): JSX.Element {",
+            "  const { api } = useServices();",
+            "  const tasks = useQuery(taskQueries.list(api, 'open'));",
+            "  return <AppText role=\"caption\">{String(tasks.data?.length ?? 0)}</AppText>;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-query-key-factory": {
+    "expect": [
+      "FAIL src/features/tasks/use-tasks-model.ts:67 [query-key-factory] an inline queryKey array: one typo and an invalidation misse"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "    onRetry: () => {\n      query.refetch()",
+          "with": "    onRetry: () => {\n      queryClient.invalidateQueries({ queryKey: ['task'] }).catch((error: unknown) => {\n        errorLog.record('network', error);\n      });\n      query.refetch()"
+        }
+      }
+    ]
+  },
+  "bad-query-key-factory-shape": {
+    "expect": [
+      "src/api/notes/note-keys.ts:1 [query-key-factory] a key factory without an `all` root key",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "$comment": "Planted: a key factory in the api folder with no `all` root key.",
+        "write": {
+          "file": "src/api/notes/note-keys.ts",
+          "lines": [
+            "// src/api/notes/note-keys.ts",
+            "export const noteKeys = {",
+            "  list: () => ['notes', 'list'] as const,",
+            "};"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-query-options": {
+    "expect": [
+      "FAIL src/features/tasks/use-task-details-model.ts:13 [query-options] a queryFn outside src/api/: queries are defined once, with q"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-details-model.ts",
+          "lines": [
+            "// src/features/tasks/use-task-details-model.ts: one task (planted: a query defined in the model hook).",
+            "import { useQuery } from '@tanstack/react-query';",
+            "",
+            "import { unwrap } from '@/api/api-error';",
+            "import { taskKeys } from '@/api/tasks/task-keys';",
+            "import { taskSchema } from '@/api/tasks/task-schemas';",
+            "import { useServices } from '@/services/services-context';",
+            "",
+            "export function useTaskDetailsModel(id: string): { readonly title: string } {",
+            "  const { api } = useServices();",
+            "  const query = useQuery({",
+            "    queryKey: taskKeys.detail(id),",
+            "    queryFn: ({ signal }) => unwrap(api.request({ method: 'GET', path: `/tasks/${id}`, schema: taskSchema, signal })),",
+            "  });",
+            "  return { title: query.data?.title ?? '' };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-query-signal": {
+    "expect": [
+      "FAIL src/api/tasks/task-queries.ts:26 [query-signal] a queryFn that does not pass TanStack's signal to the reques"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/api/tasks/task-queries.ts",
+          "find": "      queryFn: ({ signal }) =>\n        unwrap(\n          api.request({\n            method: 'GET',\n            path: '/tasks',\n            query: { filter: filter === 'all' ? undefined : filter },\n            schema: taskListSchema,\n            signal,\n          }),\n        ),",
+          "with": "      queryFn: () =>\n        unwrap(\n          api.request({\n            method: 'GET',\n            path: '/tasks',\n            query: { filter: filter === 'all' ? undefined : filter },\n            schema: taskListSchema,\n          }),\n        ),"
+        }
+      }
+    ]
+  },
+  "bad-query-signal-unforwarded": {
+    "expect": [
+      "FAIL src/api/tasks/task-queries.ts:43 [query-signal] a queryFn that does not pass TanStack's signal to the request"
+    ],
+    "ops": [
+      {
+        "$comment": "The signal is destructured (TanStack then aborts on unmount) but never handed to the request, which runs on.",
+        "replace": {
+          "file": "src/api/tasks/task-queries.ts",
+          "find": "            schema: taskSchema,\n            signal,\n",
+          "with": "            schema: taskSchema,\n"
+        }
+      }
+    ]
+  },
+  "bad-request-timeout": {
+    "expect": [
+      "FAIL src/api/fetch-api-client.ts:1 [request-timeout] the transport sets no deadline: expo/fetch on Android uses O"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/api/fetch-api-client.ts",
+          "find": "  const timer = setTimeout(() => {\n    isTimedOut = true;\n    abort();\n  }, attempt.timeoutMs);",
+          "with": "  const timer = 0;"
+        }
+      }
+    ]
+  },
+  "bad-response-schema": {
+    "expect": [
+      "FAIL src/api/tasks/task-schemas.ts:16 [response-schema] a closed set without a fallback: a value the server adds lat"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/api/tasks/task-schemas.ts",
+          "find": "priority: v.fallback(v.picklist(TASK_PRIORITIES), 'normal'),",
+          "with": "priority: v.picklist(TASK_PRIORITIES),"
+        }
+      }
+    ]
+  },
+  "bad-response-schema-strict": {
+    "expect": [
+      "FAIL src/api/tasks/task-schemas.ts:11 [response-schema] v.strictObject in the API layer: a server that adds a field"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/api/tasks/task-schemas.ts",
+          "find": "export const taskSchema = v.object({",
+          "with": "export const taskSchema = v.strictObject({"
+        }
+      }
+    ]
+  },
+  "bad-retry-policy": {
+    "expect": [
+      "FAIL src/api/create-query-client.ts:49 [retry-policy] the QueryClient keeps TanStack's default retry: three retrie",
+      "FAIL src/api/create-query-client.ts:55 [retry-policy] retry: 5 retries every failure 5 times"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/api/create-query-client.ts",
+          "find": "        retry: shouldRetryQuery,\n",
+          "with": "        retry: 5,\n"
+        }
+      }
+    ]
+  },
+  "bad-retry-policy-mutation": {
+    "expect": [
+      "FAIL src/api/tasks/task-mutations.ts:78 [retry-policy] a write that retries without an idempotency key: a retried P"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/api/tasks/task-mutations.ts",
+          "find": "      onSuccess: () => queryClient.invalidateQueries({ queryKey: taskKeys.lists() }),",
+          "with": "      onSuccess: () => queryClient.invalidateQueries({ queryKey: taskKeys.lists() }),\n      retry: 2,"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/api/tasks/task-mutations.ts",
+          "find": "            idempotencyKey: input.requestId,\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-test-fetch-mock": {
+    "expect": [
+      "FAIL src/api/tasks/task-queries.network.test.ts:4 [test-fetch-mock] a test replaces the global fetch: it leaks into other tests"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/api/tasks/task-queries.network.test.ts",
+          "lines": [
+            "// src/api/tasks/task-queries.network.test.ts: planted (replaces the global fetch).",
+            "describe('taskQueries over the network', () => {",
+            "  it('loads the list', () => {",
+            "    const spy = jest.spyOn(globalThis, 'fetch').mockResolvedValue(new Response('{\"items\":[]}'));",
+            "    expect(spy).not.toHaveBeenCalled();",
+            "  });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-transport-boundary": {
+    "expect": [
+      "FAIL src/api/fetch-api-client.ts:153 [transport-boundary] an awaited fetch or body read outside try/catch: its rejecti"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/api/fetch-api-client.ts",
+          "find": "      const received = await receive(options.fetch, {\n",
+          "with": "      const probe = await options.fetch(url, { ...init, signal: new AbortController().signal });\n      if (probe.status === 404) return err({ kind: 'not-found' });\n      const received = await receive(options.fetch, {\n"
+        }
+      }
+    ]
+  },
+  "bad-validated-response": {
+    "expect": [
+      "FAIL src/api/tasks/task-queries.ts:45 [validated-response] a request without a schema: its response would reach the app"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/api/tasks/task-queries.ts",
+          "find": "            path: `/tasks/${encodeURIComponent(id)}`,\n            schema: taskSchema,",
+          "with": "            path: `/tasks/${encodeURIComponent(id)}`,"
+        }
+      }
+    ]
+  },
+  "bad-validated-response-cast": {
+    "expect": ["FAIL src/api/tasks/task-cache.ts:5 [validated-response] parsed JSON cast to a type"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/api/tasks/task-cache.ts",
+          "lines": [
+            "// src/api/tasks/task-cache.ts: reads tasks cached as text (planted: parsed JSON cast to a type).",
+            "import type { ApiTask } from './task-schemas';",
+            "",
+            "export function readCachedTasks(text: string): readonly ApiTask[] {",
+            "  return JSON.parse(text) as ApiTask[];",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-validated-response-unrecorded": {
+    "expect": [
+      "FAIL src/api/fetch-api-client.ts:110 [validated-response] an invalid response is not recorded: after the conversion on"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/api/fetch-api-client.ts",
+          "find": "  errorLog.record(\n    'network',\n    new Error(`invalid response to ${request.method} ${request.path}: ${detail}`),\n  );\n",
+          "with": "  // detail is dropped here (planted: the invalid response is not recorded)\n  void detail;\n  void errorLog;\n"
+        }
+      }
+    ]
+  },
+  "error-bad-package-json": {
+    "expect": ["ERROR [bad-input] package.json is not valid JSON"],
+    "ops": [{ "write": { "file": "package.json", "content": "{ \"name\": \"tasks-app\", }\n" } }]
+  },
+  "error-no-package-json": { "expect": ["ERROR [bad-input] nothing to check: no package.json in"], "args": "{dir}/src" },
+  "error-unknown-option": { "expect": ["ERROR [bad-input] Unknown option '--strict'"], "args": "{dir} --strict" },
+  "pass-mutation-cache-helpers": {
+    "expect": ["check-server-state:"],
+    "ops": [
+      {
+        "$comment": "A cache effect moved into a helper: one declared in the same file (toggle), one imported from a sibling module (create).",
+        "write": {
+          "file": "src/api/tasks/task-cache.ts",
+          "lines": [
+            "// src/api/tasks/task-cache.ts",
+            "import { taskKeys } from './task-keys';",
+            "",
+            "import type { QueryClient } from '@tanstack/react-query';",
+            "",
+            "export async function refreshTaskLists(queryClient: QueryClient): Promise<void> {",
+            "  await queryClient.invalidateQueries({ queryKey: taskKeys.lists() });",
+            "}"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/api/tasks/task-mutations.ts",
+          "find": "import { taskKeys } from './task-keys';\n",
+          "with": "import { refreshTaskLists } from './task-cache';\nimport { taskKeys } from './task-keys';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/api/tasks/task-mutations.ts",
+          "find": "      onSuccess: () => queryClient.invalidateQueries({ queryKey: taskKeys.lists() }),\n",
+          "with": "      onSuccess: () => refreshTaskLists(queryClient),\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/api/tasks/task-mutations.ts",
+          "find": "      onSettled: () => queryClient.invalidateQueries({ queryKey: taskKeys.all }),\n",
+          "with": "      onSettled: async () => {\n        await refetchEveryTask(queryClient);\n      },\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/api/tasks/task-mutations.ts",
+          "find": "function withDone(",
+          "with": "const refetchEveryTask = (queryClient: QueryClient) =>\n  queryClient.invalidateQueries({ queryKey: taskKeys.all });\n\nfunction withDone("
+        }
+      }
+    ]
+  },
+  "pass-network-mode-marker": {
+    "expect": ["check-server-state:"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/api/tasks/task-queries.ts",
+          "find": "      queryKey: taskKeys.detail(id),",
+          "with": "      queryKey: taskKeys.detail(id),\n      // network-mode-always: the detail is served by the app's own local server in this flow\n      networkMode: 'always',"
+        }
+      }
+    ]
+  },
+  "pass-no-cache-effect-marker": {
+    "expect": ["check-server-state:"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/api/tasks/task-mutations.ts",
+          "find": "      onSuccess: () => queryClient.invalidateQueries({ queryKey: taskKeys.lists() }),\n",
+          "with": "      // no-cache-effect: the created task appears through the push the server sends, not a refetch\n"
+        }
+      }
+    ]
+  },
+  "pass-no-root-layout": {
+    "expect": ["SKIP src/app/_layout.tsx [managers-wired] not yet created (navigation-and-routing creates it)"],
+    "ops": [{ "delete": ["src/app/_layout.tsx", "src/features/root-navigator/app-providers.tsx"] }]
+  },
+  "pass-non-query-keys-file": {
+    "expect": ["check-server-state:", "RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "A *-keys.ts file outside the api folder that is not a TanStack key factory (secure-storage key names): no query-key-factory finding.",
+        "write": {
+          "file": "src/services/secure-storage/secure-keys.ts",
+          "lines": [
+            "// src/services/secure-storage/secure-keys.ts: the secure-store key names (not query keys).",
+            "export const SECURE_KEYS = {",
+            "  accessToken: 'auth.access-token',",
+            "} as const;"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-not-applicable": {
+    "expect": [
+      "NOT APPLICABLE: no app code imports @tanstack/react-query or calls the network, and there is no src/api/"
+    ],
+    "base": ["@tests/bases/plain"]
+  },
+  "pass-persist-cache-hoisted": {
+    "expect": ["check-server-state:"],
+    "ops": [
+      {
+        "$comment": "Persist options hoisted into a same-file const (shorthand buster included).",
+        "write": {
+          "file": "src/api/persisted-query-client.tsx",
+          "lines": [
+            "// src/api/persisted-query-client.tsx",
+            "import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';",
+            "import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';",
+            "",
+            "import type { QueryClient } from '@tanstack/react-query';",
+            "import type { JSX, ReactNode } from 'react';",
+            "",
+            "const DAY_MS = 24 * 60 * 60 * 1000;",
+            "const buster = 'tasks-api-3';",
+            "const storage = { getItem: async () => null, setItem: async () => undefined, removeItem: async () => undefined };",
+            "const persister = createAsyncStoragePersister({ storage });",
+            "const options = { persister, maxAge: DAY_MS, buster };",
+            "",
+            "export function PersistedQueryProvider(props: { readonly client: QueryClient; readonly children: ReactNode }): JSX.Element {",
+            "  return (",
+            "    <PersistQueryClientProvider client={props.client} persistOptions={options}>",
+            "      {props.children}",
+            "    </PersistQueryClientProvider>",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-query-signal-shapes": {
+    "expect": ["check-server-state:"],
+    "ops": [
+      {
+        "$comment": "Legitimate ways to forward the signal: the whole context handed on, a named same-file function, skipToken.",
+        "write": {
+          "file": "src/api/tasks/task-search.ts",
+          "lines": [
+            "// src/api/tasks/task-search.ts",
+            "import { queryOptions, skipToken } from '@tanstack/react-query';",
+            "",
+            "import { unwrap } from '@/api/api-error';",
+            "",
+            "import { taskKeys } from './task-keys';",
+            "import { taskListSchema } from './task-schemas';",
+            "",
+            "import type { ApiClient } from '@/api/api-client';",
+            "import type { QueryFunctionContext } from '@tanstack/react-query';",
+            "",
+            "async function loadOpen(api: ApiClient, context: QueryFunctionContext) {",
+            "  return unwrap(api.request({ method: 'GET', path: '/tasks', schema: taskListSchema, signal: context.signal }));",
+            "}",
+            "",
+            "export const taskSearch = {",
+            "  open: (api: ApiClient) =>",
+            "    queryOptions({ queryKey: taskKeys.list('open'), queryFn: (context) => loadOpen(api, context) }),",
+            "  maybe: (api: ApiClient, isReady: boolean) =>",
+            "    queryOptions({",
+            "      queryKey: taskKeys.list('done'),",
+            "      queryFn: isReady ? async function load({ signal }) { return unwrap(api.request({ method: 'GET', path: '/tasks', schema: taskListSchema, signal })); } : skipToken,",
+            "    }),",
+            "};"
+          ]
+        }
+      }
+    ]
+  }
+}

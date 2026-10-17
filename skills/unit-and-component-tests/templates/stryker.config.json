@@ -1,0 +1,47 @@
+{
+  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "packageManager": "npm",
+  "testRunner": "jest",
+  "jest": {
+    "projectType": "custom",
+    "configFile": "jest.config.js",
+    "enableFindRelatedTests": true
+  },
+  "checkers": ["typescript"],
+  "tsconfigFile": "tsconfig.stryker.json",
+  "disableTypeChecks": "{src,test}/**/*.{ts,tsx}",
+  "mutate": [
+    "src/core/**/*.ts",
+    "src/data/**/*.ts",
+    "src/games/*/rules/**/*.ts",
+    "src/games/*/levels/**/*.ts",
+    "src/**/*-policy.ts",
+    "src/**/*-reducer.ts",
+    "!**/*.test.ts",
+    "!**/testing/**",
+    "!**/fixtures/**",
+    "!test/**"
+  ],
+  "ignorePatterns": [
+    "ios",
+    "android",
+    "build",
+    "dist",
+    "reports",
+    "coverage",
+    "skills",
+    ".agents",
+    ".claude",
+    ".skill-tooling"
+  ],
+  "coverageAnalysis": "perTest",
+  "incremental": true,
+  "incrementalFile": "reports/stryker/incremental.json",
+  "ignoreStatic": true,
+  "thresholds": { "high": 90, "low": 80, "break": 75 },
+  "reporters": ["clear-text", "progress", "json", "html"],
+  "jsonReporter": { "fileName": "reports/stryker/mutation.json" },
+  "htmlReporter": { "fileName": "reports/stryker/mutation.html" },
+  "tempDirName": ".stryker-tmp",
+  "concurrency": 4
+}

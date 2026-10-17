@@ -1,0 +1,3 @@
+bundle (ios): 1,900 bytes of minified JS in 1 file(s) (cap 3,000)
+baseline: 1,900 bytes (x1.000, limit x1.1)
+RESULT: PASS

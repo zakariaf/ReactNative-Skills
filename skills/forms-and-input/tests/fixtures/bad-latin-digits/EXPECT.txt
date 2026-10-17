@@ -1,0 +1,2 @@
+src/features/task-editor/task-editor-schema.ts:15 [latin-digits] the schema reads digits without toLatinDigits
+RESULT: FAIL (1 problems)

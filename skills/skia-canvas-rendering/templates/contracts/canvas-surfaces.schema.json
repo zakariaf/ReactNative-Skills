@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Canvas surfaces",
+  "description": "The app's Skia canvas surfaces, read by the skia-canvas-rendering checkers. Optional: without it, every src/features/<feature>/canvas and src/games/<game-id>/canvas folder is a timeline surface (live with a sim/ sibling), each is opaque, the palette sets are light and dark, and no canvas outside a surface folder may draw a computed picture.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "paletteSets": {
+      "description": "The palette sets every canvas-palettes.json holds, with identical tokens. light and dark always; add colorBlindLight/colorBlindDark or highContrast sets when the app offers that setting.",
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-z][A-Za-z0-9]*$" },
+      "uniqueItems": true,
+      "minItems": 2
+    },
+    "goldensDir": {
+      "description": "Where the surface pixel goldens live (default test/goldens/canvas).",
+      "type": "string"
+    },
+    "surfaces": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "dir"],
+        "properties": {
+          "id": {
+            "description": "Kebab-case id: <id>-surface.ts, <id>.golden.test.ts and <id>-*.png baselines.",
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+          },
+          "dir": {
+            "description": "Repo-relative folder holding the surface files (one surface per folder).",
+            "type": "string"
+          },
+          "kind": {
+            "description": "timeline (default): committed changes played by the scene clock. live: a real-time loop draws every frame (realtime-game-loop owns its draw test and goldens); here it needs palettes, contrast pairs and a draw file only.",
+            "enum": ["timeline", "live"]
+          },
+          "opaque": {
+            "description": "true (default): draw() paints every pixel first (canvas.drawColor of the background) and the canvas is rendered opaque (on Android a SurfaceView). false: the canvas shows what lies behind it; every SurfaceHost/SurfaceCanvas that renders it passes isOpaque={false} (on Android a TextureView, which costs more), which check-canvas-code proves (opaque-contract).",
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "staticCanvases": {
+      "description": "App source files outside every surface folder whose <Canvas> shows static art recorded once (createPicture, a fixed Picture). Exempt from canvas-outside-surface; a listed file that reads per-frame values still fails. A static declarative canvas (a gradient, a blur, fixed shapes) needs no entry.",
+      "type": "array",
+      "items": { "type": "string", "pattern": "\\.[jt]sx?$" },
+      "uniqueItems": true
+    }
+  }
+}

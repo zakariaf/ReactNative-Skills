@@ -1,0 +1,54 @@
+{
+  "$comment": "Every case starts from the shipped templates plus tests/bases/app (a local-lane Tasks app), with decoy findings planted in installed and vendored skills that must stay silent.",
+  "base": [
+    {
+      "templates": true,
+      "firstLinePath": true,
+      "fill": {
+        "__APP_ID__": "com.acme.tasks"
+      }
+    },
+    "@tests/bases/app"
+  ],
+  "ops": [
+    {
+      "write": {
+        "file": ".agents/skills/demo/SKILL.md",
+        "content": "---\nname: demo\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": ".agents/skills/demo/upload.jks",
+        "content": "a planted keystore inside an installed skill\n"
+      }
+    },
+    {
+      "write": {
+        "file": ".agents/skills/demo/src/leak.ts",
+        "content": "export const KEY = '~/.android-keys/play-service-account.json';\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/demo/SKILL.md",
+        "content": "---\nname: demo\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/demo/release.keystore",
+        "content": "a planted keystore inside a vendored skill\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/demo/src/test-only-entry.ts",
+        "content": "export const OTHER_SENTINEL = 'DEMO_TEST_BUILD_ONLY';\n"
+      }
+    }
+  ],
+  "renames": {
+    "dot-claude": ".claude"
+  }
+}

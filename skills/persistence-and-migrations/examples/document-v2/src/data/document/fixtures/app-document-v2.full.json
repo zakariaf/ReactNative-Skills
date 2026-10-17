@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 2,
+  "appId": "tasks-app",
+  "settings": {
+    "theme": "dark",
+    "language": "ar",
+    "reminderHour": 7,
+    "soundEnabled": false,
+    "reduceMotion": "on",
+    "textScale": 140
+  },
+  "onboarding": { "completed": true, "seenTips": ["swipe-to-complete", "lists-in-sidebar"] },
+  "stats": {
+    "tasksCompleted": 412,
+    "streak": { "lastDate": "2026-09-30", "length": 12 },
+    "bestStreak": 40,
+    "days": { "2026-09-28": 5, "2026-09-29": 3, "2026-09-30": 7 }
+  },
+  "premium": {
+    "owned": true,
+    "ownedSinceMs": 1788000000000,
+    "lastCheckedAtMs": 1790000000000,
+    "revokedAtMs": null
+  }
+}

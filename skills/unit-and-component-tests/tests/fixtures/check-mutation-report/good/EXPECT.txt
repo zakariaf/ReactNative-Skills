@@ -1,0 +1,3 @@
+mutation score 90.0% (9 detected of 10 valid mutants; 11 in the report; break 75%)
+note src/core/task-filter.ts:17 1 survived, 0 without coverage
+RESULT: PASS

@@ -1,0 +1,307 @@
+{
+  "gameId": "pig",
+  "rulesFingerprint": "d60e02e113b9b7c24546ef88db6be287a2f20286a007f56afb4e5a8a845357cd",
+  "seedsPerCell": 100,
+  "maxMoves": 400,
+  "cells": [
+    {
+      "policy": "random",
+      "difficulty": 0,
+      "runs": 100,
+      "wins": 41,
+      "capHits": 0,
+      "winRate": 0.41,
+      "medianMoves": 17,
+      "p10Moves": 13,
+      "p90Moves": 19,
+      "medianScore": 35,
+      "payoffPerRun": 9.62,
+      "twistPerRun": 0.72,
+      "lossReasons": {
+        "pig.lose.bust-streak": 2,
+        "pig.lose.out-of-turns": 57
+      },
+      "firstPayoffShare": [
+        0.88,
+        0.98,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "policy": "random",
+      "difficulty": 25,
+      "runs": 100,
+      "wins": 16,
+      "capHits": 0,
+      "winRate": 0.16,
+      "medianMoves": 22,
+      "p10Moves": 17,
+      "p90Moves": 25,
+      "medianScore": 46,
+      "payoffPerRun": 12.75,
+      "twistPerRun": 1.03,
+      "lossReasons": {
+        "pig.lose.bust-streak": 2,
+        "pig.lose.out-of-turns": 82
+      },
+      "firstPayoffShare": [
+        0.88,
+        0.98,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "policy": "random",
+      "difficulty": 50,
+      "runs": 100,
+      "wins": 4,
+      "capHits": 0,
+      "winRate": 0.04,
+      "medianMoves": 24,
+      "p10Moves": 19,
+      "p90Moves": 28,
+      "medianScore": 50,
+      "payoffPerRun": 14.23,
+      "twistPerRun": 1.12,
+      "lossReasons": {
+        "pig.lose.bust-streak": 2,
+        "pig.lose.out-of-turns": 94
+      },
+      "firstPayoffShare": [
+        0.88,
+        0.98,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "policy": "random",
+      "difficulty": 75,
+      "runs": 100,
+      "wins": 0,
+      "capHits": 0,
+      "winRate": 0,
+      "medianMoves": 27,
+      "p10Moves": 22,
+      "p90Moves": 31,
+      "medianScore": 55,
+      "payoffPerRun": 15.6,
+      "twistPerRun": 1.23,
+      "lossReasons": {
+        "pig.lose.bust-streak": 2,
+        "pig.lose.out-of-turns": 98
+      },
+      "firstPayoffShare": [
+        0.88,
+        0.98,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "policy": "holdAt20",
+      "difficulty": 0,
+      "runs": 100,
+      "wins": 84,
+      "capHits": 0,
+      "winRate": 0.84,
+      "medianMoves": 18,
+      "p10Moves": 12,
+      "p90Moves": 25,
+      "medianScore": 41,
+      "payoffPerRun": 13.79,
+      "twistPerRun": 1.91,
+      "lossReasons": {
+        "pig.lose.bust-streak": 10,
+        "pig.lose.out-of-turns": 6
+      },
+      "firstPayoffShare": [
+        0.88,
+        0.98,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "policy": "holdAt20",
+      "difficulty": 25,
+      "runs": 100,
+      "wins": 74,
+      "capHits": 0,
+      "winRate": 0.74,
+      "medianMoves": 26,
+      "p10Moves": 17,
+      "p90Moves": 35,
+      "medianScore": 61,
+      "payoffPerRun": 19.7,
+      "twistPerRun": 2.83,
+      "lossReasons": {
+        "pig.lose.bust-streak": 16,
+        "pig.lose.out-of-turns": 10
+      },
+      "firstPayoffShare": [
+        0.88,
+        0.98,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "policy": "holdAt20",
+      "difficulty": 50,
+      "runs": 100,
+      "wins": 63,
+      "capHits": 0,
+      "winRate": 0.63,
+      "medianMoves": 33,
+      "p10Moves": 23,
+      "p90Moves": 42,
+      "medianScore": 80,
+      "payoffPerRun": 24.86,
+      "twistPerRun": 3.61,
+      "lossReasons": {
+        "pig.lose.bust-streak": 21,
+        "pig.lose.out-of-turns": 16
+      },
+      "firstPayoffShare": [
+        0.88,
+        0.98,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "policy": "holdAt20",
+      "difficulty": 75,
+      "runs": 100,
+      "wins": 46,
+      "capHits": 0,
+      "winRate": 0.46,
+      "medianMoves": 39,
+      "p10Moves": 23,
+      "p90Moves": 48,
+      "medianScore": 85,
+      "payoffPerRun": 28.64,
+      "twistPerRun": 4.17,
+      "lossReasons": {
+        "pig.lose.bust-streak": 27,
+        "pig.lose.out-of-turns": 27
+      },
+      "firstPayoffShare": [
+        0.88,
+        0.98,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "policy": "lookahead",
+      "difficulty": 25,
+      "runs": 100,
+      "wins": 90,
+      "capHits": 0,
+      "winRate": 0.9,
+      "medianMoves": 25,
+      "p10Moves": 19,
+      "p90Moves": 32,
+      "medianScore": 72,
+      "payoffPerRun": 19.77,
+      "twistPerRun": 0.15,
+      "lossReasons": {
+        "pig.lose.out-of-turns": 10
+      },
+      "firstPayoffShare": [
+        0.88,
+        0.98,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "policy": "holdAt20",
+      "difficulty": 100,
+      "runs": 100,
+      "wins": 0,
+      "capHits": 0,
+      "winRate": 0,
+      "medianMoves": 70,
+      "p10Moves": 23,
+      "p90Moves": 94,
+      "medianScore": 132,
+      "payoffPerRun": 48.48,
+      "twistPerRun": 7.01,
+      "lossReasons": {
+        "pig.lose.bust-streak": 50,
+        "pig.lose.out-of-turns": 50
+      },
+      "firstPayoffShare": [
+        0.88,
+        0.98,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "$schema": "./canvas-surfaces.schema.json",
+  "paletteSets": ["light", "dark"],
+  "surfaces": [
+    { "id": "progress-grid", "dir": "src/features/tasks/canvas", "kind": "timeline" },
+    { "id": "timer", "dir": "src/features/timer/canvas", "kind": "live" }
+  ]
+}

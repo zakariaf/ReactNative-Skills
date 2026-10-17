@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["jest"],
+    "paths": {
+      "@/*": ["./*"],
+      "@test/*": ["../test/*"]
+    },
+    "tsBuildInfoFile": "${configDir}/../node_modules/.cache/tsc/app.tsbuildinfo.json"
+  },
+  "include": ["**/*", "../.expo/types/**/*.ts"]
+}

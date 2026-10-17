@@ -1,0 +1,13 @@
+# The dry run of: node scaffold-game.mjs . --game lights-out --name "Lights Out" --hints none --continue once --levels 3x30 --daily --lose-reason out-of-moves
+# (an app with contracts/games.json and en + ar catalogs). The daily salt is the deterministic default for the id, the value game-rules-engine's and level-generation-and-solvers' templates use for lights-out.
+edit contracts/games.json (+ lights-out)
+same contracts/games.schema.json
+edit src/i18n/catalogs/ar.json (+ 2 keys)
+draft src/i18n/catalogs/ar.json: lights-out.name, lights-out.lose.out-of-moves (source-language text: translate it, then list it on the review queue)
+edit src/i18n/catalogs/en.json (+ 2 keys)
+would write 3 files for lights-out (turn-based, pan none, levels 3x30, daily on, endless off, hints none, continue once, lose lights-out.lose.out-of-moves)
+placeholders for every games skill's templates: __GAME_ID__=lights-out __GAME_PASCAL__=LightsOut __GAME_CAMEL__=lightsOut __GAME_CONST__=LIGHTS_OUT
+levels: level-generation-and-solvers adds { "id": "lights-out", "packCount": 3, "levelsPerPack": 30, "starRule": ..., "daily": true, "endless": false } to contracts/levels.json; the complete stage holds both contracts to one layout
+daily salt: 0x7c9e (31902), the 16-bit default for this id (FNV-1a of the id folded to 16 bits, level-generation-and-solvers' rule); freeze it in levels.daily.salt when the levels step starts and never change it after release
+scaffold-game: 4 planned files checked, 0 problems
+RESULT: PASS

@@ -1,0 +1,31 @@
+{
+  "id": "iphone-16-pro",
+  "platform": "ios",
+  "name": "iPhone 16 Pro (402 x 874 pt @3x)",
+  "deviceType": "com.apple.CoreSimulator.SimDeviceType.iPhone-16-Pro",
+  "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5",
+  "runtimeVersion": "26.5",
+  "simulatorName": "tasks-parity",
+  "points": { "width": 402, "height": 874 },
+  "scale": 3,
+  "pixels": { "width": 1206, "height": 2622 },
+  "safeArea": { "top": 62, "bottom": 34 },
+  "masks": [
+    { "x": 0, "y": 0, "width": 402, "height": 62 },
+    { "x": 0, "y": 840, "width": 402, "height": 34 }
+  ],
+  "systemLocale": "en_US",
+  "contentSize": "large",
+  "statusBarOverride": {
+    "time": "9:41",
+    "dataNetwork": "wifi",
+    "wifiMode": "active",
+    "wifiBars": "3",
+    "cellularMode": "active",
+    "cellularBars": "4",
+    "operatorName": "",
+    "batteryState": "discharging",
+    "batteryLevel": "100"
+  },
+  "languages": { "ar": { "appleLanguages": "(ar)", "appleLocale": "ar" } }
+}

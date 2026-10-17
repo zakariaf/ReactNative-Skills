@@ -1,0 +1,13 @@
+{
+  "base": [
+    "@tests/bases/app",
+    {
+      "from": "@skill/examples/root-layout.tsx",
+      "to": "src/app/_layout.tsx"
+    },
+    {
+      "templates": true,
+      "firstLinePath": true
+    }
+  ]
+}

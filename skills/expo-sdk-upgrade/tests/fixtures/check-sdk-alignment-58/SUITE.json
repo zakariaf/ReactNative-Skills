@@ -1,0 +1,27 @@
+{
+  "$comment": "The app after the move: tests/bases/app-57 with the tests/bases/sdk-58 overlay (expo 58.0.3 next, React Native 0.88, Jest 30, Gesture Handler 3); no scene-support helper.",
+  "base": [
+    "@tests/bases/app-57",
+    "@tests/bases/sdk-58"
+  ],
+  "ops": [
+    {
+      "write": {
+        "file": ".agents/skills/vendored-skill/SKILL.md",
+        "content": "---\nname: vendored-skill\ndescription: A planted skill folder; its files hold findings on purpose and must stay invisible.\n---\n\n# vendored-skill\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/demo-skill/SKILL.md",
+        "content": "---\nname: demo-skill\ndescription: A planted skill folder; its files hold findings on purpose and must stay invisible.\n---\n\n# demo-skill\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/vendor/third-party-skill/SKILL.md",
+        "content": "---\nname: third-party-skill\ndescription: A planted skill folder; its files hold findings on purpose and must stay invisible.\n---\n\n# third-party-skill\n"
+      }
+    }
+  ]
+}

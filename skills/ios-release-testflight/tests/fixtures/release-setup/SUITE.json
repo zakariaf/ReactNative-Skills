@@ -1,0 +1,40 @@
+{
+  "$comment": "The shipped templates plus a small app repo; installed skills with planted key material must stay silent.",
+  "base": [
+    {
+      "templates": true,
+      "firstLinePath": true,
+      "fill": {
+        "__APP_ID__": "com.acme.tasks"
+      }
+    },
+    "@tests/bases/repo"
+  ],
+  "ops": [
+    {
+      "write": {
+        "file": ".claude/settings.json",
+        "json": {
+          "permissions": {
+            "deny": [
+              "Read(~/.appstoreconnect/**)",
+              "Read(**/*.p8)",
+              "Read(**/AuthKey_*)",
+              "Read(**/*.p12)",
+              "Read(**/*.mobileprovision)"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "plant": {
+        ".agents/skills/vendor-release/SKILL.md": "---\nname: vendor-release\ndescription: planted fixture\n---\n",
+        ".agents/skills/vendor-release/AuthKey_VENDOR1234.p8": true,
+        "skills/demo-release/SKILL.md": "---\nname: demo-release\ndescription: planted fixture\n---\n",
+        "skills/demo-release/scripts/peek.ts": "import { readFileSync } from 'node:fs';\nreadFileSync(ascKeyPath(id));\n",
+        "skills/demo-release/notes/handover.md": true
+      }
+    }
+  ]
+}

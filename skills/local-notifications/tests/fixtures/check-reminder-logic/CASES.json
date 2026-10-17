@@ -1,0 +1,232 @@
+{
+  "bad-missing-module": {
+    "expect": ["src/core/reminders/reconcile-reminders.ts [missing-module]"],
+    "ops": [{ "delete": "src/core/reminders/reconcile-reminders.ts" }]
+  },
+  "bad-module-load": {
+    "expect": ["src/core/reminders/plan-reminders.ts:1", "[module-load]", "cannot be imported"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/reminders/plan-reminders.ts",
+          "find": "import { addDays, isoWeekday } from '@/core/dates/date-key';",
+          "with": "import { Platform } from 'react-native';\nimport { addDays, isoWeekday } from '@/core/dates/date-key';\n\nexport const PLATFORM = Platform.OS;"
+        }
+      }
+    ]
+  },
+  "bad-plan-data": {
+    "expect": ["src/core/reminders/plan-reminders.ts:", "[plan-data]", "the data names the reminder and nothing else"],
+    "ops": [
+      {
+        "$comment": "Planted: the notification data carries the task title, which goes stale after a rename and is shown to nobody.",
+        "replace": {
+          "file": "src/core/reminders/plan-reminders.ts",
+          "find": "data: reminderTapData(reminder.id),",
+          "with": "data: { ...reminderTapData(reminder.id), label: reminder.label },"
+        }
+      }
+    ]
+  },
+  "bad-plan-dst": {
+    "expect": ["src/core/reminders/plan-reminders.ts:", "[plan-dst]", "stays 09:00 across the spring change"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/reminders/plan-reminders.ts",
+          "find": "const fireAtMs = instantOfWallClock(day, schedule.minuteOfDay, window.offsetAt);",
+          "with": "const fireAtMs =\n      instantOfWallClock(window.today, schedule.minuteOfDay, window.offsetAt) + offset * 86_400_000;"
+        }
+      }
+    ]
+  },
+  "bad-plan-dst-once": {
+    "expect": ["src/core/reminders/plan-reminders.ts:", "[plan-dst]", "a once reminder at 09:00 on a Berlin summer day"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/reminders/plan-reminders.ts",
+          "find": "const fireAtMs = instantOfWallClock(schedule.day, schedule.minuteOfDay, window.offsetAt);",
+          "with": "const fireAtMs = instantOfWallClock(schedule.day, schedule.minuteOfDay, () => 0);"
+        }
+      }
+    ]
+  },
+  "bad-plan-edit": {
+    "expect": ["src/core/reminders/plan-reminders.ts:", "[plan-edit]", "moving the time plans a new identifier"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/reminders/plan-reminders.ts",
+          "find": "id: `${REMINDER_ID_PREFIX}${reminder.id}:${fireAtMs.toString(36)}:${fingerprint}`,",
+          "with": "id: `${REMINDER_ID_PREFIX}${reminder.id}:${String(occurrence.day)}`,"
+        }
+      }
+    ]
+  },
+  "bad-plan-idempotent": {
+    "expect": [
+      "src/core/reminders/plan-reminders.ts:",
+      "[plan-idempotent]",
+      "the same input plans the same identifiers"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/reminders/plan-reminders.ts",
+          "find": "function toPlanned(",
+          "with": "let serial = 0;\n\nfunction toPlanned("
+        }
+      },
+      {
+        "replace": {
+          "file": "src/core/reminders/plan-reminders.ts",
+          "find": "id: `${REMINDER_ID_PREFIX}${reminder.id}:${fireAtMs.toString(36)}:${fingerprint}`,",
+          "with": "id: `${REMINDER_ID_PREFIX}${reminder.id}:${fireAtMs.toString(36)}:${fingerprint}:${String((serial += 1))}`,"
+        }
+      }
+    ]
+  },
+  "bad-plan-max-pending": {
+    "expect": ["src/core/reminders/plan-reminders.ts:", "[plan-max-pending]", "at most 64"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/reminders/plan-reminders.ts",
+          "find": "export const DEFAULT_MAX_PENDING = 50;",
+          "with": "export const DEFAULT_MAX_PENDING = 100;"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/core/reminders/plan-reminders.ts",
+          "find": "if (!Number.isInteger(maxPending) || maxPending < 0 || maxPending > IOS_PENDING_LIMIT) {",
+          "with": "if (!Number.isInteger(maxPending) || maxPending < 0) {"
+        }
+      }
+    ]
+  },
+  "bad-plan-past": {
+    "expect": ["src/core/reminders/plan-reminders.ts:", "[plan-past]", "nothing is planned at or before now"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/reminders/plan-reminders.ts",
+          "find": "earliestMs: input.nowMs + (input.minLeadMs ?? DEFAULT_MIN_LEAD_MS),",
+          "with": "earliestMs: input.nowMs + (input.minLeadMs ?? 0) - DEFAULT_MIN_LEAD_MS,"
+        }
+      }
+    ]
+  },
+  "bad-plan-reject": {
+    "expect": ["src/core/reminders/plan-reminders.ts:", "[plan-reject]", "undeclared channel"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/reminders/plan-reminders.ts",
+          "find": "const problem = channels.has(reminder.channelId) ? reminderProblem(reminder) : 'channel';",
+          "with": "const problem = reminderProblem(reminder);"
+        }
+      }
+    ]
+  },
+  "bad-plan-skip": {
+    "expect": ["src/core/reminders/plan-reminders.ts:", "[plan-skip]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/reminders/plan-reminders.ts",
+          "find": "return skip.has(day) || (weekdays !== null && !weekdays.has(isoWeekday(day)));",
+          "with": "return weekdays !== null && !weekdays.has(isoWeekday(day));"
+        }
+      }
+    ]
+  },
+  "bad-plan-skip-once": {
+    "expect": ["src/core/reminders/plan-reminders.ts:", "[plan-skip]", "once-skipped"],
+    "ops": [
+      {
+        "$comment": "Planted: a once reminder ignores its skip days (the task was done before its day).",
+        "replace": {
+          "file": "src/core/reminders/plan-reminders.ts",
+          "find": "    if (reminder.skipDays.includes(schedule.day)) return [];\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-plan-skip-sunday": {
+    "expect": ["src/core/reminders/plan-reminders.ts:", "[plan-skip]", "ISO weekday 7 is Sunday"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/reminders/plan-reminders.ts",
+          "find": "return skip.has(day) || (weekdays !== null && !weekdays.has(isoWeekday(day)));",
+          "with": "return skip.has(day) || (weekdays !== null && !weekdays.has(isoWeekday(day) % 7));"
+        }
+      }
+    ]
+  },
+  "bad-reconcile-diff": {
+    "expect": [
+      "src/core/reminders/reconcile-reminders.ts:",
+      "[reconcile-diff]",
+      "only the planner's own identifiers are cancelled"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/reminders/reconcile-reminders.ts",
+          "find": "id.startsWith(REMINDER_ID_PREFIX) && !wanted.has(id)",
+          "with": "!wanted.has(id) && REMINDER_ID_PREFIX.length > 0"
+        }
+      }
+    ]
+  },
+  "bad-reconcile-imminent": {
+    "expect": ["src/core/reminders/reconcile-reminders.ts:", "[reconcile-diff]", "due within the lead is kept"],
+    "ops": [
+      {
+        "$comment": "Planted: the diff ignores the imminent identifiers, so a sync seconds before a reminder fires cancels it.",
+        "replace": {
+          "file": "src/core/reminders/reconcile-reminders.ts",
+          "find": "...planned.map((notification) => notification.id), ...keepIds",
+          "with": "...planned.map((notification) => notification.id)"
+        }
+      }
+    ]
+  },
+  "bad-tap-parse": {
+    "expect": ["src/core/reminders/reminder-tap.ts:", "[tap-parse]", "is not a reminder tap"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/reminders/reminder-tap.ts",
+          "find": "return isReminderId(reminderId) ? reminderId : null;",
+          "with": "return reminderId;"
+        }
+      }
+    ]
+  },
+  "bad-wall-clock-dst": {
+    "expect": ["src/core/reminders/wall-clock.ts:", "[wall-clock-dst]", "happens twice"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/reminders/wall-clock.ts",
+          "find": "return Math.min(...valid);",
+          "with": "return Math.max(...valid);"
+        }
+      }
+    ]
+  },
+  "error-no-src": { "expect": ["ERROR [bad-input]", "app source folder src/"], "ops": [{ "delete": "src" }] },
+  "pass-not-applicable": {
+    "expect": ["NOT APPLICABLE: expo-notifications is not in package.json"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo-notifications"], "delete": true } }]
+  },
+  "pass-push-only": {
+    "expect": ["NOT APPLICABLE: expo-notifications is installed but the app has no local reminders"],
+    "ops": [{ "delete": ["src/core/reminders", "src/services/local-notifications"] }]
+  }
+}

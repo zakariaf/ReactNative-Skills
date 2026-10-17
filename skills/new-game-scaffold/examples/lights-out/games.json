@@ -1,0 +1,21 @@
+{
+  "$schema": "./games.schema.json",
+  "$comment": "Every game of the app as data: the design notes the code must agree with. scaffold-game.mjs (new-game-scaffold) adds one entry per new game; check-game-scaffold.mjs holds each game to its entry. An app with no game keeps \"games\": [].",
+  "games": [
+    {
+      "id": "lights-out",
+      "name": "Lights Out",
+      "class": "turn-based",
+      "panMode": "none",
+      "levels": {
+        "packs": 3,
+        "levelsPerPack": 30
+      },
+      "daily": true,
+      "endless": false,
+      "hints": "none",
+      "continue": "once",
+      "loseReasons": ["out-of-moves"]
+    }
+  ]
+}

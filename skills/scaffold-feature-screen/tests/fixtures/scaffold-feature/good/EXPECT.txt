@@ -1,0 +1,18 @@
+note src/ui/screen-frame.tsx does not exist: the view's root is a plain View
+new  src/app/(app)/notes.tsx
+new  src/features/notes/notes-navigation.test.tsx
+new  src/features/notes/notes-screen.test.tsx
+new  src/features/notes/notes-screen.tsx
+new  src/features/notes/use-notes-model.test.tsx
+new  src/features/notes/use-notes-model.ts
+edit src/i18n/catalogs/ar.json (+2 keys, 2 drafts to translate)
+edit src/i18n/catalogs/de.json (+2 keys, 2 drafts to translate)
+edit src/i18n/catalogs/en.json (+2 keys)
+drafts ar: notes.body, notes.title
+drafts de: notes.body, notes.title
+note contracts/i18n.json does not exist: the drafts in ar, de reach no review queue
+edit contracts/navigation.json (routes += "(app)/notes")
+edit contracts/screens.json (screens += "notes")
+would write 6 new files and 5 edits for notes (static route (app)/notes)
+dry run: nothing written; rerun with --write
+scaffold-feature: 11 planned files checked, 0 problems

@@ -1,0 +1,30 @@
+{
+  "bad-drifted": {
+    "expect": ["[sample-mismatch] sample \"spec-ref-missing-fix\" gives [spec-ref-missing] but the list says []"],
+    "ops": [{ "json": { "file": "commit-message-samples.json", "path": ["samples", 21, "rules"], "value": [] } }]
+  },
+  "bad-missing-rule": {
+    "expect": [
+      "[sample-mismatch] sample \"trailer-placement\" gives [gate-change-missing, trailer-placement] but the list says [trailer-placement]"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "commit-message-samples.json",
+          "path": ["samples", 30, "rules"],
+          "value": ["trailer-placement"]
+        }
+      }
+    ]
+  },
+  "bad-requirement-override-lost": {
+    "expect": ["[sample-mismatch] sample \"good-no-requirement-rule\" gives [spec-ref-missing] but the list says []"],
+    "ops": [
+      { "json": { "file": "commit-message-samples.json", "path": ["samples", 8, "requirementRef"], "delete": true } }
+    ]
+  },
+  "error-missing-keys": {
+    "expect": ["ERROR [bad-input]", "needs \"scopes\", \"gatedPaths\" and \"samples\""],
+    "ops": [{ "json": { "file": "commit-message-samples.json", "path": ["gatedPaths"], "delete": true } }]
+  }
+}

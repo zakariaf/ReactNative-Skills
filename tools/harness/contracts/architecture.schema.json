@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "contracts/architecture.json",
+  "description": "App-owned architecture facts read by the architecture-and-boundaries checkers. Paths are repo-relative globs; {srcDir}, {servicesDir}, {dataDir}, {scriptsDir} and the other layout keys are filled from rn-skills.config.json or the defaults.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "$comment": {
+      "type": "string"
+    },
+    "srcFolders": {
+      "description": "Top-level src/ folders beyond the canonical set (app, features, ui, theme, core, services, stores, data, api, i18n, config, hooks, canvas, games); each is a shared layer.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+      }
+    },
+    "sdkPackagePatterns": {
+      "description": "Package names or name globs that also count as SDKs, added to the defaults (expo-*, react-native-*, *-react-native, *-react-native-*, @react-native-*/*, @*/react-native, @*/react-native-*, @*/*-react-native, @*/*-react-native-*). Runtime code may import such a package only once it is in vendorSdks or portlessSdks. When node_modules exists, a package that ships native code counts too.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^(@[a-z0-9*~._-]+/)?[a-z0-9*~._-]+$"
+      }
+    },
+    "vendorSdks": {
+      "description": "SDK package name -> the port that wraps it. Only adapter files may import it (subpaths count). null drops a default entry. Mirror each entry in eslint.config.mjs VENDOR_SDK_PATHS.",
+      "type": "object",
+      "additionalProperties": {
+        "type": ["string", "null"],
+        "minLength": 1
+      }
+    },
+    "vendorSdkFiles": {
+      "description": "SDK package name -> the only adapter file globs that may import it. null drops a default entry.",
+      "type": "object",
+      "additionalProperties": {
+        "type": ["array", "null"],
+        "items": {
+          "type": "string"
+        },
+        "minItems": 1
+      }
+    },
+    "portlessSdks": {
+      "description": "SDK package name -> why it needs no port (UI building blocks, read-only facts). Any file may import it. Every SDK the app's runtime code imports (a name matching sdkPackagePatterns, or a package that ships native code) is in vendorSdks or here. null drops a default entry.",
+      "type": "object",
+      "additionalProperties": {
+        "type": ["string", "null"],
+        "minLength": 1
+      }
+    },
+    "bannedPackages": {
+      "description": "Package name -> what to use instead: architecture bans (a port or an API replaced the package). The checker also bans every doNotAdd package of contracts/dependency-policy.json (dependency-management), so keep install bans there. null drops a default entry.",
+      "type": "object",
+      "additionalProperties": {
+        "type": ["string", "null"],
+        "minLength": 1
+      }
+    },
+    "adapterFiles": {
+      "description": "Extra adapter globs (defaults: {servicesDir}/*/*-adapter.ts, {dataDir}/**/*-adapter.ts, {dataDir}/**/*-sql-driver.ts, {dataDir}/**/*-save-store.ts, each with its .ios/.android/.native/.web platform files).",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "compositionRoot": {
+      "description": "Extra composition-root globs: files that may import adapters (defaults: services-context.tsx, create-device-services.ts, create-test-services.ts in {servicesDir}, and the data opener {dataDir}/open-device-*.ts). A file listed here may also import create-device-services (a startup module the root layout calls, or the App component of a React Navigation app).",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "nodeWorldFiles": {
+      "description": "Extra files that run in Node (defaults: app.config.ts, plugins/**, {scriptsDir}/**). App code never imports them.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "serverFiles": {
+      "description": "Extra server files (globs outside the routes folder), such as src/server/** for helpers the API routes share. Defaults: every +api file under the routes folder and the root +middleware file. Server code may use Node built-ins and imports src/core, src/api, src/config, src/data, port types, expo-server and expo-router/server; the app never imports it.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "allowedImports": {
+      "description": "Reasoned exceptions to the zone rules (feature-to-feature, layer-direction, ui-presentational, route-thin, core-pure, game-to-game, game-facing, and server-boundary for server code importing app code).",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["from", "to", "reason"],
+        "properties": {
+          "from": {
+            "type": "string",
+            "minLength": 1
+          },
+          "to": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "nonFeatureScreens": {
+      "description": "Screen files (*-screen.tsx) allowed outside src/features/, such as an error-boundary fallback.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "testOnlyFolders": {
+      "description": "Folders reached only through the test-only entry; their files may keep a debug port and fake side by side and may import fakes.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "importTimeExempt": {
+      "description": "Files allowed to do work at import time (polyfill installers).",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "gameFacing": {
+      "description": "Extra files every game (src/games/<game>/ outside rules/ and levels/) may import: the seam the game host defines (defaults: {coreDir}/**, {uiDir}/**, {themeDir}/**, {i18nDir}/**, {srcDir}/canvas/** (the canvas kit), {servicesDir}/*/*-port.ts).",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "assetExtensions": {
+      "description": "File extensions (without the dot) the app added to metro.config.js resolver.assetExts, added to the defaults (Metro's and Expo's asset extensions plus woff, woff2, lottie, riv). require() of such a file is an asset, not code.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+$"
+      }
+    },
+    "packages": {
+      "description": "When multi-package: every folder under packages/, with its world.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+          },
+          "pure": {
+            "type": "boolean",
+            "description": "No framework packages; imports only itself and other pure packages."
+          },
+          "world": {
+            "enum": ["app", "node"],
+            "description": "node: tooling; nothing in the app imports it."
+          },
+          "exports": {
+            "type": "object",
+            "description": "The exact exports map (default { \"./*\": \"./src/*\" })."
+          }
+        }
+      }
+    }
+  }
+}

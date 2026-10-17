@@ -1,0 +1,515 @@
+{
+  "bad-adapter-only": {
+    "expect": [
+      "src/features/share-list/use-badge-model.ts:6 [push-adapter-only]",
+      "getPermissionsAsync from expo-notifications outside the push adapter"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/share-list/use-badge-model.ts",
+          "lines": [
+            "// src/features/share-list/use-badge-model.ts",
+            "import { getPermissionsAsync } from 'expo-notifications';",
+            "",
+            "/** Reads the permission straight from the SDK instead of the port. */",
+            "export async function isPushOn(): Promise<boolean> {",
+            "  const status = await getPermissionsAsync();",
+            "  return status.granted;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-channel-contract": {
+    "expect": ["src/services/push/push-channels.ts:19 [channel-contract]", "differs from the contract's channels"],
+    "ops": [{ "json": { "file": "contracts/push.json", "path": ["channels", 1, "importance"], "value": "default" } }]
+  },
+  "bad-channel-setup": {
+    "expect": [
+      "src/services/push/expo-notifications-push-adapter.ts:162 [channel-setup]",
+      "no code creates an Android notification channel"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/push/expo-notifications-push-adapter.ts",
+          "find": "setNotificationChannelAsync",
+          "with": "createChannelLater",
+          "all": true
+        }
+      }
+    ]
+  },
+  "bad-client-send": {
+    "expect": ["src/features/share-list/notify-member.ts:4 [client-send]", "the Expo push send endpoint"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/share-list/notify-member.ts",
+          "lines": [
+            "// src/features/share-list/notify-member.ts",
+            "/** Sends a push straight from the app (the server's job). */",
+            "export function notifyMember(): Promise<Response> {",
+            "  return fetch('https://exp.host/--/api/v2/push/send', { method: 'POST' });",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-deprecated-api": {
+    "expect": [
+      "src/services/push/expo-notifications-push-adapter.ts:125 [deprecated-api]",
+      "shouldShowAlert is deprecated"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/push/expo-notifications-push-adapter.ts",
+          "find": "        shouldShowBanner: shown.banner,",
+          "with": "        shouldShowAlert: shown.banner,"
+        }
+      }
+    ]
+  },
+  "bad-expo-project-id": {
+    "expect": [
+      "src/services/push/expo-notifications-push-adapter.ts:162 [expo-project-id]",
+      "without an explicit projectId"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/push/expo-notifications-push-adapter.ts",
+          "find": "getExpoPushTokenAsync({ projectId: options.projectId, devicePushToken: device })",
+          "with": "getExpoPushTokenAsync({ devicePushToken: device })"
+        }
+      }
+    ]
+  },
+  "bad-expo-project-id-config": {
+    "expect": ["app.config.ts:1 [expo-project-id]", "sets no extra.eas.projectId"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    extra: { eas: { projectId: EAS_PROJECT_ID } },\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "const EAS_PROJECT_ID = '__EAS_PROJECT_ID__';",
+          "with": "const EAS_ID = '__EAS_PROJECT_ID__';"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "/** The EAS project (eas init prints it). Public: it names the project, it grants nothing. */",
+          "with": "/** The EAS project. */"
+        }
+      }
+    ]
+  },
+  "bad-fcm-config": {
+    "expect": ["app.config.ts:1 [fcm-config]", "android.googleServicesFile is not set"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "      googleServicesFile: process.env.GOOGLE_SERVICES_JSON ?? './google-services.json',\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-foreground-handler-missing": {
+    "expect": [
+      "src/services/push/expo-notifications-push-adapter.ts:162 [foreground-handler]",
+      "no setNotificationHandler"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/push/expo-notifications-push-adapter.ts",
+          "find": "setNotificationHandler",
+          "with": "installHandlerLater",
+          "all": true
+        }
+      }
+    ]
+  },
+  "bad-foreground-handler-second": {
+    "expect": [
+      "src/services/local-notifications/expo-local-notifications-adapter.ts:6 [foreground-handler]",
+      "a second setNotificationHandler (the first is in src/services/push/expo-notifications-push-adapter.ts)",
+      "local-notifications"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/local-notifications/expo-local-notifications-adapter.ts",
+          "lines": [
+            "// src/services/local-notifications/expo-local-notifications-adapter.ts",
+            "import { setNotificationHandler } from 'expo-notifications';",
+            "",
+            "/** Shows every reminder while the app is open (replaces the push adapter's handler). */",
+            "export function installReminderHandler(): void {",
+            "  setNotificationHandler({",
+            "    handleNotification: () =>",
+            "      Promise.resolve({ shouldShowBanner: true, shouldShowList: true, shouldPlaySound: true, shouldSetBadge: false }),",
+            "  });",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-kinds-contract": {
+    "expect": ["src/core/push/push-message.ts:12 [kinds-contract]", "differs from the contract's kinds"],
+    "ops": [{ "json": { "file": "contracts/push.json", "path": ["kinds", 3], "value": "task-deleted" } }]
+  },
+  "bad-kinds-unparsed": {
+    "expect": ["src/core/push/push-message.ts:1 [kinds-contract]", "never parses the data"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/push/push-message.ts",
+          "find": "v.safeParse(pushMessageSchema, data)",
+          "with": "{ success: v.is(pushMessageSchema, data), output: data }"
+        }
+      }
+    ]
+  },
+  "bad-payload-navigation": {
+    "expect": ["src/features/share-list/open-tap.ts:5 [payload-navigation]", "taken from a notification payload"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/share-list/open-tap.ts",
+          "lines": [
+            "// src/features/share-list/open-tap.ts",
+            "import { router } from 'expo-router';",
+            "",
+            "export function openTap(response: { readonly data: { readonly url: string } }): void {",
+            "  router.push(response.data.url as never);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-payload-parse": {
+    "expect": ["src/features/share-list/read-tap.ts:5 [payload-parse]", "content.data read outside the push adapter"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/share-list/read-tap.ts",
+          "lines": [
+            "// src/features/share-list/read-tap.ts",
+            "import type { NotificationResponse } from 'expo-notifications';",
+            "",
+            "export function taskIdOf(response: NotificationResponse): unknown {",
+            "  return response.notification.request.content.data;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-permission-at-startup": {
+    "expect": ["src/app/_layout.tsx:6 [permission-in-context]", "in a startup file"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/_layout.tsx",
+          "lines": [
+            "// src/app/_layout.tsx",
+            "import { AppStack } from '@/features/root-navigator/app-stack';",
+            "import { push } from '@/features/root-navigator/startup-push';",
+            "",
+            "export default function RootLayout(): React.JSX.Element {",
+            "  push.requestPermission().catch(() => undefined);",
+            "  return <AppStack />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-permission-in-effect": {
+    "expect": ["src/features/share-list/use-ask-on-mount.ts:9 [permission-in-context]", "inside an effect (on mount)"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/share-list/use-ask-on-mount.ts",
+          "lines": [
+            "// src/features/share-list/use-ask-on-mount.ts",
+            "import { useEffect } from 'react';",
+            "",
+            "import { useServices } from '@/services/services-context';",
+            "",
+            "export function useAskOnMount(): void {",
+            "  const { push } = useServices();",
+            "  useEffect(() => {",
+            "    push.requestPermission().catch(() => undefined);",
+            "  }, [push]);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-plugin-config": {
+    "expect": ["app.config.ts:45 [plugin-config]", "the contract's is \"general\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "          defaultChannel: DEFAULT_PUSH_CHANNEL,",
+          "with": "          defaultChannel: 'alerts',"
+        }
+      }
+    ]
+  },
+  "bad-plugin-config-bare": {
+    "expect": ["app.config.ts:45 [plugin-config]", "has no options"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "\\[\\n\\s*'expo-notifications',\\n\\s*\\{[\\s\\S]*?\\n\\s{8}\\},\\n\\s{6}\\],",
+          "with": "'expo-notifications',",
+          "regex": true
+        }
+      }
+    ]
+  },
+  "bad-push-contract-missing": {
+    "expect": ["src/services/push/expo-notifications-push-adapter.ts:162 [push-contract]", "RESULT: FAIL"],
+    "ops": [{ "delete": "contracts/push.json" }]
+  },
+  "bad-push-contract-shape": {
+    "expect": ["contracts/push.json:1 [push-contract]", "\"defaultChannel\" (\"urgent\") is not one of \"channels\""],
+    "ops": [{ "json": { "file": "contracts/push.json", "path": ["defaultChannel"], "value": "urgent" } }]
+  },
+  "bad-push-credentials-key-file": {
+    "expect": ["keys/AuthKey_PLANTED.p8:1 [push-credentials]", "APNs key file inside the repo"],
+    "ops": [{ "plant": { "keys/AuthKey_PLANTED.p8": true } }]
+  },
+  "bad-push-credentials-public-env": {
+    "expect": [".env:1 [push-credentials]", "EXPO_PUBLIC_ value is compiled into the app"],
+    "ops": [{ "write": { "file": ".env", "lines": ["EXPO_PUBLIC_EXPO_ACCESS_TOKEN=planted-not-real"] } }]
+  },
+  "bad-push-credentials-service-account": {
+    "expect": ["fcm-sender.json:3 [push-credentials]", "Google service account key"],
+    "ops": [
+      {
+        "write": {
+          "file": "fcm-sender.json",
+          "lines": ["{", "  \"type\": \"service_Xaccount\",", "  \"private_Xkey\": \"not-a-real-key\"", "}"]
+        }
+      },
+      { "replace": { "file": "fcm-sender.json", "find": "X", "with": "", "all": true } }
+    ]
+  },
+  "bad-push-kit-unregistered": {
+    "expect": ["src/services/push/push-root-kit.tsx:", "[push-wiring]", "createPushKit is defined but nothing calls it"],
+    "ops": [
+      { "$comment": "The kit exists but the registry never creates it.", "delete": "src/services/create-root-kits.ts" }
+    ]
+  },
+  "bad-push-token": {
+    "expect": ["contracts/push.json:1 [push-token]", "RESULT: FAIL (1 problems)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/push/expo-notifications-push-adapter.ts",
+          "find": "getDevicePushTokenAsync",
+          "with": "readDeviceTokenLater",
+          "all": true
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/push/expo-notifications-push-adapter.ts",
+          "find": "getExpoPushTokenAsync",
+          "with": "readExpoTokenLater",
+          "all": true
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/push/expo-notifications-push-adapter.ts",
+          "find": "addPushTokenListener",
+          "with": "onDeviceTokenLater",
+          "all": true
+        }
+      }
+    ]
+  },
+  "bad-push-wiring": {
+    "expect": ["src/hooks/use-push-taps.ts:19 [push-wiring]", "usePushTaps is defined but nothing calls it"],
+    "ops": [
+      {
+        "$comment": "The kit's effects no longer route taps.",
+        "replace": {
+          "file": "src/services/push/push-root-kit.tsx",
+          "find": "  usePushTaps({",
+          "with": "  usePushTapsSomeday({"
+        }
+      }
+    ]
+  },
+  "bad-push-wiring-requires-account": {
+    "expect": [
+      "src/services/push/create-app-push.ts:72 [push-wiring]",
+      "createPushRegistration gets requiresAccount: false, but contracts/push.json says true"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/push/create-app-push.ts",
+          "find": "    requiresAccount: true,",
+          "with": "    requiresAccount: false,"
+        }
+      }
+    ]
+  },
+  "bad-sign-out-unregister": {
+    "expect": ["contracts/auth.json:12 [sign-out-unregister]", "does not list push-registration"],
+    "ops": [{ "json": { "file": "contracts/auth.json", "path": ["serverSignOutSteps"], "value": [] } }]
+  },
+  "bad-tap-handling": {
+    "expect": [
+      "src/services/push/expo-notifications-push-adapter.ts:162 [tap-handling]",
+      "clearing a handled launch tap"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/push/expo-notifications-push-adapter.ts",
+          "find": "clearLastNotificationResponse",
+          "with": "forgetLaunchTapLater",
+          "all": true
+        }
+      }
+    ]
+  },
+  "bad-token-rotation": {
+    "expect": ["src/services/push/expo-notifications-push-adapter.ts:162 [token-rotation]", "fetched but never watched"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/push/expo-notifications-push-adapter.ts",
+          "find": "addPushTokenListener",
+          "with": "onDeviceTokenLater",
+          "all": true
+        }
+      }
+    ]
+  },
+  "error-no-package": {
+    "expect": ["ERROR [bad-input] nothing to check:", "has no package.json"],
+    "base": ["@tests/bases/app"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "pass-anonymous-devices": {
+    "expect": ["check-push:", "RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "contracts/push.json", "path": ["requiresAccount"], "value": false } },
+      {
+        "replace": {
+          "file": "src/services/push/create-app-push.ts",
+          "find": "    requiresAccount: true,",
+          "with": "    requiresAccount: false,"
+        }
+      },
+      { "delete": "contracts/auth.json" }
+    ]
+  },
+  "pass-local-handler-disabled": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/local-notifications/expo-local-notifications-adapter.ts",
+          "lines": [
+            "// src/services/local-notifications/expo-local-notifications-adapter.ts",
+            "import { setNotificationHandler } from 'expo-notifications';",
+            "",
+            "export type LocalAdapterOptions = { readonly installForegroundHandler?: boolean };",
+            "",
+            "/** local-notifications' adapter, copied unedited: its handler is guarded by the option. */",
+            "export function createExpoLocalNotificationsAdapter({ installForegroundHandler = true }: LocalAdapterOptions): void {",
+            "  if (installForegroundHandler) {",
+            "    setNotificationHandler({",
+            "      handleNotification: () =>",
+            "        Promise.resolve({ shouldShowBanner: true, shouldShowList: true, shouldPlaySound: true, shouldSetBadge: false }),",
+            "    });",
+            "  }",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/create-local-services.ts",
+          "lines": [
+            "// src/services/create-local-services.ts",
+            "import { createExpoLocalNotificationsAdapter } from '@/services/local-notifications/expo-local-notifications-adapter';",
+            "",
+            "/** The composition root hands the foreground handler to the push adapter. */",
+            "export function createLocalServices(): void {",
+            "  createExpoLocalNotificationsAdapter({ installForegroundHandler: false });",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-local-only": {
+    "expect": ["NOT APPLICABLE: expo-notifications is installed but no app code requests a push token", "RESULT: PASS"],
+    "base": ["@tests/bases/app"]
+  },
+  "pass-no-package": {
+    "expect": ["NOT APPLICABLE: expo-notifications is not in package.json", "RESULT: PASS"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo-notifications"], "delete": true } }]
+  },
+  "pass-other-permission-in-effect": {
+    "expect": ["check-push:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/task-photo/use-task-photo-model.ts",
+          "lines": [
+            "// src/features/task-photo/use-task-photo-model.ts",
+            "// Camera and photo-library asks in effects are not notification prompts: permission-in-context stays silent.",
+            "import { useCameraPermissions } from 'expo-camera';",
+            "import * as MediaLibrary from 'expo-media-library';",
+            "import { useEffect } from 'react';",
+            "",
+            "export function useTaskPhotoModel(): void {",
+            "  const [, requestPermission] = useCameraPermissions();",
+            "  useEffect(() => {",
+            "    requestPermission().catch(() => undefined);",
+            "    MediaLibrary.requestPermissionsAsync().catch(() => undefined);",
+            "  }, [requestPermission]);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-sign-out-not-yet-created": {
+    "expect": [
+      "SKIP contracts/auth.json [sign-out-unregister] not yet created (auth-and-secure-storage creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "contracts/auth.json" }]
+  }
+}

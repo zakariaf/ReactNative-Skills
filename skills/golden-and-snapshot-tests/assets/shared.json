@@ -1,0 +1,6 @@
+[
+  { "from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs" },
+  { "from": "repo-templates/test/goldens/skia-golden.ts", "to": "templates/test/goldens/skia-golden.ts" },
+  { "from": "repo-templates/contracts/goldens.json", "to": "templates/contracts/goldens.json" },
+  { "from": "repo-templates/contracts/goldens.schema.json", "to": "templates/contracts/goldens.schema.json" }
+]

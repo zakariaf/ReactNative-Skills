@@ -1,0 +1,512 @@
+{
+  "area": "lint",
+  "entries": [
+    {
+      "id": "lint-ts2593-jest-types",
+      "topic": "TypeScript",
+      "symptom": "TS2593: Cannot find name 'describe'",
+      "cause": "TypeScript 6 defaults types to [], so the Jest globals are unknown",
+      "fix": "Give the test programs types: [\"jest\"] (the root program [\"jest\", \"node\"])",
+      "match": [
+        "TS2593"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "typescript-and-lint-rules"
+    },
+    {
+      "id": "lint-ts2591-process",
+      "topic": "TypeScript",
+      "symptom": "TS2591: Cannot find name 'process' (or a node: module) in app code or scripts",
+      "cause": "The program has no Node types",
+      "fix": "App code: src/app-env.d.ts declares process for EXPO_PUBLIC_* (never add Node types to app code); Node scripts: the root program with types node",
+      "match": [
+        "TS2591"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "typescript-and-lint-rules"
+    },
+    {
+      "id": "lint-ts4111-env",
+      "topic": "TypeScript",
+      "symptom": "TS4111 on process.env.EXPO_PUBLIC_APP_VARIANT or process.argv",
+      "cause": "noPropertyAccessFromIndexSignature requires bracket access unless the property is declared",
+      "fix": "Declare every EXPO_PUBLIC_* in src/env.d.ts (Expo inlines only dot access); use bracket access in Node code",
+      "match": [
+        "TS4111"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "typescript-and-lint-rules"
+    },
+    {
+      "id": "lint-ts1294-erasable",
+      "topic": "TypeScript",
+      "symptom": "TS1294: This syntax is not allowed when erasableSyntaxOnly is enabled (an enum, a namespace, a constructor parameter property)",
+      "cause": "erasableSyntaxOnly (needed for Node type stripping) forbids syntax that emits code",
+      "fix": "Use string-literal unions and 'as const' objects; plain constructor fields",
+      "match": [
+        "TS1294"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "typescript-and-lint-rules"
+    },
+    {
+      "id": "lint-exact-optional",
+      "topic": "TypeScript",
+      "symptom": "exactOptionalPropertyTypes rejects an explicit undefined prop",
+      "cause": "Some third-party prop types do not include undefined",
+      "fix": "Conditional spread: {...(x ? { prop: value } : {})}; never relax the flag for the whole program",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "typescript-and-lint-rules"
+    },
+    {
+      "id": "lint-expo-env-textstyle",
+      "topic": "TypeScript",
+      "symptom": "TS2353 or TS2559 on TextStyle after expo-env.d.ts entered a program",
+      "cause": "expo/types still clashes with React Native's Strict TypeScript API on SDK 57",
+      "fix": "List expo-env.d.ts in the root tsconfig include and exclude (so expo start has nothing to add and it never enters a program); src/app-env.d.ts declares what is needed",
+      "match": [
+        "TS2353",
+        "TS2559"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "typescript-and-lint-rules",
+      "appliesTo": {
+        "expo": "57.x"
+      }
+    },
+    {
+      "id": "lint-process-env-any",
+      "topic": "TypeScript",
+      "symptom": "@typescript-eslint/no-unsafe-argument on process.env['X'] in app.config.ts once an Expo module is imported anywhere in the program",
+      "cause": "expo-modules-core's globals turn process.env members into any in the root program",
+      "fix": "Pass the whole process.env to the variant resolver (resolveAppVariant(process.env)) instead of single members",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "app-variants-and-environment"
+    },
+    {
+      "id": "lint-ts2769-navigate-never",
+      "topic": "TypeScript",
+      "symptom": "TS2769 No overload matches this call: Argument of type '\"<route>\"' is not assignable to parameter of type 'never' at navigation calls",
+      "cause": "The program never sees the global route-type augmentation (a .d.ts that nothing imports), so the route list is empty there",
+      "fix": "With Expo Router keep typed routes on and include the generated expo-env.d.ts types where the router reads them (or the router's typed hrefs); with React Navigation include the RootParamList declaration file in the tsconfig of every program that type-checks navigation",
+      "match": [
+        "parameter of type 'never'"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "navigation-and-routing"
+    },
+    {
+      "id": "lint-tsbuildinfo-node-modules",
+      "topic": "TypeScript",
+      "symptom": "A src/node_modules/ folder appears after npm run typecheck",
+      "cause": "tsBuildInfoFile: '${configDir}/node_modules/...' in a shared base resolves against the app program's folder",
+      "fix": "Point src/tsconfig.json's build info at the root cache folder",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "typescript-and-lint-rules"
+    },
+    {
+      "id": "lint-rn-deep-imports",
+      "topic": "TypeScript",
+      "symptom": "react-native/Libraries/* imports become type errors after an upgrade",
+      "cause": "React Native's Strict TypeScript API (the default from RN 0.87) does not export deep paths",
+      "fix": "Never deep-import; opt into customConditions ['react-native-strict-api'] now",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "typescript-and-lint-rules"
+    },
+    {
+      "id": "lint-paths-in-node",
+      "topic": "TypeScript",
+      "symptom": "A Node script cannot import '@/...'",
+      "cause": "Node type stripping ignores tsconfig paths",
+      "fix": "Node scripts import with relative paths and explicit .ts extensions (or a package self-reference in a multi-package repo)",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "architecture-and-boundaries"
+    },
+    {
+      "id": "lint-tsconfig-baseurl",
+      "topic": "TypeScript",
+      "symptom": "A tsconfig copied from a guide sets baseUrl and paths that disagree with the template",
+      "cause": "Guides lag the template (extends expo/tsconfig.base, paths '@/*' to './src/*', no baseUrl)",
+      "fix": "Copy the canonical tsconfig set; aliases live only in the root tsconfig paths",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "typescript-and-lint-rules"
+    },
+    {
+      "id": "lint-vendor-adapter-async",
+      "topic": "TypeScript",
+      "symptom": "A port adapter fails tsc when the vendor call is async",
+      "cause": "The result type was ReturnType<...>, which is a Promise for an async call",
+      "fix": "Use Awaited<ReturnType<...>>",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "architecture-and-boundaries"
+    },
+    {
+      "id": "lint-jest-rules-spread",
+      "topic": "ESLint config",
+      "symptom": "Assertion-free tests, duplicate titles and conditional expects pass lint",
+      "cause": "The test block spread jest flat/recommended and flat/style into one object, so the second rules key replaced the first",
+      "fix": "Use extends: [jest.configs['flat/recommended'], jest.configs['flat/style']]; the gate guardrail asserts jest/expect-expect is active",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "typescript-and-lint-rules"
+    },
+    {
+      "id": "lint-await-fireevent",
+      "topic": "ESLint config",
+      "symptom": "`fireEvent.press` is sync and does not need `await`",
+      "cause": "testing-library's no-await-sync-events contradicts RNTL 14, where fireEvent returns a Promise",
+      "fix": "Turn testing-library/no-await-sync-events off; keep await-async-events and no-floating-promises",
+      "match": [
+        "is sync and does not need `?await"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "typescript-and-lint-rules"
+    },
+    {
+      "id": "lint-left-right-data",
+      "topic": "ESLint config",
+      "symptom": "The physical-direction ban fires on { left, right } keys in pure data (a board, a geometry helper)",
+      "cause": "The selector matched any object key, but only styles are subject to RTL rules",
+      "fix": "Scope the selector to style contexts (StyleSheet.create, style props, *Style-typed variables)",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "typescript-and-lint-rules"
+    },
+    {
+      "id": "lint-complexity-switch",
+      "topic": "ESLint config",
+      "symptom": "An exhaustive switch fails 'complexity of 12. Maximum allowed is 10'",
+      "cause": "ESLint 9 counts every case, ?., ??, default parameter and logical assignment",
+      "fix": "complexity: ['error', { max: 10, variant: 'modified' }] (a switch counts once); sonarjs cognitive complexity still bounds nesting",
+      "match": [
+        "complexity of \\d+\\. Maximum allowed"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "typescript-and-lint-rules"
+    },
+    {
+      "id": "lint-determinism-leaks",
+      "topic": "ESLint config",
+      "symptom": "new Date() or performance.now() pass lint in pure logic",
+      "cause": "Only Date.now and Math.random were banned",
+      "fix": "Ban NewExpression[callee.name='Date'][arguments.length=0] and performance.now there too; time comes from the clock port",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "typescript-and-lint-rules"
+    },
+    {
+      "id": "lint-remote-url-literals",
+      "topic": "ESLint config",
+      "symptom": "<Image source={{ uri: \"https://...\" }} /> passes lint in an app that routes network through a port",
+      "cause": "Only fetch was banned, but a remote image or a URL literal also makes a request",
+      "fix": "Ban http(s)://, ws(s):// literals outside the allowed link and API config files",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "networking-and-server-state"
+    },
+    {
+      "id": "lint-warnings-pass",
+      "topic": "ESLint config",
+      "symptom": "exhaustive-deps, incompatible-library or unsupported-syntax only warn",
+      "cause": "eslint-plugin-react-hooks recommended marks them warn",
+      "fix": "Run eslint with --max-warnings 0 and raise them to error",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "typescript-and-lint-rules"
+    },
+    {
+      "id": "lint-inline-disable-inert",
+      "topic": "ESLint config",
+      "symptom": "An // eslint-disable comment has no effect and is reported",
+      "cause": "linterOptions.noInlineConfig and reportUnusedDisableDirectives are on",
+      "fix": "Fix the code, or add a named file-level exemption in eslint.config.mjs with the reviewer's agreement and a Gate-Change trailer",
+      "match": [
+        "Unused eslint-disable directive",
+        "has no effect because you have 'noInlineConfig'"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "quality-gates"
+    },
+    {
+      "id": "lint-flat-config-replace",
+      "topic": "ESLint config",
+      "symptom": "A later config block silently drops restricted paths of an earlier block",
+      "cause": "In flat config a later block replaces (not merges) the options of the same rule",
+      "fix": "Repeat the shared paths (build the blocks from shared constants)",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "typescript-and-lint-rules"
+    },
+    {
+      "id": "lint-import-order-type",
+      "topic": "ESLint config",
+      "symptom": "import/order wants a blank line between value and type imports of the same module",
+      "cause": "'type' is its own group with newlines-between always",
+      "fix": "Put import type statements in a final group after a blank line",
+      "match": [
+        "There should be at least one empty line between import groups"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "typescript-and-lint-rules"
+    },
+    {
+      "id": "lint-unbound-method-tests",
+      "topic": "ESLint config",
+      "symptom": "@typescript-eslint/unbound-method flags expect(sdk.method) in tests",
+      "cause": "Library-typed methods look unbound",
+      "fix": "Type the mock locally (jest.mocked) or use jest/unbound-method in tests",
+      "match": [
+        "unbound-method"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "unit-and-component-tests"
+    },
+    {
+      "id": "lint-mock-naming",
+      "topic": "ESLint config",
+      "symptom": "naming-convention errors in a __mocks__ file",
+      "cause": "The mock mirrors the library's PascalCase exports",
+      "fix": "Turn naming-convention off for __mocks__/**",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "unit-and-component-tests"
+    },
+    {
+      "id": "lint-no-dynamic-env-var",
+      "topic": "ESLint config",
+      "symptom": "expo/no-dynamic-env-var in app code",
+      "cause": "process.env['X'] or a computed name; Expo inlines only literal dot access",
+      "fix": "Use process.env.EXPO_PUBLIC_X literally in app code; read other variables in app.config.ts",
+      "match": [
+        "no-dynamic-env-var"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "app-variants-and-environment"
+    },
+    {
+      "id": "lint-require-imports",
+      "topic": "ESLint config",
+      "symptom": "@typescript-eslint/no-require-imports on a require() in app code",
+      "cause": "Only the test-only gate may call require() (its literal comparison lets Metro drop the module)",
+      "fix": "Use imports; the one file-level exemption is src/test-only.ts",
+      "match": [
+        "no-require-imports"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "debug-menu-and-test-hooks"
+    },
+    {
+      "id": "lint-max-lines-data",
+      "topic": "ESLint config",
+      "symptom": "max-lines fails on a data table, palette or catalog file",
+      "cause": "Large data tables were written as TypeScript",
+      "fix": "Move data to JSON (import with { type: \"json\" }); split code by responsibility, not by line count",
+      "match": [
+        "max-lines"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "typescript-and-lint-rules"
+    },
+    {
+      "id": "lint-compiler-rules-upgrade",
+      "topic": "ESLint config",
+      "symptom": "New react-hooks errors appear after a dependency bump",
+      "cause": "React Compiler rules arrive with eslint-plugin-react-hooks minor versions",
+      "fix": "Run lint after every bump and fix the code; never turn the rule off",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "dependency-management"
+    },
+    {
+      "id": "lint-exemption-file-renamed",
+      "topic": "ESLint config",
+      "symptom": "A clock adapter, direction module or text primitive suddenly fails lint",
+      "cause": "The ESLint exemptions name exact files; the file was renamed or moved",
+      "fix": "Keep the canonical file names; if a rename is right, change the exemption glob with a Gate-Change trailer",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "typescript-and-lint-rules"
+    },
+    {
+      "id": "lint-guardrail-message-reworded",
+      "topic": "ESLint config",
+      "symptom": "The gate guardrail fails: a no-restricted-properties message differs from the recorded one",
+      "cause": "The guardrail compares the restricted-property messages word for word",
+      "fix": "Never reword them; copy eslint.config.mjs byte for byte from the canonical file",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "quality-gates"
+    },
+    {
+      "id": "lint-prettier-filled-template",
+      "topic": "ESLint config",
+      "symptom": "prettier --check fails on a template right after its placeholders were filled",
+      "cause": "Filled values change line lengths, so the wrapping no longer matches Prettier",
+      "fix": "Run npx prettier --write on the filled files before lint and commit",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "typescript-and-lint-rules"
+    },
+    {
+      "id": "lint-boolean-constant-naming",
+      "topic": "Naming",
+      "symptom": "IS_DEBUG_BUILD rejected: must have one of the following prefixes",
+      "cause": "The boolean prefix rule allowed only camelCase prefixes",
+      "fix": "Allow UPPER_CASE with IS_/HAS_/CAN_/SHOULD_/DID_/WILL_/WAS_ prefixes",
+      "match": [
+        "must have one of the following prefixes"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "naming-conventions"
+    },
+    {
+      "id": "lint-destructured-boolean",
+      "topic": "Naming",
+      "symptom": "const { granted } = ... or ({ disabled }: Props) rejected by naming-convention",
+      "cause": "Destructured booleans need the is/has prefix too",
+      "fix": "Rename while destructuring: { granted: isGranted }",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "naming-conventions"
+    },
+    {
+      "id": "lint-pressed-callback",
+      "topic": "Naming",
+      "symptom": "({ pressed }) in a style callback fails naming-convention",
+      "cause": "Boolean parameter naming applies to callback parameters",
+      "fix": "Rename: ({ pressed: isPressed })",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "naming-conventions"
+    },
+    {
+      "id": "lint-blocklist-invalid-pattern",
+      "topic": "Naming",
+      "symptom": "check-file/filename-blocklist crashes with \"invalid pattern\"",
+      "cause": "The suggestion was free text",
+      "fix": "Give the rule a glob suggestion such as '**/[a-z]*-[a-z]*.ts'",
+      "match": [
+        "invalid pattern"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "naming-conventions"
+    },
+    {
+      "id": "lint-test-title-verb",
+      "topic": "Naming",
+      "symptom": "jest/valid-title: should match /^(can|[a-z]+s)\\b/u",
+      "cause": "Test titles start with a third-person verb or \"can\"",
+      "fix": "Write it('returns ...') or it('can ...'), not it('return ...')",
+      "match": [
+        "jest/valid-title"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "unit-and-component-tests"
+    },
+    {
+      "id": "lint-prefer-to-be",
+      "topic": "Naming",
+      "symptom": "jest/prefer-to-be: Use toBe when expecting primitive literals",
+      "cause": "toStrictEqual is rejected for numbers, strings and booleans",
+      "fix": "toBe for a primitive, toStrictEqual for an object or array",
+      "match": [
+        "jest/prefer-to-be"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "tdd-workflow"
+    },
+    {
+      "id": "lint-makestyles-unused",
+      "topic": "Components",
+      "symptom": "no-unused-styles reports every key as unused (\"undefined.base\")",
+      "cause": "makeStyles returned StyleSheet.create(...) directly",
+      "fix": "Use a block body: const styles = StyleSheet.create(...); return styles;",
+      "match": [
+        "undefined\\.base"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "design-system-structure"
+    },
+    {
+      "id": "lint-props-mutation",
+      "topic": "Components",
+      "symptom": "props.items.push() is not flagged by the compiler rules",
+      "cause": "The React Compiler lint does not see array mutation through props",
+      "fix": "Type props readonly (readonly T[])",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "react-components-and-hooks"
+    },
+    {
+      "id": "lint-compiler-try-catch",
+      "topic": "Components",
+      "symptom": "React Compiler skips a component or hook: \"value blocks within a try/catch\"",
+      "cause": "The compiler bails out on some try/catch shapes",
+      "fix": "Move the try/catch into a plain helper function the hook calls",
+      "match": [
+        "value blocks within a try/catch"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "react-components-and-hooks"
+    },
+    {
+      "id": "lint-draw-many-params",
+      "topic": "Components",
+      "symptom": "max-params fails on a draw or render helper with many inputs",
+      "cause": "The limit is three parameters",
+      "fix": "Pass one frame object ({ view, colors, layout, ... })",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "typescript-and-lint-rules"
+    }
+  ]
+}

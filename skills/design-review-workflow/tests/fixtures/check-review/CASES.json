@@ -1,0 +1,518 @@
+{
+  "bad-axis-locale": {
+    "expect": [
+      "reports/design-review/2026-10-01-1-0-0/cells/tasks.default--light--en--default--ios-phone-small.png [review-axis] identical to tasks.default--light--ar--default--ios-phone-small.png: the locales \"ar\" and \"en\" gave the same picture"
+    ],
+    "ops": [
+      {
+        "delete": "reports/design-review/2026-10-01-1-0-0/cells/tasks.default--light--en--default--ios-phone-small.png"
+      },
+      {
+        "copy": {
+          "from": "reports/design-review/2026-10-01-1-0-0/cells/tasks.default--light--ar--default--ios-phone-small.png",
+          "to": "reports/design-review/2026-10-01-1-0-0/cells/tasks.default--light--en--default--ios-phone-small.png"
+        }
+      }
+    ]
+  },
+  "bad-axis-text": {
+    "expect": [
+      "reports/design-review/2026-10-01-1-0-0/cells/tasks.default--light--en--largest--ios-phone-small.png [review-axis] identical to tasks.default--light--en--default--ios-phone-small.png: the text sizes \"default\" and \"largest\" gave the same picture"
+    ],
+    "ops": [
+      {
+        "delete": "reports/design-review/2026-10-01-1-0-0/cells/tasks.default--light--en--largest--ios-phone-small.png"
+      },
+      {
+        "copy": {
+          "from": "reports/design-review/2026-10-01-1-0-0/cells/tasks.default--light--en--default--ios-phone-small.png",
+          "to": "reports/design-review/2026-10-01-1-0-0/cells/tasks.default--light--en--largest--ios-phone-small.png"
+        }
+      }
+    ]
+  },
+  "bad-axis-theme": {
+    "expect": [
+      "reports/design-review/2026-10-01-1-0-0/cells/tasks.default--light--ar--largest--ios-phone-small.png [review-axis] identical to tasks.default--dark--ar--largest--ios-phone-small.png: the themes \"dark\" and \"light\" gave the same picture"
+    ],
+    "ops": [
+      { "delete": "reports/design-review/2026-10-01-1-0-0/cells/tasks.default--dark--ar--largest--ios-phone-small.png" },
+      {
+        "copy": {
+          "from": "reports/design-review/2026-10-01-1-0-0/cells/tasks.default--light--ar--largest--ios-phone-small.png",
+          "to": "reports/design-review/2026-10-01-1-0-0/cells/tasks.default--dark--ar--largest--ios-phone-small.png"
+        }
+      }
+    ]
+  },
+  "bad-capture-blank": {
+    "expect": [
+      "reports/design-review/2026-10-01-1-0-0/cells/tasks.default--light--en--default--ios-tablet.png [review-capture] blank: 1 distinct colour between the system bars, one covering 100.0%"
+    ],
+    "ops": [
+      {
+        "png": {
+          "files": ["reports/design-review/2026-10-01-1-0-0/cells/tasks.default--light--en--default--ios-tablet.png"],
+          "width": 80,
+          "height": 60,
+          "fill": "#ffffff"
+        }
+      }
+    ]
+  },
+  "bad-capture-orientation": {
+    "expect": [
+      "reports/design-review/2026-10-01-1-0-0/cells/tasks.default--light--en--default--android-tablet.png [review-capture] captured in portrait, the plan sweeps \"android-tablet\" in landscape"
+    ],
+    "ops": [
+      { "delete": "reports/design-review/2026-10-01-1-0-0/cells/tasks.default--light--en--default--android-tablet.png" },
+      {
+        "png": {
+          "files": [
+            "reports/design-review/2026-10-01-1-0-0/cells/tasks.default--light--en--default--android-tablet.png"
+          ],
+          "width": 50,
+          "height": 80,
+          "fill": "#fafafa",
+          "rects": [
+            { "x": 2, "y": 10, "width": 20, "height": 8, "fill": "#3366ff" },
+            { "x": 4, "y": 30, "width": 12, "height": 6, "fill": "#3366ff" }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-capture-size": {
+    "expect": [
+      "reports/design-review/2026-10-01-1-0-0/cells/tasks.default--light--en--default--ios-tablet.png [review-capture] 90x60 pixels, but other captures of \"ios-tablet\" are 80x60"
+    ],
+    "ops": [
+      {
+        "png": {
+          "files": ["reports/design-review/2026-10-01-1-0-0/cells/tasks.default--light--en--default--ios-tablet.png"],
+          "width": 90,
+          "height": 60,
+          "fill": "#fafafa",
+          "rects": [
+            { "x": 2, "y": 10, "width": 20, "height": 8, "fill": "#3366ff" },
+            { "x": 4, "y": 30, "width": 12, "height": 6, "fill": "#3366ff" }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-cells-extra": {
+    "expect": [
+      "reports/design-review/2026-10-01-1-0-0/cells/settings.default--light--en--default--ios-tablet.png [review-cells] a capture that is no cell of the plan"
+    ],
+    "ops": [
+      {
+        "png": {
+          "files": ["reports/design-review/2026-10-01-1-0-0/cells/settings.default--light--en--default--ios-tablet.png"],
+          "width": 80,
+          "height": 60,
+          "fill": "#fafafa",
+          "rects": [
+            { "x": 2, "y": 10, "width": 20, "height": 8, "fill": "#3366ff" },
+            { "x": 4, "y": 30, "width": 12, "height": 6, "fill": "#3366ff" }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-cells-inventory": {
+    "expect": [
+      "reports/design-review/2026-10-01-1-0-0/cells/tasks.default--light--en--default--ios-tablet.png [review-cells] the capture changed since the inventory was written"
+    ],
+    "ops": [
+      {
+        "png": {
+          "files": ["reports/design-review/2026-10-01-1-0-0/cells/tasks.default--light--en--default--ios-tablet.png"],
+          "width": 80,
+          "height": 60,
+          "fill": "#fafafa",
+          "rects": [
+            { "x": 2, "y": 10, "width": 30, "height": 9, "fill": "#22aa55" },
+            { "x": 4, "y": 30, "width": 12, "height": 6, "fill": "#3366ff" }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-cells-missing": {
+    "expect": [
+      "reports/design-review/2026-10-01-1-0-0/cells/tasks.default--light--en--default--ios-tablet.png [review-cells] not captured"
+    ],
+    "ops": [
+      { "delete": "reports/design-review/2026-10-01-1-0-0/cells/tasks.default--light--en--default--ios-tablet.png" }
+    ]
+  },
+  "bad-device-pass-header": {
+    "expect": ["[review-device-pass] android-budget: \"model\" and \"os\" (the version) are required"],
+    "ops": [
+      {
+        "json": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "path": ["devicePass", "android-budget", "os"],
+          "value": ""
+        }
+      }
+    ]
+  },
+  "bad-device-pass-missing": {
+    "expect": ["[review-device-pass] iphone: step \"crash-log\" has no result yet"],
+    "ops": [
+      {
+        "json": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "path": ["devicePass", "iphone", "results", "crash-log"],
+          "value": {}
+        }
+      }
+    ]
+  },
+  "bad-device-pass-na": {
+    "expect": ["[review-device-pass] iphone: step \"backup-restore\" is n/a without a reason"],
+    "ops": [
+      {
+        "json": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "path": ["devicePass", "iphone", "results", "backup-restore", "why"],
+          "value": "none"
+        }
+      }
+    ]
+  },
+  "bad-findings-cell": {
+    "expect": [
+      "[review-findings] finding F2: cell \"tasks.default--sepia--en--default--ios-tablet\" is not in the inventory"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "path": ["findings", "F2", "cells"],
+          "value": ["tasks.default--sepia--en--default--ios-tablet"]
+        }
+      }
+    ]
+  },
+  "bad-findings-deferred-fix": {
+    "expect": ["[review-findings] finding F1: a FIX is never deferred"],
+    "ops": [
+      {
+        "json": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "path": ["findings", "F1", "status"],
+          "value": "deferred"
+        }
+      },
+      {
+        "json": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "path": ["findings", "F1", "backlog"],
+          "value": "#7"
+        }
+      }
+    ]
+  },
+  "bad-findings-grade": {
+    "expect": ["[review-findings] finding F2: grade \"MINOR\" is not BLOCKER, FIX or NOTE"],
+    "ops": [
+      {
+        "json": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "path": ["findings", "F2", "grade"],
+          "value": "MINOR"
+        }
+      }
+    ]
+  },
+  "bad-fix-no-seen": {
+    "expect": ["[review-fix-round] finding F1 has no \"seen\" hashes of the shots it was found on"],
+    "ops": [
+      {
+        "json": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "path": ["findings", "F1", "seen"],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "bad-fix-not-reshot": {
+    "expect": [
+      "[review-fix-round] finding F1 is marked fixed but cell tasks.default--dark--ar--largest--ios-phone-small was not re-shot"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "regex": true,
+          "find": "(\"tasks.default--dark--ar--largest--ios-phone-small\": \"([0-9a-f]{64})\"[\\s\\S]*?\"seen\": \\{\\s*\"tasks.default--dark--ar--largest--ios-phone-small\": \")[0-9a-f]{64}",
+          "with": "$1$2"
+        }
+      }
+    ]
+  },
+  "bad-fix-round-missing": {
+    "expect": ["[review-fix-round] findings are marked fixed but no fix round is recorded"],
+    "ops": [
+      { "json": { "file": "design-review/2026-10-01-1-0-0/review.json", "path": ["fixRound"], "literalNull": true } },
+      {
+        "json": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "path": ["signoff", "commit"],
+          "value": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0"
+        }
+      }
+    ]
+  },
+  "bad-fix-verify-opened": {
+    "expect": ["[review-fix-round] finding F4 was opened while verifying the fixes and graded FIX"],
+    "ops": [
+      {
+        "json": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "path": ["findings", "F4"],
+          "value": {
+            "grade": "FIX",
+            "lens": "identity",
+            "what": "The header weight looks lighter than the design baseline.",
+            "screen": "tasks",
+            "status": "fixed",
+            "openedIn": "verify"
+          }
+        }
+      }
+    ]
+  },
+  "bad-fix-video-no-seen": {
+    "expect": ["[review-fix-round] finding F3 has no \"seen\" hash of video press--ios--full"],
+    "ops": [
+      {
+        "json": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "path": ["findings", "F3", "seen", "press--ios--full"],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "bad-fix-video-not-rerecorded": {
+    "expect": ["[review-fix-round] finding F3 is marked fixed but video press--ios--full was not recorded again"],
+    "ops": [
+      {
+        "replace": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "regex": true,
+          "find": "(\"press--ios--full\": \"([0-9a-f]{64})\"[\\s\\S]*?\"seen\": \\{\\s*\"press--ios--full\": \")[0-9a-f]{64}",
+          "with": "$1$2"
+        }
+      }
+    ]
+  },
+  "bad-floor": {
+    "expect": ["[review-floor] finding F1: breaks the accessibility floor (contrast) but is graded FIX"],
+    "ops": [
+      {
+        "json": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "path": ["findings", "F1", "lens"],
+          "value": "floor"
+        }
+      },
+      {
+        "json": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "path": ["findings", "F1", "floor"],
+          "value": "contrast"
+        }
+      }
+    ]
+  },
+  "bad-floor-failed-step": {
+    "expect": [
+      "[review-floor] finding F4: step \"screen-reader\" failed, and a failure there is always a BLOCKER (graded NOTE)"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "path": ["findings", "F4"],
+          "value": {
+            "grade": "NOTE",
+            "lens": "behaviour",
+            "what": "TalkBack reads the add button as \"button\" only.",
+            "step": "android-budget/screen-reader",
+            "status": "deferred",
+            "backlog": "#50",
+            "openedIn": "device-pass"
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "path": ["devicePass", "android-budget", "results", "screen-reader"],
+          "value": { "result": "pass", "finding": "F4" }
+        }
+      }
+    ]
+  },
+  "bad-record-second-round": {
+    "expect": [
+      "design-review/2026-10-01-1-0-0/review.json",
+      "[review-record] unknown key \"fixRounds\" Fix: A review has exactly one fix round"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "path": ["fixRounds"],
+          "value": [{ "commit": "c3d4e5f", "verify": "pass", "date": "2026-10-01" }]
+        }
+      }
+    ]
+  },
+  "bad-record-variant": {
+    "expect": ["[review-record] the review swept variant \"development\", the plan says \"preview\""],
+    "ops": [
+      {
+        "json": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "path": ["build", "variant"],
+          "value": "development"
+        }
+      }
+    ]
+  },
+  "bad-record-verify": {
+    "expect": [
+      "[review-record] \"build.verify\" is not \"pass\": the review starts only when every gate and test is green"
+    ],
+    "ops": [
+      { "json": { "file": "design-review/2026-10-01-1-0-0/review.json", "path": ["build", "verify"], "value": "fail" } }
+    ]
+  },
+  "bad-signoff-commit": {
+    "expect": [
+      "[review-signoff] the sign-off names commit \"a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\", but the reviewed build is \"b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1\""
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "path": ["signoff", "commit"],
+          "value": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0"
+        }
+      }
+    ]
+  },
+  "bad-signoff-future": {
+    "expect": ["[review-signoff] sign-off date \"2999-01-01\" is not a day up to today"],
+    "ops": [
+      {
+        "json": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "path": ["signoff", "date"],
+          "value": "2999-01-01"
+        }
+      }
+    ]
+  },
+  "bad-signoff-missing": {
+    "expect": ["[review-signoff] the review is not signed off yet"],
+    "ops": [
+      { "json": { "file": "design-review/2026-10-01-1-0-0/review.json", "path": ["signoff"], "literalNull": true } }
+    ]
+  },
+  "bad-signoff-no-escalation": {
+    "expect": ["[review-signoff] \"NOT SIGNED OFF\" needs an \"escalation\" naming the unresolved BLOCKER or FIX"],
+    "ops": [
+      {
+        "json": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "path": ["signoff", "verdict"],
+          "value": "NOT SIGNED OFF"
+        }
+      }
+    ]
+  },
+  "bad-signoff-open-fix": {
+    "expect": ["[review-signoff] signed off with FIX F1 open"],
+    "ops": [
+      {
+        "json": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "path": ["findings", "F1", "status"],
+          "value": "open"
+        }
+      }
+    ]
+  },
+  "bad-stale-plan": {
+    "expect": ["[review-stale] contracts/design-review.json changed after the review started"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/design-review.json",
+          "path": ["$comment"],
+          "value": "The plan, edited after the review began."
+        }
+      }
+    ]
+  },
+  "bad-stale-screens": {
+    "expect": ["[review-stale] contracts/screens.json changed after the review started"],
+    "ops": [
+      {
+        "replace": {
+          "file": "contracts/screens.json",
+          "find": "\"name\": \"Tasks\"",
+          "with": "\"name\": \"All tasks\""
+        }
+      }
+    ]
+  },
+  "bad-videos": {
+    "expect": ["reports/design-review/2026-10-01-1-0-0/motion/press--ios--reduced.mp4 [review-videos] not recorded"],
+    "ops": [{ "delete": "reports/design-review/2026-10-01-1-0-0/motion/press--ios--reduced.mp4" }]
+  },
+  "bad-videos-not-movie": {
+    "expect": [
+      "reports/design-review/2026-10-01-1-0-0/motion/press--ios--reduced.mp4 [review-videos] not a QuickTime or MP4 movie"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "reports/design-review/2026-10-01-1-0-0/motion/press--ios--reduced.mp4",
+          "content": "a screenshot renamed to mp4\n"
+        }
+      }
+    ]
+  },
+  "error-no-plan": {
+    "expect": ["ERROR [bad-input] nothing to check: contracts/design-review.json not found"],
+    "ops": [{ "delete": "contracts/design-review.json" }]
+  },
+  "error-no-record": {
+    "expect": ["ERROR [bad-input] nothing to check: no design-review/<review-id>/review.json"],
+    "ops": [{ "delete": "design-review" }]
+  },
+  "error-unknown-review": {
+    "expect": ["ERROR [bad-input] nothing to check: design-review/2026-12-31-2-0-0/review.json not found"],
+    "args": "{dir} --review 2026-12-31-2-0-0"
+  },
+  "pass-in-progress": {
+    "expect": ["verdict none yet", "RESULT: PASS"],
+    "args": "{dir} --in-progress",
+    "ops": [
+      { "json": { "file": "design-review/2026-10-01-1-0-0/review.json", "path": ["signoff"], "literalNull": true } }
+    ]
+  },
+  "pass-review-by-id": {
+    "expect": ["review 2026-10-01-1-0-0:", "RESULT: PASS"],
+    "args": "{dir} --review 2026-10-01-1-0-0"
+  }
+}

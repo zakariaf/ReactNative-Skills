@@ -1,0 +1,3 @@
+[hydrate-sync]
+src/services/settings-storage/kv-settings-storage-adapter.ts:
+asynchronous settings I/O

@@ -1,0 +1,14 @@
+{
+  "$schema": "./goldens.schema.json",
+  "$comment": "The app's compatibility-contract goldens, extra golden paths and approved pixel tolerance, read by golden-and-snapshot-tests' checkers. Change it in a Gate-Change commit.",
+  "contracts": [
+    {
+      "id": "digest-notification-id",
+      "test": "src/features/tasks/tasks-digest.golden.test.ts",
+      "why": "Installed versions cancel and replace the scheduled digest notification by this identifier."
+    }
+  ],
+  "goldenPaths": [],
+  "contractMarkers": ["[contract]"],
+  "maxPixelTolerance": 0.001
+}

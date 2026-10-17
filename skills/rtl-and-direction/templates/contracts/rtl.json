@@ -1,0 +1,15 @@
+{
+  "$comment": "Read by rtl-and-direction's check-rtl. The app's facts about direction; every key is optional and falls back to the default the checker prints with --help. Paths are repo-relative.",
+  "directionSource": "app",
+  "rootLayout": "src/app/_layout.tsx",
+  "startupCalls": ["openDeviceData", "openDeviceDatabase", "openDatabaseSync", "openDatabaseAsync"],
+  "gateWrappers": ["Fragment", "React.Fragment", "GestureHandlerRootView", "SafeAreaProvider"],
+  "outsideRoots": [],
+  "physicalSurfaces": [],
+  "iconSet": "src/ui/icons/icon-paths.ts",
+  "iconComponent": "src/ui/icons/icon.tsx",
+  "directionalIcons": ["back", "forward", "chevron", "undo", "redo"],
+  "textPrimitive": "src/ui/app-text.tsx",
+  "textStyleHook": "src/theme/use-text-style.ts",
+  "bidiFiles": ["src/i18n/bidi.ts", "src/ui/app-text.tsx"]
+}

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "crash-reporting.schema.json",
+  "title": "Crash reporting contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["provider", "consentModel", "maxTracesSampleRate", "uploadProfiles", "declarations"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "provider": {
+      "description": "The crash reporting service behind CrashReporterPort.",
+      "const": "sentry"
+    },
+    "consentModel": {
+      "description": "opt-in: nothing is sent until the person turns crash reports on (the first-launch value of the saved choice is false). opt-out: the first-launch value is true and the settings toggle turns it off.",
+      "enum": ["opt-in", "opt-out"]
+    },
+    "maxTracesSampleRate": {
+      "description": "The highest TRACES_SAMPLE_RATE (and PROFILES_SAMPLE_RATE) the code may use; 0 forbids tracing.",
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "uploadProfiles": {
+      "description": "eas.json build profiles whose builds report, so they must upload source maps and native symbols.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "declarations": {
+      "description": "What the store declarations say, in privacy-and-store-declarations' data-type ids (contracts/privacy.json sdks[\"@sentry/react-native\"].collects lists the same types).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["collects", "linkedToUser", "usedForTracking"],
+      "properties": {
+        "collects": {
+          "type": "array",
+          "items": { "enum": ["crash-data", "other-diagnostic-data", "performance-data"] },
+          "uniqueItems": true,
+          "minItems": 1
+        },
+        "linkedToUser": { "const": false },
+        "usedForTracking": { "const": false }
+      }
+    }
+  }
+}

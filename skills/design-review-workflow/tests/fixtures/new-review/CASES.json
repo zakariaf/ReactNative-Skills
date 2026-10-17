@@ -1,0 +1,35 @@
+{
+  "bad-invalid-plan": {
+    "expect": ["[plan-invalid] \"themes\" must list \"light\" and/or \"dark\", each once"],
+    "args": "{dir} --id 2026-10-02-1-0-0",
+    "ops": [{ "json": { "file": "contracts/design-review.json", "path": ["themes"], "value": ["light", "sepia"] } }]
+  },
+  "error-bad-id": {
+    "expect": ["ERROR [bad-input] review id \"release\" is not <YYYY-MM-DD>-<slug>"],
+    "args": "{dir} --id release"
+  },
+  "error-exists": {
+    "expect": ["ERROR [bad-input] design-review/2026-10-02-1-0-0/review.json exists"],
+    "args": "{dir} --id 2026-10-02-1-0-0",
+    "ops": [{ "write": { "file": "design-review/2026-10-02-1-0-0/review.json", "content": "{}\n" } }]
+  },
+  "error-no-screen-contract": {
+    "expect": ["ERROR [bad-input] cannot read the screen contract contracts/screens.json"],
+    "ops": [{ "delete": "contracts/screens.json" }]
+  },
+  "pass-refresh": {
+    "expect": [
+      "refreshed: 48 cells added, 0 dropped, 0 findings got their seen hashes",
+      "wrote design-review/2026-10-02-1-0-0/review.json: 0/48 cells and 0/8 videos captured"
+    ],
+    "args": "{dir} --refresh",
+    "ops": [
+      {
+        "write": {
+          "file": "design-review/2026-10-02-1-0-0/review.json",
+          "content": "{\n  \"version\": 1,\n  \"id\": \"2026-10-02-1-0-0\",\n  \"cells\": {},\n  \"videos\": {},\n  \"findings\": {},\n  \"signoff\": null\n}\n"
+        }
+      }
+    ]
+  }
+}

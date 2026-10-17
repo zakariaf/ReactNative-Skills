@@ -1,0 +1,15 @@
+{
+  "$schema": "./debug-links.schema.json",
+  "$comment": "The test-build debug deep link <scheme>://debug/setup?<param>=<value>&... (debug-menu-and-test-hooks). It mirrors DEBUG_LINK_PARAMS in the registry file: check-test-hooks (rule debug-registry) fails when the two differ, and E2E flows read this file instead of the TypeScript. Every parameter is optional; an unknown, repeated or bad one refuses the whole link.",
+  "registry": "src/features/debug/debug-links.ts",
+  "path": "debug/setup",
+  "params": {
+    "date": { "kind": "date", "effect": "the day clock.today() answers (YYYY-MM-DD), or real" },
+    "offline": { "values": ["0", "1"], "effect": "simulate offline for every reader" },
+    "motion": { "values": ["system", "still"], "effect": "hold every animation still" },
+    "probe": { "values": ["0", "1"], "effect": "canvas layout probes on" },
+    "lang": { "values": ["en", "ar"], "effect": "the app language (saved setting)" },
+    "theme": { "values": ["system", "light", "dark"], "effect": "the theme setting" },
+    "open": { "values": ["tasks", "debug"], "effect": "the screen to open last" }
+  }
+}

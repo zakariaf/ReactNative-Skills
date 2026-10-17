@@ -1,0 +1,1407 @@
+{
+  "$comment": "The canonical TypeScript, ESLint, Prettier and knip settings for an Expo app (single app at the repo root; verified 2026-10-03 with TypeScript 6.0.3, ESLint 9.39.5, typescript-eslint 8.70.1, Prettier 3.9.9, knip 6.38.0). check-configs.mjs compares the app repo against this file. {srcDir} is the resolved source folder. Change it only together with the templates; a change is a stop-and-ask decision and lands with a Gate-Change trailer.",
+  "tsconfigBase": {
+    "file": "tsconfig.base.json",
+    "extends": "expo/tsconfig.base",
+    "compilerOptions": {
+      "strict": true,
+      "noUncheckedIndexedAccess": true,
+      "exactOptionalPropertyTypes": true,
+      "noImplicitOverride": true,
+      "noImplicitReturns": true,
+      "noFallthroughCasesInSwitch": true,
+      "noPropertyAccessFromIndexSignature": true,
+      "erasableSyntaxOnly": true,
+      "allowImportingTsExtensions": true,
+      "verbatimModuleSyntax": true,
+      "isolatedModules": true,
+      "useUnknownInCatchVariables": true,
+      "allowUnreachableCode": false,
+      "allowUnusedLabels": false,
+      "forceConsistentCasingInFileNames": true,
+      "noErrorTruncation": true,
+      "customConditions": [
+        "react-native-strict-api",
+        "react-native"
+      ],
+      "types": []
+    },
+    "notTrue": [
+      "noUnusedLocals",
+      "noUnusedParameters",
+      "skipDefaultLibCheck"
+    ],
+    "optional": [
+      "incremental",
+      "tsBuildInfoFile"
+    ],
+    "strictFamily": [
+      "noImplicitAny",
+      "strictNullChecks",
+      "strictFunctionTypes",
+      "strictBindCallApply",
+      "strictPropertyInitialization",
+      "strictBuiltinIteratorReturn",
+      "noImplicitThis",
+      "alwaysStrict"
+    ],
+    "topLevelKeys": [
+      "$schema",
+      "extends",
+      "compilerOptions"
+    ]
+  },
+  "programAllowed": {
+    "keys": [
+      "$schema",
+      "extends",
+      "compilerOptions",
+      "include",
+      "exclude"
+    ],
+    "compilerOptions": [
+      "types",
+      "paths",
+      "tsBuildInfoFile"
+    ]
+  },
+  "programs": [
+    {
+      "id": "root",
+      "file": "tsconfig.json",
+      "world": "Node and tests: the whole repo with Node types",
+      "types": [
+        "jest",
+        "node"
+      ],
+      "lib": null,
+      "includeContains": [
+        "**/*.ts",
+        "**/*.tsx",
+        ".expo/types/**/*.ts"
+      ],
+      "excludeContains": [
+        "node_modules",
+        "ios",
+        "android",
+        "skills",
+        "{srcDir}/app-env.d.ts"
+      ],
+      "excludeWhy": {
+        "{srcDir}/app-env.d.ts": "the app program's declare const process would replace @types/node's process in the root program (TS2339 on process.exitCode)",
+        "skills": "installed skills hold templates and planted-bug fixtures that belong to no program"
+      },
+      "excludeCanonical": [
+        "node_modules",
+        "ios",
+        "android",
+        "build",
+        "dist",
+        "web-build",
+        "coverage",
+        "reports",
+        ".stryker-tmp",
+        ".skill-tooling",
+        "skills",
+        "expo-env.d.ts",
+        "{srcDir}/app-env.d.ts"
+      ]
+    },
+    {
+      "id": "app",
+      "file": "{srcDir}/tsconfig.json",
+      "world": "app: the bundled code, no Node types",
+      "types": [
+        "jest"
+      ],
+      "lib": null,
+      "includeContains": [
+        "**/*",
+        "{toRoot}.expo/types/**/*.ts"
+      ],
+      "excludeContains": [],
+      "includeWhy": {
+        "{toRoot}.expo/types/**/*.ts": "Expo Router's typed routes are a global augmentation nothing imports; without the include the app program types every href as a plain string"
+      },
+      "forbiddenInclude": [
+        "{toRoot}scripts",
+        "{toRoot}plugins",
+        "{toRoot}app.config.ts",
+        "{toRoot}expo-env.d.ts"
+      ],
+      "excludeAllowed": [],
+      "excludeWhy": "excluding a folder from the app program drops the no-Node-types guarantee for it while the root program still checks it with Node types"
+    }
+  ],
+  "appEnv": {
+    "file": "{srcDir}/app-env.d.ts",
+    "declares": "declare const process\\s*:"
+  },
+  "eslint": {
+    "file": "eslint.config.mjs",
+    "required": [
+      {
+        "id": "no-inline-config",
+        "pattern": "noInlineConfig:\\s*true",
+        "what": "linterOptions.noInlineConfig: true (inline eslint-disable comments do nothing)"
+      },
+      {
+        "id": "unused-directives",
+        "pattern": "reportUnusedDisableDirectives:\\s*'error'",
+        "what": "linterOptions.reportUnusedDisableDirectives: 'error'"
+      },
+      {
+        "id": "unused-inline-configs",
+        "pattern": "reportUnusedInlineConfigs:\\s*'error'",
+        "what": "linterOptions.reportUnusedInlineConfigs: 'error'"
+      },
+      {
+        "id": "expo-base",
+        "pattern": "from\\s+'eslint-config-expo/flat\\.js'",
+        "what": "the eslint-config-expo/flat.js base"
+      },
+      {
+        "id": "strict-type-checked",
+        "pattern": "tseslint\\.configs\\.strictTypeChecked",
+        "what": "typescript-eslint strictTypeChecked"
+      },
+      {
+        "id": "stylistic-type-checked",
+        "pattern": "tseslint\\.configs\\.stylisticTypeChecked",
+        "what": "typescript-eslint stylisticTypeChecked"
+      },
+      {
+        "id": "project-service",
+        "pattern": "projectService:\\s*true",
+        "what": "parserOptions.projectService: true (type-aware rules)"
+      },
+      {
+        "id": "prettier-last",
+        "pattern": "prettierConfig,?\\s*\\]\\s*\\)\\s*;?\\s*$",
+        "what": "eslint-config-prettier as the LAST entry of defineConfig([...])"
+      },
+      {
+        "id": "type-imports",
+        "pattern": "'@typescript-eslint\\/consistent-type-imports':\\s*\\[\\s*'error'",
+        "what": "consistent-type-imports: error"
+      },
+      {
+        "id": "type-not-interface",
+        "pattern": "'@typescript-eslint\\/consistent-type-definitions':\\s*\\[\\s*'error',\\s*'type'\\s*\\]",
+        "what": "consistent-type-definitions: ['error', 'type']"
+      },
+      {
+        "id": "module-boundary-types",
+        "pattern": "'@typescript-eslint\\/explicit-module-boundary-types':\\s*'error'",
+        "what": "explicit-module-boundary-types: error"
+      },
+      {
+        "id": "exhaustive-switch",
+        "pattern": "'@typescript-eslint\\/switch-exhaustiveness-check':\\s*\\[\\s*'error',\\s*\\{\\s*considerDefaultExhaustiveForUnions:\\s*false,\\s*requireDefaultForNonUnion:\\s*true",
+        "what": "switch-exhaustiveness-check with considerDefaultExhaustiveForUnions: false"
+      },
+      {
+        "id": "floating-promises",
+        "pattern": "'@typescript-eslint\\/no-floating-promises':\\s*\\[\\s*'error',\\s*\\{\\s*ignoreVoid:\\s*false,\\s*ignoreIIFE:\\s*false",
+        "what": "no-floating-promises with ignoreVoid: false and ignoreIIFE: false"
+      },
+      {
+        "id": "strict-booleans",
+        "pattern": "'@typescript-eslint\\/strict-boolean-expressions':\\s*\\[\\s*'error',\\s*\\{\\s*allowString:\\s*false,\\s*allowNumber:\\s*false",
+        "what": "strict-boolean-expressions with allowString: false and allowNumber: false"
+      },
+      {
+        "id": "unused-vars",
+        "pattern": "'@typescript-eslint\\/no-unused-vars':\\s*\\[\\s*'error',\\s*\\{\\s*args:\\s*'all',\\s*argsIgnorePattern:\\s*'\\^_',\\s*caughtErrors:\\s*'all'",
+        "what": "no-unused-vars with args: 'all' and caughtErrors: 'all' (ESLint, not tsc, owns unused code)"
+      },
+      {
+        "id": "empty-catch",
+        "pattern": "'no-empty':\\s*\\[\\s*'error',\\s*\\{\\s*allowEmptyCatch:\\s*false",
+        "what": "no-empty with allowEmptyCatch: false"
+      },
+      {
+        "id": "warning-comments",
+        "pattern": "'no-warning-comments':\\s*\\[\\s*'error'",
+        "what": "no-warning-comments: error (no TODO/FIXME/HACK)"
+      },
+      {
+        "id": "commented-code",
+        "pattern": "'sonarjs\\/no-commented-code':\\s*'error'",
+        "what": "sonarjs/no-commented-code: error"
+      },
+      {
+        "id": "no-default-export",
+        "pattern": "'import\\/no-default-export':\\s*'error'",
+        "what": "import/no-default-export: error"
+      },
+      {
+        "id": "no-cycle",
+        "pattern": "'import\\/no-cycle':\\s*\\[\\s*'error'",
+        "what": "import/no-cycle: error"
+      },
+      {
+        "id": "import-order",
+        "pattern": "'import\\/order':\\s*\\[\\s*'error'",
+        "what": "import/order: error"
+      },
+      {
+        "id": "no-console",
+        "pattern": "'no-console':\\s*\\[\\s*'error',\\s*\\{\\s*allow:\\s*\\[\\s*'warn',\\s*'error'\\s*\\]",
+        "what": "no-console: error (warn and error allowed)"
+      },
+      {
+        "id": "no-enums",
+        "pattern": "enums:\\s*\\{\\s*selector:\\s*'TSEnumDeclaration',",
+        "what": "the enums selector, verbatim (TSEnumDeclaration in no-restricted-syntax)"
+      },
+      {
+        "id": "node-import-extension",
+        "pattern": "const\\s*NODE_IMPORT_EXTENSION\\s*=\\s*\\{\\s*selector:\\s*':matches\\(ImportDeclaration,\\s*ExportNamedDeclaration,\\s*ExportAllDeclaration\\)\\[source\\.value=\\/\\^\\\\\\\\\\.\\/\\]\\[source\\.value!=\\/\\\\\\\\\\.\\(ts\\|tsx\\|json\\|js\\|mjs\\|cjs\\)\\$\\/\\]',\\s*message:\\s*'Write\\s*the\\s*file\\s*extension\\s*\\(\\.\\/x\\.ts\\):\\s*Node\\s*type\\s*stripping\\s*needs\\s*it\\.',\\s*\\};",
+        "what": "the NODE_IMPORT_EXTENSION selector, verbatim (Node-run files write ./x.ts)"
+      },
+      {
+        "id": "multi-package-switch",
+        "pattern": "const IS_MULTI_PACKAGE = (true|false);[\\s\\S]*IS_MULTI_PACKAGE \\? \\[PACKAGE_IMPORT_EXTENSION\\]",
+        "what": "the IS_MULTI_PACKAGE switch that adds PACKAGE_IMPORT_EXTENSION to runtimeSyntax()"
+      },
+      {
+        "id": "no-parent-import",
+        "pattern": "group:\\s*\\[\\s*'\\.\\./\\*'",
+        "what": "the PARENT_IMPORT pattern ('../*' banned)"
+      },
+      {
+        "id": "node-builtins",
+        "pattern": "group:\\s*\\[\\s*'node:\\*'",
+        "what": "the NODE_BUILTINS pattern (no Node built-ins in app code)"
+      },
+      {
+        "id": "restricted-imports-helper",
+        "pattern": "paths:\\s*\\[\\.\\.\\.without\\(BANNED_PACKAGE_PATHS,\\s*\\.\\.\\.allow\\),\\s*\\.\\.\\.paths\\]",
+        "what": "restrictedImports() prepending BANNED_PACKAGE_PATHS to every no-restricted-imports list"
+      },
+      {
+        "id": "vendor-sdk-list",
+        "pattern": "const RUNTIME_PATHS = \\[\\s*\\.\\.\\.VENDOR_SDK_PATHS,",
+        "what": "VENDOR_SDK_PATHS spread into RUNTIME_PATHS (a vendor SDK is imported only by its adapter)"
+      },
+      {
+        "id": "vendor-gma",
+        "pattern": "vendor\\('react-native-google-mobile-ads'",
+        "what": "the react-native-google-mobile-ads adapter-only ban in VENDOR_SDK_PATHS (AdsPort/ConsentPort)"
+      },
+      {
+        "id": "vendor-iap",
+        "pattern": "vendor\\('expo-iap'",
+        "what": "the expo-iap adapter-only ban in VENDOR_SDK_PATHS (PurchasePort)"
+      },
+      {
+        "id": "vendor-sqlite",
+        "pattern": "vendor\\('expo-sqlite'",
+        "what": "the expo-sqlite adapter-only ban in VENDOR_SDK_PATHS (SqlDriver)"
+      },
+      {
+        "id": "att-banned",
+        "pattern": "const ATT_IMPORT = banned\\(\\s*'expo-tracking-transparency'",
+        "what": "the expo-tracking-transparency import ban (ATT_IMPORT)"
+      },
+      {
+        "id": "att-in-banned-list",
+        "pattern": "BANNED_PACKAGE_PATHS = \\[(?:(?!\\n\\];)[\\s\\S])*?\\n\\s*ATT_IMPORT,",
+        "what": "ATT_IMPORT in BANNED_PACKAGE_PATHS, so every file but the consent adapter keeps the ban"
+      },
+      {
+        "id": "banned-axios",
+        "pattern": "BANNED_PACKAGE_PATHS = \\[(?:(?!\\n\\];)[\\s\\S])*?banned\\(\\s*'axios',",
+        "what": "the axios ban in BANNED_PACKAGE_PATHS (network goes through the ApiClient)"
+      },
+      {
+        "id": "banned-async-storage",
+        "pattern": "BANNED_PACKAGE_PATHS = \\[(?:(?!\\n\\];)[\\s\\S])*?banned\\(\\s*'@react-native-async-storage\\/async-storage',",
+        "what": "the @react-native-async-storage/async-storage ban in BANNED_PACKAGE_PATHS"
+      },
+      {
+        "id": "banned-react-native-iap",
+        "pattern": "BANNED_PACKAGE_PATHS = \\[(?:(?!\\n\\];)[\\s\\S])*?banned\\(\\s*'react-native-iap',",
+        "what": "the react-native-iap ban in BANNED_PACKAGE_PATHS (IAP goes through PurchasePort)"
+      },
+      {
+        "id": "banned-react-native-restart",
+        "pattern": "BANNED_PACKAGE_PATHS = \\[(?:(?!\\n\\];)[\\s\\S])*?banned\\(\\s*'react-native-restart',",
+        "what": "the react-native-restart ban in BANNED_PACKAGE_PATHS (reloadAppAsync from expo)"
+      },
+      {
+        "id": "att-adapter-only",
+        "pattern": "const ATT_ADAPTER = \\[\\s*'[^'*\\]]*\\/consent\\/[^'/]*-consent-adapter(?:\\{,\\.ios,\\.android,\\.native,\\.web\\})?\\.(?:ts|\\{ts,tsx\\})',?\\s*\\];",
+        "what": "ATT_ADAPTER naming one consent adapter (src/services/consent/*-consent-adapter.ts and its platform files), not a folder of adapters"
+      },
+      {
+        "id": "att-adapter-block",
+        "pattern": "files:\\s*ATT_ADAPTER,[\\s\\S]{0,400}?allow:\\s*\\[ATT_IMPORT\\]",
+        "what": "the ATT_ADAPTER block, the one place allow: [ATT_IMPORT] lifts the ban"
+      },
+      {
+        "id": "adapters-block",
+        "pattern": "files:\\s*ADAPTERS,",
+        "what": "the ADAPTERS block (the one place that lifts the vendor SDK bans)"
+      },
+      {
+        "id": "runtime-imports-used",
+        "pattern": "'no-restricted-imports':\\s*RUNTIME_IMPORTS",
+        "what": "the runtime block's no-restricted-imports (RUNTIME_IMPORTS)"
+      },
+      {
+        "id": "async-handler",
+        "pattern": "asyncHandler:\\s*\\{\\s*selector:\\s*\\[\\s*`\\$\\{ON_PROP\\}\\s*>\\s*:function\\[async=true\\]`,\\s*`\\$\\{ON_PROP\\}\\s*>\\s*CallExpression:matches\\(\\[callee\\.name='handleSubmit'\\],\\s*\\[callee\\.property\\.name='handleSubmit'\\]\\)`,\\s*`\\$\\{HANDLER_NAME\\}\\s*>\\s*:function\\[async=true\\]`,\\s*'FunctionDeclaration\\[async=true\\]\\[id\\.name=\\/\\^handle\\[A-Z\\]\\/\\]',\\s*\\]\\.join\\(',\\s*'\\),",
+        "what": "the asyncHandler selector, verbatim (async on* handlers, handleSubmit(...) on an on* prop, async handleX functions)"
+      },
+      {
+        "id": "handler-body",
+        "pattern": "handlerBody:\\s*\\{\\s*selector:\\s*\\[\\s*`\\$\\{ON_PROP\\}\\s*>\\s*ArrowFunctionExpression\\[expression=true\\]`,\\s*`\\$\\{HANDLER_NAME\\}\\s*>\\s*ArrowFunctionExpression\\[expression=true\\]`,",
+        "what": "the handlerBody selector, verbatim (an on* handler or handleX has a block body and returns nothing, so no-floating-promises sees the promise it starts)"
+      },
+      {
+        "id": "on-prop",
+        "pattern": "const\\s*ON_PROP\\s*=\\s*'JSXAttribute\\[name\\.name=\\/\\^on\\[A-Z\\]\\/\\]\\s*>\\s*JSXExpressionContainer';",
+        "what": "the ON_PROP selector part the asyncHandler selector builds on, verbatim"
+      },
+      {
+        "id": "handler-name",
+        "pattern": "const\\s*HANDLER_NAME\\s*=\\s*'VariableDeclarator\\[id\\.name=\\/\\^handle\\[A-Z\\]\\/\\]';",
+        "what": "the HANDLER_NAME selector part (handleX variables) the handler selectors build on, verbatim"
+      },
+      {
+        "id": "set-timeout-delay",
+        "pattern": "setTimeoutNoDelay:\\s*\\{\\s*selector:\\s*\"CallExpression\\[callee\\.name='setTimeout'\\]\\[arguments\\.length<2\\]\",",
+        "what": "the setTimeoutNoDelay selector, verbatim (every timer names its delay)"
+      },
+      {
+        "id": "new-date",
+        "pattern": "newDate:\\s*\\{\\s*selector:\\s*\"NewExpression\\[callee\\.name='Date'\\]\\[arguments\\.length=0\\]\",",
+        "what": "the newDate selector, verbatim (no new Date() in app code)"
+      },
+      {
+        "id": "remote-url",
+        "pattern": "remoteUrl:\\s*\\{",
+        "what": "the remoteUrl selector (remote URLs live in src/api and src/config)"
+      },
+      {
+        "id": "network-globals",
+        "pattern": "NETWORK_GLOBALS\\s*=\\s*\\[\\s*'fetch',\\s*'XMLHttpRequest',\\s*'WebSocket',\\s*'EventSource'\\s*\\]",
+        "what": "the network globals list (fetch, XMLHttpRequest, WebSocket, EventSource)"
+      },
+      {
+        "id": "network-globals-used",
+        "pattern": "'no-restricted-globals':\\s*\\[\\s*'error',\\s*\\.\\.\\.NETWORK_GLOBALS,\\s*\\.\\.\\.TEST_GLOBALS\\s*\\]",
+        "what": "the runtime block's no-restricted-globals with NETWORK_GLOBALS (network only through the ApiClient)"
+      },
+      {
+        "id": "restricted-properties-used",
+        "pattern": "'no-restricted-properties':\\s*\\[\\s*'error',\\s*\\.\\.\\.RESTRICTED_PROPERTIES\\s*\\]",
+        "what": "the runtime block's no-restricted-properties with RESTRICTED_PROPERTIES"
+      },
+      {
+        "id": "message-math-random",
+        "pattern": "object:\\s*'Math',\\s*property:\\s*'random',\\s*message:\\s*'Use the seeded RNG \\(src/core/rng\\) or an injected random source\\.'",
+        "what": "the Math.random entry with its canonical message (quality-gates.json compares the resolved entries verbatim)"
+      },
+      {
+        "id": "message-date-now",
+        "pattern": "object:\\s*'Date',\\s*property:\\s*'now',\\s*message:\\s*'Inject ClockPort \\(src/services/clock\\)\\.'",
+        "what": "the Date.now entry with its canonical message 'Inject ClockPort (src/services/clock).'"
+      },
+      {
+        "id": "message-performance-now",
+        "pattern": "object:\\s*'performance',\\s*property:\\s*'now',\\s*message:\\s*'Use the frame timestamp or ClockPort\\.'",
+        "what": "the performance.now entry with its canonical message"
+      },
+      {
+        "id": "message-is-rtl",
+        "pattern": "object:\\s*'I18nManager',\\s*property:\\s*'isRTL',\\s*message:\\s*'Read direction from DirectionContext\\.'",
+        "what": "the I18nManager.isRTL entry with its canonical message"
+      },
+      {
+        "id": "hooks-exhaustive-deps",
+        "pattern": "'react-hooks\\/exhaustive-deps':\\s*'error'",
+        "what": "react-hooks/exhaustive-deps: error"
+      },
+      {
+        "id": "hooks-incompatible-library",
+        "pattern": "'react-hooks\\/incompatible-library':\\s*'error'",
+        "what": "react-hooks/incompatible-library: error (React Compiler)"
+      },
+      {
+        "id": "hooks-unsupported-syntax",
+        "pattern": "'react-hooks\\/unsupported-syntax':\\s*'error'",
+        "what": "react-hooks/unsupported-syntax: error (React Compiler)"
+      },
+      {
+        "id": "max-lines",
+        "pattern": "'max-lines':\\s*\\[\\s*'error',\\s*\\{\\s*max:\\s*250,\\s*skipBlankLines:\\s*true,\\s*skipComments:\\s*true",
+        "what": "max-lines 250 (code lines)"
+      },
+      {
+        "id": "max-lines-tests",
+        "pattern": "'max-lines':\\s*\\[\\s*'error',\\s*\\{\\s*max:\\s*400,",
+        "what": "max-lines 400 in tests"
+      },
+      {
+        "id": "max-lines-per-function",
+        "pattern": "'max-lines-per-function':\\s*\\[\\s*'error',\\s*\\{\\s*max:\\s*40,",
+        "what": "max-lines-per-function 40 for .ts"
+      },
+      {
+        "id": "max-lines-per-component",
+        "pattern": "'max-lines-per-function':\\s*\\[\\s*'error',\\s*\\{\\s*max:\\s*80,",
+        "what": "max-lines-per-function 80 for .tsx"
+      },
+      {
+        "id": "complexity",
+        "pattern": "complexity:\\s*\\[\\s*'error',\\s*\\{\\s*max:\\s*10,\\s*variant:\\s*'modified'\\s*\\}\\s*\\]",
+        "what": "complexity 10 (variant modified)"
+      },
+      {
+        "id": "cognitive-complexity",
+        "pattern": "'sonarjs\\/cognitive-complexity':\\s*\\[\\s*'error',\\s*15\\s*\\]",
+        "what": "sonarjs/cognitive-complexity 15"
+      },
+      {
+        "id": "max-depth",
+        "pattern": "'max-depth':\\s*\\[\\s*'error',\\s*3\\s*\\]",
+        "what": "max-depth 3"
+      },
+      {
+        "id": "max-params",
+        "pattern": "'max-params':\\s*\\[\\s*'error',\\s*3\\s*\\]",
+        "what": "max-params 3"
+      },
+      {
+        "id": "max-nested-callbacks",
+        "pattern": "'max-nested-callbacks':\\s*\\[\\s*'error',\\s*3\\s*\\]",
+        "what": "max-nested-callbacks 3"
+      },
+      {
+        "id": "max-nested-callbacks-tests",
+        "pattern": "'max-nested-callbacks':\\s*\\[\\s*'error',\\s*4\\s*\\]",
+        "what": "max-nested-callbacks 4 in tests"
+      },
+      {
+        "id": "max-classes-per-file",
+        "pattern": "'max-classes-per-file':\\s*\\[\\s*'error',\\s*1\\s*\\]",
+        "what": "max-classes-per-file 1"
+      },
+      {
+        "id": "jsx-max-depth",
+        "pattern": "'react\\/jsx-max-depth':\\s*\\[\\s*'error',\\s*\\{\\s*max:\\s*5\\s*\\}\\s*\\]",
+        "what": "react/jsx-max-depth 5"
+      },
+      {
+        "id": "one-component",
+        "pattern": "'react\\/no-multi-comp':\\s*\\[\\s*'error'",
+        "what": "react/no-multi-comp (one component per file)"
+      },
+      {
+        "id": "duplicate-string",
+        "pattern": "'sonarjs\\/no-duplicate-string':\\s*\\[\\s*'error',\\s*\\{\\s*threshold:\\s*3\\s*\\}\\s*\\]",
+        "what": "sonarjs/no-duplicate-string threshold 3"
+      },
+      {
+        "id": "pure-used",
+        "pattern": "files:\\s*PURE,",
+        "what": "the PURE block (src/core imports no React, React Native, Expo or app layers)"
+      },
+      {
+        "id": "determinism-math",
+        "pattern": "const\\s*DETERMINISM_SYNTAX\\s*=\\s*\\[\\s*\\{\\s*selector:\\s*\"MemberExpression\\[object\\.name='Math'\\]\\[property\\.name!=\\/\\^\\(sqrt\\|imul\\|floor\\|round\\|abs\\|min\\|max\\|PI\\)\\$\\/\\]\",\\s*message:\\s*'Deterministic\\s*code\\s*uses\\s*only\\s*\\+\\s*-\\s*\\*\\s*\\/,\\s*sqrt,\\s*imul,\\s*floor,\\s*round,\\s*abs,\\s*min,\\s*max\\.',\\s*\\},\\s*\\{\\s*selector:\\s*\"BinaryExpression\\[operator='\\*\\*'\\],\\s*AssignmentExpression\\[operator='\\*\\*='\\]\",\\s*message:\\s*'Deterministic\\s*code:\\s*\\*\\*\\s*is\\s*Math\\.pow;\\s*multiply\\s*explicitly\\.',\\s*\\},",
+        "what": "the DETERMINISM_SYNTAX list, verbatim (the Math allow-list and the ** ban in deterministic folders)"
+      },
+      {
+        "id": "determinism-locale",
+        "pattern": "CallExpression\\[callee\\.property\\.name='localeCompare'\\]",
+        "what": "the localeCompare, Intl and toLocale*Case bans in DETERMINISM_SYNTAX (deterministic code never reads the device locale)"
+      },
+      {
+        "id": "determinism-used",
+        "pattern": "files:\\s*DETERMINISTIC,\\s*rules:\\s*\\{\\s*'no-restricted-syntax':\\s*\\[\\.\\.\\.runtimeSyntax\\(\\),\\s*\\.\\.\\.DETERMINISM_SYNTAX\\]",
+        "what": "the DETERMINISTIC block with [...runtimeSyntax(), ...DETERMINISM_SYNTAX] (integer-safe math in src/core/rng, src/core/dates and game rules)"
+      },
+      {
+        "id": "routes-block",
+        "pattern": "files:\\s*ROUTES,",
+        "what": "the Expo Router block (route files may default-export)"
+      },
+      {
+        "id": "physical-style-keys",
+        "pattern": "physicalStyleKeys:\\s*\\{",
+        "what": "the physicalStyleKeys selector (start/end, never left/right)"
+      },
+      {
+        "id": "jsx-no-literals",
+        "pattern": "'react\\/jsx-no-literals':\\s*\\[\\s*'error'",
+        "what": "react/jsx-no-literals: error (every visible string comes from the catalogs)"
+      },
+      {
+        "id": "testid-format",
+        "pattern": "testIdFormat:\\s*\\{",
+        "what": "the testIdFormat selector"
+      },
+      {
+        "id": "kind-value",
+        "pattern": "kindValue:\\s*\\{",
+        "what": "the kindValue selector"
+      },
+      {
+        "id": "naming-convention",
+        "pattern": "'@typescript-eslint\\/naming-convention':\\s*\\[\\s*'error'",
+        "what": "@typescript-eslint/naming-convention: error"
+      },
+      {
+        "id": "file-naming",
+        "pattern": "'check-file\\/filename-naming-convention':\\s*\\[\\s*'error'",
+        "what": "check-file/filename-naming-convention: error"
+      },
+      {
+        "id": "app-zones",
+        "pattern": "'import\\/no-restricted-paths':\\s*\\[\\s*'error'",
+        "what": "the app zones (import/no-restricted-paths)"
+      },
+      {
+        "id": "tests-no-focused",
+        "pattern": "'jest\\/no-focused-tests':\\s*'error'",
+        "what": "jest/no-focused-tests: error"
+      },
+      {
+        "id": "tests-valid-title",
+        "pattern": "'jest\\/valid-title':\\s*\\[\\s*'error'",
+        "what": "jest/valid-title: error (third-person titles)"
+      },
+      {
+        "id": "skills-ignored",
+        "pattern": "'skills/\\*\\*'",
+        "what": "'skills/**' in globalIgnores (installed skills hold templates and planted-bug fixtures)"
+      },
+      {
+        "id": "agents-ignored",
+        "pattern": "'\\.agents/\\*\\*'",
+        "what": "'.agents/**' in globalIgnores (where npx skills add installs)"
+      },
+      {
+        "id": "claude-ignored",
+        "pattern": "'\\.claude/\\*\\*'",
+        "what": "'.claude/**' in globalIgnores"
+      },
+      {
+        "id": "pre-existing-list",
+        "pattern": "const PRE_EXISTING = \\[[^\\]]*\\];[\\s\\S]*\\.\\.\\.PRE_EXISTING,",
+        "what": "the PRE_EXISTING list spread into globalIgnores (top-level folders that are not app code)"
+      }
+    ],
+    "limitValues": [
+      {
+        "rule": "max-lines",
+        "options": [
+          "max"
+        ],
+        "allowed": [
+          250,
+          400
+        ],
+        "eslintDefault": 300
+      },
+      {
+        "rule": "max-lines-per-function",
+        "options": [
+          "max"
+        ],
+        "allowed": [
+          40,
+          80
+        ],
+        "eslintDefault": 50
+      },
+      {
+        "rule": "complexity",
+        "options": [
+          "max",
+          "maximum"
+        ],
+        "allowed": [
+          10
+        ],
+        "eslintDefault": 20
+      },
+      {
+        "rule": "sonarjs/cognitive-complexity",
+        "options": [],
+        "allowed": [
+          15
+        ],
+        "eslintDefault": 15
+      },
+      {
+        "rule": "max-depth",
+        "options": [
+          "max",
+          "maximum"
+        ],
+        "allowed": [
+          3
+        ],
+        "eslintDefault": 4
+      },
+      {
+        "rule": "max-params",
+        "options": [
+          "max",
+          "maximum"
+        ],
+        "allowed": [
+          3
+        ],
+        "eslintDefault": 3
+      },
+      {
+        "rule": "max-nested-callbacks",
+        "options": [
+          "max",
+          "maximum"
+        ],
+        "allowed": [
+          3,
+          4
+        ],
+        "eslintDefault": 10
+      },
+      {
+        "rule": "react/jsx-max-depth",
+        "options": [
+          "max"
+        ],
+        "allowed": [
+          5
+        ],
+        "eslintDefault": 2
+      },
+      {
+        "rule": "max-classes-per-file",
+        "options": [
+          "max"
+        ],
+        "allowed": [
+          1
+        ],
+        "eslintDefault": 1
+      },
+      {
+        "rule": "sonarjs/no-duplicate-string",
+        "options": [
+          "threshold"
+        ],
+        "allowed": [
+          3
+        ],
+        "eslintDefault": 3
+      }
+    ],
+    "offAllowed": {
+      "@typescript-eslint/consistent-type-definitions": 1,
+      "@typescript-eslint/naming-convention": 1,
+      "@typescript-eslint/no-non-null-assertion": 1,
+      "@typescript-eslint/no-require-imports": 2,
+      "@typescript-eslint/no-unsafe-assignment": 1,
+      "@typescript-eslint/no-unsafe-call": 1,
+      "@typescript-eslint/no-unsafe-member-access": 1,
+      "@typescript-eslint/no-unsafe-return": 1,
+      "import/no-default-export": 4,
+      "import/no-named-as-default-member": 1,
+      "jest/no-large-snapshots": 1,
+      "max-lines-per-function": 1,
+      "no-console": 1,
+      "no-restricted-globals": 2,
+      "no-restricted-properties": 1,
+      "react/jsx-no-literals": 1,
+      "react/no-multi-comp": 1,
+      "sonarjs/no-duplicate-string": 1,
+      "testing-library/no-await-sync-events": 1
+    },
+    "maxOccurrences": [
+      {
+        "id": "disable-type-checked",
+        "pattern": "tseslint\\.configs\\.disableTypeChecked",
+        "max": 1,
+        "what": "tseslint.configs.disableTypeChecked (allowed only for the plain JS config files)"
+      },
+      {
+        "id": "inline-config-on",
+        "pattern": "noInlineConfig:\\s*false",
+        "max": 0,
+        "what": "noInlineConfig: false"
+      },
+      {
+        "id": "linter-options",
+        "pattern": "linterOptions\\s*:",
+        "max": 1,
+        "what": "a linterOptions block"
+      },
+      {
+        "id": "allow-list",
+        "pattern": "allow:\\s*\\[\\s*[A-Z]",
+        "max": 1,
+        "what": "an allow list that lifts a banned package for a block (the canonical config has one: the consent adapter)"
+      },
+      {
+        "id": "fresh-list",
+        "pattern": "['\"]no-restricted-imports['\"]\\s*:\\s*\\[",
+        "max": 0,
+        "what": "a hand-written no-restricted-imports array (every block uses restrictedImports() or RUNTIME_IMPORTS)",
+        "fix": "Rebuild it from the shared lists: 'no-restricted-imports': restrictedImports({ paths: without(RUNTIME_PATHS, ONE_EXEMPTED_ENTRY), patterns: [NODE_BUILTINS] }); a fresh list drops every vendor, Text, react-intl, memo, Node-built-in and parent-import ban for those files."
+      },
+      {
+        "id": "fresh-list",
+        "pattern": "['\"]no-restricted-syntax['\"]\\s*:\\s*\\[\\s*(?:'error'|\"error\"|2)\\s*,\\s*['\"`{]",
+        "max": 0,
+        "what": "a fresh no-restricted-syntax list (literal entries instead of the shared lists)",
+        "fix": "Rebuild it from the shared lists: runtimeSyntax(['oneSelectorKey']) drops one SYNTAX entry and keeps the rest (asyncHandler, RTL, URL, newDate ...)."
+      },
+      {
+        "id": "fresh-list",
+        "pattern": "['\"]no-restricted-properties['\"]\\s*:\\s*\\[\\s*(?:'error'|\"error\"|2)\\s*,\\s*['\"`{]",
+        "max": 0,
+        "what": "a fresh no-restricted-properties list (literal entries instead of the shared lists)",
+        "fix": "Rebuild it from the shared lists: ['error', ...withoutProperty('Date', 'now')] (or PERF_PROPERTIES) keeps every other banned property."
+      },
+      {
+        "id": "fresh-list",
+        "pattern": "['\"]no-restricted-globals['\"]\\s*:\\s*\\[\\s*(?:'error'|\"error\"|2)\\s*,\\s*['\"`{]",
+        "max": 0,
+        "what": "a fresh no-restricted-globals list (literal entries instead of the shared lists)",
+        "fix": "Rebuild it from the shared lists: ['error', ...TEST_GLOBALS] or ['error', ...NETWORK_GLOBALS, ...TEST_GLOBALS] keeps every other banned global."
+      },
+      {
+        "id": "fresh-list",
+        "pattern": "restrictedImports\\(\\{\\s*\\}\\)",
+        "max": 2,
+        "what": "restrictedImports({}) (the package bans only; the canonical config uses it for block 4 and for __mocks__/jest.setup.ts)",
+        "fix": "Start from the runtime lists: 'no-restricted-imports': RUNTIME_IMPORTS, or restrictedImports({ paths: without(RUNTIME_PATHS, ONE_EXEMPTED_ENTRY), patterns: [NODE_BUILTINS] }); restrictedImports({}) drops every vendor, Text, react-intl, memo and Node-built-in ban for its files."
+      },
+      {
+        "id": "fresh-list",
+        "pattern": "restrictedImports\\(\\{(?:(?!RUNTIME_PATHS)[^()]|\\((?:(?!RUNTIME_PATHS)[^()])*\\))*\\}\\)",
+        "max": 4,
+        "what": "a restrictedImports() call that names no RUNTIME_PATHS (the canonical config has the two restrictedImports({}) calls, the Node-code block and the root-entry block, which names VENDOR_SDK_PATHS)",
+        "fix": "Name RUNTIME_PATHS: restrictedImports({ paths: without(RUNTIME_PATHS, ONE_EXEMPTED_ENTRY), patterns: [NODE_BUILTINS] }); a call without it drops every vendor, Text, react-intl and memo ban for its files."
+      },
+      {
+        "id": "global-ignores",
+        "pattern": "globalIgnores\\s*\\(",
+        "max": 1,
+        "what": "a globalIgnores() call",
+        "fix": "Delete it: the one globalIgnores list holds the generated and agent folders plus ...PRE_EXISTING."
+      },
+      {
+        "id": "block-ignores",
+        "pattern": "(?<![\\w$])ignores\\s*:",
+        "max": 2,
+        "what": "an ignores key (the canonical config has two: tests out of the zones block, tests out of the FormatJS block; a block with only ignores is a global ignore)",
+        "fix": "Delete it: a block-level ignores list takes those files out of the block's rules, and a block with only ignores hides the files from every rule."
+      },
+      {
+        "id": "option-redeclared",
+        "pattern": "['\"]@typescript-eslint\\/no-floating-promises['\"]\\s*:",
+        "max": 1,
+        "what": "a declaration of '@typescript-eslint/no-floating-promises'",
+        "fix": "Delete the later declaration and fix the code: a later block replaces the options for its files (no merging), so a re-declared rule drops the canonical options there. A limit or option change is a stop-and-ask decision."
+      },
+      {
+        "id": "option-redeclared",
+        "pattern": "['\"]@typescript-eslint\\/strict-boolean-expressions['\"]\\s*:",
+        "max": 1,
+        "what": "a declaration of '@typescript-eslint/strict-boolean-expressions'",
+        "fix": "Delete the later declaration and fix the code: a later block replaces the options for its files (no merging), so a re-declared rule drops the canonical options there. A limit or option change is a stop-and-ask decision."
+      },
+      {
+        "id": "option-redeclared",
+        "pattern": "['\"]@typescript-eslint\\/switch-exhaustiveness-check['\"]\\s*:",
+        "max": 1,
+        "what": "a declaration of '@typescript-eslint/switch-exhaustiveness-check'",
+        "fix": "Delete the later declaration and fix the code: a later block replaces the options for its files (no merging), so a re-declared rule drops the canonical options there. A limit or option change is a stop-and-ask decision."
+      },
+      {
+        "id": "option-redeclared",
+        "pattern": "['\"]@typescript-eslint\\/no-unused-vars['\"]\\s*:",
+        "max": 1,
+        "what": "a declaration of '@typescript-eslint/no-unused-vars'",
+        "fix": "Delete the later declaration and fix the code: a later block replaces the options for its files (no merging), so a re-declared rule drops the canonical options there. A limit or option change is a stop-and-ask decision."
+      },
+      {
+        "id": "option-redeclared",
+        "pattern": "['\"]@typescript-eslint\\/consistent-type-imports['\"]\\s*:",
+        "max": 1,
+        "what": "a declaration of '@typescript-eslint/consistent-type-imports'",
+        "fix": "Delete the later declaration and fix the code: a later block replaces the options for its files (no merging), so a re-declared rule drops the canonical options there. A limit or option change is a stop-and-ask decision."
+      },
+      {
+        "id": "option-redeclared",
+        "pattern": "['\"]@typescript-eslint\\/naming-convention['\"]\\s*:",
+        "max": 3,
+        "what": "a declaration of '@typescript-eslint/naming-convention'",
+        "fix": "Delete the later declaration and fix the code: a later block replaces the options for its files (no merging), so a re-declared rule drops the canonical options there. A limit or option change is a stop-and-ask decision."
+      },
+      {
+        "id": "option-redeclared",
+        "pattern": "['\"]no-empty['\"]\\s*:",
+        "max": 1,
+        "what": "a declaration of 'no-empty'",
+        "fix": "Delete the later declaration and fix the code: a later block replaces the options for its files (no merging), so a re-declared rule drops the canonical options there. A limit or option change is a stop-and-ask decision."
+      },
+      {
+        "id": "option-redeclared",
+        "pattern": "['\"]no-warning-comments['\"]\\s*:",
+        "max": 1,
+        "what": "a declaration of 'no-warning-comments'",
+        "fix": "Delete the later declaration and fix the code: a later block replaces the options for its files (no merging), so a re-declared rule drops the canonical options there. A limit or option change is a stop-and-ask decision."
+      },
+      {
+        "id": "option-redeclared",
+        "pattern": "['\"]no-console['\"]\\s*:",
+        "max": 2,
+        "what": "a declaration of 'no-console'",
+        "fix": "Delete the later declaration and fix the code: a later block replaces the options for its files (no merging), so a re-declared rule drops the canonical options there. A limit or option change is a stop-and-ask decision."
+      },
+      {
+        "id": "option-redeclared",
+        "pattern": "['\"]no-param-reassign['\"]\\s*:",
+        "max": 2,
+        "what": "a declaration of 'no-param-reassign'",
+        "fix": "Delete the later declaration and fix the code: a later block replaces the options for its files (no merging), so a re-declared rule drops the canonical options there. A limit or option change is a stop-and-ask decision."
+      },
+      {
+        "id": "option-redeclared",
+        "pattern": "['\"]import\\/no-cycle['\"]\\s*:",
+        "max": 1,
+        "what": "a declaration of 'import/no-cycle'",
+        "fix": "Delete the later declaration and fix the code: a later block replaces the options for its files (no merging), so a re-declared rule drops the canonical options there. A limit or option change is a stop-and-ask decision."
+      },
+      {
+        "id": "option-redeclared",
+        "pattern": "['\"]@typescript-eslint\\/no-misused-promises['\"]\\s*:",
+        "max": 0,
+        "what": "a declaration of '@typescript-eslint/no-misused-promises' (strictTypeChecked sets it; the canonical config never re-declares it)",
+        "fix": "Delete the later declaration and fix the code: a later block replaces the options for its files (no merging), so a re-declared rule drops the canonical options there. A limit or option change is a stop-and-ask decision."
+      },
+      {
+        "id": "option-redeclared",
+        "pattern": "['\"]@typescript-eslint\\/ban-ts-comment['\"]\\s*:",
+        "max": 0,
+        "what": "a declaration of '@typescript-eslint/ban-ts-comment' (strictTypeChecked sets it; the canonical config never re-declares it)",
+        "fix": "Delete the later declaration and fix the code: a later block replaces the options for its files (no merging), so a re-declared rule drops the canonical options there. A limit or option change is a stop-and-ask decision."
+      },
+      {
+        "id": "option-redeclared",
+        "pattern": "['\"]@typescript-eslint\\/no-explicit-any['\"]\\s*:",
+        "max": 0,
+        "what": "a declaration of '@typescript-eslint/no-explicit-any' (strictTypeChecked sets it; the canonical config never re-declares it)",
+        "fix": "Delete the later declaration and fix the code: a later block replaces the options for its files (no merging), so a re-declared rule drops the canonical options there. A limit or option change is a stop-and-ask decision."
+      },
+      {
+        "id": "option-redeclared",
+        "pattern": "['\"]@typescript-eslint\\/only-throw-error['\"]\\s*:",
+        "max": 0,
+        "what": "a declaration of '@typescript-eslint/only-throw-error' (strictTypeChecked sets it; the canonical config never re-declares it)",
+        "fix": "Delete the later declaration and fix the code: a later block replaces the options for its files (no merging), so a re-declared rule drops the canonical options there. A limit or option change is a stop-and-ask decision."
+      },
+      {
+        "id": "option-redeclared",
+        "pattern": "['\"]@typescript-eslint\\/prefer-promise-reject-errors['\"]\\s*:",
+        "max": 0,
+        "what": "a declaration of '@typescript-eslint/prefer-promise-reject-errors' (strictTypeChecked sets it; the canonical config never re-declares it)",
+        "fix": "Delete the later declaration and fix the code: a later block replaces the options for its files (no merging), so a re-declared rule drops the canonical options there. A limit or option change is a stop-and-ask decision."
+      },
+      {
+        "id": "option-redeclared",
+        "pattern": "(?<![\\w$'\".-])eqeqeq\\s*:|['\"]eqeqeq['\"]\\s*:",
+        "max": 1,
+        "what": "a declaration of 'eqeqeq'",
+        "fix": "Delete the later declaration and fix the code: a later block replaces the options for its files (no merging), so a re-declared rule drops the canonical options there. A limit or option change is a stop-and-ask decision."
+      },
+      {
+        "id": "option-redeclared",
+        "pattern": "['\"]max-lines['\"]\\s*:",
+        "max": 2,
+        "what": "a declaration of 'max-lines'",
+        "fix": "Delete the extra declaration and split the code: a bare or later declaration replaces the canonical options for its files (a bare severity falls back to ESLint's default). A limit change is a stop-and-ask decision with a Gate-Change trailer."
+      },
+      {
+        "id": "option-redeclared",
+        "pattern": "['\"]max-lines-per-function['\"]\\s*:",
+        "max": 3,
+        "what": "a declaration of 'max-lines-per-function'",
+        "fix": "Delete the extra declaration and split the code: a bare or later declaration replaces the canonical options for its files (a bare severity falls back to ESLint's default). A limit change is a stop-and-ask decision with a Gate-Change trailer."
+      },
+      {
+        "id": "option-redeclared",
+        "pattern": "(?<![\\w$'\".-])complexity\\s*:|['\"]complexity['\"]\\s*:",
+        "max": 1,
+        "what": "a declaration of 'complexity'",
+        "fix": "Delete the extra declaration and split the code: a bare or later declaration replaces the canonical options for its files (a bare severity falls back to ESLint's default). A limit change is a stop-and-ask decision with a Gate-Change trailer."
+      },
+      {
+        "id": "option-redeclared",
+        "pattern": "['\"]sonarjs\\/cognitive-complexity['\"]\\s*:",
+        "max": 1,
+        "what": "a declaration of 'sonarjs/cognitive-complexity'",
+        "fix": "Delete the extra declaration and split the code: a bare or later declaration replaces the canonical options for its files (a bare severity falls back to ESLint's default). A limit change is a stop-and-ask decision with a Gate-Change trailer."
+      },
+      {
+        "id": "option-redeclared",
+        "pattern": "['\"]max-depth['\"]\\s*:",
+        "max": 1,
+        "what": "a declaration of 'max-depth'",
+        "fix": "Delete the extra declaration and split the code: a bare or later declaration replaces the canonical options for its files (a bare severity falls back to ESLint's default). A limit change is a stop-and-ask decision with a Gate-Change trailer."
+      },
+      {
+        "id": "option-redeclared",
+        "pattern": "['\"]max-params['\"]\\s*:",
+        "max": 1,
+        "what": "a declaration of 'max-params'",
+        "fix": "Delete the extra declaration and split the code: a bare or later declaration replaces the canonical options for its files (a bare severity falls back to ESLint's default). A limit change is a stop-and-ask decision with a Gate-Change trailer."
+      },
+      {
+        "id": "option-redeclared",
+        "pattern": "['\"]max-nested-callbacks['\"]\\s*:",
+        "max": 2,
+        "what": "a declaration of 'max-nested-callbacks'",
+        "fix": "Delete the extra declaration and split the code: a bare or later declaration replaces the canonical options for its files (a bare severity falls back to ESLint's default). A limit change is a stop-and-ask decision with a Gate-Change trailer."
+      },
+      {
+        "id": "option-redeclared",
+        "pattern": "['\"]react\\/jsx-max-depth['\"]\\s*:",
+        "max": 1,
+        "what": "a declaration of 'react/jsx-max-depth'",
+        "fix": "Delete the extra declaration and split the code: a bare or later declaration replaces the canonical options for its files (a bare severity falls back to ESLint's default). A limit change is a stop-and-ask decision with a Gate-Change trailer."
+      },
+      {
+        "id": "option-redeclared",
+        "pattern": "['\"]max-classes-per-file['\"]\\s*:",
+        "max": 1,
+        "what": "a declaration of 'max-classes-per-file'",
+        "fix": "Delete the extra declaration and split the code: a bare or later declaration replaces the canonical options for its files (a bare severity falls back to ESLint's default). A limit change is a stop-and-ask decision with a Gate-Change trailer."
+      },
+      {
+        "id": "option-redeclared",
+        "pattern": "['\"]sonarjs\\/no-duplicate-string['\"]\\s*:",
+        "max": 2,
+        "what": "a declaration of 'sonarjs/no-duplicate-string'",
+        "fix": "Delete the extra declaration and split the code: a bare or later declaration replaces the canonical options for its files (a bare severity falls back to ESLint's default). A limit change is a stop-and-ask decision with a Gate-Change trailer."
+      },
+      {
+        "id": "option-redeclared",
+        "pattern": "['\"]react\\/no-multi-comp['\"]\\s*:",
+        "max": 2,
+        "what": "a declaration of 'react/no-multi-comp'",
+        "fix": "Delete the extra declaration and split the code: a bare or later declaration replaces the canonical options for its files (a bare severity falls back to ESLint's default). A limit change is a stop-and-ask decision with a Gate-Change trailer."
+      }
+    ],
+    "forbiddenImports": [
+      "eslint-plugin-prettier"
+    ],
+    "globalIgnores": {
+      "literals": [
+        "**/node_modules/**",
+        "**/.expo/**",
+        "ios/**",
+        "android/**",
+        "build/**",
+        "dist/**",
+        "web-build/**",
+        "coverage/**",
+        "reports/**",
+        "dist-audit/**",
+        ".stryker-tmp/**",
+        ".skill-tooling/**",
+        "**/expo-env.d.ts",
+        "skills/**",
+        ".agents/**",
+        ".claude/**",
+        ".codex/**",
+        ".cursor/**",
+        ".windsurf/**",
+        ".roo/**",
+        ".cline/**",
+        ".continue/**",
+        ".kiro/**"
+      ],
+      "spreads": [
+        "PRE_EXISTING"
+      ]
+    },
+    "structure": {
+      "$comment": "check-configs compares eslint.config.mjs with the skill's own templates/eslint.config.mjs: every canonical block (files, ignores, rules, extends, options) present, unchanged and in order; every other block names exact files; every file group keeps its canonical globs; every other top-level const is verbatim. wideningGroups may gain any glob (their blocks add bans); the other file groups gain only exact file names. knobs are the consts an app fills (PRE_EXISTING, the multi-package switch and its import pattern). supersets may gain entries but never lose one (a new vendor SDK, a new banned package).",
+      "wideningGroups": [
+        "ALL_TS",
+        "RUNTIME",
+        "PURE",
+        "DETERMINISTIC"
+      ],
+      "knobs": [
+        "PRE_EXISTING",
+        "IS_MULTI_PACKAGE",
+        "PACKAGE_IMPORT_EXTENSION"
+      ],
+      "supersets": [
+        "VENDOR_SDK_PATHS",
+        "BANNED_PACKAGE_PATHS"
+      ]
+    }
+  },
+  "prettier": {
+    "file": ".prettierrc.json",
+    "options": {
+      "printWidth": 100,
+      "singleQuote": true,
+      "trailingComma": "all",
+      "bracketSpacing": true,
+      "arrowParens": "always",
+      "endOfLine": "lf"
+    }
+  },
+  "prettierIgnore": {
+    "file": ".prettierignore",
+    "requiredLines": [
+      "package-lock.json",
+      "**/node_modules/",
+      "**/.expo/",
+      "/ios/",
+      "/android/",
+      "build/",
+      "dist/",
+      "web-build/",
+      "coverage/",
+      "**/__snapshots__/",
+      "**/__image_snapshots__/",
+      "expo-env.d.ts",
+      "skills/",
+      ".agents/",
+      ".claude/"
+    ],
+    "placeholder": "__PRE_EXISTING__",
+    "canonicalLines": [
+      "package-lock.json",
+      "**/node_modules/",
+      "**/.expo/",
+      "/ios/",
+      "/android/",
+      "build/",
+      "dist/",
+      "web-build/",
+      "coverage/",
+      "reports/",
+      "dist-audit/",
+      ".stryker-tmp/",
+      ".skill-tooling/",
+      "**/__snapshots__/",
+      "**/__image_snapshots__/",
+      ".maestro/baselines/",
+      "expo-env.d.ts",
+      "src/data/migrations/v*.ts",
+      "skills/",
+      ".agents/",
+      ".claude/",
+      ".codex/",
+      ".cursor/",
+      ".windsurf/",
+      ".roo/",
+      ".cline/",
+      ".continue/",
+      ".kiro/"
+    ]
+  },
+  "appTopLevel": [
+    "src",
+    "app",
+    "assets",
+    "test",
+    "__mocks__",
+    "scripts",
+    "plugins",
+    "modules",
+    "contracts",
+    "design",
+    "skills",
+    "node_modules",
+    "ios",
+    "android",
+    "build",
+    "dist",
+    "web-build",
+    "coverage",
+    "reports",
+    "dist-audit",
+    "app.config.ts",
+    "app.config.js",
+    "app.json",
+    "eas.json",
+    "metro.config.js",
+    "babel.config.js",
+    "index.ts",
+    "index.js",
+    "package.json",
+    "package-lock.json",
+    "tsconfig.json",
+    "tsconfig.base.json",
+    "tsconfig.stryker.json",
+    "eslint.config.mjs",
+    "knip.json",
+    "lefthook.yml",
+    "lefthook-local.yml",
+    "credentials.json",
+    "quality-gates.json",
+    "rn-skills.config.json",
+    "jest.config.js",
+    "jest.setup.ts",
+    "jest.sim.config.js",
+    "stryker.config.json",
+    "expo-env.d.ts",
+    "README.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "store.config.json",
+    "google-services.json",
+    "GoogleService-Info.plist",
+    "react-native.config.js",
+    "metro.config.cjs",
+    "app.config.mjs",
+    "app.config.cjs",
+    "app.config.mts",
+    "app.config.cts",
+    "app.config.json",
+    "fingerprint.config.js",
+    "index.tsx",
+    "patches",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
+    "CODE_OF_CONDUCT.md",
+    "yarn.lock",
+    "pnpm-lock.yaml",
+    "pnpm-workspace.yaml",
+    "bun.lock",
+    "bun.lockb",
+    "eas-build-pre-install.sh",
+    "*.d.ts"
+  ],
+  "pins": {
+    "typescript": [
+      "6.0.3"
+    ],
+    "eslint": [
+      "9.39.5"
+    ],
+    "eslint-config-expo": [
+      "57.0.2"
+    ],
+    "typescript-eslint": [
+      "8.70.1"
+    ],
+    "eslint-plugin-sonarjs": [
+      "4.2.1"
+    ],
+    "eslint-plugin-react-native": [
+      "5.0.0"
+    ],
+    "@react-native/eslint-plugin": [
+      "0.86.3"
+    ],
+    "eslint-plugin-check-file": [
+      "3.3.2"
+    ],
+    "eslint-plugin-jest": [
+      "29.16.6"
+    ],
+    "eslint-plugin-testing-library": [
+      "7.16.2"
+    ],
+    "eslint-plugin-formatjs": [
+      "8.1.0"
+    ],
+    "eslint-config-prettier": [
+      "10.1.8"
+    ],
+    "globals": [
+      "17.12.0"
+    ],
+    "prettier": [
+      "3.9.9"
+    ],
+    "knip": [
+      "6.38.0"
+    ],
+    "@types/node": [
+      "26.4.1"
+    ],
+    "@types/jest": [
+      "29.5.14"
+    ]
+  },
+  "lintScript": {
+    "requires": [
+      "--max-warnings 0"
+    ],
+    "forbids": [
+      "--rule",
+      "--no-inline-config",
+      "--no-config-lookup",
+      "--no-eslintrc",
+      "--quiet",
+      "--config",
+      " -c ",
+      "--ignore-pattern",
+      "--ignore-path"
+    ],
+    "target": ".",
+    "valueFlags": [
+      "--max-warnings",
+      "--cache-location",
+      "--cache-strategy",
+      "--format",
+      "-f",
+      "--output-file",
+      "-o",
+      "--ext",
+      "--parser",
+      "--parser-options",
+      "--plugin",
+      "--rulesdir",
+      "--resolve-plugins-relative-to",
+      "--env",
+      "--global",
+      "--report-unused-disable-directives-severity",
+      "--concurrency",
+      "--flag",
+      "--ignore-pattern",
+      "--ignore-path",
+      "--cache-file"
+    ]
+  },
+  "strayConfigs": [
+    ".eslintrc",
+    ".eslintrc.js",
+    ".eslintrc.cjs",
+    ".eslintrc.json",
+    ".eslintrc.yml",
+    ".eslintrc.yaml",
+    ".eslintignore",
+    "eslint.config.js",
+    "eslint.config.cjs",
+    "eslint.config.ts",
+    "eslint.config.mts",
+    ".prettierrc",
+    ".prettierrc.js",
+    ".prettierrc.cjs",
+    ".prettierrc.mjs",
+    ".prettierrc.yml",
+    ".prettierrc.yaml",
+    ".prettierrc.toml",
+    ".prettierrc.json5",
+    "prettier.config.js",
+    "prettier.config.mjs",
+    "prettier.config.cjs",
+    "prettier.config.ts",
+    "knip.ts",
+    "knip.jsonc",
+    ".knip.json",
+    ".knip.jsonc",
+    "knip.config.ts",
+    "knip.config.js",
+    "eslint.config.cts",
+    ".prettierrc.ts",
+    ".prettierrc.mts",
+    ".prettierrc.cts",
+    "prettier.config.mts",
+    "prettier.config.cts",
+    "knip.js"
+  ],
+  "workspaceStrayConfigs": [
+    "eslint.config.mjs",
+    "eslint.config.js",
+    "eslint.config.cjs",
+    "eslint.config.ts",
+    ".eslintrc.json",
+    ".eslintrc.js",
+    ".prettierrc.json",
+    ".prettierrc",
+    "knip.json"
+  ],
+  "knip": {
+    "file": "knip.json",
+    "requiredRules": [
+      "files",
+      "dependencies",
+      "devDependencies",
+      "unlisted",
+      "binaries",
+      "unresolved",
+      "exports",
+      "types",
+      "duplicates"
+    ],
+    "severity": "error",
+    "forbiddenKeys": [
+      "exclude",
+      "include"
+    ],
+    "ignoreKeys": [
+      "ignore",
+      "ignoreFiles",
+      "ignoreIssues",
+      "ignoreWorkspaces"
+    ],
+    "entry": [
+      "src/app/**/*.{ts,tsx}",
+      "scripts/**/*.ts",
+      "__mocks__/**/*.ts",
+      "{src,test,scripts}/**/*.test.{ts,tsx}"
+    ],
+    "project": [
+      "*.ts",
+      "src/**/*.{ts,tsx}",
+      "test/**/*.{ts,tsx}",
+      "scripts/**/*.ts",
+      "__mocks__/**/*.ts"
+    ]
+  },
+  "packageOverrides": {
+    "pin": "typescript-eslint",
+    "packages": [
+      "@typescript-eslint/eslint-plugin",
+      "@typescript-eslint/parser",
+      "@typescript-eslint/project-service",
+      "@typescript-eslint/scope-manager",
+      "@typescript-eslint/tsconfig-utils",
+      "@typescript-eslint/type-utils",
+      "@typescript-eslint/types",
+      "@typescript-eslint/typescript-estree",
+      "@typescript-eslint/utils",
+      "@typescript-eslint/visitor-keys"
+    ]
+  },
+  "appScope": {
+    "$comment": "Top-level names that always hold app code, next to the layout folders (srcDir, routesDir, testDir, mocksDir, scriptsDir), the workspaces and layoutEntries. No ignore list may reach into them.",
+    "fixed": [
+      "plugins",
+      "modules",
+      "app.config.ts",
+      "app.config.js",
+      "app.config.mjs",
+      "index.ts",
+      "index.js",
+      "jest.setup.ts"
+    ]
+  },
+  "strayPackageKeys": {
+    "prettier": "prettier",
+    "eslintConfig": "eslint",
+    "knip": "knip"
+  }
+}

@@ -1,0 +1,415 @@
+{
+  "bad-bank-missing": {
+    "expect": [
+      "FAIL src/games/arena-chase/arena-events.ts:6 [bank-missing]",
+      "src/games/arena-chase cues sound \"caught\""
+    ],
+    "ops": [{ "delete": "src/games/arena-chase/sounds/arena-chase-sounds.ts" }]
+  },
+  "bad-bank-unwired": {
+    "expect": [
+      "FAIL src/games/arena-chase/sounds/arena-chase-sounds.ts:1 [bank-unwired]",
+      "ARENA_CHASE_SOUNDS is never passed to composeSoundBank"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "composeSoundBank(TASKS_SOUNDS, ARENA_CHASE_SOUNDS)",
+          "with": "composeSoundBank(TASKS_SOUNDS)"
+        }
+      }
+    ]
+  },
+  "bad-click": {
+    "expect": ["FAIL src/features/tasks/sounds/tasks-sounds.ts:11 [recipe-quality]", "sound \"complete\" first sample"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/sounds/tasks-sounds.ts",
+          "find": "        durationMs: 110,\n        attackMs: 2,\n        gain: 0.3,",
+          "with": "        durationMs: 110,\n        attackMs: 0,\n        gain: 0.9,"
+        }
+      }
+    ]
+  },
+  "bad-cue-unknown": {
+    "expect": ["FAIL src/features/tasks/tasks-feedback.ts:12 [cue-unknown]", "sound \"boom\"", "[sound-unused]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-feedback.ts",
+          "find": "sound: 'streak'",
+          "with": "sound: 'boom'"
+        }
+      }
+    ]
+  },
+  "bad-duplicate-id": {
+    "expect": [
+      "FAIL src/games/arena-chase/sounds/arena-chase-sounds.ts:5 [sound-id]",
+      "sound id \"complete\" is also in src/features/tasks/sounds/tasks-sounds.ts"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/arena-chase/sounds/arena-chase-sounds.ts",
+          "find": "  caught: {",
+          "with": "  complete: {"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/games/arena-chase/arena-events.ts",
+          "find": "audio.play('caught');",
+          "with": "audio.play('complete');"
+        }
+      }
+    ]
+  },
+  "bad-inline-cue-unknown": {
+    "expect": [
+      "FAIL src/features/tasks/use-tasks-model.ts:19 [cue-unknown] cue names sound \"boom\"",
+      "FAIL src/features/tasks/streak-cue.ts:4 [cue-unknown] cue names sound \"zap\""
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "  playUiFeedback(ports, isSaved ? 'success' : 'error');\n}\n",
+          "with": "  playUiFeedback(ports, isSaved ? 'success' : 'error');\n}\n\nexport function onTaskSnoozed(ports: FeedbackPorts): void {\n  playCue(ports, { sound: 'boom', haptic: 'light' });\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/streak-cue.ts",
+          "lines": [
+            "// src/features/tasks/streak-cue.ts",
+            "import type { FeedbackCue } from '@/services/feedback/play-cue';",
+            "",
+            "export const STREAK_CUE = { sound: 'zap', haptic: 'medium' } as const satisfies FeedbackCue;"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-late-layer-click": {
+    "expect": [
+      "FAIL src/features/tasks/sounds/tasks-sounds.ts:11 [recipe-quality]",
+      "sound \"complete\" voice 1: a layer that starts later needs attackMs"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/sounds/tasks-sounds.ts",
+          "find": "        offsetMs: 70,\n        durationMs: 80,\n        attackMs: 2,",
+          "with": "        offsetMs: 70,\n        durationMs: 80,\n        attackMs: 0,"
+        }
+      }
+    ]
+  },
+  "bad-music-no-loop": {
+    "expect": ["[bank-category]", "music \"streak\" is not looped"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/sounds/tasks-sounds.ts",
+          "find": "  streak: {\n    category: 'sfx',",
+          "with": "  streak: {\n    category: 'music',"
+        }
+      }
+    ]
+  },
+  "bad-no-bank-test": {
+    "expect": ["FAIL src/features/tasks/sounds/tasks-sounds.test.ts:1 [bank-test]"],
+    "ops": [{ "delete": "src/features/tasks/sounds/tasks-sounds.test.ts" }]
+  },
+  "bad-not-literal": {
+    "expect": ["[recipe-literal]", "\"GOAL_GAIN\" is not literal data"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/sounds/tasks-sounds.ts",
+          "find": "export const TASKS_SOUNDS",
+          "with": "const GOAL_GAIN = 0.45;\n\nexport const TASKS_SOUNDS"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/sounds/tasks-sounds.ts",
+          "find": "        gain: 0.45,\n      },\n    ],\n  },\n  /** A streak",
+          "with": "        gain: GOAL_GAIN,\n      },\n    ],\n  },\n  /** A streak"
+        }
+      }
+    ]
+  },
+  "bad-play-unknown": {
+    "expect": ["FAIL src/games/arena-chase/arena-events.ts:6 [cue-unknown]", "sound \"zap\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/arena-chase/arena-events.ts",
+          "find": "audio.play('caught');",
+          "with": "audio.play('zap');"
+        }
+      }
+    ]
+  },
+  "bad-sound-unused": {
+    "expect": ["FAIL src/features/tasks/sounds/tasks-sounds.ts:68 [sound-unused]", "sound \"streak\" is never cued"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-feedback.ts",
+          "find": "  'streak-extended': { sound: 'streak', haptic: 'medium' },\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-synth-drift": {
+    "expect": ["FAIL src/services/audio/synth/synthesize-recipe.ts:1 [synth-drift]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/audio/synth/synthesize-recipe.ts",
+          "find": "const FADE_OUT_MS = 6;",
+          "with": "const FADE_OUT_MS = 5;"
+        }
+      }
+    ]
+  },
+  "bad-too-long": {
+    "expect": ["FAIL src/features/tasks/sounds/tasks-sounds.ts:68 [recipe-quality]", "lasts 2400 ms (limit 1500 ms)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/sounds/tasks-sounds.ts",
+          "find": "durationMs: 240,",
+          "with": "durationMs: 2400,"
+        }
+      }
+    ]
+  },
+  "bad-too-quiet": {
+    "expect": [
+      "FAIL src/games/arena-chase/sounds/arena-chase-sounds.ts:5 [recipe-quality]",
+      "sound \"caught\" peak",
+      "below 0.05"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/arena-chase/sounds/arena-chase-sounds.ts",
+          "find": "gain: 0.3,",
+          "with": "gain: 0.03,"
+        }
+      }
+    ]
+  },
+  "bad-two-music": {
+    "expect": ["[bank-category]", "2 music entries across the banks"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/sounds/tasks-sounds.ts",
+          "find": "  streak: {\n    category: 'sfx',",
+          "with": "  streak: {\n    category: 'music',\n    isLoop: true,"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/games/arena-chase/sounds/arena-chase-sounds.ts",
+          "find": "    category: 'sfx',",
+          "with": "    category: 'music',\n    isLoop: true,"
+        }
+      }
+    ]
+  },
+  "bad-ui-bank-missing": {
+    "expect": ["FAIL src/services/audio/synth/ui-sounds.ts [bank-missing]", "no UI_SOUNDS"],
+    "ops": [{ "delete": "src/services/audio/synth/ui-sounds.ts" }]
+  },
+  "bad-ui-category": {
+    "expect": ["FAIL src/features/tasks/sounds/tasks-sounds.ts:11 [bank-category]", "category \"ui\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/sounds/tasks-sounds.ts",
+          "find": "  complete: {\n    category: 'sfx',",
+          "with": "  complete: {\n    category: 'ui',"
+        }
+      }
+    ]
+  },
+  "bad-ui-id": {
+    "expect": ["FAIL src/services/audio/synth/ui-sounds.ts:11 [sound-id]", "is not ui.<kebab>"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/audio/synth/ui-sounds.ts",
+          "find": "  'ui.toggle': [",
+          "with": "  toggle: ["
+        }
+      }
+    ]
+  },
+  "bad-ui-id-in-feature": {
+    "expect": ["FAIL src/features/tasks/sounds/tasks-sounds.ts:11 [sound-id]", "ui. is the UI sounds' namespace"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/sounds/tasks-sounds.ts",
+          "find": "  complete: {",
+          "with": "  'ui.complete': {"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-feedback.ts",
+          "find": "sound: 'complete'",
+          "with": "sound: 'ui.complete'"
+        }
+      }
+    ]
+  },
+  "bad-ui-unused": {
+    "expect": ["FAIL src/services/audio/synth/ui-sounds.ts:53 [sound-unused]", "UI sound \"ui.spare\" is never cued"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/audio/synth/ui-sounds.ts",
+          "find": "  'ui.error': [",
+          "with": "  'ui.spare': [\n    {\n      wave: 'sine',\n      startHz: 440,\n      endHz: 440,\n      offsetMs: 0,\n      durationMs: 60,\n      attackMs: 2,\n      gain: 0.3,\n    },\n  ],\n  'ui.error': ["
+        }
+      }
+    ]
+  },
+  "error-no-package": {
+    "expect": ["ERROR [bad-input] nothing to check:", "has no package.json"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "error-unknown-owner": {
+    "expect": ["ERROR [bad-input] nothing to check: no feature or game folder \"nope\""],
+    "args": "{dir} --owner nope",
+    "ops": []
+  },
+  "pass-installed-skills": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/sound-pack/SKILL.md",
+          "lines": ["---", "name: sound-pack", "description: An installed skill whose fixtures plant bugs.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": ".agents/skills/sound-pack/src/services/audio/load.ts",
+          "lines": [
+            "// planted: a second engine, file audio and focus",
+            "import { AudioContext } from 'react-native-audio-api';",
+            "import Sound from 'react-native-sound';",
+            "export const ctx = new AudioContext();",
+            "export const load = () => ctx.decodeAudioData('https://example.com/boom.mp3');",
+            "export const s = Sound;"
+          ]
+        }
+      },
+      { "write": { "file": ".agents/skills/sound-pack/assets/boom.mp3", "lines": ["ID3 planted decoy"] } },
+      {
+        "write": {
+          "file": "skills/demo-skill/SKILL.md",
+          "lines": ["---", "name: demo-skill", "description: A skill under development in the app repo.", "---"]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/demo-skill/src/features/demo/sounds/demo-sounds.ts",
+          "lines": [
+            "// planted: a broken bank and a cue to nothing",
+            "export const DEMO_SOUNDS = { 'ui.tap': { category: 'ui', recipe: [{ wave: 'square', startHz: 10, endHz: 10, offsetMs: 0, durationMs: 5000, attackMs: 0, gain: 1 }] } };",
+            "export const cue = { sound: 'nothing' };"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/demo-skill/src/ui/buzz.tsx",
+          "lines": [
+            "// planted: Vibration and a strong UI haptic",
+            "import { Vibration } from 'react-native';",
+            "export const buzz = (haptics: { play: (c: string) => void }) => { haptics.play('heavy'); Vibration.vibrate(); };"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/vendored/SKILL.md",
+          "lines": ["---", "name: vendored", "description: A vendored skill inside the app source.", "---"]
+        }
+      },
+      { "write": { "file": "src/features/tasks/vendored/click.wav", "lines": ["RIFF planted decoy"] } },
+      {
+        "write": {
+          "file": "src/features/tasks/vendored/play.ts",
+          "lines": [
+            "// planted: imports expo-haptics and reloads without dispose inside a folder that holds a SKILL.md",
+            "import { impactAsync } from 'expo-haptics';",
+            "import { reloadAppAsync } from 'expo';",
+            "export const go = () => { void impactAsync(); void reloadAppAsync('x'); };",
+            "export const cue = { sound: 'unknown-sound' };"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-no-audio": {
+    "expect": ["NOT APPLICABLE: no sound bank, no src/services/audio"],
+    "base": [{ "from": "@tests/bases/app/package.json", "to": "package.json" }],
+    "ops": []
+  },
+  "pass-not-cues": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/reminders/schedule-reminder.ts",
+          "lines": [
+            "// src/features/reminders/schedule-reminder.ts: notification content has a sound key; it is not a cue.",
+            "export function reminderContent(title: string): { title: string; sound: string } {",
+            "  return { title, sound: 'default' };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/notifications/reminder-channel.ts",
+          "lines": [
+            "// src/services/notifications/reminder-channel.ts: an Android channel sound (a bundled file), not a cue.",
+            "export const REMINDER_CHANNEL = { id: 'reminders', name: 'Reminders', sound: 'reminder.wav' } as const;"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/use-intro.ts",
+          "lines": [
+            "// src/features/tasks/use-intro.ts: other players' .play() are not audio cues.",
+            "export function playIntro(lottie: { play: (name: string) => void }, celebration: { play: (key: string) => void }): void {",
+            "  lottie.play('intro');",
+            "  celebration.play('task-completed');",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-owner-filter": { "expect": ["RESULT: PASS"], "args": "{dir} --owner arena-chase", "ops": [] },
+  "pass-wav-dir": {
+    "expect": ["wrote 7 WAV files", "RESULT: PASS"],
+    "args": "{dir} --wav-dir {dir}/reports/sfx",
+    "ops": []
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "base": [
+    {
+      "templates": true,
+      "firstLinePath": true,
+      "fill": {
+        "__FEATURE__": "tasks",
+        "__FEATURE_PASCAL__": "Tasks",
+        "__FEATURE_SOUNDS__": "TASKS_SOUNDS",
+        "__FEATURE_FEEDBACK__": "TASKS_FEEDBACK"
+      }
+    },
+    "@tests/bases/app"
+  ]
+}

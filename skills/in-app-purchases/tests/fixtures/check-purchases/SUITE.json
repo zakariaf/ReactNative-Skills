@@ -1,0 +1,64 @@
+{
+  "base": [
+    "@tests/bases/app",
+    {
+      "templates": true,
+      "firstLinePath": true,
+      "fill": {
+        "__PRODUCT_ID__": "com.example.tasks.premium",
+        "__PRICE__": "2.99"
+      }
+    },
+    {
+      "from": "@skill/examples/purchase-root.tsx",
+      "to": "src/features/root-navigator/purchase-root.tsx"
+    },
+    {
+      "from": "@skill/examples/create-device-services.ts",
+      "to": "src/services/create-device-services.ts"
+    },
+    {
+      "from": "@skill/examples/debug-premium-link.ts",
+      "to": "src/services/test-hooks/debug-premium-target.ts"
+    }
+  ],
+  "ops": [
+    {
+      "$comment": "Installed and vendored skills hold planted bugs: walkRepo must keep every one of them out.",
+      "write": {
+        "file": ".agents/skills/demo/src/planted-purchase.ts",
+        "content": "import { kitApi, useIAP } from 'expo-iap';\nimport { createExpoIapPurchaseAdapter } from '@/services/purchase/expo-iap-purchase-adapter';\n\nexport const planted = [kitApi, useIAP, createExpoIapPurchaseAdapter(), '$4.99'];\nexport const grant = (store: { grantPremium: (x: number) => void }) => store.grantPremium(1);\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/demo/src/planted-purchase.ts",
+        "content": "import { kitApi, useIAP } from 'expo-iap';\nimport { createExpoIapPurchaseAdapter } from '@/services/purchase/expo-iap-purchase-adapter';\n\nexport const planted = [kitApi, useIAP, createExpoIapPurchaseAdapter(), '$4.99'];\nexport const grant = (store: { grantPremium: (x: number) => void }) => store.grantPremium(1);\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/demo/Premium.storekit",
+        "content": "{ \"products\": [] }\n"
+      }
+    },
+    {
+      "write": {
+        "file": ".claude/skills/demo/storekit-harness.entitlements",
+        "content": "<key>get-task-allow</key>\n"
+      }
+    },
+    {
+      "write": {
+        "file": "vendor/kit/SKILL.md",
+        "content": "---\nname: kit\ndescription: Vendored skill.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "vendor/kit/src/planted-purchase.ts",
+        "content": "import { kitApi, useIAP } from 'expo-iap';\nimport { createExpoIapPurchaseAdapter } from '@/services/purchase/expo-iap-purchase-adapter';\n\nexport const planted = [kitApi, useIAP, createExpoIapPurchaseAdapter(), '$4.99'];\nexport const grant = (store: { grantPremium: (x: number) => void }) => store.grantPremium(1);\n"
+      }
+    }
+  ]
+}

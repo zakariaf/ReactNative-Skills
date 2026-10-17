@@ -1,0 +1,12 @@
+[
+  { "from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs" },
+  { "from": "scripts/lib/source-scan.mjs", "to": "scripts/lib/source-scan.mjs" },
+  { "from": "repo-templates/src/config/app-variant.ts", "to": "templates/src/config/app-variant.ts" },
+  { "from": "repo-templates/src/config/app-variant.test.ts", "to": "templates/src/config/app-variant.test.ts" },
+  { "from": "repo-templates/src/env.d.ts", "to": "templates/src/env.d.ts" },
+  { "from": "repo-templates/metro.config.js", "to": "templates/metro.config.js" },
+  { "from": "repo-templates/scripts/metro/public-env-cache-version.ts", "to": "templates/scripts/metro/public-env-cache-version.ts" },
+  { "from": "repo-templates/scripts/metro/public-env-cache-version.test.ts", "to": "templates/scripts/metro/public-env-cache-version.test.ts" },
+  { "from": "repo-templates/scripts/metro/compose-metro-config.ts", "to": "templates/scripts/metro/compose-metro-config.ts" },
+  { "from": "repo-templates/scripts/metro/compose-metro-config.test.ts", "to": "templates/scripts/metro/compose-metro-config.test.ts" }
+]

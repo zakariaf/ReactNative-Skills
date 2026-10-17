@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "copy-source.schema.json",
+  "title": "contracts/copy-source.json",
+  "description": "Approved copy (design, marketing, legal) in every language, synced into the catalogs by sync-copy.mjs.",
+  "type": "object",
+  "required": ["strings"],
+  "properties": {
+    "$comment": { "type": "string" },
+    "$schema": { "type": "string" },
+    "screens": {
+      "description": "Screen id -> the keys it shows (sync-copy --screen, review-sheet 'shown on').",
+      "type": "object",
+      "additionalProperties": { "type": "array", "items": { "type": "string" } }
+    },
+    "strings": {
+      "description": "Key -> language -> ICU message. Every row carries every language in LANGUAGES.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": { "type": "string" }
+      }
+    },
+    "retired": {
+      "description": "Keys that must leave every catalog, with the reason.",
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    }
+  }
+}

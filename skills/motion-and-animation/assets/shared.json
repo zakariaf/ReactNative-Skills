@@ -1,0 +1,14 @@
+[
+  { "from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs" },
+  { "from": "scripts/lib/source-scan.mjs", "to": "scripts/lib/source-scan.mjs" },
+  { "from": "scripts/lib/app-modules.mjs", "to": "scripts/lib/app-modules.mjs" },
+  { "from": "repo-templates/src/ui/a11y/system-a11y-store.ts", "to": "templates/src/ui/a11y/system-a11y-store.ts" },
+  { "from": "repo-templates/src/ui/a11y/system-a11y-store.test.ts", "to": "templates/src/ui/a11y/system-a11y-store.test.ts" },
+  { "from": "repo-templates/src/ui/a11y/use-reduce-motion.ts", "to": "templates/src/ui/a11y/use-reduce-motion.ts" },
+  { "from": "repo-templates/src/ui/a11y/use-reduce-motion.test.tsx", "to": "templates/src/ui/a11y/use-reduce-motion.test.tsx" },
+  { "from": "repo-templates/src/ui/a11y/motion-config.tsx", "to": "templates/src/ui/a11y/motion-config.tsx" },
+  { "from": "repo-templates/src/ui/a11y/motion-config.test.tsx", "to": "templates/src/ui/a11y/motion-config.test.tsx" },
+  { "from": "repo-templates/src/hooks/use-is-app-active.ts", "to": "templates/src/hooks/use-is-app-active.ts" },
+  { "from": "repo-templates/src/hooks/use-is-app-active.test.ts", "to": "templates/src/hooks/use-is-app-active.test.ts" },
+  { "from": "repo-templates/src/theme/motion.ts", "to": "tests/bases/app/src/theme/motion.ts" }
+]

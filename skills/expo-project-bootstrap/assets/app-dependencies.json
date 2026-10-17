@@ -1,0 +1,26 @@
+{
+  "$comment": "What the skeleton's package.json gets beyond the canonical skeleton manifest. dependencies: the runtime packages the skeleton's own files load (Expo Router and its peers from the SDK 57 default template, the variant config's plugins, the three native modules jest.setup.ts and babel-preset-expo load, and the web pair the template keeps); each specifier comes from templates/contracts/dependency-policy.json. laterDevDependencies: dev tools of the canonical manifest that no skeleton file uses yet; knip fails on an unused dependency, so the skill that writes the first file using one installs it (jest-image-snapshot and its types: the first pixel golden, golden-and-snapshot-tests). allowScripts: reviewed install scripts of the skeleton's tree that the canonical manifest does not list yet (none today: fsevents 2.3.3, the macOS file-watching addon jest-haste-map loads, is approved in the canonical manifest, because without it the first macOS install stops with ESTRICTALLOWSCRIPTS before anything is installed). Verified on 2026-10-14 (Expo SDK 57, the dependency-policy seed of 2026-10-03).",
+  "dependencies": [
+    "expo",
+    "expo-constants",
+    "expo-dev-client",
+    "expo-linking",
+    "expo-router",
+    "expo-splash-screen",
+    "expo-system-ui",
+    "react",
+    "react-dom",
+    "react-native",
+    "react-native-gesture-handler",
+    "react-native-reanimated",
+    "react-native-safe-area-context",
+    "react-native-screens",
+    "react-native-web",
+    "react-native-worklets"
+  ],
+  "laterDevDependencies": [
+    "jest-image-snapshot",
+    "@types/jest-image-snapshot"
+  ],
+  "allowScripts": {}
+}

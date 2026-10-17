@@ -1,0 +1,14 @@
+{
+  "name": "@acme/mobile",
+  "private": true,
+  "dependencies": {
+    "@acme/core": "*",
+    "expo": "~57.0.26",
+    "expo-iap": "5.8.0",
+    "react": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-gesture-handler": "~2.32.0",
+    "react-native-reanimated": "4.5.1",
+    "react-native-worklets": "0.10.1"
+  }
+}

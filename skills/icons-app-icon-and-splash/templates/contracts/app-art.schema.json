@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "contracts/app-art.json",
+  "description": "The code-drawn app icon, splash and store images (where each lives, which may be absent, how much of an iOS icon the mark covers) and check-icons' allow-lists.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "$comment": {
+      "type": "string"
+    },
+    "outputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "light": {
+          "$ref": "#/$defs/png"
+        },
+        "dark": {
+          "$ref": "#/$defs/png"
+        },
+        "tinted": {
+          "$ref": "#/$defs/png"
+        },
+        "androidForeground": {
+          "$ref": "#/$defs/png"
+        },
+        "androidBackground": {
+          "$ref": "#/$defs/png"
+        },
+        "androidMonochrome": {
+          "$ref": "#/$defs/png"
+        },
+        "splash": {
+          "$ref": "#/$defs/png"
+        },
+        "splashDark": {
+          "$ref": "#/$defs/png"
+        },
+        "playIcon": {
+          "$ref": "#/$defs/png"
+        },
+        "featureGraphic": {
+          "$ref": "#/$defs/png"
+        }
+      }
+    },
+    "optional": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "light",
+          "dark",
+          "tinted",
+          "androidForeground",
+          "androidBackground",
+          "androidMonochrome",
+          "splash",
+          "splashDark",
+          "playIcon",
+          "featureGraphic"
+        ]
+      }
+    },
+    "glyphArea": {
+      "type": "number",
+      "minimum": 0.4,
+      "maximum": 0.9
+    },
+    "icons": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Read by check-icons only.",
+      "properties": {
+        "allowImages": {
+          "type": "array",
+          "description": "Globs of raster images app source may hold or import (real photos); icons never.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "allowPackages": {
+          "type": "array",
+          "description": "Icon packages the app chose on purpose (for example expo-symbols for native tab bars).",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "png": {
+      "type": "string",
+      "pattern": "^(?!/)(?!.*\\.\\.)[^\\s]+\\.png$"
+    }
+  }
+}

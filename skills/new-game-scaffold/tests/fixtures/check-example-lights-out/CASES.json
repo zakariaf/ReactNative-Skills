@@ -1,0 +1,9 @@
+{
+  "bad-stale-registry-key": {
+    "expect": [
+      "[declaration] has the key \"registry\", which the schema does not allow",
+      "check-game-scaffold: 1 games checked, 1 problems"
+    ],
+    "ops": [{ "json": { "file": "contracts/games.json", "path": ["registry"], "value": "src/games/game-registry.ts" } }]
+  }
+}

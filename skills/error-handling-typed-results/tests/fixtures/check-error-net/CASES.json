@@ -1,0 +1,771 @@
+{
+  "bad-boundary-records": {
+    "expect": [
+      "FAIL src/features/crash-recovery/create-route-error-boundary.tsx:1 [boundary-records] the error boundary records nothing",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/crash-recovery/create-route-error-boundary.tsx",
+          "find": "    useEffect(() => {\n      record(error);\n    }, [error]);\n",
+          "with": "    useEffect(() => undefined, [error]);\n"
+        }
+      }
+    ]
+  },
+  "bad-boundary-records-console": {
+    "expect": [
+      "FAIL src/app/_layout.tsx:24 [boundary-records] the ErrorBoundary is given a record function that records nothing",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "  record: (error) => {\n    appErrorNet.report({ source: 'render', error, isFatal: false });\n  },\n",
+          "with": "  record: (error) => {\n    console.warn(error);\n  },\n"
+        }
+      }
+    ]
+  },
+  "bad-boundary-records-noop": {
+    "expect": [
+      "FAIL src/app/_layout.tsx:24 [boundary-records] the ErrorBoundary is given a record function that records nothing",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "  record: (error) => {\n    appErrorNet.report({ source: 'render', error, isFatal: false });\n  },\n",
+          "with": "  record: () => undefined,\n"
+        }
+      }
+    ]
+  },
+  "bad-net-chains": {
+    "expect": [
+      "FAIL src/services/error-net/error-net.ts:108 [net-chains] the handler replaces React Native's instead of chaining it",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/error-net/error-net.ts",
+          "find": "const current: MarkedHandler = errorUtils.getGlobalHandler();",
+          "with": "const current: MarkedHandler = (): void => undefined;"
+        }
+      }
+    ]
+  },
+  "bad-net-chains-dev-only": {
+    "expect": [
+      "FAIL src/services/error-net/error-net.ts:105 [net-chains] the global handler is installed or forwards only in one kind of build",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/error-net/error-net.ts",
+          "find": "    previous(error, isFatalError);\n",
+          "with": "    if (__DEV__) previous(error, isFatalError);\n"
+        }
+      }
+    ]
+  },
+  "bad-net-chains-not-forwarded": {
+    "expect": [
+      "FAIL src/services/error-net/error-net.ts:107 [net-chains] the installed handler never calls the handler it replaced",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/error-net/error-net.ts",
+          "find": "    report({ source: 'global-handler', error, isFatal: isFatalError });\n    previous(error, isFatalError);\n",
+          "with": "    report({ source: 'global-handler', error, isFatal: isFatalError });\n"
+        }
+      }
+    ]
+  },
+  "bad-net-connected-dev-only": {
+    "expect": [
+      "FAIL src/app/_layout.tsx:40 [net-connected] appErrorNet is connected only under a development-only guard",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "  connectErrorLog(appErrorNet, services.errorLog);\n",
+          "with": "  if (__DEV__) connectErrorLog(appErrorNet, services.errorLog);\n"
+        }
+      }
+    ]
+  },
+  "bad-net-connected-missing": {
+    "expect": [
+      "FAIL src/services/error-net/app-error-net.ts:13 [net-connected] nothing connects appErrorNet to the error log",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "  connectErrorLog(appErrorNet, services.errorLog);\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-net-connected-other-connect": {
+    "expect": [
+      "FAIL src/services/error-net/app-error-net.ts:13 [net-connected] nothing connects appErrorNet to the error log",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "  connectErrorLog(appErrorNet, services.errorLog);\n",
+          "with": "  startLiveUpdates(appErrorNet, createLiveSocket('wss://tasks.example.com/live'));\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "import { connectErrorLog } from '@/services/error-net/connect-error-log';\n",
+          "with": "import { createLiveSocket, startLiveUpdates } from '@/services/live/start-live-updates';\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/live/start-live-updates.ts",
+          "lines": [
+            "// src/services/live/start-live-updates.ts",
+            "import type { ErrorNet } from '@/services/error-net/error-net';",
+            "",
+            "export type LiveSocket = {",
+            "  readonly connect: () => void;",
+            "  readonly onError: (listener: (error: unknown) => void) => void;",
+            "};",
+            "",
+            "export function createLiveSocket(url: string): LiveSocket {",
+            "  const listeners: ((error: unknown) => void)[] = [];",
+            "  return {",
+            "    connect: () => {",
+            "      listeners.forEach((listener) => {",
+            "        listener(new Error(`not connected: ${url}`));",
+            "      });",
+            "    },",
+            "    onError: (listener) => {",
+            "      listeners.push(listener);",
+            "    },",
+            "  };",
+            "}",
+            "",
+            "/** Reports socket errors through the net; the socket's connect() has nothing to do with the net's. */",
+            "export function startLiveUpdates(net: Pick<ErrorNet, 'report'>, socket: LiveSocket): void {",
+            "  socket.onError((error) => {",
+            "    net.report({ source: 'global-handler', error, isFatal: false });",
+            "  });",
+            "  socket.connect();",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-net-every-build": {
+    "expect": [
+      "FAIL src/services/error-net/error-net.ts:63 [net-every-build] the error net tests __DEV__ or NODE_ENV",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/error-net/error-net.ts",
+          "find": "type Queue = Pick<ErrorNet, 'connect' | 'report'>;\n",
+          "with": "type Queue = Pick<ErrorNet, 'connect' | 'report'>;\n\n/** Rejection tracking is noisy in release (the flag the guard check cannot follow). */\nconst isTracking = __DEV__;\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/error-net/error-net.ts",
+          "find": "    hooks.enableRejectionTracker?.(rejectionOptions(report, chained?.previous ?? null));\n",
+          "with": "    if (isTracking) hooks.enableRejectionTracker?.(rejectionOptions(report, chained?.previous ?? null));\n"
+        }
+      }
+    ]
+  },
+  "bad-net-guarded": {
+    "expect": [
+      "FAIL src/services/error-net/error-net.ts:67 [net-guarded] the error sink is called outside try/catch",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/error-net/error-net.ts",
+          "find": "    try {\n      target(report);\n    } catch (sinkError: unknown) {\n      fallbackLog('error-net: the error sink threw', sinkError);\n    }\n",
+          "with": "    target(report);\n"
+        }
+      }
+    ]
+  },
+  "bad-net-guarded-elsewhere": {
+    "expect": [
+      "FAIL src/services/error-net/error-net.ts:67 [net-guarded] the error sink is called outside try/catch",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/error-net/error-net.ts",
+          "find": "    try {\n      target(report);\n    } catch (sinkError: unknown) {\n      fallbackLog('error-net: the error sink threw', sinkError);\n    }\n",
+          "with": "    target(report);\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/error-net/error-net.ts",
+          "find": "        : (options) => {\n            tracker.call(hermes, options);\n          },\n",
+          "with": "        : (options) => {\n            try {\n              tracker.call(hermes, options);\n            } catch (error: unknown) {\n              throw new Error('error-net: enabling rejection tracking failed', { cause: error });\n            }\n          },\n"
+        }
+      }
+    ]
+  },
+  "bad-net-installed-dev-only": {
+    "expect": [
+      "FAIL src/services/error-net/install-error-net.ts:7 [net-installed] the error net is installed only in one kind of build",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/error-net/install-error-net.ts",
+          "find": "appErrorNet.install();",
+          "with": "if (__DEV__) appErrorNet.install();"
+        }
+      }
+    ]
+  },
+  "bad-net-installed-in-body": {
+    "expect": [
+      "FAIL src/app/_layout.tsx:1 [net-installed] the entry installs the error net in its body, after every import has loaded",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "import '@/services/error-net/install-error-net';\n\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "/** Expo Router wraps this layout",
+          "with": "appErrorNet.install();\n\n/** Expo Router wraps this layout"
+        }
+      }
+    ]
+  },
+  "bad-net-installed-late": {
+    "expect": [
+      "FAIL src/app/_layout.tsx:1 [net-installed] the entry installs the error net only after \"expo\" has loaded",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "import '@/services/error-net/install-error-net';\n\nimport { reloadAppAsync } from 'expo';\n",
+          "with": "import { reloadAppAsync } from 'expo';\nimport '@/services/error-net/install-error-net';\n"
+        }
+      }
+    ]
+  },
+  "bad-net-installed-missing": {
+    "expect": [
+      "FAIL src/app/_layout.tsx:1 [net-installed] the entry imports the error net but never installs it",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "import '@/services/error-net/install-error-net';\n\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-net-rejections-dev-hooks": {
+    "expect": [
+      "FAIL src/services/error-net/error-net.ts:163 [net-rejections] rejection tracking depends on a build check (__DEV__ or NODE_ENV)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/error-net/error-net.ts",
+          "find": "      tracker === undefined\n        ? null",
+          "with": "      tracker === undefined || !__DEV__\n        ? null"
+        }
+      }
+    ]
+  },
+  "bad-net-rejections-dev-install": {
+    "expect": [
+      "FAIL src/services/error-net/error-net.ts:144 [net-rejections] rejection tracking depends on a build check (__DEV__ or NODE_ENV)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/error-net/error-net.ts",
+          "find": "    hooks.enableRejectionTracker?.(rejectionOptions(report, chained?.previous ?? null));\n",
+          "with": "    if (__DEV__) {\n      hooks.enableRejectionTracker?.(rejectionOptions(report, chained?.previous ?? null));\n    }\n"
+        }
+      }
+    ]
+  },
+  "bad-net-rejections-dev-only": {
+    "expect": [
+      "FAIL src/services/error-net/error-net.ts:158 [net-rejections] rejection tracking depends on a build check (__DEV__ or NODE_ENV)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/error-net/error-net.ts",
+          "find": "const tracker = hermes?.enablePromiseRejectionTracker;",
+          "with": "const tracker = __DEV__ ? hermes?.enablePromiseRejectionTracker : undefined;"
+        }
+      }
+    ]
+  },
+  "bad-net-rejections-early-return": {
+    "expect": [
+      "FAIL src/services/error-net/error-net.ts:141 [net-rejections] rejection tracking depends on a build check (__DEV__ or NODE_ENV)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/error-net/error-net.ts",
+          "find": "    let isActive = true;\n",
+          "with": "    let isActive = true;\n    if (process.env.NODE_ENV === 'development') {\n      console.info('error-net: installed');\n    } else {\n      return () => undefined;\n    }\n"
+        }
+      }
+    ]
+  },
+  "bad-net-rejections-missing": {
+    "expect": [
+      "FAIL src/services/error-net/error-net.ts:1 [net-rejections] unhandled promise rejections are not tracked (release builds drop them silently)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/error-net/error-net.ts",
+          "find": "const tracker = hermes?.enablePromiseRejectionTracker;",
+          "with": "const tracker: RejectionTrackerOptions['onHandled'] | undefined = hermes === undefined ? undefined : undefined;"
+        }
+      }
+    ]
+  },
+  "bad-net-rejections-node-env": {
+    "expect": [
+      "FAIL src/services/error-net/error-net.ts:159 [net-rejections] rejection tracking depends on a build check (__DEV__ or NODE_ENV)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/error-net/error-net.ts",
+          "find": "  const tracker = hermes?.enablePromiseRejectionTracker;\n",
+          "with": "  let tracker: ((options: RejectionTrackerOptions) => void) | undefined;\n  if (process.env.NODE_ENV !== 'production') {\n    tracker = hermes?.enablePromiseRejectionTracker;\n  }\n"
+        }
+      }
+    ]
+  },
+  "bad-net-rejections-node-env-line": {
+    "expect": [
+      "FAIL src/services/error-net/error-net.ts:158 [net-rejections] rejection tracking depends on a build check (__DEV__ or NODE_ENV)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/error-net/error-net.ts",
+          "find": "  const tracker = hermes?.enablePromiseRejectionTracker;\n",
+          "with": "  const tracker = process.env.NODE_ENV === 'development' ? hermes?.enablePromiseRejectionTracker : undefined;\n"
+        }
+      }
+    ]
+  },
+  "bad-net-single-missing": {
+    "expect": [
+      "[net-single] no file installs a global error handler (ErrorUtils.setGlobalHandler)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/error-net/error-net.ts",
+          "find": ".setGlobalHandler(",
+          "with": ".replaceHandler(",
+          "count": 2
+        }
+      }
+    ]
+  },
+  "bad-net-single-second": {
+    "expect": [
+      "FAIL src/features/tasks/task-crash-handler.ts:4 [net-single] a second global handler (the net is src/services/error-net/error-net.ts)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/task-crash-handler.ts",
+          "lines": [
+            "// src/features/tasks/task-crash-handler.ts: a second handler silently replaces the net.",
+            "/** Shows tasks a toast on a crash. */",
+            "export function installTaskCrashHandler(show: () => void): void {",
+            "  ErrorUtils.setGlobalHandler(() => {",
+            "    show();",
+            "  });",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-no-auto-retry": {
+    "expect": [
+      "FAIL src/features/crash-recovery/create-route-error-boundary.tsx:36 [no-auto-retry] the boundary retries by itself (restart() in useEffect)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/crash-recovery/create-route-error-boundary.tsx",
+          "find": "      record(error);\n    }, [error]);\n",
+          "with": "      record(error);\n      restart(retry).catch(record);\n    }, [error]);\n"
+        }
+      }
+    ]
+  },
+  "bad-no-auto-retry-fallback": {
+    "expect": [
+      "FAIL src/features/crash-recovery/crash-fallback.tsx:34 [no-auto-retry] the boundary retries by itself (onRestart in setTimeout)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/crash-recovery/crash-fallback.tsx",
+          "find": "import { directionOf } from '@/i18n/languages';\n",
+          "with": "import { useEffect } from 'react';\n\nimport { directionOf } from '@/i18n/languages';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/crash-recovery/crash-fallback.tsx",
+          "find": "export function CrashFallback({ onRestart }: CrashFallbackProps): React.JSX.Element {\n",
+          "with": "export function CrashFallback({ onRestart }: CrashFallbackProps): React.JSX.Element {\n  // \"Try again\" for the user after three seconds: a crash loop when the error repeats.\n  useEffect(() => {\n    const timer = setTimeout(onRestart, 3000);\n    return () => clearTimeout(timer);\n  }, [onRestart]);\n"
+        }
+      }
+    ]
+  },
+  "bad-no-auto-retry-navigation": {
+    "expect": [
+      "FAIL src/features/crash-recovery/crash-fallback.tsx:37 [no-auto-retry] the boundary retries by itself (router.replace() in useEffect)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/crash-recovery/crash-fallback.tsx",
+          "find": "import { directionOf } from '@/i18n/languages';\n",
+          "with": "import { useRouter } from 'expo-router';\nimport { useEffect } from 'react';\n\nimport { directionOf } from '@/i18n/languages';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/crash-recovery/crash-fallback.tsx",
+          "find": "  const theme = useTheme();\n",
+          "with": "  const theme = useTheme();\n  const router = useRouter();\n  useEffect(() => {\n    const timer = setTimeout(() => {\n      router.replace('/');\n    }, 2000);\n    return () => {\n      clearTimeout(timer);\n    };\n  }, [router]);\n"
+        }
+      }
+    ]
+  },
+  "bad-root-boundary": {
+    "expect": [
+      "FAIL src/app/_layout.tsx:1 [root-boundary] the root layout exports no ErrorBoundary",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "export const ErrorBoundary = createRouteErrorBoundary({",
+          "with": "const RootBoundary = createRouteErrorBoundary({"
+        }
+      }
+    ]
+  },
+  "error-no-package-json": {
+    "expect": ["ERROR [bad-input] no package.json in", "RESULT: FAIL (1 problems)"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "error-no-source-folder": {
+    "expect": ["ERROR [bad-input] nothing to check: app-src/ does not exist", "RESULT: FAIL (1 problems)"],
+    "args": "{dir} --src-dir app-src"
+  },
+  "pass-custom-entry": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["main"], "value": "index.ts" } },
+      {
+        "write": {
+          "file": "index.ts",
+          "lines": [
+            "// index.ts: the custom entry. The installer runs before Expo Router loads any route.",
+            "import './src/services/error-net/install-error-net';",
+            "import 'expo-router/entry';"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "import '@/services/error-net/install-error-net';\n\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "pass-installed-skills-silent": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/demo/src/hijack.ts",
+          "lines": [
+            "// planted: a second global handler, which check-error-net must not see in a skill folder",
+            "export function hijack(): void {",
+            "  ErrorUtils.setGlobalHandler(() => undefined);",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/demo/src/hijack.ts",
+          "lines": [
+            "// planted: a second global handler, which check-error-net must not see in a skill folder",
+            "export function hijack(): void {",
+            "  ErrorUtils.setGlobalHandler(() => undefined);",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/kit/hijack.ts",
+          "lines": [
+            "// planted: a second global handler, which check-error-net must not see in a skill folder",
+            "export function hijack(): void {",
+            "  ErrorUtils.setGlobalHandler(() => undefined);",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/kit/SKILL.md",
+          "lines": ["---", "name: kit", "description: A vendored skill folder inside src.", "---"]
+        }
+      }
+    ]
+  },
+  "pass-net-connected-direct": {
+    "expect": ["check-error-net:", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "  connectErrorLog(appErrorNet, services.errorLog);\n",
+          "with": ""
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/start-error-log.ts",
+          "lines": [
+            "// src/services/start-error-log.ts",
+            "import { appErrorNet } from '@/services/error-net/app-error-net';",
+            "",
+            "import type { ErrorLogPort } from '@/services/error-log/error-log-port';",
+            "",
+            "/** Connects the composition root's error log to the net; buffered startup reports flush first. */",
+            "export function startErrorLog(errorLog: Pick<ErrorLogPort, 'record'>): void {",
+            "  appErrorNet.connect((report) => {",
+            "    errorLog.record(report.source, report.error);",
+            "  });",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-net-connected-hop": {
+    "expect": ["check-error-net:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/error-net/connect-error-log.ts",
+          "lines": [
+            "// src/services/error-net/connect-error-log.ts",
+            "import { routeReports } from '@/services/error-net/route-reports';",
+            "",
+            "import type { ErrorLogPort } from '@/services/error-log/error-log-port';",
+            "import type { ErrorNet } from '@/services/error-net/error-net';",
+            "",
+            "/** Hands the net on: the parameter mapping follows it into routeReports' second parameter. */",
+            "export function connectErrorLog(net: Pick<ErrorNet, 'connect'>, errorLog: Pick<ErrorLogPort, 'record'>): void {",
+            "  routeReports(errorLog, net);",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/error-net/route-reports.ts",
+          "lines": [
+            "// src/services/error-net/route-reports.ts",
+            "import type { ErrorLogPort } from '@/services/error-log/error-log-port';",
+            "import type { ErrorNet } from '@/services/error-net/error-net';",
+            "",
+            "export function routeReports(errorLog: Pick<ErrorLogPort, 'record'>, target: Pick<ErrorNet, 'connect'>): void {",
+            "  target.connect((report) => {",
+            "    errorLog.record(report.source, report.error);",
+            "  });",
+            "}"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "  connectErrorLog(appErrorNet, services.errorLog);\n",
+          "with": "  connectErrorLog(appErrorNet, services.errorLog);\n  if (__DEV__) console.info('startup: services ready');\n"
+        }
+      }
+    ]
+  },
+  "pass-not-react-native": {
+    "expect": ["NOT APPLICABLE: react-native is not in package.json", "RESULT: PASS"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "react-native"], "delete": true } }]
+  },
+  "pass-react-navigation": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-router"], "delete": true } },
+      { "json": { "file": "package.json", "path": ["main"], "value": "index.ts" } },
+      {
+        "write": {
+          "file": "index.ts",
+          "lines": [
+            "// index.ts",
+            "import './src/services/error-net/install-error-net';",
+            "",
+            "import { registerRootComponent } from 'expo';",
+            "",
+            "import { App } from './src/app-root';",
+            "",
+            "registerRootComponent(App);"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/app-root.tsx",
+          "lines": [
+            "// src/app-root.tsx",
+            "import { useState } from 'react';",
+            "",
+            "import { appErrorNet } from '@/services/error-net/app-error-net';",
+            "import { connectErrorLog } from '@/services/error-net/connect-error-log';",
+            "import { RootErrorBoundary } from '@/ui/root-error-boundary';",
+            "",
+            "import type { ErrorLogPort } from '@/services/error-log/error-log-port';",
+            "",
+            "/** The composition root's error log, connected once, before the navigator renders. */",
+            "function startErrorLog(errorLog: Pick<ErrorLogPort, 'record'>): boolean {",
+            "  connectErrorLog(appErrorNet, errorLog);",
+            "  return true;",
+            "}",
+            "",
+            "export function App({ errorLog }: { readonly errorLog: Pick<ErrorLogPort, 'record'> }): React.JSX.Element {",
+            "  useState(() => startErrorLog(errorLog));",
+            "  return (",
+            "    <RootErrorBoundary",
+            "      record={(error) => {",
+            "        appErrorNet.report({ source: 'render', error, isFatal: false });",
+            "      }}",
+            "    >",
+            "      {null}",
+            "    </RootErrorBoundary>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/ui/root-error-boundary.tsx",
+          "lines": [
+            "// src/ui/root-error-boundary.tsx",
+            "import { Component } from 'react';",
+            "",
+            "import type { ErrorInfo, ReactNode } from 'react';",
+            "",
+            "type Props = { readonly children: ReactNode; readonly record: (error: unknown) => void };",
+            "",
+            "export class RootErrorBoundary extends Component<Props, { readonly hasError: boolean }> {",
+            "  override state = { hasError: false };",
+            "",
+            "  static getDerivedStateFromError(): { readonly hasError: boolean } {",
+            "    return { hasError: true };",
+            "  }",
+            "",
+            "  override componentDidCatch(error: unknown, _info: ErrorInfo): void {",
+            "    this.props.record(error);",
+            "  }",
+            "",
+            "  override render(): ReactNode {",
+            "    return this.state.hasError ? null : this.props.children;",
+            "  }",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-root-layout-not-created": {
+    "expect": [
+      "SKIP src/app/_layout.tsx [net-connected] not yet created (app-startup-and-bootstrap creates it)",
+      "SKIP src/app/_layout.tsx [net-installed] not yet created (app-startup-and-bootstrap creates it)",
+      "SKIP src/app/_layout.tsx [root-boundary] not yet created (app-startup-and-bootstrap creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "src/app/_layout.tsx" }]
+  }
+}

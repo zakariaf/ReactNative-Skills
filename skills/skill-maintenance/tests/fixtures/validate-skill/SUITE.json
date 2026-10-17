@@ -1,0 +1,13 @@
+{
+  "base": [
+    "good",
+    {
+      "from": "@skill/scripts/check-lib.mjs",
+      "to": "skills/greeting-checks/scripts/check-lib.mjs"
+    },
+    {
+      "from": "@skill/scripts/check-lib.mjs",
+      "to": "shared/scripts/check-lib.mjs"
+    }
+  ]
+}

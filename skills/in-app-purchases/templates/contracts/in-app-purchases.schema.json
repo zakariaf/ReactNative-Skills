@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "in-app-purchases contract",
+  "description": "The app's purchase facts, read by the in-app-purchases skill's checkers. The developer decides them; the checkers hold the code, the StoreKit configuration and the App Store Connect script to them.",
+  "type": "object",
+  "required": [
+    "productId",
+    "familyShareable",
+    "price",
+    "storeTexts",
+    "paywallScreenDir",
+    "catalogKeys",
+    "priceKeys",
+    "stateTestIds"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "productId": {
+      "description": "The one non-consumable's id, the same in the App Store and on Google Play: lowercase letters, digits, '.' and '_', starting with a letter or digit, at most 40 characters (naming-conventions' product-id grammar, valid on both stores). Never changed or reused.",
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._]{0,39}$"
+    },
+    "familyShareable": {
+      "description": "Family Sharing for the product. Default false; once turned on in App Store Connect it can never be turned off for that product.",
+      "type": "boolean"
+    },
+    "price": {
+      "type": "object",
+      "required": ["amount", "currency", "baseTerritory"],
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "description": "The price point in the base territory's currency, as a decimal string ('2.99').",
+          "type": "string",
+          "pattern": "^\\d+(\\.\\d{1,2})?$"
+        },
+        "currency": {
+          "description": "ISO 4217 code of the base territory's currency.",
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "baseTerritory": {
+          "description": "App Store Connect territory id (ISO 3166-1 alpha-3): USA, DEU, GBR, ...",
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        }
+      }
+    },
+    "storeTexts": {
+      "description": "The product's display name (2-30 characters) and description (at most 45) per App Store Connect locale. The app never shows them.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["locale", "name", "description"],
+        "additionalProperties": false,
+        "properties": {
+          "locale": { "type": "string" },
+          "name": { "type": "string", "minLength": 2, "maxLength": 30 },
+          "description": { "type": "string", "minLength": 1, "maxLength": 45 }
+        }
+      }
+    },
+    "reviewNote": { "description": "What App Review reads about the product.", "type": "string" },
+    "paywallScreenDir": {
+      "description": "Folder of the paywall screen (its state test IDs are checked there).",
+      "type": "string"
+    },
+    "catalogKeys": {
+      "description": "Message keys every catalog must hold.",
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "priceKeys": {
+      "description": "Keys whose message shows the price: each takes {priceText}.",
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "stateTestIds": {
+      "description": "Test IDs the paywall screen must carry, one per state and notice.",
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "allowedApis": {
+      "description": "Opt-in server profile: expo-iap server APIs the app decided to use (verifyPurchase, verifyPurchaseWithProvider, kitApi, KitApiError). useIAP and auto-finishing can never be allowed.",
+      "type": "array",
+      "items": { "enum": ["verifyPurchase", "verifyPurchaseWithProvider", "kitApi", "KitApiError"] }
+    },
+    "allowedConfigWords": {
+      "description": "Opt-in store profiles: expo-iap plugin switches the app decided to use (iapkitApiKey, alternativeBilling, onside, horizon, fireOS, vegaOS and their EXPO_IAP_* variables).",
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "entitlementWritersAllowedIn": {
+      "description": "Globs or folders ending in / (besides the purchase service and the premium store) that may call grantPremium/revokePremium: test-only folders only (debug-menu-and-test-hooks' src/services/test-hooks/ and src/features/debug/).",
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

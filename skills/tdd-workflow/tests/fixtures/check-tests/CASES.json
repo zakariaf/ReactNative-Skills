@@ -1,0 +1,339 @@
+{
+  "bad-component-snapshot": {
+    "expect": ["[component-snapshot]", "src/ui/app-button.test.tsx:4"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/app-button.test.tsx",
+          "content": "// src/ui/app-button.test.tsx\ndescribe('AppButton', () => {\n  it('renders the button', () => {\n    expect({ tree: 'button' }).toMatchSnapshot();\n  });\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-contract-logic-glob": {
+    "expect": ["[untested-module]", "src/domain/discount.ts:1"],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/tdd.json",
+          "content": "{\n  \"$schema\": \"./tdd.schema.json\",\n  \"logicGlobs\": [\"src/domain/**\", \"src/features/**\"]\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/domain/discount.ts",
+          "content": "// src/domain/discount.ts\nexport const discountPercent = (items: number): number => (items >= 5 ? 15 : items >= 3 ? 10 : 0);\n"
+        }
+      }
+    ]
+  },
+  "bad-describe-generic": {
+    "expect": ["[describe-generic]", "src/services/clock/fake-clock.test.ts:4"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/clock/fake-clock.test.ts",
+          "find": "describe('createFakeClock'",
+          "with": "describe('tests'"
+        }
+      }
+    ]
+  },
+  "bad-device-only-reason": {
+    "expect": ["[device-only-reason]", "src/services/clock/system-clock-adapter.ts:2"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/clock/system-clock-adapter.ts",
+          "content": "// src/services/clock/system-clock-adapter.ts\n// device-only: trivial\nexport function createSystemClockAdapter(): { readonly nowMs: () => number } {\n  return { nowMs: () => Date.now() };\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-disabled-concurrent": {
+    "expect": ["[disabled-test]", "src/features/tasks/task-urgency.test.ts:8"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/task-urgency.test.ts",
+          "find": "  it('returns today",
+          "with": "  it.concurrent.only('returns today"
+        }
+      }
+    ]
+  },
+  "bad-disabled-test": {
+    "expect": ["[disabled-test]", "src/features/tasks/task-urgency.test.ts:8"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/task-urgency.test.ts",
+          "find": "  it('returns today",
+          "with": "  it.skip('returns today"
+        }
+      }
+    ]
+  },
+  "bad-no-assertion": {
+    "expect": ["[test-without-assertion]", "src/features/tasks/count-open.test.ts:1"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/count-open.test.ts",
+          "content": "// src/features/tasks/count-open.test.ts\ndescribe('countOpen', () => {\n  it('counts the open tasks', () => {\n    const open = [1, 2, 3].length;\n    void open;\n  });\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-node-in-app-test": {
+    "expect": ["[node-api-in-app-test]", "src/data/tasks/task-file.test.ts:2", "node:fs"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/tasks/task-file.test.ts",
+          "content": "// src/data/tasks/task-file.test.ts\nimport { readFileSync } from 'node:fs';\n\ndescribe('taskFile', () => {\n  it('reads the fixture', () => {\n    expect(readFileSync).toBeDefined();\n  });\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-nondeterminism": {
+    "expect": [
+      "[test-nondeterminism]",
+      "src/core/dates/day-number.test.ts:6",
+      "test/integration/tasks/load.perf.test.ts:4"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/core/dates/day-number.test.ts",
+          "content": "// src/core/dates/day-number.test.ts\nimport { dayNumber } from './day-number';\n\ndescribe('dayNumber', () => {\n  it('returns a day for now', () => {\n    expect(dayNumber(Date.now())).toBeGreaterThan(0);\n  });\n});\n"
+        }
+      },
+      {
+        "write": {
+          "file": "test/integration/tasks/load.perf.test.ts",
+          "content": "// test/integration/tasks/load.perf.test.ts: the global performance.now is the Jest preset's 1 ms mock.\ndescribe('taskLoad', () => {\n  it('loads the tasks quickly', () => {\n    const start = performance.now();\n    expect(performance.now() - start).toBeLessThan(5);\n  });\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-real-wait": {
+    "expect": [
+      "[test-nondeterminism]",
+      "src/services/clock/fake-clock.test.ts:11",
+      "real setTimeout wait",
+      "1 problems"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/clock/fake-clock.test.ts",
+          "content": "// src/services/clock/fake-clock.test.ts\nimport { createFakeClock } from './fake-clock';\n\ndescribe('createFakeClock', () => {\n  afterEach(() => {\n    jest.useRealTimers();\n  });\n\n  it('returns the time it was given', async () => {\n    const clock = createFakeClock(5);\n    await new Promise((resolve) => setTimeout(resolve, 50));\n    expect(clock.nowMs()).toBe(5);\n  });\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-retry": {
+    "expect": ["[test-retry]", "src/features/tasks/task-urgency.test.ts:7"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/task-urgency.test.ts",
+          "find": "describe('taskUrgency', () => {",
+          "with": "jest.retryTimes(3);\ndescribe('taskUrgency', () => {"
+        }
+      }
+    ]
+  },
+  "bad-scripts-build-test": {
+    "expect": ["[disabled-test]", "scripts/build/build-steps.test.ts:5"],
+    "ops": [
+      {
+        "$comment": "scripts/build/ is tooling source and is scanned; only the root build/ output folder is skipped.",
+        "replace": { "file": "scripts/build/build-steps.test.ts", "find": "  it('lists", "with": "  it.skip('lists" }
+      }
+    ]
+  },
+  "bad-spec-file": {
+    "expect": ["[test-file-name]", "src/features/tasks/__tests__/task-urgency.spec.ts"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/__tests__/task-urgency.spec.ts",
+          "content": "// src/features/tasks/__tests__/task-urgency.spec.ts\nimport { taskUrgency } from '../task-urgency';\n\ndescribe('taskUrgency', () => {\n  it('returns today for a task due today', () => {\n    expect(taskUrgency(0)).toBe('today');\n  });\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-test-in-routes": {
+    "expect": ["[test-in-routes]", "src/app/(app)/index.test.tsx:1"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/(app)/index.test.tsx",
+          "content": "// src/app/(app)/index.test.tsx: Expo Router bundles every file in src/app/ as a route.\nimport TasksRoute from './index';\n\ndescribe('TasksRoute', () => {\n  it('renders nothing yet', () => {\n    expect(TasksRoute()).toBeNull();\n  });\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-title": {
+    "expect": ["[test-title-verb]", "src/features/tasks/task-urgency.test.ts:8", "should return today"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/task-urgency.test.ts",
+          "find": "it('returns today for",
+          "with": "it('should return today for"
+        }
+      }
+    ]
+  },
+  "bad-title-generic-each": {
+    "expect": ["[test-title-verb]", "src/features/tasks/task-urgency.test.ts:16", "should return the right urgency"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/task-urgency.test.ts",
+          "find": "  it.each([\n    [2, 'soon'],\n    [3, 'later'],\n  ] as const)('returns the right urgency %i days ahead',",
+          "with": "  it.each<[number, string]>([\n    [2, 'soon'],\n    [3, 'later'],\n  ])('should return the right urgency %i days ahead',"
+        }
+      }
+    ]
+  },
+  "bad-untested-behind-alias": {
+    "expect": ["[untested-module]", "src/core/dates/day-number.ts:1"],
+    "ops": [{ "delete": "src/features/tasks/components/task-row.test.tsx" }]
+  },
+  "bad-untested-export-list": {
+    "expect": ["[untested-module]", "src/features/notes/note-title.ts:1", "1 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/notes/note-limits.ts",
+          "content": "// src/features/notes/note-limits.ts: constants only, listed in export { } (no test needed).\nconst MAX_NOTES = 500;\nconst MAX_BODY = 10_000;\n\nexport { MAX_BODY, MAX_NOTES };\nexport type { NoteLimit } from './note-limit-type';\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/notes/note-title.ts",
+          "content": "// src/features/notes/note-title.ts\nconst MAX_TITLE = 80;\n\nfunction isBlank(title: string): boolean {\n  return title.trim() === '';\n}\n\nexport { isBlank, MAX_TITLE };\n"
+        }
+      }
+    ]
+  },
+  "bad-untested-fake": {
+    "expect": ["[untested-module]", "src/services/clock/fake-clock.ts:1"],
+    "ops": [{ "delete": "src/services/clock/fake-clock.test.ts" }]
+  },
+  "bad-untested-module": {
+    "expect": ["[untested-module]", "src/features/tasks/list-due.ts:1"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/list-due.ts",
+          "content": "// src/features/tasks/list-due.ts\nexport function listDue(days: readonly number[]): readonly number[] {\n  return days.filter((day) => day <= 0);\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-use-test": {
+    "expect": ["[use-it]", "src/features/tasks/task-urgency.test.ts:12"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/task-urgency.test.ts",
+          "find": "  it('returns overdue",
+          "with": "  test('returns overdue"
+        }
+      }
+    ]
+  },
+  "bad-workspace-node-api": {
+    "expect": ["[node-api-in-app-test]", "apps/mobile/src/core/money.test.ts:2"],
+    "ops": [
+      {
+        "$comment": "When multi-package: each workspace's src/ is app code too (package.json workspaces, never hard-coded folders).",
+        "json": { "file": "package.json", "path": ["workspaces"], "value": ["apps/*"] }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/package.json",
+          "json": { "name": "@acme/mobile", "dependencies": { "expo": "~57.0.26" } }
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/src/core/money.ts",
+          "lines": ["export const cents = (amount: number): number => Math.round(amount * 100);"]
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/src/core/money.test.ts",
+          "lines": [
+            "// apps/mobile/src/core/money.test.ts",
+            "import { join } from 'node:path';",
+            "",
+            "import { cents } from './money';",
+            "",
+            "describe('cents', () => {",
+            "  it('rounds to whole cents', () => {",
+            "    expect(cents(1.005) + join('a').length).toBe(101);",
+            "  });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "error-bad-contract": {
+    "expect": ["ERROR [bad-input] contracts/tdd.json: unknown key \"logicGlob\""],
+    "ops": [{ "write": { "file": "contracts/tdd.json", "content": "{ \"logicGlob\": [\"src/domain/**\"] }\n" } }]
+  },
+  "pass-generated-module": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/task-icon-paths.ts",
+          "content": "// src/features/tasks/task-icon-paths.ts\n// GENERATED by scripts/art/build-icon-paths.ts from design/icon-layers.json; do not edit.\nexport function taskIconPath(name: string): string {\n  return name === 'check' ? 'M0 0L1 1' : '';\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-vendored-skill-silent": {
+    "expect": ["check-tests: 16 test files and logic modules checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "A vendored skill (any folder holding a SKILL.md) is pruned from the repo scan wherever it lives.",
+        "write": {
+          "file": "src/services/planted-skill/SKILL.md",
+          "lines": [
+            "---",
+            "name: planted-skill",
+            "description: A vendored skill whose fixtures plant bugs on purpose.",
+            "---"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/planted-skill/tests/x.test.ts",
+          "lines": [
+            "describe('tests', () => {",
+            "  it.only('should stay focused on purpose', () => {",
+            "    jest.retryTimes(2);",
+            "  });",
+            "});"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/planted-skill/scripts/untested.ts",
+          "lines": ["export function untested(): number {", "  return Date.now();", "}"]
+        }
+      }
+    ]
+  }
+}

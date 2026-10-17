@@ -1,0 +1,5 @@
+{
+  "$schema": "./canvas-surfaces.schema.json",
+  "paletteSets": ["light", "dark"],
+  "surfaces": []
+}

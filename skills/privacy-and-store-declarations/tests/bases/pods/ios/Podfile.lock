@@ -1,0 +1,18 @@
+PODS:
+  - ExpoFileSystem (57.0.7)
+  - Google-Mobile-Ads-SDK (13.6.0)
+  - GoogleUserMessagingPlatform (3.1.0)
+  - React-Core (0.86.3)
+
+SPEC REPOS:
+  trunk:
+    - Google-Mobile-Ads-SDK
+    - GoogleUserMessagingPlatform
+
+EXTERNAL SOURCES:
+  ExpoFileSystem:
+    :path: "../vendor/expo-file-system/ios"
+  React-Core:
+    :path: "../vendor/react-native"
+
+COCOAPODS: 1.16.2

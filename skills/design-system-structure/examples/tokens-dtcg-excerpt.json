@@ -1,0 +1,26 @@
+{
+  "$description": "Example: the W3C design-token (DTCG) spellings the token file reader accepts. $value leaves, $type and other $ keys as metadata, aliases as {dot.path}, px dimensions as { value, unit }. Each resolves to the plain value the theme modules hold (color.light.background -> \"#F5F6F8\", spacing.md -> 12).",
+  "color": {
+    "$type": "color",
+    "primitive": {
+      "neutral": {
+        "97": { "$value": "#F5F6F8", "$description": "OKLCH lightness 0.97" },
+        "20": { "$value": "#15171C" }
+      }
+    },
+    "light": {
+      "background": { "$value": "{color.primitive.neutral.97}" },
+      "text": { "$value": "{color.primitive.neutral.20}" }
+    }
+  },
+  "spacing": {
+    "$type": "dimension",
+    "sm": { "$value": { "value": 8, "unit": "px" } },
+    "md": { "$value": { "value": 12, "unit": "px" } }
+  },
+  "motion": {
+    "spring": {
+      "release": { "$value": { "damping": 14, "stiffness": 420, "mass": 1 } }
+    }
+  }
+}

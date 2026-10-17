@@ -1,0 +1,61 @@
+# .github/workflows/release.yml
+# Starts a store build on EAS, by hand only: a developer picks the platform under Actions > release >
+# Run workflow, and the protected "production" environment (Settings > Environments: required
+# reviewers, main only) holds EXPO_TOKEN and waits for a reviewer's approval before anything runs.
+# The release preflight (eas-build-and-submit) runs first: a clean tree on main, `npm run verify`,
+# the app config and the fingerprint. The build is not submitted here; submitting to a store is the
+# developer's next, separate step. No cache is restored in a job that holds a secret.
+name: release
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: Which store build to start
+        type: choice
+        options: [all, ios, android]
+        default: all
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+env:
+  LEFTHOOK: '0'
+  EXPO_NO_TELEMETRY: '1'
+
+jobs:
+  eas-build:
+    name: eas build (production)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    environment: production
+    steps:
+      - name: Check out with the release tags
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Set up Node from .nvmrc (no cache in a job with secrets)
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - name: Install the locked dependencies
+        run: npm ci
+      - name: Install the pinned EAS CLI with the dependency policy
+        run: npm install -g --min-release-age=7 --ignore-scripts eas-cli@24.10.0
+      - name: Release preflight
+        run: node scripts/eas/release-preflight.ts --profile production --platform "$PLATFORM"
+        env:
+          PLATFORM: ${{ inputs.platform }}
+      - name: Start the EAS build
+        run: >-
+          eas build --profile production --platform "$PLATFORM" --non-interactive
+          --freeze-credentials --no-wait --message "release from $GITHUB_SHA"
+        env:
+          PLATFORM: ${{ inputs.platform }}
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}

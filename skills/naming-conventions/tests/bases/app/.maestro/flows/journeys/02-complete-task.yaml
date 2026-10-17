@@ -1,0 +1,11 @@
+# .maestro/flows/journeys/02-complete-task.yaml
+appId: ${APP_ID}
+name: Completing a task moves it below the open ones
+---
+- launchApp
+- tapOn:
+    id: 'tasks.task-row.task-1'
+- extendedWaitUntil:
+    visible:
+      id: 'tasks.list'
+    timeout: 10000

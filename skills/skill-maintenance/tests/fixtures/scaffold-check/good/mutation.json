@@ -1,0 +1,128 @@
+[
+  {
+    "replace": {
+      "file": "store-listing-texts/SKILL.md",
+      "find": "Checks __FILL_SUBJECT__ in the app. Use when __FILL_TRIGGER_WORDS__. Not for __FILL_NEIGHBOUR_WORK__ (__FILL_NEIGHBOUR_SKILL__).",
+      "with": "Checks App Store and Play listing texts for prices and other platforms. Use when writing or changing store texts or release notes. Not for exporting lists (run-list-export)."
+    }
+  },
+  {
+    "replace": {
+      "file": "store-listing-texts/SKILL.md",
+      "find": "__FILL_WHAT_THIS_SKILL_MAKES_TRUE__",
+      "with": "Keeps every store listing text free of the two things review rejects most: prices and other platforms."
+    }
+  },
+  {
+    "replace": {
+      "file": "store-listing-texts/SKILL.md",
+      "find": "1. **__FILL_MOST_IMPORTANT_RULE__** __FILL_WHY_IT_MATTERS__",
+      "with": "1. **No prices in any listing text.** Prices differ per storefront and change, and both stores reject metadata that states them."
+    }
+  },
+  {
+    "replace": {
+      "file": "store-listing-texts/SKILL.md",
+      "find": "2. **__FILL_NEXT_RULE__** __FILL_WHY_IT_MATTERS__",
+      "with": "2. **No other platforms.** Naming the other store in a listing breaks review guidelines and blocks the release."
+    }
+  },
+  {
+    "replace": {
+      "file": "store-listing-texts/SKILL.md",
+      "find": "__FILL_WHEN_TO_READ_IT__",
+      "with": "before writing any listing text"
+    }
+  },
+  {
+    "replace": {
+      "file": "store-listing-texts/SKILL.md",
+      "find": "__FILL_THE_WORK_STEP_BY_STEP__",
+      "with": "Write each text in `store/<locale>/<field>.txt`, one file per field and locale."
+    }
+  },
+  {
+    "replace": {
+      "file": "store-listing-texts/SKILL.md",
+      "find": "__FILL_A_CONCRETE_CHECKABLE_ITEM__",
+      "with": "Every field of every locale has its text file."
+    }
+  },
+  {
+    "replace": {
+      "file": "store-listing-texts/SKILL.md",
+      "find": "**__FILL_WHAT_GOES_WRONG__** __FILL_WHAT_TO_DO_INSTEAD__",
+      "with": "**\"Only 1.99 for Premium!\" in the description.** Put prices in the store price table, never in the text."
+    }
+  },
+  {
+    "replace": {
+      "file": "store-listing-texts/SKILL.md",
+      "find": "__FILL_WHAT_THE_REFERENCE_HOLDS__",
+      "with": "Field limits, the two review rules and a worked listing"
+    }
+  },
+  {
+    "replace": {
+      "file": "store-listing-texts/SKILL.md",
+      "find": "- `__FILL_RELATED_SKILL__` - __FILL_WHEN_TO_HAND_OFF__",
+      "with": "- `run-list-export` - exporting lists, which has nothing to do with listing texts."
+    }
+  },
+  {
+    "replace": {
+      "file": "store-listing-texts/references/background.md",
+      "find": "__FILL_WHAT_THIS_REFERENCE_EXPLAINS_AND_WHEN_TO_READ_IT__",
+      "with": "The review rules for listing texts. Read it before writing any text."
+    }
+  },
+  {
+    "replace": {
+      "file": "store-listing-texts/references/background.md",
+      "find": "__FILL_THE_KNOWLEDGE_COPIED_INTO_THIS_SKILL__",
+      "with": "Both stores reject listing metadata that states prices or names other platforms."
+    }
+  },
+  {
+    "replace": {
+      "file": "store-listing-texts/references/background.md",
+      "find": "__FILL_ONE_COMPLETE_REALISTIC_EXAMPLE__",
+      "with": "\"Plan your day with lists and reminders.\" passes; \"Only 1.99, also on the other store\" fails twice."
+    }
+  },
+  {
+    "replace": {
+      "file": "store-listing-texts/scripts/check-rules.mjs",
+      "find": "__FILL_RULE_ID__",
+      "with": "no-price"
+    }
+  },
+  {
+    "replace": {
+      "file": "store-listing-texts/scripts/check-rules.mjs",
+      "find": "__FILL_PATTERN__",
+      "with": "\\d+[.,]\\d{2}\\s?(?:EUR|USD|\\$)"
+    }
+  },
+  {
+    "replace": {
+      "file": "store-listing-texts/scripts/check-rules.mjs",
+      "find": "__FILL_WHAT_IS_WRONG__",
+      "with": "a listing text states a price"
+    }
+  },
+  {
+    "replace": {
+      "file": "store-listing-texts/scripts/check-rules.mjs",
+      "find": "__FILL_HOW_TO_FIX_IT__",
+      "with": "Remove the price; the store shows it from the price table."
+    }
+  },
+  {
+    "replace": {
+      "file": "store-listing-texts/tests/fixtures/bad-example/EXPECT.txt",
+      "find": "[__FILL_RULE_ID__]",
+      "with": "[no-price]"
+    }
+  }
+]

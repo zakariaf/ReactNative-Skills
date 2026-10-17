@@ -1,0 +1,230 @@
+# Recorded error lines: '<expected catalogue id><TAB><the exact text a run printed>'. check-catalogue.mjs
+# proves each line ranks its entry first, and that every entry with match patterns has at least one line.
+# Add the first error line of every newly solved failure here (workflow step 7).
+build-config-no-type-stripping	Error reading Expo config at app.config.ts: TypeError [ERR_UNKNOWN_FILE_EXTENSION]: Unknown file extension ".ts" for /repo/scripts/metro/public-env-cache-version.ts
+build-config-missing-ts-extension	Error reading Expo config at /repo/app.config.ts: Cannot find module './src/config/app-variant' imported from /repo/app.config.ts
+build-module-typeless-warning	(node:41237) Warning: [MODULE_TYPELESS_PACKAGE_JSON] Module type of file:///repo/scripts/quality/run-verify.ts is not specified
+build-variant-mismatch	Error: EXPO_PUBLIC_APP_VARIANT=development must equal APP_VARIANT=production: the JS bundle and the native app must agree
+build-variant-unset	Error: APP_VARIANT and EXPO_PUBLIC_APP_VARIANT are not set: production bundles and EAS builds name their variant (development|preview|production)
+build-metro-cache-variant	check-apk [test-code]: production bundle still contains test-only code (sentinel found in index.android.bundle)
+build-imported-constant-gate	the debug entry is still in main.jsbundle although src/test-only.ts gates it with IS_TEST_BUILD
+build-gad-app-id-missing	*** Terminating app due to uncaught exception 'GADInvalidInitializationException', reason: 'The Google Mobile Ads SDK was initialized without an application ID. Set GADApplicationIdentifier in Info.plist'
+build-gad-app-id-missing	java.lang.IllegalStateException: Missing application ID. AdMob publishers should follow the instructions to add a valid App ID inside the AndroidManifest.xml
+build-plugin-not-installed	PluginError: Failed to resolve plugin for module "expo-splash-screen" relative to "/repo". Do you have node modules installed?
+build-expo-system-ui-warning	» android: userInterfaceStyle: Install expo-system-ui in your project to enable this feature.
+build-edge-to-edge-option	» android: EDGE_TO_EDGE_PLUGIN: `edgeToEdgeEnabled` customization is no longer available - Android 16 makes edge-to-edge mandatory.
+build-preflight-script-missing	preflight failed, nothing was built: package.json has no "audit:privacy" script
+build-reload-during-bundle-eval	Unhandled JS Exception: AppRegistryBinding::startSurface failed. Global was not installed.
+build-blank-nav-background	FAIL reports/ios-sim/home.png [blank-screen] the screenshot is one colour (#F2F2F2)
+build-metro-template-import	Invalid call at line 12: import(`./locales/${language}`)
+build-metro-export-error-faster	error: Failed to run "Bundle React Native code and images" (exit code 65)
+build-metro-export-error-faster	> Task :app:createBundleReleaseJsAndAssets FAILED
+build-native-module-missing	Error: Cannot find native module 'ExpoSecureStore', js engine: hermes
+ios-wrong-xcode	FAIL build/ios-sim/LineApp.app/Info.plist [toolchain] DTXcode is "2700", expected the pinned Xcode
+ios-xcode-licence	You have not agreed to the Xcode license agreements. Please run 'sudo xcodebuild -license' from within a Terminal window
+ios-simctl-clt	xcrun: error: unable to find utility "simctl", not a developer tool or in PATH
+ios-derived-data-module-cache	error: precompiled file '/repo-copy/build/ios-sim/dd/ModuleCache.noindex/SwiftShims-1.pcm' was compiled with module cache path '/repo/build/ios-sim/dd/ModuleCache.noindex'
+ios-derived-data-module-cache	error: missing required module 'SwiftShims'
+ios-pod-download	[!] CDN: trunk URL couldn't be downloaded: https://cdn.cocoapods.org/all_pods_versions_a_7_5.txt Response: Couldn't connect to server
+ios-skia-prebuilt-missing	[!] react-native-skia: Skia prebuilt binaries not found. Run `npx install-skia`
+ios-sim-signing	error: Signing for "TasksApp" requires a development team. Select a development team in the Signing & Capabilities editor.
+ios-pod-native-error	** BUILD FAILED ** The following build commands failed: SwiftCompile normal arm64 ExpoModulesCore
+ios-screenshot-dev-null	xcrun simctl io 1B2C screenshot /dev/null: Error: Operation not permitted
+ios-status-bar-time-format	An error was encountered processing the command: Invalid, non-ISO date/time string: 9:41 AM
+ios-openurl-alert	Open in “Tasks”? Cancel Open
+ios-other-sessions-simulators	xcrun simctl shutdown all
+ios-simulator-insufficient-resources	An error was encountered processing the command (domain=com.apple.CoreSimulator.SimError, code=405): Unable to boot device due to insufficient system resources
+ios-already-booted	An error was encountered processing the command (code=149): Unable to boot device in current state: Booted
+ios-disk-full	error: unable to write file: No space left on device
+ios-app-not-ready	the app was not ready after 30 s (no ready signal in the perf log)
+android-jdk-missing	BUG! exception in phase 'semantic analysis' in source unit '_BuildScript_' Unsupported class file major version 65
+android-sdk-location	SDK location not found. Define a valid SDK location with an ANDROID_HOME environment variable or by setting the sdk.dir path
+android-sdk-licences	Failed to install the following Android SDK packages as some licences have not been accepted. ndk;27.1.12297006 NDK (Side by side)
+android-ndk-offline	No version of NDK matched the requested version 27.1.12297006. Versions available locally:
+android-maven-download	> Could not resolve all files for configuration ':app:debugRuntimeClasspath'.
+android-kotlin-metaspace	e: java.lang.OutOfMemoryError: Metaspace (compileReleaseKotlin)
+android-gradle-heap	Gradle build daemon disappeared unexpectedly (it may have been killed or may have crashed)
+android-emulator-no-boot	ERROR | x86_64 emulation currently requires hardware acceleration!
+android-adb-unnamed-device	adb: error: failed to get feature set: more than one device/emulator
+android-system-ui-not-responding	the screenshot shows "System UI isn't responding" with Close app and Wait
+android-no-matching-abis	Failure [INSTALL_FAILED_NO_MATCHING_ABIS: Failed to extract native libraries, res=-113]
+android-update-incompatible	Failure [INSTALL_FAILED_UPDATE_INCOMPATIBLE: Existing package com.acme.tasks signatures do not match newer version; ignoring!]
+android-no-certificates	Failure [INSTALL_PARSE_FAILED_NO_CERTIFICATES: Failed collecting certificates for /data/app/vmdl.tmp/base.apk]
+android-older-sdk	Failure [INSTALL_FAILED_OLDER_SDK: Failed parse during installPackageLI: Requires newer sdk version #26 (current version is #24)]
+android-missing-so	java.lang.UnsatisfiedLinkError: couldn't find "libreanimated.so"
+android-page-alignment	FAIL build/android-emu/app.apk [page-alignment] lib/arm64-v8a/libaudio.so is not 16 KB aligned
+android-upload-key-mismatch	Owner of the bundle: CN=Android Debug, O=Android, C=US
+android-keystore-password	Execution failed for task ':app:signReleaseBundle'. > Keystore was tampered with, or password was incorrect
+android-version-code-used	Error: Version code 14 has already been used. (Play Developer API, edits.bundles.upload)
+release-keychain-locked	/repo/build/ios-release/TasksApp.app: errSecInternalComponent Command CodeSign failed with a nonzero exit code
+release-codesign-access-dialog	codesign wants to access key "Apple Distribution: Acme" in your keychain.
+release-no-profiles	error: No profiles for 'com.acme.tasks' were found: Xcode couldn't find any iOS App Development provisioning profiles matching 'com.acme.tasks'.
+release-agreement	The latest Program License Agreement has not been agreed to (PLA Update available)
+release-no-app-record	ERROR: Unable to upload: cannot determine the Apple ID for bundle ID 'com.acme.tasks'
+release-not-authorized	*** Error: NOT_AUTHORIZED Authentication credentials are missing or invalid. (HTTP 401)
+release-forbidden	{"errors":[{"status":"403","code":"FORBIDDEN_ERROR","title":"This request is forbidden for security reasons"}]}
+release-processing-invalid	processing finished: processingState INVALID for build 14
+release-itms-90189	ERROR ITMS-90189: "Redundant Binary Upload. You've already uploaded a build with build number '14' for version number '1.2.0'."
+release-itms-90062	ERROR ITMS-90062: "This bundle is invalid. The value for key CFBundleShortVersionString [1.0.0] must contain a higher version than that of the previously approved version"
+release-itms-90683	ITMS-90683: Missing purpose string in Info.plist - Your app's code references one or more APIs that access sensitive user data (NSMicrophoneUsageDescription)
+release-itms-privacy	ITMS-91053: Missing API declaration - Your app's code in the "TasksApp" file references one or more APIs that require reasons
+release-processing-timeout	processing did not reach VALID within 60 minutes (last state PROCESSING)
+release-processing-rest-error	the upload finished, but reading the processing state failed: HTTP 503
+release-cannot-resume	cannot resume: HEAD is "fix(tasks): keep order", not "chore(release): build 14"
+release-app-store-method	warning: --exportOptionsPlist: "app-store" is deprecated, use "app-store-connect" instead
+release-gate-failed	ERROR store-artifact gate failed: 2 problems in build/ios-release/export/TasksApp.ipa
+release-test-ids-in-bundle	grep -c 3940256099942544 main.jsbundle prints 18
+release-ship-placeholder	FAIL app.config.ts:31 [ship-placeholder] ios.bundleIdentifier com.example.tasks is a placeholder
+release-rehearsal-unsigned	FAIL build/ios-release/export/TasksApp.ipa [signing] the app is not signed (codesign -d failed)
+release-eas-auto-submit	eas build --profile production --platform android --auto-submit
+release-eas-new-keystore	? Generate a new Android Keystore? › (Y/n)
+deps-release-age-etarget	npm error code ETARGET npm error notarget No matching version found for expo-iap@5.9.0.
+deps-expo-patch-younger-than-7-days	The following packages should be updated for best compatibility: expo@57.0.27 - expected version: ~57.0.28
+deps-typescript-eslint-two-copies	ConfigError: Config "UserConfig[0][4] > typescript-eslint/base": Key "plugins": Cannot redefine plugin "@typescript-eslint".
+deps-duplicate-native-peer	✖ Check that no duplicate dependencies are installed: Found duplicates for react-native-screens
+deps-eslint-10-crash	TypeError: contextOrFilename.getFilename is not a function Occurred while linting /repo/src/app/_layout.tsx
+deps-test-renderer-1-3	npm ls test-renderer: └── test-renderer@1.3.0 (peer of @testing-library/react-native@14.0.1)
+deps-approve-scripts-exit	Packages with unreviewed install scripts: fsevents@2.3.3 (exit code 0)
+deps-fsevents-install-script	fsevents@2.3.3 has an install script: node-gyp rebuild
+deps-npm-audit-fix	23 moderate severity vulnerabilities To address all issues, run: npm audit fix
+deps-companion-types	test/goldens/skia-golden.ts(3,36): error TS7016: Could not find a declaration file for module 'jest-image-snapshot'.
+deps-fast-check-missing	src/core/tasks/sort-tasks.test.ts(1,21): error TS2307: Cannot find module 'fast-check' or its corresponding type declarations.
+deps-knip-skills-folder	Unlisted dependencies (477)
+deps-knip-expo-updates	Unlisted dependencies (1) expo-updates app.config.ts
+deps-knip-unlisted-binaries	Unlisted binaries (2) plutil scripts/ios/build-steps.ts
+deps-knip-root-mocks	Unlisted dependencies (1) react-native-audio-api __mocks__/react-native-audio-api.ts
+deps-knip-test-only-exports	Unused exports (3) createDebugServices src/test-only-entry.ts:12:17
+lint-ts2593-jest-types	src/core/tasks/sort-tasks.test.ts(3,1): error TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner?
+lint-ts2591-process	src/config/environment.ts(4,15): error TS2591: Cannot find name 'process'.
+lint-ts4111-env	error TS4111: Property 'EXPO_PUBLIC_API_URL' comes from an index signature, so it must be accessed with ['EXPO_PUBLIC_API_URL'].
+lint-ts1294-erasable	src/core/tasks/priority.ts(1,1): error TS1294: This syntax is not allowed when 'erasableSyntaxOnly' is enabled.
+lint-expo-env-textstyle	src/ui/app-text.tsx(22,7): error TS2353: Object literal may only specify known properties, and 'fontFamily' does not exist in type 'TextStyle'
+lint-ts2769-navigate-never	error TS2769: No overload matches this call. Argument of type '"settings"' is not assignable to parameter of type 'never'.
+lint-await-fireevent	src/features/tasks/tasks-screen.test.tsx 12:5 error `fireEvent.press` is sync and does not need `await` operator testing-library/no-await-sync-events
+lint-complexity-switch	src/core/tasks/task-reducer.ts 8:1 error Function 'taskReducer' has a complexity of 12. Maximum allowed is 10 complexity
+lint-inline-disable-inert	src/features/tasks/tasks-screen.tsx 3:1 error '/*eslint-disable*/' has no effect because you have 'noInlineConfig' setting in your config
+lint-import-order-type	src/features/tasks/use-tasks-model.ts 4:1 error There should be at least one empty line between import groups import/order
+lint-unbound-method-tests	src/services/clock/system-clock.test.ts 9:12 error Avoid referencing unbound methods which may cause unintentional scoping of `this` @typescript-eslint/unbound-method
+lint-no-dynamic-env-var	src/config/environment.ts 5:20 error Unexpected dynamic access. Cannot dynamically access process.env expo/no-dynamic-env-var
+lint-require-imports	src/features/debug/debug-screen.tsx 7:15 error A `require()` style import is forbidden @typescript-eslint/no-require-imports
+lint-max-lines-data	src/theme/palette.ts 1:1 error File has too many lines (412). Maximum allowed is 250 max-lines
+lint-boolean-constant-naming	src/config/flags.ts 2:14 error Variable name `IS_DEBUG_BUILD` trimmed as `DEBUG_BUILD` must have one of the following prefixes: is, has, can
+lint-blocklist-invalid-pattern	Error: check-file/filename-blocklist: invalid pattern in the suggestion "kebab case please"
+lint-test-title-verb	src/core/tasks/sort-tasks.test.ts 5:6 error should match /^(can|[a-z]+s)\b/u jest/valid-title
+lint-prefer-to-be	src/core/tasks/count-tasks.test.ts 6:30 error Use `toBe` when expecting primitive literals jest/prefer-to-be
+lint-makestyles-unused	src/ui/task-row.tsx 14:3 error Unused style detected: undefined.base react-native/no-unused-styles
+lint-compiler-try-catch	React Compiler has skipped optimizing this component: Todo: (BuildHIR::lowerStatement) Support value blocks within a try/catch statement
+testing-babel-config-missing	SyntaxError: /repo/node_modules/@react-native/jest-preset/jest/setup.js: Unexpected token, expected "," (Flow)
+testing-esm-transform	SyntaxError: Cannot use import statement outside a module /repo/node_modules/standard-navigation/dist/index.js:1
+testing-native-module-import	Invariant Violation: TurboModuleRegistry.getEnforcing(...): 'RNGoogleMobileAdsModule' could not be found. Verify that a module by this name is registered in the native binary.
+testing-skia-jsi-unit	Error: Native Skia Module failed to correctly install JSI Bindings!
+testing-reanimated-resolver	Cannot find module 'react-native-reanimated/jest/resolver' from 'jest.config.js'
+testing-duplicate-manual-mock	jest-haste-map: duplicate manual mock found: expo-iap The following files share their name; please delete one of them: vendor/purchase-kit/__mocks__/expo-iap.ts
+testing-rntl-async	Warning: An update to TasksScreen inside a test was not wrapped in act(...).
+testing-store-reset-after-each	FAIL src/features/tasks/use-task-list.test.tsx:9 [testing-store-reset-after-each] resets a store in afterEach, before React Testing Library unmounts: the update reaches a mounted subscriber outside act(); reset it in beforeEach
+testing-router-pathname	TypeError: screen.getPathname is not a function at Object.toHavePathname
+testing-ci-snapshot	New snapshot was not written. The update flag must be explicitly passed to write a new snapshot.
+testing-obsolete-snapshot	1 snapshot obsolete from 1 test suite. To remove it, run `npm test -- -u`.
+testing-coverage-missing-dir	Jest: Coverage data for ./src/data/ was not found.
+testing-coverage-untested-templates	Jest: "global" coverage threshold for statements (90%) not met: 83.8%
+testing-subset-coverage-threshold	Jest: "global" coverage threshold for statements (90%) not met: 6.18%
+testing-untested-helper	FAIL src/core/tasks/sort-tasks.ts [untested-module] has no test of its own
+testing-stryker-worklet	TypeError: "stryNS_9fa48" is read-only
+testing-stryker-worklet	[Reanimated] useAnimatedStyle was used without a dependency array or Babel plugin. Please explicitly pass a dependency array, or enable the Babel plugin.
+testing-stryker-nan-score	Final mutation score of NaN is greater than or equal to break threshold 70
+e2e-maestro-java	The operation couldn't be completed. Unable to locate a Java Runtime.
+e2e-maestro-airplane	- setAirplaneMode: enabled
+e2e-maestro-ai-commands	- assertNoDefectsWithAI
+e2e-maestro-tags-flag	Unknown option: '--tags' (maestro test --tags smoke .maestro/flows)
+e2e-maestro-evalscript-colon	Parsing Failed at 23:60 while reading .maestro/flows/tasks/02-add-task.yaml
+e2e-maestro-text-match-case	Element not found: Text matching regex: Open
+e2e-maestro-launchapp-permissions	the tracking prompt never appears after launchApp: the ATT status already reads authorized
+e2e-debug-link-before-ready	the debug link is ignored after launchApp clearState: no language or screen was applied
+e2e-hierarchy-other-device	maestro hierarchy shows another screen or language than this run opened
+e2e-driver-port-shared	Failed to connect to the XCTest driver on port 7001: Address already in use
+e2e-hierarchy-500-hang	Exception in thread "main" UnknownFailure(errorResponse=Request for viewHierarchy failed, code: 500, body: )
+e2e-busy-machine-timeouts	flows timed out while the load average was 612 on 12 cores
+e2e-network-guard-blocks-metro	network guard blocked websocket ws://localhost:8081/hot?bundleEntry=index.ts
+e2e-android-adb-reverse	Unable to load script. Make sure you're either running Metro or that your bundle 'index.android.bundle' is packaged correctly for release.
+animation-frame-clock-reset	the second move freezes: frame.timeSinceFirstFrame is 0 again after the callback restarted
+animation-runonjs-deprecated	WARN [Worklets] runOnJS is deprecated. Use scheduleOnRN instead.
+animation-missing-worklet	[Worklets] Tried to synchronously call a non-worklet function `clampToGrid` on the UI thread.
+animation-repeat-ignores-reduce-motion	run-screenshots: CAPTURE FAILED (unstable) the screen never held still for 300 ms
+i18n-hermes-intl	TypeError: Cannot read property 'select' of undefined (Intl.PluralRules is undefined on Hermes)
+services-ad-already-used	[googleMobileAds/ad-already-used] This interstitial ad has already been shown.
+services-att-prompt-missing	App Review: the ATT prompt is missing before the first ad request (guideline 5.1.2(i))
+services-att-crash-no-usage-string	This app has crashed because it attempted to access privacy-sensitive data without a usage description. The app's Info.plist must contain an NSUserTrackingUsageDescription key with a string value
+services-att-prompt-never-shows	the ATT prompt never appears on the simulator although the status is not determined
+services-att-alert-over-form	the tracking alert appears while Google's consent form is still on screen behind it
+services-sample-idfa-explainer	Our app wants to stay free for you [Continue]
+services-netinfo-probe	GET https://clients3.google.com/generate_204 from the app process
+services-restore-sync-error	PurchaseError: [sync-error] Unable to sync with the App Store
+state-zustand-new-object	Error: Maximum update depth exceeded. This can happen when a component repeatedly calls setState inside componentWillUpdate
+state-newer-db-crash	Error: the database structure v4 is newer than this app (v3)
+state-db-not-a-database	SQLiteException: file is not a database (code 26)
+state-abort-polyfill-missing-api	TypeError: signal.throwIfAborted is not a function (it is undefined)
+state-clock-member-missing	error TS2741: Property 'msUntilNextLocalDay' is missing in type '{ nowMs: () => number; }' but required in type 'ClockPort'.
+gates-gate-change-trailer	FAIL HEAD [gate-change-missing] eslint.config.mjs changed without a Gate-Change trailer
+gates-gate-change-unneeded	FAIL 8fdc503:5 [gate-change-unneeded] a Gate-Change trailer but no gated file
+gates-requirement-ref-missing	FAIL 3c1a2b4 [spec-ref-missing] the body names no requirement reference
+gates-no-secrets-hook	no-secrets: refusing to commit AuthKey_ABC123.p8
+gates-commit-msg-enobufs	Error: spawnSync git ENOBUFS at check-commit-message.ts
+gates-report-outcome-limits	FAIL reports/evidence.md:1 [outcome-first] first line is 255 characters, the limit is 240
+gates-guardrail-drift	FAIL eslint.config.mjs [eslint-rule] max-params[1]: expected 3, got 5
+gates-sim-no-tests-found	No tests found, exiting with code 1 Run with `--passWithNoTests` to exit with code 0
+gates-script-target-missing	FAIL package.json [script-target] npm run i18n:verify runs scripts/i18n/verify-catalogs.ts, which does not exist
+gates-untrusted-workspace	Dropped 2 project-scoped permissions.allow entries - workspace not yet trusted
+gates-test-edits-comments	FAIL 604bd52:src/core/tasks/sort-tasks.ts:39 [disabled-test-added] adds "/** The order must fit (a list"
+skills-allowed-tools-approval	"permission_denials": [{ "tool_name": "Skill" }]
+skills-injection-abort	Shell command failed for pattern "!`node scripts/check.mjs`": exit 1
+skills-checker-root-flag	ERROR [bad-input] Unknown option '--root' Fix: pass the repo root as the first argument
+skills-exit-2-is-not-a-pass	ERROR [bad-input] nothing to check: 0 flows found Fix: write the flows first
+skills-bash-every-call-exits-1	every Bash call exits 1 with no output, even `true`
+games-balance-report-stale	FAIL reports/sim/lights-out.json:3 [report-stale] the report was made from other rules than the current code
+# Keyword queries: plain words for what you see (no error text)
+build-white-screen	screenshot is white after launch and the app drew nothing
+build-splash-never-hides	app stays on the splash screen forever
+android-edit-generated-folder	my fix in android/ is gone after prebuild
+deps-hand-installed-rn	npm latest react-native differs from the SDK pins
+services-banner-never-shows	banner never appears
+services-empty-products	the price never loads, fetchProducts returns an empty list
+state-stack-screen-stays-mounted	polling screen keeps working when another stack screen covers it
+i18n-device-locale-format	date shows in the device language instead of the app language
+perf-text-scale-values	large text screenshots look unscaled content_size
+release-play-target-sdk-low	FAIL build/release-android/app-release.aab [target-sdk] targetSdkVersion is 34, below 35
+release-play-api-not-enabled	edits.insert stopped: api-not-enabled (HTTP 403): Google Play Android Developer API has not been used in project 123456789 before or it is disabled.
+release-play-auth	edits.insert stopped: auth (HTTP 403): The caller does not have permission (the service account's permission or key)
+release-play-auth	token stopped: auth (HTTP 401): an answer that is not JSON (the service account's permission or key)
+release-play-auth	Permission 'androidpublisher.edits.create' denied by IAM policy
+release-play-app-not-found	edits.insert stopped: app-not-found (HTTP 404): Package not found: com.acme.tasks.
+release-play-app-not-found	Package not found: com.acme.tasks
+release-play-draft-app	Only releases with status draft may be created on draft app.
+release-play-policy-declarations	edits.commit stopped: policy-declarations (HTTP 403): You must complete the advertising ID declaration
+release-play-changes-not-sent-for-review	Changes cannot be sent for review automatically. Please set the query parameter changesNotSentForReview to true.
+android-avd-running-twice	emulator: ERROR: Running multiple emulators with the same AVD is an experimental feature.
+android-adb-device-offline	adb: error: device offline
+android-adb-root-production	adbd cannot run as root in production builds
+android-blank-screenshot	FAIL build/android-emu/home.png [blank-screen] 99.6% of the screen is #ffffff: the app drew nothing (crashed, still on its splash, or a blank first screen)
+parity-capture-unstable	FAIL .parity/runs/tasks-home/app.png [unstable] the screen never held still for 300 ms within 5000 ms (an animation, a timer or a loading state is running)
+parity-hierarchy-other-device	ERROR [bad-input] hierarchy from another device: the dump has no parity.launch.4f2a, the marker of this launch
+parity-app-died-during-capture	Cleanup: RPC timeout. Apparently deadlocked. Aborting now.
+parity-modal-root-hides-siblings	FAIL .parity/runs/delete-list/report.json [screen-not-reached] the root testID delete-list.scrim is not on screen (0 of the frame's testIDs found; the screen shows no labels)
+parity-scroll-clamped-before-insets	FAIL .parity/runs/settings-tall/report.json [scroll-mismatch] the capture is scrolled to 1104.7, not 1170
+runtime-no-bundle-url	No bundle URL present. Make sure you're running a packager server or have included a .jsbundle file in your application bundle.
+runtime-dev-server-unreachable	Could not connect to development server.
+runtime-metro-port-in-use	› Port 8081 is being used by another process
+runtime-metro-emfile	Error: EMFILE: too many open files, watch
+runtime-unable-to-resolve-module	Error: Unable to resolve module ./foo from /repo/src/app/index.tsx: None of these files exist:
+runtime-text-outside-text	Error: Text strings must be rendered within a <Text> component.
+runtime-nested-virtualized-list	VirtualizedLists should never be nested inside plain ScrollViews with the same orientation because it can break windowing and other functionality - use another VirtualizedList-backed container instead.
+runtime-invalid-hook-call	Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
+runtime-hook-order-changed	Error: Rendered more hooks than during the previous render.
+runtime-element-type-invalid	Error: Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined. Check the render method of `TaskRow`.
+runtime-missing-list-key	Warning: Each child in a list should have a unique "key" prop.
+runtime-undefined-property	TypeError: Cannot read property 'foo' of undefined
+runtime-crypto-missing	ReferenceError: Property 'crypto' doesn't exist, js engine: hermes
+runtime-native-module-not-linked	Invariant Violation: requireNativeComponent: 'RNSScreen' was not found in the UIManager.
+runtime-navigate-before-mount	Error: Attempted to navigate before mounting the Root Layout component. Ensure the Root Layout component is rendering a Slot, or other navigator on the first render.
+runtime-route-not-handled	The action 'NAVIGATE' with payload {"name":"settings"} was not handled by any navigator.
+runtime-navigation-context-missing	Error: Couldn't find a navigation context. Have you wrapped your app with 'NavigationContainer'?
+runtime-network-request-failed	TypeError: Network request failed

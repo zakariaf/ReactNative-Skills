@@ -1,0 +1,366 @@
+{
+  "bad-contract-unknown-key": {
+    "expect": ["[contract-invalid] contracts/visual-parity.json: unknown key \"tolerances\""],
+    "ops": [{ "json": { "file": "contracts/visual-parity.json", "path": ["tolerances"], "value": { "boundsPt": 4 } } }]
+  },
+  "bad-cover-crop-only": {
+    "expect": [
+      "[element-cover] delete-list-dialog-default: delete-list-dialog.art is coveredBy delete-list-dialog.confirm-button.icon, which is crop-only itself"
+    ],
+    "extends": "pass-parts",
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 2, "elements", 7, "coveredBy"],
+          "value": "delete-list-dialog.confirm-button.icon"
+        }
+      }
+    ]
+  },
+  "bad-cover-missing": {
+    "expect": [
+      "[element-cover] delete-list-dialog-default: delete-list-dialog.art is crop-only but names no \"coveredBy\""
+    ],
+    "extends": "pass-parts",
+    "ops": [
+      {
+        "json": { "file": "contracts/screens.json", "path": ["screens", 2, "elements", 7, "coveredBy"], "delete": true }
+      }
+    ]
+  },
+  "bad-cover-not-ancestor": {
+    "expect": [
+      "[element-cover] delete-list-dialog-default: delete-list-dialog.art is coveredBy delete-list-dialog.cancel-button, but the mockup does not draw it inside that element"
+    ],
+    "extends": "pass-parts",
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 2, "elements", 7, "coveredBy"],
+          "value": "delete-list-dialog.cancel-button"
+        }
+      }
+    ]
+  },
+  "bad-cover-not-compared": {
+    "expect": [
+      "[element-cover] delete-list-dialog-default: delete-list-dialog.art is coveredBy delete-list-dialog.title, whose crop is never compared"
+    ],
+    "extends": "pass-parts",
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 2, "elements", 7, "coveredBy"],
+          "value": "delete-list-dialog.title"
+        }
+      }
+    ]
+  },
+  "bad-device-density": {
+    "expect": ["[contract-invalid]", "avd.density 420 is not 160 x scale (480)"],
+    "ops": [
+      { "json": { "file": "design/parity/devices/android-parity.json", "path": ["avd", "density"], "value": 420 } }
+    ]
+  },
+  "bad-device-pixels": {
+    "expect": ["[contract-invalid]", "\"pixels\" must equal points x scale (1206 x 2622)"],
+    "ops": [
+      { "json": { "file": "design/parity/devices/iphone-16-pro.json", "path": ["pixels", "height"], "value": 2600 } }
+    ]
+  },
+  "bad-floor-without-evidence": {
+    "expect": ["[contract-invalid]", "textRoleFloors.Demo Sans.14 needs \"probe\": the evidence"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/visual-parity.json",
+          "path": ["textRoleFloors"],
+          "value": { "Demo Sans": { "14": { "floor": 1.2, "probe": "measured" } } }
+        }
+      }
+    ]
+  },
+  "bad-font": {
+    "expect": ["[mockup-font] the font fonts/DemoSans-Regular.ttf does not exist"],
+    "ops": [
+      {
+        "replace": {
+          "file": "design/parity/mockup/index.html",
+          "find": "      :root {",
+          "with": "@font-face { font-family: 'Demo Sans'; src: url('fonts/DemoSans-Regular.ttf'); }\n      :root {",
+          "occurrence": 1
+        }
+      }
+    ]
+  },
+  "bad-frame-duplicate": {
+    "expect": ["[mockup-frame] the frame tasks-default is drawn 2 times"],
+    "ops": [
+      {
+        "replace": {
+          "file": "design/parity/mockup/index.html",
+          "find": "</body>",
+          "with": "<section data-frame=\"tasks-default\"></section></body>"
+        }
+      }
+    ]
+  },
+  "bad-frame-missing": {
+    "expect": ["[mockup-frame] the frame lists-default is drawn 0 times"],
+    "ops": [
+      {
+        "replace": {
+          "file": "design/parity/mockup/index.html",
+          "find": "data-frame=\"lists-default\"",
+          "with": "data-frame-x=\"lists-default\""
+        }
+      }
+    ]
+  },
+  "bad-frame-unknown": {
+    "expect": ["[mockup-frame] data-frame=\"tasks-home\" is not a design frame of the screen contract"],
+    "ops": [
+      {
+        "replace": {
+          "file": "design/parity/mockup/index.html",
+          "find": "data-frame=\"tasks-default\"",
+          "with": "data-frame=\"tasks-home\""
+        }
+      }
+    ]
+  },
+  "bad-frame-unreferenced": {
+    "expect": ["[contract-invalid]", "frames.home-default names a frame no screen-contract state references"],
+    "ops": [{ "json": { "file": "contracts/visual-parity.json", "path": ["frames", "home-default"], "value": {} } }]
+  },
+  "bad-hidden-ancestor": {
+    "expect": [
+      "[element-reach] lists-default: lists.list-row.home.delete-button is reachable, but it sits inside lists.list-row.home, which is hidden from screen readers"
+    ],
+    "ops": [
+      {
+        "json": { "file": "contracts/screens.json", "path": ["screens", 1, "elements", 2, "a11yHidden"], "value": true }
+      },
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 1, "elements", 2, "coveredBy"],
+          "value": "lists.screen"
+        }
+      },
+      {
+        "json": { "file": "contracts/screens.json", "path": ["screens", 1, "elements", 2, "checks"], "value": ["crop"] }
+      }
+    ]
+  },
+  "bad-mockup-missing": {
+    "expect": ["[mockup-missing] the design mockup the contract names does not exist"],
+    "ops": [{ "delete": "design/parity/mockup/index.html" }]
+  },
+  "bad-no-reference": {
+    "expect": [
+      "contracts/visual-parity.json [contract-invalid] contracts/screens.json has no state with a \"reference\""
+    ],
+    "ops": [{ "write": { "file": "contracts/screens.json", "json": { "version": 1, "screens": [] } } }]
+  },
+  "bad-offline": {
+    "expect": ["[mockup-offline] the mockup loads https://fonts.example.com/css?family=Demo from the network"],
+    "ops": [
+      {
+        "replace": {
+          "file": "design/parity/mockup/index.html",
+          "find": "<title>Tasks design</title>",
+          "with": "<title>Tasks design</title><link rel=\"stylesheet\" href=\"https://fonts.example.com/css?family=Demo\" />"
+        }
+      }
+    ]
+  },
+  "bad-parent": {
+    "expect": [
+      "[mockup-parent] delete-list-dialog-default: delete-list-dialog.confirm-button.icon names the parent delete-list-dialog.title, but the mockup does not draw it inside that element"
+    ],
+    "extends": "pass-parts",
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 2, "elements", 6, "parent"],
+          "value": "delete-list-dialog.title"
+        }
+      }
+    ]
+  },
+  "bad-reach": {
+    "expect": [
+      "[element-reach] delete-list-dialog-default: delete-list-dialog.confirm-button.icon is crop-only (inside the accessible delete-list-dialog.confirm-button), so \"bounds\" cannot be checked"
+    ],
+    "extends": "pass-parts",
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 2, "elements", 6, "checks"],
+          "value": ["bounds", "crop"]
+        }
+      }
+    ]
+  },
+  "bad-state-card-bounds": {
+    "expect": [
+      "[state-card-bounds] tasks-default: tasks.list asks for a bounds check, but tasks-default is a state card"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/visual-parity.json",
+          "path": ["frames", "tasks-default", "kind"],
+          "value": "state-card"
+        }
+      }
+    ]
+  },
+  "bad-tall-without-header": {
+    "expect": ["[contract-invalid]", "a phone-tall frame needs layout.fixedHeaderPt"],
+    "ops": [{ "json": { "file": "contracts/visual-parity.json", "path": ["layout", "fixedHeaderPt"], "delete": true } }]
+  },
+  "bad-testid-missing": {
+    "expect": [
+      "[mockup-testid] tasks-default: tasks.summary matches 0 elements of the frame",
+      "[mockup-unknown-testid] tasks-default: data-testid=\"tasks.sumary\" is not an element"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "design/parity/mockup/index.html",
+          "find": "data-testid=\"tasks.summary\"",
+          "with": "data-testid=\"tasks.sumary\""
+        }
+      }
+    ]
+  },
+  "bad-testid-twice": {
+    "expect": ["[mockup-testid] tasks-default: tasks.summary matches 2 elements of the frame"],
+    "ops": [
+      {
+        "replace": {
+          "file": "design/parity/mockup/index.html",
+          "find": "<ul class=\"rows\">\n          <li class=\"row\" data-testid=\"tasks.task-row.milk\">",
+          "with": "<p data-testid=\"tasks.summary\"></p><ul class=\"rows\">\n          <li class=\"row\" data-testid=\"tasks.task-row.milk\">"
+        }
+      }
+    ]
+  },
+  "bad-variant-fact": {
+    "expect": [
+      "[contract-invalid]",
+      "frames.tasks-default.variants.compact.when names the fact \"isCompact\", which facts.values does not declare"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/visual-parity.json",
+          "path": ["frames", "tasks-default", "variants"],
+          "value": {
+            "compact": {
+              "when": { "isCompact": true },
+              "reason": "Decided with the reviewer for small phones.",
+              "derive": [{ "hide": ".foot" }]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "pass-font-present": {
+    "expect": ["check-mockup: 3 frames checked, 0 problems"],
+    "ops": [
+      {
+        "replace": {
+          "file": "design/parity/mockup/index.html",
+          "find": "      :root {",
+          "with": "@font-face { font-family: 'Demo Sans'; src: url('fonts/DemoSans-Regular.ttf'); }\n      :root {",
+          "occurrence": 1
+        }
+      },
+      {
+        "write": {
+          "file": "design/parity/mockup/fonts/DemoSans-Regular.ttf",
+          "content": "stand-in font bytes for the self-test\n"
+        }
+      }
+    ]
+  },
+  "pass-mock-only": {
+    "expect": ["check-mockup: 3 frames checked, 0 problems"],
+    "ops": [
+      {
+        "replace": {
+          "file": "design/parity/mockup/index.html",
+          "find": "</body>",
+          "with": "<section class=\"screen\" data-frame=\"system-share-sheet\" data-mock-only></section></body>"
+        }
+      }
+    ]
+  },
+  "pass-no-contract": {
+    "expect": ["NOT APPLICABLE: contracts/visual-parity.json does not exist"],
+    "ops": [{ "delete": "contracts/visual-parity.json" }]
+  },
+  "pass-no-frames": {
+    "expect": ["NOT APPLICABLE: no screen state has a \"reference\" and the contract plans no frame"],
+    "ops": [
+      { "write": { "file": "contracts/screens.json", "json": { "version": 1, "screens": [] } } },
+      { "json": { "file": "contracts/visual-parity.json", "path": ["frames"], "value": {} } }
+    ]
+  },
+  "pass-parts": {
+    "expect": ["check-mockup: 3 frames checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 2, "elements", 6],
+          "value": {
+            "testID": "delete-list-dialog.confirm-button.icon",
+            "role": "image",
+            "component": "Icon",
+            "parent": "delete-list-dialog.confirm-button",
+            "coveredBy": "delete-list-dialog.confirm-button",
+            "checks": ["crop"]
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 2, "elements", 7],
+          "value": {
+            "testID": "delete-list-dialog.art",
+            "role": "image",
+            "component": "View",
+            "a11yHidden": true,
+            "coveredBy": "delete-list-dialog.card",
+            "checks": ["crop"]
+          }
+        }
+      },
+      {
+        "replace": {
+          "file": "design/parity/mockup/index.html",
+          "find": "<h2 data-testid=\"delete-list-dialog.title\">",
+          "with": "<span class=\"art\" data-testid=\"delete-list-dialog.art\"></span><h2 data-testid=\"delete-list-dialog.title\">"
+        }
+      },
+      {
+        "replace": {
+          "file": "design/parity/mockup/index.html",
+          "find": "<button class=\"confirm\" data-testid=\"delete-list-dialog.confirm-button\">",
+          "with": "<button class=\"confirm\" data-testid=\"delete-list-dialog.confirm-button\"><span class=\"icon\" data-testid=\"delete-list-dialog.confirm-button.icon\"></span>"
+        }
+      }
+    ]
+  }
+}

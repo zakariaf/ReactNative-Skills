@@ -1,0 +1,44 @@
+# .maestro/subflows/open-link.yaml — a sub-flow, never run on its own (it is not under flows/).
+# Opens LINK (a full <scheme>://<path> URL) in the running app and waits for WAIT_FOR, the testID of
+# the screen the link opens. First it waits for any testID, so the app's JavaScript is running and
+# the router can take the link (right after launchApp that is the first screen). Tools run it with
+# maestro --device <id> --driver-host-port <port> test ... -e APP_ID=... -e LINK=... -e WAIT_FOR=...
+# (ios-simulator-build's --link step runs it too). Never `xcrun simctl openurl` from a tool: iOS
+# answers a custom scheme opened from outside with an "Open in …?" alert that nothing accepts.
+appId: ${APP_ID}
+---
+- extendedWaitUntil:
+    visible:
+      id: '[a-z0-9]+(-[a-z0-9]+)*\..+'
+    timeout: 20000
+- openLink: '${LINK}'
+# A fresh simulator asks once per app, and a tap while the alert still slides in is lost: wait for
+# it to settle, then tap once more if it is still there. Android opens the link without an alert.
+# system-ui: iOS asks "Open in “<app name>”?"; the title and 'Open' are Apple's, not app text. Guard
+# on the alert title, never on a bare 'Open': Maestro's text match ignores case, so 'Open' also
+# matches any in-app button labelled OPEN (an ad's call to action, an "Open" row).
+- runFlow:
+    when:
+      visible: 'Open in .*\?'
+    commands:
+      - waitForAnimationToEnd
+      # system-ui: Apple's Open button, the nearest one below the alert title.
+      - tapOn:
+          text: 'Open'
+          below: 'Open in .*\?'
+          optional: true
+# system-ui: the same Apple alert, when the first tap came before it settled.
+- runFlow:
+    when:
+      visible: 'Open in .*\?'
+    commands:
+      - waitForAnimationToEnd
+      # system-ui: Apple's Open button, below the alert title.
+      - tapOn:
+          text: 'Open'
+          below: 'Open in .*\?'
+          optional: true
+- extendedWaitUntil:
+    visible:
+      id: '${WAIT_FOR}'
+    timeout: 15000

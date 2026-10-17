@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "screens": [
+    {
+      "id": "tasks",
+      "name": "Tasks",
+      "presentation": "route",
+      "route": "src/app/(app)/index.tsx",
+      "view": "src/features/tasks/tasks-screen.tsx",
+      "states": [{ "id": "default" }],
+      "elements": [{ "testID": "tasks.list", "role": "list", "component": "FlatList" }]
+    },
+    {
+      "id": "not-found",
+      "name": "Page not found",
+      "presentation": "route",
+      "route": "src/app/+not-found.tsx",
+      "view": "src/features/not-found/not-found-screen.tsx",
+      "states": [{ "id": "default" }],
+      "elements": [{ "testID": "not-found.screen", "role": "none", "component": "View" }]
+    },
+    {
+      "id": "task-row",
+      "name": "Task row",
+      "presentation": "embedded",
+      "view": "src/features/tasks/components/task-row.tsx",
+      "states": [{ "id": "default" }],
+      "elements": [{ "testID": "tasks.task-row.{taskId}", "role": "checkbox", "component": "PressableSurface" }]
+    }
+  ]
+}

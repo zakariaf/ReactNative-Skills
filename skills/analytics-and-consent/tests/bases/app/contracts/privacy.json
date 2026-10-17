@@ -1,0 +1,17 @@
+{
+  "$comment": "Fixture: the privacy contract of privacy-and-store-declarations, trimmed to what privacy-sync reads.",
+  "profile": "api-port",
+  "sdks": {
+    "posthog-react-native": {
+      "why": "Product analytics after the user agreed (contracts/analytics.json is the source).",
+      "tracking": false,
+      "collects": [
+        { "type": "product-interaction", "linked": true, "tracking": false, "purposes": ["analytics"], "optional": true },
+        { "type": "device-id", "linked": true, "tracking": false, "purposes": ["analytics"], "optional": true }
+      ]
+    }
+  },
+  "app": { "collects": [] },
+  "permissionAnswers": {},
+  "accountDeletion": null
+}

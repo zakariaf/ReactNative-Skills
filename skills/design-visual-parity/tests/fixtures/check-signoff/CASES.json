@@ -1,0 +1,397 @@
+{
+  "bad-copied-reference": {
+    "expect": ["[not-a-capture]", "app.png is the design reference itself"],
+    "ops": [
+      {
+        "write": {
+          "file": "post.json",
+          "json": [
+            {
+              "copy": {
+                "from": "design/parity/test-phone/light-en/tasks-default.png",
+                "to": ".parity/test-phone/tasks-default/light-en/app.png",
+                "overwrite": true
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-coverage": {
+    "expect": ["[coverage] lists-default test-phone light-en", "elements were never fully on screen in any capture"],
+    "args": "--frame lists-default",
+    "ops": [
+      { "json": { "file": "contracts/visual-parity.json", "path": ["themes"], "value": ["light"] } },
+      { "json": { "file": "contracts/visual-parity.json", "path": ["languages"], "value": ["en"] } },
+      { "json": { "file": "contracts/visual-parity.json", "path": ["rtlLanguages"], "value": [] } },
+      {
+        "write": {
+          "file": "ledger.json",
+          "json": {
+            "version": 1,
+            "entries": [
+              {
+                "frame": "lists-default",
+                "device": "test-phone",
+                "theme": "light",
+                "lang": "en",
+                "scrollY": 0,
+                "sheetSha256": "@sheet",
+                "date": "2026-10-01",
+                "looked": "@looked",
+                "eyeChecks": {
+                  "icons": "match",
+                  "pictures": "match",
+                  "shadows": "match",
+                  "alignment": "match",
+                  "wrapping": "match",
+                  "direction": "match",
+                  "feel": "match"
+                },
+                "differences": []
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "bad-difference-open": {
+    "expect": ["[difference-open] tasks-default test-phone light-ar", "open difference \"add icon 1 pt too low\""],
+    "ops": [
+      {
+        "json": {
+          "file": "ledger.json",
+          "path": ["entries", 1, "differences"],
+          "value": [{ "what": "add icon 1 pt too low", "status": "open" }]
+        }
+      }
+    ]
+  },
+  "bad-draft-stale-sheet": {
+    "expect": ["[stale-sheet]", "sheet.png missing or changed since make-sheet.mjs wrote them"],
+    "args": "--draft {dir}/.parity/test-phone/tasks-default/light-en",
+    "ops": [
+      {
+        "write": {
+          "file": "post.json",
+          "json": [
+            {
+              "png": {
+                "files": [".parity/test-phone/tasks-default/light-en/sheet.png"],
+                "width": 10,
+                "height": 10,
+                "fill": "#FFFFFF"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-eye-check-open": {
+    "expect": ["[eye-check-open] tasks-default test-phone light-en", "eye check \"icons\" is \"open\""],
+    "ops": [{ "json": { "file": "ledger.json", "path": ["entries", 0, "eyeChecks", "icons"], "value": "open" } }]
+  },
+  "bad-eye-check-waived-short": {
+    "expect": ["[eye-check-open]", "eye check \"shadows\" is \"waived: soft\""],
+    "ops": [
+      { "json": { "file": "ledger.json", "path": ["entries", 1, "eyeChecks", "shadows"], "value": "waived: soft" } }
+    ]
+  },
+  "bad-ledger-invalid": {
+    "expect": ["[ledger-invalid] expected { \"version\": 1, \"entries\": [...] }"],
+    "ops": [{ "json": { "file": "ledger.json", "path": ["version"], "value": 2 } }]
+  },
+  "bad-looked-at-old-sheet": {
+    "expect": ["[looked-at-old-sheet] tasks-default test-phone dark-en"],
+    "ops": [{ "json": { "file": "ledger.json", "path": ["entries", 2, "sheetSha256"], "value": "0000" } }]
+  },
+  "bad-narrowed": {
+    "expect": ["[narrowed] narrowed: not a sign-off (checked test-phone x light x en, ar"],
+    "args": "--themes light"
+  },
+  "bad-no-sheet": {
+    "expect": ["[no-sheet] tasks-default test-phone light-en"],
+    "ops": [
+      {
+        "write": {
+          "file": "post.json",
+          "json": [{ "delete": ".parity/test-phone/tasks-default/light-en/sheets.json" }]
+        }
+      }
+    ]
+  },
+  "bad-not-a-capture": {
+    "expect": ["[not-a-capture]", "was not written by capture-app.mjs (source design-as-app"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [
+            { "theme": "light", "lang": "en", "patch": { "source": "design-as-app" } },
+            { "theme": "light", "lang": "ar", "patch": {} },
+            { "theme": "dark", "lang": "en", "patch": {} },
+            { "theme": "dark", "lang": "ar", "patch": {} }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-not-captured": {
+    "expect": ["[not-captured] tasks-default test-phone dark-ar: no run folder"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [
+            { "theme": "light", "lang": "en", "patch": {} },
+            { "theme": "light", "lang": "ar", "patch": {} },
+            { "theme": "dark", "lang": "en", "patch": {} }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-not-checked": {
+    "expect": ["[not-checked]", "tasks-default test-phone light-en", "has no report.json"],
+    "ops": [
+      {
+        "write": {
+          "file": "post.json",
+          "json": [{ "delete": ".parity/test-phone/tasks-default/light-en/report.json" }]
+        }
+      }
+    ]
+  },
+  "bad-not-looked": {
+    "expect": ["[not-looked] tasks-default test-phone dark-ar", "no sign-off entry"],
+    "ops": [{ "json": { "file": "ledger.json", "path": ["entries", 3], "delete": true } }]
+  },
+  "bad-not-looked-images": {
+    "expect": ["[not-looked] tasks-default test-phone light-en", "does not list zoom-1.png"],
+    "ops": [{ "json": { "file": "ledger.json", "path": ["entries", 0, "looked"], "value": ["sheet.png"] } }]
+  },
+  "bad-not-passing": {
+    "expect": ["[not-passing] tasks-default test-phone light-en", "1 parity problems"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [
+            { "theme": "light", "lang": "en", "patch": { "elements": { "tasks.summary": { "dy": 3 } } } },
+            { "theme": "light", "lang": "ar", "patch": {} },
+            { "theme": "dark", "lang": "en", "patch": {} },
+            { "theme": "dark", "lang": "ar", "patch": {} }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-reference-variant": {
+    "expect": ["[reference-variant] tasks-default test-phone light-en", "was captured against tasks-default--compact"],
+    "ops": [
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [
+            { "theme": "light", "lang": "en", "patch": { "variant": "compact" } },
+            { "theme": "light", "lang": "ar", "patch": {} },
+            { "theme": "dark", "lang": "en", "patch": {} },
+            { "theme": "dark", "lang": "ar", "patch": {} }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-stale-reference": {
+    "expect": [
+      "[stale-report] tasks-default test-phone light-en",
+      "was checked against a different reference than the current one"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "post.json",
+          "json": [
+            {
+              "png": {
+                "files": ["design/parity/test-phone/light-en/tasks-default.png"],
+                "width": 480,
+                "height": 900,
+                "fill": "#FFFFFF"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-stale-report": {
+    "expect": ["[stale-report] tasks-default test-phone light-en", "report.json does not belong to its app.png"],
+    "ops": [
+      {
+        "write": {
+          "file": "post.json",
+          "json": [
+            {
+              "png": {
+                "files": [".parity/test-phone/tasks-default/light-en/app.png"],
+                "width": 480,
+                "height": 900,
+                "fill": "#FFFFFF"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-stale-sheet": {
+    "expect": [
+      "[stale-sheet] tasks-default test-phone light-en",
+      "sheet.png is missing or changed since make-sheet.mjs wrote it"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "post.json",
+          "json": [
+            {
+              "png": {
+                "files": [".parity/test-phone/tasks-default/light-en/sheet.png"],
+                "width": 10,
+                "height": 10,
+                "fill": "#FFFFFF"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-waiver-gone": {
+    "expect": ["[waiver-gone] tasks-default test-phone light-en", "relied on waiver 1"],
+    "ops": [
+      {
+        "write": {
+          "file": "design/parity/waivers.json",
+          "content": "{\n \"version\": 1,\n \"waivers\": [\n  {\n   \"frame\": \"tasks-default\",\n   \"testID\": \"tasks.summary\",\n   \"rule\": \"bounds\",\n   \"reason\": \"The platform cannot lay this summary line out where the design does for this test.\",\n   \"reportedOn\": \"2026-10-01\",\n   \"devices\": [\n    \"test-phone\"\n   ]\n  }\n ]\n}\n"
+        }
+      },
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [
+            { "theme": "light", "lang": "en", "patch": { "elements": { "tasks.summary": { "dy": 3 } } } },
+            { "theme": "light", "lang": "ar", "patch": {} },
+            { "theme": "dark", "lang": "en", "patch": {} },
+            { "theme": "dark", "lang": "ar", "patch": {} }
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "post.json",
+          "json": [{ "write": { "file": "design/parity/waivers.json", "json": { "version": 1, "waivers": [] } } }]
+        }
+      }
+    ]
+  },
+  "error-date-without-draft": { "expect": ["ERROR [bad-input] --date belongs to --draft"], "args": "--date 2026-10-01" },
+  "error-draft-date": {
+    "expect": ["ERROR [bad-input] --date 2026-02-30 is not a calendar day written YYYY-MM-DD"],
+    "args": "--draft {dir}/.parity/test-phone/tasks-default/light-en --date 2026-02-30"
+  },
+  "error-unknown-frame": {
+    "expect": ["ERROR [bad-input] unknown frame \"home-default\""],
+    "args": "--frame home-default"
+  },
+  "pass-draft": {
+    "expect": ["\"date\": \"2026-10-02\"", "\"icons\": \"open\"", "\"sheetSha256\":"],
+    "args": "--draft {dir}/.parity/test-phone/tasks-default/light-en --date 2026-10-02"
+  },
+  "pass-draft-from-ledger": {
+    "expect": ["copied 1 recorded difference", "\"what\": \"row gap 1 pt too tight\""],
+    "args": "--draft {dir}/.parity/test-phone/tasks-default/light-en --from-ledger",
+    "ops": [
+      {
+        "json": {
+          "file": "ledger.json",
+          "path": ["entries", 0, "differences"],
+          "value": [{ "what": "row gap 1 pt too tight", "status": "fixed" }]
+        }
+      }
+    ]
+  },
+  "pass-draft-local-day": {
+    "expect": ["\"date\": \"2026-10-01\""],
+    "args": "--draft {dir}/.parity/test-phone/tasks-default/light-en",
+    "ops": [{ "write": { "file": "env.json", "content": "{\n \"FAKE_NOW\": \"2026-09-30T23:17:00Z\"\n}\n" } }]
+  },
+  "pass-eye-check-waived": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "json": {
+          "file": "ledger.json",
+          "path": ["entries", 1, "eyeChecks", "shadows"],
+          "value": "waived: the platform draws the hard shadow one pixel softer"
+        }
+      }
+    ]
+  },
+  "pass-no-contract": {
+    "expect": ["NOT APPLICABLE: contracts/visual-parity.json does not exist"],
+    "ops": [{ "delete": "contracts/visual-parity.json" }]
+  },
+  "pass-no-frames": {
+    "expect": ["NOT APPLICABLE: no screen state has a \"reference\" and the contract plans no frame"],
+    "ops": [
+      { "write": { "file": "contracts/screens.json", "json": { "version": 1, "screens": [] } } },
+      { "json": { "file": "contracts/visual-parity.json", "path": ["frames"], "value": {} } }
+    ]
+  },
+  "pass-reference-change-listed": {
+    "expect": ["intended reference change D-1 (2026-10-01): the add button became a filled button in both themes."],
+    "ops": [
+      {
+        "write": {
+          "file": "design/parity/manifest.json",
+          "content": "{\n \"version\": 1,\n \"files\": {},\n \"referenceChanges\": [\n  {\n   \"id\": \"D-1\",\n   \"date\": \"2026-10-01\",\n   \"frames\": [\n    \"tasks-default\"\n   ],\n   \"variants\": [],\n   \"what\": \"the add button became a filled button in both themes.\",\n   \"why\": \"The reviewer approved the new button style on 2026-10-01.\"\n  }\n ]\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-waiver-listed": {
+    "expect": [
+      "waiver 1 [platform] tasks-default tasks.summary bounds (test-phone): platform limit; reviewer told 2026-10-01"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "design/parity/waivers.json",
+          "content": "{\n \"version\": 1,\n \"waivers\": [\n  {\n   \"frame\": \"tasks-default\",\n   \"testID\": \"tasks.summary\",\n   \"rule\": \"bounds\",\n   \"reason\": \"The platform cannot lay this summary line out where the design does for this test.\",\n   \"reportedOn\": \"2026-10-01\",\n   \"devices\": [\n    \"test-phone\"\n   ]\n  }\n ]\n}\n"
+        }
+      },
+      {
+        "json": {
+          "file": "scenes/tasks-default.json",
+          "path": ["captures"],
+          "value": [
+            { "theme": "light", "lang": "en", "patch": { "elements": { "tasks.summary": { "dy": 3 } } } },
+            { "theme": "light", "lang": "ar", "patch": {} },
+            { "theme": "dark", "lang": "en", "patch": {} },
+            { "theme": "dark", "lang": "ar", "patch": {} }
+          ]
+        }
+      }
+    ]
+  }
+}

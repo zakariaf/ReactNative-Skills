@@ -1,0 +1,109 @@
+{
+  "bad-app-lockstep": {
+    "expect": ["[app-lockstep] react-native-reanimated differs between apps: apps/admin=4.5.0, apps/tasks=4.5.1"],
+    "ops": [
+      { "copy": { "from": "apps/tasks", "to": "apps/admin" } },
+      { "json": { "file": "apps/admin/package.json", "path": ["name"], "value": "@acme/admin" } },
+      {
+        "json": {
+          "file": "apps/admin/package.json",
+          "path": ["dependencies", "react-native-reanimated"],
+          "value": "4.5.0"
+        }
+      }
+    ]
+  },
+  "bad-missing-peer-override": {
+    "expect": [
+      "FAIL package.json:1 [root-overrides] overrides.react-native-reanimated is missing; packages/ui peers on it with \"*\""
+    ],
+    "ops": [{ "json": { "file": "package.json", "path": ["overrides", "react-native-reanimated"], "delete": true } }]
+  },
+  "bad-package-manifest": {
+    "expect": ["FAIL packages/ui/package.json:1 [package-manifest] exports must map \"./*\" to \"./src/*\""],
+    "ops": [{ "json": { "file": "packages/ui/package.json", "path": ["exports"], "delete": true } }]
+  },
+  "bad-root-runtime": {
+    "expect": ["FAIL package.json:1 [root-runtime] expo-haptics is an app runtime package listed at the root"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies"], "value": { "expo-haptics": "~57.0.3" } } },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "", "dependencies"],
+          "value": { "expo-haptics": "~57.0.3" }
+        }
+      }
+    ]
+  },
+  "bad-undeclared-package": {
+    "expect": [
+      "FAIL packages/legacy/package.json:1 [workspace-layout] packages/legacy has a package.json but no \"workspaces\" glob matches it"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["apps/*", "packages/ui"] } },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "", "workspaces"],
+          "value": ["apps/*", "packages/ui"]
+        }
+      },
+      {
+        "write": {
+          "file": "packages/legacy/package.json",
+          "content": "{ \"name\": \"@acme/legacy\", \"version\": \"1.0.0\", \"private\": true }\n"
+        }
+      }
+    ]
+  },
+  "bad-workspace-no-types": {
+    "expect": ["FAIL packages/ui/tsconfig.json:1 [tsconfig-program] sets no compilerOptions.types"],
+    "ops": [
+      {
+        "$comment": "No types list: TypeScript then loads every installed @types package, @types/node included.",
+        "json": { "file": "packages/ui/tsconfig.json", "path": ["compilerOptions", "types"], "delete": true }
+      }
+    ]
+  },
+  "bad-workspace-tsconfig": {
+    "expect": [
+      "FAIL packages/ui/tsconfig.json:8 [tsconfig-program] sets strict; a program may only set types, paths and tsBuildInfoFile",
+      "FAIL packages/ui/tsconfig.json:4 [tsconfig-program] lists types \"node\" in a package the app imports"
+    ],
+    "ops": [
+      {
+        "$comment": "A shared package's program loosens the base and adds Node globals to code the app imports.",
+        "json": { "file": "packages/ui/tsconfig.json", "path": ["compilerOptions", "types"], "value": ["jest", "node"] }
+      },
+      { "json": { "file": "packages/ui/tsconfig.json", "path": ["compilerOptions", "strict"], "value": false } }
+    ]
+  },
+  "pass-node-tooling-package": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "A package that declares engines.node is Node tooling: types node is allowed there.",
+        "json": { "file": "packages/ui/package.json", "path": ["engines"], "value": { "node": ">=22.18" } }
+      },
+      {
+        "json": { "file": "packages/ui/tsconfig.json", "path": ["compilerOptions", "types"], "value": ["jest", "node"] }
+      }
+    ]
+  },
+  "pass-workspace-routes-dir": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "The app's routes live in apps/tasks/app (rn-skills.config.json workspaces): the per-app checks follow the workspace layout.",
+        "rename": { "from": "apps/tasks/src/app", "to": "apps/tasks/app" }
+      },
+      {
+        "write": {
+          "file": "rn-skills.config.json",
+          "content": "{ \"workspaces\": { \"apps/tasks\": { \"routesDir\": \"app\" } } }\n"
+        }
+      }
+    ]
+  }
+}

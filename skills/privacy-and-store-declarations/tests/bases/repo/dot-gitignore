@@ -1,0 +1,17 @@
+node_modules/
+/ios
+/android
+dist-audit/
+*.p8
+*.p12
+*.mobileprovision
+*.keystore
+*.jks
+AuthKey_*
+ApiKey_*
+credentials.json
+*.xcarchive
+*.ipa
+*.aab
+*.apk
+.env*

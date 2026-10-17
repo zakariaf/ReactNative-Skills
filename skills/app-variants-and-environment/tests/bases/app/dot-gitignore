@@ -1,0 +1,15 @@
+node_modules/
+.expo/
+ios/
+android/
+dist/
+# local env files: .env.example is the one committed env file
+.env*
+!.env.example
+# signing material and store keys
+*.p8
+*.p12
+*.pem
+*.mobileprovision
+*.keystore
+*.jks

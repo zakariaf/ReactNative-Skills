@@ -1,0 +1,9 @@
+{
+  "$comment": "Which colour sits on which in draw-arena.ts: unoutlined bodies and the player's ring on the arena ground. The player is also told apart by its size and ring, never by colour alone.",
+  "graphics": [
+    ["player", "background"],
+    ["enemy", "background"],
+    ["ring", "background"]
+  ],
+  "distinct": [["player", "enemy"]]
+}

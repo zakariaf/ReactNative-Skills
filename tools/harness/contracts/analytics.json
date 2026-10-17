@@ -1,0 +1,14 @@
+{
+  "$schema": "./analytics.schema.json",
+  "$comment": "The harness has the analytics port, catalog, consent gate and root kit but no vendor yet: sdk \"none\", so no endpoint and nothing collected; every build is off. A vendor decision (stop and ask) fills sdk, endpoints and collects, raises consent.version and adds the consent UI.",
+  "sdk": "none",
+  "audience": "general",
+  "tracking": false,
+  "identifies": false,
+  "endpoints": [],
+  "collects": [],
+  "consent": {
+    "version": 1,
+    "covers": "c4bea1573bd7"
+  }
+}

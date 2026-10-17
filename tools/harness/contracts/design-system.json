@@ -1,0 +1,29 @@
+{
+  "$schema": "./design-system.schema.json",
+  "tokens": "design/tokens.json",
+  "exports": [
+    { "file": "src/theme/tokens.ts", "name": "SPACING", "token": "spacing" },
+    { "file": "src/theme/tokens.ts", "name": "RADII", "token": "radius" },
+    { "file": "src/theme/tokens.ts", "name": "STROKE", "token": "stroke" },
+    { "file": "src/theme/tokens.ts", "name": "ELEVATION", "token": "elevation" },
+    { "file": "src/theme/tokens.ts", "name": "MIN_TOUCH", "token": "size.minTouch" },
+    { "file": "src/theme/tokens.ts", "name": "CONTENT_MAX_WIDTH", "token": "size.contentMaxWidth" },
+    { "file": "src/theme/tokens.ts", "name": "TYPE_SCALE", "token": "type.roles" },
+    { "file": "src/theme/type-styles.ts", "name": "TYPE_STYLES", "token": "type.styles" },
+    { "file": "src/theme/motion.ts", "name": "EASING", "token": "motion.easing" },
+    { "file": "src/theme/motion.ts", "name": "MOTION_MS", "token": "motion.duration" },
+    { "file": "src/theme/motion.ts", "name": "SPRINGS", "token": "motion.spring" },
+    { "file": "src/theme/tokens.ts", "name": "PRESS", "token": "press" }
+  ],
+  "palettes": [{ "file": "src/theme/palette.ts", "export": "PALETTE", "token": "color" }],
+  "invariantFields": ["danger", "success", "warning", "focus"],
+  "text": {
+    "tabularStyles": ["number", "statValue"],
+    "minTallLineHeight": { "statValue": 1.45 }
+  },
+  "fonts": "system",
+  "rawValues": {
+    "allowColors": ["src/theme/**"],
+    "policy": { "noGradients": false, "maxRadius": null }
+  }
+}

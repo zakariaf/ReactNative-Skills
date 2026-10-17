@@ -1,0 +1,5 @@
+# .maestro/add-task.yaml
+# Task list (SCR-1): adds a task (REQ-1); see spec 1.1.
+appId: com.example.tasks
+---
+- launchApp

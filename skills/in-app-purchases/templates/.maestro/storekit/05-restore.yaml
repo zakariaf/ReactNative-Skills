@@ -1,0 +1,29 @@
+# .maestro/storekit/05-restore.yaml — StoreKit Tier 2 flow, run only by scripts/storekit/storekit-harness.ts
+# right after testArmDefault; outside .maestro/flows/, so the normal E2E run never runs it against an unarmed build.
+appId: ${APP_ID}
+name: Restore brings Premium back after the saved entitlement was cleared
+tags: [storekit]
+---
+- launchApp
+- runFlow:
+    file: ../subflows/debug-setup.yaml
+    env:
+      QUERY: 'premium=0&open=paywall'
+      WAIT_FOR: 'paywall.screen'
+- tapOn:
+    id: 'paywall.buy-button'
+- extendedWaitUntil:
+    visible:
+      id: 'paywall.state.success'
+    timeout: 15000
+- runFlow:
+    file: ../subflows/debug-setup.yaml
+    env:
+      QUERY: 'premium=0&open=paywall'
+      WAIT_FOR: 'paywall.screen'
+- tapOn:
+    id: 'paywall.restore-button'
+- extendedWaitUntil:
+    visible:
+      id: 'paywall.state.owned'
+    timeout: 15000

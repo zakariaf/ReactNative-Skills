@@ -1,0 +1,641 @@
+{
+  "bad-build-node": {
+    "expect": ["FAIL eas.json:24 [build-node] build.preview: pins no node, so EAS uses the image's Node 22.23.1"],
+    "ops": [{ "replace": { "file": "eas.json", "find": "      \"node\": \"26.4.0\",\n", "with": "", "occurrence": 2 } }]
+  },
+  "bad-build-node-npm": {
+    "expect": [
+      "FAIL eas.json:39 [build-node] build.production: node 22.18.0 bundles an npm below package.json engines.npm (>=11.17.0)"
+    ],
+    "ops": [
+      { "delete": ".nvmrc" },
+      { "replace": { "file": "eas.json", "find": "\"node\": \"26.4.0\"", "with": "\"node\": \"22.18.0\"", "count": 3 } }
+    ]
+  },
+  "bad-build-node-pin": {
+    "expect": ["FAIL eas.json:8 [build-node] build.development: node is 26.4.0 but .nvmrc pins 26.5.0"],
+    "ops": [{ "write": { "file": ".nvmrc", "content": "26.5.0\n" } }]
+  },
+  "bad-build-node-pin-partial": {
+    "expect": [
+      "FAIL eas.json:8 [build-node] build.development: node is 26.4.0 but .nvmrc pins 24",
+      "Set \"node\" to a full x.y.z within 24"
+    ],
+    "ops": [{ "write": { "file": ".nvmrc", "content": "24\n" } }]
+  },
+  "bad-cli-version": {
+    "expect": ["FAIL eas.json:3 [cli-version] cli.version allows EAS CLI 16.0.0"],
+    "ops": [{ "replace": { "file": "eas.json", "find": "\">= 24.10.0\"", "with": "\">= 16.0.0\"" } }]
+  },
+  "bad-config-version-literal": {
+    "expect": ["FAIL app.config.ts:23 [config-versions] version is \"1.2\": the stores need MAJOR.MINOR.PATCH"],
+    "ops": [{ "replace": { "file": "app.config.ts", "find": "version: '1.2.0'", "with": "version: '1.2'" } }]
+  },
+  "bad-config-versions": {
+    "expect": [
+      "FAIL app.config.ts:25 [config-versions] ios.buildNumber is set, but with remote versions EAS ignores it"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "bundleIdentifier: identity.appId, supportsTablet",
+          "with": "bundleIdentifier: identity.appId, buildNumber: '7', supportsTablet"
+        }
+      }
+    ]
+  },
+  "bad-eas-commands": {
+    "expect": [
+      "FAIL package.json [eas-commands] script \"submit:ios\": eas submit --profile production --platform ios --latest: --latest submits whatever build finished last"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "submit:ios"],
+          "value": "npm run verify && eas submit --profile production --platform ios --latest"
+        }
+      }
+    ]
+  },
+  "bad-eas-commands-auto-submit": {
+    "expect": [
+      "FAIL package.json [eas-commands] script \"release:preview\": eas build --profile preview --platform all --non-interactive --freeze-credentials --auto-submit: --auto-submit from \"preview\", which is not a store profile"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "release:preview"],
+          "value": "npm run verify && eas build --profile preview --platform all --non-interactive --freeze-credentials --auto-submit"
+        }
+      }
+    ]
+  },
+  "bad-eas-commands-auto-submit-alias": {
+    "expect": [
+      "FAIL package.json [eas-commands] script \"release:preview\": eas build --profile preview --platform ios --non-interactive --freeze-credentials -s: --auto-submit from \"preview\", which is not a store profile",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "release:preview"],
+          "value": "npm run verify && eas build --profile preview --platform ios --non-interactive --freeze-credentials -s"
+        }
+      }
+    ]
+  },
+  "bad-eas-commands-auto-submit-android": {
+    "expect": [
+      "FAIL package.json [eas-commands] script \"release:eas\": eas build --profile production --platform all --non-interactive --freeze-credentials --auto-submit: --auto-submit with --platform all",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "package.json",
+          "find": "--platform ios --non-interactive --freeze-credentials --auto-submit",
+          "with": "--platform all --non-interactive --freeze-credentials --auto-submit"
+        }
+      }
+    ]
+  },
+  "bad-eas-commands-ci": {
+    "expect": [
+      "FAIL .github/workflows/release.yml:14 [eas-commands] eas build --profile production --non-interactive --freeze-credentials --no-wait: runs in CI without --platform"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/release.yml",
+          "find": "--profile production --platform all",
+          "with": "--profile production"
+        }
+      }
+    ]
+  },
+  "bad-eas-commands-ci-submit": {
+    "expect": [
+      "FAIL .github/workflows/release.yml:17 [eas-commands] eas submit --profile production --platform ios --id 0b6f7c2e-3a41-4c5d-9e8f-1a2b3c4d5e6f: runs in CI without --non-interactive",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/release.yml",
+          "find": "        env:\n",
+          "with": "      - run: node .agents/skills/eas-build-and-submit/scripts/check-eas-build.mjs . --build dist/eas/build-ios.json --platform ios\n      - run: eas submit --profile production --platform ios --id 0b6f7c2e-3a41-4c5d-9e8f-1a2b3c4d5e6f\n        env:\n"
+        }
+      }
+    ]
+  },
+  "bad-eas-commands-freeze": {
+    "expect": [
+      "FAIL package.json [eas-commands] script \"release:eas\": eas build --profile production --platform ios --non-interactive --auto-submit: builds without --freeze-credentials"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "package.json",
+          "find": " --freeze-credentials --auto-submit\"",
+          "with": " --auto-submit\""
+        }
+      }
+    ]
+  },
+  "bad-eas-commands-npx": {
+    "expect": ["[eas-commands]", ".github/workflows/release.yml:14", "runs EAS CLI through npx"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/release.yml",
+          "find": "          eas build --profile production",
+          "with": "          npx eas-cli@latest build --profile production"
+        }
+      }
+    ]
+  },
+  "bad-eas-commands-workflow-no-profile": {
+    "expect": [
+      "FAIL .eas/workflows/release.yml:17 [eas-commands] eas build (EAS Workflows job \"build_ios\": platform ios): names no params.profile, so the build job uses EAS's default \"production\""
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": ".eas/workflows/release.yml",
+          "content": "# .eas/workflows/release.yml\nname: Release\non:\n  workflow_dispatch: {}\njobs:\n  verify:\n    steps:\n    - uses: eas/checkout\n    - uses: eas/install_node_modules\n    - name: eas build (production) gates\n      run: |\n        npm ci\n        npm run verify\n  build_ios:\n    needs:\n      - verify\n    type: build\n    params:\n      platform: ios\n  build_android:\n    needs: [verify]\n    type: 'build'\n    params: { platform: android, profile: \"production\" }\n  submit_ios:\n    needs: [build_ios]\n    type: submit\n    params:\n      build_id: ${{ needs.build_ios.outputs.build_id }}\n      profile: production\n  submit_android:\n    needs: [build_android]\n    type: submit\n    params:\n      build_id: ${{ needs.build_android.outputs.build_id }}\n      profile: production\n"
+        }
+      }
+    ]
+  },
+  "bad-eas-json": {
+    "expect": ["FAIL eas.json [eas-json] eas.json is missing although the app uses EAS (extra.eas.projectId)"],
+    "ops": [{ "delete": "eas.json" }]
+  },
+  "bad-eas-json-release-local-lane": {
+    "expect": [
+      "FAIL eas.json [eas-json] eas.json is missing: --release is the EAS ship gate, and nothing in this app uses EAS"
+    ],
+    "args": "{dir} --release",
+    "ops": [
+      { "delete": ["eas.json", ".github/workflows/release.yml"] },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    extra: { eas: { projectId: '00000000-0000-4000-8000-000000000000' } },\n",
+          "with": ""
+        }
+      },
+      { "json": { "file": "package.json", "path": ["scripts", "release:eas"], "delete": true } }
+    ]
+  },
+  "bad-eas-schema": {
+    "expect": ["FAIL eas.json:43 [eas-schema] \"build\".\"production\".\"image\" is not allowed"],
+    "ops": [
+      {
+        "replace": {
+          "file": "eas.json",
+          "find": "\"node\": \"26.4.0\",\n      \"autoIncrement\": true,",
+          "with": "\"node\": \"26.4.0\",\n      \"image\": \"latest\",\n      \"autoIncrement\": true,"
+        }
+      }
+    ]
+  },
+  "bad-eas-schema-extends": {
+    "expect": ["FAIL eas.json:18 [eas-schema] Extending non-existent build profile in eas.json: \"develop\""],
+    "ops": [
+      { "replace": { "file": "eas.json", "find": "\"extends\": \"development\"", "with": "\"extends\": \"develop\"" } }
+    ]
+  },
+  "bad-fingerprint-config": {
+    "expect": [
+      "FAIL .fingerprintignore:3 [fingerprint-config] \"package-lock.json\" hides package-lock.json from the fingerprint"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": ".fingerprintignore",
+          "lines": ["# generated folders (CNG)", "ios/**/*", "package-lock.json"]
+        }
+      }
+    ]
+  },
+  "bad-fingerprint-skip-all": {
+    "expect": ["FAIL fingerprint.config.js:4 [fingerprint-config] sourceSkips skips the whole Expo config"],
+    "ops": [
+      {
+        "write": {
+          "file": "fingerprint.config.js",
+          "lines": [
+            "// fingerprint.config.js",
+            "/** @type {import('expo/fingerprint').Config} */",
+            "const config = {",
+            "  sourceSkips: ['ExpoConfigAll'],",
+            "};",
+            "module.exports = config;"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-gates-first": {
+    "expect": [
+      "FAIL package.json [gates-first] script \"release:eas\": eas build --profile production --platform ios --non-interactive --freeze-credentials --auto-submit: leaves the machine before any gate ran"
+    ],
+    "ops": [{ "replace": { "file": "package.json", "find": "node scripts/eas/release-preflight.ts && ", "with": "" } }]
+  },
+  "bad-gates-first-ci": {
+    "expect": ["FAIL .github/workflows/release.yml:13 [gates-first]"],
+    "ops": [
+      { "replace": { "file": ".github/workflows/release.yml", "find": "      - run: npm run verify\n", "with": "" } }
+    ]
+  },
+  "bad-gates-first-comment": {
+    "expect": [
+      "FAIL .github/workflows/release.yml:16 [gates-first]",
+      "FAIL scripts/release/submit-ios.sh:3 [gates-first]"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/release/submit-ios.sh",
+          "content": "#!/bin/sh\n# TODO: add npm run verify\neas submit --profile production --platform ios --id 0b6f7c2e-3a41-4c5d-9e8f-1a2b3c4d5e6f --non-interactive\n"
+        }
+      },
+      {
+        "replace": {
+          "file": ".github/workflows/release.yml",
+          "find": "      - run: npm run verify\n",
+          "with": "      # - run: npm run verify   (turned off while the tests are slow)\n      - name: npm run verify\n        run: echo \"npm run verify is skipped\"\n"
+        }
+      }
+    ]
+  },
+  "bad-gates-first-eas-workflow": {
+    "expect": [
+      "FAIL .eas/workflows/release.yml:16 [gates-first] eas build (EAS Workflows job \"build_ios\": profile production, platform ios): leaves the machine before any gate ran",
+      "FAIL .eas/workflows/release.yml:22 [gates-first] eas submit (EAS Workflows job \"submit_ios\": profile production): submits a build whose record no check ran"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": ".eas/workflows/release.yml",
+          "content": "# .eas/workflows/release.yml\nname: Release\non:\n  push:\n    branches: ['main']\njobs:\n  verify:\n    steps:\n      - uses: eas/checkout\n      - uses: eas/install_node_modules\n      - run: npm run verify\n  build_ios:\n    name: Build iOS\n    # after: runs even when verify failed, so it is no gate\n    after: [verify]\n    type: build\n    params:\n      platform: ios\n      profile: production\n  submit_ios:\n    needs: [build_ios]\n    type: submit\n    params:\n      build_id: ${{ needs.build_ios.outputs.build_id }}\n      profile: production\n    hooks:\n      after_submit:\n        - run: npm run verify\n"
+        }
+      }
+    ]
+  },
+  "bad-gates-first-submit-verify-only": {
+    "expect": [
+      "FAIL scripts/release/submit-ios.sh:5 [gates-first] eas submit --profile production --platform ios --path build/ios-release/export/app.ipa --non-interactive: submits a build whose record no check proved",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/release/submit-ios.sh",
+          "content": "#!/bin/sh\n# planted: verify proves the code, never which build EAS made\nset -eu\nnpm run verify\neas submit --profile production --platform ios --path build/ios-release/export/app.ipa --non-interactive\n"
+        }
+      }
+    ]
+  },
+  "bad-internal-profile": {
+    "expect": [
+      "FAIL eas.json:24 [internal-profile] build.preview is internal distribution but builds an Android app bundle"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eas.json",
+          "find": "\"environment\": \"preview\",",
+          "with": "\"environment\": \"preview\",\n      \"android\": { \"buildType\": \"app-bundle\" },"
+        }
+      }
+    ]
+  },
+  "bad-release-no-expo": {
+    "expect": ["FAIL package.json [eas-json] package.json has no expo dependency: --release is the EAS ship gate"],
+    "args": "{dir} --release",
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo"], "delete": true } }]
+  },
+  "bad-release-preflight": {
+    "expect": ["FAIL scripts/eas/release-preflight.ts [release-preflight] the gates-first release preflight is missing"],
+    "ops": [{ "delete": "scripts/eas/release-preflight.ts" }]
+  },
+  "bad-require-commit": {
+    "expect": ["FAIL eas.json:2 [require-commit] cli.requireCommit is not true"],
+    "ops": [
+      { "replace": { "file": "eas.json", "find": "\"requireCommit\": true", "with": "\"requireCommit\": false" } }
+    ]
+  },
+  "bad-ship-placeholder": {
+    "expect": [
+      "FAIL eas.json:57 [ship-placeholder] submit.production.ios.bundleIdentifier is the template bundle id (com.example.*): \"com.example.tasks\"",
+      "FAIL eas.json:60 [ship-placeholder] submit.production.android.applicationId is the template bundle id"
+    ],
+    "args": "{dir} --release"
+  },
+  "bad-store-profile": {
+    "expect": [
+      "FAIL eas.json:39 [store-profile] build.production (store distribution): autoIncrement on ios is false",
+      "FAIL eas.json:39 [store-profile] build.production (store distribution): autoIncrement on android is false"
+    ],
+    "ops": [{ "replace": { "file": "eas.json", "find": "      \"autoIncrement\": true,\n", "with": "" } }]
+  },
+  "bad-store-profile-apk": {
+    "expect": ["FAIL eas.json:39 [store-profile] build.production (store distribution): android.buildType is \"apk\""],
+    "ops": [
+      { "replace": { "file": "eas.json", "find": "\"buildType\": \"app-bundle\"", "with": "\"buildType\": \"apk\"" } }
+    ]
+  },
+  "bad-store-profile-internal-only-release": {
+    "expect": [
+      "FAIL eas.json:",
+      "[store-profile] eas.json has no store-distribution profile: the store builds ship on the local lane (script \"release:ios\")",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "args": "{dir} --release",
+    "ops": [
+      { "delete": ".github/workflows/release.yml" },
+      { "json": { "file": "eas.json", "path": ["build", "production"], "delete": true } },
+      { "json": { "file": "eas.json", "path": ["submit"], "delete": true } },
+      { "json": { "file": "eas.json", "path": ["cli", "appVersionSource"], "value": "local" } },
+      { "json": { "file": "package.json", "path": ["scripts", "release:eas"], "delete": true } },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "release:ios"],
+          "value": "node scripts/release/release-ios.ts"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "supportsTablet: true }",
+          "with": "supportsTablet: true, buildNumber: '14' }"
+        }
+      }
+    ]
+  },
+  "bad-store-profile-simulator": {
+    "expect": ["FAIL eas.json:39 [store-profile] build.production (store distribution): ios.simulator is true"],
+    "ops": [
+      {
+        "replace": {
+          "file": "eas.json",
+          "find": "      \"autoIncrement\": true,\n      \"android\": {",
+          "with": "      \"autoIncrement\": true,\n      \"ios\": {\n        \"simulator\": true\n      },\n      \"android\": {"
+        }
+      }
+    ]
+  },
+  "bad-submit-credentials": {
+    "expect": [
+      "FAIL eas.json:57 [submit-credentials] submit.production: ios.ascApiKeyPath \"./keys/asc-api-key.p8\" is a key file path"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eas.json",
+          "find": "\"ascAppId\": \"6740000000\",",
+          "with": "\"ascAppId\": \"6740000000\",\n        \"ascApiKeyPath\": \"./keys/asc-api-key.p8\","
+        }
+      }
+    ]
+  },
+  "bad-submit-ids": {
+    "expect": [
+      "FAIL eas.json:54 [submit-profile] submit.production: android.applicationId \"com.example.tasks.preview\" is a testing variant's id"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eas.json",
+          "find": "\"applicationId\": \"com.example.tasks\"",
+          "with": "\"applicationId\": \"com.example.tasks.preview\""
+        }
+      }
+    ]
+  },
+  "bad-submit-ids-no-bundle": {
+    "expect": ["FAIL eas.json:54 [submit-profile] submit.production: ios pins no bundleIdentifier"],
+    "ops": [
+      {
+        "replace": {
+          "file": "eas.json",
+          "find": "\"ascAppId\": \"6740000000\",\n        \"bundleIdentifier\": \"com.example.tasks\"",
+          "with": "\"ascAppId\": \"6740000000\""
+        }
+      }
+    ]
+  },
+  "bad-submit-missing": {
+    "expect": ["FAIL eas.json:53 [submit-profile] eas.json has no submit.production profile"],
+    "ops": [
+      {
+        "replace": {
+          "file": "eas.json",
+          "find": "\"production\": {\n      \"ios\"",
+          "with": "\"store\": {\n      \"ios\""
+        }
+      }
+    ]
+  },
+  "bad-submit-track": {
+    "expect": ["FAIL eas.json:61 [submit-profile] submit.production android track is \"production\""],
+    "ops": [
+      { "replace": { "file": "eas.json", "find": "\"track\": \"internal\"", "with": "\"track\": \"production\"" } }
+    ]
+  },
+  "bad-version-source": {
+    "expect": ["FAIL eas.json:2 [version-source] cli.appVersionSource is \"local\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "eas.json",
+          "find": "\"appVersionSource\": \"remote\"",
+          "with": "\"appVersionSource\": \"local\""
+        }
+      }
+    ]
+  },
+  "error-malformed-eas": {
+    "expect": ["ERROR [bad-input] eas.json is not valid JSON"],
+    "ops": [{ "write": { "file": "eas.json", "content": "{ \"cli\": \n" } }]
+  },
+  "error-no-package": { "expect": ["ERROR [bad-input] nothing to check"], "ops": [{ "delete": "package.json" }] },
+  "pass-ci-quoted-platform": {
+    "expect": ["check-eas-config: 4 files and commands checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": ".github/workflows/release.yml",
+          "content": "# .github/workflows/release.yml\n# Starts a store build on EAS, by hand only: a developer picks the platform under Actions > release >\n# Run workflow, and the protected \"production\" environment (Settings > Environments: required\n# reviewers, main only) holds EXPO_TOKEN and waits for a reviewer's approval before anything runs.\n# The release preflight (eas-build-and-submit) runs first: a clean tree on main, `npm run verify`,\n# the app config and the fingerprint. The build is not submitted here; submitting to a store is the\n# developer's next, separate step. No cache is restored in a job that holds a secret.\nname: release\n\non:\n  workflow_dispatch:\n    inputs:\n      platform:\n        description: Which store build to start\n        type: choice\n        options: [all, ios, android]\n        default: all\n\npermissions:\n  contents: read\n\nconcurrency:\n  group: ${{ github.workflow }}\n  cancel-in-progress: false\n\nenv:\n  LEFTHOOK: '0'\n  EXPO_NO_TELEMETRY: '1'\n\njobs:\n  eas-build:\n    name: eas build (production)\n    runs-on: ubuntu-24.04\n    timeout-minutes: 45\n    environment: production\n    steps:\n      - name: Check out with the release tags\n        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1\n        with:\n          persist-credentials: false\n          fetch-depth: 0\n      - name: Set up Node from .nvmrc (no cache in a job with secrets)\n        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0\n        with:\n          node-version-file: .nvmrc\n          package-manager-cache: false\n      - name: Install the locked dependencies\n        run: npm ci\n      - name: Install the pinned EAS CLI with the dependency policy\n        run: npm install -g --min-release-age=7 --ignore-scripts eas-cli@24.10.0\n      - name: Release preflight\n        run: node scripts/eas/release-preflight.ts --profile production --platform \"$PLATFORM\"\n        env:\n          PLATFORM: ${{ inputs.platform }}\n      - name: Start the EAS build\n        run: >-\n          eas build --profile production --platform \"$PLATFORM\" --non-interactive\n          --freeze-credentials --no-wait --message \"release from $GITHUB_SHA\"\n        env:\n          PLATFORM: ${{ inputs.platform }}\n          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}\n"
+        }
+      }
+    ]
+  },
+  "pass-eas-workflow": {
+    "expect": ["check-eas-config: 8 files and commands checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": ".eas/workflows/release.yml",
+          "content": "# .eas/workflows/release.yml\nname: Release\non:\n  workflow_dispatch: {}\njobs:\n  verify:\n    steps:\n    - uses: eas/checkout\n    - uses: eas/install_node_modules\n    - name: eas build (production) gates\n      run: |\n        npm ci\n        npm run verify\n  build_ios:\n    needs:\n      - verify\n    type: build\n    params:\n      platform: ios\n      profile: production\n  build_android:\n    needs: [verify]\n    type: 'build'\n    params: { platform: android, profile: \"production\" }\n  check_ios:\n    needs: [build_ios]\n    steps:\n      - uses: eas/checkout\n      - uses: eas/install_node_modules\n      - run: |\n          npm install -g --min-release-age=7 --ignore-scripts eas-cli@24.10.0\n          mkdir -p dist/eas\n          eas build:view ${{ needs.build_ios.outputs.build_id }} --json > dist/eas/build-ios.json\n          npx --no-install @expo/fingerprint fingerprint:generate --platform ios > dist/eas/fingerprint-ios.json\n          node .agents/skills/eas-build-and-submit/scripts/check-eas-build.mjs . --build dist/eas/build-ios.json --platform ios --previous \"$LAST_IOS_BUILD\"\n  check_android:\n    needs: [build_android]\n    steps:\n      - uses: eas/checkout\n      - run: node .agents/skills/eas-build-and-submit/scripts/check-eas-build.mjs . --build dist/eas/build-android.json --platform android --previous \"$LAST_ANDROID_BUILD\"\n  submit_ios:\n    needs: [check_ios]\n    type: submit\n    params:\n      build_id: ${{ needs.build_ios.outputs.build_id }}\n      profile: production\n  submit_android:\n    needs: [check_android]\n    type: submit\n    params:\n      build_id: ${{ needs.build_android.outputs.build_id }}\n      profile: production\n"
+        }
+      }
+    ]
+  },
+  "pass-env-key-path": {
+    "expect": ["check-eas-config: 4 files and commands checked, 0 problems"],
+    "ops": [
+      {
+        "replace": {
+          "file": "eas.json",
+          "find": "\"ascAppId\": \"6740000000\",",
+          "with": "\"ascAppId\": \"6740000000\",\n        \"ascApiKeyPath\": \"$ASC_API_KEY_PATH\","
+        }
+      }
+    ]
+  },
+  "pass-fingerprint-safe": {
+    "expect": ["check-eas-config: 4 files and commands checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": ".fingerprintignore",
+          "lines": ["# generated folders (CNG)", "ios/**/*", "android/**/*", "!ios/Podfile"]
+        }
+      },
+      {
+        "write": {
+          "file": "fingerprint.config.js",
+          "lines": [
+            "// fingerprint.config.js",
+            "/** @type {import('expo/fingerprint').Config} */",
+            "const config = {",
+            "  sourceSkips: ['ExpoConfigVersions'],",
+            "};",
+            "module.exports = config;"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-internal-only-eas": {
+    "expect": [
+      "internal-only EAS: no store profile, and script \"release:ios\" ships the store builds on the local lane",
+      "check-eas-config: 2 files and commands checked, 0 problems"
+    ],
+    "ops": [
+      { "delete": ".github/workflows/release.yml" },
+      { "json": { "file": "eas.json", "path": ["build", "production"], "delete": true } },
+      { "json": { "file": "eas.json", "path": ["submit"], "delete": true } },
+      { "json": { "file": "eas.json", "path": ["cli", "appVersionSource"], "value": "local" } },
+      { "json": { "file": "package.json", "path": ["scripts", "release:eas"], "delete": true } },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "release:ios"],
+          "value": "node scripts/release/release-ios.ts"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "supportsTablet: true }",
+          "with": "supportsTablet: true, buildNumber: '14' }"
+        }
+      }
+    ]
+  },
+  "pass-local-lane": {
+    "expect": [
+      "NOT APPLICABLE: no eas.json and nothing uses EAS (no extra.eas.projectId, no eas build or eas submit command): the app builds with the local lane"
+    ],
+    "ops": [
+      { "delete": ["eas.json", ".github/workflows/release.yml"] },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    extra: { eas: { projectId: '00000000-0000-4000-8000-000000000000' } },\n",
+          "with": ""
+        }
+      },
+      { "json": { "file": "package.json", "path": ["scripts", "release:eas"], "delete": true } }
+    ]
+  },
+  "pass-no-expo": {
+    "expect": ["NOT APPLICABLE: package.json has no expo dependency"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo"], "delete": true } }]
+  },
+  "pass-nvmrc-alias": {
+    "expect": ["check-eas-config: 4 files and commands checked, 0 problems"],
+    "ops": [{ "write": { "file": ".nvmrc", "content": "lts/*\n" } }]
+  },
+  "pass-nvmrc-partial": {
+    "expect": ["check-eas-config: 4 files and commands checked, 0 problems"],
+    "ops": [{ "write": { "file": ".nvmrc", "content": "26\n" } }]
+  },
+  "pass-pre-install": {
+    "expect": ["check-eas-config: 4 files and commands checked, 0 problems"],
+    "ops": [
+      { "replace": { "file": "eas.json", "find": "      \"node\": \"26.4.0\",\n", "with": "", "count": 3 } },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "eas-build-pre-install"],
+          "value": "npm install -g npm@11.17.0"
+        }
+      }
+    ]
+  },
+  "pass-release": {
+    "expect": ["check-eas-config: 4 files and commands checked, 0 problems"],
+    "args": "{dir} --release",
+    "ops": [
+      { "replace": { "file": "eas.json", "find": "com.example.tasks", "with": "org.tasksapp.tasks", "count": 2 } },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "appId: 'com.example.tasks'",
+          "with": "appId: 'org.tasksapp.tasks'"
+        }
+      }
+    ]
+  },
+  "pass-shared-base": {
+    "expect": ["check-eas-config: 4 files and commands checked, 0 problems"],
+    "ops": [
+      {
+        "replace": {
+          "file": "eas.json",
+          "find": "      \"node\": \"26.4.0\",\n",
+          "with": "      \"extends\": \"base\",\n",
+          "count": 3
+        }
+      },
+      {
+        "replace": {
+          "file": "eas.json",
+          "find": "  \"build\": {\n",
+          "with": "  \"build\": {\n    \"base\": {\n      \"node\": \"26.4.0\"\n    },\n"
+        }
+      }
+    ]
+  },
+  "pass-submit-after-record-check": {
+    "expect": ["check-eas-config: 5 files and commands checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/release/submit-ios.sh",
+          "content": "#!/bin/sh\n# Submits the iOS build whose record passed the check (eas-build-and-submit's check-eas-build).\nset -eu\nBUILD_ID=\"$1\"\nnode \"$SKILL_DIR/scripts/check-eas-build.mjs\" . --build dist/eas/builds.json --platform ios &&\n  eas submit --profile production --platform ios --id \"$BUILD_ID\" --non-interactive\n"
+        }
+      }
+    ]
+  }
+}

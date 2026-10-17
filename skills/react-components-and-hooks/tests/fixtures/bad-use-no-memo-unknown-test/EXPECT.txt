@@ -1,0 +1,3 @@
+[use-no-memo] 'use no memo' names a test that does not exist: "keeps the probe in sync"
+src/features/tasks/components/task-probe.tsx:6
+RESULT: FAIL (1 problems)

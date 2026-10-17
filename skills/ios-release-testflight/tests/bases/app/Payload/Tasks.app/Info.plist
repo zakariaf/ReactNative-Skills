@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.acme.tasks</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>ar</string>
+	</array>
+	<key>CFBundleShortVersionString</key>
+	<string>1.4.0</string>
+	<key>CFBundleVersion</key>
+	<string>14</string>
+	<key>DTPlatformName</key>
+	<string>iphoneos</string>
+	<key>DTXcode</key>
+	<string>2660</string>
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-1234567890123456~6543210987</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>NSCameraUsageDescription</key>
+	<string>Attach a photo to a task.</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>Your answer decides whether ads may be personalized.</string>
+</dict>
+</plist>

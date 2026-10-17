@@ -1,0 +1,458 @@
+{
+  "bad-adapter-auto-finish": {
+    "expect": ["[adapter-finish] a delivered purchase is finished only by finish(tx)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/expo-iap-purchase-adapter.ts",
+          "find": "      if (transaction !== null) listener({ type: 'transaction', transaction });",
+          "with": "      void finishTransaction({ purchase, isConsumable: false });\n      if (transaction !== null) listener({ type: 'transaction', transaction });"
+        }
+      }
+    ]
+  },
+  "bad-adapter-deferred-as-failed": {
+    "expect": ["[adapter-errors] listener error deferred-payment"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/expo-iap-purchase-adapter.ts",
+          "find": "  [ErrorCode.DeferredPayment]: 'deferred',\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-adapter-drops-revocation": {
+    "expect": ["[adapter-transactions] Transaction.all with refunds, pending and unknown"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/expo-iap-purchase-adapter.ts",
+          "find": "    revocationDateMs: revoked ?? null,",
+          "with": "    revocationDateMs: null,"
+        }
+      }
+    ]
+  },
+  "bad-adapter-ignores-acknowledged": {
+    "expect": ["[adapter-transactions] an unacknowledged Android purchase is marked unfinished"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/expo-iap-purchase-adapter.ts",
+          "find": "    ...(isUnacknowledged ? { isUnfinished: true } : {}),\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-adapter-rejects": {
+    "expect": ["[adapter-results] a rejected readTransactions becomes a store error"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/expo-iap-purchase-adapter.ts",
+          "find": "function readTransactions(): Promise<StoreResult<readonly StoreTransaction[]>> {\n  return attemptAsync(async () => {",
+          "with": "function readTransactions(): Promise<StoreResult<readonly StoreTransaction[]>> {\n  return (async () => {"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/purchase/expo-iap-purchase-adapter.ts",
+          "find": "    return purchases.map(toTransaction).filter((tx) => tx !== null);\n  }, storeFailure);",
+          "with": "    return { ok: true as const, value: purchases.map(toTransaction).filter((tx) => tx !== null) };\n  })();"
+        }
+      }
+    ]
+  },
+  "bad-adapter-restore-rethrows": {
+    "expect": ["[adapter-restore] restorePurchases rejects with a cancelled account prompt"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/expo-iap-purchase-adapter.ts",
+          "find": "function restore(): Promise<StoreResult<void>> {\n  return attemptAsync(async () => {\n    await restorePurchases();\n  }, storeFailure);\n}",
+          "with": "async function restore(): Promise<StoreResult<void>> {\n  await restorePurchases();\n  return { ok: true, value: undefined };\n}"
+        }
+      }
+    ]
+  },
+  "bad-adapter-restore-swallows-failure": {
+    "expect": ["[adapter-restore] restorePurchases rejects with sync-error"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/expo-iap-purchase-adapter.ts",
+          "find": "  return attemptAsync(async () => {\n    await restorePurchases();\n  }, storeFailure);",
+          "with": "  return attemptAsync(async () => {\n    await restorePurchases().catch(() => undefined);\n  }, storeFailure);"
+        }
+      }
+    ]
+  },
+  "bad-buy-ignores-guard": {
+    "expect": ["[store-flow] BUY asks the store for nothing when the store is unavailable"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/premium-store-flow.ts",
+          "find": "  if (deps.paywall.getState().flow.kind !== 'purchasing') return;\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-duplicate-failure": {
+    "expect": ["[paywall-states] a duplicated failure is ignored"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/paywall/paywall-transitions.ts",
+          "find": "  if (state.flow.kind !== 'purchasing') return state;\n  const price = state.flow.price;",
+          "with": "  const price = priceOf(state.flow) ?? '';"
+        }
+      }
+    ]
+  },
+  "bad-empty-after-failed-sync": {
+    "expect": ["[paywall-states] restore failed", "[restore-notices]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/paywall/paywall-transitions.ts",
+          "find": "  if (evidence === 'sync-failed') return { ...state, flow: { kind: 'restore-failed', price } };\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-empty-product-silent": {
+    "expect": ["[store-flow] an empty product list -> store unavailable"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/premium-store-flow.ts",
+          "find": "  if (priceText === null) {",
+          "with": "  if (!product.ok) {"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/purchase/premium-store-flow.ts",
+          "find": "  dispatch({ type: 'set-price', price: priceText });",
+          "with": "  if (priceText !== null) dispatch({ type: 'set-price', price: priceText });"
+        }
+      }
+    ]
+  },
+  "bad-finish-first": {
+    "expect": ["[service-order] a purchase: save -> show -> finish"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/premium-service.ts",
+          "find": "  dispatch(deps, { type: 'finish-purchase' }); // 2. the paywall's thank-you ...\n  await finishQuietly(deps, tx); // 3. ... and only then may the store forget the transaction.",
+          "with": "  await finishQuietly(deps, tx);\n  dispatch(deps, { type: 'finish-purchase' });"
+        }
+      }
+    ]
+  },
+  "bad-finish-unsaved": {
+    "expect": ["[service-order] an unsaved purchase is never finished"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/premium-service.ts",
+          "find": "    dispatch(deps, { type: 'record-save-failure' });\n    return;\n  }\n  dispatch(deps, { type: 'finish-purchase' });",
+          "with": "    dispatch(deps, { type: 'record-save-failure' });\n  }\n  dispatch(deps, { type: 'finish-purchase' });"
+        }
+      }
+    ]
+  },
+  "bad-gate-connects-offline": {
+    "expect": ["[offline-gate] offline: nothing reaches the store"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/connectivity-gated-purchase.ts",
+          "find": "    connect: () => (isOnline() ? port.connect() : Promise.resolve(ok(false))),",
+          "with": "    connect: () => port.connect(),"
+        }
+      }
+    ]
+  },
+  "bad-grant-not-idempotent": {
+    "expect": ["[entitlement-reducer] a second grant returns the same state (no write)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/premium/premium-reducer.ts",
+          "find": "  if (entitlement.isOwned && entitlement.revokedAtMs === null) return state;\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-listen-late": {
+    "expect": ["[store-flow] startPremium subscribes before connecting"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/premium-store-flow.ts",
+          "find": "  const unsubscribe = deps.port.subscribe((event) => {\n    processPurchaseEvent(deps, event).catch(deps.onError);\n  });\n  await loadStore(deps);",
+          "with": "  await loadStore(deps);\n  const unsubscribe = deps.port.subscribe((event) => {\n    processPurchaseEvent(deps, event).catch(deps.onError);\n  });"
+        }
+      }
+    ]
+  },
+  "bad-missing-module": {
+    "expect": ["[module-load] premium-store-flow.ts does not exist"],
+    "ops": [{ "delete": "src/services/purchase/premium-store-flow.ts" }]
+  },
+  "bad-no-foreground-recheck": {
+    "expect": ["[store-reloads] a return to the foreground re-checks while online"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/connect-premium-reloads.ts",
+          "find": "    if (connectivity.isOnline()) recheckPremium(service).catch(service.onError);",
+          "with": "    if (connectivity.isOnline()) loadStore(service).catch(service.onError);"
+        }
+      }
+    ]
+  },
+  "bad-no-restore-toast": {
+    "expect": ["[restore-notices] restore finished with owned"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/paywall/paywall-notice.ts",
+          "find": "  return state.didJustRestore ? 'restore-success' : null;",
+          "with": "  return null;"
+        }
+      }
+    ]
+  },
+  "bad-no-start": {
+    "expect": ["src [store-reloads] no composition-root file calls startPremium(...)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/purchase-root.tsx",
+          "find": "    startPremium(deps)\n",
+          "with": "    Promise.resolve(() => undefined)\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/root-navigator/purchase-root.tsx",
+          "find": "import { startPremium } from '@/services/purchase/premium-store-flow';\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-no-store-reload": {
+    "expect": ["src [store-reloads] no composition-root file calls connectPremiumReloads(...)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/root-navigator/purchase-root.tsx",
+          "find": "    const stopReloads = connectPremiumReloads({",
+          "with": "    const stopReloads = keepFresh({"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/root-navigator/purchase-root.tsx",
+          "find": "import { connectPremiumReloads } from '@/services/purchase/connect-premium-reloads';",
+          "with": "import { connectPremiumReloads as keepFresh } from '@/services/purchase/connect-premium-reloads';"
+        }
+      }
+    ]
+  },
+  "bad-price-empty-shown": {
+    "expect": ["[price-text] no text", "[store-flow] a product without price text -> store unavailable"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/store-price-text.ts",
+          "find": "  return product.displayPrice.trim() === '' ? null : product.displayPrice;",
+          "with": "  return product.displayPrice;"
+        }
+      }
+    ]
+  },
+  "bad-price-rebuilt-from-double": {
+    "expect": ["[price-text] never rebuilt from the double (HUF)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/store-price-text.ts",
+          "find": "  return product.displayPrice.trim() === '' ? null : product.displayPrice;",
+          "with": "  const { price } = product;\n  if (price === null) return product.displayPrice;\n  return new Intl.NumberFormat('en', { style: 'currency', currency: product.currency }).format(price);"
+        }
+      }
+    ]
+  },
+  "bad-read-after-failed-sync": {
+    "expect": ["[restore-flow] a failed sync is \"couldn't restore\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/premium-service.ts",
+          "find": "  if (!synced.ok) return NOT_SYNCED; // a cancelled prompt or offline: never \"nothing to restore\"\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-recheck-leaves-unfinished": {
+    "expect": ["[service-order] the re-check finishes an unfinished purchase once saved"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/premium-service.ts",
+          "find": "  const { unfinished } = applyEvidence(deps, read.value);\n  await finishAll(deps, unfinished);",
+          "with": "  applyEvidence(deps, read.value);"
+        }
+      }
+    ]
+  },
+  "bad-reducer-revokes-undated": {
+    "expect": ["[entitlement-reducer] a revoke without a date keeps Premium"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/premium/premium-reducer.ts",
+          "find": "  if (!Number.isSafeInteger(revokedAtMs) || revokedAtMs <= 0) return state;\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-reload-no-recheck": {
+    "expect": ["[store-reloads] back online, Premium is re-checked"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/connect-premium-reloads.ts",
+          "find": "    const done = isOnline ? reload.then(async () => recheckPremium(service)) : reload;",
+          "with": "    const done = reload;"
+        }
+      }
+    ]
+  },
+  "bad-reload-while-buying": {
+    "expect": ["[offline-gate] shouldReloadStore(purchasing, online=false)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/premium-store-flow.ts",
+          "find": "  return isOnline ? flow === 'unavailable' : QUIET_FLOWS.has(flow);",
+          "with": "  return isOnline ? flow === 'unavailable' : flow !== 'unavailable';"
+        }
+      }
+    ]
+  },
+  "bad-restore-empty-for-owner": {
+    "expect": ["[restore-flow] an owner whose sync finds nothing never hears \"nothing to restore\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/premium-service.ts",
+          "find": "  const isPremium = deps.premium.getState().entitlement.isOwned;\n  dispatch(deps, { type: 'finish-restore', evidence, isPremium });",
+          "with": "  const isPremium = false;\n  dispatch(deps, { type: 'finish-restore', evidence, isPremium });"
+        }
+      }
+    ]
+  },
+  "bad-restore-save-failed-shows-restored": {
+    "expect": ["[restore-flow] a restored purchase the disk refused shows save-failed"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/premium-service.ts",
+          "find": "  if (evidence === 'owned' && !isSaved) {\n    dispatch(deps, { type: 'record-save-failure' });\n    return;\n  }\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-restore-shows-thanks": {
+    "expect": ["[paywall-states] a restore after a purchase shows \"owned\", not the thank-you"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/paywall/paywall-transitions.ts",
+          "find": "    return { ...state, didJustPurchase: false, didJustRestore: true, flow };",
+          "with": "    return { ...state, didJustRestore: true, flow };"
+        }
+      }
+    ]
+  },
+  "bad-revoke-on-absence": {
+    "expect": ["[revocation] the launch re-check without transactions keeps Premium"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/premium-service.ts",
+          "find": "  if (evidence === 'revoked') {",
+          "with": "  if (evidence !== 'owned') {"
+        }
+      }
+    ]
+  },
+  "bad-revoke-without-date": {
+    "expect": ["[revocation] a refund is revoked with its date"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/premium-service.ts",
+          "find": "      .revokePremium(latestRevocationMs(transactions, deps.productId));",
+          "with": "      .revokePremium(latestRevocationMs([], deps.productId));"
+        }
+      }
+    ]
+  },
+  "bad-revoked-beats-owned": {
+    "expect": ["[evidence] a newer purchase after a refund"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/purchase/entitlement-evidence.ts",
+          "find": "  if (transactions.some((tx) => isOwnedPurchase(tx, productId))) return 'owned';\n  const ofProduct = transactions.filter((tx) => tx.productId === productId);\n  if (ofProduct.some((tx) => tx.revocationDateMs !== null)) return 'revoked';",
+          "with": "  const ofProduct = transactions.filter((tx) => tx.productId === productId);\n  if (ofProduct.some((tx) => tx.revocationDateMs !== null)) return 'revoked';\n  if (transactions.some((tx) => isOwnedPurchase(tx, productId))) return 'owned';"
+        }
+      }
+    ]
+  },
+  "bad-thanks-at-launch": {
+    "expect": ["[paywall-states] a purchase delivered at launch shows no thank-you"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/paywall/paywall-transitions.ts",
+          "find": "  if (flow.kind !== 'purchasing' && flow.kind !== 'pending') return state;\n  return { ...state, didJustPurchase: true, flow: { kind: 'ready', price: flow.price } };",
+          "with": "  const price = priceOf(flow);\n  return { ...state, didJustPurchase: true, flow: readyOrUnavailable(price) };"
+        }
+      }
+    ]
+  },
+  "bad-upsell-every-time": {
+    "expect": ["[upsell-line] already shown today"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/stores/premium/upsell-line.ts",
+          "find": "  return input.lastShownOn === input.today ? null : input.priceText;",
+          "with": "  return input.priceText;"
+        }
+      }
+    ]
+  },
+  "pass-not-adopted": {
+    "expect": ["NOT APPLICABLE: expo-iap is installed but no code uses it yet", "RESULT: PASS"],
+    "base": ["@tests/bases/bare"]
+  }
+}

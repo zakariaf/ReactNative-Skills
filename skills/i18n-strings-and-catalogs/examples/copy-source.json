@@ -1,0 +1,45 @@
+{
+  "$comment": "Shape of contracts/copy-source.json: the approved copy, every language in every row. sync-copy.mjs reads it.",
+  "screens": {
+    "tasks": [
+      "tasks.list.title",
+      "tasks.summary.open"
+    ],
+    "delete-dialog": [
+      "tasks.delete.title",
+      "tasks.delete.body"
+    ],
+    "settings": [
+      "permissions.camera.usage-description"
+    ]
+  },
+  "strings": {
+    "app.name": {
+      "en": "Tasks",
+      "ar": "المهام"
+    },
+    "permissions.camera.usage-description": {
+      "en": "Lets you add a photo to a task. Photos stay on this device unless you share them.",
+      "ar": "يتيح لك هذا إضافة صورة إلى مهمة. تبقى الصور على هذا الجهاز ما لم تشاركها."
+    },
+    "tasks.delete.body": {
+      "en": "This can’t be undone.",
+      "ar": "لا يمكن التراجع عن ذلك."
+    },
+    "tasks.delete.title": {
+      "en": "Delete this task?",
+      "ar": "حذف هذه المهمة؟"
+    },
+    "tasks.list.title": {
+      "en": "Tasks",
+      "ar": "المهام"
+    },
+    "tasks.summary.open": {
+      "en": "{openCount, plural, =0 {No open tasks} one {# open task} other {# open tasks}}",
+      "ar": "{openCount, plural, =0 {لا توجد مهام مفتوحة} one {مهمة مفتوحة واحدة} two {مهمتان مفتوحتان} few {# مهام مفتوحة} many {# مهمة مفتوحة} other {# مهمة مفتوحة}}"
+    }
+  },
+  "retired": {
+    "tasks.count-label": "replaced by tasks.summary.open, a plural with every category of each language"
+  }
+}

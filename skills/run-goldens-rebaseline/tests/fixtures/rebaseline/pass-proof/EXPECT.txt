@@ -1,0 +1,3 @@
+proof: the whole golden project passed twice without -u
+RESULT: PASS
+recorded the 6 golden hashes the proof ran against in reports/rebaseline/proof-goldens.json

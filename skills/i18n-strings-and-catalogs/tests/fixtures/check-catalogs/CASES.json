@@ -1,0 +1,349 @@
+{
+  "bad-arabic-letters": {
+    "expect": ["[L9 arabic-letters]", "src/i18n/catalogs/fa.json:2"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/i18n/catalogs/fa.json",
+          "find": "\"app.name\": \"کارها\"",
+          "with": "\"app.name\": \"كارها\""
+        }
+      }
+    ]
+  },
+  "bad-bidi-control": {
+    "expect": ["[L8 bidi-controls]", "src/i18n/catalogs/fa.json:9"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/i18n/catalogs/fa.json",
+          "find": "به {listName} منتقل شد",
+          "with": "به ⁨{listName}⁩ منتقل شد"
+        }
+      }
+    ]
+  },
+  "bad-catalog-file-casing": {
+    "expect": [
+      "[F1 catalog-file]",
+      "src/i18n/catalogs/en-gb.json:1",
+      "the catalog is named en-gb.json, but LANGUAGES spells the tag en-GB",
+      "Rename it to en-GB.json"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/i18n/languages.ts",
+          "find": "['en', 'de', 'fa', 'ar']",
+          "with": "['en', 'de', 'fa', 'ar', 'en-GB']"
+        }
+      },
+      { "copy": { "from": "src/i18n/catalogs/en.json", "to": "src/i18n/catalogs/en-gb.json" } }
+    ]
+  },
+  "bad-count-needs-plural": {
+    "expect": ["[L6 count-needs-plural]", "src/i18n/catalogs/en.json:10"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/i18n/catalogs/en.json",
+          "find": "\"Page {page, number}\"",
+          "with": "\"{page, number} pages left\""
+        }
+      }
+    ]
+  },
+  "bad-count-needs-plural-german": {
+    "expect": ["[L6 count-needs-plural]", "src/i18n/catalogs/de.json:10", "{page, number} is followed by a word"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/i18n/languages.ts",
+          "lines": [
+            "// src/i18n/languages.ts (fixture: a German-source app)",
+            "export const LANGUAGES = ['de', 'en'] as const;",
+            "export type Language = (typeof LANGUAGES)[number];",
+            "export const SOURCE_LANGUAGE = 'de' satisfies Language;"
+          ]
+        }
+      },
+      { "delete": ["src/i18n/catalogs/fa.json", "src/i18n/catalogs/ar.json"] },
+      { "json": { "file": "contracts/i18n.json", "path": ["reviewLanguages"], "value": ["en"] } },
+      {
+        "replace": {
+          "file": "src/i18n/catalogs/de.json",
+          "find": "\"Seite {page, number}\"",
+          "with": "\"{page, number} Seiten übrig\""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/i18n/catalogs/en.json",
+          "find": "\"Page {page, number}\"",
+          "with": "\"{page, number} pages left\""
+        }
+      }
+    ]
+  },
+  "bad-date-tag": {
+    "expect": ["[L3 no-date-time-tags]", "src/i18n/catalogs/en.json:5"],
+    "ops": [
+      { "replace": { "file": "src/i18n/catalogs/en.json", "find": "{dateText}", "with": "{dueDate, date, short}" } },
+      { "replace": { "file": "src/i18n/catalogs/de.json", "find": "{dateText}", "with": "{dueDate, date, short}" } },
+      { "replace": { "file": "src/i18n/catalogs/fa.json", "find": "{dateText}", "with": "{dueDate, date, short}" } },
+      { "replace": { "file": "src/i18n/catalogs/ar.json", "find": "{dateText}", "with": "{dueDate, date, short}" } }
+    ]
+  },
+  "bad-exact-plural": {
+    "expect": ["[P4 exact-plural-parity]", "src/i18n/catalogs/fa.json:12"],
+    "ops": [{ "replace": { "file": "src/i18n/catalogs/fa.json", "find": "=0 {هیچ کار بازی نمانده} ", "with": "" } }]
+  },
+  "bad-extra-key": {
+    "expect": ["[P2 extra-key]", "tasks.subtitle: not in en.json"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/i18n/catalogs/de.json",
+          "find": "  \"tasks.summary.open\":",
+          "with": "  \"tasks.subtitle\": \"Heute\",\n  \"tasks.summary.open\":"
+        }
+      }
+    ]
+  },
+  "bad-icu-syntax": {
+    "expect": ["[L2 icu-syntax]", "src/i18n/catalogs/en.json:12", "tasks.summary.open: ICU syntax error"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/i18n/catalogs/en.json",
+          "find": "other {# open tasks}}\"",
+          "with": "other {# open tasks}\""
+        }
+      }
+    ]
+  },
+  "bad-key-shape": {
+    "expect": [
+      "[L1 key-shape]",
+      "src/i18n/catalogs/en.json:10",
+      "tasks.page_count: key must be 2-5 dot-separated kebab-case segments"
+    ],
+    "ops": [
+      { "replace": { "file": "src/i18n/catalogs/en.json", "find": "\"tasks.page\"", "with": "\"tasks.page_count\"" } },
+      { "replace": { "file": "src/i18n/catalogs/de.json", "find": "\"tasks.page\"", "with": "\"tasks.page_count\"" } },
+      { "replace": { "file": "src/i18n/catalogs/fa.json", "find": "\"tasks.page\"", "with": "\"tasks.page_count\"" } },
+      { "replace": { "file": "src/i18n/catalogs/ar.json", "find": "\"tasks.page\"", "with": "\"tasks.page_count\"" } }
+    ]
+  },
+  "bad-language-casing": {
+    "expect": [
+      "[F1 catalog-file]",
+      "src/i18n/languages.ts:2",
+      "\"en-gb\" in LANGUAGES is not in BCP 47 canonical casing: the tag is \"en-GB\"",
+      "catalogs/en-GB.json"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/i18n/languages.ts",
+          "find": "['en', 'de', 'fa', 'ar']",
+          "with": "['en', 'de', 'fa', 'ar', 'en-gb']"
+        }
+      },
+      { "copy": { "from": "src/i18n/catalogs/en.json", "to": "src/i18n/catalogs/en-gb.json" } }
+    ]
+  },
+  "bad-latin-punctuation": {
+    "expect": ["[L10 latin-punctuation]", "src/i18n/catalogs/fa.json:4", "src/i18n/catalogs/ar.json:6"],
+    "ops": [
+      { "replace": { "file": "src/i18n/catalogs/fa.json", "find": "می‌مانند، مگر", "with": "می‌مانند, مگر" } },
+      { "replace": { "file": "src/i18n/catalogs/ar.json", "find": "حذف هذه المهمة؟", "with": "حذف هذه المهمة?" } }
+    ]
+  },
+  "bad-literal-digits": {
+    "expect": ["[L7 literal-digits]", "src/i18n/catalogs/ar.json:8"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/i18n/catalogs/ar.json",
+          "find": "\"tasks.list.title\": \"المهام\"",
+          "with": "\"tasks.list.title\": \"المهام ٣\""
+        }
+      }
+    ]
+  },
+  "bad-missing-file": {
+    "expect": ["[F1 catalog-file]", "src/i18n/catalogs/fa.json:1", "fa.json is missing"],
+    "ops": [{ "delete": "src/i18n/catalogs/fa.json" }]
+  },
+  "bad-missing-key": {
+    "expect": ["[P1 missing-key]", "src/i18n/catalogs/fa.json:1", "tasks.list.title: missing in fa"],
+    "ops": [{ "json": { "file": "src/i18n/catalogs/fa.json", "path": ["tasks.list.title"], "delete": true } }]
+  },
+  "bad-not-string": {
+    "expect": ["[F1 catalog-file]", "tasks.page: value is not a string"],
+    "ops": [{ "json": { "file": "src/i18n/catalogs/en.json", "path": ["tasks.page"], "value": 12 } }]
+  },
+  "bad-ordinal-category": {
+    "expect": ["[L5 plural-categories]", "src/i18n/catalogs/en.json:7", "{place} lacks the en ordinal categories two"],
+    "ops": [{ "replace": { "file": "src/i18n/catalogs/en.json", "find": "two {#nd} ", "with": "" } }]
+  },
+  "bad-orphan-catalog": {
+    "expect": ["[F1 catalog-file]", "src/i18n/catalogs/fr.json:1", "fr.json is not in LANGUAGES"],
+    "ops": [{ "copy": { "from": "src/i18n/catalogs/de.json", "to": "src/i18n/catalogs/fr.json" } }]
+  },
+  "bad-placeholder-parity": {
+    "expect": ["[P3 placeholder-parity]", "src/i18n/catalogs/de.json:10", "tasks.page: placeholders differ from en"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/i18n/catalogs/de.json",
+          "find": "Seite {page, number}",
+          "with": "Seite {pageNumber, number}"
+        }
+      }
+    ]
+  },
+  "bad-plain-number": {
+    "expect": ["[L4 placeholder-name]", "src/i18n/catalogs/en.json:10", "{page} is plain text"],
+    "ops": [
+      { "replace": { "file": "src/i18n/catalogs/en.json", "find": "{page, number}", "with": "{page}" } },
+      { "replace": { "file": "src/i18n/catalogs/de.json", "find": "{page, number}", "with": "{page}" } },
+      { "replace": { "file": "src/i18n/catalogs/fa.json", "find": "{page, number}", "with": "{page}" } },
+      { "replace": { "file": "src/i18n/catalogs/ar.json", "find": "{page, number}", "with": "{page}" } }
+    ]
+  },
+  "bad-plural-category": {
+    "expect": ["[L5 plural-categories]", "src/i18n/catalogs/en.json:12", "plural category \"few\" does not exist in en"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/i18n/catalogs/en.json",
+          "find": "one {# open task} other",
+          "with": "one {# open task} few {# open tasks} other"
+        }
+      }
+    ]
+  },
+  "bad-plural-missing-category": {
+    "expect": [
+      "[L5 plural-categories]",
+      "src/i18n/catalogs/ar.json:12",
+      "{openCount} lacks the ar cardinal categories many"
+    ],
+    "ops": [{ "replace": { "file": "src/i18n/catalogs/ar.json", "find": "many {# مهمة مفتوحة} ", "with": "" } }]
+  },
+  "bad-sentence-fragment": {
+    "expect": ["[L11 sentence-shape]", "src/i18n/catalogs/en.json:9", "starts/ends with space or joiner"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/i18n/catalogs/en.json",
+          "find": "\"Moved to {listName}\"",
+          "with": "\"Moved to {listName} \""
+        }
+      }
+    ]
+  },
+  "bad-system-text-icu": {
+    "expect": ["[L13 system-text-plain]", "src/i18n/catalogs/en.json:4"],
+    "ops": [
+      {
+        "replace": { "file": "src/i18n/catalogs/en.json", "find": "\"Lets you add", "with": "\"{appName} lets you add" }
+      },
+      {
+        "replace": {
+          "file": "src/i18n/catalogs/de.json",
+          "find": "\"Damit kannst du",
+          "with": "\"{appName}: Damit kannst du"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/i18n/catalogs/fa.json",
+          "find": "\"با این اجازه",
+          "with": "\"{appName}: با این اجازه"
+        }
+      },
+      { "replace": { "file": "src/i18n/catalogs/ar.json", "find": "\"يتيح لك", "with": "\"{appName}: يتيح لك" } }
+    ]
+  },
+  "bad-unsorted": {
+    "expect": ["[L12 keys-sorted]", "src/i18n/catalogs/de.json:2", "first out of place: \"debug.title\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/i18n/catalogs/de.json",
+          "find": "  \"app.name\": \"Aufgaben\",\n  \"debug.title\": \"Debug menu\",",
+          "with": "  \"debug.title\": \"Debug menu\",\n  \"app.name\": \"Aufgaben\","
+        }
+      }
+    ]
+  },
+  "bad-untranslated-prefix": {
+    "expect": [
+      "[P5 untranslated-prefix]",
+      "src/i18n/catalogs/fa.json:3",
+      "debug.title: keeps the source text in every language"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/i18n/catalogs/fa.json",
+          "find": "\"debug.title\": \"Debug menu\"",
+          "with": "\"debug.title\": \"منوی اشکال‌زدایی\""
+        }
+      }
+    ]
+  },
+  "error-no-language-list": {
+    "expect": ["ERROR [bad-input] nothing to check: no language list"],
+    "ops": [{ "delete": "src/i18n/languages.ts" }]
+  },
+  "error-unknown-language": {
+    "expect": ["ERROR [bad-input]", "Node's ICU has no plural rules for \"qq\""],
+    "ops": [
+      { "replace": { "file": "src/i18n/languages.ts", "find": "'ar'] as const", "with": "'ar', 'qq'] as const" } }
+    ]
+  },
+  "error-workspace-without-app-dir": {
+    "expect": [
+      "ERROR [bad-input] nothing to check: no language list (src/i18n/languages.ts does not exist)",
+      "pass the app's workspace: --app-dir apps/mobile"
+    ],
+    "ops": [
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      {
+        "write": {
+          "file": "package.json",
+          "json": { "name": "tasks-monorepo", "private": true, "workspaces": ["apps/*"] }
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/package.json",
+          "json": { "name": "tasks", "private": true, "main": "index.ts" }
+        }
+      }
+    ]
+  },
+  "pass-app-dir": {
+    "expect": ["check-catalogs: 4 catalog files checked, 0 problems", "RESULT: PASS"],
+    "args": "{dir} --app-dir apps/mobile",
+    "ops": [
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      {
+        "write": {
+          "file": "package.json",
+          "json": { "name": "tasks-monorepo", "private": true, "workspaces": ["apps/*"] }
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/package.json",
+          "json": { "name": "tasks", "private": true, "main": "index.ts" }
+        }
+      }
+    ]
+  }
+}

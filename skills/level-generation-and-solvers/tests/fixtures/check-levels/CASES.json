@@ -1,0 +1,728 @@
+{
+  "bad-config-mismatch": {
+    "expect": ["[pack-config]", "contracts/levels.json", "the levels contract says 25 levels per pack"],
+    "ops": [{ "json": { "file": "contracts/levels.json", "path": ["games", 0, "levelsPerPack"], "value": 25 } }]
+  },
+  "bad-contract-entry-missing": {
+    "expect": [
+      "[levels-config]",
+      "contracts/levels.json",
+      "lights-out has a levels folder but no entry in the levels contract"
+    ],
+    "ops": [{ "json": { "file": "contracts/levels.json", "path": ["games"], "value": [] } }]
+  },
+  "bad-contract-missing": {
+    "expect": ["[levels-config]", "contracts/levels.json", "lights-out has levels but the levels contract is missing"],
+    "ops": [{ "delete": ["contracts/levels.json", "contracts/levels.schema.json"] }]
+  },
+  "bad-contract-orphan": {
+    "expect": [
+      "[levels-file-missing]",
+      "src/games/pig/levels",
+      "the levels contract lists this game, but it has no levels folder"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/levels.json",
+          "path": ["games", 1],
+          "value": {
+            "id": "pig",
+            "packCount": 3,
+            "levelsPerPack": 30,
+            "starRule": "score",
+            "daily": true,
+            "endless": true
+          }
+        }
+      }
+    ]
+  },
+  "bad-contract-shape": {
+    "expect": [
+      "[levels-config]",
+      "contracts/levels.json",
+      "lights-out: starRule \"time\" is neither \"par\" nor \"score\""
+    ],
+    "ops": [{ "json": { "file": "contracts/levels.json", "path": ["games", 0, "starRule"], "value": "time" } }]
+  },
+  "bad-daily-golden-contract": {
+    "expect": [
+      "[daily-golden-contract]",
+      "src/games/lights-out/levels/lights-out-levels.golden.test.ts",
+      "contract marker ([contract])"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/levels/lights-out-levels.golden.test.ts",
+          "find": "describe('[contract] lights-out daily goldens'",
+          "with": "describe('lights-out daily goldens'"
+        }
+      }
+    ]
+  },
+  "bad-daily-golden-dates": {
+    "expect": ["[daily-golden]", "src/games/lights-out/levels/lights-out-levels.golden.test.ts", "found 2026-09-28"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/levels/lights-out-levels.golden.test.ts",
+          "find": "'2026-09-28', '2026-12-31', '2027-01-01'",
+          "with": "'2026-09-28'"
+        }
+      }
+    ]
+  },
+  "bad-daily-golden-missing": {
+    "expect": ["[daily-golden]", "src/games/lights-out/levels", "calls dailyStart or dailySeed"],
+    "ops": [
+      {
+        "$comment": "The daily dates are pinned, but no golden calls dailyStart( or dailySeed(: the boards are not the daily level.",
+        "replace": {
+          "file": "src/games/lights-out/levels/lights-out-levels.golden.test.ts",
+          "find": "    const start = dailyStart(LIGHTS_OUT_LEVELS, date);\n    if (start === null) throw new Error('the daily mode is off');\n    expect(describeStart(start.seed, start.difficulty)).toMatchSnapshot();",
+          "with": "    expect(describeStart(date.length, 40)).toMatchSnapshot();"
+        }
+      }
+    ]
+  },
+  "bad-daily-golden-unregistered": {
+    "expect": [
+      "[daily-golden-contract]",
+      "contracts/goldens.json",
+      "src/games/lights-out/levels/lights-out-levels.golden.test.ts holds the daily goldens but is not listed in \"contracts\""
+    ],
+    "ops": [
+      {
+        "$comment": "The daily goldens carry the [contract] marker but contracts/goldens.json does not register the test.",
+        "json": { "file": "contracts/goldens.json", "path": ["contracts"], "value": [] }
+      }
+    ]
+  },
+  "bad-daily-no-year-boundary": {
+    "expect": ["[daily-golden]", "found 2026-09-28, 2026-12-30, 2026-12-31"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/levels/lights-out-levels.golden.test.ts",
+          "find": "'2026-12-31', '2027-01-01'",
+          "with": "'2026-12-30', '2026-12-31'"
+        }
+      }
+    ]
+  },
+  "bad-daily-off": {
+    "expect": [
+      "[daily-mode]",
+      "src/games/lights-out/levels/lights-out-levels.ts:1",
+      "the levels contract says daily false but the LevelsSpec daily is on"
+    ],
+    "ops": [{ "json": { "file": "contracts/levels.json", "path": ["games", 0, "daily"], "value": false } }]
+  },
+  "bad-daily-only-golden-missing": {
+    "expect": [
+      "[daily-golden]",
+      "src/games/lights-out/levels",
+      "no *.golden.test.ts in src/games/lights-out/levels calls dailyStart or dailySeed"
+    ],
+    "extends": "pass-daily-only",
+    "ops": [
+      {
+        "$comment": "The daily-only game of pass-daily-only without its golden test: its daily level is pinned nowhere.",
+        "delete": [
+          "src/games/lights-out/levels/lights-out-levels.golden.test.ts",
+          "src/games/lights-out/levels/lights-out-levels.golden.test.ts.snap.ios"
+        ]
+      }
+    ]
+  },
+  "bad-daily-salt-shared": {
+    "expect": [
+      "[daily-salt-shared]",
+      "src/games/lights-out/levels/lights-out-levels.ts:1",
+      "the daily salt 0x7c9e is also pig's",
+      "default for lights-out: 0x7c9e, for pig: 0x93cf"
+    ],
+    "args": "{dir} --game lights-out",
+    "ops": [
+      {
+        "$comment": "Another game copied the template LevelsSpec without changing its salt.",
+        "write": {
+          "file": "src/games/pig/levels/pig-levels.ts",
+          "content": "// src/games/pig/levels/pig-levels.ts (copied from the template: the salt was never changed)\nexport const PIG_DAILY_SALT = 0x7c9e;\nexport const PIG_LEVELS = { daily: { kind: 'daily', difficulty: 40, salt: PIG_DAILY_SALT } };\n"
+        }
+      }
+    ]
+  },
+  "bad-difficulty-drop": {
+    "expect": [
+      "[difficulty-curve]",
+      "src/games/lights-out/levels/pack-3.json",
+      "level 61 difficulty 10 is below level 60's 39"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/levels/pack-3.json",
+          "find": "\"difficulty\": 40,",
+          "with": "\"difficulty\": 10,"
+        }
+      }
+    ]
+  },
+  "bad-duplicate-level": {
+    "expect": [
+      "[duplicate-level]",
+      "src/games/lights-out/levels/pack-1.json",
+      "level 2 repeats level 1 (seed/difficulty 534475766/0)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/levels/pack-1.json",
+          "find": "\"seed\": 4239839143,",
+          "with": "\"seed\": 534475766,"
+        }
+      }
+    ]
+  },
+  "bad-endless-on": {
+    "expect": [
+      "[endless-mode]",
+      "src/games/lights-out/levels/lights-out-levels.ts:1",
+      "the levels contract says endless true but the LevelsSpec endless is off"
+    ],
+    "ops": [{ "json": { "file": "contracts/levels.json", "path": ["games", 0, "endless"], "value": true } }]
+  },
+  "bad-fast-check-missing": {
+    "expect": [
+      "[kit-test-dependency]",
+      "package.json:1",
+      "has no fast-check devDependency",
+      "npm install -D -E fast-check@4.10.2"
+    ],
+    "ops": [{ "json": { "file": "package.json", "path": ["devDependencies", "fast-check"], "delete": true } }]
+  },
+  "bad-fast-check-range": {
+    "expect": ["[kit-test-dependency]", "package.json:1", "fast-check is \"^4.10.2\", not an exact version"],
+    "ops": [{ "json": { "file": "package.json", "path": ["devDependencies", "fast-check"], "value": "^4.10.2" } }]
+  },
+  "bad-game-unknown": {
+    "expect": [
+      "[levels-file-missing]",
+      "src/games/lights-off/levels",
+      "--game lights-off names a game that has no levels folder"
+    ],
+    "args": "{dir} --game lights-off"
+  },
+  "bad-generator-missing": {
+    "expect": ["[kit-file-missing]", "scripts/levels/generate-levels.ts", "level generator script is missing"],
+    "ops": [{ "delete": "scripts/levels/generate-levels.ts" }]
+  },
+  "bad-impure-import": {
+    "expect": ["[pure-import]", "src/games/lights-out/levels/lights-out-solver.ts:2", "imports react-native"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/levels/lights-out-solver.ts",
+          "find": "import { bfsSolve } from",
+          "with": "import { Platform } from 'react-native';\nimport { bfsSolve } from"
+        }
+      }
+    ]
+  },
+  "bad-kit-export-missing": {
+    "expect": ["[kit-export-missing]", "src/core/game/level-kit/pack-progress.ts:1", "does not export nextLevel"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/game/level-kit/pack-progress.ts",
+          "find": "export function nextLevel(",
+          "with": "function nextLevel("
+        }
+      }
+    ]
+  },
+  "bad-kit-missing": {
+    "expect": [
+      "[kit-file-missing]",
+      "src/core/game/solver/verify-line.ts",
+      "templates/src/core/game/solver/verify-line.ts"
+    ],
+    "ops": [{ "delete": "src/core/game/solver/verify-line.ts" }]
+  },
+  "bad-kit-prerequisite": {
+    "expect": ["[kit-prerequisite]", "src/core/dates/daily-seed.ts", "seeded-determinism-and-golden-vectors"],
+    "ops": [{ "delete": "src/core/dates/daily-seed.ts" }]
+  },
+  "bad-kit-prerequisite-old": {
+    "expect": ["[kit-prerequisite]", "src/core/game/levels.ts:1", "SolveResult has no final state", "game-rules-engine"],
+    "ops": [
+      { "replace": { "file": "src/core/game/levels.ts", "find": "      readonly final: TState;\n", "with": "" } },
+      {
+        "replace": {
+          "file": "src/core/game/levels.ts",
+          "find": "`solved` carries the winning line, its length (par for an exact solver) and\n * the state the line ends in, so a score-rated plan reads the score without a replay.",
+          "with": "`solved` carries the winning line and its length (par for an exact solver)."
+        }
+      }
+    ]
+  },
+  "bad-locale-compare": {
+    "expect": ["[determinism]", "src/games/lights-out/levels/lights-out-describe.ts", "uses localeCompare("],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/levels/lights-out-describe.ts",
+          "find": "].join('\\n');",
+          "with": "].sort((a, b) => a.localeCompare(b)).join('\\n');"
+        }
+      }
+    ]
+  },
+  "bad-math-random": {
+    "expect": ["[determinism]", "src/games/lights-out/levels/lights-out-level-plan.ts", "uses Math.random"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/levels/lights-out-level-plan.ts",
+          "find": "return 2 + Math.floor((level - 1) / LEVELS_PER_PACK);",
+          "with": "return 2 + Math.floor(Math.random() * 2);"
+        }
+      }
+    ]
+  },
+  "bad-no-contract-test": {
+    "expect": ["[levels-contract-test]", "src/games/lights-out/levels"],
+    "ops": [{ "delete": "src/games/lights-out/levels/lights-out-levels.test.ts" }]
+  },
+  "bad-no-golden": {
+    "expect": ["[level-golden]", "src/games/lights-out/levels", "no data golden test"],
+    "ops": [
+      {
+        "delete": [
+          "src/games/lights-out/levels/lights-out-levels.golden.test.ts",
+          "src/games/lights-out/levels/lights-out-levels.golden.test.ts.snap.ios"
+        ]
+      }
+    ]
+  },
+  "bad-no-snapshot": {
+    "expect": ["[golden-snapshot-missing]", "src/games/lights-out/levels/lights-out-levels.golden.test.ts"],
+    "ops": [{ "delete": "src/games/lights-out/levels/lights-out-levels.golden.test.ts.snap.ios" }]
+  },
+  "bad-null-solver": {
+    "expect": ["[solver-required]", "src/games/lights-out/levels/lights-out-levels.ts:1"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/levels/lights-out-levels.ts",
+          "find": "solver: LIGHTS_OUT_SOLVER,",
+          "with": "solver: null,"
+        }
+      }
+    ]
+  },
+  "bad-pack-edited": {
+    "expect": ["[pack-stale]", "src/games/lights-out/levels/pack-2.json", "entry 0: committed"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/levels/pack-2.json",
+          "find": "\"seed\": 2308875243,",
+          "with": "\"seed\": 2308875244,"
+        }
+      }
+    ]
+  },
+  "bad-pack-gap": {
+    "expect": ["[level-numbering]", "src/games/lights-out/levels/pack-1.json", "level 50 is at position 5"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/levels/pack-1.json",
+          "find": "\"level\": 5,",
+          "with": "\"level\": 50,"
+        }
+      }
+    ]
+  },
+  "bad-pack-name-key": {
+    "expect": [
+      "[pack-name-key]",
+      "src/games/lights-out/levels/lights-out-level-plan.ts",
+      "lights-out.pack-name.3 is missing from src/i18n/catalogs/ar.json"
+    ],
+    "ops": [{ "json": { "file": "src/i18n/catalogs/ar.json", "path": ["lights-out.pack-name.3"], "delete": true } }]
+  },
+  "bad-pack-size": {
+    "expect": ["[pack-size]", "src/games/lights-out/levels/pack-1.json", "packs have different sizes (30, 30, 29)"],
+    "ops": [{ "json": { "file": "src/games/lights-out/levels/pack-3.json", "path": [29], "delete": true } }]
+  },
+  "bad-packless-packs": {
+    "expect": [
+      "[pack-config]",
+      "src/games/lights-out/levels/pack-1.json",
+      "the levels contract says packCount 0 (no packs), but the levels folder has pack files"
+    ],
+    "ops": [
+      {
+        "$comment": "The contract says packCount 0 (a daily-only game) but the packs and the plan are still in the levels folder.",
+        "json": {
+          "file": "contracts/levels.json",
+          "path": ["games", 0],
+          "value": { "id": "lights-out", "packCount": 0, "levelsPerPack": 0, "daily": true, "endless": false }
+        }
+      }
+    ]
+  },
+  "bad-packless-shape": {
+    "expect": [
+      "[levels-config]",
+      "contracts/levels.json",
+      "lights-out: packCount 0 has no levels to rate; leave starRule out"
+    ],
+    "extends": "pass-daily-only",
+    "ops": [
+      {
+        "$comment": "A pack-less entry that still names a star rule: there are no levels to rate.",
+        "json": { "file": "contracts/levels.json", "path": ["games", 0, "starRule"], "value": "par" }
+      }
+    ]
+  },
+  "bad-par-curve": {
+    "expect": ["[par-curve]", "src/games/lights-out/levels/pack-3.json", "pack 3 averages par 2.00, below pack 2's"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/levels/pack-3.json",
+          "find": "\"par\": \\d+",
+          "with": "\"par\": 2",
+          "regex": true,
+          "all": true
+        }
+      }
+    ]
+  },
+  "bad-placeholder-left": {
+    "expect": ["[placeholder-left]", "src/games/lights-out/levels/lights-out-describe.ts", "__GAME_PASCAL__"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/levels/lights-out-describe.ts",
+          "find": "export function describeLevel(state: LightsOutState)",
+          "with": "export function describeLevel(state: __GAME_PASCAL__State)"
+        }
+      }
+    ]
+  },
+  "bad-plan-failure": {
+    "expect": ["[plan-failure]", "src/games/lights-out/levels/lights-out-level-plan.ts", "level 1: no candidate"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/levels/lights-out-level-plan.ts",
+          "find": "maxTries: 50,",
+          "with": "maxTries: 0,"
+        }
+      }
+    ]
+  },
+  "bad-plan-missing": {
+    "expect": [
+      "[levels-file-missing]",
+      "src/games/lights-out/levels/lights-out-level-plan.ts",
+      "the level plan (generator recipe) is missing"
+    ],
+    "ops": [{ "delete": "src/games/lights-out/levels/lights-out-level-plan.ts" }]
+  },
+  "bad-plan-run": {
+    "expect": [
+      "[plan-run]",
+      "src/games/lights-out/levels/lights-out-level-plan.ts",
+      "the level plan cannot run headless"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/levels/lights-out-level-plan.ts",
+          "find": "import { LIGHTS_OUT_SOLVER } from './lights-out-solver';",
+          "with": "import { LIGHTS_OUT_SOLVER } from './lights-out-solver';\nimport { CURVE } from './lights-out-curve';"
+        }
+      }
+    ]
+  },
+  "bad-relative-escape": {
+    "expect": [
+      "[pure-import]",
+      "src/games/lights-out/levels/lights-out-describe.ts",
+      "it reaches src/games/lights-out/board/board-ids"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/levels/lights-out-describe.ts",
+          "find": "import { renderCells } from '@/core/game/testing/render-cells';",
+          "with": "import { renderCells } from '@/core/game/testing/render-cells';\nimport { BOARD_IDS } from '../board/board-ids';"
+        }
+      }
+    ]
+  },
+  "bad-star-kind": {
+    "expect": [
+      "[pack-config]",
+      "src/games/lights-out/levels/pack-1.json",
+      "level 1 is par-rated, the levels contract says starRule \"score\""
+    ],
+    "ops": [{ "json": { "file": "contracts/levels.json", "path": ["games", 0, "starRule"], "value": "score" } }]
+  },
+  "bad-star-slack": {
+    "expect": ["[star-rule]", "src/core/game/level-kit/star-rating.ts:1", "the star rule gives 1"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/game/level-kit/star-rating.ts",
+          "find": "export const PAR_SLACK_FOR_TWO_STARS = 2;",
+          "with": "export const PAR_SLACK_FOR_TWO_STARS = 3;"
+        }
+      }
+    ]
+  },
+  "bad-testing-import": {
+    "expect": [
+      "[pure-import]",
+      "src/games/lights-out/levels/lights-out-solver.test.ts",
+      "imports @/games/lights-out/testing/lights-out-testing",
+      "not testing/"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/levels/lights-out-solver.test.ts",
+          "find": "import fc from 'fast-check';",
+          "with": "import fc from 'fast-check';\nimport { LIGHTS_OUT_TESTING } from '@/games/lights-out/testing/lights-out-testing';"
+        }
+      }
+    ]
+  },
+  "bad-thresholds-descending": {
+    "expect": [
+      "[pack-json]",
+      "src/games/lights-out/levels/pack-3.json",
+      "score thresholds [30,20,10] are not three ascending whole numbers"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/levels/pack-3.json",
+          "find": "\"stars\": {\n      \"kind\": \"par\",\n      \"par\": 4\n    }",
+          "with": "\"stars\": {\n      \"kind\": \"score\",\n      \"thresholds\": [30, 20, 10]\n    }",
+          "occurrence": 1
+        }
+      }
+    ]
+  },
+  "bad-trivial-level": {
+    "expect": ["[trivial-level]", "src/games/lights-out/levels/pack-2.json", "level 46 is won in 1 move"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/lights-out/levels/pack-2.json",
+          "find": "\"par\": 3",
+          "with": "\"par\": 1",
+          "occurrence": 1
+        }
+      }
+    ]
+  },
+  "error-contract-json": {
+    "expect": ["ERROR [bad-input]", "contracts/levels.json is not valid JSON"],
+    "ops": [{ "write": { "file": "contracts/levels.json", "content": "{ \"games\": [\n" } }]
+  },
+  "error-missing-root": { "expect": ["ERROR [bad-input]"], "args": "{dir}/missing" },
+  "error-no-package": {
+    "expect": ["ERROR [bad-input] nothing to check:", "has no package.json"],
+    "base": ["@tests/bases/app"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "pass-before-catalogs": {
+    "expect": [
+      "SKIP src/i18n/catalogs [pack-name-key] not yet created (i18n-strings-and-catalogs creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "src/i18n/catalogs" }]
+  },
+  "pass-contract-path": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "rename": { "from": "contracts/levels.json", "to": "qa/levels.json" } },
+      { "write": { "file": "rn-skills.config.json", "json": { "levelsContract": "qa/levels.json" } } }
+    ]
+  },
+  "pass-daily-only": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "A daily-only game: the contract entry has packCount 0, levelsPerPack 0 and no starRule; the levels folder keeps only the LevelsSpec (packs: [], table: []), its test and the daily goldens.",
+        "json": {
+          "file": "contracts/levels.json",
+          "path": ["games", 0],
+          "value": { "id": "lights-out", "packCount": 0, "levelsPerPack": 0, "daily": true, "endless": false }
+        }
+      },
+      {
+        "delete": [
+          "src/games/lights-out/levels/pack-1.json",
+          "src/games/lights-out/levels/pack-2.json",
+          "src/games/lights-out/levels/pack-3.json",
+          "src/games/lights-out/levels/lights-out-level-plan.ts",
+          "src/games/lights-out/levels/lights-out-level-plan.test.ts",
+          "src/games/lights-out/levels/lights-out-solver.ts",
+          "src/games/lights-out/levels/lights-out-solver.test.ts"
+        ]
+      },
+      {
+        "write": {
+          "file": "src/games/lights-out/levels/lights-out-levels.ts",
+          "lines": [
+            "// src/games/lights-out/levels/lights-out-levels.ts",
+            "import type { LevelsSpec } from '@/core/game/levels';",
+            "import type { LightsOutMove, LightsOutState } from '@/games/lights-out/rules/lights-out-types';",
+            "",
+            "export const LIGHTS_OUT_DAILY_SALT = 0x7c9e;",
+            "export const LIGHTS_OUT_DAILY_DIFFICULTY = 45;",
+            "",
+            "/** A daily-only game: no packs, no table, no solver; only the daily mode. */",
+            "export const LIGHTS_OUT_LEVELS: LevelsSpec<LightsOutState, LightsOutMove> = {",
+            "  difficultyFor: () => LIGHTS_OUT_DAILY_DIFFICULTY,",
+            "  packs: [],",
+            "  table: [],",
+            "  solver: null,",
+            "  daily: { kind: 'daily', difficulty: LIGHTS_OUT_DAILY_DIFFICULTY, salt: LIGHTS_OUT_DAILY_SALT },",
+            "  endless: { kind: 'none' },",
+            "};"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/lights-out/levels/lights-out-levels.test.ts",
+          "lines": [
+            "// src/games/lights-out/levels/lights-out-levels.test.ts",
+            "import { dailyStart } from '@/core/game/level-kit/daily-start';",
+            "",
+            "import { LIGHTS_OUT_DAILY_DIFFICULTY, LIGHTS_OUT_LEVELS } from './lights-out-levels';",
+            "",
+            "describe('LIGHTS_OUT_LEVELS', () => {",
+            "  it('ships no packs and starts the daily level at the daily difficulty', () => {",
+            "    expect(LIGHTS_OUT_LEVELS.packs).toStrictEqual([]);",
+            "    expect(dailyStart(LIGHTS_OUT_LEVELS, '2026-09-28')?.difficulty).toBe(LIGHTS_OUT_DAILY_DIFFICULTY);",
+            "  });",
+            "});"
+          ]
+        }
+      },
+      {
+        "$comment": "No level table to pin: the golden keeps only the [contract] daily goldens.",
+        "replace": {
+          "file": "src/games/lights-out/levels/lights-out-levels.golden.test.ts",
+          "find": "describe('lights-out level table goldens', () => {\n  it.each([1, 30, 31, 60, 61, 90])('keeps the frozen board of level %i', (level) => {\n    const entry = LIGHTS_OUT_LEVELS.table[level - 1];\n    if (entry === undefined) throw new Error(`level ${String(level)} missing`);\n    expect(\n      `${describeStart(entry.seed, entry.difficulty)}\\n${JSON.stringify(entry.stars)}`,\n    ).toMatchSnapshot();\n  });\n});\n\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "pass-daily-seed": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "The daily golden written with dailySeed(date, salt) instead of dailyStart(levels, date): both forms pin the daily level.",
+        "replace": {
+          "file": "src/games/lights-out/levels/lights-out-levels.golden.test.ts",
+          "find": "import { dailyStart } from '@/core/game/level-kit/daily-start';",
+          "with": "import { dailySeed } from '@/core/dates/daily-seed';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/games/lights-out/levels/lights-out-levels.golden.test.ts",
+          "find": "import { LIGHTS_OUT_LEVELS } from './lights-out-levels';",
+          "with": "import {\n  LIGHTS_OUT_DAILY_DIFFICULTY,\n  LIGHTS_OUT_DAILY_SALT,\n  LIGHTS_OUT_LEVELS,\n} from './lights-out-levels';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/games/lights-out/levels/lights-out-levels.golden.test.ts",
+          "find": "    const start = dailyStart(LIGHTS_OUT_LEVELS, date);\n    if (start === null) throw new Error('the daily mode is off');\n    expect(describeStart(start.seed, start.difficulty)).toMatchSnapshot();",
+          "with": "    const seed = dailySeed(date, LIGHTS_OUT_DAILY_SALT);\n    expect(describeStart(seed, LIGHTS_OUT_DAILY_DIFFICULTY)).toMatchSnapshot();"
+        }
+      }
+    ]
+  },
+  "pass-endless-mode": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "contracts/levels.json", "path": ["games", 0, "endless"], "value": true } },
+      {
+        "replace": {
+          "file": "src/games/lights-out/levels/lights-out-levels.ts",
+          "find": "endless: { kind: 'none' },",
+          "with": "endless: { kind: 'endless', difficulty: ENDLESS_DIFFICULTY },"
+        }
+      }
+    ]
+  },
+  "pass-goldens-contract-not-yet": {
+    "expect": [
+      "SKIP contracts/goldens.json [daily-golden-contract] not yet created (golden-and-snapshot-tests creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "$comment": "Before golden-and-snapshot-tests made contracts/goldens.json, the registration is a SKIP.",
+        "delete": "contracts/goldens.json"
+      }
+    ]
+  },
+  "pass-installed-skills": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "Planted level files inside installed skill folders and a vendored game folder holding a SKILL.md stay silent.",
+        "write": {
+          "file": ".agents/skills/other-skill/src/games/planted/levels/planted-levels.ts",
+          "content": "export const r = Math.random();\n"
+        }
+      },
+      {
+        "write": {
+          "file": "skills/other-skill/src/games/planted/levels/pack-1.json",
+          "content": "[{ \"level\": 9 }]\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/vendored/SKILL.md",
+          "content": "---\nname: vendored\ndescription: A vendored skill folder.\n---\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/games/vendored/levels/vendored-levels.ts",
+          "content": "import { Platform } from 'react-native';\nexport const salt = 0x7c9e;\nexport const s = Math.sin(1) ** 2;\n"
+        }
+      }
+    ]
+  },
+  "pass-kit-only": {
+    "expect": ["RESULT: PASS"],
+    "ops": [{ "delete": ["src/games", "contracts/levels.json", "contracts/levels.schema.json"] }]
+  },
+  "pass-no-levels": {
+    "expect": [
+      "NOT APPLICABLE: the app has no levels (no src/games/<game-id>/levels/, no contracts/levels.json and no src/core/game/solver or src/core/game/level-kit)"
+    ],
+    "base": ["@tests/bases/app"]
+  }
+}

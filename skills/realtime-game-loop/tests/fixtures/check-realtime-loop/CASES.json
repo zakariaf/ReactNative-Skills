@@ -1,0 +1,798 @@
+{
+  "bad-arena-budget": {
+    "expect": [
+      "[arena-draw-budget]",
+      "draw-call budget 4000 is above the app-wide cap of 1000",
+      "src/games/bounce-arena/canvas/draw-arena.test.ts:"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/canvas/draw-arena.test.ts",
+          "find": "const DRAW_CALL_BUDGET = 100;\n",
+          "with": "const DRAW_CALL_BUDGET = 4000;\n"
+        }
+      }
+    ]
+  },
+  "bad-arena-budget-in-comment": {
+    "expect": ["[arena-draw-budget]", "the real-time surface has no draw test asserting a draw-call budget"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/canvas/draw-arena.test.ts",
+          "find": "    expect(recorded.calls.length).toBeLessThanOrEqual(DRAW_CALL_BUDGET);\n",
+          "with": "    // Later: expect(recorded.calls.length).toBeLessThanOrEqual(DRAW_CALL_BUDGET);\n    expect(recorded.calls.length).toBeGreaterThan(0);\n"
+        }
+      }
+    ]
+  },
+  "bad-arena-budget-unasserted": {
+    "expect": ["[arena-draw-budget]", "the real-time surface has no draw test asserting a draw-call budget"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/canvas/draw-arena.test.ts",
+          "find": "    expect(recorded.calls.length).toBeLessThanOrEqual(DRAW_CALL_BUDGET);\n",
+          "with": "    expect(recorded.calls.length).toBeLessThanOrEqual(DRAW_CALL_BUDGET * 0 + recorded.calls.length);\n"
+        }
+      }
+    ]
+  },
+  "bad-arena-draw-no-worklet": {
+    "expect": ["[worklet-directive]", "src/games/bounce-arena/canvas/draw-arena.ts:1"],
+    "ops": [
+      { "replace": { "file": "src/games/bounce-arena/canvas/draw-arena.ts", "find": "'worklet';\n\n", "with": "" } }
+    ]
+  },
+  "bad-arena-few-baselines": {
+    "expect": ["[arena-golden]", "7 baseline PNG(s) for bounce-arena"],
+    "ops": [
+      {
+        "delete": [
+          "test/goldens/canvas/__image_snapshots__/bounce-arena-arena-small-0.png",
+          "test/goldens/canvas/__image_snapshots__/bounce-arena-arena-small-1.png"
+        ]
+      }
+    ]
+  },
+  "bad-arena-golden-two-sizes": {
+    "expect": ["[arena-golden]", "renders 2 canvas size(s)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "test/goldens/canvas/bounce-arena-arena.golden.test.ts",
+          "find": "  { name: 'small', width: 320, height: 400 },\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-arena-no-golden": {
+    "expect": [
+      "[arena-golden]",
+      "test/goldens/canvas/bounce-arena-arena.golden.test.ts",
+      "the real-time surface of bounce-arena has no pixel golden"
+    ],
+    "ops": [{ "delete": "test/goldens/canvas/bounce-arena-arena.golden.test.ts" }]
+  },
+  "bad-auto-resume": {
+    "expect": ["[loop-no-auto-resume]", "src/canvas/realtime/realtime-canvas-host.tsx:", "not gated on isPaused"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/realtime/realtime-canvas-host.tsx",
+          "find": "    isInterrupted: props.isInterrupted || props.isPaused || props.isEnded,\n",
+          "with": "    isInterrupted: props.isInterrupted || props.isEnded,\n"
+        }
+      }
+    ]
+  },
+  "bad-auto-resume-setter": {
+    "expect": ["[loop-no-auto-resume]", "src/canvas/realtime/realtime-canvas-host.tsx:", "not gated on isPaused"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/realtime/realtime-canvas-host.tsx",
+          "find": "    isInterrupted: props.isInterrupted || props.isPaused || props.isEnded,\n",
+          "with": "    isInterrupted: props.isInterrupted || props.isEnded,\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/canvas/realtime/realtime-canvas-host.tsx",
+          "find": "      loop.stop();\n",
+          "with": "      loop.stop();\n      setWasPaused(true);\n"
+        }
+      }
+    ]
+  },
+  "bad-frame-callback": {
+    "expect": ["[frame-callback-body]", "src/canvas/realtime/use-fixed-step-loop.ts:"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/realtime/use-fixed-step-loop.ts",
+          "find": "  const frame = useFrameCallback((info) => {\n",
+          "with": "  const frame = useFrameCallback((info) => {\n    accMs.set(accMs.get() + (info.timeSincePreviousFrame ?? 0));\n"
+        }
+      }
+    ]
+  },
+  "bad-import-unresolved": {
+    "expect": [
+      "[loop-import-unresolved]",
+      "src/canvas/realtime/run-loop-frame.ts:",
+      "skia-canvas-rendering",
+      "src/canvas/realtime/record-sim.ts:"
+    ],
+    "ops": [{ "delete": "src/canvas/describe-error.ts" }]
+  },
+  "bad-kit-trig": {
+    "expect": ["[determinism]", "src/core/geom/vec2.ts", "Math.atan2"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/geom/vec2.ts",
+          "find": "  return Math.sqrt(dot(a, a));\n",
+          "with": "  return Math.sqrt(dot(a, a)) + Math.atan2(0, 1);\n"
+        }
+      }
+    ]
+  },
+  "bad-missing-geom": {
+    "expect": ["[loop-file-missing]", "src/core/geom/sweep.ts"],
+    "ops": [{ "delete": ["src/core/geom/sweep.ts", "src/core/geom/sweep.test.ts"] }]
+  },
+  "bad-missing-runner": {
+    "expect": ["[loop-file-missing]", "src/canvas/realtime/run-loop-frame.ts"],
+    "ops": [{ "delete": "src/canvas/realtime/run-loop-frame.ts" }]
+  },
+  "bad-no-lifecycle": {
+    "expect": ["[loop-lifecycle]", "src/canvas/realtime/realtime-canvas-host.tsx:"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/realtime/realtime-canvas-host.tsx",
+          "find": "  useCanvasLifecycle({\n    isFocused: props.isFocused,\n    // The pause UI and the result cover the surface too: the loop never resumes by itself.\n    isInterrupted: props.isInterrupted || props.isPaused || props.isEnded,\n    onPause: () => {\n      loop.stop();\n      // The game screen records a finished run itself (outcome, statistics) and shows the result.\n      if (props.isEnded) return;\n      props.onSavePoint(sim.get());\n      props.onAutoPause();\n    },\n    onResume: () => {\n      loop.start();\n    },\n  });\n",
+          "with": "  loop.start();\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/canvas/realtime/realtime-canvas-host.tsx",
+          "find": "import { useCanvasLifecycle } from '@/canvas/use-canvas-lifecycle';\n\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-no-realtime-spec": {
+    "expect": ["[realtime-spec]", "src/games/bounce-arena/bounce-arena-realtime.ts", "exposes no RealtimeSpec"],
+    "ops": [
+      {
+        "delete": [
+          "src/games/bounce-arena/bounce-arena-realtime.ts",
+          "src/games/bounce-arena/bounce-arena-realtime.test.ts"
+        ]
+      }
+    ]
+  },
+  "bad-no-replay-test": {
+    "expect": ["[sim-replay-test]", "no test replays a recorded", "however ticks are grouped"],
+    "ops": [{ "delete": "src/games/bounce-arena/sim/bounce-arena-sim.test.ts" }]
+  },
+  "bad-replay-kit-missing": {
+    "expect": ["[loop-file-missing]", "src/core/realtime/fixed-step.ts", "src/core/geom/vec2.ts"],
+    "ops": [
+      {
+        "delete": [
+          "src/core/realtime",
+          "src/core/geom",
+          "src/canvas/realtime",
+          "test/goldens/canvas",
+          "src/games/bounce-arena"
+        ]
+      }
+    ]
+  },
+  "bad-replay-kit-only": {
+    "expect": ["[replay-events-timed]", "src/games/lights-out/rules/volley.ts", "[replay-capped]"],
+    "ops": [
+      { "delete": ["src/canvas/realtime", "test/goldens/canvas", "src/games/bounce-arena"] },
+      {
+        "write": {
+          "file": "src/games/lights-out/rules/volley.ts",
+          "lines": [
+            "// src/games/lights-out/rules/volley.ts",
+            "import { STEP_MS } from '@/core/realtime/fixed-step';",
+            "",
+            "/** Planted bug: a continuous phase with neither timed events nor a tick cap. */",
+            "export function volley(ticks: number): { readonly endMs: number } {",
+            "  return { endMs: ticks * STEP_MS };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-replay-uncapped": {
+    "expect": ["[replay-capped]", "src/games/ricochet-volley/rules/simulate-volley.ts"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/ricochet-volley/rules/simulate-volley.ts",
+          "find": "      if (pos.y > arena.floorY || tick === arena.maxTicks) {\n",
+          "with": "      if (pos.y > arena.floorY || tick === arena.tickLimit) {\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/games/ricochet-volley/rules/simulate-volley.ts",
+          "find": "  for (let tick = 1; tick <= arena.maxTicks && live.length > 0; tick += 1) {\n",
+          "with": "  for (let tick = 1; tick <= arena.tickLimit && live.length > 0; tick += 1) {\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/games/ricochet-volley/rules/simulate-volley.ts",
+          "find": "  readonly maxTicks: number;\n",
+          "with": "  readonly tickLimit: number;\n"
+        }
+      }
+    ]
+  },
+  "bad-replay-untimed": {
+    "expect": ["[replay-events-timed]", "src/games/ricochet-volley/rules/simulate-volley.ts"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/ricochet-volley/rules/simulate-volley.ts",
+          "find": "atMs",
+          "with": "tick",
+          "all": true
+        }
+      }
+    ]
+  },
+  "bad-runner-no-batch": {
+    "expect": ["[loop-runner]", "send events to JS once per frame"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/realtime/run-loop-frame.ts",
+          "find": "    if (events.length > 0) scheduleOnRN(wiring.onEvents, events);\n",
+          "with": "    for (const event of events) scheduleOnRN(wiring.onEvents, [event]);\n"
+        }
+      }
+    ]
+  },
+  "bad-runner-no-batch-multiline": {
+    "expect": ["[loop-runner]", "src/canvas/realtime/run-loop-frame.ts:1", "send events to JS once per frame"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/realtime/run-loop-frame.ts",
+          "find": "    if (events.length > 0) scheduleOnRN(wiring.onEvents, events);\n",
+          "with": "    for (let e = 0; e < events.length; e += 3) {\n      const one = events.slice(e, e + 3);\n      scheduleOnRN(wiring.onEvents, one);\n    }\n"
+        }
+      }
+    ]
+  },
+  "bad-runner-no-modify": {
+    "expect": ["[loop-runner]", "call sim.modify()"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/realtime/run-loop-frame.ts",
+          "find": "    wiring.sim.modify(); // mutated in place: force listeners (the picture) to re-run\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-sim-alloc": {
+    "expect": [
+      "[sim-no-alloc]",
+      "stepBounceArenaSim runs every tick and allocates or grows an array (new Float32Array)",
+      "src/games/bounce-arena/sim/bounce-arena-sim.ts:"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/sim/bounce-arena-sim.ts",
+          "find": "  movePlayer(sim, command);\n",
+          "with": "  const before = new Float32Array(sim.body);\n  movePlayer(sim, command);\n  sim.body.set(before.subarray(0, 0));\n"
+        }
+      }
+    ]
+  },
+  "bad-sim-app-import": {
+    "expect": ["[sim-isolated]", "sim imports @/stores/arena-settings"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/stores/arena-settings.ts",
+          "lines": ["// src/stores/arena-settings.ts", "'worklet';", "", "export const ARENA_SPEED = 3;"]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/sim/bounce-arena-sim.ts",
+          "find": "const PLAYER_SPEED = 3;\n",
+          "with": "const PLAYER_SPEED = ARENA_SPEED;\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/sim/bounce-arena-sim.ts",
+          "find": "\nimport { nextU32, seedRng } from '@/core/rng/sfc32';\n",
+          "with": "\nimport { nextU32, seedRng } from '@/core/rng/sfc32';\nimport { ARENA_SPEED } from '@/stores/arena-settings';\n"
+        }
+      }
+    ]
+  },
+  "bad-sim-bridge": {
+    "expect": ["[sim-isolated]", "sim calls scheduleOnRN itself", "sim imports react-native-worklets"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/sim/bounce-arena-sim.ts",
+          "find": "  if (isBounceX || isBounceY) pushEvent(sim, EVENT_EDGE, e);\n",
+          "with": "  if (isBounceX || isBounceY) scheduleOnRN(console.warn, e);\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/sim/bounce-arena-sim.ts",
+          "find": "\nimport { nextU32, seedRng } from '@/core/rng/sfc32';\n",
+          "with": "\nimport { scheduleOnRN } from 'react-native-worklets';\n\nimport { nextU32, seedRng } from '@/core/rng/sfc32';\n"
+        }
+      }
+    ]
+  },
+  "bad-sim-closure": {
+    "expect": [
+      "[sim-no-alloc]",
+      "moveEntity runs every tick and allocates",
+      "src/games/bounce-arena/sim/bounce-arena-sim.ts:"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/sim/bounce-arena-sim.ts",
+          "find": "  const isBounceX = moveAxis(sim, e, 0);\n  const isBounceY = moveAxis(sim, e, 1);\n  if (isBounceX || isBounceY) pushEvent(sim, EVENT_EDGE, e);\n",
+          "with": "  let isBounce = false;\n  [0, 1].forEach((axis) => {\n    isBounce = moveAxis(sim, e, axis) || isBounce;\n  });\n  if (isBounce) pushEvent(sim, EVENT_EDGE, e);\n"
+        }
+      }
+    ]
+  },
+  "bad-sim-helper-alloc": {
+    "expect": ["[sim-no-alloc]", "moveEntity runs every tick and allocates"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/sim/bounce-arena-sim.ts",
+          "find": "  const isBounceX = moveAxis(sim, e, 0);\n",
+          "with": "  const bounce = { x: moveAxis(sim, e, 0), y: false };\n  const isBounceX = bounce.x;\n"
+        }
+      }
+    ]
+  },
+  "bad-sim-kit-alloc": {
+    "expect": ["[sim-no-alloc]", "moveEntity runs every tick and calls sub() from the vec2/sweep kit"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/sim/bounce-arena-sim.ts",
+          "find": "  const isBounceY = moveAxis(sim, e, 1);\n",
+          "with": "  const isBounceY = moveAxis(sim, e, 1);\n  const offset = sub(CENTRE, HOME);\n  if (offset.x < 0) pushEvent(sim, EVENT_EDGE, e);\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/sim/bounce-arena-sim.ts",
+          "find": "const PLAYER_SPEED = 3;\n",
+          "with": "const PLAYER_SPEED = 3;\n/** Planted bug: vec2 maths in the per-tick path (each call returns a new object). */\nconst CENTRE = { x: ARENA / 2, y: ARENA / 2 };\nconst HOME = { x: 0, y: 0 };\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/sim/bounce-arena-sim.ts",
+          "find": "\nimport { nextU32, seedRng } from '@/core/rng/sfc32';\n",
+          "with": "\nimport { sub } from '@/core/geom/vec2';\nimport { nextU32, seedRng } from '@/core/rng/sfc32';\n"
+        }
+      }
+    ]
+  },
+  "bad-sim-module-state": {
+    "expect": [
+      "[sim-module-state]",
+      "edgeLog at module level",
+      "[sim-no-alloc]",
+      "moveEntity runs every tick and allocates or grows an array (.push)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/sim/bounce-arena-sim.ts",
+          "find": "  if (isBounceX || isBounceY) pushEvent(sim, EVENT_EDGE, e);\n",
+          "with": "  if (isBounceX || isBounceY) {\n    pushEvent(sim, EVENT_EDGE, e);\n    edgeLog.push(e);\n  }\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/sim/bounce-arena-sim.ts",
+          "find": "export const MAX_ENTITIES = 64;\n",
+          "with": "export const MAX_ENTITIES = 64;\n/** Planted bug: state outside the sim object, grown every tick. */\nconst edgeLog: number[] = [];\n"
+        }
+      }
+    ]
+  },
+  "bad-sim-module-state-upper": {
+    "expect": [
+      "[sim-module-state]",
+      "src/games/bounce-arena/sim/bounce-arena-sim.ts:",
+      "sim writes to the module-level HIT_COUNTS"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/sim/bounce-arena-sim.ts",
+          "find": "  if (isBounceX || isBounceY) pushEvent(sim, EVENT_EDGE, e);\n",
+          "with": "  if (isBounceX || isBounceY) {\n    pushEvent(sim, EVENT_EDGE, e);\n    HIT_COUNTS[e] += 1;\n  }\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/sim/bounce-arena-sim.ts",
+          "find": "export const MAX_ENTITIES = 64;\n",
+          "with": "export const MAX_ENTITIES = 64;\n/** Planted bug: an UPPER_CASE container the sim writes to every tick. */\nconst HIT_COUNTS = new Int32Array(64);\n"
+        }
+      }
+    ]
+  },
+  "bad-sim-ms": {
+    "expect": ["[sim-ticks]", "sim code uses STEP_MS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/sim/bounce-arena-sim.ts",
+          "find": "const PLAYER_SPEED = 3;\n",
+          "with": "const STEP_MS = 1000 / 120;\nconst PLAYER_SPEED = 0.36 * STEP_MS;\n"
+        }
+      }
+    ]
+  },
+  "bad-sim-no-worklet": {
+    "expect": ["[worklet-directive]", "src/games/bounce-arena/sim/bounce-arena-sim.ts:1"],
+    "ops": [
+      { "replace": { "file": "src/games/bounce-arena/sim/bounce-arena-sim.ts", "find": "'worklet';\n", "with": "" } }
+    ]
+  },
+  "bad-sim-pow": {
+    "expect": ["[determinism]", "uses ** (Math.pow)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/sim/bounce-arena-sim.ts",
+          "find": "  sim.body[0] = Math.min(ARENA, Math.max(0, (sim.body[0] ?? 0) + dx * PLAYER_SPEED));\n",
+          "with": "  sim.body[0] = Math.min(ARENA, Math.max(0, (sim.body[0] ?? 0) + dx * PLAYER_SPEED ** 1));\n"
+        }
+      }
+    ]
+  },
+  "bad-sim-random": {
+    "expect": ["[determinism]", "Math.random"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/sim/bounce-arena-sim.ts",
+          "find": "    sim.body[e * 4] = drawU32(sim) % ARENA;\n",
+          "with": "    sim.body[e * 4] = Math.floor(Math.random() * ARENA);\n"
+        }
+      }
+    ]
+  },
+  "bad-sim-return-object": {
+    "expect": [
+      "[sim-no-alloc]",
+      "direction runs every tick and allocates or grows an array (return {)",
+      "src/games/bounce-arena/sim/bounce-arena-sim.ts:"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/sim/bounce-arena-sim.ts",
+          "find": "function movePlayer(sim: BounceArenaSim, command: number): void {\n  const dx = command === 0 ? 0 : (STICK[(command - 1) * 2] ?? 0);\n  const dy = command === 0 ? 0 : (STICK[(command - 1) * 2 + 1] ?? 0);\n",
+          "with": "/** Planted bug: a small vector helper that returns a fresh object on every tick. */\nfunction direction(command: number): { dx: number; dy: number } {\n  const dx = command === 0 ? 0 : (STICK[(command - 1) * 2] ?? 0);\n  const dy = command === 0 ? 0 : (STICK[(command - 1) * 2 + 1] ?? 0);\n  return { dx, dy };\n}\n\nfunction movePlayer(sim: BounceArenaSim, command: number): void {\n  const { dx, dy } = direction(command);\n"
+        }
+      }
+    ]
+  },
+  "bad-sim-rng-helper-alloc": {
+    "expect": ["[sim-no-alloc]", "drawU32 runs every tick and allocates or grows an array (new Float32Array)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/sim/bounce-arena-sim.ts",
+          "find": "  const draw = nextU32(state);\n",
+          "with": "  const draw = nextU32(state);\n  const jitter = new Float32Array(2);\n  sim.body[3] = (sim.body[3] ?? 0) + (jitter[0] ?? 0);\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/sim/bounce-arena-sim.ts",
+          "find": "  if (tick % WAVE_TICKS === 0) pushEvent(sim, EVENT_WAVE_END, tick);\n",
+          "with": "  if (tick % WAVE_TICKS === 0) pushEvent(sim, EVENT_WAVE_END, drawU32(sim) > 0 ? tick : tick);\n"
+        }
+      }
+    ]
+  },
+  "bad-sim-sibling-alloc": {
+    "expect": [
+      "[sim-no-alloc]",
+      "nearPlayer runs every tick and allocates or grows an array (= [)",
+      "src/games/bounce-arena/sim/collide.ts:8"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/bounce-arena/sim/collide.ts",
+          "lines": [
+            "// src/games/bounce-arena/sim/collide.ts",
+            "'worklet';",
+            "",
+            "import type { BounceArenaSim } from './bounce-arena-sim';",
+            "",
+            "/** Planted bug: a per-tick helper in a sibling sim file that grows a fresh array every tick. */",
+            "export function nearPlayer(sim: BounceArenaSim, count: number): number {",
+            "  const near: number[] = [];",
+            "  for (let e = 1; e < count; e += 1) {",
+            "    if (Math.abs((sim.body[e * 4] ?? 0) - (sim.body[0] ?? 0)) < 24) near.push(e);",
+            "  }",
+            "  return near.length;",
+            "}"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/sim/bounce-arena-sim.ts",
+          "find": "  movePlayer(sim, command);\n",
+          "with": "  movePlayer(sim, command);\n  if (nearPlayer(sim, sim.ints[COUNT] ?? 0) > 0) pushEvent(sim, EVENT_EDGE, 0);\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/sim/bounce-arena-sim.ts",
+          "find": "\nimport type { RngState } from '@/core/rng/sfc32';\n",
+          "with": "\nimport { nearPlayer } from './collide';\n\nimport type { RngState } from '@/core/rng/sfc32';\n"
+        }
+      }
+    ]
+  },
+  "bad-sim-trig": {
+    "expect": ["[determinism]", "Math.cos"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/sim/bounce-arena-sim.ts",
+          "find": "  const dx = command === 0 ? 0 : (STICK[(command - 1) * 2] ?? 0);\n",
+          "with": "  const dx = command === 0 ? 0 : Math.cos(((command - 1) * Math.PI) / 8);\n"
+        }
+      }
+    ]
+  },
+  "bad-sim-worklet-import": {
+    "expect": ["[worklet-import]", "src/games/bounce-arena/sim/tuning.ts", "[worklet-directive]", "tuning.ts:1"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/bounce-arena/sim/tuning.ts",
+          "lines": [
+            "// src/games/bounce-arena/sim/tuning.ts",
+            "// Planted bug: a plain module called from a 'worklet' sim (it throws on the UI thread).",
+            "export function speedFor(level: number): number {",
+            "  return 3 * level;",
+            "}"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/sim/bounce-arena-sim.ts",
+          "find": "const PLAYER_SPEED = 3;\n",
+          "with": "const PLAYER_SPEED = speedFor(1);\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/sim/bounce-arena-sim.ts",
+          "find": "\nimport type { RngState } from '@/core/rng/sfc32';\n",
+          "with": "\nimport { speedFor } from './tuning';\n\nimport type { RngState } from '@/core/rng/sfc32';\n"
+        }
+      }
+    ]
+  },
+  "bad-spec-no-round-trip": {
+    "expect": [
+      "[realtime-spec]",
+      "src/games/bounce-arena/bounce-arena-realtime.ts:1",
+      "no test proves the snapshot round trip"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/bounce-arena-realtime.test.ts",
+          "find": "it('survives a snapshot round trip: snapshot(createSim(snapshot(sim))) equals snapshot(sim)'",
+          "with": "it('saves a snapshot as JSON'"
+        }
+      }
+    ]
+  },
+  "bad-step-constants": {
+    "expect": ["[step-constants]", "STEP_MS is not 1000 / 120"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/realtime/fixed-step.ts",
+          "find": "export const STEP_MS = 1000 / 120;\n",
+          "with": "export const STEP_MS = 1000 / 60;\n"
+        }
+      }
+    ]
+  },
+  "bad-stick-table": {
+    "expect": ["[stick-table]", "src/games/bounce-arena/sim/bounce-arena-sim.ts:"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/sim/bounce-arena-sim.ts",
+          "find": "  1, 0, 0.9238795325112867, 0.3826834323650898, 0.7071067811865476, 0.7071067811865476,\n",
+          "with": "  0, 1, 0.9238795325112867, 0.3826834323650898, 0.7071067811865476, 0.7071067811865476,\n"
+        }
+      }
+    ]
+  },
+  "error-no-package-json": {
+    "expect": ["ERROR [bad-input]", "has no package.json"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "pass-config-kit-dir": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "write": { "file": "rn-skills.config.json", "lines": ["{ \"realtimeKitDir\": \"{coreDir}/loop\" }"] } },
+      { "rename": { "from": "src/core/realtime", "to": "src/core/loop" } },
+      {
+        "replace": {
+          "file": "src/canvas/realtime/run-loop-frame.ts",
+          "find": "@/core/realtime/fixed-step",
+          "with": "@/core/loop/fixed-step"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/canvas/realtime/use-fixed-step-loop.ts",
+          "find": "@/core/realtime/realtime-spec",
+          "with": "@/core/loop/realtime-spec"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/canvas/realtime/realtime-canvas-host.tsx",
+          "find": "@/core/realtime/realtime-spec",
+          "with": "@/core/loop/realtime-spec"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/games/ricochet-volley/rules/simulate-volley.ts",
+          "find": "@/core/realtime/fixed-step",
+          "with": "@/core/loop/fixed-step"
+        }
+      }
+    ]
+  },
+  "pass-frame-callback-destructured": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/canvas/realtime/use-fixed-step-loop.ts",
+          "find": "  const frame = useFrameCallback((info) => {\n    runLoopFrame(wiring, info.timeSincePreviousFrame);\n",
+          "with": "  const frame = useFrameCallback(({ timeSincePreviousFrame }) => {\n    runLoopFrame(wiring, timeSincePreviousFrame);\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/canvas/realtime/realtime-canvas-host.tsx",
+          "find": "    isInterrupted: props.isInterrupted || props.isPaused || props.isEnded,\n",
+          "with": "    isInterrupted: props.isInterrupted || isGamePaused || props.isEnded,\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/canvas/realtime/realtime-canvas-host.tsx",
+          "find": "  const sim = useSharedValue(props.initialSim);\n",
+          "with": "  const isGamePaused = props.isPaused;\n  const sim = useSharedValue(props.initialSim);\n"
+        }
+      }
+    ]
+  },
+  "pass-installed-skills-silent": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/decoy/src/canvas/realtime/decoy-host.tsx",
+          "content": "// planted: runs the loop with no lifecycle and a fat frame callback; installed skills are never scanned\nimport { useFrameCallback } from 'react-native-reanimated';\nexport function Decoy(): null {\n  useFixedStepLoop({});\n  useFrameCallback((info) => { runLoopFrame(wiring, info.timeSincePreviousFrame); extra(); }, false);\n  return null;\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "skills/decoy/src/decoy-host.tsx",
+          "content": "// planted: runs the loop with no lifecycle and a fat frame callback; installed skills are never scanned\nimport { useFrameCallback } from 'react-native-reanimated';\nexport function Decoy(): null {\n  useFixedStepLoop({});\n  useFrameCallback((info) => { runLoopFrame(wiring, info.timeSincePreviousFrame); extra(); }, false);\n  return null;\n}\n"
+        }
+      },
+      { "write": { "file": "src/vendor/decoy-skill/SKILL.md", "lines": ["---", "name: decoy", "---"] } },
+      {
+        "write": {
+          "file": "src/vendor/decoy-skill/decoy-host.tsx",
+          "content": "// planted: runs the loop with no lifecycle and a fat frame callback; installed skills are never scanned\nimport { useFrameCallback } from 'react-native-reanimated';\nexport function Decoy(): null {\n  useFixedStepLoop({});\n  useFrameCallback((info) => { runLoopFrame(wiring, info.timeSincePreviousFrame); extra(); }, false);\n  return null;\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-own-geom-not-applicable": {
+    "expect": ["NOT APPLICABLE: no real-time code", "RESULT: PASS"],
+    "ops": [
+      {
+        "delete": [
+          "src/core/realtime",
+          "src/canvas/realtime",
+          "test/goldens/canvas",
+          "src/games/bounce-arena",
+          "src/games/ricochet-volley"
+        ]
+      }
+    ]
+  },
+  "pass-sim-rng-draw-in-step": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/games/bounce-arena/sim/bounce-arena-sim.ts",
+          "find": "  if (tick % WAVE_TICKS === 0) pushEvent(sim, EVENT_WAVE_END, tick);\n",
+          "with": "  if (tick % WAVE_TICKS === 0) pushEvent(sim, EVENT_WAVE_END, tick);\n  if (tick % 600 === 0) sim.body[6] = (drawU32(sim) % 5) - 2;\n"
+        }
+      }
+    ]
+  },
+  "pass-turn-based": {
+    "expect": ["NOT APPLICABLE: no real-time code", "RESULT: PASS"],
+    "ops": [
+      {
+        "delete": [
+          "src/core/realtime",
+          "src/core/geom",
+          "src/canvas/realtime",
+          "test/goldens/canvas",
+          "src/games/bounce-arena",
+          "src/games/ricochet-volley"
+        ]
+      },
+      {
+        "write": {
+          "file": "src/games/lights-out/rules/lights-out-engine.ts",
+          "lines": [
+            "// src/games/lights-out/rules/lights-out-engine.ts",
+            "// Turn-based: applyMove resolves a tap at once, with no fixed-step phase.",
+            "export const LIGHTS_OUT_ENGINE = { panMode: 'none', selectRegions: [] } as const;"
+          ]
+        }
+      }
+    ]
+  }
+}

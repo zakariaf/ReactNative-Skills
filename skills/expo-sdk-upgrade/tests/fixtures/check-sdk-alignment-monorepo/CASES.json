@@ -1,0 +1,72 @@
+{
+  "bad-app-drift": {
+    "expect": [
+      "FAIL apps/notes/package.json:1 [sdk-lockstep] expo differs between apps: apps/notes=~57.0.25, apps/tasks=~57.0.27"
+    ],
+    "ops": [{ "json": { "file": "apps/notes/package.json", "path": ["dependencies", "expo"], "value": "~57.0.25" } }]
+  },
+  "bad-app-lockstep": {
+    "expect": [
+      "FAIL apps/notes/package.json:1 [app-lockstep] expo-system-ui differs between apps: apps/notes=~57.0.3, apps/tasks=~57.0.4"
+    ],
+    "ops": [
+      { "json": { "file": "apps/notes/package.json", "path": ["dependencies", "expo-system-ui"], "value": "~57.0.3" } }
+    ]
+  },
+  "bad-duplicate-first-install": {
+    "expect": [
+      "FAIL package-lock.json:1 [duplicate-native] react-native-safe-area-context is installed as 5.7.3 and 5.9.1",
+      "the apps install 5.7.3 for \"~5.7.0\"",
+      "Add \"react-native-safe-area-context\": \"5.7.3\" to the root overrides",
+      "a shared package's \"*\" peer"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "apps/tasks/package.json",
+          "path": ["dependencies", "react-native-safe-area-context"],
+          "value": "~5.7.0"
+        }
+      },
+      {
+        "json": {
+          "file": "apps/notes/package.json",
+          "path": ["dependencies", "react-native-safe-area-context"],
+          "value": "~5.7.0"
+        }
+      },
+      {
+        "json": {
+          "file": "packages/ui/package.json",
+          "path": ["peerDependencies", "react-native-safe-area-context"],
+          "value": "*"
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/react-native-safe-area-context"],
+          "value": { "version": "5.9.1" }
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "apps/tasks/node_modules/react-native-safe-area-context"],
+          "value": { "version": "5.7.3" }
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "apps/notes/node_modules/react-native-safe-area-context"],
+          "value": { "version": "5.7.3" }
+        }
+      }
+    ]
+  },
+  "bad-overrides-missing": {
+    "expect": ["FAIL package.json:1 [overrides] overrides.react is missing but the apps use 19.2.3"],
+    "ops": [{ "json": { "file": "package.json", "path": ["overrides", "react"], "delete": true } }]
+  }
+}

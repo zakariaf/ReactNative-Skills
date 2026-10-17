@@ -1,0 +1,12 @@
+{
+  "tasks.photos.camera-needed": "Allow camera access to take a photo.",
+  "tasks.photos.camera-unavailable": "This device has no camera the app can use.",
+  "tasks.photos.no-space": "Your device is full. Free some space, then try again.",
+  "tasks.photos.photo-label": "Photo {position} of {count}",
+  "tasks.photos.pick-failed": "The photo could not be opened. Try again.",
+  "tasks.photos.save-failed": "The photo could not be saved. Try again.",
+  "tasks.photos.share-failed": "The photo could not be shared. Try again.",
+  "tasks.photos.share-title": "Share photo",
+  "tasks.photos.share-unavailable": "Sharing is not available on this device.",
+  "tasks.photos.unreadable": "This file is not a photo the app can read."
+}

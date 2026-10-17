@@ -1,0 +1,14 @@
+# .maestro/subflows/airplane-mode.yaml — a sub-flow, never run on its own (it is not under flows/).
+# Optional: real airplane mode around an offline journey, on Android only. The debug link's offline=1
+# changes what ConnectivityPort readers see; it does not cut the network, so fetch, DNS and native SDKs
+# still reach the internet. An app whose offline handling depends on real request failures (fetch
+# errors, paused mutations, retries) also runs its offline journeys on the Android emulator with this
+# sub-flow around them: AIRPLANE=enabled right after the debug link, AIRPLANE=disabled before the end.
+# iOS simulators have no airplane mode (Maestro 2.10 only logs there), hence the platform guard.
+appId: ${APP_ID}
+---
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - setAirplaneMode: ${AIRPLANE}

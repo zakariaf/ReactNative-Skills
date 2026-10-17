@@ -1,0 +1,33 @@
+{
+  "$schema": "./games.schema.json",
+  "$comment": "When multi-package: one game = one white-label app. The apps block holds what every app shares.",
+  "games": [
+    {
+      "id": "arena-chase",
+      "name": "Arena Chase",
+      "class": "realtime",
+      "panMode": "none",
+      "levels": null,
+      "daily": false,
+      "endless": true,
+      "hints": "none",
+      "continue": "once",
+      "loseReasons": ["caught"],
+      "app": "apps/arena-chase"
+    }
+  ],
+  "apps": {
+    "dir": "apps",
+    "scope": "@acme",
+    "bundlePrefix": "com.acme",
+    "products": ["premium"],
+    "locales": ["en", "ar"],
+    "composer": {
+      "import": "@acme/app-config/with-app-settings.ts",
+      "name": "withAppSettings",
+      "type": "AppSettings"
+    },
+    "fontsDir": "packages/brand/fonts",
+    "adUnits": ["banner", "rewarded"]
+  }
+}

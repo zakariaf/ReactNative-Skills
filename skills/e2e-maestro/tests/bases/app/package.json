@@ -1,0 +1,10 @@
+{
+  "name": "tasks",
+  "private": true,
+  "scripts": {
+    "e2e:ios": "node scripts/e2e/run-e2e.ts --platform ios",
+    "e2e:android": "node scripts/e2e/run-e2e.ts --platform android",
+    "screenshots:ios": "node scripts/e2e/capture-screenshots.ts --platform ios",
+    "screenshots:android": "node scripts/e2e/capture-screenshots.ts --platform android"
+  }
+}

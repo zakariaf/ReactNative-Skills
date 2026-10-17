@@ -1,0 +1,9 @@
+node_modules/
+ios/
+android/
+dist/
+.env*.local
+*.p8
+*.p12
+*.jks
+*.keystore

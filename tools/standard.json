@@ -1,0 +1,526 @@
+{
+  "$comment": "The constants of the skill standard (CONTRIBUTING.md is the prose; DECISIONS.md section 5 the summary). validate-skills.mjs, check-repo-hygiene.mjs and build-catalog.mjs read this file. Change a constant here, then run node tools/tests/selftest.mjs and node tools/validate-skills.mjs --summary.",
+  "version": 1,
+  "skillsDir": "skills",
+  "frontmatter": {
+    "allowedKeys": [
+      "name",
+      "description",
+      "argument-hint",
+      "arguments",
+      "metadata",
+      "license",
+      "compatibility",
+      "disable-model-invocation"
+    ],
+    "bannedKeys": {
+      "allowed-tools": "allowed-tools makes Claude's own invocation of the skill ask for permission (denied in headless runs)"
+    },
+    "keyAdvice": {
+      "paths": "\"paths\" hides the skill from the listing and the / menu until a matching file is read, so a developer cannot name it",
+      "hooks": "\"hooks\" make Claude's own Skill-tool call need approval (denied in headless runs)",
+      "user-invocable": "\"user-invocable: false\" stops a developer typing /name",
+      "when_to_use": "\"when_to_use\" adds to the listing budget; put the triggers in the description",
+      "context": "\"context: fork\" runs the skill without the conversation; build skills need the conversation",
+      "model": "\"model\" pins one vendor's model and is ignored by other agents",
+      "version": "put a version under metadata (metadata: then an indented version line), not at the top level"
+    },
+    "runbook": {
+      "key": "disable-model-invocation",
+      "value": "true",
+      "namePrefix": "run-",
+      "stopAndAskPatterns": [
+        "\\bstop and ask\\b",
+        "\\bstop-and-ask\\b",
+        "\\bask (?:the )?(?:developer|user|reviewer|human)\\b[^.]{0,80}\\b(?:before|first|to confirm|for (?:a |an |the )?(?:go-ahead|confirmation|approval))\\b",
+        "\\bwait for (?:the )?(?:developer|user|reviewer|human)(?:'s)? (?:confirmation|approval|go-ahead|answer)\\b"
+      ]
+    }
+  },
+  "names": {
+    "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+    "maxLength": 64,
+    "reservedSubstrings": [
+      "claude",
+      "anthropic"
+    ],
+    "reserved": [
+      "verify",
+      "run",
+      "debug",
+      "loop",
+      "init",
+      "review",
+      "code-review",
+      "simplify",
+      "security-review",
+      "help",
+      "clear",
+      "compact",
+      "config",
+      "context",
+      "cost",
+      "doctor",
+      "exit",
+      "memory",
+      "model",
+      "permissions",
+      "resume",
+      "skills",
+      "status",
+      "reload-skills",
+      "skill-doctor",
+      "add-dir",
+      "agents",
+      "hooks",
+      "login",
+      "logout",
+      "mcp",
+      "plugin",
+      "export",
+      "rewind",
+      "batch",
+      "schedule",
+      "update-config",
+      "keybindings-help",
+      "fewer-permission-prompts",
+      "workflow-authoring",
+      "design",
+      "design-sync",
+      "dataviz",
+      "deep-research",
+      "synced",
+      "anthropic-skills",
+      "expo-router",
+      "eas-app-stores",
+      "eas-update",
+      "expo-ui",
+      "expo-data-fetching",
+      "expo-module",
+      "expo-dev-client",
+      "eas-hosting",
+      "eas-observe",
+      "eas-simulator",
+      "eas-update-insights",
+      "eas-workflows",
+      "expo-animation",
+      "expo-app-clip",
+      "expo-brownfield",
+      "expo-design-system",
+      "expo-dom",
+      "expo-examples",
+      "expo-native-ui",
+      "expo-overview",
+      "expo-project-structure",
+      "expo-skill-feedback",
+      "expo-upgrade",
+      "expo-web-to-native"
+    ],
+    "reservedNote": "Bundled Claude Code commands and skills (a project or npx install would shadow them) and the names of Expo's official skills (DECISIONS section 14: this library complements them and never reuses their names).",
+    "expoSkillsVerified": "All 24 skills of expo/skills (plugins/expo/skills), verified on 2026-10-16. Re-verify: curl -s https://api.github.com/repos/expo/skills/contents/plugins/expo/skills | grep '\"name\"' (every folder except README.md is a skill name)."
+  },
+  "description": {
+    "maxChars": 300,
+    "targetChars": 250,
+    "triggerPhrase": "Use when",
+    "notForPhrase": "Not for",
+    "notVerbs": [
+      "this",
+      "these",
+      "those",
+      "its",
+      "is",
+      "was",
+      "always",
+      "various",
+      "across",
+      "towards",
+      "perhaps",
+      "thus",
+      "plus",
+      "apps",
+      "skills",
+      "tools",
+      "rules",
+      "notes",
+      "docs",
+      "settings",
+      "stats",
+      "statistics",
+      "basics",
+      "us",
+      "yes",
+      "less",
+      "unless",
+      "class",
+      "alias",
+      "status",
+      "focus",
+      "colours",
+      "colors",
+      "components",
+      "ios",
+      "series",
+      "news",
+      "tasks",
+      "products",
+      "accounts",
+      "reminders",
+      "migrations",
+      "animations",
+      "permissions",
+      "notifications",
+      "translations",
+      "variants",
+      "analytics",
+      "metrics",
+      "credentials",
+      "assets"
+    ]
+  },
+  "skillMd": {
+    "maxLines": 300,
+    "sections": [
+      "Rules that must hold",
+      "Workflow",
+      "Definition of done",
+      "Anti-patterns",
+      "Files in this skill",
+      "Related skills"
+    ],
+    "filesTableHeader": [
+      "File",
+      "What it is",
+      "Read/run when"
+    ],
+    "tocThreshold": 100,
+    "dodCharLimit": 20000,
+    "dodCharLimitNote": "About 5,000 tokens: what survives context compaction.",
+    "shouting": [
+      "MUST",
+      "NEVER",
+      "ALWAYS",
+      "IMPORTANT",
+      "CRITICAL",
+      "MANDATORY",
+      "WARNING",
+      "DO NOT",
+      "DON'T"
+    ]
+  },
+  "layout": {
+    "topLevel": [
+      "SKILL.md",
+      "references",
+      "templates",
+      "examples",
+      "scripts",
+      "tests",
+      "assets"
+    ],
+    "scriptsTopLevelExtensions": [
+      ".mjs",
+      ".json"
+    ],
+    "scriptsTopLevelAllowed": [
+      "scripts/.gitignore",
+      "scripts/dot-gitignore",
+      "scripts/package-lock.json"
+    ]
+  },
+  "projectRefs": {
+    "patterns": [
+      {
+        "pattern": "(?:^|[\\s'\"`(=:,\\[])(?:/Users/|/home/)[A-Za-z0-9._-]",
+        "flags": "",
+        "what": "an absolute path in a user home folder"
+      },
+      {
+        "pattern": "\\b[A-Za-z]:(?:\\\\{1,2}|/)Users(?:\\\\{1,2}|/)",
+        "flags": "i",
+        "what": "an absolute Windows user path"
+      },
+      {
+        "pattern": "scratchpad",
+        "flags": "i",
+        "what": "a scratchpad location"
+      },
+      {
+        "pattern": "/private/tmp/|/tmp/claude-",
+        "flags": "",
+        "what": "a temporary scratch path"
+      }
+    ],
+    "legacyLibraryFolder": "_library",
+    "repoTooling": {
+      "dir": "tools",
+      "entries": [
+        "DECISIONS.md",
+        "README.md",
+        "standard.json",
+        "stack.json",
+        "catalog.json",
+        "routing-evals.json",
+        "validate-skills.mjs",
+        "sync-shared.mjs",
+        "selftest-all.mjs",
+        "build-catalog.mjs",
+        "check-repo-hygiene.mjs",
+        "check-stack-pins.mjs",
+        "check-routing-evals.mjs",
+        "verify-templates.mjs",
+        "lib",
+        "shared",
+        "tests",
+        "harness"
+      ],
+      "extensions": [
+        ".mjs",
+        ".json"
+      ]
+    },
+    "markdownParentPath": "../",
+    "scriptParentPath": "../../"
+  },
+  "runtimeEnv": {
+    "banned": [
+      "CLAUDE_PLUGIN_ROOT",
+      "CLAUDE_PLUGIN_DATA",
+      "CLAUDE_PROJECT_DIR",
+      "CLAUDE_ENV_FILE"
+    ],
+    "scriptEnvPrefix": "CLAUDE_",
+    "note": "Each exists only in some agents or install scopes (plugin root, project dir); ${CLAUDE_SKILL_DIR} in markdown is the one allowed variable (AGENTS.md states how other agents substitute it)."
+  },
+  "device": {
+    "maestroDeviceCommands": [
+      "test",
+      "hierarchy",
+      "record",
+      "start-device"
+    ],
+    "maestroValueOptions": [
+      "--device",
+      "--udid",
+      "--driver-host-port",
+      "--host",
+      "--port",
+      "--platform",
+      "-p"
+    ],
+    "simctlDeviceCommands": [
+      "boot",
+      "shutdown",
+      "erase",
+      "delete",
+      "rename",
+      "clone",
+      "install",
+      "uninstall",
+      "launch",
+      "terminate",
+      "openurl",
+      "addmedia",
+      "io",
+      "spawn",
+      "get_app_container",
+      "listapps",
+      "appinfo",
+      "privacy",
+      "push",
+      "keychain",
+      "status_bar",
+      "ui",
+      "pbcopy",
+      "pbpaste",
+      "pbsync",
+      "bootstatus",
+      "getenv",
+      "location",
+      "icloud_sync",
+      "upgrade",
+      "diagnose",
+      "logverbose",
+      "install_app_data",
+      "notify_post"
+    ],
+    "simctlImplicitDevices": [
+      "booted",
+      "all"
+    ],
+    "adbDeviceCommands": [
+      "shell",
+      "install",
+      "install-multiple",
+      "uninstall",
+      "push",
+      "pull",
+      "logcat",
+      "reverse",
+      "forward",
+      "emu",
+      "reboot",
+      "root",
+      "unroot",
+      "remount",
+      "wait-for-device",
+      "exec-out",
+      "bugreport",
+      "sideload",
+      "get-state",
+      "get-serialno",
+      "jdwp",
+      "sync",
+      "tcpip",
+      "usb"
+    ],
+    "adbValueOptions": [
+      "-s",
+      "-t",
+      "-H",
+      "-P",
+      "-L"
+    ],
+    "adbSelectOptions": [
+      "-s",
+      "-t"
+    ],
+    "bindingHelpers": [
+      "maestroGlobalArgs",
+      "maestroArgs",
+      "deviceArgs",
+      "adbArgs",
+      "adbDeviceArgs"
+    ],
+    "bindingFactoryPrefixes": [
+      "make",
+      "create"
+    ],
+    "simulatorNaming": "<project>-<purpose>"
+  },
+  "scripts": {
+    "timeoutMs": 30000,
+    "nodeBuiltins": [
+      "assert",
+      "buffer",
+      "child_process",
+      "cluster",
+      "console",
+      "crypto",
+      "dgram",
+      "dns",
+      "events",
+      "fs",
+      "fs/promises",
+      "http",
+      "http2",
+      "https",
+      "module",
+      "net",
+      "os",
+      "path",
+      "perf_hooks",
+      "process",
+      "querystring",
+      "readline",
+      "stream",
+      "string_decoder",
+      "timers",
+      "tls",
+      "tty",
+      "url",
+      "util",
+      "v8",
+      "vm",
+      "worker_threads",
+      "zlib",
+      "test",
+      "sqlite"
+    ]
+  },
+  "fixtures": {
+    "caseKinds": {
+      "good": 0,
+      "pass-": 0,
+      "bad-": 1,
+      "error-": 2
+    },
+    "overlayFiles": [
+      "mutation.json",
+      "DELETE.txt",
+      "plant.json"
+    ],
+    "overlayDir": "overlay",
+    "suiteFile": "SUITE.json",
+    "casesFile": "CASES.json",
+    "argsFile": "ARGS.txt",
+    "expectFile": "EXPECT.txt",
+    "basesDir": "tests/bases",
+    "mutationOps": [
+      "replace",
+      "json",
+      "write",
+      "delete",
+      "rename",
+      "copy",
+      "png",
+      "reformat",
+      "mkdir",
+      "symlink",
+      "plant"
+    ],
+    "mutationOpsNote": "Mirrors OVERLAY_OPS in tools/shared/scripts/check-lib.mjs (DECISIONS section 7 names the core six: replace, json, write, delete, rename, png); keep the two lists equal.",
+    "hygieneNames": [
+      ".gitignore",
+      "metadata.json",
+      ".git",
+      "__pycache__",
+      "__pypackages__"
+    ],
+    "hygieneRenames": {
+      "dot-gitignore": ".gitignore",
+      "dot-metadata.json": "metadata.json"
+    },
+    "hygieneNote": "The skills CLI drops .git, __pycache__, __pypackages__ and every metadata.json when it copies a skill, and git honours a nested .gitignore; store such files under their hygieneRenames name (check-lib's case assembly renames them back) or create them at run time.",
+    "budget": {
+      "testsMaxBytes": 1048576,
+      "testsMaxFiles": 600,
+      "fileMaxBytes": 262144,
+      "binaryExtensions": [
+        ".png",
+        ".jpg",
+        ".jpeg",
+        ".webp",
+        ".gif",
+        ".ico",
+        ".ttf",
+        ".otf",
+        ".woff",
+        ".woff2",
+        ".wav",
+        ".mp3",
+        ".m4a",
+        ".caf",
+        ".pdf",
+        ".plist",
+        ".jsbundle",
+        ".hbc",
+        ".car"
+      ]
+    }
+  },
+  "listing": {
+    "setBudgetChars": 20000,
+    "averageDescriptionTarget": 250,
+    "perEntryOverheadChars": 4
+  },
+  "repo": {
+    "maxTrackedBytes": 31457280,
+    "maxTrackedFiles": 8000,
+    "noSkillMdUnder": [
+      "tools",
+      "docs"
+    ],
+    "skillsHoldOnly": "skill folders"
+  }
+}

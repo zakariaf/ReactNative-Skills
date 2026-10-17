@@ -1,0 +1,399 @@
+{
+  "bad-abi": {
+    "expect": ["artifacts/apk/lib/ [abi] the APK holds native libraries for arm64-v8a, not x86_64"],
+    "args": "{dir} --apk artifacts/apk --variant preview --abi x86_64"
+  },
+  "bad-ad-app-id": {
+    "expect": ["artifacts/apk/AndroidManifest.xml [ad-app-id] com.google.android.gms.ads.APPLICATION_ID is missing"],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["dependencies", "react-native-google-mobile-ads"],
+          "value": "16.2.0"
+        }
+      }
+    ]
+  },
+  "bad-ad-app-id-format": {
+    "expect": [
+      "artifacts/apk/AndroidManifest.xml [ad-app-id] com.google.android.gms.ads.APPLICATION_ID \"ca-app-pub-123~456\" is not an AdMob app id"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "artifacts/apk/AndroidManifest.xml",
+          "find": "    <meta-data android:name=\"expo.modules.updates.ENABLED\" android:value=\"false\"/>\n",
+          "with": "    <meta-data android:name=\"expo.modules.updates.ENABLED\" android:value=\"false\"/>\n    <meta-data android:name=\"com.google.android.gms.ads.APPLICATION_ID\" android:value=\"ca-app-pub-123~456\"/>\n"
+        }
+      }
+    ]
+  },
+  "bad-application-id": {
+    "expect": [
+      "artifacts/apk/AndroidManifest.xml [application-id] the package is \"com.acme.tasks\", expected \"com.acme.tasks.preview\" for a preview build"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "artifacts/apk/AndroidManifest.xml",
+          "find": "package=\"com.acme.tasks.preview\"",
+          "with": "package=\"com.acme.tasks\""
+        }
+      },
+      {
+        "replace": {
+          "file": "artifacts/apk/assets/app.config",
+          "find": "\"package\":\"com.acme.tasks.preview\"",
+          "with": "\"package\":\"com.acme.tasks\""
+        }
+      }
+    ]
+  },
+  "bad-application-id-shape": {
+    "expect": [
+      "artifacts/apk/AndroidManifest.xml [application-id] the package com.acme.tasks-app.preview is not a valid Android package"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "artifacts/apk/AndroidManifest.xml",
+          "find": "package=\"com.acme.tasks.preview\"",
+          "with": "package=\"com.acme.tasks-app.preview\""
+        }
+      },
+      {
+        "replace": {
+          "file": "artifacts/apk/AndroidManifest.xml",
+          "find": "com.acme.tasks.preview.DYNAMIC",
+          "with": "com.acme.tasks-app.preview.DYNAMIC",
+          "all": true
+        }
+      },
+      {
+        "replace": {
+          "file": "artifacts/apk/assets/app.config",
+          "find": "\"package\":\"com.acme.tasks.preview\"",
+          "with": "\"package\":\"com.acme.tasks-app.preview\""
+        }
+      }
+    ]
+  },
+  "bad-constants-missing": {
+    "expect": [
+      "artifacts/apk/assets/app.config [constants-variant] assets/app.config (written by expo-constants at build time) is missing"
+    ],
+    "ops": [{ "delete": "artifacts/apk/assets/app.config" }]
+  },
+  "bad-constants-package": {
+    "expect": [
+      "artifacts/apk/assets/app.config [constants-variant] android.package is \"com.acme.tasks\" but the manifest says \"com.acme.tasks.preview\""
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "artifacts/apk/assets/app.config",
+          "find": "\"package\":\"com.acme.tasks.preview\"",
+          "with": "\"package\":\"com.acme.tasks\""
+        }
+      }
+    ]
+  },
+  "bad-constants-variant": {
+    "expect": [
+      "artifacts/apk/assets/app.config [constants-variant] extra.appVariant is \"production\", expected \"preview\""
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "artifacts/apk/assets/app.config",
+          "find": "\"appVariant\":\"preview\"",
+          "with": "\"appVariant\":\"production\""
+        }
+      }
+    ]
+  },
+  "bad-debuggable": {
+    "expect": ["artifacts/apk/AndroidManifest.xml [debuggable] android:debuggable is true"],
+    "ops": [
+      {
+        "replace": {
+          "file": "artifacts/apk/AndroidManifest.xml",
+          "find": "<application android:name=\"com.acme.tasks.preview.MainApplication\" android:label=\"Tasks (Preview)\" android:allowBackup=\"true\"",
+          "with": "<application android:name=\"com.acme.tasks.preview.MainApplication\" android:label=\"Tasks (Preview)\" android:allowBackup=\"true\" android:debuggable=\"true\""
+        }
+      }
+    ]
+  },
+  "bad-gate-without-sentinel": {
+    "expect": [
+      "src/test-only.ts:1 [test-code] src/test-only.ts gates test-only code, but no test-only sentinel is known"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/test-only-entry.ts",
+          "find": "export const TEST_BUILD_SENTINEL = 'TASKS_TEST_BUILD_ONLY';",
+          "with": "export const testBuild = true;"
+        }
+      }
+    ]
+  },
+  "bad-manifest-keys": {
+    "expect": [
+      "artifacts/apk/AndroidManifest.xml [manifest-keys] <application android:allowBackup> is \"true\", the contract expects false"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/android-emu-build.json",
+          "path": ["application"],
+          "value": { "allowBackup": false }
+        }
+      }
+    ]
+  },
+  "bad-min-sdk-contract": {
+    "expect": ["artifacts/apk/AndroidManifest.xml [sdk-levels] minSdkVersion is 24, the contract says 26"],
+    "ops": [{ "json": { "file": "contracts/android-emu-build.json", "path": ["minSdk"], "value": 26 } }]
+  },
+  "bad-min-sdk-floor": {
+    "expect": ["artifacts/apk/AndroidManifest.xml [sdk-levels] minSdkVersion is 23, below 24"],
+    "ops": [
+      {
+        "replace": {
+          "file": "artifacts/apk/AndroidManifest.xml",
+          "find": "android:minSdkVersion=\"24\"",
+          "with": "android:minSdkVersion=\"23\""
+        }
+      },
+      { "json": { "file": "contracts/android-emu-build.json", "path": ["minSdk"], "delete": true } }
+    ]
+  },
+  "bad-no-bundle": {
+    "expect": ["artifacts/apk/assets/index.android.bundle [embedded-bundle] the APK embeds no JS bundle"],
+    "ops": [{ "delete": "artifacts/apk/assets/index.android.bundle" }]
+  },
+  "bad-not-hermes": {
+    "expect": ["artifacts/apk/assets/index.android.bundle [embedded-bundle] the embedded bundle is not Hermes bytecode"],
+    "ops": [
+      {
+        "write": {
+          "file": "artifacts/apk/assets/index.android.bundle",
+          "content": "var TEST_BUILD_SENTINEL=\"TASKS_TEST_BUILD_ONLY\";\n"
+        }
+      }
+    ]
+  },
+  "bad-page-alignment-elf": {
+    "expect": [
+      "artifacts/apk/lib/arm64-v8a/libreactnative.so [page-alignment] a LOAD segment is aligned to 4096 bytes, not 16 KB"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "artifacts/apk/lib/arm64-v8a/libreactnative.so",
+          "base64": "f0VMRgIBAQAAAAAAAAAAAAMAtwAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAEAAOAACAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAA="
+        }
+      }
+    ]
+  },
+  "bad-permission-foreign-signature": {
+    "expect": [
+      "artifacts/apk/AndroidManifest.xml [permissions] the merged manifest requests com.other.sync.permission.SHARED_DATA, which the contract does not list",
+      "Remove it with android.blockedPermissions"
+    ],
+    "ops": [
+      {
+        "$comment": "a signature permission under another package is a library's request, not the app's own",
+        "replace": {
+          "file": "artifacts/apk/AndroidManifest.xml",
+          "find": "  <uses-permission android:name=\"android.permission.VIBRATE\"/>\n",
+          "with": "  <uses-permission android:name=\"android.permission.VIBRATE\"/>\n  <permission android:name=\"com.other.sync.permission.SHARED_DATA\" android:protectionLevel=\"signature\"/>\n  <uses-permission android:name=\"com.other.sync.permission.SHARED_DATA\"/>\n"
+        }
+      }
+    ]
+  },
+  "bad-permission-own-not-signature": {
+    "expect": [
+      "artifacts/apk/AndroidManifest.xml [permissions] the merged manifest requests com.acme.tasks.preview.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION, which the contract does not list",
+      "does not declare it as a signature permission"
+    ],
+    "ops": [
+      {
+        "$comment": "named after the app's package but declared normal: not the app's own signature permission",
+        "replace": {
+          "file": "artifacts/apk/AndroidManifest.xml",
+          "find": "android:protectionLevel=\"signature\"",
+          "with": "android:protectionLevel=\"normal\""
+        }
+      }
+    ]
+  },
+  "bad-permissions": {
+    "expect": [
+      "artifacts/apk/AndroidManifest.xml [permissions] the merged manifest requests android.permission.CAMERA, which the contract does not list"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "artifacts/apk/AndroidManifest.xml",
+          "find": "  <uses-permission android:name=\"android.permission.VIBRATE\"/>\n",
+          "with": "  <uses-permission android:name=\"android.permission.VIBRATE\"/>\n  <uses-permission android:name=\"android.permission.CAMERA\"/>\n"
+        }
+      }
+    ]
+  },
+  "bad-sentinel-missing": {
+    "expect": [
+      "artifacts/apk/assets/index.android.bundle [test-code] the preview APK lacks the test-only sentinel \"TASKS_TEST_BUILD_ONLY\""
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "artifacts/apk/assets/index.android.bundle",
+          "base64": "xh+8A8EDGR9gAAAAAAAAAHZhciB0YXNrcz1bXTs="
+        }
+      }
+    ]
+  },
+  "bad-target-sdk": {
+    "expect": ["artifacts/apk/AndroidManifest.xml [sdk-levels] targetSdkVersion is 35, expected 36"],
+    "ops": [
+      {
+        "replace": {
+          "file": "artifacts/apk/AndroidManifest.xml",
+          "find": "android:targetSdkVersion=\"36\"",
+          "with": "android:targetSdkVersion=\"35\""
+        }
+      }
+    ]
+  },
+  "bad-target-sdk-catalog": {
+    "expect": ["artifacts/apk/AndroidManifest.xml [sdk-levels] targetSdkVersion is 36, expected 37"],
+    "ops": [
+      {
+        "$comment": "React Native's catalog targets 37 and the contract states no targetSdk: an APK targeting 36 is stale",
+        "json": { "file": "contracts/android-emu-build.json", "path": ["targetSdk"], "delete": true }
+      },
+      {
+        "write": {
+          "file": "node_modules/react-native/gradle/libs.versions.toml",
+          "content": "[versions]\nminSdk = \"24\"\ntargetSdk = \"37\"\ncompileSdk = \"37\"\nbuildTools = \"37.0.0\"\n"
+        }
+      }
+    ]
+  },
+  "bad-template-token": {
+    "expect": [
+      "artifacts/apk/AndroidManifest.xml [ship-placeholder] the manifest meta-data expo.modules.updates.ENABLED is an unfilled template placeholder"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "artifacts/apk/AndroidManifest.xml",
+          "find": "android:name=\"expo.modules.updates.ENABLED\" android:value=\"false\"",
+          "with": "android:name=\"expo.modules.updates.ENABLED\" android:value=\"__UPDATES_ENABLED__\""
+        }
+      }
+    ]
+  },
+  "bad-version": {
+    "expect": ["artifacts/apk/AndroidManifest.xml [version] versionName is \"1.0.0\", expected 2.0.0"],
+    "args": "{dir} --apk artifacts/apk --variant preview --version 2.0.0"
+  },
+  "bad-version-code": {
+    "expect": ["artifacts/apk/AndroidManifest.xml [version-code] versionCode is 1, expected 7"],
+    "args": "{dir} --apk artifacts/apk --variant preview --version-code 7"
+  },
+  "error-bad-variant": {
+    "expect": ["ERROR [bad-input] --variant must be one of development|preview|production, got \"staging\""],
+    "args": "{dir} --apk artifacts/apk --variant staging"
+  },
+  "error-contract-invalid": {
+    "expect": ["ERROR [bad-input] contracts/android-emu-build.json is not valid (\"targetSdk\" is \"36\""],
+    "ops": [{ "json": { "file": "contracts/android-emu-build.json", "path": ["targetSdk"], "value": "36" } }]
+  },
+  "error-no-apk": {
+    "expect": ["ERROR [bad-input] nothing to check: --apk is required"],
+    "args": "{dir} --variant preview"
+  },
+  "error-no-manifest": {
+    "expect": ["ERROR [bad-input] nothing to check: artifacts/apk has no AndroidManifest.xml"],
+    "ops": [{ "delete": "artifacts/apk/AndroidManifest.xml" }]
+  },
+  "error-not-apk": {
+    "expect": ["ERROR [bad-input] nothing to check: package.json: not a ZIP file"],
+    "args": "{dir} --apk package.json --variant preview"
+  },
+  "pass-no-gate": {
+    "expect": ["SKIP src/test-only.ts [test-code] not yet created (debug-menu-and-test-hooks creates it)"],
+    "ops": [{ "delete": ["src/test-only.ts", "src/test-only-entry.ts"] }]
+  },
+  "pass-no-permission-list": {
+    "expect": [
+      "permissions (not checked, no contract list): android.permission.INTERNET, android.permission.VIBRATE",
+      "0 problems"
+    ],
+    "ops": [{ "json": { "file": "contracts/android-emu-build.json", "path": ["permissions"], "delete": true } }]
+  },
+  "pass-permission-application-id": {
+    "expect": ["check-apk:", "0 problems"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/android-emu-build.json",
+          "path": ["permissions", 2],
+          "value": "${applicationId}.permission.C2D_MESSAGE"
+        }
+      },
+      {
+        "replace": {
+          "file": "artifacts/apk/AndroidManifest.xml",
+          "find": "  <uses-permission android:name=\"android.permission.VIBRATE\"/>\n",
+          "with": "  <uses-permission android:name=\"android.permission.VIBRATE\"/>\n  <uses-permission android:name=\"com.acme.tasks.preview.permission.C2D_MESSAGE\"/>\n"
+        }
+      }
+    ]
+  },
+  "pass-sentinel-option": {
+    "expect": ["check-apk:", "0 problems"],
+    "args": "{dir} --apk artifacts/apk --variant preview --sentinel tasks=[]",
+    "ops": [
+      {
+        "write": {
+          "file": "artifacts/apk/assets/index.android.bundle",
+          "base64": "xh+8A8EDGR9gAAAAAAAAAHZhciB0YXNrcz1bXTs="
+        }
+      },
+      {
+        "replace": {
+          "file": "src/test-only-entry.ts",
+          "find": "export const TEST_BUILD_SENTINEL = 'TASKS_TEST_BUILD_ONLY';",
+          "with": "export const TEST_BUILD_SENTINEL = 'OTHER_SENTINEL_VALUE';"
+        }
+      }
+    ]
+  },
+  "pass-target-sdk-catalog": {
+    "expect": ["check-apk:", "0 problems"],
+    "ops": [
+      {
+        "$comment": "compileSdk moved to 37 (ANDROID_API), targetSdk stays 36 in React Native's catalog: the APK's 36 is right",
+        "json": { "file": "contracts/android-emu-build.json", "path": ["targetSdk"], "delete": true }
+      },
+      {
+        "write": {
+          "file": "scripts/android/toolchain.ts",
+          "content": "// scripts/android/toolchain.ts\nexport const JDK_MAJOR = 17;\nexport const ANDROID_API = 37;\nexport const BUILD_TOOLS_VERSION = '37.0.0';\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/react-native/gradle/libs.versions.toml",
+          "content": "[versions]\nminSdk = \"24\"\ntargetSdk = \"36\"\ncompileSdk = \"37\"\nbuildTools = \"37.0.0\"\n"
+        }
+      }
+    ]
+  }
+}

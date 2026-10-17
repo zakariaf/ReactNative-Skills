@@ -1,0 +1,6 @@
+node_modules/
+/ios
+/android
+build/
+reports/
+/tools/maestro/

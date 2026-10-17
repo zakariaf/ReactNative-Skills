@@ -1,0 +1,11 @@
+{
+  "untranslatedPrefixes": [
+    "debug."
+  ],
+  "catalogs": [
+    {
+      "dir": "packages/billing/src/i18n",
+      "keyPrefix": "billing"
+    }
+  ]
+}

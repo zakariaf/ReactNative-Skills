@@ -1,0 +1,225 @@
+{
+  "area": "skills",
+  "entries": [
+    {
+      "id": "skills-grouping-folder",
+      "topic": "Loading",
+      "symptom": "A skill placed in a grouping sub-folder (two levels below the skills folder) never appears",
+      "cause": "Skills are discovered exactly one folder deep",
+      "fix": "Keep <skills folder>/<name>/SKILL.md",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "skill-maintenance"
+    },
+    {
+      "id": "skills-frontmatter-line1",
+      "topic": "Loading",
+      "symptom": "The skill is listed with the description \"---\"",
+      "cause": "The opening --- is not line 1 (a blank line or byte-order mark before it), so the whole file became the body",
+      "fix": "Put --- on line 1",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "skill-maintenance"
+    },
+    {
+      "id": "skills-yaml-parse",
+      "topic": "Loading",
+      "symptom": "The skill is listed with its first body line as the description",
+      "cause": "The frontmatter YAML does not parse, so every field is dropped silently",
+      "fix": "One-line values only; quote values that contain \": \" or \" #\"",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "skill-maintenance"
+    },
+    {
+      "id": "skills-missing-description",
+      "topic": "Loading",
+      "symptom": "The skill is listed with its first body line and never triggers",
+      "cause": "The description field is missing or misspelled (unknown keys are ignored silently)",
+      "fix": "Write a description of at most 300 characters: verb first, trigger words, Not for",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "skill-maintenance"
+    },
+    {
+      "id": "skills-nested-skills",
+      "topic": "Loading",
+      "symptom": "A skill in a sub-folder's own .claude/skills is missing from the / menu",
+      "cause": "Nested skills load only after the agent reads or edits a file in that folder",
+      "fix": "Install skills at the repo root (.claude/skills/<name> or .agents/skills/<name>)",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "skill-maintenance"
+    },
+    {
+      "id": "skills-reload",
+      "topic": "Loading",
+      "symptom": "A skill folder created mid-session does not appear",
+      "cause": "A new top-level skills folder is not watched until it is re-scanned",
+      "fix": "Run /reload-skills or start a new session",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "skill-maintenance"
+    },
+    {
+      "id": "skills-allowed-tools-approval",
+      "topic": "Invocation",
+      "symptom": "The agent's Skill call is denied in headless runs (permission_denials: [Skill])",
+      "cause": "A skill with allowed-tools or hooks needs approval to be invoked by the model",
+      "fix": "No allowed-tools in skills; allow the scripts with a project Bash rule instead",
+      "match": [
+        "permission_denials"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "skill-maintenance"
+    },
+    {
+      "id": "skills-disable-model-invocation",
+      "topic": "Invocation",
+      "symptom": "The agent says to type /name instead of using the skill",
+      "cause": "disable-model-invocation: true removes the description and blocks the Skill tool",
+      "fix": "Use it only on side-effecting run-* runbooks that stop and ask before the irreversible step",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "skill-maintenance"
+    },
+    {
+      "id": "skills-hidden-by-keys",
+      "topic": "Invocation",
+      "symptom": "A skill is missing from the listing, or /name does nothing",
+      "cause": "paths: hides it until a matching file is read; user-invocable: false hides it from the menu",
+      "fix": "Use only the keys the standard allows (name, description, metadata ...)",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "skill-maintenance"
+    },
+    {
+      "id": "skills-injection-abort",
+      "topic": "Invocation",
+      "symptom": "Shell command failed for pattern ... and the skill never loads",
+      "cause": "A !`command` injection in SKILL.md exited non-zero or was not pre-approved",
+      "fix": "Run checks as normal shell calls from the instructions, not as injected commands",
+      "match": [
+        "Shell command failed for pattern",
+        "Shell command permission check failed"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "skill-maintenance"
+    },
+    {
+      "id": "skills-bundled-name",
+      "topic": "Invocation",
+      "symptom": "A skill named like a bundled command replaced it, or a different skill loads than expected",
+      "cause": "Same-name skills shadow bundled commands, and a personal skill wins over a project skill of the same name",
+      "fix": "Never use bundled names (verify, run, debug, review, simplify, init, loop ...); keep names unique",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "skill-maintenance"
+    },
+    {
+      "id": "skills-listing-budget",
+      "topic": "Listing",
+      "symptom": "Some skills show only their name, no description",
+      "cause": "The skill listing exceeded its character budget and dropped the least-used descriptions",
+      "fix": "Keep descriptions short (aim for 250 characters); raise skillListingBudgetFraction in settings only if needed",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "skill-maintenance"
+    },
+    {
+      "id": "skills-compaction",
+      "topic": "Listing",
+      "symptom": "After a long session a skill's later sections are forgotten",
+      "cause": "After compaction only the first part of each invoked skill (about 5,000 tokens) is re-attached",
+      "fix": "Keep rules and the definition of done near the top; re-invoke the skill before verifying",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "skill-maintenance"
+    },
+    {
+      "id": "skills-cwd-relative-script",
+      "topic": "Scripts",
+      "symptom": "A skill script path works in one session and not another",
+      "cause": "Commands run in the session folder, not the skill folder",
+      "fix": "Call scripts through the skill folder: node ${CLAUDE_SKILL_DIR}/scripts/<x>.mjs",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "skill-maintenance"
+    },
+    {
+      "id": "skills-checker-root-flag",
+      "topic": "Scripts",
+      "symptom": "A skill checker prints ERROR [bad-input] Unknown option '--root'",
+      "cause": "Every checker takes the repo root as its first positional argument, never --root",
+      "fix": "Run node <skill>/scripts/<checker>.mjs . [options]; the error's fix text prints the positional form",
+      "match": [
+        "Unknown option '--root'"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "skill-maintenance"
+    },
+    {
+      "id": "skills-exit-2-is-not-a-pass",
+      "topic": "Scripts",
+      "symptom": "A checker exits 2 with ERROR [bad-input] nothing to check",
+      "cause": "Exit 2 means bad input or nothing to check; it is never a pass (NOT APPLICABLE and SKIP lines with RESULT: PASS are the passing forms)",
+      "fix": "Rerun with the full command; if the target is created by a later step, name the check as not run yet in the report",
+      "match": [
+        "nothing to check"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "react-native-conventions-index"
+    },
+    {
+      "id": "skills-checker-scans-skills",
+      "topic": "Scripts",
+      "symptom": "A repo checker reports findings inside skills/ or .agents/skills/",
+      "cause": "The checker walked the whole repo, including installed skills whose fixtures plant findings on purpose",
+      "fix": "A library bug: repo scans use walkRepo (it prunes every folder holding a SKILL.md); report it to skill-maintenance",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "skill-maintenance"
+    },
+    {
+      "id": "skills-long-output",
+      "topic": "Scripts",
+      "symptom": "A script's output arrives as a file path plus a preview",
+      "cause": "Shell output over about 30,000 characters is not shown inline",
+      "fix": "Checkers print short problem lines and a RESULT line; long reports go to files",
+      "match": [],
+      "status": "documented",
+      "needsHuman": false,
+      "skill": "skill-maintenance"
+    },
+    {
+      "id": "skills-bash-every-call-exits-1",
+      "topic": "Session",
+      "symptom": "Every shell call exits 1 with no output, even true (file reads and writes still work)",
+      "cause": "The agent session's shell tool broke after hours of long runs (exhausted processes or descriptors); nothing in the repo causes it",
+      "fix": "Stop at once and report what is done and what is left; the session needs a restart. Prevent it: stop your own simulators, emulators, Metro, Maestro drivers and log streams when done",
+      "match": [
+        "every (Bash|shell) (call|command) exits 1"
+      ],
+      "status": "verified",
+      "needsHuman": true,
+      "skill": "troubleshooting-playbook"
+    }
+  ]
+}

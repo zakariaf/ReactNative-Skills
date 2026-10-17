@@ -1,0 +1,92 @@
+{
+  "base": "good",
+  "ops": [
+    {
+      "$comment": "Installed skills and vendored skill folders hold planted findings that must stay silent.",
+      "write": {
+        "file": ".agents/skills/demo/SKILL.md",
+        "content": "---\nname: planted\ndescription: Planted to prove that the checker prunes skill folders.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": ".agents/skills/demo/src/features/x/x.test.tsx",
+        "content": "import { render, fireEvent } from '@testing-library/react-native';\n\ndescribe('planted', () => {\n  it('breaks every rule', () => {\n    render(null);\n    fireEvent.press(null);\n  });\n});\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/demo/test/x.test.tsx",
+        "content": "import { render, fireEvent } from '@testing-library/react-native';\n\ndescribe('planted', () => {\n  it('breaks every rule', () => {\n    render(null);\n    fireEvent.press(null);\n  });\n});\n"
+      }
+    },
+    {
+      "write": {
+        "file": "test/vendor/kit/SKILL.md",
+        "content": "---\nname: planted\ndescription: Planted to prove that the checker prunes skill folders.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "test/vendor/kit/kit.test.tsx",
+        "content": "import { render, fireEvent } from '@testing-library/react-native';\n\ndescribe('planted', () => {\n  it('breaks every rule', () => {\n    render(null);\n    fireEvent.press(null);\n  });\n});\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/vendor/kit/SKILL.md",
+        "content": "---\nname: planted\ndescription: Planted to prove that the checker prunes skill folders.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/vendor/kit/kit.test.tsx",
+        "content": "import { render, fireEvent } from '@testing-library/react-native';\n\ndescribe('planted', () => {\n  it('breaks every rule', () => {\n    render(null);\n    fireEvent.press(null);\n  });\n});\n"
+      }
+    },
+    {
+      "$comment": "A folder that runs its own tests, and a __tests__/ helper without a test, are not this app's Jest tests: both stay silent.",
+      "write": {
+        "file": "functions/package.json",
+        "content": "{\n  \"name\": \"functions\",\n  \"private\": true,\n  \"scripts\": { \"test\": \"jest\" }\n}\n"
+      }
+    },
+    {
+      "write": {
+        "file": "functions/src/index.test.tsx",
+        "content": "import { render, fireEvent } from '@testing-library/react-native';\n\ndescribe('planted', () => {\n  it('breaks every rule', () => {\n    render(null);\n    fireEvent.press(null);\n  });\n});\n"
+      }
+    },
+    {
+      "write": {
+        "file": "__tests__/render-quietly.tsx",
+        "content": "import { render } from '@testing-library/react-native';\n\nexport function renderQuietly(): void {\n  void render(null);\n}\n"
+      }
+    },
+    {
+      "$comment": "Folders another test runner owns stay silent: a root Playwright config's testDir, and a Deno folder.",
+      "write": {
+        "file": "playwright.config.ts",
+        "content": "import { defineConfig } from '@playwright/test';\n\nexport default defineConfig({ testDir: './e2e-web' });\n"
+      }
+    },
+    {
+      "write": {
+        "file": "e2e-web/home.spec.tsx",
+        "content": "import { render, fireEvent } from '@testing-library/react-native';\n\ndescribe('planted', () => {\n  it('breaks every rule', () => {\n    render(null);\n    fireEvent.press(null);\n  });\n});\n"
+      }
+    },
+    {
+      "write": {
+        "file": "supabase/functions/deno.json",
+        "content": "{\n  \"imports\": {}\n}\n"
+      }
+    },
+    {
+      "write": {
+        "file": "supabase/functions/send-reminder/index.test.tsx",
+        "content": "import { render, fireEvent } from '@testing-library/react-native';\n\ndescribe('planted', () => {\n  it('breaks every rule', () => {\n    render(null);\n    fireEvent.press(null);\n  });\n});\n"
+      }
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+# .prettierignore: generated, vendored or binary-adjacent files Prettier must not touch.
+package-lock.json
+**/node_modules/
+**/.expo/
+/ios/
+/android/
+build/
+dist/
+web-build/
+coverage/
+reports/
+dist-audit/
+.stryker-tmp/
+.skill-tooling/
+**/__snapshots__/
+**/__image_snapshots__/
+.maestro/baselines/
+# the approved design mockup (design-visual-parity): static HTML whose text check-mockup reads and the
+# references are rendered from; reformatting it would change an approved design input
+design/parity/mockup/
+expo-env.d.ts
+# frozen migration steps: a shipped step's bytes are pinned by contracts/schema-ledger.json (run-migration)
+src/data/migrations/v*.ts
+# Agent skills (installed copies are hand-written knowledge with their own checks) and agent settings.
+skills/
+.agents/
+.claude/
+.codex/
+.cursor/
+.windsurf/
+.roo/
+.cline/
+.continue/
+.kiro/
+# Folders and files that existed before the app (knowledge, design exports, notes): one line each
+# below (handbook/, notes.md), the same entries as PRE_EXISTING in eslint.config.mjs and the root
+# tsconfig.json "exclude".

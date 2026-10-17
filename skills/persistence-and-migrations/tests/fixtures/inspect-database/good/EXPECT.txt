@@ -1,0 +1,5 @@
+user_version: 2
+journal_mode: wal
+integrity_check: ok
+current: ok
+backup: ok

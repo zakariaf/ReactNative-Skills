@@ -1,0 +1,848 @@
+{
+  "bad-async-and-errors": {
+    "expect": [
+      "src/features/task-editor/use-restore-model.ts:7 [sync-handler]",
+      "src/features/task-editor/restore-button.tsx:11 [sync-handler]",
+      "src/data/flush-tasks.ts:4 [no-void-promise]",
+      "src/data/flush-tasks.ts:7 [no-empty-catch]",
+      "src/data/flush-tasks.ts:8 [no-console-log]",
+      "src/data/flush-tasks.ts:9 [throw-error-object]",
+      "src/features/task-editor/restore-button.tsx:14 [no-void-promise]",
+      "src/features/task-form/task-form.tsx:18 [sync-handler]",
+      "src/features/task-form/task-form.tsx:19 [sync-handler]",
+      "src/features/task-form/use-task-form-model.ts:8 [sync-handler]",
+      "src/features/notes/open-link-row.tsx:10 [handler-body] event handler with an expression body",
+      "src/features/notes/open-link-row.tsx:14 [handler-body] event handler with an expression body"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/flush-tasks.ts",
+          "lines": [
+            "// src/data/flush-tasks.ts",
+            "/** Flushes pending task writes. */",
+            "export function flushTasks(write: () => Promise<void>): void {",
+            "  void write();",
+            "  try {",
+            "    JSON.parse('{');",
+            "  } catch {}",
+            "  console.log('flushed');",
+            "  throw 'flush failed';",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/notes/open-link-row.tsx",
+          "lines": [
+            "// src/features/notes/open-link-row.tsx",
+            "import { Linking } from 'react-native';",
+            "",
+            "import { Button } from '@/ui/button';",
+            "",
+            "export type OpenLinkRowProps = { readonly url: string; readonly retry: () => Promise<void> };",
+            "",
+            "/** Opens the note's link; a long press retries the last sync. */",
+            "export function OpenLinkRow({ url, retry }: OpenLinkRowProps): React.JSX.Element {",
+            "  const handleLongPress = (): Promise<void> => retry();",
+            "  return (",
+            "    <Button",
+            "      testID=\"notes.open-link\"",
+            "      onPress={() => Linking.openURL(url)}",
+            "      onLongPress={handleLongPress}",
+            "    />",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/task-editor/restore-button.tsx",
+          "lines": [
+            "// src/features/task-editor/restore-button.tsx",
+            "import { Button } from '@/ui/button';",
+            "",
+            "export type RestoreButtonProps = { readonly onRestore: () => Promise<void> };",
+            "",
+            "/** Restores the last deleted task. */",
+            "export function RestoreButton({ onRestore }: RestoreButtonProps): React.JSX.Element {",
+            "  return (",
+            "    <Button",
+            "      testID=\"task-editor.restore-button\"",
+            "      onPress={async () => {",
+            "        await onRestore();",
+            "      }}",
+            "      onLongPress={() => void onRestore()}",
+            "    />",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/task-editor/use-restore-model.ts",
+          "lines": [
+            "// src/features/task-editor/use-restore-model.ts",
+            "import { useServices } from '@/services/services-context';",
+            "",
+            "/** Restores a deleted task. */",
+            "export function useRestoreModel(): { readonly handleRestore: () => Promise<void> } {",
+            "  const { tasks } = useServices();",
+            "  const handleRestore = async (): Promise<void> => {",
+            "    await tasks.restoreLast();",
+            "  };",
+            "  return { handleRestore };",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/task-form/task-form.tsx",
+          "lines": [
+            "// src/features/task-form/task-form.tsx",
+            "import type { UseFormHandleSubmit } from 'react-hook-form';",
+            "",
+            "import { Button } from '@/ui/button';",
+            "",
+            "import type { TaskFormValues } from './task-form-values';",
+            "",
+            "export type TaskFormProps = {",
+            "  readonly form: { readonly handleSubmit: UseFormHandleSubmit<TaskFormValues> };",
+            "  readonly save: (values: TaskFormValues) => Promise<void>;",
+            "};",
+            "",
+            "/** The save button of the task form. */",
+            "export function TaskForm({ form, save }: TaskFormProps): React.JSX.Element {",
+            "  const { handleSubmit } = form;",
+            "  return (",
+            "    <>",
+            "      <Button testID=\"task-form.save-button\" onPress={handleSubmit(async (values) => { await save(values); })} />",
+            "      <Button testID=\"task-form.save-draft-button\" onPress={form.handleSubmit(save)} />",
+            "    </>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/task-form/use-task-form-model.ts",
+          "lines": [
+            "// src/features/task-form/use-task-form-model.ts",
+            "import type { TaskFormValues } from './task-form-values';",
+            "",
+            "export type TaskFormModel = { readonly handleSave: () => Promise<void> };",
+            "",
+            "/** Saves the form values. */",
+            "export function useTaskFormModel(values: TaskFormValues, save: (values: TaskFormValues) => Promise<void>): TaskFormModel {",
+            "  const handleSave: () => Promise<void> = async () => {",
+            "    await save(values);",
+            "  };",
+            "  return { handleSave };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-import-extension-all": {
+    "expect": [
+      "src/features/tasks/parse-task-id-param.ts:5 [import-extension] \"@/core/result\" has no file extension",
+      "TypeScript-source workspace packages do not resolve without it",
+      "src/core/goals/score-day.test.ts:2 [import-extension] \"./score-day\" has no file extension"
+    ],
+    "ops": [{ "write": { "file": "rn-skills.config.json", "content": "{ \"importExtensions\": \"all\" }\n" } }]
+  },
+  "bad-imports": {
+    "expect": [
+      "src/features/tasks/group-tasks.ts:2 [no-parent-import] import from \"../../core/goals/score-day\"",
+      "src/features/tasks/group-tasks.ts:4 [no-parent-import] import from \"../task-editor/task-draft\"",
+      "scripts/report/print-summary.ts:2 [import-extension] \"../format/format-line\" has no file extension",
+      "Node type stripping resolves no extensionless relative import",
+      "app.config.ts:4 [import-extension] \"./plugins/with-task-widget\" has no file extension"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/report/print-summary.ts",
+          "lines": [
+            "// scripts/report/print-summary.ts",
+            "import { formatLine } from '../format/format-line';",
+            "",
+            "/** Prints the summary line. */",
+            "export function printSummary(count: number): void {",
+            "  console.log(formatLine('summary', String(count)));",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/group-tasks.ts",
+          "lines": [
+            "// src/features/tasks/group-tasks.ts",
+            "import { scoreDay } from '../../core/goals/score-day';",
+            "",
+            "import type { TaskDraft } from '../task-editor/task-draft';",
+            "",
+            "/** Groups drafts by whether they have a due date. */",
+            "export function groupTasks(drafts: readonly TaskDraft[]): number {",
+            "  return drafts.filter((draft) => draft.dueDate !== null).length + scoreDay.length;",
+            "}"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "from './plugins/with-task-widget.ts';",
+          "with": "from './plugins/with-task-widget';"
+        }
+      }
+    ]
+  },
+  "bad-node-world": {
+    "expect": [
+      "src/config/app-version.ts:2 [node-world-import] app code imports the Node built-in \"node:fs\"",
+      "src/config/app-version.ts:6 [node-world-import] app code imports the Node-world file app.config.ts (import type still pulls the file into the app program)",
+      "src/config/app-version.ts:7 [node-world-import] app code imports the Node-world file scripts/format/format-line.ts",
+      "src/services/async/with-timeout.ts:9 [node-world-import] app code imports the Node built-in \"node:timers/promises\""
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/config/app-version.ts",
+          "lines": [
+            "// src/config/app-version.ts",
+            "import { readFileSync } from 'node:fs';",
+            "",
+            "import type { ExpoConfig } from 'expo/config';",
+            "",
+            "import type appConfig from '../../app.config';",
+            "import { formatLine } from '../../scripts/format/format-line.ts';",
+            "",
+            "/** The app version as the config declares it. */",
+            "export function appVersion(config: ExpoConfig, build: typeof appConfig): string {",
+            "  return formatLine(config.version ?? readFileSync('version.txt', 'utf8'), build.name);",
+            "}"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/async/with-timeout.ts",
+          "find": "import { err } from '@/core/result';\n",
+          "with": "import { err } from '@/core/result';\nimport { setTimeout as wait } from 'node:timers/promises';\n"
+        }
+      }
+    ]
+  },
+  "bad-pre-existing-app-code": {
+    "expect": [
+      "eslint.config.mjs:2 [ignore-app-code] PRE_EXISTING lists 'src/features/**', which reaches into the app path src; check-source checks those files anyway",
+      "src/features/tasks/task-status.ts:2 [no-enum]",
+      "src/features/docs/doc-kind.ts:2 [no-interface]",
+      "check-source: 26 TypeScript files checked, 3 problems"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "const PRE_EXISTING = ['handbook/**'];",
+          "with": "const PRE_EXISTING = ['handbook/**', 'src/features/**', 'docs'];"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/task-status.ts",
+          "content": "// src/features/tasks/task-status.ts: app code the PRE_EXISTING entry tried to hide.\nexport enum TaskStatus {\n  Open,\n  Done,\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/docs/doc-kind.ts",
+          "content": "// src/features/docs/doc-kind.ts: 'docs' in PRE_EXISTING is the top-level docs/ only.\nexport interface DocKind {\n  readonly kind: string;\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "docs/tools/old-tool.ts",
+          "content": "// docs/tools/old-tool.ts: a pre-existing tool; PRE_EXISTING 'docs' leaves it out.\nexport enum Old {\n  A,\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-silenced": {
+    "expect": [
+      "src/features/tasks/task-label.ts:4 [no-inline-config]",
+      "src/features/tasks/task-label.ts:5 [no-ts-ignore]",
+      "src/features/tasks/task-label.ts:9 [ts-expect-error-reason]",
+      "src/features/tasks/task-label.ts:12 [no-warning-comment]"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/task-label.ts",
+          "lines": [
+            "// src/features/tasks/task-label.ts",
+            "/** Formats a task label. */",
+            "export function taskLabel(title: string): string {",
+            "  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions",
+            "  // @ts-ignore",
+            "  return `Task ${title}`;",
+            "}",
+            "",
+            "// @ts-expect-error: x",
+            "export const WRONG: number = 'a';",
+            "",
+            "// TODO: translate this label"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-syntax": {
+    "expect": [
+      "src/stores/task-filter.ts:2 [no-enum]",
+      "src/stores/task-filter.ts:7 [no-interface]",
+      "src/stores/task-filter.ts:11 [no-namespace]",
+      "src/stores/task-filter.ts:16 [no-parameter-property]",
+      "src/stores/task-filter.ts:19 [no-explicit-any]",
+      "src/stores/task-filter.ts:24 [no-non-null-assertion]",
+      "src/stores/task-filter.ts:27 [no-default-export]"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/stores/task-filter.ts",
+          "lines": [
+            "// src/stores/task-filter.ts",
+            "export enum TaskFilter {",
+            "  All,",
+            "  Open,",
+            "}",
+            "",
+            "export interface FilterState {",
+            "  readonly filter: TaskFilter;",
+            "}",
+            "",
+            "export namespace Filters {",
+            "  export const DEFAULT = 1;",
+            "}",
+            "",
+            "export class FilterHolder {",
+            "  constructor(private readonly state: FilterState) {}",
+            "}",
+            "",
+            "export function parse(json: any): FilterState {",
+            "  return json as FilterState;",
+            "}",
+            "",
+            "export function first(list: readonly FilterState[]): FilterState {",
+            "  return list[0]!;",
+            "}",
+            "",
+            "export default parse;"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-too-big": {
+    "expect": [
+      "src/features/tasks/task-table.ts:1 [max-lines] 257 code lines; the limit is 250",
+      "src/features/tasks/sum-estimates.ts:3 [max-lines-per-function] function sumEstimates has 46 code lines; the limit is 40",
+      "src/features/tasks/sum-estimates.ts:51 [max-params] schedule takes 4 parameters",
+      "src/features/tasks/sum-estimates.ts:55 [max-params] (anonymous) takes 4 parameters",
+      "src/features/tasks/components/task-card.tsx:12 [max-lines-per-function] function TaskCard has 82 code lines; the limit is 80"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-card.tsx",
+          "lines": [
+            "// src/features/tasks/components/task-card.tsx: a component may hold 80 code lines (a .ts function 40).",
+            "import { View } from 'react-native';",
+            "",
+            "import { TaskField } from './task-field';",
+            "",
+            "export type TaskCardProps = {",
+            "  readonly labels: Readonly<Record<string, string>>;",
+            "  readonly values: Readonly<Record<string, string>>;",
+            "};",
+            "",
+            "/** All fields of one task, one row each. */",
+            "export function TaskCard({ labels, values }: TaskCardProps): React.JSX.Element {",
+            "  const title = values['title'] ?? '';",
+            "  const isEmpty = title === '';",
+            "  if (isEmpty) {",
+            "    return <View testID=\"task-card.empty\" />;",
+            "  }",
+            "  return (",
+            "    <View testID=\"task-card.root\">",
+            "      <TaskField label={labels.field0} value={values.field0} />",
+            "      <TaskField label={labels.field1} value={values.field1} />",
+            "      <TaskField label={labels.field2} value={values.field2} />",
+            "      <TaskField label={labels.field3} value={values.field3} />",
+            "      <TaskField label={labels.field4} value={values.field4} />",
+            "      <TaskField label={labels.field5} value={values.field5} />",
+            "      <TaskField label={labels.field6} value={values.field6} />",
+            "      <TaskField label={labels.field7} value={values.field7} />",
+            "      <TaskField label={labels.field8} value={values.field8} />",
+            "      <TaskField label={labels.field9} value={values.field9} />",
+            "      <TaskField label={labels.field10} value={values.field10} />",
+            "      <TaskField label={labels.field11} value={values.field11} />",
+            "      <TaskField label={labels.field12} value={values.field12} />",
+            "      <TaskField label={labels.field13} value={values.field13} />",
+            "      <TaskField label={labels.field14} value={values.field14} />",
+            "      <TaskField label={labels.field15} value={values.field15} />",
+            "      <TaskField label={labels.field16} value={values.field16} />",
+            "      <TaskField label={labels.field17} value={values.field17} />",
+            "      <TaskField label={labels.field18} value={values.field18} />",
+            "      <TaskField label={labels.field19} value={values.field19} />",
+            "      <TaskField label={labels.field20} value={values.field20} />",
+            "      <TaskField label={labels.field21} value={values.field21} />",
+            "      <TaskField label={labels.field22} value={values.field22} />",
+            "      <TaskField label={labels.field23} value={values.field23} />",
+            "      <TaskField label={labels.field24} value={values.field24} />",
+            "      <TaskField label={labels.field25} value={values.field25} />",
+            "      <TaskField label={labels.field26} value={values.field26} />",
+            "      <TaskField label={labels.field27} value={values.field27} />",
+            "      <TaskField label={labels.field28} value={values.field28} />",
+            "      <TaskField label={labels.field29} value={values.field29} />",
+            "      <TaskField label={labels.field30} value={values.field30} />",
+            "      <TaskField label={labels.field31} value={values.field31} />",
+            "      <TaskField label={labels.field32} value={values.field32} />",
+            "      <TaskField label={labels.field33} value={values.field33} />",
+            "      <TaskField label={labels.field34} value={values.field34} />",
+            "      <TaskField label={labels.field35} value={values.field35} />",
+            "      <TaskField label={labels.field36} value={values.field36} />",
+            "      <TaskField label={labels.field37} value={values.field37} />",
+            "      <TaskField label={labels.field38} value={values.field38} />",
+            "      <TaskField label={labels.field39} value={values.field39} />",
+            "      <TaskField label={labels.field40} value={values.field40} />",
+            "      <TaskField label={labels.field41} value={values.field41} />",
+            "      <TaskField label={labels.field42} value={values.field42} />",
+            "      <TaskField label={labels.field43} value={values.field43} />",
+            "      <TaskField label={labels.field44} value={values.field44} />",
+            "      <TaskField label={labels.field45} value={values.field45} />",
+            "      <TaskField label={labels.field46} value={values.field46} />",
+            "      <TaskField label={labels.field47} value={values.field47} />",
+            "      <TaskField label={labels.field48} value={values.field48} />",
+            "      <TaskField label={labels.field49} value={values.field49} />",
+            "      <TaskField label={labels.field50} value={values.field50} />",
+            "      <TaskField label={labels.field51} value={values.field51} />",
+            "      <TaskField label={labels.field52} value={values.field52} />",
+            "      <TaskField label={labels.field53} value={values.field53} />",
+            "      <TaskField label={labels.field54} value={values.field54} />",
+            "      <TaskField label={labels.field55} value={values.field55} />",
+            "      <TaskField label={labels.field56} value={values.field56} />",
+            "      <TaskField label={labels.field57} value={values.field57} />",
+            "      <TaskField label={labels.field58} value={values.field58} />",
+            "      <TaskField label={labels.field59} value={values.field59} />",
+            "      <TaskField label={labels.field60} value={values.field60} />",
+            "      <TaskField label={labels.field61} value={values.field61} />",
+            "      <TaskField label={labels.field62} value={values.field62} />",
+            "      <TaskField label={labels.field63} value={values.field63} />",
+            "      <TaskField label={labels.field64} value={values.field64} />",
+            "      <TaskField label={labels.field65} value={values.field65} />",
+            "      <TaskField label={labels.field66} value={values.field66} />",
+            "      <TaskField label={labels.field67} value={values.field67} />",
+            "      <TaskField label={labels.field68} value={values.field68} />",
+            "      <TaskField label={labels.field69} value={values.field69} />",
+            "      <TaskField label={labels.title} value={title} />",
+            "    </View>",
+            "  );",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/sum-estimates.ts",
+          "lines": [
+            "// src/features/tasks/sum-estimates.ts",
+            "/** Sums the first 42 estimates. */",
+            "export function sumEstimates(minutes: readonly number[]): number {",
+            "  let total = 0;",
+            "  total += minutes[0] ?? 0;",
+            "  total += minutes[1] ?? 0;",
+            "  total += minutes[2] ?? 0;",
+            "  total += minutes[3] ?? 0;",
+            "  total += minutes[4] ?? 0;",
+            "  total += minutes[5] ?? 0;",
+            "  total += minutes[6] ?? 0;",
+            "  total += minutes[7] ?? 0;",
+            "  total += minutes[8] ?? 0;",
+            "  total += minutes[9] ?? 0;",
+            "  total += minutes[10] ?? 0;",
+            "  total += minutes[11] ?? 0;",
+            "  total += minutes[12] ?? 0;",
+            "  total += minutes[13] ?? 0;",
+            "  total += minutes[14] ?? 0;",
+            "  total += minutes[15] ?? 0;",
+            "  total += minutes[16] ?? 0;",
+            "  total += minutes[17] ?? 0;",
+            "  total += minutes[18] ?? 0;",
+            "  total += minutes[19] ?? 0;",
+            "  total += minutes[20] ?? 0;",
+            "  total += minutes[21] ?? 0;",
+            "  total += minutes[22] ?? 0;",
+            "  total += minutes[23] ?? 0;",
+            "  total += minutes[24] ?? 0;",
+            "  total += minutes[25] ?? 0;",
+            "  total += minutes[26] ?? 0;",
+            "  total += minutes[27] ?? 0;",
+            "  total += minutes[28] ?? 0;",
+            "  total += minutes[29] ?? 0;",
+            "  total += minutes[30] ?? 0;",
+            "  total += minutes[31] ?? 0;",
+            "  total += minutes[32] ?? 0;",
+            "  total += minutes[33] ?? 0;",
+            "  total += minutes[34] ?? 0;",
+            "  total += minutes[35] ?? 0;",
+            "  total += minutes[36] ?? 0;",
+            "  total += minutes[37] ?? 0;",
+            "  total += minutes[38] ?? 0;",
+            "  total += minutes[39] ?? 0;",
+            "  total += minutes[40] ?? 0;",
+            "  total += minutes[41] ?? 0;",
+            "  return total;",
+            "}",
+            "",
+            "/** Too many parameters. */",
+            "export function schedule(listId: string, title: string, dueDate: string, remindAt: string): string {",
+            "  return listId + title + dueDate + remindAt;",
+            "}",
+            "",
+            "export type Mover = (a: number, b: number, c: number, d: number) => void;"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/task-table.ts",
+          "lines": [
+            "// src/features/tasks/task-table.ts",
+            "export const TASK_TABLE: readonly number[] = [",
+            "  0,",
+            "  1,",
+            "  2,",
+            "  3,",
+            "  4,",
+            "  5,",
+            "  6,",
+            "  7,",
+            "  8,",
+            "  9,",
+            "  10,",
+            "  11,",
+            "  12,",
+            "  13,",
+            "  14,",
+            "  15,",
+            "  16,",
+            "  17,",
+            "  18,",
+            "  19,",
+            "  20,",
+            "  21,",
+            "  22,",
+            "  23,",
+            "  24,",
+            "  25,",
+            "  26,",
+            "  27,",
+            "  28,",
+            "  29,",
+            "  30,",
+            "  31,",
+            "  32,",
+            "  33,",
+            "  34,",
+            "  35,",
+            "  36,",
+            "  37,",
+            "  38,",
+            "  39,",
+            "  40,",
+            "  41,",
+            "  42,",
+            "  43,",
+            "  44,",
+            "  45,",
+            "  46,",
+            "  47,",
+            "  48,",
+            "  49,",
+            "  50,",
+            "  51,",
+            "  52,",
+            "  53,",
+            "  54,",
+            "  55,",
+            "  56,",
+            "  57,",
+            "  58,",
+            "  59,",
+            "  60,",
+            "  61,",
+            "  62,",
+            "  63,",
+            "  64,",
+            "  65,",
+            "  66,",
+            "  67,",
+            "  68,",
+            "  69,",
+            "  70,",
+            "  71,",
+            "  72,",
+            "  73,",
+            "  74,",
+            "  75,",
+            "  76,",
+            "  77,",
+            "  78,",
+            "  79,",
+            "  80,",
+            "  81,",
+            "  82,",
+            "  83,",
+            "  84,",
+            "  85,",
+            "  86,",
+            "  87,",
+            "  88,",
+            "  89,",
+            "  90,",
+            "  91,",
+            "  92,",
+            "  93,",
+            "  94,",
+            "  95,",
+            "  96,",
+            "  97,",
+            "  98,",
+            "  99,",
+            "  100,",
+            "  101,",
+            "  102,",
+            "  103,",
+            "  104,",
+            "  105,",
+            "  106,",
+            "  107,",
+            "  108,",
+            "  109,",
+            "  110,",
+            "  111,",
+            "  112,",
+            "  113,",
+            "  114,",
+            "  115,",
+            "  116,",
+            "  117,",
+            "  118,",
+            "  119,",
+            "  120,",
+            "  121,",
+            "  122,",
+            "  123,",
+            "  124,",
+            "  125,",
+            "  126,",
+            "  127,",
+            "  128,",
+            "  129,",
+            "  130,",
+            "  131,",
+            "  132,",
+            "  133,",
+            "  134,",
+            "  135,",
+            "  136,",
+            "  137,",
+            "  138,",
+            "  139,",
+            "  140,",
+            "  141,",
+            "  142,",
+            "  143,",
+            "  144,",
+            "  145,",
+            "  146,",
+            "  147,",
+            "  148,",
+            "  149,",
+            "  150,",
+            "  151,",
+            "  152,",
+            "  153,",
+            "  154,",
+            "  155,",
+            "  156,",
+            "  157,",
+            "  158,",
+            "  159,",
+            "  160,",
+            "  161,",
+            "  162,",
+            "  163,",
+            "  164,",
+            "  165,",
+            "  166,",
+            "  167,",
+            "  168,",
+            "  169,",
+            "  170,",
+            "  171,",
+            "  172,",
+            "  173,",
+            "  174,",
+            "  175,",
+            "  176,",
+            "  177,",
+            "  178,",
+            "  179,",
+            "  180,",
+            "  181,",
+            "  182,",
+            "  183,",
+            "  184,",
+            "  185,",
+            "  186,",
+            "  187,",
+            "  188,",
+            "  189,",
+            "  190,",
+            "  191,",
+            "  192,",
+            "  193,",
+            "  194,",
+            "  195,",
+            "  196,",
+            "  197,",
+            "  198,",
+            "  199,",
+            "  200,",
+            "  201,",
+            "  202,",
+            "  203,",
+            "  204,",
+            "  205,",
+            "  206,",
+            "  207,",
+            "  208,",
+            "  209,",
+            "  210,",
+            "  211,",
+            "  212,",
+            "  213,",
+            "  214,",
+            "  215,",
+            "  216,",
+            "  217,",
+            "  218,",
+            "  219,",
+            "  220,",
+            "  221,",
+            "  222,",
+            "  223,",
+            "  224,",
+            "  225,",
+            "  226,",
+            "  227,",
+            "  228,",
+            "  229,",
+            "  230,",
+            "  231,",
+            "  232,",
+            "  233,",
+            "  234,",
+            "  235,",
+            "  236,",
+            "  237,",
+            "  238,",
+            "  239,",
+            "  240,",
+            "  241,",
+            "  242,",
+            "  243,",
+            "  244,",
+            "  245,",
+            "  246,",
+            "  247,",
+            "  248,",
+            "  249,",
+            "  250,",
+            "  251,",
+            "  252,",
+            "  253,",
+            "  254,",
+            "];"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-tsdoc": {
+    "expect": [
+      "src/core/tasks/sort-tasks.ts:4 [tsdoc-contract] exported function sortTasks has no TSDoc summary",
+      "src/core/tasks/sort-tasks.ts:14 [tsdoc-contract] exported function countOpen has no TSDoc summary",
+      "src/services/clock/clock-port.ts:2 [tsdoc-contract] exported port type ClockPort has no TSDoc summary"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/core/tasks/sort-tasks.ts",
+          "lines": [
+            "// src/core/tasks/sort-tasks.ts",
+            "export type SortableTask = { readonly title: string; readonly isDone: boolean };",
+            "",
+            "export function sortTasks(tasks: readonly SortableTask[]): readonly SortableTask[] {",
+            "  return [...tasks].sort((a, b) => Number(a.isDone) - Number(b.isDone));",
+            "}",
+            "",
+            "/** Open tasks first, then alphabetical; never mutates its input. */",
+            "export function sortForToday(tasks: readonly SortableTask[]): readonly SortableTask[] {",
+            "  return [...sortTasks(tasks)].sort((a, b) => a.title.localeCompare(b.title));",
+            "}",
+            "",
+            "// Counts the open tasks (a line comment is not TSDoc).",
+            "export const countOpen = (tasks: readonly SortableTask[]): number =>",
+            "  tasks.filter((task) => !task.isDone).length;",
+            "",
+            "export const OPEN_LIMIT = 50;"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/clock/clock-port.ts",
+          "lines": [
+            "// src/services/clock/clock-port.ts",
+            "export type ClockPort = { readonly nowMs: () => number };",
+            "",
+            "/** A frozen clock for tests and screenshots. */",
+            "export type FixedClock = ClockPort & { readonly setNowMs: (ms: number) => void };"
+          ]
+        }
+      }
+    ]
+  },
+  "error-bad-extensions": {
+    "expect": ["ERROR [bad-input] import extensions \"some\" is not node or all"],
+    "args": "{dir} --import-extensions some",
+    "ops": []
+  },
+  "error-no-root": {
+    "expect": ["ERROR [bad-input] nothing to check:", "missing-folder"],
+    "args": "{dir}/missing-folder",
+    "ops": []
+  }
+}

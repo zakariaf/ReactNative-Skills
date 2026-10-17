@@ -1,0 +1,319 @@
+{
+  "$comment": "One commit-message rule set: the commit-msg hook (scripts/git/commit-message-rules.ts, tested by commit-message-rules.test.ts) and the git-commits-and-reporting skill's check-commits.mjs (--samples) must both give exactly these rule ids for every sample. 'scopes' is the complete allowed list; a sample's own 'requirementRef' (null: no contract rule) replaces the shared one. Add a sample for every new rule, in both places at once. The placeholder sample spells its first underscore as \\u005f so template tools that fill placeholders leave it alone.",
+  "scopes": [
+    "app",
+    "ci",
+    "core",
+    "data",
+    "deps",
+    "docs",
+    "e2e",
+    "features",
+    "i18n",
+    "lists",
+    "release",
+    "repo",
+    "services",
+    "settings",
+    "skills",
+    "stores",
+    "tasks",
+    "tooling",
+    "ui"
+  ],
+  "gatedPaths": [
+    "eslint.config.mjs",
+    "tsconfig.json",
+    "src/tsconfig.json",
+    "jest.config.js",
+    "**/tsconfig.json",
+    "**/__snapshots__/*.golden.test.ts.snap",
+    "**/*.vectors.json",
+    "src/data/**/fixtures/**",
+    ".claude/settings.json",
+    "perf-baselines/**",
+    ".maestro/baselines/**"
+  ],
+  "requirementRef": {
+    "pattern": "\\bTASK-\\d+\\b",
+    "required": true,
+    "exemptScopes": ["repo", "deps", "docs", "ci", "tooling", "e2e", "release", "skills"]
+  },
+  "samples": [
+    {
+      "name": "good-feat",
+      "message": "feat(tasks): keep a draft when the app is killed\n\nTASK-12: an unsaved task title survives a restart. A repository test\nreopens the database and finds the draft.",
+      "files": ["src/features/tasks/task-draft.ts", "src/features/tasks/task-draft.test.ts"],
+      "rules": []
+    },
+    {
+      "name": "good-fix",
+      "message": "fix(lists): keep overdue state across time-zone changes\n\nTASK-31: a task due yesterday stayed overdue only in the old time zone.\nThe due check now compares date keys; a property over zones covers it.",
+      "files": ["src/features/lists/overdue.ts", "src/features/lists/overdue.test.ts"],
+      "rules": []
+    },
+    {
+      "name": "good-exempt-scope-feat",
+      "message": "feat(tooling): run verify through one runner\n\nOne runner prints every step and its time, so a slow gate is visible.",
+      "files": ["scripts/quality/run-verify.ts"],
+      "rules": []
+    },
+    {
+      "name": "good-gate-change",
+      "message": "chore(repo): reorder the lint config blocks\n\nPrettier moved two blocks; no rule changed.\n\nGate-Change: reorder only, every resolved rule is the same",
+      "files": ["eslint.config.mjs"],
+      "rules": []
+    },
+    {
+      "name": "good-app-tsconfig",
+      "message": "build(repo): include the route types in the app program\n\nThe app program needs the typed routes.\n\nGate-Change: the reviewer agreed to add the generated route types",
+      "files": ["src/tsconfig.json"],
+      "rules": []
+    },
+    {
+      "name": "good-unknown-files",
+      "message": "docs(repo): explain the folder layout\n\nThe README now names each src/ folder and what belongs there.",
+      "files": null,
+      "rules": []
+    },
+    {
+      "name": "good-merge",
+      "message": "Merge branch 'main' into feat/tasks-drafts",
+      "files": null,
+      "rules": []
+    },
+    {
+      "name": "good-editor-comments",
+      "message": "chore(ui): tidy the button styles\n\nOnly styles moved.\n# Please enter the commit message for your changes.\n# ------------------------ >8 ------------------------\n# Do not modify or remove the line above.\ndiff --git a/src/ui/button.tsx b/src/ui/button.tsx",
+      "files": ["src/ui/button.tsx"],
+      "rules": []
+    },
+    {
+      "name": "good-no-requirement-rule",
+      "message": "feat(tasks): keep a draft when the app is killed\n\nAn unsaved task title survives a restart.",
+      "files": ["src/features/tasks/task-draft.ts", "src/features/tasks/task-draft.test.ts"],
+      "rules": [],
+      "requirementRef": null
+    },
+    {
+      "name": "header-format",
+      "message": "add the draft",
+      "files": null,
+      "rules": ["header-format"]
+    },
+    {
+      "name": "header-type",
+      "message": "feature(tasks): keep a draft",
+      "files": null,
+      "rules": ["header-type"]
+    },
+    {
+      "name": "scope-missing",
+      "message": "chore: tidy the repo scripts",
+      "files": null,
+      "rules": ["scope-missing"]
+    },
+    {
+      "name": "header-scope",
+      "message": "chore(widgets): tidy the button styles",
+      "files": null,
+      "rules": ["header-scope"]
+    },
+    {
+      "name": "header-length",
+      "message": "chore(ui): tidy the button styles of the settings rows and the premium screen",
+      "files": null,
+      "rules": ["header-length"]
+    },
+    {
+      "name": "subject-case",
+      "message": "chore(ui): Tidy the button styles",
+      "files": null,
+      "rules": ["subject-case"]
+    },
+    {
+      "name": "subject-period",
+      "message": "chore(ui): tidy the button styles.",
+      "files": null,
+      "rules": ["subject-period"]
+    },
+    {
+      "name": "subject-mood",
+      "message": "chore(ui): added the button styles",
+      "files": null,
+      "rules": ["subject-mood"]
+    },
+    {
+      "name": "subject-vague",
+      "message": "chore(ui): cleanup",
+      "files": null,
+      "rules": ["subject-vague"]
+    },
+    {
+      "name": "blank-line",
+      "message": "chore(ui): tidy the button styles\nThe styles moved.",
+      "files": null,
+      "rules": ["blank-line"]
+    },
+    {
+      "name": "body-missing",
+      "message": "fix(tasks): keep the draft after a crash",
+      "files": ["src/features/tasks/task-draft.ts", "src/features/tasks/task-draft.test.ts"],
+      "rules": ["body-missing"]
+    },
+    {
+      "name": "spec-ref-missing-feat",
+      "message": "feat(tasks): add repeating reminders\n\nA reminder can now repeat every week.",
+      "files": ["src/features/tasks/task-draft.ts", "src/features/tasks/task-draft.test.ts"],
+      "rules": ["spec-ref-missing"]
+    },
+    {
+      "name": "spec-ref-missing-fix",
+      "message": "fix(tasks): keep the draft after a crash\n\nThe draft was written only when the screen closed.",
+      "files": ["src/features/tasks/task-draft.ts", "src/features/tasks/task-draft.test.ts"],
+      "rules": ["spec-ref-missing"]
+    },
+    {
+      "name": "gate-change-missing",
+      "message": "chore(repo): reorder the lint config blocks\n\nPrettier moved two blocks.",
+      "files": ["eslint.config.mjs"],
+      "rules": ["gate-change-missing"]
+    },
+    {
+      "name": "gate-change-unneeded",
+      "message": "chore(ui): tidy the button styles\n\nOnly styles moved.\n\nGate-Change: the lint config changed a lot",
+      "files": ["src/ui/button.tsx"],
+      "rules": ["gate-change-unneeded"]
+    },
+    {
+      "name": "trailer-empty",
+      "message": "chore(repo): reorder the lint config blocks\n\nPrettier moved two blocks.\n\nGate-Change: update",
+      "files": ["eslint.config.mjs"],
+      "rules": ["trailer-empty"]
+    },
+    {
+      "name": "good-spec-change",
+      "message": "test(tasks): expect weekly repeats to skip holidays\n\nThe product decision changed the repeat rule.\n\nSpec-Change: TASK-40 weekly repeats now skip public holidays",
+      "files": ["src/features/tasks/repeat.test.ts"],
+      "rules": []
+    },
+    {
+      "name": "spec-change-format",
+      "message": "test(tasks): expect weekly repeats to skip holidays\n\nThe expectation was off.\n\nSpec-Change: the test was wrong",
+      "files": ["src/features/tasks/repeat.test.ts"],
+      "rules": ["spec-change-format"]
+    },
+    {
+      "name": "good-spec-change-default-pattern",
+      "message": "test(tasks): expect weekly repeats to skip holidays\n\nThe product decision changed the repeat rule.\n\nSpec-Change: issue 31 weekly repeats now skip public holidays",
+      "files": ["src/features/tasks/repeat.test.ts"],
+      "rules": [],
+      "requirementRef": null
+    },
+    {
+      "name": "good-spec-change-default-pattern-child",
+      "message": "test(tasks): expect the empty list to offer an add button\n\nThe screen spec gained an empty state.\n\nSpec-Change: SCR-2a the empty list now offers an add button",
+      "files": ["src/features/tasks/tasks-screen.test.tsx"],
+      "rules": [],
+      "requirementRef": null
+    },
+    {
+      "name": "spec-change-format-default-pattern",
+      "message": "test(tasks): expect weekly repeats to skip holidays\n\nThe expectation was off.\n\nSpec-Change: the test was wrong",
+      "files": ["src/features/tasks/repeat.test.ts"],
+      "rules": ["spec-change-format"],
+      "requirementRef": null
+    },
+    {
+      "name": "trailer-placement",
+      "message": "chore(repo): reorder the lint config blocks\n\nGate-Change: reorder only, no rule changed\n\nPrettier moved two blocks.",
+      "files": ["eslint.config.mjs"],
+      "rules": ["gate-change-missing", "trailer-placement"]
+    },
+    {
+      "name": "placeholder-left",
+      "message": "chore(ui): tidy the button styles\n\n\u005f_WHY_THE_CHANGE_WAS_MADE__",
+      "files": null,
+      "rules": ["placeholder-left"]
+    },
+    {
+      "name": "good-golden",
+      "message": "test(tasks): record the task row golden\n\nThe row now shows the due date under the title.\n\nGate-Change: new golden for the task row with a due date",
+      "files": ["src/features/tasks/__snapshots__/task-row.golden.test.ts.snap"],
+      "rules": []
+    },
+    {
+      "name": "golden-without-trailer",
+      "message": "test(tasks): record the task row golden\n\nThe row now shows the due date under the title.",
+      "files": ["src/features/tasks/__snapshots__/task-row.golden.test.ts.snap"],
+      "rules": ["gate-change-missing"]
+    },
+    {
+      "name": "vectors-without-trailer",
+      "message": "test(core): extend the rng golden vectors\n\nTen more draws pin the generator.",
+      "files": ["src/core/rng/sfc32.vectors.json"],
+      "rules": ["gate-change-missing"]
+    },
+    {
+      "name": "data-fixture-without-trailer",
+      "message": "test(data): freeze the version 1 database fixture\n\nThe migration test opens it.",
+      "files": ["src/data/migrations/fixtures/db-v1.sql"],
+      "rules": ["gate-change-missing"]
+    },
+    {
+      "name": "claude-settings-without-trailer",
+      "message": "chore(repo): allow the format command for the agent\n\nThe agent formats after every edit.",
+      "files": [".claude/settings.json"],
+      "rules": ["gate-change-missing"]
+    },
+    {
+      "name": "perf-baseline-without-trailer",
+      "message": "test(tooling): record the cold-start baseline\n\nThe first evidence run sets the median later runs must stay within.",
+      "files": ["perf-baselines/cold-start-ios-sim.json"],
+      "rules": ["gate-change-missing"]
+    },
+    {
+      "name": "good-perf-baseline",
+      "message": "test(tooling): record the cold-start baseline\n\nThe first evidence run sets the median later runs must stay within.\n\nGate-Change: first cold-start baseline from the evidence run",
+      "files": ["perf-baselines/cold-start-ios-sim.json"],
+      "rules": []
+    },
+    {
+      "name": "good-agent-folder-files",
+      "message": "docs(skills): add fixtures to the vendored agent folders\n\nAgent folders hold knowledge, never gates.",
+      "files": [
+        "skills/__snapshots__/task-row.golden.test.ts.snap",
+        ".agents/tsconfig.json",
+        ".cursor/rules/sfc32.vectors.json"
+      ],
+      "rules": []
+    },
+    {
+      "name": "good-breaking-change",
+      "message": "feat(data)!: drop the version 1 save format\n\nTASK-60: version 1 saves were migrated two releases ago; the reader for\nthem is removed, so a version 1 file is now refused with a clear error.\n\nBREAKING-CHANGE: a version 1 save file no longer opens\nGate-Change: the version 1 fixture is replaced by the version 2 one",
+      "files": ["src/data/migrations/fixtures/db-v1.sql"],
+      "rules": []
+    },
+    {
+      "name": "breaking-change-spaced-footer",
+      "message": "feat(data)!: drop the version 1 save format\n\nTASK-60: version 1 saves were migrated two releases ago.\n\nBREAKING CHANGE: a version 1 save file no longer opens\nGate-Change: the version 1 fixture is replaced by the version 2 one",
+      "files": ["src/data/migrations/fixtures/db-v1.sql"],
+      "rules": ["gate-change-missing", "trailer-placement"]
+    },
+    {
+      "name": "good-ordinary-snapshot",
+      "message": "test(tasks): snapshot the empty task row\n\nThe row had no test for a task without a due date.",
+      "files": [
+        "src/features/tasks/__snapshots__/task-row.test.tsx.snap",
+        "src/features/tasks/task-row.test.tsx"
+      ],
+      "rules": []
+    },
+    {
+      "name": "ordinary-snapshot-with-trailer",
+      "message": "test(tasks): snapshot the empty task row\n\nThe row had no test for a task without a due date.\n\nGate-Change: new snapshot of the empty task row",
+      "files": ["src/features/tasks/__snapshots__/task-row.test.tsx.snap"],
+      "rules": ["gate-change-unneeded"]
+    }
+  ]
+}

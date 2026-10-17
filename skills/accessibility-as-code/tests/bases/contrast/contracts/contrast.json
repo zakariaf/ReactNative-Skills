@@ -1,0 +1,61 @@
+{
+  "$schema": "./contrast.schema.json",
+  "palettes": [
+    {
+      "name": "app",
+      "file": "src/theme/palette.ts",
+      "export": "PALETTE",
+      "sets": ["light", "dark"],
+      "optionalSets": ["colorBlind.light", "colorBlind.dark"],
+      "base": "background",
+      "edge": "border",
+      "text": [
+        ["text", "background"],
+        ["text", "surface"],
+        ["text", "sunken"],
+        ["textMuted", "background"],
+        ["textMuted", "surface"],
+        ["textMuted", "sunken"],
+        ["onPrimary", "primary"],
+        ["danger", "surface"],
+        ["danger", "dangerSurface"],
+        ["text", "dangerSurface"],
+        ["success", "surface"],
+        ["warning", "surface"]
+      ],
+      "graphics": [
+        ["border", "background"],
+        ["border", "surface"],
+        ["focus", "background"],
+        ["focus", "surface"]
+      ],
+      "shapes": [
+        ["primary", "background"],
+        ["primary", "surface"]
+      ],
+      "distinct": []
+    },
+    {
+      "name": "chart",
+      "file": "src/features/stats/chart-colors.ts",
+      "export": "CHART_COLORS",
+      "sets": ["light", "dark"],
+      "base": "plot",
+      "edge": "bandEdge",
+      "text": [
+        ["label", "plot"],
+        ["markerLabel", "marker"]
+      ],
+      "graphics": [
+        ["grid", "plot"],
+        ["series1", "plot"],
+        ["series2", "plot"],
+        ["series3", "plot"],
+        ["series4", "plot"]
+      ],
+      "shapes": [["band", "plot"]],
+      "distinct": [["series1", "series2", "series3", "series4"]]
+    }
+  ],
+  "exceptions": []
+}

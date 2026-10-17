@@ -1,0 +1,3 @@
+[reference-drift]
+pixels differ from a fresh render
+[stale-reference] the mockup changed since the references were rendered

@@ -1,0 +1,12 @@
+# .github/workflows/verify.yml (fixture): LEFTHOOK: '0' switches git hooks off on the runner only.
+name: verify
+on: [push, pull_request]
+env:
+  LEFTHOOK: '0'
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: npm ci
+      - run: npm run verify # never --no-verify here either

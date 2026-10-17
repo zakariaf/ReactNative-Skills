@@ -1,0 +1,741 @@
+{
+  "$comment": "One planted bug per rule (bad-<rule>), layout options (a moved srcDir, a workspace app), repo facts that relax a rule, and bad input. Base: good/, a single-app tree whose installed skills, vendored skill folder, ios/Pods and build/ hold planted bugs that must stay silent.",
+  "bad-android-adb-text-form": {
+    "expect": ["[android-adb-unnamed-device]", "scripts/android/read-log.sh:3"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/android/read-log.sh",
+          "lines": ["#!/bin/sh", "adb devices -l", "adb logcat -d -s ReactNativeJS:V"]
+        }
+      }
+    ]
+  },
+  "bad-android-adb-unnamed-device": {
+    "expect": ["[android-adb-unnamed-device]", "scripts/android/adb-args.ts:9"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/android/adb-args.ts",
+          "find": "execFileSync('adb', ['-s', serial, 'install', '-r', apk]);",
+          "with": "execFileSync('adb', ['install', '-r', apk]);"
+        }
+      }
+    ]
+  },
+  "bad-animation-frame-clock-reset": {
+    "expect": ["[animation-frame-clock-reset]", "src/features/tasks/use-task-pulse.ts:17"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-task-pulse.ts",
+          "find": "if (frame.timestamp - startedAt.get() > 1000) scheduleOnRN(onDone);",
+          "with": "if (frame.timeSinceFirstFrame > 1000) scheduleOnRN(onDone);"
+        }
+      }
+    ]
+  },
+  "bad-animation-repeat-ignores-reduce-motion": {
+    "expect": ["[animation-repeat-ignores-reduce-motion]", "src/features/tasks/use-badge-wiggle.ts:8"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-badge-wiggle.ts",
+          "content": "// src/features/tasks/use-badge-wiggle.ts\nimport { useEffect } from 'react';\nimport { useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';\n\nexport function useBadgeWiggle() {\n  const angle = useSharedValue(0);\n  useEffect(() => {\n    angle.set(withRepeat(withTiming(4), -1, true));\n  }, [angle]);\n  return angle;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-animation-runonjs-deprecated": {
+    "expect": ["[animation-runonjs-deprecated]", "src/features/tasks/use-task-pulse.ts:4"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-task-pulse.ts",
+          "find": "import { scheduleOnRN } from 'react-native-worklets';",
+          "with": "import { runOnJS } from 'react-native-worklets';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/use-task-pulse.ts",
+          "find": "scheduleOnRN(onDone);",
+          "with": "runOnJS(onDone)();"
+        }
+      }
+    ]
+  },
+  "bad-animation-shared-value-access": {
+    "expect": ["[animation-shared-value-access]", "src/features/tasks/use-task-pulse.ts:13", "scale.value"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-task-pulse.ts",
+          "find": "scale.set(isReduceMotion ? 1 : withRepeat(withTiming(1.05), -1, true));",
+          "with": "scale.value = isReduceMotion ? 1 : withRepeat(withTiming(1.05), -1, true);"
+        }
+      }
+    ]
+  },
+  "bad-animation-skia-mutable-path": {
+    "expect": ["[animation-skia-mutable-path]", "src/canvas/ring-icon.ts:4"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/canvas/ring-icon.ts",
+          "content": "// src/canvas/ring-icon.ts\nimport { Skia } from '@shopify/react-native-skia';\n\nconst ring = Skia.Path.Make();\nring.addCircle(8, 8, 6);\n\nexport const RING_ICON = ring;\n"
+        }
+      }
+    ]
+  },
+  "bad-build-config-missing-ts-extension": {
+    "expect": ["[build-config-missing-ts-extension]", "app.config.ts:2"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "'./src/config/app-variant.ts'",
+          "with": "'./src/config/app-variant'"
+        }
+      }
+    ]
+  },
+  "bad-build-edge-to-edge-option": {
+    "expect": ["[build-edge-to-edge-option]", "app.config.ts:17"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "android: { predictiveBackGestureEnabled: false }",
+          "with": "android: { edgeToEdgeEnabled: true, predictiveBackGestureEnabled: false }"
+        }
+      }
+    ]
+  },
+  "bad-build-imported-constant-gate": {
+    "expect": ["[build-imported-constant-gate]", "src/features/debug/debug-entry.ts:4"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/debug/debug-entry.ts",
+          "content": "// src/features/debug/debug-entry.ts\nconst IS_TEST_BUILD = process.env.EXPO_PUBLIC_APP_VARIANT !== 'production';\n\nexport const debugKit: unknown = IS_TEST_BUILD ? require('../../test-only-entry') : null;\n"
+        }
+      }
+    ]
+  },
+  "bad-build-metro-cache-variant": {
+    "expect": ["[build-metro-cache-variant]", "metro.config.js:1"],
+    "ops": [
+      {
+        "replace": {
+          "file": "metro.config.js",
+          "find": "config.cacheVersion = publicEnvCacheVersion(process.env);\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-build-metro-template-import": {
+    "expect": ["[build-metro-template-import]", "src/i18n/catalogs.ts:7"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/i18n/catalogs.ts",
+          "find": "export const CATALOGS = { ar, en } as const;\n",
+          "with": "export const CATALOGS = { ar, en } as const;\n\nexport const loadCatalog = (language: string) => import(`./catalogs/${language}.json`);\n"
+        }
+      }
+    ]
+  },
+  "bad-build-reload-during-bundle-eval": {
+    "expect": ["[build-reload-during-bundle-eval]", "index.ts:5"],
+    "ops": [
+      {
+        "replace": {
+          "file": "index.ts",
+          "find": "import 'expo-router/entry';\n",
+          "with": "import { reloadAppAsync } from 'expo';\nimport 'expo-router/entry';\n\nvoid reloadAppAsync('direction');\n"
+        }
+      }
+    ]
+  },
+  "bad-deps-eslint-10-crash": {
+    "expect": ["[deps-eslint-10-crash]", "package.json:", "eslint@10.0.1"],
+    "ops": [{ "json": { "file": "package.json", "path": ["devDependencies", "eslint"], "value": "10.0.1" } }]
+  },
+  "bad-deps-expo-install-range": {
+    "expect": ["[deps-expo-install-range]", "expo-iap@^5.8.0"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo-iap"], "value": "^5.8.0" } }]
+  },
+  "bad-deps-jest-30": {
+    "expect": ["[deps-jest-30]", "jest@30.1.0"],
+    "ops": [{ "json": { "file": "package.json", "path": ["devDependencies", "jest"], "value": "30.1.0" } }]
+  },
+  "bad-deps-knip-skills-folder": {
+    "expect": ["[deps-knip-skills-folder]", "knip.json:1", "does not ignore skills/**", "does not ignore .agents/**"],
+    "ops": [{ "json": { "file": "knip.json", "path": ["ignore"], "value": [".claude/**"] } }]
+  },
+  "bad-deps-test-renderer-1-3": {
+    "expect": ["[deps-test-renderer-1-3]", "test-renderer@1.3.0"],
+    "ops": [{ "json": { "file": "package.json", "path": ["devDependencies", "test-renderer"], "value": "1.3.0" } }]
+  },
+  "bad-deps-typescript-7": {
+    "expect": ["[deps-typescript-7]", "typescript@7.0.0"],
+    "ops": [{ "json": { "file": "package.json", "path": ["devDependencies", "typescript"], "value": "7.0.0" } }]
+  },
+  "bad-e2e-maestro-ai-commands": {
+    "expect": ["[e2e-maestro-ai-commands]", ".maestro/flows/tasks/01-add-task.yaml:8"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/flows/tasks/01-add-task.yaml",
+          "find": "- assertVisible:\n",
+          "with": "- assertNoDefectsWithAI\n- assertVisible:\n"
+        }
+      }
+    ]
+  },
+  "bad-e2e-maestro-airplane": {
+    "expect": ["[e2e-maestro-airplane]", ".maestro/flows/tasks/01-add-task.yaml:6"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".maestro/flows/tasks/01-add-task.yaml",
+          "find": "- launchApp\n",
+          "with": "- launchApp\n- setAirplaneMode: enabled\n"
+        }
+      }
+    ]
+  },
+  "bad-e2e-maestro-tags-flag": {
+    "expect": ["[e2e-maestro-tags-flag]", "scripts/e2e/run-e2e.ts:3"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/e2e/run-e2e.ts",
+          "find": "'test', '--include-tags', 'smoke'",
+          "with": "'test', '--tags', 'smoke'"
+        }
+      }
+    ]
+  },
+  "bad-gates-commit-msg-enobufs": {
+    "expect": ["[gates-commit-msg-enobufs]", "scripts/git/check-commit-message.ts:1"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/git/check-commit-message.ts",
+          "find": ", maxBuffer: 64 * 1024 * 1024",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-i18n-device-locale-format": {
+    "expect": ["[i18n-device-locale-format]", "src/i18n/format-due-date.ts:5"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/i18n/format-due-date.ts",
+          "find": "return intl.formatDate(dueAt, { dateStyle: 'medium' });",
+          "with": "return intl.locale ? new Date(dueAt).toLocaleDateString() : '';"
+        }
+      }
+    ]
+  },
+  "bad-i18n-force-rtl-reload": {
+    "expect": ["[i18n-force-rtl-reload]", "src/i18n/direction.ts:8"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/i18n/direction.ts",
+          "find": "import { reloadAppAsync } from 'expo';\n",
+          "with": "import * as Updates from 'expo-updates';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/i18n/direction.ts",
+          "find": "await reloadAppAsync('direction changed');",
+          "with": "await Updates.reloadAsync();"
+        }
+      }
+    ]
+  },
+  "bad-i18n-localization-rtl-flags": {
+    "expect": ["[i18n-localization-rtl-flags]", "app.config.ts:13"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "supportedLocales: { ios: ['en', 'ar'], android: ['en', 'ar'] } }",
+          "with": "supportedLocales: { ios: ['en', 'ar'], android: ['en', 'ar'] }, supportsRTL: true }"
+        }
+      }
+    ]
+  },
+  "bad-ios-other-sessions-simulators": {
+    "expect": ["[ios-other-sessions-simulators]", "scripts/ios/toolchain.ts:5"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/ios/toolchain.ts",
+          "find": "export function simctl(",
+          "with": "export function shutdownSimulators(): void {\n  execFileSync('xcrun', ['simctl', 'shutdown', 'all']);\n}\n\nexport function simctl("
+        }
+      }
+    ]
+  },
+  "bad-ios-wrong-xcode": {
+    "expect": ["[ios-wrong-xcode]", "scripts/ios/toolchain.ts:5"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/ios/toolchain.ts",
+          "find": "export function simctl(",
+          "with": "export function selectXcode(path: string): void {\n  execFileSync('sudo', ['xcode-select', '-s', path]);\n}\n\nexport function simctl("
+        }
+      }
+    ]
+  },
+  "bad-lint-complexity-switch": {
+    "expect": ["[lint-complexity-switch]", "eslint.config.mjs:8"],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "complexity: ['error', { max: 10, variant: 'modified' }]",
+          "with": "complexity: ['error', 10]"
+        }
+      }
+    ]
+  },
+  "bad-lint-jest-rules-spread": {
+    "expect": ["[lint-jest-rules-spread]", "eslint.config.mjs:12"],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "extends: [jest.configs['flat/recommended'], jest.configs['flat/style']],",
+          "with": "...jest.configs['flat/recommended'], ...jest.configs['flat/style'],"
+        }
+      }
+    ]
+  },
+  "bad-moved-src-dir": {
+    "expect": ["[i18n-device-locale-format]", "app-src/features/tasks/late-format.ts:2"],
+    "ops": [
+      { "write": { "file": "rn-skills.config.json", "content": "{\"srcDir\": \"app-src\"}\n" } },
+      { "rename": { "from": "src", "to": "app-src" } },
+      {
+        "write": {
+          "file": "app-src/features/tasks/late-format.ts",
+          "content": "// app-src/features/tasks/late-format.ts\nexport const label = (when: Date) => when.toLocaleTimeString();\n"
+        }
+      }
+    ]
+  },
+  "bad-release-app-store-method": {
+    "expect": ["[release-app-store-method]", "scripts/release/export-options-production.plist:5"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/release/export-options-production.plist",
+          "find": "<string>app-store-connect</string>",
+          "with": "<string>app-store</string>"
+        }
+      }
+    ]
+  },
+  "bad-release-manage-version-default": {
+    "expect": ["[release-manage-version-default]", "scripts/release/export-options-production.plist:1"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/release/export-options-production.plist",
+          "find": "  <key>manageAppVersionAndBuildNumber</key>\n  <false/>\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-release-secrets-printed": {
+    "expect": ["[release-secrets-printed]", "scripts/asc/asc-client.ts:3"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/asc/asc-client.ts",
+          "find": "console.log(`uploaded build ${buildNumber}`);",
+          "with": "console.log(`uploaded build ${buildNumber}`, { authorization: 'Bearer' });"
+        }
+      }
+    ]
+  },
+  "bad-services-att-prompt-missing": {
+    "expect": [
+      "[services-att-prompt-missing]",
+      "app.config.ts:14",
+      "no NSUserTrackingUsageDescription",
+      "src/features/ads/ask-tracking-early.ts:2",
+      "imports expo-tracking-transparency outside"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "      ['expo-tracking-transparency', { userTrackingPermission: 'Ads stay relevant when you allow tracking.' }],\n",
+          "with": ""
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/ads/ask-tracking-early.ts",
+          "content": "// src/features/ads/ask-tracking-early.ts\nimport { requestTrackingPermissionsAsync } from 'expo-tracking-transparency';\n\nexport const askEarly = () => requestTrackingPermissionsAsync();\n"
+        }
+      }
+    ]
+  },
+  "bad-state-abort-polyfill-missing-api": {
+    "expect": ["[state-abort-polyfill-missing-api]", "src/core/async/stop-if-aborted.ts:3"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/async/stop-if-aborted.ts",
+          "find": "if (signal.aborted) throw new Error('aborted');",
+          "with": "signal.throwIfAborted();"
+        }
+      }
+    ]
+  },
+  "bad-state-countdown-utc": {
+    "expect": ["[state-countdown-utc]", "src/features/tasks/next-reset.ts:3"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/next-reset.ts",
+          "content": "// src/features/tasks/next-reset.ts\nexport function msUntilReset(nowMs: number): number {\n  return 86_400_000 - (nowMs % 86_400_000);\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-state-listener-signal-option": {
+    "expect": ["[state-listener-signal-option]", "src/core/async/watch-keyboard.ts:3"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/core/async/watch-keyboard.ts",
+          "content": "// src/core/async/watch-keyboard.ts\nexport function watchKeys(target: EventTarget, signal: AbortSignal, onKey: () => void): void {\n  target.addEventListener('keydown', onKey, { signal });\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-state-zustand-filter": {
+    "expect": ["[state-zustand-new-object]", "src/features/tasks/use-open-count.ts:7"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-open-count.ts",
+          "find": "return useTasksStore(useShallow((state) => state.tasks.filter((task) => !task.isDone)));",
+          "with": "return useTasksStore((state) => state.tasks.filter((task) => !task.isDone).map((task) => task.id));"
+        }
+      }
+    ]
+  },
+  "bad-state-zustand-new-object": {
+    "expect": ["[state-zustand-new-object]", "src/features/tasks/use-open-count.ts:7"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-open-count.ts",
+          "find": "return useTasksStore(useShallow((state) => state.tasks.filter((task) => !task.isDone)));",
+          "with": "return useTasksStore((state) => ({ open: state.tasks.filter((task) => !task.isDone) }));"
+        }
+      }
+    ]
+  },
+  "bad-testing-babel-config-missing": {
+    "expect": ["[testing-babel-config-missing]", "package.json:1"],
+    "ops": [{ "delete": "babel.config.js" }]
+  },
+  "bad-testing-coverage-missing-dir": {
+    "expect": ["[testing-coverage-missing-dir]", "jest.config.js:", "./src/data/"],
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "coverageThreshold: { global: { statements: 90 }, ...thresholds },",
+          "with": "coverageThreshold: { global: { statements: 90 }, './src/data/': { statements: 90 } },"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "const thresholds = Object.fromEntries(['./src/core/'].filter((key) => fs.existsSync(key)).map((key) => [key, { statements: 90 }]));\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-testing-duplicate-manual-mock": {
+    "expect": [
+      "[testing-duplicate-manual-mock]",
+      "jest.config.js:1",
+      "does not ignore skills/",
+      "does not ignore .agents/"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "'<rootDir>/(coverage|reports|skills|\\\\.stryker-tmp)/', '<rootDir>/\\\\.(agents|claude|codex|cursor)/'",
+          "with": "'<rootDir>/(coverage|reports|\\\\.stryker-tmp)/', '<rootDir>/\\\\.(claude|codex|cursor)/'"
+        }
+      }
+    ]
+  },
+  "bad-testing-skia-global-env": {
+    "expect": ["[testing-skia-global-env]", "jest.config.js:1"],
+    "ops": [
+      {
+        "write": {
+          "file": "jest.config.js",
+          "content": "// jest.config.js\nmodule.exports = {\n  preset: 'jest-expo/ios',\n  testEnvironment: '@shopify/react-native-skia/jestEnv.js',\n  modulePathIgnorePatterns: ['<rootDir>/(skills)/', '<rootDir>/\\\\.(agents|claude)/'],\n};\n"
+        }
+      }
+    ]
+  },
+  "bad-testing-snap-platform-path": {
+    "expect": ["[testing-snap-platform-path]", "quality-gates.json:1", ".snap.android"],
+    "ops": [
+      {
+        "json": {
+          "file": "quality-gates.json",
+          "path": ["gatedPaths"],
+          "value": [
+            "eslint.config.mjs",
+            "jest.config.js",
+            "**/__snapshots__/*.golden.test.ts.snap",
+            "**/*.golden.test.ts.snap.ios"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-testing-store-reset-after-each": {
+    "expect": [
+      "[testing-store-reset-after-each]",
+      "src/features/tasks/use-task-list.test.tsx:9",
+      "test/stores/reset-stores.test.ts:4"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-list.test.tsx",
+          "lines": [
+            "// src/features/tasks/use-task-list.test.tsx",
+            "import { renderHook } from '@testing-library/react-native';",
+            "",
+            "import { useTasksStore } from '@/stores/tasks-store';",
+            "import { useTaskList } from './use-task-list';",
+            "",
+            "const initialState = useTasksStore.getState();",
+            "",
+            "afterEach(() => {",
+            "  useTasksStore.setState(initialState, true);",
+            "});",
+            "",
+            "test('lists the open tasks', async () => {",
+            "  const { result } = await renderHook(() => useTaskList());",
+            "  expect(result.current).toEqual([]);",
+            "});"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "test/stores/reset-stores.test.ts",
+          "lines": [
+            "// test/stores/reset-stores.test.ts",
+            "import { resetTasksStore } from '@test/stores/reset-tasks-store';",
+            "",
+            "afterEach(async () => { resetTasksStore(); });",
+            "",
+            "test('starts empty', () => {",
+            "  expect(true).toBe(true);",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-two-findings-one-file": {
+    "expect": [
+      "scripts/ios/toolchain.ts:5 [ios-other-sessions-simulators]",
+      "scripts/ios/toolchain.ts:6 [ios-other-sessions-simulators]"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/ios/toolchain.ts",
+          "find": "export function simctl(",
+          "with": "export function resetSimulators(): void {\n  execFileSync('xcrun', ['simctl', 'erase', 'all']);\n  execFileSync('xcrun', ['simctl', 'shutdown', 'all']);\n}\n\nexport function simctl("
+        }
+      }
+    ]
+  },
+  "bad-workspace-app": {
+    "expect": [
+      "[animation-runonjs-deprecated]",
+      "apps/mobile/src/features/tasks/pulse.ts:2",
+      "[deps-jest-30]",
+      "apps/mobile/package.json"
+    ],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["apps/*"] } },
+      {
+        "write": {
+          "file": "apps/mobile/package.json",
+          "content": "{\n  \"name\": \"@acme/mobile\",\n  \"dependencies\": {\n    \"expo\": \"~57.0.26\",\n    \"jest\": \"30.0.0\"\n  }\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/src/features/tasks/pulse.ts",
+          "content": "// apps/mobile/src/features/tasks/pulse.ts\nimport { runOnJS } from 'react-native-worklets';\n\nexport const toJs = runOnJS;\n"
+        }
+      }
+    ]
+  },
+  "error-no-package-json": { "expect": ["ERROR [bad-input]", "package.json"], "ops": [{ "delete": "package.json" }] },
+  "error-unknown-only": {
+    "expect": ["--only names no pitfall rule: no-such-rule"],
+    "args": "{dir} --only no-such-rule",
+    "ops": []
+  },
+  "pass-adb-devices": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/android/list-devices.ts",
+          "lines": [
+            "// scripts/android/list-devices.ts",
+            "import { execFileSync } from 'node:child_process';",
+            "",
+            "export function listDevices(): string {",
+            "  execFileSync('adb', ['start-server']);",
+            "  execFileSync('adb', ['version']);",
+            "  execFileSync('adb', ['devices']);",
+            "  return execFileSync('adb', ['devices', '-l'], { encoding: 'utf8' });",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "scripts/android/list-devices.sh",
+          "lines": ["#!/bin/sh", "adb devices -l", "adb -s \"$1\" shell getprop sys.boot_completed"]
+        }
+      }
+    ]
+  },
+  "pass-child-directed": {
+    "expect": ["0 problems"],
+    "ops": [
+      { "json": { "file": "contracts/ads.json", "path": ["audience"], "value": "child-directed" } },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "      ['expo-tracking-transparency', { userTrackingPermission: 'Ads stay relevant when you allow tracking.' }],\n",
+          "with": ""
+        }
+      },
+      { "delete": "src/services/consent/expo-tracking-consent-adapter.ts" }
+    ]
+  },
+  "pass-rtl-device-profile": {
+    "expect": ["0 problems"],
+    "ops": [
+      { "write": { "file": "contracts/rtl.json", "content": "{\"directionSource\": \"device\"}\n" } },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "supportedLocales: { ios: ['en', 'ar'], android: ['en', 'ar'] } }",
+          "with": "supportedLocales: { ios: ['en', 'ar'], android: ['en', 'ar'] }, supportsRTL: true }"
+        }
+      }
+    ]
+  },
+  "pass-store-reset-before-each": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-list.test.tsx",
+          "lines": [
+            "// src/features/tasks/use-task-list.test.tsx",
+            "import { renderHook } from '@testing-library/react-native';",
+            "",
+            "import { useTasksStore } from '@/stores/tasks-store';",
+            "import { useTaskList } from './use-task-list';",
+            "",
+            "const initialState = useTasksStore.getState();",
+            "",
+            "beforeEach(() => {",
+            "  useTasksStore.setState(initialState, true);",
+            "});",
+            "",
+            "test('lists the open tasks', async () => {",
+            "  const { result } = await renderHook(() => useTaskList());",
+            "  expect(result.current).toEqual([]);",
+            "});"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-list.ts",
+          "lines": [
+            "// src/features/tasks/use-task-list.ts",
+            "// afterEach(() => useTasksStore.setState(x)) is a comment here and is not flagged",
+            "export function useTaskList(): string[] {",
+            "  return [];",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-zustand-derived-value": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-stats.ts",
+          "lines": [
+            "// src/features/tasks/use-task-stats.ts",
+            "import { useShallow } from 'zustand/shallow';",
+            "",
+            "import { useTasksStore } from '@/stores/tasks-store';",
+            "",
+            "export function useOpenCount(): number {",
+            "  return useTasksStore((state) => state.tasks.filter((task) => !task.isDone).length);",
+            "}",
+            "",
+            "export function useFirstTitle(): string | undefined {",
+            "  return useTasksStore((state) => state.tasks.map((task) => task.title)[0]);",
+            "}",
+            "",
+            "export function useTitles(): string[] {",
+            "  return useTasksStore(useShallow((state) => state.tasks.map((task) => task.title)));",
+            "}",
+            "",
+            "export function useTasks() {",
+            "  return useTasksStore((state) => state.tasks);",
+            "}"
+          ]
+        }
+      }
+    ]
+  }
+}

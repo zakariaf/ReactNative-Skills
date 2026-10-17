@@ -1,0 +1,55 @@
+{
+  "$comment": "One Expo app at the repo root: the shipped templates (the seed policy, the .npmrc and the gate scripts) over tests/bases/single-app, plus an active dated exclude block and one licence exception.",
+  "base": [
+    "@tests/bases/single-app",
+    {
+      "templates": true,
+      "firstLinePath": true
+    }
+  ],
+  "renames": {
+    "dot-npmrc": ".npmrc"
+  },
+  "ops": [
+    {
+      "$comment": "Installed and vendored skills (a folder with a SKILL.md) hold planted imports and manifests: the repo scan never reads them.",
+      "write": {
+        "file": ".agents/skills/vendored-skill/SKILL.md",
+        "content": "---\nname: vendored-skill\ndescription: A planted skill folder; its files hold findings on purpose and must stay invisible.\n---\n\n# vendored-skill\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/demo-skill/SKILL.md",
+        "content": "---\nname: demo-skill\ndescription: A planted skill folder; its files hold findings on purpose and must stay invisible.\n---\n\n# demo-skill\n"
+      }
+    },
+    {
+      "write": {
+        "file": "vendor/third-party-skill/SKILL.md",
+        "content": "---\nname: third-party-skill\ndescription: A planted skill folder; its files hold findings on purpose and must stay invisible.\n---\n\n# third-party-skill\n"
+      }
+    },
+    {
+      "replace": {
+        "file": ".npmrc",
+        "find": "# min-release-age-exclude[]=<package>\n",
+        "with": "# min-release-age-exclude[]=<package>\n\n# exclude-block expires=2026-10-10 reason=Expo SDK 57.0.26 pins module patches younger than 7 days\nmin-release-age-exclude[]=expo\nmin-release-age-exclude[]=expo-*\nmin-release-age-exclude[]=@expo/*\n"
+      }
+    },
+    {
+      "json": {
+        "file": "contracts/dependency-policy.json",
+        "path": [
+          "licenses",
+          "exceptions",
+          "caniuse-lite"
+        ],
+        "value": {
+          "license": "CC-BY-4.0",
+          "reason": "browser support data, used only by build tools"
+        }
+      }
+    }
+  ]
+}

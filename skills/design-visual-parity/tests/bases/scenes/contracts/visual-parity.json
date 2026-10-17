@@ -1,0 +1,114 @@
+{
+ "version": 1,
+ "mockup": {
+  "file": "design/parity/mockup/index.html",
+  "htmlAttributes": {
+   "data-theme": "{theme}",
+   "lang": "{lang}",
+   "dir": "{dir}"
+  }
+ },
+ "themes": [
+  "light",
+  "dark"
+ ],
+ "languages": [
+  "en",
+  "ar"
+ ],
+ "rtlLanguages": [
+  "ar"
+ ],
+ "devices": [
+  "test-phone"
+ ],
+ "launch": {
+  "scheme": "tasks",
+  "ios": "com.example.tasks.preview",
+  "android": "com.example.tasks.preview"
+ },
+ "layout": {
+  "fixedHeaderPt": 30,
+  "pinnedComponents": [
+   "BottomBar"
+  ],
+  "dialogComponents": [
+   "DialogCard"
+  ]
+ },
+ "textRoleFloors": {
+  "Demo Sans": {
+   "14": {
+    "floor": 1.37,
+    "probe": "type-role probe 2026-09-29, Release build on the parity simulator"
+   }
+  }
+ },
+ "frames": {
+  "tasks-default": {
+   "keys": {
+    "taskId": [
+     "milk",
+     "bread",
+     "mail"
+    ]
+   }
+  },
+  "tasks-menu-open": {
+   "keys": {
+    "taskId": [
+     "milk",
+     "bread",
+     "mail"
+    ]
+   },
+   "modal": {
+    "reachedBy": "tasks.menu",
+    "hidden": [
+     "tasks.title",
+     "tasks.add-button",
+     "tasks.summary",
+     "tasks.task-row.milk",
+     "tasks.task-row.bread",
+     "tasks.task-row.mail",
+     "tasks.footer-note"
+    ]
+   }
+  },
+  "lists-default": {
+   "kind": "phone-tall",
+   "keys": {
+    "listId": [
+     "home",
+     "work",
+     "garden",
+     "travel",
+     "books",
+     "gifts",
+     "music",
+     "films",
+     "health",
+     "ideas",
+     "shop",
+     "later"
+    ]
+   }
+  },
+  "premium-loading": {
+   "kind": "state-card",
+   "root": "premium.state.loading"
+  },
+  "map-default": {
+   "probe": {
+    "region": "map",
+    "element": "map.canvas",
+    "above": [
+     "map.legend"
+    ]
+   }
+  },
+  "onboarding-default": {
+   "appDrawn": "onboarding.picture"
+  }
+ }
+}

@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Adaptive layout contract",
+  "description": "The app's adaptive-layout facts for check-adaptive-layout.mjs (adaptive-layout skill). Paths are repo-relative.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "appOrientation": {
+      "description": "The orientation app.config sets. Default: 'default' or 'portrait' (phones only; tablets rotate anyway). 'landscape' only when the app means it.",
+      "enum": ["default", "portrait", "landscape"]
+    },
+    "tablets": {
+      "description": "false only for an app that deliberately ships no iPad layout (it then runs as a scaled phone app on iPad); needs tabletsReason.",
+      "type": "boolean"
+    },
+    "tabletsReason": { "type": "string", "minLength": 1 },
+    "listDetailScreens": {
+      "description": "Screens that show a list and its selected item: each renders ListDetailLayout.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "fullBleedScreens": {
+      "description": "Screens whose content fills the window on purpose (a canvas, a map, a camera, media): no readable-width cap.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/exception" }
+    },
+    "orientationLocks": {
+      "description": "Files that may lock the orientation for one screen (camera capture, a full-screen video), each with its reason.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/exception" }
+    },
+    "breakpointModules": {
+      "description": "Globs of the files that may hold width breakpoints. Default: the window-class hook and src/ui/adaptive/**.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "screenGlobs": {
+      "description": "Globs of the screen files the readable-width rule reads. Default: src/features/**/*-screen.tsx.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "layoutGlobs": {
+      "description": "Globs of the UI code the layout rules read (device-branch, device-orientation, raw-breakpoint, fixed-width, readable-width-token, grid-*). Default: the routes folder, src/features/**, src/ui/**, src/hooks/**, src/theme/**. Services, core, data and api code lays nothing out.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "readableComponents": {
+      "description": "Components that cap a screen's reading width for it. Default: ScreenFrame, ListDetailLayout.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "maxFixedWidth": {
+      "description": "The widest fixed width a style may set (default 288: the 320 pt window minus two 16 pt gutters).",
+      "type": "integer",
+      "minimum": 1
+    }
+  },
+  "$defs": {
+    "exception": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "reason"],
+      "properties": {
+        "file": { "type": "string", "minLength": 1 },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

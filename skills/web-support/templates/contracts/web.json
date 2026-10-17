@@ -1,0 +1,11 @@
+{
+  "$schema": "./web.schema.json",
+  "$comment": "The app's web target, read by web-support's check-web-support.mjs and check-web-export.mjs. output repeats app.config.ts web.output; host says where the deployed site gets its response headers; smokeRoutes are the pages the export check opens in a browser, each with a testID the page must show; smokeLanguage opens the first one again in a right-to-left language (remove it when the app has one language); clientRoutes are dynamic routes a static export leaves to the host's rewrites.",
+  "version": 1,
+  "output": "static",
+  "host": "eas-hosting",
+  "smokeRoutes": [{ "path": "/", "testID": "tasks.list" }],
+  "smokeLanguage": { "lang": "ar", "dir": "rtl" },
+  "clientRoutes": [],
+  "publishSourceMaps": false
+}

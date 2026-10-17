@@ -1,0 +1,159 @@
+{
+  "$schema": "./privacy.schema.json",
+  "$comment": "The reference Tasks app's privacy facts (adopted from privacy-and-store-declarations' template, filled for the harness's installed SDKs; pods and collected data read from a production prebuild on 2026-10-14). The app's privacy facts (privacy-and-store-declarations): where its own code may open connections (profile), every network-capable SDK it ships with what each collects, what the app itself sends to its server, the answer for every permission, and account deletion. audit-repo.mjs, audit-bundle.mjs, audit-privacy-manifest.mjs and audit-app-bundle.mjs read it; npm run audit:network reads it too. The App Privacy (App Store) and Data safety (Google Play) answers come from it: node <skill>/scripts/audit-repo.mjs . --answers prints them. Change it in the same commit as the code or package that changes what the app collects.",
+  "profile": "api-port",
+  "networkModules": [],
+  "linkFiles": [],
+  "sdks": {
+    "react-native-google-mobile-ads": {
+      "family": "ads",
+      "why": "banner and interstitial ads for free users (admob-ads-and-consent)",
+      "pods": ["Google-Mobile-Ads-SDK", "GoogleUserMessagingPlatform"],
+      "maven": [
+        "com.google.android.gms:play-services-ads",
+        "com.google.android.gms:play-services-measurement-sdk-api",
+        "com.google.android.ump:"
+      ],
+      "tracking": true,
+      "collects": [
+        {
+          "type": "device-id",
+          "linked": true,
+          "tracking": true,
+          "purposes": ["third-party-advertising", "developer-advertising", "analytics"],
+          "shared": true
+        },
+        {
+          "type": "coarse-location",
+          "linked": true,
+          "tracking": false,
+          "purposes": [
+            "third-party-advertising",
+            "developer-advertising",
+            "analytics",
+            "app-functionality"
+          ],
+          "shared": true
+        },
+        {
+          "type": "advertising-data",
+          "linked": true,
+          "tracking": false,
+          "purposes": ["third-party-advertising", "developer-advertising", "analytics"],
+          "shared": true
+        },
+        {
+          "type": "product-interaction",
+          "linked": true,
+          "tracking": false,
+          "purposes": [
+            "third-party-advertising",
+            "developer-advertising",
+            "analytics",
+            "app-functionality"
+          ],
+          "shared": true
+        },
+        {
+          "type": "performance-data",
+          "linked": false,
+          "tracking": false,
+          "purposes": [
+            "third-party-advertising",
+            "developer-advertising",
+            "analytics",
+            "app-functionality"
+          ],
+          "shared": true
+        },
+        {
+          "type": "crash-data",
+          "linked": false,
+          "tracking": false,
+          "purposes": ["analytics"],
+          "shared": true
+        },
+        {
+          "type": "other-diagnostic-data",
+          "linked": false,
+          "tracking": false,
+          "purposes": ["third-party-advertising", "developer-advertising", "analytics"],
+          "shared": true
+        }
+      ]
+    },
+    "expo-iap": {
+      "family": "in-app purchases",
+      "why": "the Premium unlock, verified on the device (in-app-purchases)",
+      "pods": ["openiap"],
+      "collects": [],
+      "maven": ["io.github.hyochan.openiap:"]
+    },
+    "@sentry/react-native": {
+      "family": "crash reporting",
+      "why": "crash reports behind CrashReporterPort (crash-reporting-and-observability)",
+      "pods": ["Sentry"],
+      "maven": ["io.sentry:"],
+      "collects": [
+        {
+          "type": "crash-data",
+          "linked": false,
+          "tracking": false,
+          "purposes": ["app-functionality"]
+        },
+        {
+          "type": "performance-data",
+          "linked": false,
+          "tracking": false,
+          "purposes": ["app-functionality"]
+        },
+        {
+          "type": "other-diagnostic-data",
+          "linked": false,
+          "tracking": false,
+          "purposes": ["app-functionality"]
+        }
+      ]
+    },
+    "expo-notifications": {
+      "family": "push notifications",
+      "why": "task reminders and pushes (local-notifications, push-notifications); the push token is registered without an account (contracts/push.json requiresAccount false), so it is not linked to a person",
+      "collects": [
+        {
+          "type": "device-id",
+          "linked": false,
+          "tracking": false,
+          "purposes": ["app-functionality"]
+        }
+      ],
+      "maven": ["com.google.firebase:", "com.google.android.gms:play-services-cloud-messaging"]
+    },
+    "expo-updates": {
+      "family": "over-the-air updates",
+      "why": "JavaScript updates between store releases (ota-updates)",
+      "pods": ["ReachabilitySwift"],
+      "collects": []
+    },
+    "expo-web-browser": {
+      "family": "web views and browsers",
+      "why": "opens the sign-in page and help links in the system browser",
+      "collects": []
+    },
+    "expo-auth-session": {
+      "family": "sign-in with an identity provider",
+      "why": "installed by the canonical stack; the reference app builds no sign-in yet (auth-and-secure-storage)",
+      "collects": []
+    }
+  },
+  "app": {
+    "collects": []
+  },
+  "permissionAnswers": {
+    "camera": "not-collected: task photos stay on the device unless the person shares them",
+    "photos": "not-collected: task photos stay on the device unless the person shares them",
+    "notifications": "not-collected: the permission only lets the device show reminders",
+    "storage": "not-collected: legacy storage permissions the prebuild template merges; files stay on the device",
+    "overlay": "not-collected: SYSTEM_ALERT_WINDOW from the prebuild template; development builds use it for the dev menu"
+  },
+  "accountDeletion": null
+}

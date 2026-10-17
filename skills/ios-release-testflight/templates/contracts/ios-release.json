@@ -1,0 +1,16 @@
+{
+  "$schema": "./ios-release.schema.json",
+  "$comment": "The app's facts for iOS releases: read by scripts/release/*.ts and the ios-release-testflight skill's check-release-setup (the local lane), and by its check-store-artifact on every lane, EAS included. Only appId is required; the schema says what each key does and its default.",
+  "appId": "__APP_ID__",
+  "releaseBranch": "main",
+  "preflight": ["verify"],
+  "postPrebuild": ["audit:privacy", "audit:network"],
+  "usageStrings": [],
+  "usesNonExemptEncryption": false,
+  "forbiddenBundleStrings": [],
+  "unfinishedMarkers": [],
+  "whatToTest": {
+    "always": [],
+    "whenChanged": []
+  }
+}

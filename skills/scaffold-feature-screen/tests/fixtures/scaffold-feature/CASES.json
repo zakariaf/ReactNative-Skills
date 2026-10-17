@@ -1,0 +1,282 @@
+{
+  "bad-conflict": {
+    "expect": [
+      "FAIL src/features/notes/notes-screen.tsx:1 [conflict] exists with different content; the scaffold never overwrites"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/notes/notes-screen.tsx",
+          "content": "// src/features/notes/notes-screen.tsx: an older screen\nexport function NotesScreen(): null {\n  return null;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-contract-comments": {
+    "expect": [
+      "FAIL contracts/navigation.json:1 [conflict] holds // comments on 1 line, which the edit (printed as plain JSON) would drop",
+      "would write 6 new files and 4 edits"
+    ],
+    "args": ". --feature notes --route (app)/notes --title Notes --write",
+    "ops": [
+      {
+        "replace": {
+          "file": "contracts/navigation.json",
+          "find": "  \"home\": \"/\",\n",
+          "with": "  // The first screen a cold start shows.\n  \"home\": \"/\",\n"
+        }
+      }
+    ]
+  },
+  "bad-href-taken": {
+    "expect": ["FAIL src/app/notes.tsx:1 [conflict] src/app/(app)/notes.tsx already serves /notes"],
+    "args": ". --feature notes --route notes --title Notes",
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/(app)/notes.tsx",
+          "content": "// src/app/(app)/notes.tsx: an existing route at /notes\nexport default function NotesRoute(): null {\n  return null;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-href-taken-dynamic": {
+    "expect": [
+      "FAIL src/app/notes/[id].tsx:1 [conflict] src/app/(app)/notes/[noteId].ios.tsx already serves /notes/<param>"
+    ],
+    "args": ". --feature note-detail --route notes/[id] --title Note",
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/(app)/notes/[noteId].ios.tsx",
+          "content": "// src/app/(app)/notes/[noteId].ios.tsx: an existing route at /notes/<noteId>\nexport default function NoteRoute(): null {\n  return null;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-key-conflict": {
+    "expect": [
+      "FAIL src/i18n/catalogs/en.json:1 [conflict] \"notes.title\" exists with other text",
+      "would write 6 new files and 5 edits"
+    ],
+    "args": ". --feature notes --route (app)/notes --title Notes --write",
+    "ops": [{ "json": { "file": "src/i18n/catalogs/en.json", "path": ["notes.title"], "value": "Old notes" } }]
+  },
+  "bad-screen-id-taken": {
+    "expect": ["FAIL contracts/screens.json:1 [conflict] a screen \"home\" exists with another view"],
+    "args": ". --feature home --route (app)/home --title Home",
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 0, "view"],
+          "value": "src/features/start/start-screen.tsx"
+        }
+      }
+    ]
+  },
+  "bad-source-language-key": {
+    "expect": ["FAIL src/i18n/catalogs/de.json:1 [conflict] \"notes.title\" exists with other text"],
+    "args": ". --feature notes --route (app)/notes --title Notes --source-language de",
+    "ops": [{ "json": { "file": "src/i18n/catalogs/de.json", "path": ["notes.title"], "value": "Alte Notizen" } }]
+  },
+  "bad-starter": {
+    "expect": [
+      "FAIL src/app/index.tsx:1 [starter] src/app/index.tsx, src/features/home/home-screen.test.tsx, src/features/home/home-screen.tsx are the starter screen of a new app (expo-project-bootstrap)",
+      "Fix: Delete the starter, which holds no work: src/app/index.tsx and src/features/home/; then rerun the same command."
+    ],
+    "args": ". --feature home --route index --title Home",
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/index.tsx",
+          "content": "// src/app/index.tsx: the first route of a new app. Route files stay thin: they render a screen from\n// src/features/. The first real feature (scaffold-feature-screen) replaces this route and its screen.\nimport { HomeScreen } from '@/features/home/home-screen';\n\nexport default function HomeRoute(): React.JSX.Element {\n  return <HomeScreen />;\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/home/home-screen.tsx",
+          "content": "// src/features/home/home-screen.tsx: the starter screen of a new app, a pure view. It shows no text\n// yet: words reach the screen through the message catalogs (i18n-strings-and-catalogs), never as\n// literal strings, and colours through the theme (design-system-structure). The first real feature\n// (scaffold-feature-screen) replaces it.\nimport { StyleSheet, View } from 'react-native';\n\nexport function HomeScreen(): React.JSX.Element {\n  return <View style={styles.screen} testID=\"home.screen\" />;\n}\n\nconst styles = StyleSheet.create({\n  screen: { flex: 1 },\n});\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/home/home-screen.test.tsx",
+          "content": "// src/features/home/home-screen.test.tsx\n// no-providers: the starter screen reads nothing from context (no copy, theme or store yet)\nimport { render, screen } from '@testing-library/react-native';\n\nimport { HomeScreen } from './home-screen';\n\ndescribe('HomeScreen', () => {\n  it('renders the starter screen under its testID', async () => {\n    await render(<HomeScreen />);\n\n    expect(screen.getByTestId('home.screen')).toBeOnTheScreen();\n  });\n});\n"
+        }
+      }
+    ]
+  },
+  "error-feature": {
+    "expect": ["ERROR [bad-input] --feature \"Notes\" is not a kebab-case feature name"],
+    "args": ". --feature Notes --route (app)/notes --title Notes",
+    "ops": []
+  },
+  "error-no-router": {
+    "expect": ["ERROR [bad-input] expo-router is not in package.json"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo-router"], "delete": true } }]
+  },
+  "error-route": {
+    "expect": ["ERROR [bad-input] --route \"(app)/[listId]/notes\" is not a route id this scaffold writes"],
+    "args": ". --feature notes --route (app)/[listId]/notes --title Notes",
+    "ops": []
+  },
+  "error-title": {
+    "expect": ["ERROR [bad-input] --title \"{count}\" is not a plain one-line text"],
+    "args": ". --feature notes --route (app)/notes --title {count}",
+    "ops": []
+  },
+  "pass-drop-contract-comments": {
+    "expect": [
+      "note contracts/navigation.json: --drop-contract-comments: 1 line of comments dropped by the edit",
+      "edit contracts/navigation.json (routes += \"(app)/notes\")",
+      "would write 6 new files and 5 edits"
+    ],
+    "args": ". --feature notes --route (app)/notes --title Notes --drop-contract-comments",
+    "ops": [
+      {
+        "replace": {
+          "file": "contracts/navigation.json",
+          "find": "  \"home\": \"/\",\n",
+          "with": "  // The first screen a cold start shows.\n  \"home\": \"/\",\n"
+        }
+      }
+    ]
+  },
+  "pass-dynamic-route": {
+    "expect": [
+      "new  src/features/note-detail/note-detail-params.ts",
+      "new  src/features/note-detail/note-detail-params.test.ts",
+      "new  src/features/note-detail/components/note-detail-invalid-link.tsx",
+      "new  src/app/(app)/notes/[noteId].tsx",
+      "edit contracts/navigation.json (routes += \"(app)/notes/[noteId]\", paramParsers += \"(app)/notes/[noteId]\")",
+      "edit src/i18n/catalogs/en.json (+4 keys)",
+      "would write 9 new files and 5 edits for note-detail (dynamic route (app)/notes/[noteId], param noteId)",
+      "edit src/i18n/catalogs/ar.json (+4 keys, 2 drafts to translate)",
+      "edit src/i18n/catalogs/de.json (+4 keys, 4 drafts to translate)",
+      "drafts de: note-detail.body, note-detail.invalid-link.body, note-detail.invalid-link.go-home, note-detail.title"
+    ],
+    "args": ". --feature note-detail --route (app)/notes/[noteId] --title Note",
+    "ops": []
+  },
+  "pass-home-href": {
+    "expect": ["note the invalid-link way out goes to /tasks (contracts/navigation.json home)", "RESULT: PASS"],
+    "args": ". --feature note-detail --route (app)/notes/[noteId] --title Note",
+    "ops": [{ "json": { "file": "contracts/navigation.json", "path": ["home"], "value": "/tasks" } }]
+  },
+  "pass-no-contracts": {
+    "expect": [
+      "note contracts/navigation.json does not exist: the route is not registered (navigation-and-routing creates the contract)",
+      "note contracts/screens.json does not exist: no screen entry written (screen-contracts creates the contract)",
+      "note src/i18n/catalogs/ does not exist",
+      "would write 6 new files and 0 edits"
+    ],
+    "ops": [{ "delete": ["contracts", "src/i18n"] }]
+  },
+  "pass-review-languages": {
+    "expect": [
+      "note de is not in contracts/i18n.json reviewLanguages: add it so the drafts reach the review queue (i18n-strings-and-catalogs)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/i18n.json",
+          "content": "{\n  \"untranslatedPrefixes\": [],\n  \"reviewLanguages\": [\"ar\"],\n  \"catalogs\": []\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-same": {
+    "expect": ["same contracts/navigation.json"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/navigation.json",
+          "path": ["routes"],
+          "value": ["(app)/index", "+not-found", "(app)/notes"]
+        }
+      }
+    ]
+  },
+  "pass-screen-frame": {
+    "expect": [
+      "note src/ui/screen-frame.tsx exists: the view's root is <ScreenFrame edges={BELOW_HEADER_EDGES}>",
+      "wrote 9 new files and 5 edits for note-detail"
+    ],
+    "args": ". --feature note-detail --route (app)/notes/[noteId] --title Note --write",
+    "ops": [
+      {
+        "write": {
+          "file": "src/ui/screen-frame.tsx",
+          "content": "// src/ui/screen-frame.tsx (react-components-and-hooks)\n"
+        }
+      }
+    ]
+  },
+  "pass-source-language": {
+    "expect": [
+      "edit src/i18n/catalogs/de.json (+2 keys)",
+      "edit src/i18n/catalogs/en.json (+2 keys, 2 drafts to translate)",
+      "drafts en: notes.body, notes.title"
+    ],
+    "args": ". --feature notes --route (app)/notes --title Notizen",
+    "ops": [
+      {
+        "write": {
+          "file": "src/i18n/languages.ts",
+          "content": "// src/i18n/languages.ts\nexport const LANGUAGES = ['de', 'en', 'ar'] as const;\nexport type Language = (typeof LANGUAGES)[number];\nexport const SOURCE_LANGUAGE = 'de' satisfies Language;\n"
+        }
+      }
+    ]
+  },
+  "pass-starter-note": {
+    "expect": [
+      "note the starter screen of a new app is still here (src/app/index.tsx, src/features/home/): delete it when the first feature takes its route",
+      "scaffold-feature: 11 planned files checked, 0 problems"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/index.tsx",
+          "content": "// src/app/index.tsx: the first route of a new app. Route files stay thin: they render a screen from\n// src/features/. The first real feature (scaffold-feature-screen) replaces this route and its screen.\nimport { HomeScreen } from '@/features/home/home-screen';\n\nexport default function HomeRoute(): React.JSX.Element {\n  return <HomeScreen />;\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/home/home-screen.tsx",
+          "content": "// src/features/home/home-screen.tsx: the starter screen of a new app, a pure view. It shows no text\n// yet: words reach the screen through the message catalogs (i18n-strings-and-catalogs), never as\n// literal strings, and colours through the theme (design-system-structure). The first real feature\n// (scaffold-feature-screen) replaces it.\nimport { StyleSheet, View } from 'react-native';\n\nexport function HomeScreen(): React.JSX.Element {\n  return <View style={styles.screen} testID=\"home.screen\" />;\n}\n\nconst styles = StyleSheet.create({\n  screen: { flex: 1 },\n});\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/home/home-screen.test.tsx",
+          "content": "// src/features/home/home-screen.test.tsx\n// no-providers: the starter screen reads nothing from context (no copy, theme or store yet)\nimport { render, screen } from '@testing-library/react-native';\n\nimport { HomeScreen } from './home-screen';\n\ndescribe('HomeScreen', () => {\n  it('renders the starter screen under its testID', async () => {\n    await render(<HomeScreen />);\n\n    expect(screen.getByTestId('home.screen')).toBeOnTheScreen();\n  });\n});\n"
+        }
+      }
+    ]
+  },
+  "pass-tabs-note": {
+    "expect": [
+      "note src/app/(tabs)/orders.tsx renders inside a Tabs layout (src/app/(tabs)/_layout.tsx): change <Stack.Screen> to <Tabs.Screen>",
+      "RESULT: PASS"
+    ],
+    "args": ". --feature orders --route (tabs)/orders --title Orders",
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/(tabs)/_layout.tsx",
+          "content": "// src/app/(tabs)/_layout.tsx\nimport { Tabs } from 'expo-router';\n\nexport default function TabsLayout(): React.JSX.Element {\n  return <Tabs />;\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-write": {
+    "expect": [
+      "wrote 6 new files and 5 edits for notes",
+      "note the app has no node_modules/prettier: format the 11 written files",
+      "next: npx jest src/features/notes --ci --maxWorkers=2"
+    ],
+    "args": ". --feature notes --route (app)/notes --title Notes --write",
+    "ops": []
+  }
+}

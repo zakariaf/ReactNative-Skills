@@ -1,0 +1,22 @@
+{
+  "light": {
+    "background": "#F4F6FA",
+    "cell": "#DDE3EC",
+    "done": "#2F5FD0",
+    "edge": "#14213D",
+    "mark": "#FFFFFF",
+    "glow": "#E8A317",
+    "label": "#14213D",
+    "hint": "#14213D"
+  },
+  "dark": {
+    "background": "#0E1726",
+    "cell": "#1C2940",
+    "done": "#7AA7FF",
+    "edge": "#E6ECF5",
+    "mark": "#0E1726",
+    "glow": "#F2C14E",
+    "label": "#F4F7FB",
+    "hint": "#E6ECF5"
+  }
+}

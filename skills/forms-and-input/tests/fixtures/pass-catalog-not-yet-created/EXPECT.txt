@@ -1,0 +1,2 @@
+SKIP src/i18n/catalogs/en.json [schema-message-key] not yet created (i18n-strings-and-catalogs creates it)
+RESULT: PASS

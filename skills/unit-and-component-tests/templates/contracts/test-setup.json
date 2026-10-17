@@ -1,0 +1,31 @@
+{
+  "$schema": "./test-setup.schema.json",
+  "$comment": "The app's facts for check-test-setup and check-test-code (unit-and-component-tests). Every key is optional; these values are the defaults for the canonical single-app layout.",
+  "renderHelper": {
+    "file": "test/render-with-providers.tsx",
+    "functions": ["renderWithProviders", "renderHookWithProviders", "createProvidersWrapper"]
+  },
+  "routerHelper": {
+    "file": "test/render-router-with-providers.tsx",
+    "functions": ["renderRouterWithProviders"]
+  },
+  "deviceOnlyHelper": "scripts/quality/device-only.ts",
+  "rootMocks": [],
+  "logicCoverageKeys": ["./src/core/", "./src/data/", "./src/games/*/rules/**/*.ts"],
+  "mutateGlobs": [
+    "src/core/**/*.ts",
+    "src/data/**/*.ts",
+    "src/**/*-policy.ts",
+    "src/**/*-reducer.ts"
+  ],
+  "styleContractGlobs": ["src/ui/**", "src/theme/**", "src/i18n/**"],
+  "logicTestGlobs": [
+    "src/core/**",
+    "src/data/**",
+    "src/stores/**",
+    "src/services/**",
+    "src/api/**",
+    "src/games/*/{rules,levels,sim}/**"
+  ],
+  "otherRunnerGlobs": []
+}

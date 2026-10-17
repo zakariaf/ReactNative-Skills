@@ -1,0 +1,6 @@
+readiness scan for SDK 58
+todo     src/features/tasks/components/swipe-row.tsx:8 [gesture-api] uses the Gesture Handler builder Gesture.Tap(), deprecated in v3 (change it in the move commit to SDK 58)
+todo     plugins/with-variant-marker.ts:2 [config-plugin-import] imports 'expo/config-plugins.js', but on SDK 58 config plugins import 'expo/config-plugins'
+todo     jest.config.js:1 [jest-config] lacks resolver: 'react-native-reanimated/jest/resolver' for SDK 58
+todo     scripts/config/scene-support.ts:33 [scene-support] scene support is a no-op on SDK 58
+RESULT: PASS

@@ -1,0 +1,20 @@
+{
+  "feedback.failure.unknown": "Something went wrong. Try again.",
+  "feedback.notice.dismiss": "Dismiss",
+  "feedback.offline.none": "You’re offline. Changes sync when you’re back online.",
+  "feedback.offline.unvalidated": "You’re connected, but the internet may not be reachable.",
+  "feedback.undo": "Undo",
+  "feedback.updating": "Updating…",
+  "tasks.notice.offline": "You’re offline. These tasks may be out of date.",
+  "tasks.state.empty.action": "Add a task",
+  "tasks.state.empty.body": "Add the first thing you want to get done.",
+  "tasks.state.empty.title": "No tasks yet",
+  "tasks.state.failed.action": "Try again",
+  "tasks.state.failed.title": "Couldn’t load your tasks",
+  "tasks.state.filtered-empty.action": "Show all tasks",
+  "tasks.state.filtered-empty.body": "No task matches this filter.",
+  "tasks.state.filtered-empty.title": "Nothing matches",
+  "tasks.state.loading.label": "Loading tasks",
+  "tasks.state.offline.body": "Your tasks load by themselves when you’re back online.",
+  "tasks.state.offline.title": "You’re offline"
+}

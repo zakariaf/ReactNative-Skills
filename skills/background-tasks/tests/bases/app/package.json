@@ -1,0 +1,12 @@
+{
+  "name": "tasks-fixture",
+  "private": true,
+  "main": "index.ts",
+  "dependencies": {
+    "expo": "~57.0.26",
+    "expo-background-task": "~57.0.21",
+    "expo-router": "~57.0.24",
+    "expo-task-manager": "~57.0.21",
+    "react-native": "0.86.3"
+  }
+}

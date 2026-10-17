@@ -1,0 +1,584 @@
+{
+  "bad-class": [
+    {
+      "write": {
+        "file": "src/features/tasks/components/legacy-card.tsx",
+        "content": "// src/features/tasks/components/legacy-card.tsx\nimport { Component } from 'react';\n\nimport type { ReactNode } from 'react';\n\nexport class LegacyCard extends Component<{ readonly title: string }> {\n  override render(): ReactNode {\n    return this.props.title;\n  }\n}\n"
+      }
+    }
+  ],
+  "bad-config-text-primitive": [{ "rename": { "from": "src/ui/app-text.tsx", "to": "src/ui/text/app-text.tsx" } }],
+  "bad-dimensions": [
+    {
+      "write": {
+        "file": "src/features/tasks/use-columns.ts",
+        "content": "// src/features/tasks/use-columns.ts\nimport { Dimensions } from 'react-native';\n\nexport function useColumns(): number {\n  return Dimensions.get('window').width >= 600 ? 2 : 1;\n}\n"
+      }
+    }
+  ],
+  "bad-effect-back-handler": [
+    {
+      "replace": {
+        "file": "src/features/settings/use-close-on-back.ts",
+        "find": "    return () => {\n      subscription.remove();\n    };\n",
+        "with": ""
+      }
+    }
+  ],
+  "bad-effect-expo-listener": [
+    {
+      "write": {
+        "file": "src/features/tasks/use-open-from-notification.ts",
+        "content": "// src/features/tasks/use-open-from-notification.ts: a notification tap opens the task it names.\nimport * as Notifications from 'expo-notifications';\nimport { useEffect, useEffectEvent } from 'react';\n\nexport function useOpenFromNotification(onOpen: (taskId: string) => void): void {\n  const handleOpen = useEffectEvent(onOpen);\n  useEffect(() => {\n    Notifications.addNotificationResponseReceivedListener((response) => {\n      const taskId = response.notification.request.content.data.taskId;\n      if (typeof taskId === 'string') handleOpen(taskId);\n    });\n  }, []);\n}\n"
+      }
+    }
+  ],
+  "bad-effect-expression-body": [
+    {
+      "write": {
+        "file": "src/features/tasks/use-refresh-on-change.ts",
+        "content": "// src/features/tasks/use-refresh-on-change.ts: an expression-bodied effect hands React the subscription.\nimport { useEffect, useEffectEvent } from 'react';\nimport { AppState } from 'react-native';\n\nexport function useRefreshOnChange(onChange: () => void): void {\n  const handleChange = useEffectEvent(onChange);\n  useEffect(() => AppState.addEventListener('change', () => handleChange()), []);\n}\n"
+      }
+    }
+  ],
+  "bad-effect-focus-callback": [
+    {
+      "replace": {
+        "file": "app.config.ts",
+        "find": "experiments: { typedRoutes: true, reactCompiler: true }",
+        "with": "experiments: { typedRoutes: true }"
+      }
+    },
+    {
+      "write": {
+        "file": "src/features/tasks/use-autosave.ts",
+        "content": "// src/features/tasks/use-autosave.ts: the compiler is off, so useFocusEffect gets a useCallback.\nimport { useFocusEffect } from 'expo-router';\nimport { useCallback } from 'react';\n\nexport function useAutosave(save: () => void): void {\n  useFocusEffect(\n    useCallback(() => {\n      setInterval(save, 30_000);\n    }, [save]),\n  );\n}\n"
+      }
+    }
+  ],
+  "bad-effect-function-expression": [
+    {
+      "replace": {
+        "file": "src/features/tasks/use-sync-on-foreground.ts",
+        "find": "  useEffect(() => {\n",
+        "with": "  useEffect(function syncOnForeground() {\n"
+      }
+    },
+    {
+      "replace": {
+        "file": "src/features/tasks/use-sync-on-foreground.ts",
+        "find": "    return () => {\n      subscription.remove();\n    };\n",
+        "with": ""
+      }
+    }
+  ],
+  "bad-effect-no-cleanup": [
+    {
+      "replace": {
+        "file": "src/features/tasks/use-sync-on-foreground.ts",
+        "find": "    return () => {\n      subscription.remove();\n    };\n",
+        "with": ""
+      }
+    }
+  ],
+  "bad-effect-return-expo-subscription": [
+    {
+      "write": {
+        "file": "src/features/tasks/use-follow-colour-scheme.ts",
+        "content": "// src/features/tasks/use-follow-colour-scheme.ts: returns the subscription object, which React never calls.\nimport { useEffect, useEffectEvent } from 'react';\nimport { Appearance } from 'react-native';\n\nexport function useFollowColourScheme(onChange: (scheme: string) => void): void {\n  const handleChange = useEffectEvent(onChange);\n  useEffect(() => {\n    const subscription = Appearance.addChangeListener(({ colorScheme }) => {\n      handleChange(colorScheme ?? 'light');\n    });\n    return subscription;\n  }, []);\n}\n"
+      }
+    }
+  ],
+  "bad-effect-return-subscription": [
+    {
+      "replace": {
+        "file": "src/features/tasks/use-sync-on-foreground.ts",
+        "find": "    return () => {\n      subscription.remove();\n    };\n",
+        "with": "    return subscription;\n"
+      }
+    }
+  ],
+  "bad-focus-effect-timer": [
+    {
+      "write": {
+        "file": "src/features/tasks/use-autosave.ts",
+        "content": "// src/features/tasks/use-autosave.ts\nimport { useFocusEffect } from 'expo-router';\n\nexport function useAutosave(save: () => void): void {\n  // Runs while the screen is focused; the interval must stop when it blurs.\n  useFocusEffect(() => {\n    setInterval(save, 30_000);\n  });\n}\n"
+      }
+    }
+  ],
+  "bad-gesture-handler-button": [
+    {
+      "write": {
+        "file": "src/features/tasks/components/swipe-delete-button.tsx",
+        "content": "// src/features/tasks/components/swipe-delete-button.tsx\nimport { RectButton } from 'react-native-gesture-handler';\n\nimport type { ReactNode } from 'react';\n\nexport type SwipeDeleteButtonProps = { readonly onPress: () => void; readonly testID: string };\n\nexport function SwipeDeleteButton({ onPress, testID }: SwipeDeleteButtonProps): ReactNode {\n  return <RectButton onPress={onPress} testID={testID} />;\n}\n"
+      }
+    }
+  ],
+  "bad-hook-file": [
+    {
+      "write": {
+        "file": "src/features/tasks/task-counts.ts",
+        "content": "// src/features/tasks/task-counts.ts\nimport { useTasksStore } from '@/stores/tasks-store';\n\nexport function useOpenCount(): number {\n  return useTasksStore((state) => state.tasks.filter((task) => !task.isDone).length);\n}\n"
+      }
+    }
+  ],
+  "bad-inset-direction": [
+    {
+      "replace": {
+        "file": "src/features/tasks/components/tasks-footer.tsx",
+        "find": "paddingLeft: insets.left, paddingRight: insets.right",
+        "with": "paddingStart: insets.left, paddingEnd: insets.right"
+      }
+    }
+  ],
+  "bad-isrtl": [
+    {
+      "write": {
+        "file": "src/features/tasks/components/row-direction.ts",
+        "content": "// src/features/tasks/components/row-direction.ts\nimport { I18nManager } from 'react-native';\n\nexport const ROW_START = I18nManager.isRTL ? 'right' : 'left';\n"
+      }
+    }
+  ],
+  "bad-key-extractor-index": [
+    {
+      "replace": {
+        "file": "src/features/tasks/tasks-screen.tsx",
+        "find": "keyExtractor={(task) => task.id}",
+        "with": "keyExtractor={(_task, index) => String(index)}"
+      }
+    }
+  ],
+  "bad-key-index": [
+    {
+      "replace": {
+        "file": "src/features/tasks/components/task-tags.tsx",
+        "find": "{tags.map((tag) => (\n        <AppText key={tag}",
+        "with": "{tags.map((tag, index) => (\n        <AppText key={index}"
+      }
+    }
+  ],
+  "bad-key-index-template": [
+    {
+      "replace": {
+        "file": "src/features/tasks/components/task-tags.tsx",
+        "find": "{tags.map((tag) => (\n        <AppText key={tag}",
+        "with": "{tags.map((tag, tagIndex) => (\n        <AppText key={`tag-${String(tagIndex)}`}"
+      }
+    }
+  ],
+  "bad-multi-package-scan": [
+    { "rename": { "from": "src", "to": "apps/mobile/src" } },
+    { "rename": { "from": "app.config.ts", "to": "apps/mobile/app.config.ts" } },
+    { "rename": { "from": "tsconfig.json", "to": "apps/mobile/tsconfig.json" } },
+    { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+    {
+      "write": {
+        "file": "package.json",
+        "content": "{\n  \"name\": \"tasks-workspace\",\n  \"private\": true,\n  \"workspaces\": [\"apps/*\", \"packages/*\"]\n}\n"
+      }
+    },
+    {
+      "write": {
+        "file": "packages/kit/package.json",
+        "content": "{\n  \"name\": \"@acme/kit\",\n  \"private\": true\n}\n"
+      }
+    },
+    {
+      "write": {
+        "file": "packages/kit/src/clamp.ts",
+        "content": "// packages/kit/src/clamp.ts\nexport function clamp(value: number, min: number, max: number): number {\n  return Math.min(Math.max(value, min), max);\n}\n"
+      }
+    },
+    {
+      "write": {
+        "file": "apps/mobile/ios/Pods/use-planted.ts",
+        "content": "import { useMemo } from 'react';\n\nexport const usePlanted = (): number => useMemo(() => 1, []);\n"
+      }
+    },
+    {
+      "write": {
+        "file": "apps/mobile/android/app/build/use-planted.ts",
+        "content": "import { useMemo } from 'react';\n\nexport const usePlanted = (): number => useMemo(() => 1, []);\n"
+      }
+    },
+    {
+      "write": {
+        "file": "packages/kit/src/use-stable.ts",
+        "content": "// packages/kit/src/use-stable.ts\nimport { useCallback } from 'react';\n\nexport function useStable(fn: () => void): () => void {\n  return useCallback(fn, [fn]);\n}\n"
+      }
+    }
+  ],
+  "bad-pressable-in-feature": [
+    {
+      "write": {
+        "file": "src/features/tasks/components/raw-button.tsx",
+        "content": "// src/features/tasks/components/raw-button.tsx\nimport { Pressable } from 'react-native';\n\nimport type { ReactNode } from 'react';\n\nexport function RawButton({ onPress }: { readonly onPress: () => void }): ReactNode {\n  return <Pressable accessibilityRole=\"button\" onPress={onPress} testID=\"tasks.raw-button\" />;\n}\n"
+      }
+    }
+  ],
+  "bad-pressed-destructure": [
+    {
+      "replace": {
+        "file": "src/ui/tile-button.tsx",
+        "find": "style={(state) => [styles.tile, state.pressed && styles.pressed]}",
+        "with": "style={({ pressed }) => [styles.tile, pressed && styles.pressed]}"
+      }
+    }
+  ],
+  "bad-props-intersection": [
+    {
+      "write": {
+        "file": "src/features/tasks/components/task-card.tsx",
+        "content": "// src/features/tasks/components/task-card.tsx\nimport { AppText } from '@/ui/app-text';\n\nimport type { ReactNode } from 'react';\n\ntype BaseProps = { readonly testID: string };\n\nexport type TaskCardProps = BaseProps & {\n  readonly tags: readonly string[];\n  title: string;\n};\n\nexport function TaskCard({ testID, title }: TaskCardProps): ReactNode {\n  return <AppText testID={testID}>{title}</AppText>;\n}\n"
+      }
+    }
+  ],
+  "bad-props-method": [
+    {
+      "replace": {
+        "file": "src/features/tasks/components/task-row.tsx",
+        "find": "  readonly onToggle: (id: string) => void;\n",
+        "with": "  onToggle(id: string): void;\n"
+      }
+    }
+  ],
+  "bad-props-mutable": [
+    {
+      "replace": {
+        "file": "src/ui/labelled-value.tsx",
+        "find": "  readonly label: string;\n",
+        "with": "  label: string;\n"
+      }
+    }
+  ],
+  "bad-props-mutable-array": [
+    {
+      "replace": {
+        "file": "src/features/tasks/components/task-tags.tsx",
+        "find": "  readonly tags: readonly string[];\n",
+        "with": "  readonly tags: string[];\n"
+      }
+    }
+  ],
+  "bad-react-dot-memo": [
+    {
+      "write": {
+        "file": "src/features/tasks/components/task-badge.tsx",
+        "content": "// src/features/tasks/components/task-badge.tsx\nimport React from 'react';\n\nimport type { ReactNode } from 'react';\n\nexport const TaskBadge = React.memo(function TaskBadge(): ReactNode {\n  return null;\n});\n"
+      }
+    }
+  ],
+  "bad-render-date": [
+    {
+      "replace": {
+        "file": "src/features/tasks/components/due-label.tsx",
+        "find": "const isOverdue = dueAtMs < nowMs;",
+        "with": "const isOverdue = dueAtMs < Date.now() + nowMs * 0;"
+      }
+    }
+  ],
+  "bad-render-new-date": [
+    {
+      "replace": {
+        "file": "src/features/tasks/components/due-label.tsx",
+        "find": "const due = new Date(dueAtMs);",
+        "with": "const due = new Date();"
+      }
+    }
+  ],
+  "bad-rn-safe-area-view": [
+    {
+      "write": {
+        "file": "src/features/settings/settings-screen.tsx",
+        "content": "// src/features/settings/settings-screen.tsx\nimport { SafeAreaView } from 'react-native';\n\nimport type { ReactNode } from 'react';\n\nexport function SettingsScreen(): ReactNode {\n  return <SafeAreaView testID=\"settings.screen\" />;\n}\n"
+      }
+    }
+  ],
+  "bad-rn-text": [
+    {
+      "write": {
+        "file": "src/features/tasks/components/raw-label.tsx",
+        "content": "// src/features/tasks/components/raw-label.tsx\nimport { Text } from 'react-native';\n\nimport type { ReactNode } from 'react';\n\nexport function RawLabel({ text }: { readonly text: string }): ReactNode {\n  return <Text>{text}</Text>;\n}\n"
+      }
+    }
+  ],
+  "bad-scrollview-empty-state": [
+    {
+      "write": {
+        "file": "src/features/tasks/components/done-tasks.tsx",
+        "content": "// src/features/tasks/components/done-tasks.tsx\nimport { ScrollView, View } from 'react-native';\n\nimport { AppText } from '@/ui/app-text';\n\nimport type { Task } from '@/stores/tasks-store';\nimport type { ReactNode } from 'react';\n\nexport type DoneTasksProps = {\n  readonly tasks: readonly Task[];\n  readonly emptyText: string;\n  readonly testID: string;\n};\n\nexport function DoneTasks({ tasks, emptyText, testID }: DoneTasksProps): ReactNode {\n  return (\n    <View testID={testID}>\n      <ScrollView testID={`${testID}.list`}>\n        {tasks.length === 0 ? (\n          <AppText testID={`${testID}.empty`}>{emptyText}</AppText>\n        ) : (\n          [...tasks]\n            .sort((a, b) => a.title.localeCompare(b.title))\n            .map((task) => (\n              <AppText key={task.id} testID={`${testID}.${task.id}`}>\n                {task.title}\n              </AppText>\n            ))\n        )}\n      </ScrollView>\n    </View>\n  );\n}\n"
+      }
+    }
+  ],
+  "bad-scrollview-list": [
+    {
+      "replace": {
+        "file": "src/features/onboarding/onboarding-screen.tsx",
+        "find": "      {/* bounded-list: the onboarding has three to five steps, fixed at build time */}\n",
+        "with": "      {/* the onboarding steps */}\n"
+      }
+    }
+  ],
+  "bad-scrollview-optional-map": [
+    {
+      "write": {
+        "file": "src/features/tasks/components/recent-tasks.tsx",
+        "content": "// src/features/tasks/components/recent-tasks.tsx\nimport { ScrollView } from 'react-native';\n\nimport { AppText } from '@/ui/app-text';\n\nimport type { Task } from '@/stores/tasks-store';\nimport type { ReactNode } from 'react';\n\nexport type RecentTasksProps = { readonly tasks: readonly Task[] | undefined; readonly testID: string };\n\nexport function RecentTasks({ tasks, testID }: RecentTasksProps): ReactNode {\n  return (\n    <ScrollView testID={testID}>\n      {tasks?.map((task) => (\n        <AppText key={task.id} testID={`${testID}.${task.id}`}>\n          {task.title}\n        </AppText>\n      ))}\n    </ScrollView>\n  );\n}\n"
+      }
+    }
+  ],
+  "bad-shared-value": [
+    {
+      "replace": {
+        "file": "src/ui/use-hold-to-confirm.ts",
+        "find": "progress.set(withTiming(0, { duration: MOTION_MS.fast, reduceMotion: ReduceMotion.Never }));",
+        "with": "progress.value = withTiming(0, { duration: MOTION_MS.fast, reduceMotion: ReduceMotion.Never });"
+      }
+    }
+  ],
+  "bad-shared-value-hook-result": [
+    {
+      "write": {
+        "file": "src/ui/delete-all-fill.tsx",
+        "content": "// src/ui/delete-all-fill.tsx: the fill behind a hold-to-confirm control.\nimport Animated, { useAnimatedStyle } from 'react-native-reanimated';\n\nimport { useHoldToConfirm } from './use-hold-to-confirm';\n\nimport type { ReactNode } from 'react';\n\nexport type DeleteAllFillProps = { readonly onConfirm: () => void; readonly testID: string };\n\nexport function DeleteAllFill({ onConfirm, testID }: DeleteAllFillProps): ReactNode {\n  const { progress } = useHoldToConfirm(onConfirm);\n  const fillStyle = useAnimatedStyle(() => ({ transform: [{ scaleX: progress.value }] }));\n  return <Animated.View style={fillStyle} testID={testID} />;\n}\n"
+      }
+    }
+  ],
+  "bad-shared-value-prop": [
+    {
+      "write": {
+        "file": "src/features/tasks/components/use-swipe-offset.ts",
+        "content": "// src/features/tasks/components/use-swipe-offset.ts: a pan gesture that writes a shared value it receives.\nimport { Gesture } from 'react-native-gesture-handler';\n\nimport type { PanGesture } from 'react-native-gesture-handler';\nimport type { SharedValue } from 'react-native-reanimated';\n\nexport function useSwipeOffset(offset: SharedValue<number>): PanGesture {\n  return Gesture.Pan().onUpdate((event) => {\n    offset.value = event.translationX;\n  });\n}\n"
+      }
+    }
+  ],
+  "bad-testid-optional": [
+    {
+      "replace": {
+        "file": "src/ui/tile-button.tsx",
+        "find": "  readonly testID: string;\n",
+        "with": "  readonly testID?: string;\n"
+      }
+    }
+  ],
+  "bad-touchable-in-feature": [
+    {
+      "write": {
+        "file": "src/features/tasks/components/old-button.tsx",
+        "content": "// src/features/tasks/components/old-button.tsx\nimport { TouchableOpacity } from 'react-native';\n\nimport type { ReactNode } from 'react';\n\nexport function OldButton({ onPress }: { readonly onPress: () => void }): ReactNode {\n  return <TouchableOpacity accessibilityRole=\"button\" onPress={onPress} testID=\"tasks.old-button\" />;\n}\n"
+      }
+    }
+  ],
+  "bad-use-memo": [
+    {
+      "write": {
+        "file": "src/features/tasks/components/sorted-titles.tsx",
+        "content": "// src/features/tasks/components/sorted-titles.tsx\nimport { useMemo } from 'react';\n\nimport type { ReactNode } from 'react';\n\nexport function SortedTitles({ titles }: { readonly titles: readonly string[] }): ReactNode {\n  const sorted = useMemo(() => [...titles].sort(), [titles]);\n  return sorted.join(', ');\n}\n"
+      }
+    }
+  ],
+  "bad-use-no-memo": [
+    {
+      "write": {
+        "file": "src/features/tasks/components/task-probe.tsx",
+        "content": "// src/features/tasks/components/task-probe.tsx\nimport type { ReactNode } from 'react';\n\nexport function TaskProbe(): ReactNode {\n  'use no memo';\n  return null;\n}\n"
+      }
+    }
+  ],
+  "bad-use-no-memo-unknown-test": [
+    {
+      "write": {
+        "file": "src/features/tasks/components/task-probe.tsx",
+        "content": "// src/features/tasks/components/task-probe.tsx\n// use-no-memo-test: keeps the probe in sync\nimport type { ReactNode } from 'react';\n\nexport function TaskProbe(): ReactNode {\n  'use no memo';\n  return null;\n}\n"
+      }
+    }
+  ],
+  "error-bad-config": [
+    {
+      "write": {
+        "file": "rn-skills.config.json",
+        "content": "{\n  \"reactRules\": { \"directionModules\": \"src/i18n/direction.ts\" }\n}\n"
+      }
+    }
+  ],
+  "error-no-src": [{ "delete": "src" }],
+  "error-src-missing": { "args": "{dir} --src app-src", "ops": [] },
+  "pass-compiler-off": [
+    {
+      "replace": {
+        "file": "app.config.ts",
+        "find": "experiments: { typedRoutes: true, reactCompiler: true }",
+        "with": "experiments: { typedRoutes: true }"
+      }
+    },
+    {
+      "write": {
+        "file": "src/features/tasks/components/sorted-titles.tsx",
+        "content": "// src/features/tasks/components/sorted-titles.tsx\nimport { useMemo } from 'react';\n\nimport type { ReactNode } from 'react';\n\nexport function SortedTitles({ titles }: { readonly titles: readonly string[] }): ReactNode {\n  const sorted = useMemo(() => [...titles].sort(), [titles]);\n  return sorted.join(', ');\n}\n"
+      }
+    }
+  ],
+  "pass-conditional-subscription": [
+    {
+      "replace": {
+        "file": "app.config.ts",
+        "find": "experiments: { typedRoutes: true, reactCompiler: true }",
+        "with": "experiments: { typedRoutes: true }"
+      }
+    },
+    {
+      "write": {
+        "file": "src/features/tasks/use-keyboard-height.ts",
+        "content": "// src/features/tasks/use-keyboard-height.ts: a subscription that exists only while isOn, cleaned up in\n// the branch that made it.\nimport { useEffect, useEffectEvent } from 'react';\nimport { Keyboard } from 'react-native';\n\nexport function useKeyboardHeight(isOn: boolean, onHeight: (height: number) => void): void {\n  const handleHeight = useEffectEvent(onHeight);\n  useEffect(() => {\n    if (isOn) {\n      const subscription = Keyboard.addListener('keyboardDidShow', (event) => {\n        handleHeight(event.endCoordinates.height);\n      });\n      return () => {\n        subscription.remove();\n      };\n    }\n    return undefined;\n  }, [isOn]);\n}\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/features/tasks/use-poll-while-focused.ts",
+        "content": "// src/features/tasks/use-poll-while-focused.ts: the cleanup is returned from inside try and switch.\nimport { useFocusEffect } from 'expo-router';\nimport { useCallback } from 'react';\n\nexport function usePollWhileFocused(mode: 'fast' | 'slow' | 'off', poll: () => void): void {\n  useFocusEffect(\n    useCallback(() => {\n      switch (mode) {\n        case 'fast': {\n          const id = setInterval(poll, 5_000);\n          return () => {\n            clearInterval(id);\n          };\n        }\n        case 'slow': {\n          try {\n            const id = setInterval(poll, 60_000);\n            return () => {\n              clearInterval(id);\n            };\n          } catch {\n            return undefined;\n          }\n        }\n        default:\n          return undefined;\n      }\n    }, [mode, poll]),\n  );\n}\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/features/tasks/use-follow-tasks-store.ts",
+        "content": "// src/features/tasks/use-follow-tasks-store.ts: cleanups returned by name, from an expression body and\n// from a named function expression all count.\nimport { useEffect, useEffectEvent, useLayoutEffect } from 'react';\nimport { Keyboard } from 'react-native';\n\nimport { useTasksStore } from '@/stores/tasks-store';\n\nexport function useFollowTasksStore(onChange: () => void): void {\n  const handleChange = useEffectEvent(onChange);\n  useEffect(() => {\n    const unsubscribe = useTasksStore.subscribe(() => handleChange());\n    return unsubscribe;\n  }, []);\n  useLayoutEffect(() => useTasksStore.subscribe(() => handleChange()), []);\n  useEffect(function followKeyboard() {\n    const subscription = Keyboard.addListener('keyboardDidHide', () => handleChange());\n    return () => {\n      subscription.remove();\n    };\n  }, []);\n}\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/features/tasks/use-refresh-on-focus.ts",
+        "content": "// src/features/tasks/use-refresh-on-focus.ts: navigation.addListener returns the unsubscribe function,\n// so returning it (by name or as an expression body) is the cleanup.\nimport { useNavigation } from 'expo-router';\nimport { useEffect, useEffectEvent } from 'react';\n\nexport function useRefreshOnFocus(onFocus: () => void, onBlur: () => void): void {\n  const navigation = useNavigation();\n  const handleFocus = useEffectEvent(onFocus);\n  const handleBlur = useEffectEvent(onBlur);\n  useEffect(() => {\n    const unsubscribe = navigation.addListener('focus', () => handleFocus());\n    return unsubscribe;\n  }, [navigation]);\n  useEffect(() => navigation.addListener('blur', () => handleBlur()), [navigation]);\n}\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/features/tasks/use-connection-change.ts",
+        "content": "// src/features/tasks/use-connection-change.ts: NetInfo.addEventListener returns the unsubscribe function.\nimport NetInfo from '@react-native-community/netinfo';\nimport { useEffect, useEffectEvent } from 'react';\n\nexport function useConnectionChange(onChange: (isConnected: boolean) => void): void {\n  const handleChange = useEffectEvent(onChange);\n  useEffect(() => NetInfo.addEventListener((state) => handleChange(state.isConnected === true)), []);\n}\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/features/tasks/use-open-from-notification.ts",
+        "content": "// src/features/tasks/use-open-from-notification.ts: expo-notifications returns a subscription object,\n// so the cleanup is a function that removes it.\nimport * as Notifications from 'expo-notifications';\nimport { useEffect, useEffectEvent } from 'react';\n\nexport function useOpenFromNotification(onOpen: (taskId: string) => void): void {\n  const handleOpen = useEffectEvent(onOpen);\n  useEffect(() => {\n    const subscription = Notifications.addNotificationResponseReceivedListener((response) => {\n      const taskId = response.notification.request.content.data.taskId;\n      if (typeof taskId === 'string') handleOpen(taskId);\n    });\n    return () => {\n      subscription.remove();\n    };\n  }, []);\n}\n"
+      }
+    }
+  ],
+  "pass-config-text-primitive": [
+    { "rename": { "from": "src/ui/app-text.tsx", "to": "src/ui/text/app-text.tsx" } },
+    {
+      "write": {
+        "file": "rn-skills.config.json",
+        "content": "{\n  \"reactRules\": { \"textPrimitive\": \"src/ui/text/app-text.tsx\" }\n}\n"
+      }
+    }
+  ],
+  "pass-memo-exemption": [
+    {
+      "write": {
+        "file": "src/features/tasks/components/sorted-titles.tsx",
+        "content": "// src/features/tasks/components/sorted-titles.tsx\n// memo-exemption: sorting 5,000 titles took 48 ms per render on a Pixel 6a Release build (2026-10-01)\nimport { useMemo } from 'react';\n\nimport type { ReactNode } from 'react';\n\nexport function SortedTitles({ titles }: { readonly titles: readonly string[] }): ReactNode {\n  const sorted = useMemo(() => [...titles].sort(), [titles]);\n  return sorted.join(', ');\n}\n"
+      }
+    }
+  ],
+  "pass-multi-package": [
+    { "rename": { "from": "src", "to": "apps/mobile/src" } },
+    { "rename": { "from": "app.config.ts", "to": "apps/mobile/app.config.ts" } },
+    { "rename": { "from": "tsconfig.json", "to": "apps/mobile/tsconfig.json" } },
+    { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+    {
+      "write": {
+        "file": "package.json",
+        "content": "{\n  \"name\": \"tasks-workspace\",\n  \"private\": true,\n  \"workspaces\": [\"apps/*\", \"packages/*\"]\n}\n"
+      }
+    },
+    {
+      "write": {
+        "file": "packages/kit/package.json",
+        "content": "{\n  \"name\": \"@acme/kit\",\n  \"private\": true\n}\n"
+      }
+    },
+    {
+      "write": {
+        "file": "packages/kit/src/clamp.ts",
+        "content": "// packages/kit/src/clamp.ts\nexport function clamp(value: number, min: number, max: number): number {\n  return Math.min(Math.max(value, min), max);\n}\n"
+      }
+    },
+    {
+      "write": {
+        "file": "apps/mobile/ios/Pods/use-planted.ts",
+        "content": "import { useMemo } from 'react';\n\nexport const usePlanted = (): number => useMemo(() => 1, []);\n"
+      }
+    },
+    {
+      "write": {
+        "file": "apps/mobile/android/app/build/use-planted.ts",
+        "content": "import { useMemo } from 'react';\n\nexport const usePlanted = (): number => useMemo(() => 1, []);\n"
+      }
+    }
+  ],
+  "pass-scrollview-bounded": [
+    {
+      "write": {
+        "file": "src/features/settings/settings-sections.tsx",
+        "content": "// src/features/settings/settings-sections.tsx: lists whose length is fixed by definition.\nimport { ScrollView, View } from 'react-native';\n\nimport { AppText } from '@/ui/app-text';\n\nimport type { ReactNode } from 'react';\n\nconst SECTIONS = ['general', 'notifications', 'about'] as const;\nconst LABELS = { general: 'General', about: 'About' } as const;\n\nexport type SettingsSectionsProps = {\n  readonly values: readonly number[];\n  readonly testID: string;\n  readonly renderChart: (points: readonly number[]) => ReactNode;\n};\n\nexport function SettingsSections({ values, testID, renderChart }: SettingsSectionsProps): ReactNode {\n  return (\n    <View testID={testID}>\n      <ScrollView testID={`${testID}.list`}>\n        {SECTIONS.map((section) => (\n          <View key={section} testID={`${testID}.${section}`} />\n        ))}\n        {Object.entries(LABELS).map(([key, label]) => (\n          <AppText key={key}>{label}</AppText>\n        ))}\n        {Array.from({ length: 3 }, (_, index) => (\n          <View key={index} />\n        ))}\n        {renderChart(values.map((value) => value * 2))}\n      </ScrollView>\n      <ScrollView testID={`${testID}.empty`} />\n    </View>\n  );\n}\n"
+      }
+    }
+  ],
+  "pass-strings-and-comments": [
+    {
+      "write": {
+        "file": "src/features/tasks/tasks-store-guard.tsx",
+        "content": "// src/features/tasks/tasks-store-guard.tsx: rule words inside strings and comments are not code.\n// useTasksStore() without a selector, Date.now() and isRTL are only mentioned here.\nimport type { ReactNode } from 'react';\n\nexport function TasksStoreGuard({ store }: { readonly store: object | null }): ReactNode {\n  if (store === null) throw new Error('useTasksStore() needs a provider; Date.now() and isRTL are not read here');\n  return null;\n}\n"
+      }
+    }
+  ],
+  "pass-use-no-memo-with-test": [
+    {
+      "write": {
+        "file": "src/features/tasks/components/task-probe.tsx",
+        "content": "// src/features/tasks/components/task-probe.tsx\n// use-no-memo-test: sorts open tasks before done ones\nimport type { ReactNode } from 'react';\n\nexport function TaskProbe(): ReactNode {\n  'use no memo';\n  return null;\n}\n"
+      }
+    }
+  ],
+  "pass-whole-repo-scan": {
+    "args": "{dir} --src .",
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/demo/SKILL.md",
+          "content": "---\nname: demo\ndescription: An installed skill; its fixtures plant bugs on purpose.\n---\n"
+        }
+      },
+      {
+        "write": {
+          "file": ".agents/skills/demo/tests/fixtures/bad/src/use-planted.ts",
+          "content": "import { useMemo } from 'react';\n\nexport const usePlanted = (): number => useMemo(() => 1, []);\n"
+        }
+      },
+      {
+        "write": {
+          "file": "skills/demo-skill/templates/src/use-planted.ts",
+          "content": "import { useMemo } from 'react';\n\nexport const usePlanted = (): number => useMemo(() => 1, []);\n"
+        }
+      },
+      {
+        "write": {
+          "file": "ios/Generated/use-planted.ts",
+          "content": "import { useMemo } from 'react';\n\nexport const usePlanted = (): number => useMemo(() => 1, []);\n"
+        }
+      },
+      {
+        "write": {
+          "file": "android/app/build/use-planted.ts",
+          "content": "import { useMemo } from 'react';\n\nexport const usePlanted = (): number => useMemo(() => 1, []);\n"
+        }
+      },
+      {
+        "write": {
+          "file": "node_modules/some-lib/use-planted.ts",
+          "content": "import { useMemo } from 'react';\n\nexport const usePlanted = (): number => useMemo(() => 1, []);\n"
+        }
+      }
+    ]
+  }
+}

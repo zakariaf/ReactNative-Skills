@@ -1,0 +1,7 @@
+{
+  "reminders.channel.reminders.description": "Reminders you set for your tasks",
+  "reminders.channel.reminders.name": "Reminders",
+  "reminders.notification.body": "Time for “{labelText}”",
+  "reminders.notification.body-unlabelled": "It is time for the reminder you set.",
+  "reminders.notification.title": "Task reminder"
+}

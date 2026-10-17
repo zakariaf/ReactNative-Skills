@@ -1,0 +1,195 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "The shape of the repo-owned contracts/naming.json (template: templates/contracts/naming.json). scripts/lib/naming-scope.mjs enforces the same shape: an unknown key or a wrong type is exit 2.",
+  "title": "naming contract",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$comment": {
+      "type": "string"
+    },
+    "pathHeader": {
+      "type": "boolean",
+      "default": true,
+      "description": "Line 1 of every .ts/.tsx/.js/.mjs/.cjs file is // <repo-relative path> (line 2 after a #! line). false turns the path-header rule off."
+    },
+    "slugMatchesAppFolder": {
+      "type": "boolean",
+      "default": false,
+      "description": "Multi-package only: true makes app-id fail when an app workspace's slug differs from its folder (apps/planner with slug 'planner'). Turn it on only for a new repo or one whose folders already match; never change an existing slug to satisfy it (the slug names the EAS project)."
+    },
+    "locales": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z]{2,3}(-[A-Z][a-z]{3})?(-([A-Z]{2}|[0-9]{3}))?$"
+      },
+      "description": "The app's locales; each catalog is src/i18n/catalogs/<locale>.json. Absent: any BCP 47 tag is accepted."
+    },
+    "keyAreas": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+      },
+      "description": "First segments a message key may start with besides a feature folder name. The template's app, common, date, errors, permissions and reminders match the i18n-strings-and-catalogs catalogs (app.name, date.*, permissions.<topic>.usage-description, and reminders.next in its date-formatting example); crash matches the crash screen error-handling-typed-results ships (crash.title). Absent: key namespaces are not checked."
+    },
+    "allowedIndexFiles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Repo-relative index.ts(x) files a tool requires by name (route index files and a root entry are always allowed)."
+    },
+    "nodeCode": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Globs of src/ files that run only in Node or on the server outside the detected places (API routes <name>+api.ts, +middleware.ts and src/server/ are server code already), such as a module only app.config.ts imports: they may read any env variable."
+    },
+    "extraTestIdRoles": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+      },
+      "description": "Role words a pressable's testID element may end in, besides the library's list (button, row, switch, input, ...)."
+    },
+    "extraE2eFolders": {
+      "type": "array",
+      "description": "Folders inside the e2e folder (.maestro/) that hold flows CI does not run: a screenshot matrix, StoreKit tests run by their own script, a by-hand checklist. flow-file accepts kebab-case YAML directly inside each one; every other flow lives in flows/<area>/ (what CI runs) or subflows/.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "folder",
+          "why"
+        ],
+        "properties": {
+          "folder": {
+            "type": "string",
+            "pattern": "^(?!(flows|subflows)(/|$))[a-z0-9]+(-[a-z0-9]+)*(/[a-z0-9]+(-[a-z0-9]+)*)*$",
+            "description": "The folder relative to the e2e folder, e.g. screenshots."
+          },
+          "why": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Who runs these flows and when, e.g. run only by npm run screenshots:ios."
+          }
+        }
+      }
+    },
+    "canonical": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Type names exported from <kebab-name>.ts that are never renamed (ports, SqlDriver)."
+        },
+        "npmScripts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Root npm scripts CI, hooks and docs call by name."
+        },
+        "envVars": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Env variables the build or the app reads (APP_VARIANT, EXPO_PUBLIC_API_URL)."
+        }
+      }
+    },
+    "storeProductIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9_.]*$",
+        "maxLength": 40
+      },
+      "description": "App Store and Google Play product ids, each <app id>.<product>. A product that already exists with another shape goes in publishedProductIds too."
+    },
+    "publishedAppIds": {
+      "type": "array",
+      "description": "iOS bundle ids and Android packages that are already live on a store and therefore permanent. app-id accepts each as it is for its platform (a capital letter, an underscore, different ids on the two platforms) and still checks every other id, including variant ids. Add an entry only after the developer confirms the id is live.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "platform",
+          "why"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "platform": {
+            "enum": [
+              "ios",
+              "android",
+              "both"
+            ]
+          },
+          "why": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Where and since when it is live, e.g. live on the App Store since 2023."
+          }
+        }
+      }
+    },
+    "publishedSlugs": {
+      "type": "array",
+      "description": "Slugs that already name an EAS project (its builds, updates and credentials) and therefore stay. app-id accepts each as it is.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "slug",
+          "why"
+        ],
+        "properties": {
+          "slug": {
+            "type": "string",
+            "minLength": 1
+          },
+          "why": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "publishedProductIds": {
+      "type": "array",
+      "description": "Store product ids that already exist on the App Store or Google Play and therefore never change. product-id accepts each as it is (list it in storeProductIds too).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "why"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "why": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,2 @@
+FAIL reports/rebaseline/inspection.json:4 [inspection-record]
+verdict "regression" is not a yes

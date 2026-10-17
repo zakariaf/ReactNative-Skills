@@ -1,0 +1,130 @@
+{
+ "appId": "com.example.tasks",
+ "appVersion": "1.0.0",
+ "buildNumber": "12",
+ "platform": "ios",
+ "osVersion": "26.5",
+ "deviceModel": "iPhone17,1",
+ "entries": [
+  {
+   "kind": "cold-start",
+   "label": "tasks",
+   "atEpochMs": 1790430000000,
+   "build": "12",
+   "data": {
+    "nativeMs": 520,
+    "jsMs": 300,
+    "totalMs": 820,
+    "prewarmed": false
+   }
+  },
+  {
+   "kind": "cold-start",
+   "label": "tasks",
+   "atEpochMs": 1790430000001,
+   "build": "12",
+   "data": {
+    "nativeMs": 490,
+    "jsMs": 300,
+    "totalMs": 790,
+    "prewarmed": false
+   }
+  },
+  {
+   "kind": "cold-start",
+   "label": "tasks",
+   "atEpochMs": 1790430000002,
+   "build": "12",
+   "data": {
+    "nativeMs": 545,
+    "jsMs": 300,
+    "totalMs": 845,
+    "prewarmed": false
+   }
+  },
+  {
+   "kind": "cold-start",
+   "label": "tasks",
+   "atEpochMs": 1790430000003,
+   "build": "12",
+   "data": {
+    "nativeMs": 501,
+    "jsMs": 300,
+    "totalMs": 801,
+    "prewarmed": false
+   }
+  },
+  {
+   "kind": "cold-start",
+   "label": "tasks",
+   "atEpochMs": 1790430000004,
+   "build": "12",
+   "data": {
+    "nativeMs": 530,
+    "jsMs": 300,
+    "totalMs": 830,
+    "prewarmed": false
+   }
+  },
+  {
+   "kind": "frames",
+   "label": "tasks/list-scroll",
+   "atEpochMs": 1790430100000,
+   "build": "12",
+   "data": {
+    "frames": 1440,
+    "seconds": 12.1,
+    "refreshHz": 120,
+    "p50UpToMs": 9,
+    "p95UpToMs": 17,
+    "maxMs": 41,
+    "hitchMsPerS": 3.2,
+    "buckets": [
+     1300,
+     110,
+     20,
+     7,
+     3,
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "kind": "frames",
+   "label": "tasks/complete-animation",
+   "atEpochMs": 1790430100000,
+   "build": "12",
+   "data": {
+    "frames": 1440,
+    "seconds": 12.1,
+    "refreshHz": 120,
+    "p50UpToMs": 9,
+    "p95UpToMs": 17,
+    "maxMs": 41,
+    "hitchMsPerS": 6.4,
+    "buckets": [
+     1300,
+     110,
+     20,
+     7,
+     3,
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "kind": "storage-benchmark",
+   "label": "storage-write",
+   "atEpochMs": 1790430200000,
+   "build": "12",
+   "data": {
+    "p50": 0.4,
+    "p95": 0.9,
+    "max": 2.1,
+    "writes": 300
+   }
+  }
+ ]
+}

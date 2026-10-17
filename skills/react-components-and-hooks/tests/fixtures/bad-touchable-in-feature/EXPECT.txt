@@ -1,0 +1,3 @@
+[banned-import] imports TouchableOpacity outside the UI primitives folder
+src/features/tasks/components/old-button.tsx:2
+RESULT: FAIL (1 problems)

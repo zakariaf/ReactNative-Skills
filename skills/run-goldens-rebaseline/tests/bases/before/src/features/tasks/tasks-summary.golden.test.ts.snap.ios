@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`summarizeTasks goldens summarizes the sample list 1`] = `"tasks 1 open 1 done 0"`;

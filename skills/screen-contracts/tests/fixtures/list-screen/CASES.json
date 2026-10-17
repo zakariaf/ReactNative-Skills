@@ -1,0 +1,185 @@
+{
+  "bad-contract-invalid": {
+    "expect": ["[contract-invalid] screen \"lists\" lists lists.empty-title twice for the same state"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 1, "elements", 5, "testID"],
+          "value": "lists.empty-title"
+        }
+      }
+    ]
+  },
+  "bad-reference-image-missing": {
+    "expect": ["[reference-image-missing] lists state \"empty\" names design/screens/lists-empty.png"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 1, "states", 1, "reference"],
+          "value": "lists-empty.png"
+        }
+      }
+    ]
+  },
+  "bad-retired-copy-key": {
+    "expect": ["[retired-copy-key] lists lists.error-note still shows the retired key \"lists.error.body\""],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["policies", "retiredKeys"],
+          "value": { "lists.error.body": "lists.error.message" }
+        }
+      }
+    ]
+  },
+  "bad-unknown-copy-key": {
+    "expect": ["[unknown-copy-key] lists lists.retry-button shows \"lists.retry-button.lable\""],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 1, "elements", 7, "text"],
+          "value": "lists.retry-button.lable"
+        }
+      }
+    ]
+  },
+  "error-all-no-contract": {
+    "expect": ["ERROR [bad-input] nothing to check: contracts/screens.json does not exist"],
+    "args": "{dir} --all",
+    "ops": [{ "delete": "contracts/screens.json" }]
+  },
+  "error-no-contract": {
+    "expect": ["ERROR [bad-input] nothing to check: contracts/screens.json does not exist"],
+    "ops": [{ "delete": "contracts/screens.json" }]
+  },
+  "error-no-target": { "expect": ["ERROR [bad-input] name a screen (--screen lists) or pass --all"], "args": "{dir}" },
+  "error-unknown-lang": {
+    "expect": ["ERROR [bad-input] no catalog for \"fr\""],
+    "args": "{dir} --screen lists --lang fr"
+  },
+  "pass-all": {
+    "expect": [
+      "lists (route): 8 testIDs, 3 states",
+      "delete-list-dialog (dialog): 6 testIDs, 1 states",
+      "list-screen: 3 screens checked, 0 problems"
+    ],
+    "args": "{dir} --all"
+  },
+  "pass-catalog-missing": {
+    "expect": [
+      "SKIP src/i18n/catalogs/en.json [unknown-copy-key] not yet created (i18n-strings-and-catalogs creates it)",
+      "\"(missing)\""
+    ],
+    "ops": [{ "delete": "src/i18n/catalogs/en.json" }]
+  },
+  "pass-derived-parts": {
+    "expect": [
+      "lists.summary-card.title | text | AppText |  |  | default | SummaryCard from lists.summary-card | crop-only in lists.summary-card",
+      "lists.summary-card.value | text | AppText |  |  | default | SummaryCard from lists.summary-card | crop-only in lists.summary-card (hidden from screen readers)",
+      "lists.sort-control.{sortKey} | tab | SegmentedControl |  |  | default | SegmentedControl from lists.sort-control (keyed by data) | bounds"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["components"],
+          "value": {
+            "SummaryCard": { "parts": ["title", "value"] },
+            "SegmentedControl": { "parts": ["label"], "keyed": true }
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 1, "elements", 8],
+          "value": { "testID": "lists.summary-card", "role": "none", "component": "SummaryCard", "states": ["default"] }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 1, "elements", 9],
+          "value": {
+            "testID": "lists.summary-card.title",
+            "role": "text",
+            "component": "AppText",
+            "states": ["default"],
+            "parent": "lists.summary-card"
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 1, "elements", 10],
+          "value": {
+            "testID": "lists.summary-card.value",
+            "role": "text",
+            "component": "AppText",
+            "states": ["default"],
+            "a11yHidden": true,
+            "coveredBy": "lists.summary-card"
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 1, "elements", 11],
+          "value": {
+            "testID": "lists.sort-control",
+            "role": "tablist",
+            "component": "SegmentedControl",
+            "states": ["default"]
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 1, "elements", 12],
+          "value": {
+            "testID": "lists.sort-control.{sortKey}",
+            "role": "tab",
+            "component": "SegmentedControl",
+            "states": ["default"]
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 1, "elements", 13],
+          "value": {
+            "testID": "lists.sort-control.{sortKey}.label",
+            "role": "text",
+            "component": "AppText",
+            "states": ["default"]
+          }
+        }
+      }
+    ]
+  },
+  "pass-lang": {
+    "expect": ["lists.retry-button | button | PressableSurface | lists.retry-button.label | \"حاول مرة أخرى\""],
+    "args": "{dir} --screen lists --lang ar"
+  },
+  "pass-reference-image": {
+    "expect": ["states: default -> design/screens/lists-default.png"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/screens.json",
+          "path": ["screens", 1, "states", 0, "reference"],
+          "value": "lists-default.png"
+        }
+      },
+      { "png": { "files": ["design/screens/lists-default.png"], "width": 40, "height": 80, "fill": "#ffffff" } }
+    ]
+  }
+}

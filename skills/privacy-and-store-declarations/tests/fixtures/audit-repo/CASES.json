@@ -1,0 +1,1270 @@
+{
+  "bad-account-deletion-missing": {
+    "expect": ["[store-answer]", "contracts/auth.json creates accounts, but accountDeletion is null"],
+    "ops": [
+      { "json": { "file": "contracts/privacy.json", "path": ["accountDeletion"], "value": null, "literalNull": true } }
+    ]
+  },
+  "bad-account-deletion-placeholder": {
+    "expect": ["[store-answer]", "accountDeletion.webUrl \"https://example.com/delete\" is not a real https link"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["accountDeletion", "webUrl"],
+          "value": "https://example.com/delete"
+        }
+      }
+    ]
+  },
+  "bad-account-signals-no-auth-contract": {
+    "expect": [
+      "[store-answer]",
+      "contracts/privacy.json",
+      "the contract shows accounts (app collects email-address for account-management; app collects user-id), but accountDeletion is null and contracts/auth.json does not say whether the app creates accounts",
+      "Users can request that their data is deleted: unknown: confirm whether the app has accounts",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "args": "{dir} --answers",
+    "ops": [
+      { "delete": "contracts/auth.json" },
+      { "json": { "file": "contracts/privacy.json", "path": ["accountDeletion"], "value": null, "literalNull": true } }
+    ]
+  },
+  "bad-aliased-fetch": {
+    "expect": ["[network-global]", "src/features/tasks/use-tasks-model.ts:5", "fetch taken as a value"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "  return { load: () => api.request('/tasks') };",
+          "with": "  const send = globalThis.fetch;\n  void send;\n  return { load: () => api.request('/tasks') };"
+        }
+      }
+    ]
+  },
+  "bad-aliased-websocket": {
+    "expect": ["[network-global]", "src/features/tasks/use-tasks-model.ts:5", "WebSocket taken as a value"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "  return { load: () => api.request('/tasks') };",
+          "with": "  const Socket = WebSocket;\n  void Socket;\n  return { load: () => api.request('/tasks') };"
+        }
+      }
+    ]
+  },
+  "bad-answer-collected-undeclared": {
+    "expect": [
+      "[permission-answer]",
+      "permissionAnswers[\"camera\"] says photos-or-videos is collected, but no collects row declares it"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["permissionAnswers", "camera"],
+          "value": "collected: photos-or-videos"
+        }
+      }
+    ]
+  },
+  "bad-app-tracks": {
+    "expect": ["[store-answer]", "app.collects user-id is marked tracking"],
+    "ops": [{ "json": { "file": "contracts/privacy.json", "path": ["app", "collects", 1, "tracking"], "value": true } }]
+  },
+  "bad-apple-sign-in-no-deletion": {
+    "expect": [
+      "[store-answer]",
+      "the contract shows accounts (sign-in package expo-apple-authentication), but accountDeletion is null",
+      "Users can request that their data is deleted: unknown: confirm whether the app has accounts (sign-in package expo-apple-authentication)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "args": "{dir} --answers",
+    "ops": [
+      { "delete": "contracts/auth.json" },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-apple-authentication"], "value": "~57.0.2" } },
+      { "json": { "file": "contracts/privacy.json", "path": ["app", "collects"], "value": [] } },
+      { "json": { "file": "contracts/privacy.json", "path": ["accountDeletion"], "value": null, "literalNull": true } },
+      {
+        "write": {
+          "file": "src/features/sign-in/apple-sign-in-button.tsx",
+          "lines": [
+            "// src/features/sign-in/apple-sign-in-button.tsx",
+            "import * as AppleAuthentication from 'expo-apple-authentication';",
+            "",
+            "export const isAppleSignInAvailable = (): Promise<boolean> => AppleAuthentication.isAvailableAsync();"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-banned-pod": {
+    "expect": ["[banned-pod]", "ios/Podfile.lock:15", "FirebaseAnalytics (Firebase / Google Analytics)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "ios/Podfile.lock",
+          "find": "    - openiap\n",
+          "with": "    - openiap\n    - FirebaseAnalytics\n"
+        }
+      }
+    ]
+  },
+  "bad-baseline-first-party": {
+    "expect": ["[baseline]", "js entry \"src/features/tasks/use-tasks-model.ts\" is first-party code"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/network-baseline.json",
+          "path": ["js", "src/features/tasks/use-tasks-model.ts"],
+          "value": { "categories": ["fetch"], "reason": "loads the task list from the server" }
+        }
+      }
+    ]
+  },
+  "bad-baseline-no-reason": {
+    "expect": ["[baseline]", "contracts/network-baseline.json", "js entry \"expo\" has no categories or no real reason"],
+    "ops": [
+      { "json": { "file": "contracts/network-baseline.json", "path": ["js", "expo", "reason"], "value": "unused" } }
+    ]
+  },
+  "bad-baseline-not-gated": {
+    "expect": ["[gated-paths]", "quality-gates.json", "gatedPaths does not cover contracts/network-baseline.json"],
+    "ops": [
+      {
+        "json": {
+          "file": "quality-gates.json",
+          "path": ["gatedPaths"],
+          "value": ["quality-gates.json", "contracts/privacy.json"]
+        }
+      }
+    ]
+  },
+  "bad-contract-missing": {
+    "expect": ["[contract]", "contracts/privacy.json", "missing: the app declares no network profile"],
+    "ops": [{ "delete": "contracts/privacy.json" }]
+  },
+  "bad-contract-offline-modules": {
+    "expect": ["[contract]", "the offline-only profile allows no first-party network module"],
+    "ops": [
+      { "json": { "file": "contracts/privacy.json", "path": ["profile"], "value": "offline-only" } },
+      { "json": { "file": "contracts/dependency-policy.json", "path": ["profiles"], "value": ["offline-only"] } },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    slug: 'tasks',",
+          "with": "    slug: 'tasks',\n    updates: { enabled: false },"
+        }
+      },
+      { "json": { "file": "contracts/privacy.json", "path": ["app", "collects"], "value": [] } },
+      { "json": { "file": "contracts/auth.json", "path": ["createsAccounts"], "value": false } },
+      { "delete": "src/api" },
+      { "json": { "file": "contracts/privacy.json", "path": ["linkFiles"], "value": ["src/config/external-links.ts"] } },
+      { "json": { "file": "contracts/privacy.json", "path": ["networkModules"], "value": ["src/services/sync/*.ts"] } },
+      { "json": { "file": "contracts/e2e.json", "path": ["network"], "value": { "mode": "offline-only" } } }
+    ]
+  },
+  "bad-contract-unknown-type": {
+    "expect": [
+      "[contract]",
+      "contracts/privacy.json",
+      "sdks[\"react-native-google-mobile-ads\"].collects[3].type \"crash-logs\" is not a known data type"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["sdks", "react-native-google-mobile-ads", "collects", 3, "type"],
+          "value": "crash-logs"
+        }
+      }
+    ]
+  },
+  "bad-declared-not-installed": {
+    "expect": ["[sdk-inventory]", "contracts/privacy.json", "sdks[\"expo-iap\"] is declared but not installed"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-iap"], "delete": true } },
+      { "json": { "file": "package-lock.json", "path": ["packages", "node_modules/expo-iap"], "delete": true } },
+      { "replace": { "file": "app.config.ts", "find": "      'expo-iap',\n", "with": "" } },
+      { "replace": { "file": "ios/Podfile.lock", "find": "    - openiap\n", "with": "" } }
+    ]
+  },
+  "bad-deletion-route-mismatch": {
+    "expect": [
+      "[store-answer]",
+      "accountDeletion.inApp src/app/(app)/delete-account.tsx differs from contracts/auth.json accountDeletionRoute src/app/(app)/settings/delete-account.tsx",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/auth.json",
+          "path": ["accountDeletionRoute"],
+          "value": "src/app/(app)/settings/delete-account.tsx"
+        }
+      }
+    ]
+  },
+  "bad-deletion-route-missing-no-auth": {
+    "expect": [
+      "[store-answer]",
+      "accountDeletion.inApp src/app/(app)/remove-account.tsx does not exist",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      { "delete": "contracts/auth.json" },
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["accountDeletion", "inApp"],
+          "value": "src/app/(app)/remove-account.tsx"
+        }
+      }
+    ]
+  },
+  "bad-deny-rules": {
+    "expect": ["[deny-rules]", ".claude/settings.json", "permissions.deny lacks Read(**/*.keystore)"],
+    "ops": [
+      {
+        "json": {
+          "file": ".claude/settings.json",
+          "path": ["permissions", "deny"],
+          "value": [
+            "Read(**/*.p8)",
+            "Read(**/AuthKey_*)",
+            "Read(**/*.p12)",
+            "Read(**/*.mobileprovision)",
+            "Read(**/*.jks)",
+            "Read(**/credentials.json)"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-deny-service-account": {
+    "expect": ["[deny-rules]", ".claude/settings.json", "permissions.deny lacks Read(**/*service-account*.json)"],
+    "ops": [
+      {
+        "json": {
+          "file": ".claude/settings.json",
+          "path": ["permissions", "deny"],
+          "value": [
+            "Read(**/*.p8)",
+            "Read(**/AuthKey_*)",
+            "Read(**/*.p12)",
+            "Read(**/*.mobileprovision)",
+            "Read(**/*.keystore)",
+            "Read(**/*.jks)",
+            "Read(**/credentials.json)",
+            "Read(**/key.properties)",
+            "Read(**/keystore.properties)"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-destructured-global": {
+    "expect": [
+      "[network-global]",
+      "src/features/tasks/use-tasks-model.ts:5",
+      "WebSocket taken as a value",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "  return { load: () => api.request('/tasks') };",
+          "with": "  const { WebSocket: Ws } = globalThis;\n  void Ws;\n  return { load: () => api.request('/tasks') };"
+        }
+      }
+    ]
+  },
+  "bad-e2e-mode-off": {
+    "expect": [
+      "[runtime-proof]",
+      "contracts/e2e.json",
+      "network.mode is \"off\", but the api-port profile needs \"allowlist\" or \"offline-only\""
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/e2e.json",
+          "path": ["network"],
+          "value": { "mode": "off", "why": "not set up yet" }
+        }
+      }
+    ]
+  },
+  "bad-expo-fetch-alias": {
+    "expect": [
+      "[network-call]",
+      "src/features/tasks/sync-tasks.ts:2",
+      "imports the request client expo/fetch outside the network seam"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/sync-tasks.ts",
+          "content": "// src/features/tasks/sync-tasks.ts\nimport { fetch as get } from 'expo/fetch';\n\nexport const syncTasks = (path: string): Promise<Response> => get(path);\n"
+        }
+      }
+    ]
+  },
+  "bad-fetch-global-member": {
+    "expect": [
+      "[network-call]",
+      "src/features/tasks/use-tasks-model.ts:5",
+      "src/features/tasks/use-tasks-model.ts:6",
+      "fetch() outside the network seam"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "  return { load: () => api.request('/tasks') };",
+          "with": "  void globalThis.fetch('/a.json');\n  void window?.fetch('/b.json');\n  return { load: () => api.request('/tasks') };"
+        }
+      }
+    ]
+  },
+  "bad-fetch-in-feature": {
+    "expect": ["[network-call]", "src/features/tasks/use-tasks-model.ts:5", "fetch() outside the network seam"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "  return { load: () => api.request('/tasks') };",
+          "with": "  void fetch('/tasks.json');\n  return { load: () => api.request('/tasks') };"
+        }
+      }
+    ]
+  },
+  "bad-file-transfer-in-feature": {
+    "expect": [
+      "[network-call]",
+      "src/features/tasks/attach-photo.ts:5",
+      "a file transfer (expo-file-system) outside the network seam"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/attach-photo.ts",
+          "content": "// src/features/tasks/attach-photo.ts\nimport { File, Paths } from 'expo-file-system';\n\nexport const attachPhoto = (url: string): Promise<File> =>\n  File.downloadFileAsync(url, Paths.cache);\n"
+        }
+      }
+    ]
+  },
+  "bad-gitignore": {
+    "expect": ["[gitignore-secrets]", ".gitignore", "does not ignore *.keystore"],
+    "ops": [{ "replace": { "file": ".gitignore", "find": "*.keystore\n", "with": "" } }]
+  },
+  "bad-global-fetch-bracket": {
+    "expect": ["[network-call]", "src/features/tasks/use-tasks-model.ts:5"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "  return { load: () => api.request('/tasks') };",
+          "with": "  void globalThis['fetch']('/tasks.json');\n  return { load: () => api.request('/tasks') };"
+        }
+      }
+    ]
+  },
+  "bad-gradle-firebase": {
+    "expect": [
+      "[vendor-maven]",
+      "android-deps.txt:19",
+      "com.google.firebase:firebase-analytics (Firebase Analytics, Crashlytics or Performance)",
+      "by artifact"
+    ],
+    "args": "{dir} --gradle-deps {dir}/android-deps.txt",
+    "ops": [
+      {
+        "replace": {
+          "file": "android-deps.txt",
+          "find": "\\--- project :expo-iap",
+          "with": "+--- com.google.firebase:firebase-analytics:23.0.0\n\\--- project :expo-iap"
+        }
+      }
+    ]
+  },
+  "bad-gradle-measurement-undeclared": {
+    "expect": [
+      "[vendor-maven]",
+      "android-deps.txt:6",
+      "com.google.android.gms:play-services-measurement-sdk-api (Google Analytics for Firebase)"
+    ],
+    "args": "{dir} --gradle-deps {dir}/android-deps.txt",
+    "ops": [
+      {
+        "replace": {
+          "file": "contracts/privacy.json",
+          "find": "        \"com.google.android.gms:play-services-measurement-sdk-api\",\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-gradle-push-undeclared": {
+    "expect": [
+      "[vendor-maven]",
+      "com.google.firebase:firebase-messaging (Firebase)",
+      "com.google.firebase:firebase-installations (Firebase)"
+    ],
+    "args": "{dir} --gradle-deps {dir}/android-deps.txt",
+    "ops": [
+      { "json": { "file": "contracts/privacy.json", "path": ["sdks", "expo-notifications", "maven"], "delete": true } }
+    ]
+  },
+  "bad-guard-in-feature": {
+    "expect": ["[network-guard-import]", "src/features/tasks/use-tasks-model.ts:2"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "import type { ApiClient } from '@/api/api-client';",
+          "with": "import { installNetworkGuard } from '@/services/test-hooks/network-guard';\nimport type { ApiClient } from '@/api/api-client';"
+        }
+      }
+    ]
+  },
+  "bad-iap-server-purchase-history": {
+    "expect": [
+      "[store-answer]",
+      "allows server APIs (allowedApis), but sdks[\"expo-iap\"] does not collect purchase-history"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/in-app-purchases.json",
+          "path": ["allowedApis"],
+          "value": ["verifyPurchaseWithProvider"]
+        }
+      }
+    ]
+  },
+  "bad-keystore-file": {
+    "expect": ["[secret-file]", "keys/release.keystore"],
+    "ops": [{ "write": { "file": "keys/release.keystore", "content": "planted: stands in for a signing keystore\n" } }]
+  },
+  "bad-local-module-reason": {
+    "expect": [
+      "[required-reason]",
+      "modules/device-facts/ios/DeviceFactsModule.swift:10",
+      "uses activeInputModes (NSPrivacyAccessedAPICategoryActiveKeyboards)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "modules/device-facts/ios/DeviceFactsModule.swift",
+          "lines": [
+            "import ExpoModulesCore",
+            "",
+            "public class DeviceFactsModule: Module {",
+            "  public func definition() -> ModuleDefinition {",
+            "    Name(\"DeviceFacts\")",
+            "    Function(\"freeBytes\") { () -> Int64 in",
+            "      let values = try? URL(fileURLWithPath: NSHomeDirectory()).resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey])",
+            "      return values?.volumeAvailableCapacityForImportantUsage ?? 0",
+            "    }",
+            "    Function(\"keyboards\") { () -> Int in UITextInputMode.activeInputModes.count }",
+            "    Function(\"lastLaunch\") { () -> Double in UserDefaults.standard.double(forKey: \"lastLaunch\") }",
+            "  }",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-manifest-missing": {
+    "expect": ["[privacy-manifest]", "src/config/privacy-manifest.ts", "missing"],
+    "ops": [{ "delete": ["src/config/privacy-manifest.ts", "src/config/privacy-manifest.test.ts"] }]
+  },
+  "bad-manifest-missing-reason": {
+    "expect": [
+      "[required-reason]",
+      "src/config/privacy-manifest.ts",
+      "NSPrivacyAccessedAPICategorySystemBootTime 35F9.1 is not declared, but react-native"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/privacy-manifest.ts",
+          "find": "NSPrivacyAccessedAPITypeReasons: ['35F9.1'],",
+          "with": "NSPrivacyAccessedAPITypeReasons: [],"
+        }
+      }
+    ]
+  },
+  "bad-manifest-not-wired": {
+    "expect": ["[privacy-manifest]", "app.config.ts", "ios.privacyManifests is not set from PRIVACY_MANIFESTS"],
+    "ops": [
+      { "replace": { "file": "app.config.ts", "find": ", privacyManifests: PRIVACY_MANIFESTS", "with": "" } },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "import { PRIVACY_MANIFESTS } from './src/config/privacy-manifest.ts';\n\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-manifest-tracking-domains": {
+    "expect": ["[privacy-manifest]", "src/config/privacy-manifest.ts", "NSPrivacyTrackingDomains lists domains"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/privacy-manifest.ts",
+          "find": "  NSPrivacyTracking: false,",
+          "with": "  NSPrivacyTracking: false,\n  NSPrivacyTrackingDomains: ['ads.acme.test'],"
+        }
+      }
+    ]
+  },
+  "bad-manifest-tracking-true": {
+    "expect": ["[privacy-manifest]", "NSPrivacyTracking is not false"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/privacy-manifest.ts",
+          "find": "  NSPrivacyTracking: false,",
+          "with": "  NSPrivacyTracking: true,"
+        }
+      }
+    ]
+  },
+  "bad-missing-script": {
+    "expect": ["[audit-wiring]", "package.json", "scripts[\"audit:privacy\"] is missing"],
+    "ops": [{ "json": { "file": "package.json", "path": ["scripts", "audit:privacy"], "delete": true } }]
+  },
+  "bad-missing-tooling": {
+    "expect": ["[audit-wiring]", "scripts/audit/network-pods-layer.ts", "the audit tooling is incomplete"],
+    "ops": [{ "delete": "scripts/audit/network-pods-layer.ts" }]
+  },
+  "bad-offline-api-call": {
+    "expect": [
+      "[network-call]",
+      "src/services/sync/sync-adapter.ts:2",
+      "the offline-only profile allows no first-party network code"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/privacy.json", "path": ["profile"], "value": "offline-only" } },
+      { "json": { "file": "contracts/dependency-policy.json", "path": ["profiles"], "value": ["offline-only"] } },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    slug: 'tasks',",
+          "with": "    slug: 'tasks',\n    updates: { enabled: false },"
+        }
+      },
+      { "json": { "file": "contracts/privacy.json", "path": ["app", "collects"], "value": [] } },
+      { "json": { "file": "contracts/auth.json", "path": ["createsAccounts"], "value": false } },
+      { "delete": "src/api" },
+      {
+        "write": {
+          "file": "src/services/sync/sync-adapter.ts",
+          "content": "// src/services/sync/sync-adapter.ts\nexport const sync = (): Promise<Response> => fetch('/sync');\n"
+        }
+      },
+      { "json": { "file": "contracts/privacy.json", "path": ["linkFiles"], "value": ["src/config/external-links.ts"] } },
+      { "json": { "file": "contracts/e2e.json", "path": ["network"], "value": { "mode": "offline-only" } } }
+    ]
+  },
+  "bad-offline-ats": {
+    "expect": ["[config-ats]", "app.config.ts:12", "NSAllowsArbitraryLoads is switched on"],
+    "ops": [
+      { "json": { "file": "contracts/privacy.json", "path": ["profile"], "value": "offline-only" } },
+      { "json": { "file": "contracts/dependency-policy.json", "path": ["profiles"], "value": ["offline-only"] } },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    slug: 'tasks',",
+          "with": "    slug: 'tasks',\n    updates: { enabled: false },"
+        }
+      },
+      { "json": { "file": "contracts/privacy.json", "path": ["app", "collects"], "value": [] } },
+      { "json": { "file": "contracts/auth.json", "path": ["createsAccounts"], "value": false } },
+      { "delete": "src/api" },
+      { "json": { "file": "contracts/privacy.json", "path": ["linkFiles"], "value": ["src/config/external-links.ts"] } },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "privacyManifests: PRIVACY_MANIFESTS },",
+          "with": "privacyManifests: PRIVACY_MANIFESTS,\n      infoPlist: { NSAppTransportSecurity: { NSAllowsArbitraryLoads: true } } },"
+        }
+      },
+      { "json": { "file": "contracts/e2e.json", "path": ["network"], "value": { "mode": "offline-only" } } }
+    ]
+  },
+  "bad-offline-config-url": {
+    "expect": ["[remote-url]", "src/config/external-links.ts:2"],
+    "ops": [
+      { "json": { "file": "contracts/privacy.json", "path": ["profile"], "value": "offline-only" } },
+      { "json": { "file": "contracts/dependency-policy.json", "path": ["profiles"], "value": ["offline-only"] } },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    slug: 'tasks',",
+          "with": "    slug: 'tasks',\n    updates: { enabled: false },"
+        }
+      },
+      { "json": { "file": "contracts/privacy.json", "path": ["app", "collects"], "value": [] } },
+      { "json": { "file": "contracts/auth.json", "path": ["createsAccounts"], "value": false } },
+      { "delete": "src/api" },
+      { "json": { "file": "contracts/e2e.json", "path": ["network"], "value": { "mode": "offline-only" } } }
+    ]
+  },
+  "bad-offline-e2e-allowlist": {
+    "expect": [
+      "[runtime-proof]",
+      "contracts/e2e.json",
+      "network.mode is \"allowlist\", but the offline-only profile needs \"offline-only\""
+    ],
+    "ops": [
+      { "json": { "file": "contracts/privacy.json", "path": ["profile"], "value": "offline-only" } },
+      { "json": { "file": "contracts/dependency-policy.json", "path": ["profiles"], "value": ["offline-only"] } },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    slug: 'tasks',",
+          "with": "    slug: 'tasks',\n    updates: { enabled: false },"
+        }
+      },
+      { "json": { "file": "contracts/privacy.json", "path": ["app", "collects"], "value": [] } },
+      { "json": { "file": "contracts/auth.json", "path": ["createsAccounts"], "value": false } },
+      { "delete": "src/api" },
+      { "json": { "file": "contracts/privacy.json", "path": ["linkFiles"], "value": ["src/config/external-links.ts"] } }
+    ]
+  },
+  "bad-offline-policy-missing": {
+    "expect": ["[profile-policy]", "contracts/dependency-policy.json", "does not list the offline-only profile"],
+    "ops": [
+      { "json": { "file": "contracts/privacy.json", "path": ["profile"], "value": "offline-only" } },
+      { "json": { "file": "contracts/dependency-policy.json", "path": ["profiles"], "value": ["offline-only"] } },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    slug: 'tasks',",
+          "with": "    slug: 'tasks',\n    updates: { enabled: false },"
+        }
+      },
+      { "json": { "file": "contracts/privacy.json", "path": ["app", "collects"], "value": [] } },
+      { "json": { "file": "contracts/auth.json", "path": ["createsAccounts"], "value": false } },
+      { "delete": "src/api" },
+      { "json": { "file": "contracts/privacy.json", "path": ["linkFiles"], "value": ["src/config/external-links.ts"] } },
+      { "json": { "file": "contracts/dependency-policy.json", "path": ["profiles"], "value": [] } },
+      { "json": { "file": "contracts/e2e.json", "path": ["network"], "value": { "mode": "offline-only" } } }
+    ]
+  },
+  "bad-offline-updates-on": {
+    "expect": ["[config-updates]", "app.config.ts", "no updates: { enabled: false } in the app config"],
+    "ops": [
+      { "json": { "file": "contracts/privacy.json", "path": ["profile"], "value": "offline-only" } },
+      { "json": { "file": "contracts/dependency-policy.json", "path": ["profiles"], "value": ["offline-only"] } },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    slug: 'tasks',",
+          "with": "    slug: 'tasks',\n    updates: { enabled: false },"
+        }
+      },
+      { "json": { "file": "contracts/privacy.json", "path": ["app", "collects"], "value": [] } },
+      { "json": { "file": "contracts/auth.json", "path": ["createsAccounts"], "value": false } },
+      { "delete": "src/api" },
+      { "json": { "file": "contracts/privacy.json", "path": ["linkFiles"], "value": ["src/config/external-links.ts"] } },
+      { "replace": { "file": "app.config.ts", "find": "    updates: { enabled: false },\n", "with": "" } },
+      { "json": { "file": "contracts/e2e.json", "path": ["network"], "value": { "mode": "offline-only" } } }
+    ]
+  },
+  "bad-offline-updates-plugin": {
+    "expect": ["[config-updates]", "app.config.ts:15", "expo-updates in the build config of an offline-only app"],
+    "ops": [
+      { "json": { "file": "contracts/privacy.json", "path": ["profile"], "value": "offline-only" } },
+      { "json": { "file": "contracts/dependency-policy.json", "path": ["profiles"], "value": ["offline-only"] } },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    slug: 'tasks',",
+          "with": "    slug: 'tasks',\n    updates: { enabled: false },"
+        }
+      },
+      { "json": { "file": "contracts/privacy.json", "path": ["app", "collects"], "value": [] } },
+      { "json": { "file": "contracts/auth.json", "path": ["createsAccounts"], "value": false } },
+      { "delete": "src/api" },
+      { "json": { "file": "contracts/privacy.json", "path": ["linkFiles"], "value": ["src/config/external-links.ts"] } },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "      'expo-router',\n",
+          "with": "      'expo-router',\n      'expo-updates',\n"
+        }
+      },
+      { "json": { "file": "contracts/e2e.json", "path": ["network"], "value": { "mode": "offline-only" } } }
+    ]
+  },
+  "bad-permission-unanswered": {
+    "expect": [
+      "[permission-answer]",
+      "contracts/permissions.json asks for camera, but permissionAnswers has no \"camera\""
+    ],
+    "ops": [{ "json": { "file": "contracts/privacy.json", "path": ["permissionAnswers", "camera"], "delete": true } }]
+  },
+  "bad-pod-git-source": {
+    "expect": ["[pod-source]", "ios/Podfile.lock", "pod RemoteKit comes from a :git source"],
+    "ops": [
+      {
+        "replace": {
+          "file": "ios/Podfile.lock",
+          "find": "    :path: \"../node_modules/react-native-google-mobile-ads\"\n",
+          "with": "    :path: \"../node_modules/react-native-google-mobile-ads\"\n  RemoteKit:\n    :git: https://git.acme.test/remote-kit.git\n"
+        }
+      }
+    ]
+  },
+  "bad-pod-path-outside": {
+    "expect": ["[pod-source]", "pod OutsideKit comes from a :path source (../../outside-kit)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "ios/Podfile.lock",
+          "find": "    :path: \"../node_modules/react-native-google-mobile-ads\"\n",
+          "with": "    :path: \"../node_modules/react-native-google-mobile-ads\"\n  OutsideKit:\n    :path: \"../../outside-kit\"\n"
+        }
+      }
+    ]
+  },
+  "bad-private-key-in-agent-skill": {
+    "expect": ["[private-key]", ".agents/skills/release-notes/references/pasted.txt:1"],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/release-notes/references/pasted.txt",
+          "content": "-----BEGIN EC PRIVATE XKEY-----\nMHcC\n-----END EC PRIVATE XKEY-----\n"
+        }
+      },
+      {
+        "replace": {
+          "file": ".agents/skills/release-notes/references/pasted.txt",
+          "find": "XKEY",
+          "with": "KEY",
+          "all": true
+        }
+      }
+    ]
+  },
+  "bad-private-key-text": {
+    "expect": ["[private-key]", "notes/handover.md:4"],
+    "ops": [{ "plant": { "notes/handover.md": true } }]
+  },
+  "bad-push-token-undeclared": {
+    "expect": [
+      "[store-answer]",
+      "contracts/push.json exists, but sdks[\"expo-notifications\"] does not collect device-id"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/privacy.json", "path": ["sdks", "expo-notifications", "collects"], "value": [] } }
+    ]
+  },
+  "bad-push-token-unlinked": {
+    "expect": ["[store-answer]", "the push token is linked=false, but contracts/push.json requiresAccount is true"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["sdks", "expo-notifications", "collects", 0, "linked"],
+          "value": false
+        }
+      }
+    ]
+  },
+  "bad-remote-image": {
+    "expect": ["[remote-url]", "src/features/tasks/tasks-screen.tsx:5", "remote URL https://cdn.acme.app/empty.png"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "find": "require('@/assets/empty-list.png')",
+          "with": "{ uri: 'https://cdn.acme.app/empty.png' }"
+        }
+      }
+    ]
+  },
+  "bad-second-transport-undeclared": {
+    "expect": ["[network-call]", "src/services/file-transfer/upload-adapter.ts:2"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/file-transfer/upload-adapter.ts",
+          "content": "// src/services/file-transfer/upload-adapter.ts\nexport const upload = (body: string): Promise<Response> => fetch('/upload', { method: 'POST', body });\n"
+        }
+      }
+    ]
+  },
+  "bad-service-account-file": {
+    "expect": ["[secret-file]", "credentials/play-service-account.json"],
+    "ops": [{ "write": { "file": "credentials/play-service-account.json", "content": "{\"type\": \"planted\"}\n" } }]
+  },
+  "bad-sign-in-sdk-no-deletion": {
+    "expect": [
+      "[store-answer]",
+      "the contract shows accounts (sign-in SDK expo-auth-session), but accountDeletion is null",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      { "delete": "contracts/auth.json" },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-auth-session"], "value": "~57.0.3" } },
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["sdks", "expo-auth-session"],
+          "value": { "why": "sign-in with the team's identity provider", "collects": [] }
+        }
+      },
+      { "json": { "file": "contracts/privacy.json", "path": ["app", "collects"], "value": [] } },
+      { "json": { "file": "contracts/privacy.json", "path": ["accountDeletion"], "value": null, "literalNull": true } },
+      {
+        "write": {
+          "file": "src/features/sign-in/use-sign-in-model.ts",
+          "lines": [
+            "// src/features/sign-in/use-sign-in-model.ts",
+            "import * as AuthSession from 'expo-auth-session';",
+            "",
+            "export const signInRedirectUri = (): string => AuthSession.makeRedirectUri();"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-tracking-without-row": {
+    "expect": [
+      "[store-answer]",
+      "sdks[\"react-native-google-mobile-ads\"] tracks but lists no collects row with tracking: true"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["sdks", "react-native-google-mobile-ads", "collects", 0, "tracking"],
+          "value": false
+        }
+      }
+    ]
+  },
+  "bad-transitive-netinfo": {
+    "expect": ["[network-sdk]", "package-lock.json", "@react-native-community/netinfo", "through another package"],
+    "ops": [
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/@react-native-community/netinfo"],
+          "value": { "version": "11.4.1" }
+        }
+      }
+    ]
+  },
+  "bad-undeclared-sdk": {
+    "expect": ["[network-sdk]", "package.json", "@sentry/react-native (crash reporting) is installed but not declared"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "@sentry/react-native"], "value": "~7.11.0" } },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/@sentry/react-native"],
+          "value": { "version": "7.11.0" }
+        }
+      }
+    ]
+  },
+  "bad-unknown-trunk-pod": {
+    "expect": ["[vendor-pod]", "ios/Podfile.lock:15", "trunk pod SomeAnalyticsKit is not brought by a declared SDK"],
+    "ops": [
+      {
+        "replace": {
+          "file": "ios/Podfile.lock",
+          "find": "    - openiap\n",
+          "with": "    - openiap\n    - SomeAnalyticsKit\n"
+        }
+      }
+    ]
+  },
+  "bad-url-in-api": {
+    "expect": ["[remote-url]", "src/api/endpoints.ts:2", "remote URL https://api.acme.app/v1/tasks"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/api/endpoints.ts",
+          "content": "// src/api/endpoints.ts\nexport const TASKS_ENDPOINT = 'https://api.acme.app/v1/tasks';\n"
+        }
+      }
+    ]
+  },
+  "bad-websocket-namespaced": {
+    "expect": ["[network-call]", "src/features/tasks/use-tasks-model.ts:5", "new WebSocket()"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "  return { load: () => api.request('/tasks') };",
+          "with": "  const socket = new globalThis.WebSocket('/live');\n  socket.close();\n  return { load: () => api.request('/tasks') };"
+        }
+      }
+    ]
+  },
+  "bad-workspace-package-sdks": {
+    "expect": [
+      "[network-sdk]",
+      "packages/ui/package.json",
+      "axios (HTTP client) is installed through the workspace package packages/ui/package.json",
+      "react-native-webview (web views and browsers) is installed through the workspace package packages/ui/package.json",
+      "package-lock.json",
+      "@react-native-community/netinfo",
+      "through another package"
+    ],
+    "args": "{dir} --app apps/tasks",
+    "ops": [
+      { "mkdir": "apps/tasks" },
+      { "rename": { "from": "package.json", "to": "apps/tasks/package.json" } },
+      { "rename": { "from": "app.config.ts", "to": "apps/tasks/app.config.ts" } },
+      { "rename": { "from": "contracts", "to": "apps/tasks/contracts" } },
+      { "rename": { "from": "src", "to": "apps/tasks/src" } },
+      { "rename": { "from": "scripts", "to": "apps/tasks/scripts" } },
+      { "rename": { "from": "ios", "to": "apps/tasks/ios" } },
+      { "json": { "file": "apps/tasks/package.json", "path": ["dependencies", "@acme/ui"], "value": "*" } },
+      {
+        "write": {
+          "file": "package.json",
+          "content": "{\n  \"name\": \"tasks-repo\",\n  \"private\": true,\n  \"workspaces\": [\"apps/*\", \"packages/*\"]\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "packages/ui/package.json",
+          "content": "{\n  \"name\": \"@acme/ui\",\n  \"version\": \"1.0.0\",\n  \"dependencies\": { \"axios\": \"1.12.2\", \"react-native-webview\": \"13.16.0\" }\n}\n"
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": ["packages", "node_modules/@react-native-community/netinfo"],
+          "value": { "version": "11.4.1" }
+        }
+      },
+      {
+        "json": {
+          "file": "quality-gates.json",
+          "path": ["gatedPaths"],
+          "value": ["quality-gates.json", "apps/*/contracts/network-baseline.json", "apps/*/contracts/privacy.json"]
+        }
+      }
+    ]
+  },
+  "error-no-package-json": {
+    "expect": ["ERROR [bad-input]", "the app's package.json"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "pass-answers": {
+    "expect": [
+      "App Privacy: Identifiers > Device ID · linked to the user · used for tracking",
+      "Data safety: Device or other IDs > Device or other IDs · collected, shared · required",
+      "sharing purposes: Advertising or marketing, Analytics (react-native-google-mobile-ads, expo-notifications)",
+      "Data safety: security practices",
+      "Data is encrypted in transit: yes",
+      "Users can request that their data is deleted: yes, in the app (src/app/(app)/delete-account.tsx) and on the web (https://tasks.acme.app/delete-account",
+      "RESULT: PASS"
+    ],
+    "args": "{dir} --answers",
+    "ops": []
+  },
+  "pass-answers-no-accounts": {
+    "expect": [
+      "Users can request that their data is deleted: no (contracts/auth.json says the app creates no accounts)",
+      "RESULT: PASS"
+    ],
+    "args": "{dir} --answers",
+    "ops": [
+      { "json": { "file": "contracts/privacy.json", "path": ["accountDeletion"], "value": null, "literalNull": true } },
+      { "json": { "file": "contracts/auth.json", "path": ["createsAccounts"], "value": false } }
+    ]
+  },
+  "pass-answers-plain-http": {
+    "expect": [
+      "Data is encrypted in transit: NO: src/config/api-base.ts:2 holds http://api.acme.app (make it https before answering yes)",
+      "RESULT: PASS"
+    ],
+    "args": "{dir} --answers",
+    "ops": [
+      {
+        "write": {
+          "file": "src/config/api-base.ts",
+          "content": "// src/config/api-base.ts\nexport const API_BASE_URL = 'http://api.acme.app';\n"
+        }
+      }
+    ]
+  },
+  "pass-answers-play-only-type": {
+    "expect": [
+      "App Privacy: User Content > Emails or Text Messages · linked to the user · not used for tracking · App Functionality (app)",
+      "Data safety: Messages > Emails · collected · required",
+      "Data safety: Messages > SMS or MMS · collected · required",
+      "Data safety: Files and docs > Files and docs · collected · optional · collection purposes: App functionality (app) (Data safety only: App Privacy has no such type)",
+      "RESULT: PASS"
+    ],
+    "args": "{dir} --answers",
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["app", "collects", 2],
+          "value": {
+            "type": "files-and-docs",
+            "linked": true,
+            "tracking": false,
+            "purposes": ["app-functionality"],
+            "optional": true
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["app", "collects", 3],
+          "value": {
+            "type": "emails-or-messages",
+            "linked": true,
+            "tracking": false,
+            "purposes": ["app-functionality"]
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["app", "collects", 4],
+          "value": { "type": "sms-or-mms", "linked": true, "tracking": false, "purposes": ["app-functionality"] }
+        }
+      }
+    ]
+  },
+  "pass-answers-videos-and-diagnostics": {
+    "expect": [
+      "App Privacy: User Content > Photos or Videos · linked to the user · not used for tracking · App Functionality (app)",
+      "Data safety: Photos and videos > Photos · collected · optional",
+      "Data safety: Photos and videos > Videos · collected · optional",
+      "Data safety: App info and performance > Diagnostics · collected · required · collection purposes: Analytics, App functionality (app)",
+      "RESULT: PASS"
+    ],
+    "args": "{dir} --answers",
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["app", "collects", 2],
+          "value": {
+            "type": "photos-or-videos",
+            "linked": true,
+            "tracking": false,
+            "purposes": ["app-functionality"],
+            "optional": true
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["app", "collects", 3],
+          "value": {
+            "type": "videos",
+            "linked": true,
+            "tracking": false,
+            "purposes": ["app-functionality"],
+            "optional": true
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["app", "collects", 4],
+          "value": { "type": "performance-data", "linked": false, "tracking": false, "purposes": ["app-functionality"] }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["app", "collects", 5],
+          "value": { "type": "other-diagnostic-data", "linked": false, "tracking": false, "purposes": ["analytics"] }
+        }
+      }
+    ]
+  },
+  "pass-fetch-method-and-namespace": {
+    "expect": ["audit-repo:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/task-cache.ts",
+          "lines": [
+            "// src/features/tasks/task-cache.ts",
+            "type TaskRepo = { fetch(id: string): Promise<string>; fetchAll(): Promise<string[]> };",
+            "class Cache {",
+            "  async fetch(): Promise<void> {}",
+            "}",
+            "export async function load(repo: TaskRepo, cache: Cache | null): Promise<string> {",
+            "  await cache?.fetch();",
+            "  return repo.fetch('task-1');",
+            "}",
+            "export const SVG_NS = 'http://www.w3.org/2000/svg';",
+            "export const SCHEMA = 'https://json-schema.org/draft-07/schema';"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-gradle-declared": {
+    "expect": ["audit-repo:", "RESULT: PASS"],
+    "args": "{dir} --gradle-deps {dir}/android-deps.txt",
+    "ops": []
+  },
+  "pass-local-asset-copy": {
+    "expect": ["audit-repo:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-empty-art.ts",
+          "content": "// src/features/tasks/use-empty-art.ts\nimport { Asset } from 'expo-asset';\n\n/** Copies the bundled artwork to the cache: downloadAsync() without a URL reads the app bundle. */\nexport const loadEmptyArt = async (): Promise<Asset> => Asset.fromModule(1).downloadAsync();\n"
+        }
+      }
+    ]
+  },
+  "pass-manifest-spread": {
+    "expect": ["audit-repo:", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "privacyManifests: PRIVACY_MANIFESTS }",
+          "with": "privacyManifests: { ...PRIVACY_MANIFESTS, NSPrivacyCollectedDataTypes: [...SDK_COLLECTED_TYPES] } }"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "import type { ExpoConfig } from 'expo/config';",
+          "with": "import type { ExpoConfig } from 'expo/config';\n\nconst SDK_COLLECTED_TYPES: Record<string, unknown>[] = [];"
+        }
+      }
+    ]
+  },
+  "pass-no-gates-yet": {
+    "expect": [
+      "SKIP quality-gates.json [gated-paths] not yet created (quality-gates creates it)",
+      "SKIP contracts/e2e.json [runtime-proof] not yet created (e2e-maestro creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "quality-gates.json" }, { "delete": "contracts/e2e.json" }]
+  },
+  "pass-no-podfile": {
+    "expect": [
+      "SKIP ios/Podfile.lock [vendor-pod] not yet created (npx expo prebuild --platform ios creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "ios/Podfile.lock" }]
+  },
+  "pass-offline-no-policy-yet": {
+    "expect": [
+      "SKIP contracts/dependency-policy.json [profile-policy] not yet created (dependency-management creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/privacy.json", "path": ["profile"], "value": "offline-only" } },
+      { "json": { "file": "contracts/dependency-policy.json", "path": ["profiles"], "value": ["offline-only"] } },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    slug: 'tasks',",
+          "with": "    slug: 'tasks',\n    updates: { enabled: false },"
+        }
+      },
+      { "json": { "file": "contracts/privacy.json", "path": ["app", "collects"], "value": [] } },
+      { "json": { "file": "contracts/auth.json", "path": ["createsAccounts"], "value": false } },
+      { "delete": "src/api" },
+      { "json": { "file": "contracts/privacy.json", "path": ["linkFiles"], "value": ["src/config/external-links.ts"] } },
+      { "delete": "contracts/dependency-policy.json" },
+      { "json": { "file": "contracts/e2e.json", "path": ["network"], "value": { "mode": "offline-only" } } }
+    ]
+  },
+  "pass-offline-only": {
+    "expect": ["audit-repo:", "RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "contracts/privacy.json", "path": ["profile"], "value": "offline-only" } },
+      { "json": { "file": "contracts/dependency-policy.json", "path": ["profiles"], "value": ["offline-only"] } },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    slug: 'tasks',",
+          "with": "    slug: 'tasks',\n    updates: { enabled: false },"
+        }
+      },
+      { "json": { "file": "contracts/privacy.json", "path": ["app", "collects"], "value": [] } },
+      { "json": { "file": "contracts/auth.json", "path": ["createsAccounts"], "value": false } },
+      { "delete": "src/api" },
+      { "json": { "file": "contracts/privacy.json", "path": ["linkFiles"], "value": ["src/config/external-links.ts"] } },
+      { "json": { "file": "contracts/e2e.json", "path": ["network"], "value": { "mode": "offline-only" } } }
+    ]
+  },
+  "pass-pod-hoisted-package": {
+    "expect": ["audit-repo:", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "ios/Podfile.lock",
+          "find": "    :path: \"../node_modules/react-native-google-mobile-ads\"\n",
+          "with": "    :path: \"../node_modules/react-native-google-mobile-ads\"\n  React-Core:\n    :path: \"../../../node_modules/react-native/\"\n"
+        }
+      }
+    ]
+  },
+  "pass-second-transport-declared": {
+    "expect": ["audit-repo:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/file-transfer/upload-adapter.ts",
+          "content": "// src/services/file-transfer/upload-adapter.ts\nexport const upload = (body: string): Promise<Response> => fetch('/upload', { method: 'POST', body });\n"
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["networkModules"],
+          "value": ["src/services/file-transfer/*-adapter.ts"]
+        }
+      }
+    ]
+  },
+  "pass-sign-in-installed-not-built": {
+    "expect": [
+      "Users can request that their data is deleted: no (no code imports a sign-in package and the contract holds no account data",
+      "RESULT: PASS"
+    ],
+    "args": "{dir} --answers",
+    "ops": [
+      { "delete": "contracts/auth.json" },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-auth-session"], "value": "~57.0.3" } },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-apple-authentication"], "value": "~57.0.2" } },
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["sdks", "expo-auth-session"],
+          "value": { "why": "installed by the stack; no screen signs in yet", "collects": [] }
+        }
+      },
+      { "json": { "file": "contracts/privacy.json", "path": ["app", "collects"], "value": [] } },
+      { "json": { "file": "contracts/privacy.json", "path": ["accountDeletion"], "value": null, "literalNull": true } }
+    ]
+  }
+}

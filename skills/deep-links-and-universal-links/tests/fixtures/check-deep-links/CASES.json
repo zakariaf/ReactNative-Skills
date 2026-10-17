@@ -1,0 +1,507 @@
+{
+  "bad-gate-encoding": {
+    "expect": [
+      "[gate-behaviour] \"acme-tasks://tasks/link-check-1?highlight=a%26b&utm_source=link-check\" gave open /tasks/link-check-1?highlight=a&b; expected open /tasks/link-check-1?highlight=a%26b"
+    ],
+    "ops": [
+      {
+        "$comment": "Query values go back unencoded: a decoded & becomes a new query key.",
+        "replace": {
+          "file": "src/core/links/route-incoming-link.ts",
+          "find": "`${encodeURIComponent(key)}=${encodeURIComponent(value)}`",
+          "with": "`${key}=${value}`"
+        }
+      }
+    ]
+  },
+  "bad-gate-host-suffix": {
+    "expect": [
+      "FAIL src/core/links/route-incoming-link.ts:1 [gate-behaviour] \"https://eviltasks.acme.dev/tasks/new\" gave open /tasks/new; expected refused (a lookalike host that ends with a verified host)"
+    ],
+    "ops": [
+      {
+        "$comment": "The host check compares suffixes: eviltasks.acme.dev passes for tasks.acme.dev.",
+        "replace": {
+          "file": "src/core/links/incoming-link.ts",
+          "find": "host === pattern",
+          "with": "host.endsWith(pattern)"
+        }
+      }
+    ]
+  },
+  "bad-gate-port": {
+    "expect": [
+      "FAIL src/core/links/route-incoming-link.ts:1 [gate-behaviour] \"https://tasks.acme.dev:8443/tasks/new\" gave open /tasks/new; expected refused (a port)"
+    ],
+    "ops": [
+      {
+        "$comment": "The parser forgets the port check.",
+        "replace": {
+          "file": "src/core/links/incoming-link.ts",
+          "find": "  if (url.port !== '') return refuse('port');\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-intent-async": {
+    "expect": ["FAIL src/features/deep-links/redirect-system-path.ts:49 [intent-total] async in the gate"],
+    "ops": [
+      {
+        "$comment": "An async gate: the first screen waits on it and a rejection loses the link.",
+        "replace": {
+          "file": "src/features/deep-links/redirect-system-path.ts",
+          "find": "  return (event) => {\n",
+          "with": "  return async (event) => {\n"
+        }
+      }
+    ]
+  },
+  "bad-intent-missing": {
+    "expect": ["FAIL src/app/+native-intent.tsx [intent-gate] no +native-intent"],
+    "ops": [{ "delete": "src/app/+native-intent.tsx" }]
+  },
+  "bad-intent-passthrough": {
+    "expect": [
+      "FAIL src/features/deep-links/redirect-system-path.ts:50 [intent-gate] returns the incoming path unchecked"
+    ],
+    "ops": [
+      {
+        "$comment": "A cold link skips the gate: the launch URL opens whatever it names.",
+        "replace": {
+          "file": "src/features/deep-links/redirect-system-path.ts",
+          "find": "  return (event) => {\n",
+          "with": "  return (event) => {\n    if (event.initial) return event.path;\n"
+        }
+      }
+    ]
+  },
+  "bad-intent-passthrough-ternary": {
+    "expect": [
+      "FAIL src/features/deep-links/redirect-system-path.ts:56 [intent-gate] returns the incoming path unchecked"
+    ],
+    "ops": [
+      {
+        "$comment": "A crashed decision falls back to the raw path on a warm link: that link opens whatever it names.",
+        "replace": {
+          "file": "src/features/deep-links/redirect-system-path.ts",
+          "find": "    return event.initial ? LINK_FALLBACK : null;\n  };",
+          "with": "    return event.initial ? LINK_FALLBACK : event.path;\n  };"
+        }
+      }
+    ]
+  },
+  "bad-intent-uncaught": {
+    "expect": [
+      "FAIL src/features/deep-links/redirect-system-path.ts:1 [intent-total] a throw in redirectSystemPath crashes the launch"
+    ],
+    "ops": [
+      {
+        "$comment": "The decision runs bare: a bug in it crashes every launch with a link.",
+        "replace": {
+          "file": "src/features/deep-links/redirect-system-path.ts",
+          "find": "    const decided = attempt(\n      () => routeIncomingLink(event.path, deps.policy(), deps.isGateOpen),\n      (thrown) => thrown,\n    );\n    if (decided.ok) return hrefFor(decided.value, event.initial, deps);\n    deps.report(decided.error);\n    return event.initial ? LINK_FALLBACK : null;\n",
+          "with": "    return hrefFor(routeIncomingLink(event.path, deps.policy(), deps.isGateOpen), event.initial, deps);\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/deep-links/redirect-system-path.ts",
+          "find": "import { attempt } from '@/core/result';\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-link-contract": {
+    "expect": ["FAIL contracts/deep-links.json:1 [link-contract] \"appleTeamId\" must be the 10-character Team ID"],
+    "ops": [{ "json": { "file": "contracts/deep-links.json", "path": ["appleTeamId"], "value": "A1B2C3" } }]
+  },
+  "bad-link-route-exists": {
+    "expect": [
+      "FAIL src/features/deep-links/link-routes.ts:11 [link-route-exists] no route file in src/app opens /tasks/new"
+    ],
+    "ops": [{ "delete": "src/app/(app)/tasks/new.tsx" }]
+  },
+  "bad-link-routes": {
+    "expect": [
+      "FAIL src/features/deep-links/link-routes.ts:10 [link-routes] /tasks/[taskId]: [taskId] needs a kind in params (slug, uuid, int)"
+    ],
+    "ops": [
+      {
+        "$comment": "A free-text kind: the segment would take any text.",
+        "replace": {
+          "file": "src/features/deep-links/link-routes.ts",
+          "find": "params: { taskId: 'slug' }",
+          "with": "params: { taskId: 'text' }"
+        }
+      }
+    ]
+  },
+  "bad-link-routes-shadow": {
+    "expect": [
+      "FAIL src/features/deep-links/link-routes.ts:13 [link-routes] /lists/[listId]: query key \"listId\" shadows a path param"
+    ],
+    "ops": [
+      {
+        "$comment": "A query key named like the segment: open() would get the unchecked query text instead of the checked uuid.",
+        "replace": {
+          "file": "src/features/deep-links/link-routes.ts",
+          "find": "    params: { listId: 'uuid' },\n",
+          "with": "    params: { listId: 'uuid' },\n    query: ['listId'],\n"
+        }
+      }
+    ]
+  },
+  "bad-link-secret": {
+    "expect": [
+      "FAIL src/features/deep-links/link-routes.ts:18 [link-secret] /verify-email carries \"token\" on a link any app can receive"
+    ],
+    "ops": [
+      {
+        "$comment": "The email-verification token rides on the custom scheme too, where another app can receive it.",
+        "replace": {
+          "file": "src/features/deep-links/link-routes.ts",
+          "find": "{ path: '/verify-email', query: ['token'], verifiedOnly: true }",
+          "with": "{ path: '/verify-email', query: ['token'] }"
+        }
+      }
+    ]
+  },
+  "bad-link-secret-reset-code": {
+    "expect": [
+      "src/features/deep-links/link-routes.ts:12 [link-secret] /reset-password carries \"code\"",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "$comment": "An auth provider's password-reset link carries a bare one-time code: on the custom scheme another app can receive it.",
+        "replace": {
+          "file": "src/features/deep-links/link-routes.ts",
+          "find": "  { path: '/tasks/new' },\n",
+          "with": "  { path: '/tasks/new' },\n  { path: '/reset-password', query: ['code'] },\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/reset-password.tsx",
+          "content": "// src/app/reset-password.tsx\nexport default function Route(): null {\n  return null;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-link-test-only": {
+    "expect": ["FAIL src/features/deep-links/link-routes.ts:20 [link-test-only] /debug/setup is a debug route"],
+    "ops": [
+      {
+        "$comment": "The debug link opens in production builds.",
+        "replace": {
+          "file": "src/features/deep-links/link-routes.ts",
+          "find": "{ path: '/debug/setup', query: 'any', testBuildOnly: true }",
+          "with": "{ path: '/debug/setup', query: ['date'] }"
+        }
+      }
+    ]
+  },
+  "bad-native-links": {
+    "expect": ["FAIL app.config.ts:18 [native-links] production: an http(s) intent filter without autoVerify"],
+    "ops": [
+      {
+        "$comment": "The App Links filter loses autoVerify: Android 12+ opens the browser.",
+        "replace": {
+          "file": "app.config.ts",
+          "find": "intentFilters: links.intentFilters }",
+          "with": "intentFilters: links.intentFilters.map((filter) => ({ ...filter, autoVerify: false })) }"
+        }
+      }
+    ]
+  },
+  "bad-native-links-empty": {
+    "expect": ["FAIL app.config.ts:18 [native-links] development: ios.associatedDomains is an empty array"],
+    "ops": [
+      {
+        "$comment": "The development variant has no hosts but still gets associatedDomains: [], so prebuild writes an empty Associated Domains entitlement.",
+        "replace": {
+          "file": "app.config.ts",
+          "find": "...(links.associatedDomains && { associatedDomains: links.associatedDomains })",
+          "with": "associatedDomains: links.associatedDomains ?? []"
+        }
+      }
+    ]
+  },
+  "bad-native-links-paths": {
+    "expect": [
+      "FAIL app.config.ts:18 [native-links] production: the App Links filter has no path, pathPrefix or pathPattern"
+    ],
+    "ops": [
+      {
+        "$comment": "The App Links filter loses its paths: Android opens the app for every page of the host, which the gate then refuses.",
+        "replace": {
+          "file": "scripts/deep-links/link-native-config.ts",
+          "find": "    ...contract.webPaths.map((webPath) => ({ pathPattern: toPathPattern(webPath) })),\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-one-listener": {
+    "expect": ["FAIL src/features/tasks/use-task-link.ts:6 [one-listener] a 'url' listener"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-link.ts",
+          "content": "// src/features/tasks/use-task-link.ts\n// A second link handler beside the router's: it opens a task for every incoming URL, unchecked.\nimport { Linking } from 'react-native';\n\nexport function listenForTaskLinks(open: (url: string) => void): () => void {\n  const subscription = Linking.addEventListener('url', ({ url }) => open(url));\n  return () => subscription.remove();\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-open-redirect": {
+    "expect": [
+      "FAIL src/features/tasks/use-open-attachment.ts:9 [open-redirect] openURL() opens a URL taken from a link's params"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-open-attachment.ts",
+          "content": "// src/features/tasks/use-open-attachment.ts\n// Opens the attachment URL a link carries: any link can now open any site with the app's trust.\nimport { useLocalSearchParams } from 'expo-router';\nimport { Linking } from 'react-native';\n\nexport function useOpenAttachment(): () => void {\n  const params = useLocalSearchParams();\n  return () => {\n    void Linking.openURL(String(params.url));\n  };\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-open-redirect-alias": {
+    "expect": [
+      "FAIL src/features/tasks/use-open-help.ts:10 [open-redirect] openBrowserAsync() opens a URL taken from a link's params"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-open-help.ts",
+          "content": "// src/features/tasks/use-open-help.ts\n// Opens the help page a link names, through one alias: the URL still comes from the link.\nimport { useGlobalSearchParams } from 'expo-router';\nimport * as WebBrowser from 'expo-web-browser';\n\nexport function useOpenHelp(): () => void {\n  const search = useGlobalSearchParams();\n  const target = String(search['url']);\n  return () => {\n    void WebBrowser.openBrowserAsync(target);\n  };\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-open-redirect-destructured": {
+    "expect": [
+      "FAIL src/features/tasks/use-return-to.ts:9 [open-redirect] openURL() opens a URL taken from a link's params"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-return-to.ts",
+          "content": "// src/features/tasks/use-return-to.ts\n// Sends the user back to the \"returnTo\" URL a link carries: any link can now open any site.\nimport { useLocalSearchParams } from 'expo-router';\nimport { Linking } from 'react-native';\n\nexport function useReturnTo(): () => void {\n  const { returnTo } = useLocalSearchParams<{ returnTo: string }>();\n  return () => {\n    void Linking.openURL(returnTo);\n  };\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-open-redirect-narrowed": {
+    "expect": [
+      "FAIL src/features/tasks/use-continue.ts:11 [open-redirect] openBrowserAsync() opens a URL taken from a link's params"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-continue.ts",
+          "content": "// src/features/tasks/use-continue.ts\n// Reads the raw params, narrows `next` to a string, then opens it in the browser: still the link's URL.\nimport { useLocalSearchParams } from 'expo-router';\nimport * as WebBrowser from 'expo-web-browser';\n\nexport function useContinue(): () => void {\n  const raw = useLocalSearchParams();\n  const target =\n    typeof raw['next'] === 'string' ? raw['next'] : '';\n  return () => {\n    void WebBrowser.openBrowserAsync(target);\n  };\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-open-redirect-parsed": {
+    "expect": [
+      "FAIL src/features/help/use-help-return.ts:12 [open-redirect] openURL() opens a URL taken from a link's params"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/help/use-help-return.ts",
+          "content": "// src/features/help/use-help-return.ts\n// Parses the route's params with its valibot parser, then opens the parsed returnTo: a v.url() field\n// still passes any URL, so the link opens any site with the app's trust.\nimport { useLocalSearchParams } from 'expo-router';\nimport { Linking } from 'react-native';\n\nimport { parseHelpParams } from './help-params';\n\nexport function useHelpReturn(): () => void {\n  const parsed = parseHelpParams(useLocalSearchParams());\n  return () => {\n    if (parsed.ok) void Linking.openURL(parsed.value.returnTo);\n  };\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-pending-link": {
+    "expect": ["[pending-link] gate \"signed-in\": no useOpenPendingLink('signed-in') in app code"],
+    "ops": [{ "delete": "src/features/tasks/use-tasks-model.ts" }]
+  },
+  "bad-release-placeholder": {
+    "expect": [
+      "FAIL contracts/deep-links.json:1 [ship-placeholder] hosts.production is a placeholder domain (example.com): tasks.example.com"
+    ],
+    "args": "{dir} --release",
+    "ops": [
+      {
+        "$comment": "The production host is still the documentation domain.",
+        "json": { "file": "contracts/deep-links.json", "path": ["hosts", "production"], "value": ["tasks.example.com"] }
+      },
+      { "rename": { "from": "well-known/tasks.acme.dev", "to": "well-known/tasks.example.com" } }
+    ]
+  },
+  "bad-static-routes": {
+    "$comment": "A plain app with a scheme and one static screen: <scheme>://settings opens it from any web page or app, and nothing gates it.",
+    "expect": ["FAIL src/app/+native-intent.tsx [intent-gate] no +native-intent"],
+    "base": ["@tests/bases/plain"],
+    "extends": null,
+    "ops": [
+      {
+        "write": {
+          "file": "src/app/settings.tsx",
+          "lines": ["// src/app/settings.tsx", "export default function Settings(): null {", "  return null;", "}"]
+        }
+      }
+    ]
+  },
+  "bad-web-paths": {
+    "expect": ["FAIL contracts/deep-links.json:1 [web-paths] webPaths \"/settings/*\" matches no listed route"],
+    "ops": [
+      {
+        "$comment": "A web path for a screen links never open: the app starts for that page, then shows its first screen.",
+        "json": { "file": "contracts/deep-links.json", "path": ["webPaths", 3], "value": "/settings/*" }
+      },
+      {
+        "json": {
+          "file": "well-known/tasks.acme.dev/apple-app-site-association",
+          "path": ["applinks", "details", 0, "components", 3],
+          "value": { "/": "/settings/*" }
+        }
+      },
+      {
+        "json": {
+          "file": "well-known/preview.tasks.acme.dev/apple-app-site-association",
+          "path": ["applinks", "details", 0, "components", 3],
+          "value": { "/": "/settings/*" }
+        }
+      }
+    ]
+  },
+  "bad-well-known": {
+    "expect": [
+      "FAIL well-known/tasks.acme.dev/assetlinks.json:1 [well-known] differs from what the contract and the app config give"
+    ],
+    "ops": [
+      {
+        "$comment": "The deployed file still names the upload key, not the key that signs installs.",
+        "json": {
+          "file": "well-known/tasks.acme.dev/assetlinks.json",
+          "path": [0, "target", "sha256_cert_fingerprints", 0],
+          "value": "00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF"
+        }
+      }
+    ]
+  },
+  "bad-well-known-stale": {
+    "expect": ["FAIL well-known/old.acme.dev [well-known] a host folder the contract no longer lists"],
+    "ops": [{ "write": { "file": "well-known/old.acme.dev/assetlinks.json", "content": "[]\n" } }]
+  },
+  "error-config-throws": {
+    "expect": ["ERROR [bad-input] app.config.ts does not evaluate for APP_VARIANT=development"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "  const links = linkNativeConfig(",
+          "with": "  throw new Error('config broke');\n  const links = linkNativeConfig("
+        }
+      }
+    ]
+  },
+  "error-no-package": { "expect": ["ERROR [bad-input]"], "ops": [{ "delete": "package.json" }] },
+  "pass-link-secret-everyday-code": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "Everyday codes are data, not secrets, even on an auth path: a region setting's country code, and an invite's language code.",
+        "replace": {
+          "file": "src/features/deep-links/link-routes.ts",
+          "find": "  { path: '/tasks/new' },\n",
+          "with": "  { path: '/tasks/new' },\n  { path: '/settings/region', query: ['countryCode'] },\n  { path: '/invite/region', query: ['countryCode', 'languageCode'] },\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/(app)/settings/region.tsx",
+          "content": "// src/app/(app)/settings/region.tsx\nexport default function Route(): null {\n  return null;\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/invite/region.tsx",
+          "content": "// src/app/invite/region.tsx\nexport default function Route(): null {\n  return null;\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-no-link-input": {
+    "expect": ["NOT APPLICABLE: the app takes no input from links"],
+    "base": ["@tests/bases/plain"],
+    "extends": null
+  },
+  "pass-no-router": {
+    "expect": ["NOT APPLICABLE: expo-router is not in package.json"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo-router"], "delete": true } }]
+  },
+  "pass-oauth-start": {
+    "expect": ["check-deep-links: "],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/auth/use-sign-in-start.ts",
+          "content": "// src/features/auth/use-sign-in-start.ts\n// The app's own OAuth start: the authorize URL is built from constants; the only link param read\n// here is an error to show. A local `params` (URLSearchParams) is not a link's params.\nimport { useLocalSearchParams } from 'expo-router';\nimport * as WebBrowser from 'expo-web-browser';\n\nconst AUTHORIZE_URL = 'https://auth.acme.dev/authorize';\nconst REDIRECT_URI = 'acme-tasks://oauth-redirect';\n\nexport function useSignInStart(): { readonly error: string | undefined; readonly start: () => void } {\n  const { error } = useLocalSearchParams<{ error?: string }>();\n  const start = (): void => {\n    const params = new URLSearchParams({ client_id: 'tasks', redirect_uri: REDIRECT_URI, response_type: 'code' });\n    void WebBrowser.openAuthSessionAsync(`${AUTHORIZE_URL}?${params.toString()}`, REDIRECT_URI);\n  };\n  return { error, start };\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-open-config-builder": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-open-task-web.ts",
+          "content": "// src/features/tasks/use-open-task-web.ts\n// Opens the task's web page: the link's param is parsed to an id, and the URL is built by a helper of\n// src/config from the app's own origin, so the host never comes from the link.\nimport { useLocalSearchParams } from 'expo-router';\nimport { Linking } from 'react-native';\n\nimport { taskWebUrl } from '@/config/links';\n\nimport { parseTaskId } from './task-id';\n\nexport function useOpenTaskWeb(): () => void {\n  const params = useLocalSearchParams();\n  const id = parseTaskId(params['taskId']);\n  return () => {\n    void Linking.openURL(taskWebUrl(id));\n  };\n}\n\n/** The same URL bound to a name first: still built by the config helper, still accepted. */\nexport function useOpenTaskWebBound(): () => void {\n  const { taskId } = useLocalSearchParams();\n  const webUrl = taskWebUrl(parseTaskId(taskId));\n  return () => {\n    void Linking.openURL(webUrl);\n  };\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-scheme-only": {
+    "expect": ["check-deep-links: "],
+    "ops": [
+      {
+        "$comment": "No domain yet: only the custom scheme, no well-known files, no team id.",
+        "json": {
+          "file": "contracts/deep-links.json",
+          "path": ["hosts"],
+          "value": { "development": [], "preview": [], "production": [] }
+        }
+      },
+      { "json": { "file": "contracts/deep-links.json", "path": ["webPaths"], "value": [] } },
+      { "json": { "file": "contracts/deep-links.json", "path": ["appleTeamId"], "delete": true } },
+      {
+        "replace": {
+          "file": "src/features/deep-links/link-routes.ts",
+          "find": "{ path: '/verify-email', query: ['token'], verifiedOnly: true },\n",
+          "with": ""
+        }
+      },
+      { "delete": "well-known" }
+    ]
+  },
+  "pass-session-id": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "A meeting app's session record and a footprint query key are ids and data, not secrets: no verifiedOnly needed.",
+        "replace": {
+          "file": "src/features/deep-links/link-routes.ts",
+          "find": "  { path: '/tasks/new' },\n",
+          "with": "  { path: '/tasks/new' },\n  { path: '/sessions/[sessionId]', params: { sessionId: 'slug' }, query: ['footprint'] },\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/app/(app)/sessions/[sessionId].tsx",
+          "content": "// src/app/(app)/sessions/[sessionId].tsx\nexport default function Route(): null {\n  return null;\n}\n"
+        }
+      }
+    ]
+  }
+}

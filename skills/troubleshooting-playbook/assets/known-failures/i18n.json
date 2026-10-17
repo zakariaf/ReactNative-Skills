@@ -1,0 +1,223 @@
+{
+  "area": "i18n",
+  "entries": [
+    {
+      "id": "i18n-hermes-intl",
+      "topic": "Intl",
+      "symptom": "Plural forms wrong, Intl.PluralRules or Intl.Locale undefined, -u-nu- digits ignored, or dates in an unexpected calendar on the device while Jest passes",
+      "cause": "Hermes implements only part of Intl natively (no PluralRules or Locale on some builds), drops the numbering system, and some locales (fa) default to a non-Gregorian calendar",
+      "fix": "Load the FormatJS polyfills (getcanonicallocales, locale, pluralrules, numberformat with the app's locale data) first in the entry and in Jest; format at the edge through react-intl; pass an explicit calendar (-u-ca-gregory) where the product needs one",
+      "match": [
+        "PluralRules",
+        "Intl\\.Locale"
+      ],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "i18n-strings-and-catalogs"
+    },
+    {
+      "id": "i18n-device-locale-format",
+      "topic": "Intl",
+      "symptom": "A date or number shows in the device's language instead of the language chosen in the app",
+      "cause": "toLocaleDateString() / toLocaleString() without a locale argument format in the device locale",
+      "fix": "Format through react-intl (formatDate, formatNumber) with the app's current locale; never call toLocale* without arguments in app code",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "i18n-strings-and-catalogs"
+    },
+    {
+      "id": "i18n-formatjs-lint-blind",
+      "topic": "Catalogs",
+      "symptom": "eslint-plugin-formatjs never reports ICU problems in the catalogs",
+      "cause": "Its content rules skip calls without defaultMessage, and the messages live only in JSON catalogs",
+      "fix": "Register the app's translate helpers in settings.formatjs and run the catalog checker plus formatjs verify --structural-equality",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "i18n-strings-and-catalogs"
+    },
+    {
+      "id": "i18n-enforce-id-pattern",
+      "topic": "Catalogs",
+      "symptom": "formatjs/enforce-id demands hash ids",
+      "cause": "idInterpolationPattern requires defaultMessage and hashed ids, which conflicts with semantic keys",
+      "fix": "Use enforce-id without the pattern, or drop the rule",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "i18n-strings-and-catalogs"
+    },
+    {
+      "id": "i18n-system-text-plain",
+      "topic": "Catalogs",
+      "symptom": "A usage-description text (Info.plist, InfoPlist.strings) shows a literal {placeholder} in the system dialog",
+      "cause": "iOS shows usage strings straight from Info.plist, where nothing formats ICU",
+      "fix": "Write system texts as plain sentences without braces (iOS already names the app in the dialog title)",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "i18n-strings-and-catalogs",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "i18n-system-text-missing",
+      "topic": "Catalogs",
+      "symptom": "A <lang>.lproj/InfoPlist.strings has no translation for a usage description, so the system dialog shows English",
+      "cause": "The catalogs lack the system text the config plugin writes into each language",
+      "fix": "Add the key to every catalog, then prebuild again; the privacy and release gates check every language",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "i18n-strings-and-catalogs",
+      "platforms": [
+        "ios"
+      ]
+    },
+    {
+      "id": "i18n-nested-isolates",
+      "topic": "RTL layout",
+      "symptom": "A date inside a sentence shows its parts in the wrong order in an RTL language",
+      "cause": "A text that already carries bidi isolates (FSI ... PDI) was passed into another message as a value, which isolates it again",
+      "fix": "Strip the inner isolates before passing it (stripIsolates), so the sentence holds one isolate per value",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "rtl-and-direction"
+    },
+    {
+      "id": "i18n-textalign-rtl",
+      "topic": "RTL layout",
+      "symptom": "Text stays left-aligned in an RTL layout, or right-aligned text lands on the left",
+      "cause": "textAlign 'auto' stays physical left on iOS unless the app language itself is RTL, and 'left'/'right' are swapped to start/end in RTL",
+      "fix": "Align through the text primitive (AppText align start/end) with writingDirection set; never 'right' for Arabic",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "rtl-and-direction"
+    },
+    {
+      "id": "i18n-force-rtl-reload",
+      "topic": "Direction",
+      "symptom": "forceRTL(true) has no visible effect",
+      "cause": "I18nManager changes apply on the next JS load",
+      "fix": "Change direction only through the direction module: record the pending direction, allowRTL and forceRTL together, save state first, then reloadAppAsync() from expo (Updates.reloadAsync rejects where expo-updates is disabled, as in development builds)",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "rtl-and-direction"
+    },
+    {
+      "id": "i18n-double-write-before-reload",
+      "topic": "Direction",
+      "symptom": "Data is written twice on a direction switch",
+      "cause": "Module-level and startup code run once before the reload and once after it",
+      "fix": "Run the direction check first at startup, before any write, and reload only from a mounted component",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "rtl-and-direction"
+    },
+    {
+      "id": "i18n-isrtl-drift",
+      "topic": "Direction",
+      "symptom": "Direction flips back or disagrees with the saved language",
+      "cause": "I18nManager.isRTL is captured at JS load and persists natively (it can drift after a device restore)",
+      "fix": "Compute the desired direction from the saved language, correct drift at startup, and read the layout direction from I18nManager",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "rtl-and-direction"
+    },
+    {
+      "id": "i18n-localization-rtl-flags",
+      "topic": "Direction",
+      "symptom": "The app follows the device language for direction and undoes the in-app language choice at every launch",
+      "cause": "expo-localization's supportsRTL / forcesRTL plugin options re-apply direction from the device language at every module creation",
+      "fix": "Give expo-localization supportedLocales only; never forcesRTL; supportsRTL only for an app without its own language choice",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "rtl-and-direction"
+    },
+    {
+      "id": "i18n-system-sheet-language",
+      "topic": "Direction",
+      "symptom": "A consent form or purchase sheet shows the device language, not the language chosen in the app",
+      "cause": "Google UMP and the store sheets follow the device or per-app system language",
+      "fix": "Expected: nothing to fix in app code; say so in the release notes for testers",
+      "match": [],
+      "status": "open",
+      "needsHuman": false,
+      "skill": "i18n-strings-and-catalogs"
+    },
+    {
+      "id": "i18n-rtl-defaults-upgrade",
+      "topic": "Direction",
+      "symptom": "RTL behaviour changes after an SDK upgrade",
+      "cause": "Expo's localization guide announces RTL default changes for SDK 58",
+      "fix": "Rerun the RTL screenshots and the direction tests after the upgrade",
+      "match": [],
+      "status": "open",
+      "needsHuman": false,
+      "skill": "expo-sdk-upgrade"
+    },
+    {
+      "id": "i18n-locale-code-variants",
+      "topic": "Locale",
+      "symptom": "A language is not detected on a real device",
+      "cause": "Devices report some languages under several codes (ckb or ku-Arab; zh-Hant-TW or zh-TW)",
+      "fix": "Resolve the device locale through a mapping that accepts each known form, with a test per form",
+      "match": [],
+      "status": "open",
+      "needsHuman": false,
+      "skill": "i18n-strings-and-catalogs"
+    },
+    {
+      "id": "i18n-bidi-marks",
+      "topic": "Fonts",
+      "symptom": "Tofu boxes around interpolated values",
+      "cause": "The font lacks FSI U+2068 / PDI U+2069",
+      "fix": "Check each new font for the isolate characters, or pick one that draws them invisibly",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "rtl-and-direction"
+    },
+    {
+      "id": "i18n-arabic-line-height",
+      "topic": "Fonts",
+      "symptom": "Marks or digit tops of Arabic-script text are clipped",
+      "cause": "Arabic-script fonts need more line height, and iOS clips a Text at its frame while browsers let it overflow",
+      "fix": "Give Arabic-script text about 1.5x line height in the type scale (the text primitive applies it per script); check in screenshots",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "design-system-structure"
+    },
+    {
+      "id": "i18n-font-coverage",
+      "topic": "Fonts",
+      "symptom": "A character renders as tofu in one language",
+      "cause": "The font lacks the glyph (letter-like marks, rare capitals, tabular digits)",
+      "fix": "Check every font against the catalogs, avoid those characters, or add a fallback font",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "design-system-structure"
+    },
+    {
+      "id": "i18n-font-plugin-partial",
+      "topic": "Fonts",
+      "symptom": "Every screen renders in the system font; the design fonts never appear",
+      "cause": "The expo-font plugin entry embeds only some of the font files",
+      "fix": "One expo-font plugin entry that embeds every font file the theme names; prebuild with --clean",
+      "match": [],
+      "status": "verified",
+      "needsHuman": false,
+      "skill": "design-system-structure"
+    }
+  ]
+}

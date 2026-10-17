@@ -1,0 +1,66 @@
+{
+  "bad-unknown-id": {
+    "expect": [
+      "docs/spec:1 [unknown-spec-id]",
+      "\"REQ-9\" is not a spec entry (nearest: REQ-5",
+      "\"SCR-16\" is not a spec entry",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "args": "{dir} REQ-1 REQ-9 SCR-16"
+  },
+  "bad-unknown-id-from-file": {
+    "expect": [
+      "== REQ-2 · Complete a task",
+      "ids.txt:2 [unknown-spec-id] \"REQ-19\" is not a spec entry",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "args": "{dir} --from {dir}/ids.txt --brief",
+    "ops": [{ "write": { "file": "ids.txt", "content": "REQ-2\nSCR-3, REQ-19\n" } }]
+  },
+  "error-no-ids": { "expect": ["ERROR [bad-input] no IDs given"], "args": "{dir}" },
+  "error-no-spec-ids": {
+    "expect": ["ERROR [bad-input] no requirement spec to look REQ-1 up in"],
+    "args": "{dir} REQ-1",
+    "ops": [{ "delete": ["docs/spec", "contracts/spec.json"] }]
+  },
+  "error-unknown-kind": {
+    "expect": ["ERROR [bad-input] no entry of kind \"story\""],
+    "args": "{dir} --list --kind story"
+  },
+  "pass-from-file": {
+    "expect": ["== REQ-2 · Complete a task", "== SCR-3 · Settings", "spec-lookup: 2 IDs checked"],
+    "args": "{dir} --from {dir}/ids.txt --brief",
+    "ops": [{ "write": { "file": "ids.txt", "content": "spec REQ-2,\nscr-3\n" } }]
+  },
+  "pass-list-kind": {
+    "expect": [
+      "DEC-1      decision        open         How long Undo stays on screen",
+      "DEC-2      decision        decided      First day of the week in date pickers",
+      "spec-lookup: 2 spec entries checked"
+    ],
+    "args": "{dir} --list --kind decision"
+  },
+  "pass-no-spec-list": {
+    "expect": [
+      "NOT APPLICABLE: the app keeps no requirement spec (no contracts/spec.json and no docs/spec/ folder); quote the issue or acceptance criterion instead"
+    ],
+    "args": "{dir} --list",
+    "ops": [{ "delete": ["docs/spec", "contracts/spec.json"] }]
+  },
+  "pass-parent-includes-children": {
+    "expect": ["== REQ-4 · Remind at the due time  [requirement, planned]", "spec-lookup: 1 IDs checked"],
+    "args": "{dir} REQ-4 --brief"
+  },
+  "pass-section": {
+    "expect": ["== 1.1 · Task  (docs/spec/glossary.md:5)", "== 1 · Words  (docs/spec/glossary.md:3)"],
+    "args": "{dir} spec 1.1 § 1 --brief",
+    "ops": [
+      {
+        "write": {
+          "file": "docs/spec/glossary.md",
+          "lines": ["# Glossary", "", "## 1 · Words", "", "### 1.1 · Task", "", "One thing to do."]
+        }
+      }
+    ]
+  }
+}

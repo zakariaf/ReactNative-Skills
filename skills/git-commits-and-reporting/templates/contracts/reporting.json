@@ -1,0 +1,28 @@
+{
+  "$schema": "./reporting.schema.json",
+  "$comment": "Facts the report checker reads (git-commits-and-reporting check-report.mjs). locales null takes the file names of src/i18n/catalogs/*.json. A humanChecks entry with minLocales applies only when the app has at least that many locales.",
+  "locales": null,
+  "sliceChecks": [],
+  "releaseChecks": ["Coverage", "Mutation", "End-to-end"],
+  "humanChecks": [
+    {
+      "name": "the on-device check",
+      "match": "device|phone|tablet|hands-on|TestFlight|internal test",
+      "example": "On-device check: try the new reminder sound on a phone, still open"
+    },
+    {
+      "name": "the native-language review of changed texts",
+      "match": "review",
+      "minLocales": 2,
+      "example": "Native-language review of changed texts: none pending"
+    }
+  ],
+  "nonEvidenceMarkers": [
+    "rehearsal",
+    "--rehearsal",
+    "dry run",
+    "dry-run",
+    "--dry-run",
+    "ship-placeholder"
+  ]
+}

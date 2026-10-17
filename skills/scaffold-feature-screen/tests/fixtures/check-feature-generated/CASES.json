@@ -1,0 +1,18 @@
+{
+  "bad-draft-key-missing": {
+    "expect": ["[message-key-missing] 'note-detail.title' is missing from src/i18n/catalogs/de.json"],
+    "ops": [{ "json": { "file": "src/i18n/catalogs/de.json", "path": ["note-detail.title"], "delete": true } }]
+  },
+  "bad-frame-view-pure": {
+    "expect": ["FAIL src/features/note-detail/note-detail-screen.tsx:12 [view-pure] the view imports expo-router"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/note-detail/note-detail-screen.tsx",
+          "find": "import { BELOW_HEADER_EDGES, ScreenFrame } from '@/ui/screen-frame';",
+          "with": "import { BELOW_HEADER_EDGES, ScreenFrame } from '@/ui/screen-frame';\nimport { useRouter } from 'expo-router';"
+        }
+      }
+    ]
+  }
+}

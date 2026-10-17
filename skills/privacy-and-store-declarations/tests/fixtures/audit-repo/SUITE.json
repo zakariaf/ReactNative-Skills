@@ -1,0 +1,1 @@
+{ "base": [{ "templates": true, "firstLinePath": true }, "@tests/bases/repo"], "extends": "good" }

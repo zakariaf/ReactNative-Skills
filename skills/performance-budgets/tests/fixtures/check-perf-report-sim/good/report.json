@@ -1,0 +1,68 @@
+[
+ {
+  "kind": "cold-start",
+  "label": "tasks",
+  "atEpochMs": 1790430000000,
+  "data": {
+   "nativeMs": 600,
+   "jsMs": 300,
+   "totalMs": 900,
+   "prewarmed": false
+  }
+ },
+ {
+  "kind": "cold-start",
+  "label": "tasks",
+  "atEpochMs": 1790430000001,
+  "data": {
+   "nativeMs": 340,
+   "jsMs": 300,
+   "totalMs": 640,
+   "prewarmed": false
+  }
+ },
+ {
+  "kind": "cold-start",
+  "label": "tasks",
+  "atEpochMs": 1790430000002,
+  "data": {
+   "nativeMs": 310,
+   "jsMs": 300,
+   "totalMs": 610,
+   "prewarmed": false
+  }
+ },
+ {
+  "kind": "cold-start",
+  "label": "tasks",
+  "atEpochMs": 1790430000003,
+  "data": {
+   "nativeMs": 355,
+   "jsMs": 300,
+   "totalMs": 655,
+   "prewarmed": false
+  }
+ },
+ {
+  "kind": "cold-start",
+  "label": "tasks",
+  "atEpochMs": 1790430000004,
+  "data": {
+   "nativeMs": 300,
+   "jsMs": 300,
+   "totalMs": 600,
+   "prewarmed": false
+  }
+ },
+ {
+  "kind": "cold-start",
+  "label": "tasks",
+  "atEpochMs": 1790430000005,
+  "data": {
+   "nativeMs": 330,
+   "jsMs": 300,
+   "totalMs": 630,
+   "prewarmed": false
+  }
+ }
+]

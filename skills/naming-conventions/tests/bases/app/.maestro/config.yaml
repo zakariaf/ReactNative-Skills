@@ -1,0 +1,3 @@
+flows:
+  - flows/smoke/*
+  - flows/journeys/*

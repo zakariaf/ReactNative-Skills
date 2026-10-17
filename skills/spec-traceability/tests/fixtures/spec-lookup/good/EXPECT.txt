@@ -1,0 +1,8 @@
+== REQ-1 · Add a task  [requirement, planned]  (docs/spec/requirements.md:8)
+A task needs a title of 1 to 200 characters
+== SCR-2 · Task editor  [screen, planned]
+== NN-1 · Tasks work offline
+- Default: 5 seconds
+== REQ-4.1 · Ask for notification permission on first use
+NOTE OOS-2 is out-of-scope: do not build it
+RESULT: PASS

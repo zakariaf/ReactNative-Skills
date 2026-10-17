@@ -1,0 +1,214 @@
+==> commit e0e9c7b4fc2ee5fbee2e49c2970f5811f186e01e
+feat(tasks): show how urgent each open task is
+
+TASKS-12: due today is "today", within 2 days "soon", later "later",
+past its date "overdue".
+
+==> diff
+
+diff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts
+new file mode 100644
+index 0000000..a151dce
+--- /dev/null
++++ b/src/features/tasks/task-urgency.test.ts
+@@ -0,0 +1,12 @@
++// src/features/tasks/task-urgency.test.ts
++import { taskUrgency } from './task-urgency';
++
++describe('taskUrgency', () => {
++  it('returns today for a task due today (TASKS-12)', () => {
++    expect(taskUrgency(0)).toBe('today');
++  });
++
++  it('returns soon for a task due in 2 days', () => {
++    expect(taskUrgency(2)).toBe('soon');
++  });
++});
+diff --git a/src/features/tasks/task-urgency.ts b/src/features/tasks/task-urgency.ts
+new file mode 100644
+index 0000000..3e41ca3
+--- /dev/null
++++ b/src/features/tasks/task-urgency.ts
+@@ -0,0 +1,12 @@
++// src/features/tasks/task-urgency.ts
++export type Urgency = 'overdue' | 'today' | 'soon' | 'later';
++
++export function taskUrgency(daysLeft: number): Urgency {
++  if (daysLeft < 0) {
++    return 'overdue';
++  }
++  if (daysLeft === 0) {
++    return 'today';
++  }
++  return daysLeft <= 2 ? 'soon' : 'later';
++}
+==> commit e52096e48d48e744ed70c3f1f3ab8b4c393619e3
+refactor(tasks): name the soon limit
+
+==> diff
+
+diff --git a/src/features/tasks/task-urgency.ts b/src/features/tasks/task-urgency.ts
+index 3e41ca3..aae8d2d 100644
+--- a/src/features/tasks/task-urgency.ts
++++ b/src/features/tasks/task-urgency.ts
+@@ -1,6 +1,8 @@
+ // src/features/tasks/task-urgency.ts
+ export type Urgency = 'overdue' | 'today' | 'soon' | 'later';
+ 
++const SOON_DAYS = 2;
++
+ export function taskUrgency(daysLeft: number): Urgency {
+   if (daysLeft < 0) {
+     return 'overdue';
+@@ -8,5 +10,5 @@ export function taskUrgency(daysLeft: number): Urgency {
+   if (daysLeft === 0) {
+     return 'today';
+   }
+-  return daysLeft <= 2 ? 'soon' : 'later';
++  return daysLeft <= SOON_DAYS ? 'soon' : 'later';
+ }
+==> commit 094430d9a9a3af248dc0821922121d5364780f38
+test(tasks): cover the later case
+
+==> diff
+
+diff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts
+index a151dce..189e27f 100644
+--- a/src/features/tasks/task-urgency.test.ts
++++ b/src/features/tasks/task-urgency.test.ts
+@@ -7,6 +7,12 @@ describe('taskUrgency', () => {
+   });
+ 
+   it('returns soon for a task due in 2 days', () => {
+-    expect(taskUrgency(2)).toBe('soon');
++    expect(
++      taskUrgency(2),
++    ).toBe('soon');
++  });
++
++  it('returns later for a task due in 3 days', () => {
++    expect(taskUrgency(3)).toBe('later');
+   });
+ });
+==> commit 236940cad19f4d1591859d6c8eaa0e19d193d730
+fix(tasks): count three days ahead as soon
+
+The product team widened the soon band (issue #41).
+
+Spec-Change: TASKS-12 soon now reaches 3 days ahead (issue #41)
+
+==> diff
+
+diff --git a/src/features/tasks/task-urgency.test.ts b/src/features/tasks/task-urgency.test.ts
+index 189e27f..cde7050 100644
+--- a/src/features/tasks/task-urgency.test.ts
++++ b/src/features/tasks/task-urgency.test.ts
+@@ -12,7 +12,7 @@ describe('taskUrgency', () => {
+     ).toBe('soon');
+   });
+ 
+-  it('returns later for a task due in 3 days', () => {
+-    expect(taskUrgency(3)).toBe('later');
++  it('returns soon for a task due in 3 days', () => {
++    expect(taskUrgency(3)).toBe('soon');
+   });
+ });
+diff --git a/src/features/tasks/task-urgency.ts b/src/features/tasks/task-urgency.ts
+index aae8d2d..9eebad3 100644
+--- a/src/features/tasks/task-urgency.ts
++++ b/src/features/tasks/task-urgency.ts
+@@ -1,7 +1,7 @@
+ // src/features/tasks/task-urgency.ts
+ export type Urgency = 'overdue' | 'today' | 'soon' | 'later';
+ 
+-const SOON_DAYS = 2;
++const SOON_DAYS = 3;
+ 
+ export function taskUrgency(daysLeft: number): Urgency {
+   if (daysLeft < 0) {
+==> commit 4e23861de34c7c9e91e8cec614ba60fc79cb4870
+docs(repo): add notes
+
+==> diff
+
+diff --git a/NOTES.md b/NOTES.md
+new file mode 100644
+index 0000000..17e0f0d
+--- /dev/null
++++ b/NOTES.md
+@@ -0,0 +1 @@
++# Notes
+==> commit 77b0ede1dcec31ada8e15be0e59e4e257879cef9
+chore(data): add the expo-sqlite driver
+
+==> diff
+
+diff --git a/src/data/expo-sqlite-sql-driver.ts b/src/data/expo-sqlite-sql-driver.ts
+new file mode 100644
+index 0000000..5b3962f
+--- /dev/null
++++ b/src/data/expo-sqlite-sql-driver.ts
+@@ -0,0 +1,4 @@
++// src/data/expo-sqlite-sql-driver.ts
++// device-only: covered by the e2e flow open-tasks.yaml and the device kill test.
++import { openDatabaseSync } from 'expo-sqlite';
++export const openTasksDatabase = (fileName: string) => openDatabaseSync(fileName, { useNewConnection: true });
+==> commit 4b4bb2197a8d83d9f5f0bc237035695386b2431f
+fix(data): open the tasks database on the shared connection
+
+A thin device wrapper: the e2e flow and the kill test cover it (the SQL itself runs on node:sqlite in Jest).
+
+==> diff
+
+diff --git a/src/data/expo-sqlite-sql-driver.ts b/src/data/expo-sqlite-sql-driver.ts
+index 5b3962f..d098f48 100644
+--- a/src/data/expo-sqlite-sql-driver.ts
++++ b/src/data/expo-sqlite-sql-driver.ts
+@@ -1,4 +1,4 @@
+ // src/data/expo-sqlite-sql-driver.ts
+ // device-only: covered by the e2e flow open-tasks.yaml and the device kill test.
+ import { openDatabaseSync } from 'expo-sqlite';
+-export const openTasksDatabase = (fileName: string) => openDatabaseSync(fileName, { useNewConnection: true });
++export const openTasksDatabase = (fileName: string) => openDatabaseSync(fileName);
+==> commit 5f83b472434f6a421b91208c599f4e8738186f42
+docs(repo): explain the urgency bands
+
+==> diff
+
+diff --git a/NOTES.md b/NOTES.md
+index 17e0f0d..6c52534 100644
+--- a/NOTES.md
++++ b/NOTES.md
+@@ -1 +1,3 @@
+ # Notes
++
++Urgency bands: TASKS-12.
+==> commit d3e3432d0de8d38318fe9436b82656d612e9460c
+Merge branch 'notes'
+
+==> diff
+==> commit 188562c2b62eacf73a780c1896287ae2d3a356ee
+docs(skills): add the project skill library
+
+Installed skills plant skipped and retried tests on purpose; the history check skips them.
+
+==> diff
+
+diff --git a/.agents/skills/demo/templates/x.test.ts b/.agents/skills/demo/templates/x.test.ts
+new file mode 100644
+index 0000000..d372ec7
+--- /dev/null
++++ b/.agents/skills/demo/templates/x.test.ts
+@@ -0,0 +1 @@
++it.only('focuses on purpose', () => {});
+diff --git a/skills/tdd-workflow/tests/fixtures/check-tests/bad-disabled-test/a.test.ts b/skills/tdd-workflow/tests/fixtures/check-tests/bad-disabled-test/a.test.ts
+new file mode 100644
+index 0000000..feb03d0
+--- /dev/null
++++ b/skills/tdd-workflow/tests/fixtures/check-tests/bad-disabled-test/a.test.ts
+@@ -0,0 +1,5 @@
++describe('a planted bug', () => {
++  it.skip('stays skipped on purpose', () => {
++    jest.retryTimes(3);
++  });
++});

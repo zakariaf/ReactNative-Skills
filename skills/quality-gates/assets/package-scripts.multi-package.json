@@ -1,0 +1,6 @@
+{
+  "$comment": "When multi-package (npm workspaces): the canonical scripts that take another form. Every other script of templates/package-scripts.json stays as it is. Each workspace keeps its own \"typecheck\" script (tsc --noEmit -p tsconfig.json). check-gate-wiring.mjs reads this file when package.json has workspaces.",
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json && npm run -s typecheck --workspaces"
+  }
+}

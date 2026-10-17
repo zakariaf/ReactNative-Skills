@@ -1,0 +1,15 @@
+{
+  "base": [
+    {
+      "templates": true,
+      "firstLinePath": true,
+      "fill": {
+        "__FEATURE__": "tasks",
+        "__SURFACE__": "progress-grid",
+        "__SURFACE_PASCAL__": "ProgressGrid",
+        "__SURFACE_CAMEL__": "progressGrid"
+      }
+    },
+    "@tests/bases/app"
+  ]
+}

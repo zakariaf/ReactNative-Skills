@@ -1,0 +1,17 @@
+[
+  { "from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs" },
+  { "from": "scripts/lib/source-scan.mjs", "to": "scripts/lib/source-scan.mjs" },
+  { "from": "scripts/lib/workspaces.mjs", "to": "scripts/lib/workspaces.mjs" },
+  { "from": "repo-templates/eslint.config.mjs", "to": "templates/eslint.config.mjs" },
+  { "from": "repo-templates/tsconfig.base.json", "to": "templates/tsconfig.base.json" },
+  { "from": "repo-templates/tsconfig.json", "to": "templates/tsconfig.json" },
+  { "from": "repo-templates/src/tsconfig.json", "to": "templates/src/tsconfig.json" },
+  { "from": "repo-templates/src/app-env.d.ts", "to": "templates/src/app-env.d.ts" },
+  { "from": "repo-templates/dot-prettierrc.json", "to": "templates/dot-prettierrc.json" },
+  { "from": "repo-templates/dot-prettierignore", "to": "templates/dot-prettierignore" },
+  { "from": "repo-templates/knip.json", "to": "templates/knip.json" },
+  { "from": "repo-templates/src/services/async/with-timeout.ts", "to": "examples/with-timeout.ts" },
+  { "from": "repo-templates/src/services/async/with-timeout.test.ts", "to": "examples/with-timeout.test.ts" },
+  { "from": "repo-templates/src/services/async/with-timeout.ts", "to": "tests/fixtures/check-source/good/src/services/async/with-timeout.ts" },
+  { "from": "repo-templates/src/services/async/with-timeout.test.ts", "to": "tests/fixtures/check-source/good/src/services/async/with-timeout.test.ts" }
+]

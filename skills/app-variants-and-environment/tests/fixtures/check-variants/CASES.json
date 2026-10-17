@@ -1,0 +1,713 @@
+{
+  "bad-config-throws-for-preview": {
+    "expect": ["FAIL app.config.ts:1 [variant-config] app.config.ts fails for APP_VARIANT=preview: no preview icon set"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "  const icons = iconsFor(variant);\n",
+          "with": "  const icons = iconsFor(variant);\n  if (variant === 'preview') {\n    throw new Error('no preview icon set');\n  }\n"
+        }
+      }
+    ]
+  },
+  "bad-eas-profile-base-conflict": {
+    "expect": [
+      "FAIL eas.json:6 [eas-profile] build.base (a shared base extended by development, preview, production): sets \"environment\": \"production\", but development builds development",
+      "check-variants: 8 config evaluations checked, 1 problems"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "eas.json",
+          "json": {
+            "cli": { "version": ">= 24.10.0" },
+            "build": {
+              "base": { "node": "26.4.0", "environment": "production" },
+              "development": {
+                "extends": "base",
+                "developmentClient": true,
+                "distribution": "internal",
+                "environment": "development",
+                "env": { "APP_VARIANT": "development", "EXPO_PUBLIC_APP_VARIANT": "development" }
+              },
+              "preview": {
+                "extends": "base",
+                "distribution": "internal",
+                "environment": "preview",
+                "env": { "APP_VARIANT": "preview", "EXPO_PUBLIC_APP_VARIANT": "preview" }
+              },
+              "production": {
+                "extends": "base",
+                "env": { "APP_VARIANT": "production", "EXPO_PUBLIC_APP_VARIANT": "production" }
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "bad-eas-profile-dev-client": {
+    "expect": ["[eas-profile] build.production: developmentClient is true in a production profile"],
+    "ops": [{ "json": { "file": "eas.json", "path": ["build", "production", "developmentClient"], "value": true } }]
+  },
+  "bad-eas-profile-env": {
+    "expect": ["[eas-profile] build.production: env.EXPO_PUBLIC_APP_VARIANT is null, expected \"production\""],
+    "ops": [
+      {
+        "json": {
+          "file": "eas.json",
+          "path": ["build", "production", "env", "EXPO_PUBLIC_APP_VARIANT"],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "bad-eas-profile-environment": {
+    "expect": ["[eas-profile] build.preview: \"environment\" is \"production\", expected \"preview\""],
+    "ops": [{ "json": { "file": "eas.json", "path": ["build", "preview", "environment"], "value": "production" } }]
+  },
+  "bad-eas-profile-missing": {
+    "expect": ["[eas-profile] eas.json has no \"preview\" build profile"],
+    "ops": [{ "json": { "file": "eas.json", "path": ["build", "preview"], "delete": true } }]
+  },
+  "bad-eas-profile-node-pin": {
+    "expect": [
+      "FAIL eas.json:7 [eas-profile] build.base pins Node 20.19.4: metro.config.js and app.config.ts load .ts files with Node's type stripping"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "eas.json",
+          "json": {
+            "cli": { "version": ">= 24.10.0" },
+            "build": {
+              "base": {
+                "node": "20.19.4",
+                "env": { "EXPO_PUBLIC_TASKS_API_URL": "https://api.tasks.test" },
+                "ios": { "image": "latest" }
+              },
+              "development": {
+                "extends": "base",
+                "developmentClient": true,
+                "distribution": "internal",
+                "environment": "development",
+                "env": { "APP_VARIANT": "development", "EXPO_PUBLIC_APP_VARIANT": "development" }
+              },
+              "preview": {
+                "extends": "base",
+                "distribution": "internal",
+                "environment": "preview",
+                "env": { "APP_VARIANT": "preview", "EXPO_PUBLIC_APP_VARIANT": "preview" }
+              },
+              "production": {
+                "extends": "base",
+                "environment": "production",
+                "env": { "APP_VARIANT": "production", "EXPO_PUBLIC_APP_VARIANT": "production" }
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "bad-eas-profile-unnamed": {
+    "expect": ["[eas-profile] build.simulator: sets no APP_VARIANT (directly or through extends)"],
+    "ops": [
+      { "json": { "file": "eas.json", "path": ["build", "simulator"], "value": { "ios": { "simulator": true } } } }
+    ]
+  },
+  "bad-metro-missing": {
+    "expect": ["FAIL metro.config.js [metro-cache-key] no metro.config.js"],
+    "ops": [{ "delete": "metro.config.js" }]
+  },
+  "bad-metro-no-cache-version": {
+    "expect": ["FAIL metro.config.js:1 [metro-cache-key] metro.config.js does not set cacheVersion"],
+    "ops": [
+      {
+        "replace": {
+          "file": "metro.config.js",
+          "find": "config.cacheVersion = publicEnvCacheVersion(process.env);\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-metro-same-per-variant": {
+    "expect": [
+      "FAIL metro.config.js:20 [metro-cache-key] cacheVersion is",
+      "for every variant: a production export reuses the development transforms"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "metro.config.js",
+          "find": "config.cacheVersion = publicEnvCacheVersion(process.env);",
+          "with": "config.cacheVersion = publicEnvCacheVersion({ ...process.env, EXPO_PUBLIC_APP_VARIANT: undefined });"
+        }
+      }
+    ]
+  },
+  "bad-metro-unkeyed": {
+    "expect": ["[metro-cache-key] cacheVersion is not derived from the EXPO_PUBLIC_* values"],
+    "ops": [
+      {
+        "replace": {
+          "file": "metro.config.js",
+          "find": "config.cacheVersion = publicEnvCacheVersion(process.env);",
+          "with": "config.cacheVersion = '1.0';"
+        }
+      }
+    ]
+  },
+  "bad-metro-variant-only": {
+    "expect": [
+      "[metro-cache-key] cacheVersion is not derived from the EXPO_PUBLIC_* values: it stays \"production\" when only EXPO_PUBLIC_RNSKILLS_PROBE changes"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "metro.config.js",
+          "find": "config.cacheVersion = publicEnvCacheVersion(process.env);",
+          "with": "config.cacheVersion = process.env.EXPO_PUBLIC_APP_VARIANT ?? 'development';"
+        }
+      }
+    ]
+  },
+  "bad-secret-config-extra": {
+    "expect": [
+      "[secret-config] extra.signingKey looks like a secret",
+      "[secret-config] extra.signingKey holds a PEM private key"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    experiments: { typedRoutes: true, reactCompiler: true },\n",
+          "with": "    experiments: { typedRoutes: true, reactCompiler: true },\n    extra: { signingKey: '-----BEGIN PRIVATE XKEY-----\\nMIIBVQ\\n-----END PRIVATE XKEY-----' },\n"
+        }
+      },
+      { "replace": { "file": "app.config.ts", "find": "PRIVATE XKEY", "with": "PRIVATE KEY", "all": true } }
+    ]
+  },
+  "bad-secret-config-llm": {
+    "expect": ["[secret-config] the value of OPENAI_API_KEY reaches extra.aiKey in the public config"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    experiments: { typedRoutes: true, reactCompiler: true },\n",
+          "with": "    experiments: { typedRoutes: true, reactCompiler: true },\n    extra: { aiKey: process.env['OPENAI_API_KEY'] },\n"
+        }
+      }
+    ]
+  },
+  "bad-secret-config-plugin": {
+    "expect": ["[secret-config] the value of SENTRY_AUTH_TOKEN reaches plugins[1][1].authToken in the public config"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    'expo-router',\n",
+          "with": "    'expo-router',\n    ['@sentry/react-native/expo', { organization: 'tasks', authToken: process.env['SENTRY_AUTH_TOKEN'] }],\n"
+        }
+      },
+      { "json": { "file": "package.json", "path": ["dependencies", "@sentry/react-native"], "value": "~7.11.0" } }
+    ]
+  },
+  "bad-variant-config": {
+    "expect": ["FAIL app.json:1 [variant-config] app.json sits beside app.config.ts"],
+    "ops": [{ "write": { "file": "app.json", "content": "{ \"expo\": { \"name\": \"Tasks\" } }\n" } }]
+  },
+  "bad-variant-config-local-plugin": {
+    "expect": ["[variant-config] plugin \"./plugins/with-tasks-widget.js\" (every variant) does not exist"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    'expo-router',\n",
+          "with": "    'expo-router',\n    './plugins/with-tasks-widget.js',\n"
+        }
+      }
+    ]
+  },
+  "bad-variant-config-plugin-missing": {
+    "expect": [
+      "[variant-config] plugin \"expo-dev-client\" (every variant) comes from expo-dev-client, which is neither in package.json nor installed",
+      "npx expo install expo-dev-client"
+    ],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo-dev-client"], "delete": true } }]
+  },
+  "bad-variant-icon-copied": {
+    "expect": ["[variant-icon] the development iOS icon files are byte-identical copies of production's"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "const STORE_IOS_ICON = 'expo.icon';",
+          "with": "const STORE_IOS_ICON = 'icon.png';"
+        }
+      },
+      { "delete": "assets/icons/development/icon.png" },
+      { "copy": { "from": "assets/icons/production/icon.png", "to": "assets/icons/development/icon.png" } }
+    ]
+  },
+  "bad-variant-icon-copied-android": {
+    "expect": ["[variant-icon] the preview Android icon files are byte-identical copies of production's"],
+    "ops": [
+      {
+        "delete": [
+          "assets/icons/preview/android-foreground.png",
+          "assets/icons/preview/android-background.png",
+          "assets/icons/preview/android-monochrome.png"
+        ]
+      },
+      {
+        "copy": {
+          "from": "assets/icons/production/android-foreground.png",
+          "to": "assets/icons/preview/android-foreground.png"
+        }
+      },
+      {
+        "copy": {
+          "from": "assets/icons/production/android-background.png",
+          "to": "assets/icons/preview/android-background.png"
+        }
+      },
+      {
+        "copy": {
+          "from": "assets/icons/production/android-monochrome.png",
+          "to": "assets/icons/preview/android-monochrome.png"
+        }
+      }
+    ]
+  },
+  "bad-variant-icon-missing": {
+    "expect": [
+      "FAIL assets/icons/preview/icon.png [variant-icon] icon of the preview variant names assets/icons/preview/icon.png, which does not exist: npx expo prebuild and EAS Build stop with ENOENT Fix: Draw the badged copies: make-variant-icons.mjs",
+      "check-variants: 8 config evaluations checked, 1 problems"
+    ],
+    "ops": [{ "delete": "assets/icons/preview/icon.png" }]
+  },
+  "bad-variant-icon-missing-store": {
+    "expect": [
+      "FAIL assets/icons/production/android-background.png [variant-icon] android.adaptiveIcon.backgroundImage of the production variant names assets/icons/production/android-background.png, which does not exist: npx expo prebuild and EAS Build stop with ENOENT Fix: Move the app's store icon files into assets/icons/production/"
+    ],
+    "ops": [{ "delete": "assets/icons/production/android-background.png" }]
+  },
+  "bad-variant-icon-shared": {
+    "expect": [
+      "[variant-icon] development uses the production iOS icon",
+      "[variant-icon] preview uses the production Android icon"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "const folder = `./assets/icons/${variant}`;",
+          "with": "const folder = './assets/icons/production';"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "ios: variant === 'production' ? `${folder}/${STORE_IOS_ICON}` : `${folder}/icon.png`,",
+          "with": "ios: `${folder}/${STORE_IOS_ICON}`,"
+        }
+      }
+    ]
+  },
+  "bad-variant-id-format": {
+    "expect": ["[variant-id] android.package \"com.example.my-tasks\" (production) is not a valid Android package"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "      package: identity.appId,",
+          "with": "      package: identity.appId.replace('tasks', 'my-tasks'),"
+        }
+      }
+    ]
+  },
+  "bad-variant-id-not-derived": {
+    "expect": [
+      "[variant-id] development Android package \"com.example.devtasks\" does not extend the production id \"com.example.tasks\" by one segment"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "      package: identity.appId,",
+          "with": "      package: variant === 'development' ? 'com.example.devtasks' : identity.appId,"
+        }
+      }
+    ]
+  },
+  "bad-variant-id-reserved": {
+    "expect": [
+      "[variant-id] android.package \"com.example.new\" (production) is not a valid Android package: \"new\" is a reserved Java keyword"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "  appId: 'com.example.tasks',",
+          "with": "  appId: 'com.example.new',"
+        }
+      }
+    ]
+  },
+  "bad-variant-id-shared": {
+    "expect": [
+      "[variant-id] development uses the production iOS bundle identifier \"com.example.tasks\"",
+      "[variant-id] preview uses the production iOS bundle identifier \"com.example.tasks\""
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "ios: { bundleIdentifier: identity.appId,",
+          "with": "ios: { bundleIdentifier: BASE.appId,"
+        }
+      }
+    ]
+  },
+  "bad-variant-name": {
+    "expect": ["[variant-name] development and production are both named \"Tasks\""],
+    "ops": [
+      { "replace": { "file": "app.config.ts", "find": "    name: identity.name,", "with": "    name: BASE.name," } }
+    ]
+  },
+  "bad-variant-name-marker": {
+    "expect": ["[variant-name] the production name \"Tasks (Dev)\" carries a testing marker"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    name: identity.name,",
+          "with": "    name: variant === 'production' ? 'Tasks (Dev)' : identity.name,"
+        }
+      }
+    ]
+  },
+  "bad-variant-resolve-committed-env": {
+    "expect": [
+      "[variant-resolve] with no variant exported locally the config builds com.example.tasks / com.example.tasks / Tasks, not the development variant: .env sets the variant, and Expo CLI loads it for start, export and prebuild",
+      "Fix: Remove APP_VARIANT and EXPO_PUBLIC_APP_VARIANT from .env"
+    ],
+    "ops": [
+      { "replace": { "file": ".gitignore", "find": ".env*\n", "with": ".env*.local\n" } },
+      { "write": { "file": ".env", "content": "APP_VARIANT=production\nEXPO_PUBLIC_APP_VARIANT=production\n" } }
+    ]
+  },
+  "bad-variant-resolve-lenient": {
+    "expect": [
+      "[variant-resolve] the config evaluates with APP_VARIANT=staging (an unknown name)",
+      "[variant-resolve] the config evaluates with APP_VARIANT=production without EXPO_PUBLIC_APP_VARIANT"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "const variant = resolveAppVariant(process.env);",
+          "with": "const variant = (process.env['APP_VARIANT'] ?? 'development') as AppVariant;"
+        }
+      }
+    ]
+  },
+  "bad-variant-resolve-local-default": {
+    "expect": [
+      "[variant-resolve] with no variant set locally the config builds com.example.tasks / com.example.tasks / Tasks, not the development variant"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/app-variant.ts",
+          "find": "    return 'development';",
+          "with": "    return 'production';"
+        }
+      }
+    ]
+  },
+  "bad-variant-resolve-mismatch": {
+    "expect": [
+      "FAIL app.config.ts:75 [variant-resolve] the config evaluates with APP_VARIANT=production without EXPO_PUBLIC_APP_VARIANT: the JS bundle would believe it is a development build"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/app-variant.ts",
+          "find": "if (forConfig !== forBundle) {",
+          "with": "if (forConfig === undefined && forBundle !== undefined) {"
+        }
+      }
+    ]
+  },
+  "bad-variant-resolve-unset": {
+    "expect": [
+      "[variant-resolve] the config evaluates with no variant in a production bundle (NODE_ENV=production: expo export, eas update)",
+      "[variant-resolve] the config evaluates with no variant on an EAS Build worker (EAS_BUILD=true)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/app-variant.ts",
+          "find": "if (needsExplicitVariant(env)) {",
+          "with": "if (env['FORCE_EXPLICIT_VARIANT'] === 'yes') {"
+        }
+      }
+    ]
+  },
+  "bad-variant-scheme": {
+    "expect": [
+      "[variant-scheme] the URL scheme \"acmetasks\" is registered by both development and production",
+      "Fix: Give every variant its own scheme: acmetasks-dev, acmetasks-preview, acmetasks (variantIdentity does)."
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    scheme: identity.scheme,",
+          "with": "    scheme: BASE.scheme,"
+        }
+      },
+      { "replace": { "file": "app.config.ts", "find": "  scheme: 'tasks',", "with": "  scheme: 'acmetasks'," } }
+    ]
+  },
+  "bad-variant-scheme-dev-client": {
+    "expect": [
+      "[variant-scheme] production registers the dev client's generated exp+<slug> scheme",
+      "[variant-scheme] preview registers the dev client's generated exp+<slug> scheme"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "addGeneratedScheme: variant === 'development'",
+          "with": "addGeneratedScheme: true"
+        }
+      }
+    ]
+  },
+  "error-bad-eas-json": {
+    "expect": ["ERROR [bad-input] eas.json is not valid JSON"],
+    "ops": [{ "write": { "file": "eas.json", "content": "{ \"build\": \n" } }]
+  },
+  "error-no-app-config": {
+    "expect": ["ERROR [bad-input] nothing to check: no app config"],
+    "ops": [{ "delete": "app.config.ts" }]
+  },
+  "error-two-apps-no-app-dir": {
+    "expect": ["ERROR [bad-input] several workspaces hold an app config (apps/mobile, apps/tablet)"],
+    "ops": [
+      { "rename": { "from": "app.config.ts", "to": "apps/mobile/app.config.ts" } },
+      { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+      {
+        "write": {
+          "file": "package.json",
+          "content": "{ \"name\": \"tasks-repo\", \"private\": true, \"workspaces\": [\"apps/*\"] }\n"
+        }
+      },
+      { "copy": { "from": "apps/mobile", "to": "apps/tablet" } },
+      { "json": { "file": "apps/tablet/package.json", "path": ["name"], "value": "tablet" } }
+    ]
+  },
+  "pass-eas-profile-base": {
+    "expect": ["check-variants: 8 config evaluations checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "eas.json",
+          "json": {
+            "cli": { "version": ">= 24.10.0" },
+            "build": {
+              "base": {
+                "node": "26.4.0",
+                "env": { "EXPO_PUBLIC_TASKS_API_URL": "https://api.tasks.test" },
+                "ios": { "image": "latest" }
+              },
+              "development": {
+                "extends": "base",
+                "developmentClient": true,
+                "distribution": "internal",
+                "environment": "development",
+                "env": { "APP_VARIANT": "development", "EXPO_PUBLIC_APP_VARIANT": "development" }
+              },
+              "preview": {
+                "extends": "base",
+                "distribution": "internal",
+                "environment": "preview",
+                "env": { "APP_VARIANT": "preview", "EXPO_PUBLIC_APP_VARIANT": "preview" }
+              },
+              "production": {
+                "extends": "base",
+                "environment": "production",
+                "env": { "APP_VARIANT": "production", "EXPO_PUBLIC_APP_VARIANT": "production" }
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "pass-eas-profile-extends": {
+    "expect": ["check-variants: 8 config evaluations checked, 0 problems"],
+    "ops": [
+      {
+        "json": {
+          "file": "eas.json",
+          "path": ["build", "simulator"],
+          "value": { "extends": "development", "ios": { "simulator": true } }
+        }
+      }
+    ]
+  },
+  "pass-eas-profile-node-pin": {
+    "expect": ["check-variants: 8 config evaluations checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "eas.json",
+          "json": {
+            "cli": { "version": ">= 24.10.0" },
+            "build": {
+              "base": {
+                "node": "22.23.1",
+                "env": { "EXPO_PUBLIC_TASKS_API_URL": "https://api.tasks.test" },
+                "ios": { "image": "latest" }
+              },
+              "development": {
+                "extends": "base",
+                "developmentClient": true,
+                "distribution": "internal",
+                "environment": "development",
+                "env": { "APP_VARIANT": "development", "EXPO_PUBLIC_APP_VARIANT": "development" }
+              },
+              "preview": {
+                "extends": "base",
+                "distribution": "internal",
+                "environment": "preview",
+                "env": { "APP_VARIANT": "preview", "EXPO_PUBLIC_APP_VARIANT": "preview" }
+              },
+              "production": {
+                "extends": "base",
+                "environment": "production",
+                "env": { "APP_VARIANT": "production", "EXPO_PUBLIC_APP_VARIANT": "production" },
+                "node": "22.x"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "pass-fail-closed-locally": {
+    "expect": ["check-variants: 8 config evaluations checked, 0 problems"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/app-variant.ts",
+          "find": "    return 'development';",
+          "with": "    throw new Error('set APP_VARIANT and EXPO_PUBLIC_APP_VARIANT');"
+        }
+      }
+    ]
+  },
+  "pass-metro-unloadable": {
+    "expect": [
+      "note: metro.config.js could not be loaded",
+      "metro-cache-key checked statically",
+      "check-variants: 8 config evaluations checked, 0 problems"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "metro.config.js",
+          "find": "module.exports = config;",
+          "with": "const { withTasksCss } = require('tasks-css/metro');\n\nmodule.exports = withTasksCss(config);"
+        }
+      }
+    ]
+  },
+  "pass-multi-package": {
+    "expect": ["check-variants: 8 config evaluations checked, 0 problems"],
+    "args": "{dir} --app-dir apps/mobile",
+    "ops": [
+      { "rename": { "from": "app.config.ts", "to": "apps/mobile/app.config.ts" } },
+      { "rename": { "from": "eas.json", "to": "apps/mobile/eas.json" } },
+      { "rename": { "from": "metro.config.js", "to": "apps/mobile/metro.config.js" } },
+      { "rename": { "from": ".env.example", "to": "apps/mobile/.env.example" } },
+      { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      { "rename": { "from": "scripts", "to": "apps/mobile/scripts" } },
+      { "rename": { "from": "assets", "to": "apps/mobile/assets" } },
+      {
+        "write": {
+          "file": "package.json",
+          "content": "{ \"name\": \"tasks-repo\", \"private\": true, \"workspaces\": [\"apps/*\"] }\n"
+        }
+      }
+    ]
+  },
+  "pass-multi-package-detected": {
+    "expect": ["check-variants: 8 config evaluations checked, 0 problems"],
+    "ops": [
+      { "rename": { "from": "app.config.ts", "to": "apps/mobile/app.config.ts" } },
+      { "rename": { "from": "eas.json", "to": "apps/mobile/eas.json" } },
+      { "rename": { "from": "metro.config.js", "to": "apps/mobile/metro.config.js" } },
+      { "rename": { "from": ".env.example", "to": "apps/mobile/.env.example" } },
+      { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      { "rename": { "from": "scripts", "to": "apps/mobile/scripts" } },
+      { "rename": { "from": "assets", "to": "apps/mobile/assets" } },
+      {
+        "write": {
+          "file": "package.json",
+          "content": "{ \"name\": \"tasks-repo\", \"private\": true, \"workspaces\": [\"apps/*\"] }\n"
+        }
+      }
+    ]
+  },
+  "pass-no-eas-json": {
+    "expect": ["SKIP eas.json [eas-profile] not yet created (eas-build-and-submit creates it)"],
+    "ops": [{ "delete": "eas.json" }]
+  },
+  "pass-not-expo": {
+    "expect": ["NOT APPLICABLE: expo is not in package.json dependencies (not an Expo app)"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo"], "delete": true } }]
+  },
+  "pass-submit-empty-production": {
+    "expect": [
+      "note: eas.json submit.production pins no ios.ascAppId or ios.bundleIdentifier and android.applicationId",
+      "check-variants: 8 config evaluations checked, 0 problems"
+    ],
+    "ops": [{ "json": { "file": "eas.json", "path": ["submit", "production"], "value": {} } }]
+  },
+  "pass-submit-unpinned-note": {
+    "expect": [
+      "note: eas.json submit.production pins no ios.ascAppId or ios.bundleIdentifier and android.applicationId",
+      "check-variants: 8 config evaluations checked, 0 problems"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "eas.json",
+          "path": ["submit", "production"],
+          "value": { "ios": { "appleId": "dev@example.com" }, "android": { "track": "internal" } }
+        }
+      }
+    ]
+  },
+  "pass-variant-id-uppercase": {
+    "expect": ["check-variants: 8 config evaluations checked, 0 problems"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "  appId: 'com.example.tasks',",
+          "with": "  appId: 'com.Example.tasks',"
+        }
+      }
+    ]
+  }
+}

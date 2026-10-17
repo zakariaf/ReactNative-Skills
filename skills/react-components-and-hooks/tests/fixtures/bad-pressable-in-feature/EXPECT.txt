@@ -1,0 +1,3 @@
+[banned-import] imports Pressable outside the UI primitives folder
+src/features/tasks/components/raw-button.tsx:2
+RESULT: FAIL (1 problems)

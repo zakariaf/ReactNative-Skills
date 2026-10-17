@@ -1,0 +1,13 @@
+{
+  "permissions": [
+    {
+      "kind": "camera",
+      "feature": "Take a photo and attach it to a task",
+      "askedFrom": "src/features/tasks/use-tasks-model.ts",
+      "platforms": [
+        "ios",
+        "android"
+      ]
+    }
+  ]
+}

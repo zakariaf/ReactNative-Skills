@@ -1,0 +1,20 @@
+// modules/time-change/android/build.gradle
+// The sdk-57 local module template: the Expo module Gradle plugin brings Kotlin and expo-modules-core.
+plugins {
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
+}
+
+group = 'expo.modules.timechange'
+version = '1.0.0'
+
+android {
+  namespace "expo.modules.timechange"
+  defaultConfig {
+    versionCode 1
+    versionName "1.0.0"
+  }
+  lintOptions {
+    abortOnError false
+  }
+}

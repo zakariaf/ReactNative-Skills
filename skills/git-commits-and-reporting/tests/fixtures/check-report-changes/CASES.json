@@ -1,0 +1,62 @@
+{
+  "bad-baseline-ratio-not-file": {
+    "expect": ["report.md:18 [baseline-change-trailer]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": "- .maestro/baselines/: 4 task-list screenshots after the row change (Gate-Change trailer in 8c2f4b0)",
+          "with": "- Task list screenshots, light/dark: 4 baselines after the row change (Gate-Change trailer in 8c2f4b0)"
+        }
+      }
+    ]
+  },
+  "bad-baseline-trailer-missing": {
+    "expect": ["report.md:18 [baseline-change-trailer]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": " after the row change (Gate-Change trailer in 8c2f4b0)",
+          "with": " after the row change"
+        }
+      }
+    ]
+  },
+  "bad-human-checks-none-pending": {
+    "expect": ["report.md:25 [human-checks-listed]", "says no review is pending, but texts changed"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": "review of changed texts: the ar draft of tasks.empty.title",
+          "with": "review of changed texts: none pending"
+        }
+      }
+    ]
+  },
+  "bad-translations-missing-locale": {
+    "expect": ["report.md:21 [translations-listed]", "does not name ar"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": "- tasks.empty.title (en, ar): the source text now reads \"Nothing due today\"; ar changed with it, and the ar draft goes to a native-language review, listed under \"Human checks (not blocking)\".",
+          "with": "- tasks.empty.title (en): the source text now reads \"Nothing due today\"; the native-language review is listed under \"Human checks (not blocking)\"."
+        }
+      }
+    ]
+  },
+  "bad-translations-no-review": {
+    "expect": ["report.md:21 [translations-listed]", "does not say which drafts go to a native-language review"],
+    "ops": [
+      {
+        "replace": {
+          "file": "report.md",
+          "find": ", and the ar draft goes to a native-language review, listed under \"Human checks (not blocking)\".",
+          "with": "."
+        }
+      }
+    ]
+  }
+}

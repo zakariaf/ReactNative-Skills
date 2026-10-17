@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "screens": [
+    {
+      "id": "notes",
+      "name": "Notes",
+      "presentation": "route",
+      "route": "src/app/(app)/notes.tsx",
+      "model": "src/features/notes/use-notes-model.ts",
+      "view": "src/features/notes/notes-screen.tsx",
+      "states": [{ "id": "default" }],
+      "elements": [
+        { "testID": "notes.screen", "role": "none", "component": "View" },
+        { "testID": "notes.body", "role": "text", "component": "AppText", "text": "notes.body" }
+      ]
+    },
+    {
+      "id": "note-detail",
+      "name": "Note",
+      "presentation": "route",
+      "route": "src/app/(app)/notes/[noteId].tsx",
+      "model": "src/features/note-detail/use-note-detail-model.ts",
+      "view": "src/features/note-detail/note-detail-screen.tsx",
+      "states": [{ "id": "ready" }, { "id": "invalid-link", "drawn": false, "why": "Any link can name nothing." }],
+      "elements": [{ "testID": "note-detail.screen", "role": "none", "component": "View" }]
+    }
+  ]
+}

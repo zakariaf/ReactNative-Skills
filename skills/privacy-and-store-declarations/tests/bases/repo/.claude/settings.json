@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(**/*.p8)",
+      "Read(**/AuthKey_*)",
+      "Read(**/*.p12)",
+      "Read(**/*.mobileprovision)",
+      "Read(**/*.keystore)",
+      "Read(**/*.jks)",
+      "Read(**/credentials.json)",
+      "Read(**/*service-account*.json)",
+      "Read(**/key.properties)",
+      "Read(**/keystore.properties)"
+    ]
+  }
+}

@@ -1,0 +1,30 @@
+# .maestro/design-review/open-cell.yaml (example shape: e2e-maestro owns the flows and the runner)
+# Opens one cell's state and waits until it has settled; the runner then takes the screenshot itself
+# (screenshotCommands in scripts/design-review/device-settings.ts), so every cell is captured one way.
+# On iOS it first turns the simulator (simctl cannot rotate one); Android is turned by the runner
+# (orientationCommands). One run per cell, always naming the device and this run's driver port:
+#   maestro --device <udid> --driver-host-port <port> test .maestro/design-review/open-cell.yaml \
+#     -e APP_ID=com.example.tasks.preview -e LINK='tasks://debug/setup?open=tasks' \
+#     -e ROOT=tasks.list -e ORIENTATION=LANDSCAPE_LEFT
+appId: ${APP_ID}
+name: Design review cell
+tags: [design-review]
+---
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - setOrientation: ${ORIENTATION}
+- openLink:
+    link: ${LINK}
+- runFlow:
+    when:
+      visible: 'Open'
+    commands:
+      - tapOn: 'Open'
+- extendedWaitUntil:
+    visible:
+      id: ${ROOT}
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000

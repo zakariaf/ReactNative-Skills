@@ -1,0 +1,271 @@
+{
+  "bad-overdue-no-tag": {
+    "expect": ["[upgrade-due] expo \"latest\" is 59.0.1, past SDK 58, and the facts hold no \"sdk-58\" dist-tag"],
+    "ops": [{ "json": { "file": "facts.json", "path": ["distTags", "latest"], "value": "59.0.1" } }]
+  },
+  "bad-skip-sdk-56": {
+    "expect": [
+      "sdk      app on Expo SDK 55; target SDK 57 (expo 57.0.27, dist-tag sdk-57); npm latest 58.0.2",
+      "note     SDK 57 is the next move from SDK 55, skipping SDK 56: Expo's expo-upgrade skill",
+      "[upgrade-due] SDK 57 (expo 57.0.27) meets the trigger and the app is still on SDK 55",
+      "plan 1   git switch -c chore/expo-sdk-57",
+      "plan 2   npx expo install expo@~57.0.27 && npx expo install --fix"
+    ],
+    "ops": [
+      {
+        "$comment": "An app on SDK 55: Expo's notes send it straight to SDK 57 (57 lists 55 in skipFrom); the facts hold SDK 57's map.",
+        "json": { "file": "package.json", "path": ["dependencies", "expo"], "value": "~55.0.31" }
+      },
+      {
+        "json": {
+          "file": "facts.json",
+          "path": ["moduleMap"],
+          "value": {
+            "@shopify/react-native-skia": "2.6.2",
+            "eslint-config-expo": "~57.0.2",
+            "expo-build-properties": "~57.0.22",
+            "expo-router": "~57.0.24",
+            "expo-system-ui": "~57.0.4",
+            "jest-expo": "~57.0.5",
+            "react": "19.2.3",
+            "react-native": "0.86.3",
+            "react-native-gesture-handler": "~2.32.0",
+            "react-native-reanimated": "4.5.1",
+            "react-native-screens": "~4.26.0",
+            "react-native-worklets": "0.10.1"
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "facts.json",
+          "path": ["packageTimes"],
+          "value": {
+            "@shopify/react-native-skia": { "2.6.2": "2026-09-10T10:00:00.000Z" },
+            "eslint-config-expo": { "57.0.2": "2026-09-10T10:00:00.000Z" },
+            "expo-build-properties": { "57.0.22": "2026-09-10T10:00:00.000Z" },
+            "expo-router": { "57.0.24": "2026-09-10T10:00:00.000Z" },
+            "expo-system-ui": { "57.0.4": "2026-09-10T10:00:00.000Z" },
+            "jest-expo": { "57.0.5": "2026-09-10T10:00:00.000Z" },
+            "react": { "19.2.3": "2026-09-10T10:00:00.000Z" },
+            "react-native": { "0.86.3": "2026-09-10T10:00:00.000Z" },
+            "react-native-gesture-handler": { "2.32.0": "2026-09-10T10:00:00.000Z" },
+            "react-native-reanimated": { "4.5.1": "2026-09-10T10:00:00.000Z" },
+            "react-native-screens": { "4.26.0": "2026-09-10T10:00:00.000Z" },
+            "react-native-worklets": { "0.10.1": "2026-09-10T10:00:00.000Z" },
+            "@react-native/jest-preset": { "0.86.3": "2026-09-10T10:00:00.000Z" },
+            "@react-native/eslint-plugin": { "0.86.3": "2026-09-10T10:00:00.000Z" }
+          }
+        }
+      }
+    ]
+  },
+  "bad-store-deadline-play": {
+    "expect": [
+      "wait     [target-stable]",
+      "FAIL app.config.ts:7 [store-deadline] Android targetSdk 35 (targetSdkVersion in app.config.ts) is below 36: from 2026-08-31 Google Play says new apps and app updates must target Android 16 (API level 36)"
+    ],
+    "ops": [
+      { "json": { "file": "facts.json", "path": ["distTags", "latest"], "value": "57.0.27" } },
+      { "json": { "file": "facts.json", "path": ["distTags", "next"], "value": "58.0.0-preview.9" } },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "return ['expo-router',",
+          "with": "return [['expo-build-properties', { android: { targetSdkVersion: 35 } }], 'expo-router',"
+        }
+      }
+    ]
+  },
+  "bad-store-deadline-xcode": {
+    "expect": [
+      "FAIL .xcode-version:1 [store-deadline] Xcode 16.4 (.xcode-version) is below 26.0: from 2026-04-28 Apple says apps uploaded to App Store Connect must be built with Xcode 26 or later"
+    ],
+    "ops": [
+      { "json": { "file": "facts.json", "path": ["distTags", "latest"], "value": "57.0.27" } },
+      { "json": { "file": "facts.json", "path": ["distTags", "next"], "value": "58.0.0-preview.9" } },
+      { "write": { "file": ".xcode-version", "content": "16.4\n" } }
+    ]
+  },
+  "bad-upgrade-due": {
+    "expect": [
+      "[upgrade-due] SDK 58 (expo 58.0.2) meets the trigger and the app is still on SDK 57: the move is due and not yet done",
+      "plan 1   git switch -c chore/expo-sdk-58",
+      "plan 2   npx expo install expo@~58.0.2 && npx expo install --fix",
+      "plan 3   npm install -D jest-expo@58.0.4 eslint-config-expo@58.0.3 @react-native/jest-preset@0.88.2 @react-native/eslint-plugin@0.88.2 @types/react@19.3 test-renderer@1.3 jest@30 babel-jest@30 @types/jest@30.0.0",
+      "RESULT: FAIL (1 problems)"
+    ]
+  },
+  "bad-upgrade-due-by-the-hour": {
+    "expect": [
+      "age      7 days (no .npmrc: the 7-day floor), measured at 2026-11-02T12:00Z",
+      "[upgrade-due] SDK 58 (expo 58.0.2) meets the trigger"
+    ],
+    "ops": [{ "json": { "file": "facts.json", "path": ["expoTimes", "58.0.2"], "value": "2026-10-26T06:00:00.000Z" } }]
+  },
+  "bad-upgrade-due-monorepo": {
+    "expect": [
+      "sdk      2 apps on Expo SDK 57; target SDK 58",
+      "FAIL apps/notes/package.json [upgrade-due] SDK 58 (expo 58.0.2) meets the trigger and the 2 apps are still on SDK 57",
+      "plan 2   (cd apps/notes && npx expo install expo@~58.0.2 && npx expo install --fix)",
+      "plan 2   (cd apps/tasks && npx expo install expo@~58.0.2 && npx expo install --fix)",
+      "plan 4   set root \"overrides\": { \"react\": \"<installed, at least 19.3.0>\""
+    ],
+    "base": ["@tests/bases/monorepo-57", "@tests/bases/trigger-facts"],
+    "extends": null,
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/vendored-skill/SKILL.md",
+          "content": "---\nname: vendored-skill\ndescription: A planted skill folder; its files hold findings on purpose and must stay invisible.\n---\n\n# vendored-skill\n"
+        }
+      },
+      {
+        "write": {
+          "file": "skills/demo-skill/SKILL.md",
+          "content": "---\nname: demo-skill\ndescription: A planted skill folder; its files hold findings on purpose and must stay invisible.\n---\n\n# demo-skill\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/third-party-skill/SKILL.md",
+          "content": "---\nname: third-party-skill\ndescription: A planted skill folder; its files hold findings on purpose and must stay invisible.\n---\n\n# third-party-skill\n"
+        }
+      }
+    ]
+  },
+  "bad-upgrade-overdue": {
+    "expect": [
+      "sdk      app on Expo SDK 57; target SDK 58 (expo 58.0.2, dist-tag sdk-58); npm latest 59.0.1",
+      "[upgrade-due] SDK 58 (expo 58.0.2) meets the trigger and the app is still on SDK 57",
+      "plan 2   npx expo install expo@~58.0.2 && npx expo install --fix"
+    ],
+    "ops": [
+      { "json": { "file": "facts.json", "path": ["distTags", "latest"], "value": "59.0.1" } },
+      { "json": { "file": "facts.json", "path": ["distTags", "sdk-58"], "value": "58.0.2" } },
+      { "json": { "file": "facts.json", "path": ["expoTimes", "59.0.1"], "value": "2027-02-10T10:00:00.000Z" } }
+    ]
+  },
+  "error-no-facts": {
+    "expect": ["ERROR [bad-input] no facts to judge: pass --online (reads npm) or --facts <file>"],
+    "args": "{dir}"
+  },
+  "error-no-latest": {
+    "expect": ["ERROR [bad-input] the facts hold no expo \"latest\" dist-tag"],
+    "ops": [{ "json": { "file": "facts.json", "path": ["distTags", "latest"], "delete": true } }]
+  },
+  "pass-after-move": {
+    "expect": [
+      "sdk      app on Expo SDK 58; target SDK 59; npm latest 58.0.2, next 59.0.0-preview.1",
+      "wait     [target-stable] SDK 59 is not stable yet: expo \"latest\" is 58.0.2 (next: 59.0.0-preview.1)",
+      "verdict  no SDK move due: stay on SDK 58"
+    ],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo"], "value": "~58.0.2" } }]
+  },
+  "pass-min-release-age-14": {
+    "expect": [
+      "age      14 days (.npmrc min-release-age), measured at 2026-11-02T12:00Z",
+      "wait     [target-age] expo 58.0.2 was published 2026-10-22T10:00Z; it is not 14 days old at 2026-11-02T12:00Z",
+      "possible from 2026-11-05T10:00Z",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": ".npmrc",
+          "lines": ["# The app is stricter than the 7-day floor.", "min-release-age=14", "engine-strict=true"]
+        }
+      }
+    ]
+  },
+  "pass-not-stable": {
+    "expect": [
+      "wait     [target-stable] SDK 58 is not stable yet: expo \"latest\" is 57.0.27 (next: 58.0.0-preview.9)",
+      "verdict  no SDK move due: stay on SDK 57; check again at the next session start"
+    ],
+    "ops": [
+      { "json": { "file": "facts.json", "path": ["distTags", "latest"], "value": "57.0.27" } },
+      { "json": { "file": "facts.json", "path": ["distTags", "next"], "value": "58.0.0-preview.9" } }
+    ]
+  },
+  "pass-package-missing": {
+    "expect": [
+      "wait     [package-missing] SDK 58 expects @shopify/react-native-skia 2.11.2, which npm does not list",
+      "verdict  no SDK move due: stay on SDK 57"
+    ],
+    "ops": [
+      { "json": { "file": "facts.json", "path": ["packageTimes", "@shopify/react-native-skia"], "delete": true } }
+    ]
+  },
+  "pass-package-young": {
+    "expect": [
+      "wait     [package-age] react-native-reanimated 4.7.0 was published 2026-10-28T12:00Z; it is not 7 days old at 2026-11-02T12:00Z; possible from 2026-11-04T12:00Z",
+      "verdict  no SDK move due: stay on SDK 57; the trigger can hold from 2026-11-04T12:00Z; check again then"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "facts.json",
+          "path": ["packageTimes", "react-native-reanimated", "4.7.0"],
+          "value": "2026-10-28T12:00:00.000Z"
+        }
+      }
+    ]
+  },
+  "pass-rn-tool-missing": {
+    "expect": [
+      "wait     [package-missing] SDK 58 expects @react-native/jest-preset 0.88.2, which npm does not list",
+      "verdict  no SDK move due: stay on SDK 57"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "facts.json",
+          "path": ["packageTimes", "@react-native/jest-preset", "0.88.2"],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "pass-store-notice": {
+    "expect": [
+      "notice   [store-deadline] Android targetSdk 35 (targetSdkVersion in app.config.ts) is below 36",
+      "plan the move before 2026-08-31",
+      "RESULT: PASS"
+    ],
+    "args": "{dir} --facts {dir}/facts.json --now 2026-08-01T12:00:00Z",
+    "ops": [
+      { "json": { "file": "facts.json", "path": ["distTags", "latest"], "value": "57.0.27" } },
+      { "json": { "file": "facts.json", "path": ["distTags", "next"], "value": "58.0.0-preview.9" } },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "return ['expo-router',",
+          "with": "return [['expo-build-properties', { android: { targetSdkVersion: 35 } }], 'expo-router',"
+        }
+      }
+    ]
+  },
+  "pass-too-young": {
+    "expect": [
+      "wait     [target-age] expo 58.0.2 was published 2026-10-30T09:00Z; it is not 7 days old at 2026-11-02T12:00Z",
+      "possible from 2026-11-06T09:00Z",
+      "verdict  no SDK move due: stay on SDK 57; the trigger can hold from 2026-11-06T09:00Z; check again then"
+    ],
+    "ops": [{ "json": { "file": "facts.json", "path": ["expoTimes", "58.0.2"], "value": "2026-10-30T09:00:00.000Z" } }]
+  },
+  "pass-young-by-seconds": {
+    "expect": [
+      "wait     [target-age] expo 58.0.2 was published 2026-10-26T18:00Z; it is not 7 days old at 2026-11-02T12:00Z",
+      "possible from 2026-11-02T18:01Z"
+    ],
+    "ops": [{ "json": { "file": "facts.json", "path": ["expoTimes", "58.0.2"], "value": "2026-10-26T18:00:30.000Z" } }]
+  },
+  "pass-young-by-the-hour": {
+    "expect": [
+      "wait     [target-age] expo 58.0.2 was published 2026-10-26T18:00Z; it is not 7 days old at 2026-11-02T12:00Z",
+      "possible from 2026-11-02T18:00Z"
+    ],
+    "ops": [{ "json": { "file": "facts.json", "path": ["expoTimes", "58.0.2"], "value": "2026-10-26T18:00:00.000Z" } }]
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "@acme/sliding-puzzle",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.ts",
+  "dependencies": {
+    "expo": "~57.0.26",
+    "react": "19.2.3",
+    "react-native": "0.86.3"
+  }
+}

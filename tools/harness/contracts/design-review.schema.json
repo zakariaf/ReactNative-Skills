@@ -1,0 +1,246 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "contracts/design-review.json",
+  "description": "The end-of-build design review plan read by design-review-workflow's check-review-plan.mjs, new-review.mjs, check-review.mjs and check-signoff.mjs. Paths are repo-relative. The checkers also prove what a schema cannot: the plan against the app config, the languages, the screen contract, the motion catalog and the debug-link contract.",
+  "type": "object",
+  "required": [
+    "version",
+    "screens",
+    "themes",
+    "locales",
+    "textSizes",
+    "devices",
+    "build",
+    "devicePass"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "version": { "const": 1 },
+    "reviewsDir": {
+      "description": "Where review records live, one folder per review (committed). Default design-review.",
+      "type": "string"
+    },
+    "capturesDir": {
+      "description": "Where captures live, <capturesDir>/<review-id>/cells and /motion (git-ignored). Default reports/design-review.",
+      "type": "string"
+    },
+    "screens": {
+      "type": "object",
+      "required": ["open"],
+      "additionalProperties": false,
+      "properties": {
+        "contract": {
+          "description": "The screen contract (screen-contracts). Default contracts/screens.json. Every screen and state is swept except embedded parts and the exclusions.",
+          "type": "string"
+        },
+        "exclude": {
+          "description": "Screens a person never sees in a shipped build (a test-only screen), each with why.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "why"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string" },
+              "why": { "type": "string", "minLength": 20 }
+            }
+          }
+        },
+        "open": {
+          "description": "How each swept state is opened: \"<screen>.<state>\" -> a debug-link query without lang/theme/motion (\"open=tasks\"), or an app path (\"/tasks/42\").",
+          "type": "object",
+          "additionalProperties": { "type": "string", "minLength": 1 }
+        },
+        "invariant": {
+          "description": "A screen that cannot change along an axis (a canvas with no text across locales), so identical captures there are expected.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["screen", "axis", "why"],
+            "additionalProperties": false,
+            "properties": {
+              "screen": { "type": "string" },
+              "axis": { "enum": ["theme", "locale", "text"] },
+              "why": { "type": "string", "minLength": 20 }
+            }
+          }
+        }
+      }
+    },
+    "themes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "enum": ["light", "dark"] }
+    },
+    "locales": {
+      "description": "One left-to-right and, when the app ships one, one right-to-left locale.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["tag", "direction"],
+        "additionalProperties": false,
+        "properties": {
+          "tag": { "type": "string", "pattern": "^[a-z]{2,3}(-[A-Za-z0-9]+)*$" },
+          "direction": { "enum": ["ltr", "rtl"] }
+        }
+      }
+    },
+    "textSizes": {
+      "description": "default (iOS large, Android 1) on every device and largest (iOS accessibility-extra-extra-extra-large, Android 2) on at least every smallest phone.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+          "ios": {
+            "enum": [
+              "extra-small",
+              "small",
+              "medium",
+              "large",
+              "extra-large",
+              "extra-extra-large",
+              "extra-extra-extra-large",
+              "accessibility-medium",
+              "accessibility-large",
+              "accessibility-extra-large",
+              "accessibility-extra-extra-large",
+              "accessibility-extra-extra-extra-large"
+            ]
+          },
+          "android": { "type": "number", "exclusiveMinimum": 0, "maximum": 3 },
+          "devices": {
+            "description": "Sweep this size only on these device ids (default: every device).",
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "devices": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "platform", "role", "model"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+          "platform": { "enum": ["ios", "android", "web"] },
+          "role": { "enum": ["smallest-phone", "phone", "tablet", "foldable", "desktop"] },
+          "model": { "type": "string", "minLength": 1 },
+          "name": {
+            "description": "The simulator or emulator this review creates and owns, <project>-<purpose>; never booted or a shared one.",
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)+$"
+          },
+          "orientation": { "enum": ["portrait", "landscape"] },
+          "size": {
+            "description": "The capture size in pixels [width, height], when known.",
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": { "type": "integer", "minimum": 1 }
+          }
+        }
+      }
+    },
+    "motion": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "catalog": {
+          "description": "The moment catalog (motion-and-animation). Default src/ui/motion/motion-moments.ts.",
+          "type": "string"
+        },
+        "record": {
+          "description": "Moments recorded as video, full and reduced motion, per platform.",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "notRecorded": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "why"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string" },
+              "why": { "type": "string", "minLength": 20 }
+            }
+          }
+        }
+      }
+    },
+    "build": {
+      "type": "object",
+      "required": ["variant"],
+      "additionalProperties": false,
+      "properties": {
+        "variant": {
+          "description": "The preview build: Release JavaScript that keeps the test-only debug link every combination is set through (language, theme, motion held still). Production builds strip it; the store build is judged in the on-device pass.",
+          "enum": ["preview"]
+        }
+      }
+    },
+    "signoff": {
+      "description": "Optional changes to the paths check-signoff.mjs treats as user-facing after the signed commit. Globs on repo paths: * stays inside a folder, ** crosses folders, a trailing / means the whole folder.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "watch": {
+          "description": "Extra user-facing paths (native/, a second entry file, a shared design folder).",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "ignore": {
+          "description": "Watched paths that never change what people see (a dev-only tool folder), each a deliberate choice.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "devicePass": {
+      "type": "object",
+      "required": ["hardware", "steps"],
+      "additionalProperties": false,
+      "properties": {
+        "hardware": {
+          "description": "Real phones, one per shipped platform at least: the cheapest of the target market.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "platform", "model"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+              "platform": { "enum": ["ios", "android"] },
+              "model": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "steps": {
+          "description": "Every core step, destructive ones last; an app may add its own.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "destructive"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+              "destructive": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,1061 @@
+{
+  "bad-android-blocked": {
+    "expect": [
+      "FAIL app.config.ts:16 [android-blocked] camera: android.permission.CAMERA is in android.blockedPermissions"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "android: { package: 'com.example.tasks' },",
+          "with": "android: { package: 'com.example.tasks', blockedPermissions: ['android.permission.CAMERA'] },"
+        }
+      }
+    ]
+  },
+  "bad-ask-from-action": {
+    "expect": [
+      "FAIL src/app/_layout.tsx:5 [ask-from-action] .requestPermission() in a startup file",
+      "FAIL src/features/task-photo/ask-at-load.ts:5 [ask-from-action] .requestPermission() at module scope",
+      "FAIL src/features/task-photo/use-auto-ask.ts:8 [ask-from-action] .requestAccess() inside useEffect()"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/task-photo/use-auto-ask.ts",
+          "lines": [
+            "// src/features/task-photo/use-auto-ask.ts",
+            "import { useEffect } from 'react';",
+            "",
+            "import type { PermissionGate } from '@/hooks/use-permission-gate';",
+            "",
+            "export function useAutoAsk(gate: PermissionGate, onAllowed: () => void): void {",
+            "  useEffect(() => {",
+            "    gate.requestAccess(onAllowed);",
+            "  }, [gate, onAllowed]);",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/task-photo/ask-at-load.ts",
+          "lines": [
+            "// src/features/task-photo/ask-at-load.ts",
+            "import { createFakePermissionAccess } from '@/services/permissions/fake-permissions';",
+            "",
+            "const camera = createFakePermissionAccess({ platform: 'ios' });",
+            "export const firstAnswer = camera.requestPermission();"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "  return <Stack />;",
+          "with": "  services.permissions.access.camera.requestPermission().catch(() => undefined);\n  return <Stack />;"
+        }
+      }
+    ]
+  },
+  "bad-asked-from-explain": {
+    "expect": [
+      "FAIL contracts/permissions.json:8 [asked-from] camera: src/features/task-photo/use-task-photo-model.ts passes shouldExplainFirst: false, the contract says true"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/permissions.json",
+          "path": ["permissions", 0, "shouldExplainFirst"],
+          "value": true
+        }
+      }
+    ]
+  },
+  "bad-asked-from-missing": {
+    "expect": ["[asked-from] camera: askedFrom src/features/task-photo/use-camera-model.ts does not exist"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/permissions.json",
+          "path": ["permissions", 0, "askedFrom"],
+          "value": "src/features/task-photo/use-camera-model.ts"
+        }
+      }
+    ]
+  },
+  "bad-asked-from-test": {
+    "expect": [
+      "FAIL contracts/permissions.json:8 [asked-from] camera: src/features/task-photo/use-task-photo-model.test.ts does not exist"
+    ],
+    "ops": [{ "delete": "src/features/task-photo/use-task-photo-model.test.tsx" }]
+  },
+  "bad-can-ask-again": {
+    "expect": [
+      "FAIL src/services/permissions/raw-camera-permission-adapter.ts:8 [can-ask-again] getCameraPermissionsAsync answers are mapped without canAskAgain"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/permissions/raw-camera-permission-adapter.ts",
+          "lines": [
+            "// src/services/permissions/raw-camera-permission-adapter.ts",
+            "import { getCameraPermissionsAsync, requestCameraPermissionsAsync } from 'expo-image-picker';",
+            "",
+            "import type { PermissionAccess } from '@/services/permissions/permissions-port';",
+            "",
+            "export function createRawCameraPermissionAdapter(): PermissionAccess {",
+            "  return {",
+            "    permission: async () => ((await getCameraPermissionsAsync()).granted ? 'granted' : 'denied'),",
+            "    requestPermission: async () => ((await requestCameraPermissionsAsync()).granted ? 'granted' : 'denied'),",
+            "  };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-can-ask-again-android": {
+    "expect": [
+      "FAIL src/services/permissions/android-camera-permission-adapter.ts:5 [can-ask-again] PermissionsAndroid.request results are read without NEVER_ASK_AGAIN"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/permissions/android-camera-permission-adapter.ts",
+          "lines": [
+            "// src/services/permissions/android-camera-permission-adapter.ts",
+            "import { PermissionsAndroid } from 'react-native';",
+            "",
+            "export async function askAndroidCamera(): Promise<'granted' | 'denied'> {",
+            "  const result = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.CAMERA);",
+            "  return result === PermissionsAndroid.RESULTS.GRANTED ? 'granted' : 'denied';",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-contract-entry": {
+    "expect": [
+      "[contract] tracking: App Tracking Transparency is asked through the ConsentPort (admob-ads-and-consent): leave it out of this contract",
+      "[contract] location-background: \"feature\" must say what the person gets (10 characters or more)",
+      "[contract] location-background: location-background needs a location entry"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/permissions.json",
+          "path": ["permissions", 1],
+          "value": { "kind": "tracking", "feature": "Ads that match" }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/permissions.json",
+          "path": ["permissions", 2],
+          "value": {
+            "kind": "location-background",
+            "feature": "GPS",
+            "askedFrom": "src/features/task-photo/use-task-photo-model.ts",
+            "platforms": ["android"],
+            "shouldExplainFirst": false,
+            "explain": {
+              "title": "permissions.camera.explain.title",
+              "body": "permissions.camera.explain.body",
+              "continue": "permissions.continue",
+              "dismiss": "permissions.not-now"
+            },
+            "settings": {
+              "title": "permissions.camera.settings.title",
+              "body": "permissions.camera.settings.body",
+              "open": "permissions.open-settings",
+              "dismiss": "permissions.close"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "bad-contract-json": {
+    "expect": ["FAIL contracts/permissions.json:1 [contract] not valid JSON"],
+    "ops": [{ "write": { "file": "contracts/permissions.json", "lines": ["{ \"permissions\": [ }"] } }]
+  },
+  "bad-contract-missing": {
+    "expect": [
+      "FAIL src/services/permissions/camera-permission-adapter.ts:25 [contract] getCameraPermissionsAsync reads or requests a permission, but contracts/permissions.json does not exist"
+    ],
+    "ops": [{ "delete": "contracts/permissions.json" }]
+  },
+  "bad-contract-unused": {
+    "expect": ["[contract-unused] contacts is listed but no code reads or requests it"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/permissions.json",
+          "path": ["permissions", 1],
+          "value": {
+            "kind": "contacts",
+            "feature": "Share a list with a contact",
+            "askedFrom": "src/features/task-photo/use-task-photo-model.ts",
+            "platforms": ["android"],
+            "shouldExplainFirst": false,
+            "explain": {
+              "title": "permissions.camera.explain.title",
+              "body": "permissions.camera.explain.body",
+              "continue": "permissions.continue",
+              "dismiss": "permissions.not-now"
+            },
+            "settings": {
+              "title": "permissions.camera.settings.title",
+              "body": "permissions.camera.settings.body",
+              "open": "permissions.open-settings",
+              "dismiss": "permissions.close"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "bad-copy-keys": {
+    "expect": [
+      "FAIL contracts/permissions.json:20 [copy-keys] camera: permissions.camera.settings.body is not in src/i18n/catalogs/en.json"
+    ],
+    "ops": [
+      { "json": { "file": "src/i18n/catalogs/en.json", "path": ["permissions.camera.settings.body"], "delete": true } }
+    ]
+  },
+  "bad-image-picker-false": {
+    "expect": [
+      "FAIL app.config.ts:22 [purpose-string] camera: cameraPermission: false deletes NSCameraUsageDescription",
+      "FAIL app.config.ts:22 [android-blocked] camera: expo-image-picker's cameraPermission: false also blocks android.permission.CAMERA on Android"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "cameraPermission: sourceText(projectRoot, 'permissions.camera.usage-description'),",
+          "with": "cameraPermission: false,"
+        }
+      }
+    ]
+  },
+  "bad-legacy-subpath-hook": {
+    "expect": [
+      "FAIL src/features/task-photo/use-library-status.ts:6 [system-hook] usePermissions from expo-media-library/legacy asks with no explanation"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/task-photo/use-library-status.ts",
+          "lines": [
+            "// src/features/task-photo/use-library-status.ts",
+            "// planted: system-hook (a module hook from a subpath). It also reads photos, which the base contract lacks, so undeclared-permission fires too: expected, the case checks system-hook.",
+            "import { usePermissions } from 'expo-media-library/legacy';",
+            "",
+            "export function useLibraryStatus(): boolean {",
+            "  const [status] = usePermissions();",
+            "  return status?.granted ?? false;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-location-foreground-first": {
+    "expect": [
+      "FAIL src/services/permissions/background-location-permission-adapter.ts:10 [location-foreground-first] background location is requested without reading or requesting foreground location first"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/permissions.json",
+          "path": ["permissions", 1],
+          "value": {
+            "kind": "location",
+            "feature": "Find tasks near where you are",
+            "askedFrom": "src/features/task-photo/use-task-photo-model.ts",
+            "platforms": ["android"],
+            "shouldExplainFirst": false,
+            "explain": {
+              "title": "permissions.camera.explain.title",
+              "body": "permissions.camera.explain.body",
+              "continue": "permissions.continue",
+              "dismiss": "permissions.not-now"
+            },
+            "settings": {
+              "title": "permissions.camera.settings.title",
+              "body": "permissions.camera.settings.body",
+              "open": "permissions.open-settings",
+              "dismiss": "permissions.close"
+            }
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/permissions.json",
+          "path": ["permissions", 2],
+          "value": {
+            "kind": "location-background",
+            "feature": "Remind you when you arrive at a place",
+            "askedFrom": "src/features/task-photo/use-task-photo-model.ts",
+            "platforms": ["android"],
+            "shouldExplainFirst": false,
+            "explain": {
+              "title": "permissions.camera.explain.title",
+              "body": "permissions.camera.explain.body",
+              "continue": "permissions.continue",
+              "dismiss": "permissions.not-now"
+            },
+            "settings": {
+              "title": "permissions.camera.settings.title",
+              "body": "permissions.camera.settings.body",
+              "open": "permissions.open-settings",
+              "dismiss": "permissions.close"
+            }
+          }
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/permissions/location-permission-adapter.ts",
+          "lines": [
+            "// src/services/permissions/location-permission-adapter.ts",
+            "import { getForegroundPermissionsAsync, requestForegroundPermissionsAsync } from 'expo-location';",
+            "",
+            "import { createExpoPermissionAccess } from '@/services/permissions/expo-permission-access';",
+            "",
+            "import type { ErrorLogPort } from '@/services/error-log/error-log-port';",
+            "import type { PermissionAccess } from '@/services/permissions/permissions-port';",
+            "",
+            "export function createAdapter(errorLog: Pick<ErrorLogPort, 'record'>): PermissionAccess {",
+            "  return createExpoPermissionAccess({ read: getForegroundPermissionsAsync, request: requestForegroundPermissionsAsync, errorLog });",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/permissions/background-location-permission-adapter.ts",
+          "lines": [
+            "// src/services/permissions/background-location-permission-adapter.ts",
+            "import { getBackgroundPermissionsAsync, requestBackgroundPermissionsAsync } from 'expo-location';",
+            "",
+            "import { createExpoPermissionAccess } from '@/services/permissions/expo-permission-access';",
+            "",
+            "import type { ErrorLogPort } from '@/services/error-log/error-log-port';",
+            "import type { PermissionAccess } from '@/services/permissions/permissions-port';",
+            "",
+            "export function createAdapter(errorLog: Pick<ErrorLogPort, 'record'>): PermissionAccess {",
+            "  return createExpoPermissionAccess({ read: getBackgroundPermissionsAsync, request: requestBackgroundPermissionsAsync, errorLog });",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-open-settings": {
+    "expect": [
+      "FAIL contracts/permissions.json:1 [open-settings] the app asks for permissions but no code opens the Settings app"
+    ],
+    "ops": [{ "delete": "src/services/permissions/system-settings-adapter.ts" }]
+  },
+  "bad-photos-add-full-read": {
+    "expect": [
+      "FAIL src/services/permissions/photo-saver-permission-adapter.ts:13 [undeclared-permission] requestPermissionsAsync reads or requests photos, which contracts/permissions.json does not list"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/permissions.json",
+          "path": ["permissions", 1],
+          "value": {
+            "kind": "photos-add",
+            "feature": "Save a task photo into the photo library",
+            "askedFrom": "src/features/task-photo/use-task-photo-model.ts",
+            "platforms": ["ios", "android"],
+            "purposeKey": "permissions.camera.usage-description",
+            "shouldExplainFirst": false,
+            "explain": {
+              "title": "permissions.camera.explain.title",
+              "body": "permissions.camera.explain.body",
+              "continue": "permissions.continue",
+              "dismiss": "permissions.not-now"
+            },
+            "settings": {
+              "title": "permissions.camera.settings.title",
+              "body": "permissions.camera.settings.body",
+              "open": "permissions.open-settings",
+              "dismiss": "permissions.close"
+            }
+          }
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "          microphonePermission: false,\n        },\n      ],\n",
+          "with": "          microphonePermission: false,\n        },\n      ],\n      [\n        'expo-media-library',\n        { savePhotosPermission: sourceText(projectRoot, 'permissions.camera.usage-description'), photosPermission: false },\n      ],\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/permissions/photo-saver-permission-adapter.ts",
+          "lines": [
+            "// src/services/permissions/photo-saver-permission-adapter.ts",
+            "import { getPermissionsAsync, requestPermissionsAsync } from 'expo-media-library';",
+            "",
+            "import { createExpoPermissionAccess } from '@/services/permissions/expo-permission-access';",
+            "",
+            "import type { ErrorLogPort } from '@/services/error-log/error-log-port';",
+            "import type { PermissionAccess } from '@/services/permissions/permissions-port';",
+            "",
+            "/** Add-only access: saving a task photo into the library, never reading it. */",
+            "export function createPhotoSaverPermissionAdapter(errorLog: Pick<ErrorLogPort, 'record'>): PermissionAccess {",
+            "  return createExpoPermissionAccess({",
+            "    read: () => getPermissionsAsync(true),",
+            "    request: () => requestPermissionsAsync(),",
+            "    errorLog,",
+            "  });",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-photos-limited": {
+    "expect": [
+      "FAIL src/services/permissions/photo-library-permission-adapter.ts:14 [photos-limited] getPermissionsAsync answers are mapped without accessPrivileges"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/permissions.json",
+          "path": ["permissions", 1],
+          "value": {
+            "kind": "photos",
+            "feature": "Browse the photo library for a task",
+            "askedFrom": "src/features/task-photo/use-task-photo-model.ts",
+            "platforms": ["ios", "android"],
+            "purposeKey": "permissions.camera.usage-description",
+            "shouldExplainFirst": false,
+            "explain": {
+              "title": "permissions.camera.explain.title",
+              "body": "permissions.camera.explain.body",
+              "continue": "permissions.continue",
+              "dismiss": "permissions.not-now"
+            },
+            "settings": {
+              "title": "permissions.camera.settings.title",
+              "body": "permissions.camera.settings.body",
+              "open": "permissions.open-settings",
+              "dismiss": "permissions.close"
+            }
+          }
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "photosPermission: false,",
+          "with": "photosPermission: sourceText(projectRoot, 'permissions.camera.usage-description'),"
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/permissions/photo-library-permission-adapter.ts",
+          "lines": [
+            "// src/services/permissions/photo-library-permission-adapter.ts",
+            "import { getPermissionsAsync, requestPermissionsAsync } from 'expo-media-library';",
+            "",
+            "import type { PermissionState } from '@/core/permissions/permission-state';",
+            "import type { PermissionAccess } from '@/services/permissions/permissions-port';",
+            "",
+            "function toState(answer: { granted: boolean; canAskAgain: boolean }): PermissionState {",
+            "  if (answer.granted) return 'granted';",
+            "  return answer.canAskAgain ? 'denied' : 'blocked';",
+            "}",
+            "",
+            "export function createPhotoLibraryPermissionAdapter(): PermissionAccess {",
+            "  return {",
+            "    permission: async () => toState(await getPermissionsAsync()),",
+            "    requestPermission: async () => toState(await requestPermissionsAsync()),",
+            "  };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-picker-no-permission": {
+    "expect": [
+      "FAIL src/services/permissions/picker-photos-permission-adapter.ts:11 [picker-no-permission] getMediaLibraryPermissionsAsync: launchImageLibraryAsync opens the system photo picker",
+      "FAIL src/services/permissions/picker-photos-permission-adapter.ts:12 [picker-no-permission] requestMediaLibraryPermissionsAsync"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/permissions.json",
+          "path": ["permissions", 1],
+          "value": {
+            "kind": "photos",
+            "feature": "Browse the photo library for a task",
+            "askedFrom": "src/features/task-photo/use-task-photo-model.ts",
+            "platforms": ["ios", "android"],
+            "purposeKey": "permissions.camera.usage-description",
+            "shouldExplainFirst": false,
+            "explain": {
+              "title": "permissions.camera.explain.title",
+              "body": "permissions.camera.explain.body",
+              "continue": "permissions.continue",
+              "dismiss": "permissions.not-now"
+            },
+            "settings": {
+              "title": "permissions.camera.settings.title",
+              "body": "permissions.camera.settings.body",
+              "open": "permissions.open-settings",
+              "dismiss": "permissions.close"
+            }
+          }
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "photosPermission: false,",
+          "with": "photosPermission: sourceText(projectRoot, 'permissions.camera.usage-description'),"
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/permissions/picker-photos-permission-adapter.ts",
+          "lines": [
+            "// src/services/permissions/picker-photos-permission-adapter.ts",
+            "import { getMediaLibraryPermissionsAsync, requestMediaLibraryPermissionsAsync } from 'expo-image-picker';",
+            "",
+            "import { createExpoPermissionAccess } from '@/services/permissions/expo-permission-access';",
+            "",
+            "import type { ErrorLogPort } from '@/services/error-log/error-log-port';",
+            "import type { PermissionAccess } from '@/services/permissions/permissions-port';",
+            "",
+            "export function createPickerPhotosPermissionAdapter(errorLog: Pick<ErrorLogPort, 'record'>): PermissionAccess {",
+            "  return createExpoPermissionAccess({",
+            "    read: getMediaLibraryPermissionsAsync,",
+            "    request: requestMediaLibraryPermissionsAsync,",
+            "    errorLog,",
+            "  });",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-purpose-string": {
+    "expect": ["FAIL app.config.ts:1 [purpose-string] camera: nothing in app.config.ts sets NSCameraUsageDescription"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "          cameraPermission: sourceText(projectRoot, 'permissions.camera.usage-description'),\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-recheck-on-active": {
+    "expect": [
+      "FAIL src/features/task-photo/use-camera-state.ts:11 [recheck-on-active] this hook reads the permission once and never again"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/task-photo/use-camera-state.ts",
+          "lines": [
+            "// src/features/task-photo/use-camera-state.ts",
+            "import { useEffect, useState } from 'react';",
+            "",
+            "import type { PermissionState } from '@/core/permissions/permission-state';",
+            "import type { PermissionAccess } from '@/services/permissions/permissions-port';",
+            "",
+            "export function useCameraState(camera: PermissionAccess): PermissionState | 'unknown' {",
+            "  const [state, setState] = useState<PermissionState | 'unknown'>('unknown');",
+            "  useEffect(() => {",
+            "    let isActive = true;",
+            "    camera.permission().then((next) => {",
+            "      if (isActive) setState(next);",
+            "    }, () => undefined);",
+            "    return () => {",
+            "      isActive = false;",
+            "    };",
+            "  }, [camera]);",
+            "  return state;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-request-boundary": {
+    "expect": [
+      "FAIL src/features/task-photo/ask-camera.ts:9 [request-boundary] requestCameraPermissionsAsync from expo-image-picker is used outside a service adapter"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/task-photo/ask-camera.ts",
+          "lines": [
+            "// src/features/task-photo/ask-camera.ts",
+            "import { requestCameraPermissionsAsync } from 'expo-image-picker';",
+            "",
+            "import { toPermissionState } from '@/services/permissions/expo-permission-access';",
+            "",
+            "import type { PermissionState } from '@/core/permissions/permission-state';",
+            "",
+            "export async function askCamera(): Promise<PermissionState> {",
+            "  return toPermissionState(await requestCameraPermissionsAsync());",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-snapshot-blocked": {
+    "expect": [
+      "FAIL contracts/native-config.json:1 [android-blocked] camera: android.permission.CAMERA is removed from the manifest (tools:node=remove)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/native-config.json",
+          "lines": [
+            "{",
+            "  \"variant\": \"production\",",
+            "  \"ios\": { \"infoPlist\": { \"NSCameraUsageDescription\": \"Lets you add a photo to a task.\" } },",
+            "  \"android\": { \"permissions\": [\"android.permission.CAMERA tools:node=remove\"] }",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-snapshot-purpose": {
+    "expect": [
+      "FAIL contracts/native-config.json:1 [purpose-string] camera: NSCameraUsageDescription is not in the production Info.plist"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/native-config.json",
+          "lines": [
+            "{",
+            "  \"variant\": \"production\",",
+            "  \"ios\": { \"infoPlist\": { \"NSPhotoLibraryUsageDescription\": \"Lets you pick a photo.\" } },",
+            "  \"android\": { \"permissions\": [\"android.permission.CAMERA\"] }",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-snapshot-stale-config": {
+    "expect": [
+      "FAIL app.config.ts:22 [purpose-string] camera: cameraPermission: false deletes NSCameraUsageDescription",
+      "FAIL app.config.ts:22 [android-blocked] camera: expo-image-picker's cameraPermission: false also blocks android.permission.CAMERA on Android"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/native-config.json",
+          "lines": [
+            "{",
+            "  \"variant\": \"production\",",
+            "  \"ios\": { \"infoPlist\": { \"NSCameraUsageDescription\": \"Lets you add a photo to a task.\" } },",
+            "  \"android\": { \"permissions\": [\"android.permission.CAMERA\", \"android.permission.RECORD_AUDIO tools:node=remove\"] }",
+            "}"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "cameraPermission: sourceText(projectRoot, 'permissions.camera.usage-description'),",
+          "with": "cameraPermission: false,"
+        }
+      }
+    ]
+  },
+  "bad-system-hook": {
+    "expect": [
+      "FAIL src/features/task-photo/use-camera-status.ts:5 [system-hook] useCameraPermissions from expo-image-picker asks with no explanation"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/task-photo/use-camera-status.ts",
+          "lines": [
+            "// src/features/task-photo/use-camera-status.ts",
+            "import { useCameraPermissions } from 'expo-image-picker';",
+            "",
+            "export function useCameraStatus(): boolean {",
+            "  const [status] = useCameraPermissions();",
+            "  return status?.granted ?? false;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-unavailable-catalog": {
+    "expect": ["[copy-keys] camera: permissions.camera.unavailable.body is not in src/i18n/catalogs/en.json"],
+    "ops": [
+      {
+        "json": { "file": "src/i18n/catalogs/en.json", "path": ["permissions.camera.unavailable.body"], "delete": true }
+      }
+    ]
+  },
+  "bad-unavailable-copy": {
+    "expect": ["[contract] camera: \"unavailable\" (optional) needs the catalog keys title, body, dismiss"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/permissions.json",
+          "path": ["permissions", 0, "unavailable", "dismiss"],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "bad-undeclared-permission": {
+    "expect": [
+      "FAIL src/services/permissions/microphone-permission-adapter.ts:11 [undeclared-permission] getMicrophonePermissionsAsync reads or requests microphone",
+      "FAIL src/services/permissions/microphone-permission-adapter.ts:12 [undeclared-permission] requestMicrophonePermissionsAsync reads or requests microphone"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/permissions/microphone-permission-adapter.ts",
+          "lines": [
+            "// src/services/permissions/microphone-permission-adapter.ts",
+            "import { Camera } from 'expo-camera';",
+            "",
+            "import { createExpoPermissionAccess } from '@/services/permissions/expo-permission-access';",
+            "",
+            "import type { ErrorLogPort } from '@/services/error-log/error-log-port';",
+            "import type { PermissionAccess } from '@/services/permissions/permissions-port';",
+            "",
+            "export function createMicrophonePermissionAdapter(errorLog: Pick<ErrorLogPort, 'record'>): PermissionAccess {",
+            "  return createExpoPermissionAccess({",
+            "    read: Camera.getMicrophonePermissionsAsync,",
+            "    request: Camera.requestMicrophonePermissionsAsync,",
+            "    errorLog,",
+            "  });",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "error-bad-native-snapshot": {
+    "expect": ["ERROR [bad-input] contracts/native-config.json is not valid JSON"],
+    "ops": [{ "write": { "file": "contracts/native-config.json", "lines": ["{ not json"] } }]
+  },
+  "error-no-package-json": {
+    "expect": ["ERROR [bad-input] no package.json in", "RESULT: FAIL (1 problems)"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "error-no-source-folder": {
+    "expect": ["ERROR [bad-input] nothing to check: app-src/ does not exist"],
+    "args": ". --src-dir app-src"
+  },
+  "pass-installed-skills-silent": {
+    "expect": ["check-permissions: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/demo/SKILL.md",
+          "lines": ["# An installed skill: its planted fixtures stay invisible"]
+        }
+      },
+      {
+        "write": {
+          "file": ".agents/skills/demo/src/use-launch-ask.ts",
+          "lines": [
+            "// planted: a launch-time camera request in an installed skill. Outside src/, so out of the scan scope anyway; the src/vendor/camera-kit plant is the real walkRepo pruning proof",
+            "import { useEffect } from 'react';",
+            "import { requestCameraPermissionsAsync, useCameraPermissions } from 'expo-image-picker';",
+            "",
+            "export function useLaunchAsk(): void {",
+            "  useCameraPermissions();",
+            "  useEffect(() => {",
+            "    requestCameraPermissionsAsync().catch(() => undefined);",
+            "  }, []);",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/demo/SKILL.md",
+          "lines": ["# An installed skill: its planted fixtures stay invisible"]
+        }
+      },
+      {
+        "write": {
+          "file": "skills/demo/src/use-launch-ask.ts",
+          "lines": [
+            "// planted: a launch-time camera request in an installed skill. Outside src/, so out of the scan scope anyway; the src/vendor/camera-kit plant is the real walkRepo pruning proof",
+            "import { useEffect } from 'react';",
+            "import { requestCameraPermissionsAsync, useCameraPermissions } from 'expo-image-picker';",
+            "",
+            "export function useLaunchAsk(): void {",
+            "  useCameraPermissions();",
+            "  useEffect(() => {",
+            "    requestCameraPermissionsAsync().catch(() => undefined);",
+            "  }, []);",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/camera-kit/SKILL.md",
+          "lines": ["# A vendored skill: its planted fixtures stay invisible"]
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/camera-kit/fixtures/use-launch-ask.ts",
+          "lines": [
+            "// planted: a launch-time camera request through the module hook, which check-permissions must not see in a skill folder",
+            "import { useEffect } from 'react';",
+            "import { requestCameraPermissionsAsync, useCameraPermissions } from 'expo-image-picker';",
+            "",
+            "export function useLaunchAsk(): void {",
+            "  useCameraPermissions();",
+            "  useEffect(() => {",
+            "    requestCameraPermissionsAsync().catch(() => undefined);",
+            "  }, []);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-native-snapshot": {
+    "expect": ["check-permissions: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/native-config.json",
+          "lines": [
+            "{",
+            "  \"variant\": \"production\",",
+            "  \"ios\": { \"infoPlist\": { \"NSCameraUsageDescription\": \"Lets you add a photo to a task.\" } },",
+            "  \"android\": { \"permissions\": [\"android.permission.CAMERA\", \"android.permission.RECORD_AUDIO tools:node=remove\"] }",
+            "}"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "          cameraPermission: sourceText(projectRoot, 'permissions.camera.usage-description'),\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "pass-no-permission-module": {
+    "expect": [
+      "NOT APPLICABLE: no permission module (expo-image-picker, expo-camera, expo-location, ...) is in package.json and no code uses PermissionsAndroid",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      { "delete": ["contracts/permissions.json", "src/services/permissions/camera-permission-adapter.ts"] },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-image-picker"], "delete": true } }
+    ]
+  },
+  "pass-not-react-native": {
+    "expect": ["NOT APPLICABLE: react-native is not in package.json", "RESULT: PASS"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "react-native"], "delete": true } }]
+  },
+  "pass-not-yet-created": {
+    "expect": [
+      "SKIP app.config.ts [purpose-string] not yet created (expo-project-bootstrap creates it)",
+      "SKIP src/i18n/catalogs/en.json [copy-keys] not yet created (i18n-strings-and-catalogs creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": ["app.config.ts", "src/i18n/catalogs"] }]
+  },
+  "pass-notification-port": {
+    "expect": ["check-permissions: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/push/expo-push-permission-adapter.ts",
+          "lines": [
+            "// src/services/push/expo-push-permission-adapter.ts",
+            "import { getPermissionsAsync, requestPermissionsAsync } from 'expo-notifications';",
+            "",
+            "import { createExpoPermissionAccess } from '@/services/permissions/expo-permission-access';",
+            "",
+            "import type { ErrorLogPort } from '@/services/error-log/error-log-port';",
+            "import type { PermissionAccess } from '@/services/permissions/permissions-port';",
+            "",
+            "export function createExpoPushPermissionAdapter(errorLog: Pick<ErrorLogPort, 'record'>): PermissionAccess {",
+            "  return createExpoPermissionAccess({ read: getPermissionsAsync, request: () => requestPermissionsAsync(), errorLog });",
+            "}"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/permissions.json",
+          "path": ["permissions", 1],
+          "value": {
+            "kind": "notifications",
+            "feature": "Reminders when a task is due",
+            "askedFrom": "src/features/task-photo/use-task-photo-model.ts",
+            "platforms": ["ios", "android"],
+            "shouldExplainFirst": false,
+            "explain": {
+              "title": "permissions.camera.explain.title",
+              "body": "permissions.camera.explain.body",
+              "continue": "permissions.continue",
+              "dismiss": "permissions.not-now"
+            },
+            "settings": {
+              "title": "permissions.camera.settings.title",
+              "body": "permissions.camera.settings.body",
+              "open": "permissions.open-settings",
+              "dismiss": "permissions.close"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "pass-photos-add": {
+    "expect": ["check-permissions: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/permissions.json",
+          "path": ["permissions", 1],
+          "value": {
+            "kind": "photos-add",
+            "feature": "Save a task photo into the photo library",
+            "askedFrom": "src/features/task-photo/use-task-photo-model.ts",
+            "platforms": ["ios", "android"],
+            "purposeKey": "permissions.camera.usage-description",
+            "shouldExplainFirst": false,
+            "explain": {
+              "title": "permissions.camera.explain.title",
+              "body": "permissions.camera.explain.body",
+              "continue": "permissions.continue",
+              "dismiss": "permissions.not-now"
+            },
+            "settings": {
+              "title": "permissions.camera.settings.title",
+              "body": "permissions.camera.settings.body",
+              "open": "permissions.open-settings",
+              "dismiss": "permissions.close"
+            }
+          }
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "          microphonePermission: false,\n        },\n      ],\n",
+          "with": "          microphonePermission: false,\n        },\n      ],\n      [\n        'expo-media-library',\n        { savePhotosPermission: sourceText(projectRoot, 'permissions.camera.usage-description'), photosPermission: false },\n      ],\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/permissions/photo-saver-permission-adapter.ts",
+          "lines": [
+            "// src/services/permissions/photo-saver-permission-adapter.ts",
+            "import { getPermissionsAsync, requestPermissionsAsync } from 'expo-media-library';",
+            "",
+            "import { createExpoPermissionAccess } from '@/services/permissions/expo-permission-access';",
+            "",
+            "import type { ErrorLogPort } from '@/services/error-log/error-log-port';",
+            "import type { PermissionAccess } from '@/services/permissions/permissions-port';",
+            "",
+            "/** Add-only access: saving a task photo into the library, never reading it. */",
+            "export function createPhotoSaverPermissionAdapter(errorLog: Pick<ErrorLogPort, 'record'>): PermissionAccess {",
+            "  return createExpoPermissionAccess({",
+            "    read: () => getPermissionsAsync(true),",
+            "    request: () => requestPermissionsAsync(true),",
+            "    errorLog,",
+            "  });",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-photos-add-namespace": {
+    "expect": ["check-permissions: ", "RESULT: PASS"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/permissions.json",
+          "path": ["permissions", 1],
+          "value": {
+            "kind": "photos-add",
+            "feature": "Save a task photo into the photo library",
+            "askedFrom": "src/features/task-photo/use-task-photo-model.ts",
+            "platforms": ["ios", "android"],
+            "purposeKey": "permissions.camera.usage-description",
+            "shouldExplainFirst": false,
+            "explain": {
+              "title": "permissions.camera.explain.title",
+              "body": "permissions.camera.explain.body",
+              "continue": "permissions.continue",
+              "dismiss": "permissions.not-now"
+            },
+            "settings": {
+              "title": "permissions.camera.settings.title",
+              "body": "permissions.camera.settings.body",
+              "open": "permissions.open-settings",
+              "dismiss": "permissions.close"
+            }
+          }
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "          microphonePermission: false,\n        },\n      ],\n",
+          "with": "          microphonePermission: false,\n        },\n      ],\n      [\n        'expo-media-library',\n        { savePhotosPermission: sourceText(projectRoot, 'permissions.camera.usage-description'), photosPermission: false },\n      ],\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/permissions/photo-saver-permission-adapter.ts",
+          "lines": [
+            "// src/services/permissions/photo-saver-permission-adapter.ts",
+            "import * as MediaLibrary from 'expo-media-library';",
+            "",
+            "import { createExpoPermissionAccess } from '@/services/permissions/expo-permission-access';",
+            "",
+            "import type { ErrorLogPort } from '@/services/error-log/error-log-port';",
+            "import type { PermissionAccess } from '@/services/permissions/permissions-port';",
+            "",
+            "/** Add-only access: saving a task photo into the library, never reading it. */",
+            "export function createPhotoSaverPermissionAdapter(errorLog: Pick<ErrorLogPort, 'record'>): PermissionAccess {",
+            "  return createExpoPermissionAccess({",
+            "    read: () => MediaLibrary.getPermissionsAsync(true),",
+            "    request: () => MediaLibrary.requestPermissionsAsync(true),",
+            "    errorLog,",
+            "  });",
+            "}"
+          ]
+        }
+      }
+    ]
+  }
+}

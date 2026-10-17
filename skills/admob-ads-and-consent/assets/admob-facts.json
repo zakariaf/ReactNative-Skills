@@ -1,0 +1,51 @@
+{
+  "$comment": "Facts the checkers read. Paths are relative to the resolved layout: {servicesDir}, {configDir}, {srcDir}, {uiDir}, {scriptsDir}, {mocksDir}, {contractsDir} come from check-lib's resolveLayout (rn-skills.config.json can move them). Update the versions, the adapter allowlists and the stand-ins in scripts/lib/stubs/ together on an SDK upgrade (references/setup-ids-and-modes.md, 'Re-verify after an upgrade').",
+  "verified": "2026-10-10",
+  "sdk": {
+    "package": "react-native-google-mobile-ads",
+    "version": "17.2.0",
+    "iosPods": { "Google-Mobile-Ads-SDK": "13.6.0", "GoogleUserMessagingPlatform": "3.1.0" },
+    "android": { "play-services-ads": "25.4.0", "user-messaging-platform": "4.0.0", "minSdk": 24 }
+  },
+  "tracking": {
+    "package": "expo-tracking-transparency",
+    "spec": "~57.0.2",
+    "allowedNames": ["getTrackingPermissionsAsync", "requestTrackingPermissionsAsync", "PermissionStatus", "PermissionResponse"],
+    "adapter": "{servicesDir}/consent/expo-tracking-consent-adapter.ts",
+    "defaultTextKey": "permissions.tracking.usage-description"
+  },
+  "adapters": {
+    "{servicesDir}/ads/admob-ads-adapter.ts": ["default", "AdEventType", "BannerAd", "BannerAdSize", "InterstitialAd", "MaxAdContentRating", "RewardedAd", "RewardedAdEventType", "TestIds", "AdErrorPayload"],
+    "{servicesDir}/consent/admob-consent-adapter.ts": ["AdsConsent", "AdsConsentDebugGeography", "AdsConsentPrivacyOptionsRequirementStatus", "AdsConsentInfo"],
+    "{servicesDir}/consent/admob-consent-debug-adapter.ts": ["default", "AdsConsent", "AdsConsentUserChoices"]
+  },
+  "consentAdapter": "{servicesDir}/consent/admob-consent-adapter.ts",
+  "debugAdapter": "{servicesDir}/consent/admob-consent-debug-adapter.ts",
+  "testOnlyDefaults": ["{srcDir}/test-only.ts", "{srcDir}/test-only-entry.ts", "{srcDir}/test-only-api.ts", "{srcDir}/features/debug/"],
+  "testOnlyCalls": ["AdsConsent.reset", "AdsConsent.getUserChoices", "openAdInspector"],
+  "bannedSdkNames": ["useAppOpenAd", "useAppOpenAdManager", "useInterstitialAd", "useRewardedAd", "useRewardedInterstitialAd", "useGAMInterstitialAd", "useForeground", "AdPoolProvider", "useAdPool", "usePooledAd", "useMultiFormatAd", "useNativeAd", "AdPools", "AdPoolPresets", "MultiFormatAdRequest", "MultiFormatBannerAdView", "AppOpenAd", "NativeAd", "RewardedInterstitialAd", "GAMBannerAd", "GAMInterstitialAd"],
+  "childTags": ["tagForChildDirectedTreatment", "tagForUnderAgeOfConsent"],
+  "alwaysBannedRequestOptions": ["requestNonPersonalizedAdsOnly"],
+  "androidDroppedRequestOptions": ["ageRestrictedTreatment"],
+  "adIdPermission": "com.google.android.gms.permission.AD_ID",
+  "samplePublisher": "3940256099942544",
+  "placeholderPublisher": "0000000000000000",
+  "idPatterns": { "appId": "^ca-app-pub-\\d{16}~\\d{10}$", "unitId": "^ca-app-pub-\\d{16}/\\d{10}$" },
+  "skadnetwork": { "file": "{configDir}/skadnetwork-ids.ts", "first": "cstr6suwn9.skadnetwork", "minCount": 40, "idPattern": "^[a-z0-9]{10}\\.skadnetwork$" },
+  "rewardedStatus": { "statusType": "RewardedStatus", "members": ["rewardedStatus", "subscribeRewardedStatus"], "retired": ["isRewardedLoaded", "subscribeRewardedLoaded"] },
+  "pacingKeys": ["minBreaksBeforeFirst", "minMsBetweenInterstitials", "minBreaksBetween"],
+  "defaultPacingFloors": { "minBreaksBeforeFirst": 3, "minMsBetweenInterstitials": 180000, "minBreaksBetween": 2 },
+  "files": {
+    "ads": ["ads-port.ts", "admob-ads-adapter.ts", "admob-ads-adapter.test.ts", "fake-ads.ts", "fake-ads.test.ts", "ads-factory.ts", "ads-factory.test.ts", "read-ads-extra.ts", "read-ads-extra.test.ts", "ad-policy.ts", "ad-policy.test.ts", "ad-history.ts", "ad-history.test.ts", "rewarded-offer.ts", "rewarded-offer.test.ts", "ad-gate.ts", "ad-gate.test.ts", "consent-moment-flow.ts", "consent-moment-flow.test.ts", "ad-moments.ts", "ad-moments.test.ts", "fullscreen-ad.ts", "fullscreen-ad.test.ts", "ads-context.ts", "use-consent-moment.ts", "ads-provider.tsx", "ads-provider.test.tsx"],
+    "consent": ["consent-port.ts", "admob-consent-adapter.ts", "admob-consent-adapter.test.ts", "consent-factory.ts", "consent-factory.test.ts", "fake-consent.ts", "fake-consent.test.ts"],
+    "tracking": ["expo-tracking-consent-adapter.ts", "expo-tracking-consent-adapter.test.ts"],
+    "config": ["ads-config.ts", "ads-config.test.ts", "admob-ids.ts", "ad-pacing.ts", "skadnetwork-ids.ts", "app-variant.ts"],
+    "hooks": ["use-ad-context.ts", "use-banner-slot.ts", "use-rewarded-offer.ts"],
+    "ui": ["ad-banner-slot.tsx", "ad-banner-slot.test.tsx"],
+    "connectivity": ["connectivity-port.ts", "expo-network-connectivity-adapter.ts", "fake-connectivity.ts"],
+    "scripts": ["ads/refresh-skadnetwork.ts", "ads/skadnetwork-list.ts"],
+    "mocks": ["react-native-google-mobile-ads.ts"],
+    "trackingMock": ["expo-tracking-transparency.ts"]
+  },
+  "purePolicyFiles": ["ad-policy.ts", "ad-history.ts", "rewarded-offer.ts"]
+}

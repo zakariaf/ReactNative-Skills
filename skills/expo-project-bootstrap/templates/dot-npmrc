@@ -1,0 +1,24 @@
+# .npmrc — the dependency policy (dependency-management skill). Commit a change to it with a
+# Gate-Change trailer. npm keeps the last value of a key, so each policy line appears exactly once.
+# Refuse to resolve any version published less than 7 days ago (an app may be stricter, never laxer).
+min-release-age=7
+# Refuse to install when node/npm do not satisfy package.json "engines" (npm >= 11.17.0, node >= 22.18).
+engine-strict=true
+# Never let npm guess ranges: every `npm install <pkg>` writes an exact version.
+save-exact=true
+# Stop an install before anything runs when an install script is not covered by the root
+# package.json allowScripts (ESTRICTALLOWSCRIPTS). Without it npm runs the unreviewed script and
+# only prints a notice afterwards. Review first, then approve "<pkg>@<x.y.z>": true.
+strict-allow-scripts=true
+# Written out although they are npm's defaults: a project line beats ~/.npmrc, so a developer's
+# user config cannot switch these guards off (an NPM_CONFIG_* variable still beats both). Never
+# change them: each would switch a line above off for every install.
+legacy-peer-deps=false
+force=false
+dangerously-allow-all-scripts=false
+package-lock=true
+# Never here: allow-scripts or before=, and no exclude outside a dated block.
+
+# A dated exception, only for a needed release younger than the release age, agreed by the developer:
+# exclude-block expires=YYYY-MM-DD reason=<issue link or changelog line>
+# min-release-age-exclude[]=<package>

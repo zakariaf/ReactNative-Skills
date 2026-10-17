@@ -1,0 +1,719 @@
+{
+  "bad-component-snapshot": {
+    "expect": ["add-task-button.test.tsx:12 [component-snapshot] toMatchSnapshot() outside a golden test"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/add-task-button.test.tsx",
+          "lines": [
+            "// src/features/tasks/add-task-button.test.tsx",
+            "import { act, screen, userEvent } from '@testing-library/react-native';",
+            "",
+            "import { renderWithProviders } from '@test/render-with-providers';",
+            "",
+            "import { AddTaskButton } from './add-task-button';",
+            "",
+            "describe('AddTaskButton', () => {",
+            "  it('renders the button', async () => {",
+            "    const view = await renderWithProviders(<AddTaskButton />);",
+            "",
+            "    expect(view.toJSON()).toMatchSnapshot();",
+            "  });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-cross-root-import": {
+    "expect": [
+      "task-title.test.tsx:4 [cross-root-import] imports ../../../test/render-with-providers (test/render-with-providers) across source roots",
+      "open-count.test.ts:2 [cross-root-import] imports ../../../src/core/task-filter (src/core/task-filter) across source roots"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/task-title.test.tsx",
+          "lines": [
+            "// src/features/tasks/task-title.test.tsx",
+            "import { screen } from '@testing-library/react-native';",
+            "",
+            "import { renderWithProviders } from '../../../test/render-with-providers';",
+            "",
+            "import { TaskTitle } from './task-title';",
+            "",
+            "describe('TaskTitle', () => {",
+            "  it('shows the title', async () => {",
+            "    await renderWithProviders(<TaskTitle title=\"Buy milk\" />);",
+            "",
+            "    expect(screen.getByText('Buy milk')).toBeOnTheScreen();",
+            "  });",
+            "});"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "test/integration/data/open-count.test.ts",
+          "lines": [
+            "// test/integration/data/open-count.test.ts",
+            "import { openTaskCount } from '../../../src/core/task-filter';",
+            "",
+            "describe('openTaskCount', () => {",
+            "  it('counts open tasks', () => {",
+            "    expect(openTaskCount([false])).toBe(1);",
+            "  });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-cross-workspace-import": {
+    "expect": [
+      "apps/mobile/src/features/totals/totals.test.ts:2 [cross-root-import] imports ../../../../../packages/core/src/sum (packages/core/src/sum) across workspaces",
+      "test/integration/totals/totals.test.ts:2 [cross-root-import]"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "apps/mobile/package.json",
+          "lines": ["{", "  \"name\": \"@acme/mobile\",", "  \"private\": true", "}"]
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/src/features/totals/totals.test.ts",
+          "lines": [
+            "// apps/mobile/src/features/totals/totals.test.ts",
+            "import { sum } from '../../../../../packages/core/src/sum';",
+            "",
+            "describe('sum', () => {",
+            "  it('adds the task estimates', () => {",
+            "    expect(sum([1, 2])).toBe(3);",
+            "  });",
+            "});"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "package.json",
+          "lines": [
+            "{",
+            "  \"name\": \"tasks-workspace\",",
+            "  \"private\": true,",
+            "  \"workspaces\": [",
+            "    \"apps/*\",",
+            "    \"packages/*\"",
+            "  ]",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "packages/core/package.json",
+          "lines": ["{", "  \"name\": \"@acme/core\",", "  \"private\": true", "}"]
+        }
+      },
+      {
+        "write": {
+          "file": "test/integration/totals/totals.test.ts",
+          "lines": [
+            "// test/integration/totals/totals.test.ts",
+            "import { sum } from '../../../packages/core/src/sum';",
+            "",
+            "describe('sum', () => {",
+            "  it('adds nothing to zero', () => {",
+            "    expect(sum([])).toBe(0);",
+            "  });",
+            "});"
+          ]
+        }
+      },
+      {
+        "$comment": "The monorepo has no root src/: the good tree's src/ would add a second planted finding (its src/ui test is no longer in a workspace's design-system folder).",
+        "delete": "src"
+      }
+    ]
+  },
+  "bad-destructured-and-direct-user-event": {
+    "expect": [
+      "add-task-button.test.tsx:10 [destructured-queries]",
+      "add-task-button.test.tsx:11 [user-event-setup] userEvent.press(...) is called without a setup() instance"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/add-task-button.test.tsx",
+          "lines": [
+            "// src/features/tasks/add-task-button.test.tsx",
+            "import { act, screen, userEvent } from '@testing-library/react-native';",
+            "",
+            "import { renderWithProviders } from '@test/render-with-providers';",
+            "",
+            "import { AddTaskButton } from './add-task-button';",
+            "",
+            "describe('AddTaskButton', () => {",
+            "  it('adds a task', async () => {",
+            "    const { getByRole } = await renderWithProviders(<AddTaskButton />);",
+            "    await userEvent.press(getByRole('button', { name: 'Add' }));",
+            "",
+            "    expect(await screen.findByText('Buy milk')).toBeOnTheScreen();",
+            "  });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-expo-router-testing": {
+    "expect": [
+      "src/features/tasks/tasks-routes.test.tsx:3 [expo-router-testing] imports renderRouter from expo-router/testing-library",
+      "src/features/tasks/tasks-routes.test.tsx:3 [expo-router-testing] imports testRouter from expo-router/testing-library",
+      "src/features/tasks/tasks-routes.test.tsx:12 [expo-router-testing] toHavePathname() is Expo Router's matcher, which throws with RNTL 14",
+      "src/features/tasks/tasks-routes-namespace.test.tsx:2 [expo-router-testing] imports expo-router/testing-library as * as RouterTesting",
+      "src/features/tasks/tasks-routes-namespace.test.tsx:8 [expo-router-testing] calls renderRouter(...) as a member of expo-router/testing-library",
+      "src/features/tasks/tasks-routes-namespace.test.tsx:14 [expo-router-testing] loads expo-router/testing-library with require()",
+      "src/features/tasks/tasks-routes-namespace.test.tsx:15 [expo-router-testing] calls testRouter from expo-router/testing-library"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/tasks-routes-namespace.test.tsx",
+          "lines": [
+            "// src/features/tasks/tasks-routes-namespace.test.tsx",
+            "import * as RouterTesting from 'expo-router/testing-library';",
+            "",
+            "import TasksRoute from '@/app/index';",
+            "",
+            "describe('tasks routes', () => {",
+            "  it('opens the list', async () => {",
+            "    await RouterTesting.renderRouter({ index: TasksRoute });",
+            "",
+            "    expect(await RouterTesting.screen.findByText('No tasks yet')).toBeOnTheScreen();",
+            "  });",
+            "",
+            "  it('goes back', () => {",
+            "    const { testRouter } = require('expo-router/testing-library') as typeof RouterTesting;",
+            "    testRouter.back('/');",
+            "  });",
+            "});"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/tasks-routes.test.tsx",
+          "lines": [
+            "// src/features/tasks/tasks-routes.test.tsx",
+            "import { screen } from '@testing-library/react-native';",
+            "import { renderRouter, testRouter } from 'expo-router/testing-library';",
+            "",
+            "import TasksRoute from '@/app/index';",
+            "import TaskDetailRoute from '@/app/tasks/[id]';",
+            "",
+            "describe('tasks routes', () => {",
+            "  it('opens a deep link', async () => {",
+            "    renderRouter({ index: TasksRoute, 'tasks/[id]': TaskDetailRoute }, { initialUrl: '/tasks/task-7' });",
+            "",
+            "    expect(screen).toHavePathname('/tasks/task-7');",
+            "    testRouter.back('/');",
+            "    expect(await screen.findByText('No tasks yet')).toBeOnTheScreen();",
+            "  });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-fake-timers-in-logic": {
+    "expect": ["src/core/due-soon.test.ts:6 [fake-timers-in-logic] fake timers in a logic test"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/core/due-soon.test.ts",
+          "lines": [
+            "// src/core/due-soon.test.ts",
+            "import { isDueSoon } from './due-soon';",
+            "",
+            "describe('isDueSoon', () => {",
+            "  it('flags a task due within the hour', () => {",
+            "    jest.useFakeTimers();",
+            "",
+            "    expect(isDueSoon(3_600_000)).toBe(true);",
+            "  });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-guide-test-snapshot": {
+    "expect": ["__tests__/home-screen-test.tsx:9 [component-snapshot] toMatchSnapshot() outside a golden test"],
+    "ops": [
+      {
+        "write": {
+          "file": "__tests__/home-screen-test.tsx",
+          "content": "import { render } from '@testing-library/react-native';\n\nimport { TasksScreen } from '@/features/tasks/tasks-screen';\n\ndescribe('<TasksScreen />', () => {\n  test('TasksScreen renders correctly', async () => {\n    const tree = (await render(<TasksScreen />)).toJSON();\n\n    expect(tree).toMatchSnapshot();\n  });\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-hook-without-wrapper": {
+    "expect": [
+      "use-task-count.test.tsx:8 [render-hook-wrapper] renderHook(...) has no wrapper",
+      "use-task-count.test.tsx:15 [render-hook-wrapper] renderHook(...) has no wrapper"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-count.test.tsx",
+          "lines": [
+            "// src/features/tasks/use-task-count.test.tsx",
+            "import { renderHook } from '@testing-library/react-native';",
+            "",
+            "import { useTaskCount } from './use-task-count';",
+            "",
+            "describe('useTaskCount', () => {",
+            "  it('starts at zero', async () => {",
+            "    const { result } = await renderHook(() => useTaskCount());",
+            "",
+            "    expect(result.current).toBe(0);",
+            "  });",
+            "",
+            "  it('resolves without providers', async () => {",
+            "    // Only a call expected to reject may skip the providers; .resolves proves nothing about them.",
+            "    await expect(renderHook(() => useTaskCount())).resolves.toBeDefined();",
+            "  });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-marker-without-reason": {
+    "expect": [
+      "add-task-button.test.tsx:3 [render-with-providers] renders with RNTL render() instead of renderWithProviders"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/add-task-button.test.tsx",
+          "lines": [
+            "// src/features/tasks/add-task-button.test.tsx",
+            "// no-providers: pure",
+            "import { render, screen } from '@testing-library/react-native';",
+            "",
+            "import { AddTaskButton } from './add-task-button';",
+            "",
+            "describe('AddTaskButton', () => {",
+            "  it('shows the add button', async () => {",
+            "    await render(<AddTaskButton />);",
+            "",
+            "    expect(screen.getByRole('button', { name: 'Add' })).toBeOnTheScreen();",
+            "  });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-mocked-store": {
+    "expect": ["premium-banner.test.tsx:8 [mocked-store] jest.mock('@/stores/premium-store') mocks a store"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/premium-banner.test.tsx",
+          "lines": [
+            "// src/features/tasks/premium-banner.test.tsx",
+            "import { screen } from '@testing-library/react-native';",
+            "",
+            "import { renderWithProviders } from '@test/render-with-providers';",
+            "",
+            "import { PremiumBanner } from './premium-banner';",
+            "",
+            "jest.mock('@/stores/premium-store');",
+            "",
+            "describe('PremiumBanner', () => {",
+            "  it('hides for a Premium account', async () => {",
+            "    await renderWithProviders(<PremiumBanner />);",
+            "",
+            "    expect(screen.queryByRole('button')).not.toBeOnTheScreen();",
+            "  });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-plain-render": {
+    "expect": [
+      "add-task-button.test.tsx:2 [render-with-providers] renders with RNTL render() instead of renderWithProviders"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/add-task-button.test.tsx",
+          "lines": [
+            "// src/features/tasks/add-task-button.test.tsx",
+            "import { render, screen } from '@testing-library/react-native';",
+            "",
+            "import { AddTaskButton } from './add-task-button';",
+            "",
+            "describe('AddTaskButton', () => {",
+            "  it('shows the add button', async () => {",
+            "    await render(<AddTaskButton />);",
+            "",
+            "    expect(screen.getByRole('button', { name: 'Add' })).toBeOnTheScreen();",
+            "  });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-platform-override": {
+    "expect": [
+      "back-handler.test.tsx:6 [platform-override] jest.mock('react-native/Libraries/Utilities/Platform') replaces the Platform module",
+      "back-handler.test.tsx:10 [platform-override] the test overwrites Platform.OS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/back-handler.test.tsx",
+          "lines": [
+            "// src/features/tasks/back-handler.test.tsx",
+            "import { Platform } from 'react-native';",
+            "",
+            "import { closesOnBack } from './back-handler';",
+            "",
+            "jest.mock('react-native/Libraries/Utilities/Platform', () => ({ OS: 'android', select: jest.fn() }));",
+            "",
+            "describe('closesOnBack', () => {",
+            "  it('closes the editor on the hardware back button', () => {",
+            "    Platform.OS = 'android';",
+            "",
+            "    expect(closesOnBack()).toBe(true);",
+            "  });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-query-misuse": {
+    "expect": ["add-task-button.test.tsx:12 [query-for-presence]", "add-task-button.test.tsx:13 [get-for-absence]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/add-task-button.test.tsx",
+          "lines": [
+            "// src/features/tasks/add-task-button.test.tsx",
+            "import { act, screen, userEvent } from '@testing-library/react-native';",
+            "",
+            "import { renderWithProviders } from '@test/render-with-providers';",
+            "",
+            "import { AddTaskButton } from './add-task-button';",
+            "",
+            "describe('AddTaskButton', () => {",
+            "  it('hides the empty state', async () => {",
+            "    await renderWithProviders(<AddTaskButton />);",
+            "",
+            "    expect(screen.queryByText('Add')).toBeOnTheScreen();",
+            "    expect(screen.getByText('No tasks yet')).not.toBeOnTheScreen();",
+            "  });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-react-test-renderer": {
+    "expect": [
+      "src/features/tasks/tasks-screen-renderer.test.tsx:2 [react-test-renderer] the test imports react-test-renderer, which React 19 deprecates"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/tasks-screen-renderer.test.tsx",
+          "content": "// src/features/tasks/tasks-screen-renderer.test.tsx\nimport { act, create, type ReactTestRenderer } from 'react-test-renderer';\n\nimport { TasksScreen } from './tasks-screen';\n\ndescribe('TasksScreen', () => {\n  it('renders nothing without tasks', async () => {\n    let renderer: ReactTestRenderer | undefined;\n    await act(async () => {\n      renderer = create(<TasksScreen />);\n    });\n\n    expect(renderer?.toJSON()).toBeNull();\n  });\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-require-mock-without-mock": {
+    "expect": [
+      "restore-purchases.test.ts:5 [require-mock-without-mock] jest.requireMock('expo-iap') without jest.mock('expo-iap')"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/purchase/restore-purchases.test.ts",
+          "lines": [
+            "// src/services/purchase/restore-purchases.test.ts",
+            "import { restorePurchases } from './restore-purchases';",
+            "",
+            "type MockedIap = { readonly getAvailablePurchases: jest.Mock<Promise<unknown[]>> };",
+            "const iap = jest.requireMock<MockedIap>('expo-iap');",
+            "",
+            "describe('restorePurchases', () => {",
+            "  it('asks the store once', async () => {",
+            "    await restorePurchases();",
+            "",
+            "    expect(iap.getAvailablePurchases).toHaveBeenCalledTimes(1);",
+            "  });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-router-helper-unawaited": {
+    "expect": [
+      "src/features/tasks/tasks-deep-link.test.tsx:9 [rntl-await] renderRouterWithProviders(...) is not awaited"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/tasks-deep-link.test.tsx",
+          "lines": [
+            "// src/features/tasks/tasks-deep-link.test.tsx",
+            "import { screen } from '@testing-library/react-native';",
+            "",
+            "import TaskDetailRoute from '@/app/tasks/[id]';",
+            "import { renderRouterWithProviders } from '@test/render-router-with-providers';",
+            "",
+            "describe('task deep link', () => {",
+            "  it('opens the task', async () => {",
+            "    renderRouterWithProviders({ 'tasks/[id]': TaskDetailRoute }, { initialUrl: '/tasks/task-7' });",
+            "",
+            "    expect(await screen.findByRole('header', { name: 'Buy milk' })).toBeOnTheScreen();",
+            "  });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-sdk-import": {
+    "expect": ["admob-ads-adapter.test.ts:2 [vendor-sdk-import] the test imports react-native-google-mobile-ads"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/ads/admob-ads-adapter.test.ts",
+          "lines": [
+            "// src/services/ads/admob-ads-adapter.test.ts",
+            "import { MobileAds } from 'react-native-google-mobile-ads';",
+            "",
+            "import { createAdmobAdsAdapter } from './admob-ads-adapter';",
+            "",
+            "describe('createAdmobAdsAdapter', () => {",
+            "  it('starts the SDK once', async () => {",
+            "    await createAdmobAdsAdapter().initialize();",
+            "",
+            "    expect(MobileAds).toBeDefined();",
+            "  });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-sleep": {
+    "expect": ["premium-service.test.ts:7 [test-sleep] the test sleeps"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/purchase/premium-service.test.ts",
+          "lines": [
+            "// src/services/purchase/premium-service.test.ts",
+            "import { createPremiumService } from './premium-service';",
+            "",
+            "describe('createPremiumService', () => {",
+            "  it('persists the entitlement', async () => {",
+            "    const service = createPremiumService();",
+            "    await new Promise((resolve) => setTimeout(resolve, 50));",
+            "",
+            "    expect(service.isPremium()).toBe(false);",
+            "  });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-style-assertion": {
+    "expect": ["add-task-button.test.tsx:12 [style-assertion] asserts a style"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/add-task-button.test.tsx",
+          "lines": [
+            "// src/features/tasks/add-task-button.test.tsx",
+            "import { act, screen, userEvent } from '@testing-library/react-native';",
+            "",
+            "import { renderWithProviders } from '@test/render-with-providers';",
+            "",
+            "import { AddTaskButton } from './add-task-button';",
+            "",
+            "describe('AddTaskButton', () => {",
+            "  it('is wide enough', async () => {",
+            "    await renderWithProviders(<AddTaskButton />);",
+            "",
+            "    expect(screen.getByRole('button', { name: 'Add' })).toHaveStyle({ minWidth: 44 });",
+            "  });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-test-retries": {
+    "expect": ["reminder-sync.test.ts:4 [test-retries] the test file retries failing tests"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/reminders/reminder-sync.test.ts",
+          "lines": [
+            "// src/services/reminders/reminder-sync.test.ts",
+            "import { syncReminders } from './reminder-sync';",
+            "",
+            "jest.retryTimes(3);",
+            "",
+            "describe('syncReminders', () => {",
+            "  it('schedules one reminder per open task', async () => {",
+            "    await expect(syncReminders([])).resolves.toStrictEqual([]);",
+            "  });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-unawaited": {
+    "expect": [
+      "src/features/tasks/add-task-button.test.tsx:11 [rntl-await] renderWithProviders(...) is not awaited",
+      "src/features/tasks/add-task-button.test.tsx:13 [rntl-await] user.press(...) is not awaited",
+      "src/features/tasks/add-task-button.test.tsx:14 [rntl-await] act(...) is not awaited",
+      "src/features/tasks/add-task-button.test.tsx:16 [rntl-await] screen.findByText(...) is not awaited (expect() receives the pending promise, so the assertion always passes)",
+      "src/features/tasks/add-task-button.test.tsx:17 [rntl-await] screen.findByText(...) is not awaited",
+      "src/features/tasks/add-task-button.test.tsx:18 [rntl-await] user.press(...) is not awaited",
+      "src/features/tasks/add-task-button.test.tsx:19 [rntl-await] findByText(...) is not awaited",
+      "src/features/tasks/add-task-button.test.tsx:20 [rntl-await] user.press(...) is not awaited",
+      "src/features/tasks/add-task-button.test.tsx:21 [rntl-await] user.press(...) is not awaited",
+      "src/features/tasks/add-task-button.test.tsx:34 [rntl-await] view.rerender(...) is not awaited",
+      "src/features/tasks/add-task-button.test.tsx:35 [rntl-await] presser.press(...) is not awaited",
+      "src/features/tasks/add-task-button.test.tsx:36 [rntl-await] screen.unmount(...) is not awaited",
+      "src/features/tasks/add-task-button.test.tsx:43 [rntl-await] waitForElementToBeRemoved(...) is not awaited",
+      "src/features/tasks/task-badge.test.tsx:10 [rntl-await] rerender(...) is not awaited",
+      "src/features/tasks/task-badge.test.tsx:11 [rntl-await] unmountBadge(...) is not awaited",
+      "check-test-code: 17 test files checked, 15 problems"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/add-task-button.test.tsx",
+          "lines": [
+            "// src/features/tasks/add-task-button.test.tsx",
+            "import { act, screen, userEvent, waitForElementToBeRemoved, within } from '@testing-library/react-native';",
+            "",
+            "import { renderWithProviders } from '@test/render-with-providers';",
+            "",
+            "import { AddTaskButton } from './add-task-button';",
+            "",
+            "describe('AddTaskButton', () => {",
+            "  it('adds a task', async () => {",
+            "    const user = userEvent.setup();",
+            "    renderWithProviders(<AddTaskButton />);",
+            "",
+            "    user.press(screen.getByRole('button', { name: 'Add' }));",
+            "    act(() => undefined);",
+            "",
+            "    expect(screen.findByText('Buy milk')).toBeTruthy();",
+            "    screen.findByText('Answer email');",
+            "    Promise.all([user.press(screen.getByRole('button', { name: 'Add' }))]);",
+            "    void within(screen.getByTestId('tasks.row.task-1')).findByText('Buy milk');",
+            "    ['Add', 'Clear'].forEach((name) => user.press(screen.getByRole('button', { name })));",
+            "    ['Add', 'Clear'].map((name) => user.press(screen.getByRole('button', { name })));",
+            "  });",
+            "",
+            "  describe('when rendered again', () => {",
+            "    let presser: ReturnType<typeof userEvent.setup>;",
+            "",
+            "    beforeEach(() => {",
+            "      presser = userEvent.setup();",
+            "    });",
+            "",
+            "    it('keeps the button', async () => {",
+            "      const view = await renderWithProviders(<AddTaskButton />);",
+            "",
+            "      view.rerender(<AddTaskButton />);",
+            "      presser.press(screen.getByRole('button', { name: 'Add' }));",
+            "      screen.unmount();",
+            "      await view.unmount();",
+            "    });",
+            "",
+            "    it('hides the spinner', async () => {",
+            "      await renderWithProviders(<AddTaskButton />);",
+            "",
+            "      waitForElementToBeRemoved(() => screen.getByRole('progressbar'));",
+            "    });",
+            "  });",
+            "});"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/task-badge.test.tsx",
+          "lines": [
+            "// src/features/tasks/task-badge.test.tsx",
+            "import { renderWithProviders } from '@test/render-with-providers';",
+            "",
+            "import { TaskBadge } from './task-badge';",
+            "",
+            "describe('TaskBadge', () => {",
+            "  it('updates the count', async () => {",
+            "    const { rerender, unmount: unmountBadge } = await renderWithProviders(<TaskBadge count={1} />);",
+            "",
+            "    rerender(<TaskBadge count={2} />);",
+            "    unmountBadge();",
+            "  });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-waitfor-side-effect": {
+    "expect": ["add-task-button.test.tsx:12 [waitfor-side-effect] a press or fireEvent runs inside waitFor"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/add-task-button.test.tsx",
+          "lines": [
+            "// src/features/tasks/add-task-button.test.tsx",
+            "import { screen, userEvent, waitFor } from '@testing-library/react-native';",
+            "",
+            "import { renderWithProviders } from '@test/render-with-providers';",
+            "",
+            "import { AddTaskButton } from './add-task-button';",
+            "",
+            "describe('AddTaskButton', () => {",
+            "  it('adds a task', async () => {",
+            "    const user = userEvent.setup();",
+            "    await renderWithProviders(<AddTaskButton />);",
+            "    await waitFor(async () => {",
+            "      await user.press(screen.getByRole('button', { name: 'Add' }));",
+            "      expect(screen.getByText('Buy milk')).toBeOnTheScreen();",
+            "    });",
+            "  });",
+            "});"
+          ]
+        }
+      }
+    ]
+  }
+}

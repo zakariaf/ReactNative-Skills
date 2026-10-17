@@ -1,0 +1,4 @@
+{
+  "productionAppIds": ["app.acme.tasks"],
+  "network": { "mode": "allowlist", "allowHosts": ["api.acme.app"] }
+}

@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "reviewedOn": "2026-10-17",
+  "stack": "Expo SDK 57",
+  "areas": {
+    "build": {
+      "title": "Build",
+      "file": "references/build.md",
+      "intro": "Build failures.",
+      "reverify": "npx expo config"
+    },
+    "release": {
+      "title": "Release",
+      "file": "references/release.md",
+      "intro": "Release failures.",
+      "reverify": "xcrun altool --version"
+    }
+  },
+  "skills": [
+    "app-variants-and-environment",
+    "ios-release-testflight",
+    "android-release-play"
+  ],
+  "bannedTerms": [
+    {
+      "pattern": "\\bthe owner\\b",
+      "why": "house vocabulary: the developer"
+    }
+  ]
+}

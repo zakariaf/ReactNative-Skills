@@ -1,0 +1,126 @@
+{
+  "$comment": "The permission kinds check-permissions.mjs knows and the Expo SDK 57 / React Native 0.86 functions that read or request each one. Verified on 2026-10-14 by reading the published type declarations (build/index.d.ts) and config plugins of expo-image-picker 57.0.20, expo-camera 57.0.6, expo-location 57.0.21, expo-media-library 57.0.5, expo-contacts 57.0.7, expo-calendar 57.0.5, expo-audio 57.0.5, expo-sensors 57.0.3, expo-notifications 57.0.21 and react-native 0.86.3. expo-camera exports its get/request functions only as members of the Camera object (marked @hidden in the docs; useCameraPermissions is the documented API), so its entries match Camera.getCameraPermissionsAsync and friends. Modules are matched by package name, so a subpath (expo-media-library/legacy) uses its package's entry. expo-av is not an SDK 57 module and is not listed. Re-verify: npm pack <pkg>@<version> and grep build/*.d.ts for (get|request|use)\\w*Permissions. App Tracking Transparency (expo-tracking-transparency) is deliberately absent: admob-ads-and-consent owns it.",
+  "kinds": {
+    "camera": { "ios": ["NSCameraUsageDescription"], "android": ["android.permission.CAMERA"], "options": ["cameraPermission"] },
+    "microphone": { "ios": ["NSMicrophoneUsageDescription"], "android": ["android.permission.RECORD_AUDIO"], "options": ["microphonePermission"] },
+    "photos": { "ios": ["NSPhotoLibraryUsageDescription"], "android": ["android.permission.READ_MEDIA_IMAGES"], "options": ["photosPermission"] },
+    "photos-add": { "ios": ["NSPhotoLibraryAddUsageDescription"], "android": [], "options": ["savePhotosPermission"] },
+    "location": { "ios": ["NSLocationWhenInUseUsageDescription"], "android": ["android.permission.ACCESS_COARSE_LOCATION"], "options": ["locationWhenInUsePermission"] },
+    "location-background": { "ios": ["NSLocationAlwaysAndWhenInUseUsageDescription"], "android": ["android.permission.ACCESS_BACKGROUND_LOCATION"], "options": ["locationAlwaysAndWhenInUsePermission"], "requires": "location" },
+    "contacts": { "ios": ["NSContactsUsageDescription"], "android": ["android.permission.READ_CONTACTS"], "options": ["contactsPermission"] },
+    "calendar": { "ios": ["NSCalendarsFullAccessUsageDescription"], "android": ["android.permission.READ_CALENDAR"], "options": ["calendarPermission"] },
+    "reminders": { "ios": ["NSRemindersFullAccessUsageDescription"], "android": [], "options": ["remindersPermission"] },
+    "motion": { "ios": ["NSMotionUsageDescription"], "android": ["android.permission.ACTIVITY_RECOGNITION"], "options": ["motionPermission", "motionUsagePermission"] },
+    "notifications": { "ios": [], "android": ["android.permission.POST_NOTIFICATIONS"], "options": [] },
+    "bluetooth": { "ios": ["NSBluetoothAlwaysUsageDescription"], "android": ["android.permission.BLUETOOTH_CONNECT"], "options": [] }
+  },
+  "imagePickerBlocks": {
+    "$comment": "expo-image-picker 57.0.20 (plugin withImagePicker): an option set to false also adds the Android permission to the blocked list (tools:node=\"remove\"). expo-camera 57.0.6 always adds CAMERA, whatever its options.",
+    "cameraPermission": "android.permission.CAMERA",
+    "microphonePermission": "android.permission.RECORD_AUDIO"
+  },
+  "modules": {
+    "expo-image-picker": {
+      "functions": {
+        "getCameraPermissionsAsync": ["camera", "read"],
+        "requestCameraPermissionsAsync": ["camera", "request"],
+        "getMediaLibraryPermissionsAsync": ["photos", "read"],
+        "requestMediaLibraryPermissionsAsync": ["photos", "request"],
+        "useCameraPermissions": ["camera", "hook"],
+        "useMediaLibraryPermissions": ["photos", "hook"]
+      }
+    },
+    "expo-camera": {
+      "functions": {
+        "getCameraPermissionsAsync": ["camera", "read"],
+        "requestCameraPermissionsAsync": ["camera", "request"],
+        "getMicrophonePermissionsAsync": ["microphone", "read"],
+        "requestMicrophonePermissionsAsync": ["microphone", "request"],
+        "useCameraPermissions": ["camera", "hook"],
+        "useMicrophonePermissions": ["microphone", "hook"]
+      }
+    },
+    "expo-media-library": {
+      "functions": {
+        "getPermissionsAsync": ["photos", "read"],
+        "requestPermissionsAsync": ["photos", "request"],
+        "usePermissions": ["photos", "hook"]
+      },
+      "writeOnlyKind": "photos-add"
+    },
+    "expo-location": {
+      "functions": {
+        "getForegroundPermissionsAsync": ["location", "read"],
+        "requestForegroundPermissionsAsync": ["location", "request"],
+        "getBackgroundPermissionsAsync": ["location-background", "read"],
+        "requestBackgroundPermissionsAsync": ["location-background", "request"],
+        "getMotionActivityPermissionsAsync": ["motion", "read"],
+        "requestMotionActivityPermissionsAsync": ["motion", "request"],
+        "useForegroundPermissions": ["location", "hook"],
+        "useBackgroundPermissions": ["location-background", "hook"],
+        "useMotionActivityPermissions": ["motion", "hook"]
+      }
+    },
+    "expo-contacts": {
+      "functions": {
+        "getPermissionsAsync": ["contacts", "read"],
+        "requestPermissionsAsync": ["contacts", "request"]
+      }
+    },
+    "expo-calendar": {
+      "functions": {
+        "getCalendarPermissionsAsync": ["calendar", "read"],
+        "requestCalendarPermissionsAsync": ["calendar", "request"],
+        "getCalendarPermissions": ["calendar", "read"],
+        "requestCalendarPermissions": ["calendar", "request"],
+        "getRemindersPermissionsAsync": ["reminders", "read"],
+        "requestRemindersPermissionsAsync": ["reminders", "request"],
+        "getRemindersPermissions": ["reminders", "read"],
+        "requestRemindersPermissions": ["reminders", "request"],
+        "requestPermissionsAsync": ["calendar", "request"],
+        "useCalendarPermissions": ["calendar", "hook"],
+        "useRemindersPermissions": ["reminders", "hook"]
+      }
+    },
+    "expo-audio": {
+      "functions": {
+        "getRecordingPermissionsAsync": ["microphone", "read"],
+        "requestRecordingPermissionsAsync": ["microphone", "request"],
+        "requestNotificationPermissionsAsync": ["notifications", "request"]
+      }
+    },
+    "expo-sensors": {
+      "functions": {
+        "getPermissionsAsync": ["motion", "read"],
+        "requestPermissionsAsync": ["motion", "request"]
+      }
+    },
+    "expo-notifications": {
+      "functions": {
+        "getPermissionsAsync": ["notifications", "read"],
+        "requestPermissionsAsync": ["notifications", "request"],
+        "usePermissions": ["notifications", "hook"]
+      }
+    }
+  },
+  "androidPermissionKinds": {
+    "$comment": "React Native's PermissionsAndroid: the PERMISSIONS constant (or the android.permission.* string) a request names, to its kind.",
+    "CAMERA": "camera",
+    "RECORD_AUDIO": "microphone",
+    "READ_MEDIA_IMAGES": "photos",
+    "READ_MEDIA_VIDEO": "photos",
+    "READ_MEDIA_VISUAL_USER_SELECTED": "photos",
+    "READ_EXTERNAL_STORAGE": "photos",
+    "ACCESS_FINE_LOCATION": "location",
+    "ACCESS_COARSE_LOCATION": "location",
+    "ACCESS_BACKGROUND_LOCATION": "location-background",
+    "READ_CONTACTS": "contacts",
+    "WRITE_CONTACTS": "contacts",
+    "READ_CALENDAR": "calendar",
+    "WRITE_CALENDAR": "calendar",
+    "ACTIVITY_RECOGNITION": "motion",
+    "POST_NOTIFICATIONS": "notifications",
+    "BLUETOOTH_CONNECT": "bluetooth",
+    "BLUETOOTH_SCAN": "bluetooth"
+  }
+}

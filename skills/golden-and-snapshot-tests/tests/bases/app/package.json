@@ -1,0 +1,13 @@
+{
+  "name": "tasks-app",
+  "private": true,
+  "scripts": {
+    "test": "jest --ci",
+    "test:golden": "jest --ci --selectProjects golden",
+    "test:coverage": "jest --ci --coverage --randomize"
+  },
+  "devDependencies": {
+    "@types/jest-image-snapshot": "6.4.2",
+    "jest-image-snapshot": "6.5.2"
+  }
+}

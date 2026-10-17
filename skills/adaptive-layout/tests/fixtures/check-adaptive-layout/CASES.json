@@ -1,0 +1,890 @@
+{
+  "bad-android-resizable": {
+    "expect": ["[full-screen-opt-out]", "plugins/with-task-widgets.js:6", "API 36 tablet AVD"],
+    "ops": [
+      {
+        "write": {
+          "file": "plugins/with-task-widgets.js",
+          "lines": [
+            "// plugins/with-task-widgets.js: pins the main activity to one size (the planted bug).",
+            "const { withAndroidManifest } = require('expo/config-plugins');",
+            "",
+            "module.exports = function withTaskWidgets(config) {",
+            "  return withAndroidManifest(config, (next) => {",
+            "    next.modResults.manifest.application[0].activity[0].$['android:resizeableActivity'] = 'false';",
+            "    return next;",
+            "  });",
+            "};"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-config-orientation": {
+    "expect": ["[config-orientation]", "app.config.ts:10"],
+    "ops": [
+      { "json": { "file": "contracts/adaptive-layout.json", "path": ["appOrientation"], "delete": true } },
+      {
+        "replace": { "file": "app.config.ts", "find": "orientation: 'portrait',", "with": "orientation: 'landscape'," }
+      }
+    ]
+  },
+  "bad-config-orientation-contract": {
+    "expect": ["[config-orientation]", "app.config.ts:10"],
+    "ops": [
+      { "replace": { "file": "app.config.ts", "find": "orientation: 'portrait',", "with": "orientation: 'default'," } }
+    ]
+  },
+  "bad-device-branch": {
+    "expect": ["[device-branch]", "src/features/tasks/components/task-row.tsx:7"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "find": "import { View } from 'react-native';",
+          "with": "import { Platform, View } from 'react-native';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "find": "width: '100%' }}",
+          "with": "width: Platform.isPad ? '50%' : '100%' }}"
+        }
+      }
+    ]
+  },
+  "bad-device-helper": {
+    "expect": ["[device-branch]", "src/features/tasks/device-kind.ts:4"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/device-kind.ts",
+          "lines": [
+            "// src/features/tasks/device-kind.ts",
+            "import * as Device from 'expo-device';",
+            "",
+            "export function isTablet(): boolean {",
+            "  return Device.deviceType === Device.DeviceType.TABLET;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-device-orientation": {
+    "expect": ["[device-orientation]", "src/features/tasks/use-is-landscape.ts:8"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-is-landscape.ts",
+          "lines": [
+            "// src/features/tasks/use-is-landscape.ts",
+            "import * as ScreenOrientation from 'expo-screen-orientation';",
+            "import { useEffect, useState } from 'react';",
+            "",
+            "export function useIsLandscape(): boolean {",
+            "  const [isLandscape, setIsLandscape] = useState(false);",
+            "  useEffect(() => {",
+            "    const subscription = ScreenOrientation.addOrientationChangeListener((event) => {",
+            "      setIsLandscape(event.orientationInfo.orientation >= ScreenOrientation.Orientation.LANDSCAPE_LEFT);",
+            "    });",
+            "    return () => subscription.remove();",
+            "  }, []);",
+            "  return isLandscape;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-fixed-width": {
+    "expect": ["[fixed-width]", "src/features/tasks/components/task-row.tsx:7"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "find": "width: '100%' }}",
+          "with": "width: 375 }}"
+        }
+      }
+    ]
+  },
+  "bad-fixed-width-attr": {
+    "expect": ["[fixed-width]", "src/features/tasks/components/task-chart.tsx:5"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-chart.tsx",
+          "lines": [
+            "// src/features/tasks/components/task-chart.tsx",
+            "import { Canvas } from '@shopify/react-native-skia';",
+            "",
+            "export function TaskChart(): React.JSX.Element {",
+            "  return <Canvas width={360} style={{ height: 120 }} />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-fixed-width-constant": {
+    "expect": ["[fixed-width]", "src/features/tasks/components/task-row.tsx:8"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "find": "import type { Task } from '../task-list';\n",
+          "with": "import type { Task } from '../task-list';\nconst ROW_WIDTH = 375;\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "find": "width: '100%' }}",
+          "with": "width: ROW_WIDTH }}"
+        }
+      }
+    ]
+  },
+  "bad-fixed-width-ternary": {
+    "expect": ["[fixed-width]", "src/features/tasks/components/task-row.tsx:7"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-row.tsx",
+          "find": "width: '100%' }}",
+          "with": "width: props.task.id === '' ? 500 : '100%' }}"
+        }
+      }
+    ]
+  },
+  "bad-full-screen-redundant": {
+    "expect": [
+      "[full-screen-opt-out]",
+      "app.config.ts:11",
+      "UIRequiresFullScreen set to false is redundant: Apple TN3192 asks apps not to include the key; remove it."
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "supportsTablet: true },",
+          "with": "supportsTablet: true, infoPlist: { UIRequiresFullScreen: false } },"
+        }
+      }
+    ]
+  },
+  "bad-full-screen-wrong-version": {
+    "expect": [
+      "[full-screen-opt-out]",
+      "app.config.ts:11",
+      "UIRequiresFullScreenIgnoredStartingWithVersion '40' does not count"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "supportsTablet: true },",
+          "with": "supportsTablet: true, requireFullScreen: true, infoPlist: { UIRequiresFullScreenIgnoredStartingWithVersion: '40' } },"
+        }
+      }
+    ]
+  },
+  "bad-grid-columns-key": {
+    "expect": ["[grid-columns-key]", "src/features/tasks/components/task-board.tsx:17"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/task-board.tsx",
+          "find": "          key={`grid-${columns}`}\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-grid-columns-source": {
+    "expect": ["[grid-columns-source]", "src/features/tasks/components/task-board.tsx:11"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/task-board.tsx",
+          "lines": [
+            "// src/features/tasks/components/task-board.tsx",
+            "import { FlatList, View } from 'react-native';",
+            "",
+            "import { useWindowClass } from '@/hooks/use-window-class';",
+            "",
+            "import type { Task } from '../task-list';",
+            "",
+            "export function TaskBoard(props: { readonly tasks: readonly Task[] }): React.JSX.Element {",
+            "  const columns = useWindowClass().width === 'regular' ? 3 : 1;",
+            "  return (",
+            "    <FlatList",
+            "      key={`grid-${columns}`}",
+            "      numColumns={columns}",
+            "      data={props.tasks}",
+            "      keyExtractor={(task) => task.id}",
+            "      renderItem={({ item }) => <View testID={`tasks.card.${item.id}`} style={{ flex: 1 }} />}",
+            "    />",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-initial-orientation": {
+    "expect": ["[config-orientation]", "app.config.ts:13", "initialOrientation 'LANDSCAPE'"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "plugins: ['expo-router', './plugins/with-task-widgets.js'],",
+          "with": "plugins: ['expo-router', './plugins/with-task-widgets.js', ['expo-screen-orientation', { initialOrientation: 'LANDSCAPE' }]],"
+        }
+      }
+    ]
+  },
+  "bad-kit-missing": {
+    "expect": ["[list-detail-screens]", "src/ui/adaptive/list-detail-layout.tsx:1"],
+    "ops": [{ "delete": "src/ui/adaptive/list-detail-layout.tsx" }]
+  },
+  "bad-list-detail-missing-file": {
+    "expect": ["[list-detail-screens]", "src/features/notes/notes-screen.tsx:1"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/adaptive-layout.json",
+          "path": ["listDetailScreens"],
+          "value": ["src/features/tasks/tasks-screen.tsx", "src/features/notes/notes-screen.tsx"]
+        }
+      }
+    ]
+  },
+  "bad-list-detail-screen": {
+    "expect": ["[list-detail-screens]", "src/features/tasks/tasks-screen.tsx:1"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/tasks-screen.tsx",
+          "lines": [
+            "// src/features/tasks/tasks-screen.tsx: one long list, even on a 13-inch iPad (the planted bug).",
+            "import { FlatList } from 'react-native';",
+            "",
+            "import { CONTENT_MAX_WIDTH } from '@/theme/tokens';",
+            "",
+            "import { TaskRow } from './components/task-row';",
+            "",
+            "import type { TasksModel } from './use-tasks-model';",
+            "",
+            "export function TasksScreen({ model }: { readonly model: TasksModel }): React.JSX.Element {",
+            "  return (",
+            "    <FlatList",
+            "      contentContainerStyle={{ width: '100%', maxWidth: CONTENT_MAX_WIDTH, alignSelf: 'center' }}",
+            "      data={model.tasks}",
+            "      keyExtractor={(task) => task.id}",
+            "      renderItem={({ item }) => <TaskRow task={item} onSelect={model.onSelect} />}",
+            "    />",
+            "  );",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-orientation-lock": {
+    "expect": ["[orientation-lock]", "src/features/tasks/use-portrait-lock.ts:7"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-portrait-lock.ts",
+          "lines": [
+            "// src/features/tasks/use-portrait-lock.ts",
+            "import * as ScreenOrientation from 'expo-screen-orientation';",
+            "import { useEffect } from 'react';",
+            "",
+            "export function usePortraitLock(): void {",
+            "  useEffect(() => {",
+            "    void ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);",
+            "  }, []);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-orientation-route": {
+    "expect": ["[orientation-lock]", "src/app/(app)/_layout.tsx:5"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/(app)/_layout.tsx",
+          "find": "return <Stack />;",
+          "with": "return <Stack screenOptions={{ orientation: 'portrait' }} />;"
+        }
+      }
+    ]
+  },
+  "bad-orientation-unlock": {
+    "expect": ["[orientation-unlock]", "src/features/attachments/capture-screen.tsx:8"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/attachments/capture-screen.tsx",
+          "find": "    return () => {\n      void ScreenOrientation.unlockAsync();\n    };\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-raw-breakpoint": {
+    "expect": ["[raw-breakpoint]", "src/features/tasks/use-is-wide.ts:6"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-is-wide.ts",
+          "lines": [
+            "// src/features/tasks/use-is-wide.ts",
+            "import { useWindowDimensions } from 'react-native';",
+            "",
+            "export function useIsWide(): boolean {",
+            "  const { width } = useWindowDimensions();",
+            "  return width >= 768;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-raw-breakpoint-constant": {
+    "expect": ["[raw-breakpoint]", "src/features/tasks/use-is-wide.ts:7"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-is-wide.ts",
+          "lines": [
+            "// src/features/tasks/use-is-wide.ts",
+            "import { useWindowDimensions } from 'react-native';",
+            "",
+            "const TABLET_BREAKPOINT = 768;",
+            "export function useIsWide(): boolean {",
+            "  const { width } = useWindowDimensions();",
+            "  return width >= TABLET_BREAKPOINT;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-raw-breakpoint-shortest-side": {
+    "expect": ["[raw-breakpoint]", "src/features/tasks/use-is-big.ts:6"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-is-big.ts",
+          "lines": [
+            "// src/features/tasks/use-is-big.ts",
+            "import { useWindowDimensions } from 'react-native';",
+            "",
+            "export function useIsBig(): boolean {",
+            "  const window = useWindowDimensions();",
+            "  return 600 <= Math.min(window.width, window.height);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-readable-width": {
+    "expect": ["[readable-width]", "src/features/settings/settings-screen.tsx:1"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/settings/settings-screen.tsx",
+          "find": "import { ScreenFrame } from '@/ui/screen-frame';\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/settings/settings-screen.tsx",
+          "find": "<ScreenFrame testID=\"settings.screen\" edges={['right', 'bottom', 'left']}>",
+          "with": "<View testID=\"settings.screen\" style={{ flex: 1 }}>"
+        }
+      },
+      {
+        "replace": { "file": "src/features/settings/settings-screen.tsx", "find": "</ScreenFrame>", "with": "</View>" }
+      }
+    ]
+  },
+  "bad-readable-width-import-only": {
+    "expect": ["[readable-width]", "src/features/settings/settings-screen.tsx:1"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/settings/settings-screen.tsx",
+          "find": "<ScreenFrame testID=\"settings.screen\" edges={['right', 'bottom', 'left']}>",
+          "with": "<View testID=\"settings.screen\" style={{ flex: 1 }}>"
+        }
+      },
+      {
+        "replace": { "file": "src/features/settings/settings-screen.tsx", "find": "</ScreenFrame>", "with": "</View>" }
+      }
+    ]
+  },
+  "bad-readable-width-token": {
+    "expect": ["[readable-width-token]", "src/features/settings/settings-screen.tsx:9"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/settings/settings-screen.tsx",
+          "find": "<View testID=\"settings.rows\" />",
+          "with": "<View testID=\"settings.rows\" style={{ maxWidth: 720 }} />"
+        }
+      }
+    ]
+  },
+  "bad-require-full-screen": {
+    "expect": ["[full-screen-opt-out]", "app.config.ts:11"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "supportsTablet: true },",
+          "with": "supportsTablet: true, requireFullScreen: true },"
+        }
+      }
+    ]
+  },
+  "bad-require-full-screen-app-json": {
+    "expect": ["[full-screen-opt-out]", "app.json:5", "ios.requireFullScreen: true opts out of resizing"],
+    "ops": [
+      { "delete": "app.config.ts" },
+      {
+        "write": {
+          "file": "app.json",
+          "lines": [
+            "{",
+            "  \"expo\": {",
+            "    \"name\": \"Tasks\",",
+            "    \"orientation\": \"portrait\",",
+            "    \"ios\": { \"supportsTablet\": true, \"requireFullScreen\": true },",
+            "    \"plugins\": [\"expo-router\", \"./plugins/with-task-widgets.js\"]",
+            "  }",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-selection-active-id": {
+    "expect": ["[list-detail-selection]", "src/features/tasks/use-tasks-model.ts:21"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "import { router, useLocalSearchParams } from 'expo-router';",
+          "with": "import { router, useLocalSearchParams } from 'expo-router';\nimport { useState } from 'react';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "  const selectedId = (onePane === 'detail' ? params.id : params.selected) ?? null;",
+          "with": "  const [activeTaskId, setActiveTaskId] = useState<string | null>(params.id ?? null);\n  const selectedId = activeTaskId;"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "    else router.setParams({ selected: id });",
+          "with": "    else setActiveTaskId(id);"
+        }
+      }
+    ]
+  },
+  "bad-selection-not-routed": {
+    "expect": ["[list-detail-selection]", "src/features/tasks/tasks-screen.tsx:1"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "import { router, useLocalSearchParams } from 'expo-router';",
+          "with": "import { router } from 'expo-router';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "  const params = useLocalSearchParams<{ selected?: string; id?: string }>();\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "  const selectedId = (onePane === 'detail' ? params.id : params.selected) ?? null;",
+          "with": "  const selectedId: string | null = null;"
+        }
+      }
+    ]
+  },
+  "bad-selection-state": {
+    "expect": ["[list-detail-selection]", "src/features/tasks/use-tasks-model.ts:21"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "import { router, useLocalSearchParams } from 'expo-router';",
+          "with": "import { router, useLocalSearchParams } from 'expo-router';\nimport { useState } from 'react';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "  const selectedId = (onePane === 'detail' ? params.id : params.selected) ?? null;",
+          "with": "  const [selectedId, setSelectedId] = useState<string | null>(params.id ?? null);"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "    else router.setParams({ selected: id });",
+          "with": "    else setSelectedId(id);"
+        }
+      }
+    ]
+  },
+  "bad-selection-unrelated-route": {
+    "expect": ["[list-detail-selection]", "src/features/tasks/tasks-screen.tsx:1"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "import { router, useLocalSearchParams } from 'expo-router';",
+          "with": "import { router } from 'expo-router';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "  const params = useLocalSearchParams<{ selected?: string; id?: string }>();\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "  const selectedId = (onePane === 'detail' ? params.id : params.selected) ?? null;",
+          "with": "  const selectedId: string | null = null;"
+        }
+      },
+      {
+        "$comment": "A route that has nothing to do with the tasks feature reads its own params: no proof for the tasks screen.",
+        "write": {
+          "file": "src/app/(app)/settings/[section].tsx",
+          "lines": [
+            "// src/app/(app)/settings/[section].tsx",
+            "import { useLocalSearchParams } from 'expo-router';",
+            "",
+            "import { SettingsScreen } from '@/features/settings/settings-screen';",
+            "",
+            "export default function SettingsSectionRoute(): React.JSX.Element {",
+            "  const { section } = useLocalSearchParams<{ section: string }>();",
+            "  return section === '' ? <SettingsScreen /> : <SettingsScreen />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-tablet-support": {
+    "expect": ["[tablet-support]", "app.config.ts:11"],
+    "ops": [{ "replace": { "file": "app.config.ts", "find": "supportsTablet: true", "with": "supportsTablet: false" } }]
+  },
+  "bad-window-class-fork": {
+    "expect": ["[window-class-fork]", "src/features/tasks/use-breakpoint.ts:4"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-breakpoint.ts",
+          "lines": [
+            "// src/features/tasks/use-breakpoint.ts",
+            "import { useWindowClass } from '@/hooks/use-window-class';",
+            "",
+            "export function useBreakpoint(): 'phone' | 'tablet' {",
+            "  return useWindowClass().width === 'regular' ? 'tablet' : 'phone';",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "error-exception-without-reason": {
+    "expect": ["ERROR [bad-input]", "\"orientationLocks\" must be a list"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/adaptive-layout.json",
+          "path": ["orientationLocks"],
+          "value": [{ "file": "src/features/attachments/capture-screen.tsx", "reason": "" }]
+        }
+      }
+    ]
+  },
+  "error-no-package-json": {
+    "expect": ["ERROR [bad-input] nothing to check: no package.json"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "error-no-source": {
+    "expect": ["ERROR [bad-input] nothing to check: no source file under src/"],
+    "ops": [{ "delete": "src" }]
+  },
+  "error-unknown-contract-key": {
+    "expect": ["ERROR [bad-input]", "unknown key \"breakpoints\""],
+    "ops": [
+      { "json": { "file": "contracts/adaptive-layout.json", "path": ["breakpoints"], "value": { "tablet": 768 } } }
+    ]
+  },
+  "pass-full-screen-older-ios": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "Apple TN3192's migration path: keep full screen on iOS 18 and earlier, resize from iOS 26 on.",
+        "replace": {
+          "file": "app.config.ts",
+          "find": "supportsTablet: true },",
+          "with": "supportsTablet: true, requireFullScreen: true, infoPlist: { UIRequiresFullScreenIgnoredStartingWithVersion: '26' } },"
+        }
+      }
+    ]
+  },
+  "pass-full-screen-older-ios-18": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "TN3192: any UIRequiresFullScreenIgnoredStartingWithVersion of 27 or lower keeps the app resizable from that version on.",
+        "replace": {
+          "file": "app.config.ts",
+          "find": "supportsTablet: true },",
+          "with": "supportsTablet: true, requireFullScreen: true, infoPlist: { UIRequiresFullScreenIgnoredStartingWithVersion: '18' } },"
+        }
+      }
+    ]
+  },
+  "pass-initial-orientation-portrait": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "The contract names appOrientation 'portrait', so a portrait launch lock on iOS is the recorded profile.",
+        "replace": {
+          "file": "app.config.ts",
+          "find": "plugins: ['expo-router', './plugins/with-task-widgets.js'],",
+          "with": "plugins: ['expo-router', './plugins/with-task-widgets.js', ['expo-screen-orientation', { initialOrientation: 'PORTRAIT_UP' }]],"
+        }
+      }
+    ]
+  },
+  "pass-landscape-app": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "contracts/adaptive-layout.json", "path": ["appOrientation"], "value": "landscape" } },
+      {
+        "replace": { "file": "app.config.ts", "find": "orientation: 'portrait',", "with": "orientation: 'landscape'," }
+      }
+    ]
+  },
+  "pass-monorepo": {
+    "expect": ["RESULT: PASS"],
+    "args": "{dir} --app-dir apps/mobile",
+    "base": [{ "from": "@skill/templates", "to": "apps/mobile" }, { "from": "@tests/bases/app", "to": "apps/mobile" }],
+    "ops": [
+      {
+        "write": {
+          "file": "package.json",
+          "lines": [
+            "{",
+            "  \"name\": \"tasks-monorepo\",",
+            "  \"private\": true,",
+            "  \"workspaces\": [\"apps/*\"]",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-no-app-config": {
+    "expect": ["SKIP app.config.ts [config-orientation] not yet created (expo-project-bootstrap creates it)"],
+    "ops": [{ "delete": "app.config.ts" }]
+  },
+  "pass-no-react-native": {
+    "expect": ["NOT APPLICABLE: react-native is not in package.json"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "react-native"], "delete": true } }]
+  },
+  "pass-no-tablets": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "contracts/adaptive-layout.json", "path": ["tablets"], "value": false } },
+      {
+        "json": {
+          "file": "contracts/adaptive-layout.json",
+          "path": ["tabletsReason"],
+          "value": "A pocket timer: the iPad gets the scaled phone app until a tablet layout ships."
+        }
+      },
+      { "replace": { "file": "app.config.ts", "find": "supportsTablet: true", "with": "supportsTablet: false" } }
+    ]
+  },
+  "pass-no-window-class": {
+    "expect": [
+      "SKIP src/hooks/use-window-class.ts [window-class-fork] not yet created (react-components-and-hooks creates it)"
+    ],
+    "ops": [{ "delete": ["src/hooks/use-window-class.ts", "src/hooks/use-window-class.test.ts"] }]
+  },
+  "pass-route-orientation-default": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/app/(app)/_layout.tsx",
+          "find": "return <Stack />;",
+          "with": "return <Stack screenOptions={{ orientation: 'default' }}><Stack.Screen name=\"index\" options={{ orientation: 'all' }} /></Stack>;"
+        }
+      }
+    ]
+  },
+  "pass-selection-in-route-file": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "import { router, useLocalSearchParams } from 'expo-router';",
+          "with": "import { router } from 'expo-router';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "  const params = useLocalSearchParams<{ selected?: string; id?: string }>();\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "  const selectedId = (onePane === 'detail' ? params.id : params.selected) ?? null;",
+          "with": "  const selectedId: string | null = null;"
+        }
+      },
+      {
+        "$comment": "The model takes no params; the list route file that renders the tasks screen reads them (it imports from the feature folder).",
+        "replace": {
+          "file": "src/app/(app)/tasks/index.tsx",
+          "find": "import { TasksScreen } from '@/features/tasks/tasks-screen';",
+          "with": "import { useLocalSearchParams } from 'expo-router';\n\nimport { TasksScreen } from '@/features/tasks/tasks-screen';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/(app)/tasks/index.tsx",
+          "find": "  const model = useTasksModel(SAMPLE, 'list');",
+          "with": "  const { selected } = useLocalSearchParams<{ selected?: string }>();\n  const model = useTasksModel(selected === undefined ? SAMPLE : SAMPLE, 'list');"
+        }
+      }
+    ]
+  },
+  "pass-services-capability": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "$comment": "Services lay nothing out: a haptics adapter reads Platform.isPad (iPads have no haptic engine), an image resize passes a pixel width, a capture service reads the device orientation to rotate a photo.",
+        "write": {
+          "file": "src/services/haptics/expo-haptics-adapter.ts",
+          "lines": [
+            "// src/services/haptics/expo-haptics-adapter.ts",
+            "import { Platform } from 'react-native';",
+            "",
+            "/** iPads have no haptic engine: a hardware capability, not a layout decision. */",
+            "export const HAS_HAPTICS = Platform.OS === 'android' || !Platform.isPad;"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/media/resize-photo.ts",
+          "lines": [
+            "// src/services/media/resize-photo.ts",
+            "import { manipulateAsync } from 'expo-image-manipulator';",
+            "",
+            "const MAX_EDGE = 2000;",
+            "",
+            "export async function resizePhoto(uri: string, result: { readonly width: number }): Promise<string> {",
+            "  if (result.width > 2000 || result.width > MAX_EDGE) {",
+            "    const resized = await manipulateAsync(uri, [{ resize: { width: 1080 } }]);",
+            "    return resized.uri;",
+            "  }",
+            "  return uri;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/services/capture/capture-rotation.ts",
+          "lines": [
+            "// src/services/capture/capture-rotation.ts",
+            "import * as ScreenOrientation from 'expo-screen-orientation';",
+            "",
+            "export async function captureRotation(): Promise<number> {",
+            "  return ScreenOrientation.getOrientationAsync();",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-small-values": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/task-metrics.ts",
+          "lines": [
+            "// src/features/tasks/task-metrics.ts: comparisons and sizes that are not breakpoints.",
+            "import { useWindowDimensions } from 'react-native';",
+            "",
+            "export const BADGE = { width: 288, maxWidth: 200, minWidth: 44 };",
+            "",
+            "export function useTaskMetrics(count: number): { readonly isLarge: boolean; readonly hasRoom: boolean; readonly isLong: boolean } {",
+            "  const { width, fontScale } = useWindowDimensions();",
+            "  // A comment that mentions width >= 768 is not code.",
+            "  const label = 'width > 1024';",
+            "  return { isLarge: fontScale >= 1.25, hasRoom: width > 0 && label.length > 0, isLong: count > 500 };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-test-only-screen": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/debug/debug-menu-screen.tsx",
+          "lines": [
+            "// src/features/debug/debug-menu-screen.tsx",
+            "import { View } from 'react-native';",
+            "",
+            "export function DebugMenuScreen(): React.JSX.Element {",
+            "  return <View testID=\"debug.menu\" style={{ flex: 1 }} />;",
+            "}"
+          ]
+        }
+      },
+      { "write": { "file": "contracts/architecture.json", "json": { "testOnlyFolders": ["src/features/debug/"] } } }
+    ]
+  }
+}

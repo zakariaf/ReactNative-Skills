@@ -1,0 +1,3 @@
+[settings-default]
+DEFAULT_SETTINGS.soundEnabled is true, the contract says false
+src/stores/settings/settings-schema.ts:

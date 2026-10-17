@@ -1,0 +1,214 @@
+{
+  "bad-alias": {
+    "expect": ["[token-file] {color.primitive.blue.99} points to no token"],
+    "ops": [
+      {
+        "replace": {
+          "file": "design/tokens.json",
+          "find": "\"focus\": \"{color.primitive.blue.45}\"",
+          "with": "\"focus\": \"{color.primitive.blue.99}\""
+        }
+      }
+    ]
+  },
+  "bad-colorblind-noop": {
+    "expect": ["design/tokens.json [palette-colorblind] color.colorBlind changes no primary or status colour"],
+    "ops": [
+      {
+        "json": {
+          "file": "design/tokens.json",
+          "path": ["color", "colorBlind"],
+          "value": { "light": "{color.light}", "dark": "{color.dark}" }
+        }
+      }
+    ]
+  },
+  "bad-contract-pair": {
+    "expect": [
+      "design/tokens.json [palette-contrast] light: textMuted on primary is 1.10:1, needs 4.5:1",
+      "design/tokens.json [palette-contrast] dark: textMuted on primary is 1.06:1, needs 4.5:1"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/contrast.json",
+          "json": {
+            "palettes": [
+              {
+                "name": "app",
+                "file": "src/theme/palette.ts",
+                "export": "PALETTE",
+                "sets": ["light", "dark"],
+                "base": "background",
+                "edge": "border",
+                "text": [
+                  ["text", "background"],
+                  ["textMuted", "surface"],
+                  ["onPrimary", "primary"],
+                  ["text", "separator"],
+                  ["textMuted", "primary"]
+                ],
+                "graphics": [["border", "background"], ["focus", "surface"]],
+                "shapes": [["primary", "background"]]
+              }
+            ],
+            "exceptions": []
+          }
+        }
+      }
+    ]
+  },
+  "bad-contrast": {
+    "expect": ["[palette-contrast] light: textMuted on background is 2.04:1, needs 4.5:1", "design/tokens.json"],
+    "ops": [
+      {
+        "replace": {
+          "file": "design/tokens.json",
+          "find": "\"textMuted\": \"{color.primitive.neutral.46}\"",
+          "with": "\"textMuted\": \"{color.primitive.neutral.75}\""
+        }
+      }
+    ]
+  },
+  "bad-exists": {
+    "expect": ["src/theme/palette.ts [palette-exists] the palette module already holds other colours"],
+    "args": "{dir}",
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/palette.ts",
+          "find": "  primary: '#2156C8', // blue.49\n",
+          "with": "  primary: '#1F51BB', // edited by hand\n"
+        }
+      }
+    ]
+  },
+  "bad-fill": {
+    "expect": [
+      "design/tokens.json [palette-fill] light: primary stands only 2.47:1 off background and off border, needs 3:1 from one of them",
+      "design/tokens.json [palette-fill] light: primary stands only 2.47:1 off surface and off border"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "design/tokens.json",
+          "find": "\"primary\": \"{color.primitive.blue.49}\"",
+          "with": "\"primary\": \"#C9CED6\""
+        }
+      },
+      {
+        "replace": {
+          "file": "design/tokens.json",
+          "find": "\"onPrimary\": \"{color.primitive.neutral.100}\"",
+          "with": "\"onPrimary\": \"{color.primitive.neutral.20}\""
+        }
+      }
+    ]
+  },
+  "bad-hex": {
+    "expect": ["[palette-hex] light.sunken is \"lightblue\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "design/tokens.json",
+          "find": "\"sunken\": \"{color.primitive.neutral.95}\"",
+          "with": "\"sunken\": \"lightblue\""
+        }
+      }
+    ]
+  },
+  "error-no-tokens": {
+    "expect": ["ERROR [bad-input] nothing to read: the token file design/tokens.json does not exist"],
+    "ops": [{ "delete": "design/tokens.json" }]
+  },
+  "pass-colorblind-variant": {
+    "expect": [
+      "const COLOR_BLIND_LIGHT: ColorTokens = {",
+      "  danger: '#8A5300', // amber.49",
+      "  colorBlind: { light: COLOR_BLIND_LIGHT, dark: COLOR_BLIND_DARK },",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "design/tokens.json",
+          "path": ["color", "colorBlind"],
+          "value": {
+            "light": {
+              "background": "{color.primitive.neutral.97}",
+              "surface": "{color.primitive.neutral.100}",
+              "sunken": "{color.primitive.neutral.95}",
+              "text": "{color.primitive.neutral.20}",
+              "textMuted": "{color.primitive.neutral.46}",
+              "primary": "{color.primitive.blue.49}",
+              "onPrimary": "{color.primitive.neutral.100}",
+              "border": "{color.primitive.neutral.60}",
+              "separator": "#15171C1F",
+              "shadow": "#15171C33",
+              "focus": "{color.primitive.blue.45}",
+              "danger": "{color.primitive.amber.49}",
+              "dangerSurface": "{color.primitive.red.96}",
+              "success": "{color.primitive.green.45}",
+              "warning": "{color.primitive.amber.49}",
+              "scrim": "#0F111599"
+            },
+            "dark": {
+              "background": "{color.primitive.neutral.18}",
+              "surface": "{color.primitive.neutral.23}",
+              "sunken": "{color.primitive.neutral.20}",
+              "text": "{color.primitive.neutral.97}",
+              "textMuted": "{color.primitive.neutral.75}",
+              "primary": "{color.primitive.blue.77}",
+              "onPrimary": "{color.primitive.neutral.18}",
+              "border": "{color.primitive.neutral.60}",
+              "separator": "#F5F6F824",
+              "shadow": "#00000066",
+              "focus": "{color.primitive.blue.83}",
+              "danger": "{color.primitive.amber.82}",
+              "dangerSurface": "{color.primitive.red.26}",
+              "success": "{color.primitive.green.80}",
+              "warning": "{color.primitive.amber.82}",
+              "scrim": "#000000B3"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "pass-contract-translucent": {
+    "expect": [
+      "pairs: contracts/contrast.json plus the core pairs (6 text, 3 graphics, 1 shapes)",
+      "export const PALETTE: Palette = { light: LIGHT, dark: DARK };",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/contrast.json",
+          "json": {
+            "palettes": [
+              {
+                "name": "app",
+                "file": "src/theme/palette.ts",
+                "export": "PALETTE",
+                "sets": ["light", "dark"],
+                "base": "background",
+                "edge": "border",
+                "text": [
+                  ["text", "background"],
+                  ["textMuted", "surface"],
+                  ["onPrimary", "primary"],
+                  ["text", "separator"]
+                ],
+                "graphics": [["border", "background"], ["focus", "surface"]],
+                "shapes": [["primary", "background"]]
+              }
+            ],
+            "exceptions": []
+          }
+        }
+      }
+    ]
+  },
+  "pass-unchanged": { "expect": ["unchanged src/theme/palette.ts", "RESULT: PASS"], "args": "{dir}", "ops": [] }
+}

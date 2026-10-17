@@ -1,0 +1,53 @@
+{
+  "base": "good",
+  "ops": [
+    {
+      "write": {
+        "file": ".agents/skills/demo-skill/SKILL.md",
+        "content": "---\nname: demo-skill\ndescription: A decoy installed skill.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": ".agents/skills/demo-skill/tests/fixtures/bad/src/bad.ts",
+        "content": "// eslint-disable-next-line\nexport enum Bad {\n  A,\n}\nexport default Bad;\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/demo-skill/SKILL.md",
+        "content": "---\nname: demo-skill\ndescription: A decoy skill folder.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/demo-skill/templates/bad.ts",
+        "content": "// @ts-ignore\nexport const value: any = 1;\n"
+      }
+    },
+    {
+      "write": {
+        "file": "vendor/ui-kit/SKILL.md",
+        "content": "---\nname: ui-kit\ndescription: A vendored folder that ships a skill.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "vendor/ui-kit/src/bad.ts",
+        "content": "// TODO: everything\nexport interface Bad {\n  readonly a: number;\n}\n"
+      }
+    },
+    {
+      "write": {
+        "file": "ios/build/generated/codegen.ts",
+        "content": "export default function generated(): void {}\n"
+      }
+    },
+    {
+      "write": {
+        "file": "node_modules/some-package/index.ts",
+        "content": "export enum Generated {\n  A,\n}\n"
+      }
+    }
+  ]
+}

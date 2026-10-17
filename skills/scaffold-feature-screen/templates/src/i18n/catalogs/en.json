@@ -1,0 +1,8 @@
+{
+  "__DETAIL__.body": "__DETAIL_BODY__",
+  "__DETAIL__.invalid-link.body": "This link doesn’t open anything in the app. It may be old or mistyped.",
+  "__DETAIL__.invalid-link.go-home": "Go to the first screen",
+  "__DETAIL__.title": "__DETAIL_TITLE__",
+  "__FEATURE__.body": "__BODY__",
+  "__FEATURE__.title": "__TITLE__"
+}

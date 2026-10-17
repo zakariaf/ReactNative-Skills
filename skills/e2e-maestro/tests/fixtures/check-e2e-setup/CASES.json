@@ -1,0 +1,563 @@
+{
+  "bad-adb-implicit": {
+    "expect": ["FAIL scripts/e2e/logs.ts:5 [shared-device] uses adb's implicit device"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/e2e/logs.ts",
+          "content": "// scripts/e2e/logs.ts\nimport { execFileSync } from 'node:child_process';\n\nexport function logs(): string {\n  return execFileSync('adb', ['-e', 'logcat', '-d'], { encoding: 'utf8' });\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-adb-no-serial": {
+    "expect": ["FAIL scripts/e2e/shot.ts:5 [shared-device] runs adb shell without -s <serial>"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/e2e/shot.ts",
+          "content": "// scripts/e2e/shot.ts\nimport { execFileSync } from 'node:child_process';\n\nexport function shot(): Buffer {\n  return execFileSync('adb', ['shell', 'screencap', '-p']);\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-adb-shell-script": {
+    "expect": [
+      "FAIL scripts/e2e/reset.sh:3 [shared-device] scripts/e2e/reset.sh runs an adb device command without -s <serial>"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/e2e/reset.sh",
+          "content": "#!/usr/bin/env bash\nset -euo pipefail\nadb shell pm clear com.example.tasks.preview\nadb -s \"$SERIAL\" install -r build/android-emu/app-preview.apk\n"
+        }
+      }
+    ]
+  },
+  "bad-ads-not-off": {
+    "expect": [
+      "FAIL contracts/e2e.json:1 [e2e-ads-off] the app has react-native-google-mobile-ads but buildExtra.adsMode is null"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["dependencies", "react-native-google-mobile-ads"],
+          "value": "17.2.0"
+        }
+      },
+      { "json": { "file": "contracts/e2e.json", "path": ["buildExtra"], "delete": true } }
+    ]
+  },
+  "bad-allowlist-no-hosts": {
+    "expect": ["[e2e-contract] contracts/e2e.json \"network.mode\" allowlist needs \"allowHosts\""],
+    "ops": [{ "json": { "file": "contracts/e2e.json", "path": ["network", "allowHosts"], "delete": true } }]
+  },
+  "bad-android-clock": {
+    "expect": ["[deterministic-capture] does not pin the Android status bar clock to 09:41"],
+    "ops": [
+      { "replace": { "file": "scripts/e2e/android-device.ts", "find": "'hhmm', '0941'", "with": "'hhmm', '1200'" } }
+    ]
+  },
+  "bad-baselines": {
+    "expect": [
+      "FAIL .maestro/baselines/ios/phone/en-dark [baseline-matrix] lacks 1 screen(s) the other ios sets have: debug.png"
+    ],
+    "ops": [
+      {
+        "png": {
+          "files": [
+            ".maestro/baselines/ios/phone/en-light/tasks.png",
+            ".maestro/baselines/ios/phone/en-light/debug.png",
+            ".maestro/baselines/ios/phone/en-dark/tasks.png"
+          ],
+          "width": 4,
+          "height": 8,
+          "fill": "#ffffff"
+        }
+      }
+    ]
+  },
+  "bad-baselines-matrix": {
+    "expect": ["FAIL .maestro/baselines/android/tablet/ar-dark [baseline-matrix] the baseline set is missing"],
+    "args": "{dir} --baselines",
+    "ops": [
+      {
+        "png": {
+          "files": [
+            ".maestro/baselines/ios/phone/en-light/tasks.png",
+            ".maestro/baselines/ios/phone/en-dark/tasks.png",
+            ".maestro/baselines/ios/phone/ar-light/tasks.png",
+            ".maestro/baselines/ios/phone/ar-dark/tasks.png",
+            ".maestro/baselines/ios/tablet/en-light/tasks.png",
+            ".maestro/baselines/ios/tablet/en-dark/tasks.png",
+            ".maestro/baselines/ios/tablet/ar-light/tasks.png",
+            ".maestro/baselines/ios/tablet/ar-dark/tasks.png",
+            ".maestro/baselines/android/phone/en-light/tasks.png",
+            ".maestro/baselines/android/phone/en-dark/tasks.png",
+            ".maestro/baselines/android/phone/ar-light/tasks.png",
+            ".maestro/baselines/android/phone/ar-dark/tasks.png",
+            ".maestro/baselines/android/tablet/en-light/tasks.png",
+            ".maestro/baselines/android/tablet/en-dark/tasks.png",
+            ".maestro/baselines/android/tablet/ar-light/tasks.png"
+          ],
+          "width": 4,
+          "height": 8,
+          "fill": "#ffffff"
+        }
+      }
+    ]
+  },
+  "bad-booted": {
+    "expect": ["FAIL scripts/e2e/reset.ts:5 [shared-device] targets the booted simulator"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/e2e/reset.ts",
+          "content": "// scripts/e2e/reset.ts\nimport { execFileSync } from 'node:child_process';\n\nexport function reset(): void {\n  execFileSync('xcrun', ['simctl', 'erase', 'booted']);\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-booted-npm-script": {
+    "expect": [
+      "FAIL package.json:1 [shared-device] npm script \"e2e:reset\" targets the booted simulator or all simulators"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "e2e:reset"],
+          "value": "xcrun simctl shutdown all && xcrun simctl erase all"
+        }
+      }
+    ]
+  },
+  "bad-booted-workflow": {
+    "expect": [
+      "FAIL .github/workflows/e2e.yml:6 [shared-device] .github/workflows/e2e.yml targets the booted simulator or all simulators"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": ".github/workflows/e2e.yml",
+          "content": "name: e2e\non: workflow_dispatch\njobs:\n  ios:\n    steps:\n      - run: xcrun simctl status_bar booted override --time 9:41\n"
+        }
+      }
+    ]
+  },
+  "bad-build-guard": {
+    "expect": ["[runner-build-guard] runs on whatever build it finds"],
+    "ops": [
+      { "replace": { "file": "scripts/e2e/open-device.ts", "find": "  requireE2eBuild(app, config);\n", "with": "" } }
+    ]
+  },
+  "bad-build-guard-extra": {
+    "expect": ["FAIL scripts/e2e/build-guard.ts:1 [runner-build-guard] e2eBuildProblem does not refuse"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/e2e/build-guard.ts",
+          "find": "  return extraProblem(app, buildExtra);\n",
+          "with": "  return null;\n"
+        }
+      }
+    ]
+  },
+  "bad-capture-stale": {
+    "expect": [
+      "FAIL scripts/e2e/capture-screenshots.ts:1 [capture-evidence] does not empty reports/screenshots/<platform>/"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/e2e/capture-screenshots.ts",
+          "find": "  rmSync(capture.out, { recursive: true, force: true });\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-capture-throws": {
+    "expect": ["FAIL scripts/e2e/capture-screenshots.ts:1 [capture-evidence] does not record a failed combination"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/e2e/capture-screenshots.ts",
+          "find": "{ kind: 'capture-failed', message, outDir }",
+          "with": "{ kind: 'missing-baseline', baselinePath: message, outDir }"
+        }
+      }
+    ]
+  },
+  "bad-curl-installer": {
+    "expect": ["FAIL .github/workflows/e2e.yml:4 [maestro-install-source]"],
+    "ops": [
+      {
+        "write": {
+          "file": ".github/workflows/e2e.yml",
+          "content": "jobs:\n  e2e:\n    steps:\n      - run: curl -fsSL \"https://get.maestro.mobile.dev\" | bash\n"
+        }
+      }
+    ]
+  },
+  "bad-e2e-contract": {
+    "expect": ["FAIL contracts/e2e.json:1 [e2e-contract] contracts/e2e.json \"network.mode\" is \"sometimes\""],
+    "ops": [{ "json": { "file": "contracts/e2e.json", "path": ["network", "mode"], "value": "sometimes" } }]
+  },
+  "bad-gitignore": {
+    "expect": ["FAIL .gitignore:1 [gitignore-tools] does not ignore tools/maestro/"],
+    "ops": [{ "replace": { "file": ".gitignore", "find": "/tools/maestro/\n", "with": "" } }]
+  },
+  "bad-install-source": {
+    "expect": [
+      "FAIL package.json:1 [maestro-install-source] npm script \"setup:maestro\" installs Maestro outside the pinned installer"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "setup:maestro"],
+          "value": "brew install mobile-dev-inc/tap/maestro"
+        }
+      }
+    ]
+  },
+  "bad-installer-missing": {
+    "expect": ["FAIL scripts/e2e/install-maestro.sh:1 [maestro-pin] is missing"],
+    "ops": [{ "delete": "scripts/e2e/install-maestro.sh" }]
+  },
+  "bad-maestro-checksum": {
+    "expect": ["[maestro-pin] the SHA-256 for 2.10.0 is 39b675e10cc1…"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/e2e/install-maestro.sh",
+          "find": "MAESTRO_SHA256=\"29b675",
+          "with": "MAESTRO_SHA256=\"39b675"
+        }
+      }
+    ]
+  },
+  "bad-maestro-env": {
+    "expect": ["FAIL scripts/e2e/maestro-run.ts:1 [maestro-env] does not set MAESTRO_DISABLE_UPDATE_CHECK: 'true'"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/e2e/maestro-run.ts",
+          "find": "MAESTRO_DISABLE_UPDATE_CHECK: 'true'",
+          "with": "MAESTRO_DISABLE_UPDATE_CHECK: 'false'"
+        }
+      }
+    ]
+  },
+  "bad-maestro-no-device": {
+    "expect": ["FAIL scripts/e2e/quick-run.ts:5 [maestro-device]"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/e2e/quick-run.ts",
+          "content": "// scripts/e2e/quick-run.ts\nimport { spawnSync } from 'node:child_process';\n\nexport function quickRun(flow: string): number {\n  return spawnSync('tools/maestro/bin/maestro', ['test', flow]).status ?? 1;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-maestro-upload": {
+    "expect": ["FAIL .github/workflows/e2e.yml:4 [maestro-upload]"],
+    "ops": [
+      {
+        "write": {
+          "file": ".github/workflows/e2e.yml",
+          "content": "jobs:\n  e2e:\n    steps:\n      - run: tools/maestro/bin/maestro cloud --app-file app.apk .maestro/flows\n"
+        }
+      }
+    ]
+  },
+  "bad-maestro-version": {
+    "expect": [
+      "FAIL scripts/e2e/install-maestro.sh:1 [maestro-pin] pins Maestro 2.11.0, which this skill has not verified"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/e2e/install-maestro.sh",
+          "find": "MAESTRO_VERSION=\"2.10.0\"",
+          "with": "MAESTRO_VERSION=\"2.11.0\""
+        }
+      }
+    ]
+  },
+  "bad-missing-files": {
+    "expect": ["FAIL scripts/e2e/build-guard.ts [runner-file-missing] is missing"],
+    "ops": [{ "delete": "scripts/e2e/build-guard.ts" }]
+  },
+  "bad-no-checksum-check": {
+    "expect": ["[maestro-pin] does not verify the download with shasum -a 256 -c"],
+    "ops": [{ "replace": { "file": "scripts/e2e/install-maestro.sh", "find": "shasum -a 256 -c -", "with": "cat" } }]
+  },
+  "bad-no-java-17": {
+    "expect": ["[maestro-env] does not select Java 17 for Maestro"],
+    "ops": [{ "replace": { "file": "scripts/e2e/maestro-run.ts", "find": "['-v', '17']", "with": "['-v', '21']" } }]
+  },
+  "bad-no-strict-mode": {
+    "expect": ["[maestro-pin] does not run with set -euo pipefail"],
+    "ops": [{ "replace": { "file": "scripts/e2e/install-maestro.sh", "find": "set -euo pipefail", "with": "set -e" } }]
+  },
+  "bad-npm-maestro": {
+    "expect": ["FAIL package.json:1 [maestro-device] npm script \"e2e:quick\" runs maestro test without --device"],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "e2e:quick"],
+          "value": "maestro test .maestro/flows/smoke"
+        }
+      }
+    ]
+  },
+  "bad-openurl": {
+    "expect": ["FAIL scripts/e2e/open.ts:5 [openurl-prompt]"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/e2e/open.ts",
+          "content": "// scripts/e2e/open.ts\nimport { execFileSync } from 'node:child_process';\n\nexport function open(udid: string, url: string): void {\n  execFileSync('xcrun', ['simctl', 'openurl', udid, url]);\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-pixel-threshold": {
+    "expect": ["[screenshot-tolerance] PIXEL_THRESHOLD is 0.3, above 0.1"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/e2e/screenshot-compare.ts",
+          "find": "PIXEL_THRESHOLD = 0.1",
+          "with": "PIXEL_THRESHOLD = 0.3"
+        }
+      }
+    ]
+  },
+  "bad-runner-lists-manual": {
+    "expect": ["[runner-steps] lists the manual folder permissions/"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/e2e.json",
+          "path": ["manualFolders"],
+          "value": [{ "folder": "permissions", "why": "real system prompts" }]
+        }
+      },
+      {
+        "replace": {
+          "file": "scripts/e2e/run-e2e.ts",
+          "find": "const A11Y_FLOWS =",
+          "with": "const PROMPT_FLOWS = join('.maestro', 'permissions', '*.yaml');\nconst A11Y_FLOWS ="
+        }
+      }
+    ]
+  },
+  "bad-runner-no-sampler": {
+    "expect": ["FAIL scripts/e2e/run-e2e.ts:1 [runner-network] does not run the socket sampler"],
+    "ops": [
+      { "replace": { "file": "scripts/e2e/run-e2e.ts", "find": "'sample-sockets.ts'", "with": "'watch-sockets.ts'" } }
+    ]
+  },
+  "bad-runner-steps": {
+    "expect": ["[runner-steps] the flows step does not exclude quarantine and a11y flows"],
+    "ops": [{ "replace": { "file": "scripts/e2e/run-e2e.ts", "find": "'quarantine,a11y'", "with": "'quarantine'" } }]
+  },
+  "bad-sampler-any-device": {
+    "expect": ["FAIL scripts/e2e/sample-sockets.ts:1 [sampler-own-devices]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/e2e/sample-sockets.ts",
+          "find": "appProcessPattern(executable, udid)",
+          "with": "appProcessPattern(executable)"
+        }
+      }
+    ]
+  },
+  "bad-sampler-every-copy": {
+    "expect": ["FAIL scripts/e2e/run-e2e.ts:1 [sampler-own-devices] starts the socket sampler without the device's id"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/e2e/run-e2e.ts",
+          "find": "        device.id,\n        app.executable,",
+          "with": "        'all',\n        app.executable,"
+        }
+      }
+    ]
+  },
+  "bad-sampler-no-status": {
+    "expect": ["FAIL scripts/e2e/sample-sockets.ts:1 [sampler-liveness] does not write its status"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/e2e/sample-sockets.ts",
+          "find": "    status = nextSamplerStatus(status, found);\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-sampler-not-proven": {
+    "expect": [
+      "FAIL scripts/e2e/run-e2e.ts:1 [sampler-liveness] stops the socket samplers without proving they watched"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/e2e/run-e2e.ts",
+          "find": "      return proveSamplersAlive(samplers, network, () => delay(LIVENESS_WAIT_MS));\n",
+          "with": "      for (const sampler of samplers) sampler.kill();\n      return [];\n"
+        }
+      }
+    ]
+  },
+  "bad-screenshot-tolerance": {
+    "expect": ["FAIL scripts/e2e/screenshot-compare.ts:1 [screenshot-tolerance] MAX_DIFF_RATIO is 0.01, above 0.002"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/e2e/screenshot-compare.ts",
+          "find": "MAX_DIFF_RATIO = 0.002",
+          "with": "MAX_DIFF_RATIO = 0.01"
+        }
+      }
+    ]
+  },
+  "bad-scripts": {
+    "expect": ["FAIL package.json:1 [e2e-script] script \"e2e:android\" is missing"],
+    "ops": [{ "json": { "file": "package.json", "path": ["scripts", "e2e:android"], "delete": true } }]
+  },
+  "bad-status-bar": {
+    "expect": ["FAIL scripts/e2e/ios-device.ts:1 [deterministic-capture] does not pin the iOS status bar to 9:41"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/e2e/ios-device.ts",
+          "find": "      simctl(statusBarArgs(udid));\n",
+          "with": "      simctl(['status_bar', udid, 'clear']);\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "scripts/e2e/ios-device.ts",
+          "find": "import { createSimctl, ensureSimulator, simulatorName, statusBarArgs } from",
+          "with": "import { createSimctl, ensureSimulator, simulatorName } from"
+        }
+      }
+    ]
+  },
+  "bad-subflow-missing": {
+    "expect": ["FAIL .maestro/subflows/open-link.yaml [subflow-missing] is missing"],
+    "ops": [{ "delete": ".maestro/subflows/open-link.yaml" }]
+  },
+  "error-not-a-repo": { "expect": ["ERROR [bad-input] nothing to check"], "ops": [{ "delete": "package.json" }] },
+  "pass-ads-off": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["dependencies", "react-native-google-mobile-ads"],
+          "value": "17.2.0"
+        }
+      }
+    ]
+  },
+  "pass-baselines-complete": {
+    "expect": ["check-e2e-setup: 1 app checked, 0 problems"],
+    "args": "{dir} --baselines",
+    "ops": [
+      {
+        "png": {
+          "files": [
+            ".maestro/baselines/ios/phone/en-light/tasks.png",
+            ".maestro/baselines/ios/phone/en-dark/tasks.png",
+            ".maestro/baselines/ios/phone/ar-light/tasks.png",
+            ".maestro/baselines/ios/phone/ar-dark/tasks.png",
+            ".maestro/baselines/ios/tablet/en-light/tasks.png",
+            ".maestro/baselines/ios/tablet/en-dark/tasks.png",
+            ".maestro/baselines/ios/tablet/ar-light/tasks.png",
+            ".maestro/baselines/ios/tablet/ar-dark/tasks.png",
+            ".maestro/baselines/android/phone/en-light/tasks.png",
+            ".maestro/baselines/android/phone/en-dark/tasks.png",
+            ".maestro/baselines/android/phone/ar-light/tasks.png",
+            ".maestro/baselines/android/phone/ar-dark/tasks.png",
+            ".maestro/baselines/android/tablet/en-light/tasks.png",
+            ".maestro/baselines/android/tablet/en-dark/tasks.png",
+            ".maestro/baselines/android/tablet/ar-light/tasks.png",
+            ".maestro/baselines/android/tablet/ar-dark/tasks.png"
+          ],
+          "width": 4,
+          "height": 8,
+          "fill": "#ffffff"
+        }
+      }
+    ]
+  },
+  "pass-installed-skills": {
+    "expect": ["check-e2e-setup: 1 app checked, 0 problems"],
+    "ops": [
+      { "write": { "file": ".agents/skills/some-skill/SKILL.md", "content": "# installed\n" } },
+      {
+        "write": {
+          "file": ".agents/skills/some-skill/install.sh",
+          "content": "brew install maestro\nmaestro test flows\n"
+        }
+      },
+      { "write": { "file": "skills/other/SKILL.md", "content": "# skill\n" } },
+      { "write": { "file": "skills/other/ci.yml", "content": "- run: maestro cloud flows\n" } },
+      { "write": { "file": "scripts/vendor/SKILL.md", "content": "# vendored skill\n" } },
+      {
+        "write": {
+          "file": "scripts/vendor/run.ts",
+          "content": "// scripts/vendor/run.ts\nimport { execFileSync } from 'node:child_process';\nexecFileSync('xcrun', ['simctl', 'erase', 'booted']);\n"
+        }
+      }
+    ]
+  },
+  "pass-network-off": {
+    "expect": ["check-e2e-setup: 1 app checked, 0 problems"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/e2e.json",
+          "path": ["network"],
+          "value": { "mode": "off", "why": "the test build talks to a local mock server only" }
+        }
+      },
+      {
+        "delete": [
+          "scripts/e2e/network-sampler.ts",
+          "scripts/e2e/sample-sockets.ts",
+          "scripts/e2e/network-sampler.test.ts"
+        ]
+      }
+    ]
+  },
+  "pass-no-android-kit": {
+    "expect": [
+      "SKIP scripts/android/adb-args.ts [runner-file-missing] not yet created (android-emulator-build creates it)"
+    ],
+    "ops": [{ "delete": "scripts/android" }]
+  },
+  "pass-no-ios-tooling": {
+    "expect": [
+      "SKIP scripts/ios/simulators.ts [runner-file-missing] not yet created (ios-simulator-build creates it)",
+      "SKIP scripts/ios/toolchain.ts [runner-file-missing] not yet created (ios-simulator-build creates it)"
+    ],
+    "ops": [{ "delete": "scripts/ios" }]
+  },
+  "pass-not-adopted": {
+    "expect": ["NOT APPLICABLE: the app has no Maestro E2E yet"],
+    "ops": [
+      { "delete": [".maestro", "contracts/e2e.json"] },
+      { "json": { "file": "package.json", "path": ["scripts"], "value": {} } }
+    ]
+  }
+}

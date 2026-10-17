@@ -1,0 +1,466 @@
+{
+  "bad-adb-no-serial": {
+    "expect": ["scripts/android/install-apk.ts:4 [adb-device] adb install runs without -s <serial> before the command"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/android/install-apk.ts",
+          "content": "// scripts/android/install-apk.ts\nimport { execFileSync } from 'node:child_process';\n\nexecFileSync('adb', ['install', '-r', 'android/app/build/outputs/apk/release/app-release.apk']);\n"
+        }
+      }
+    ]
+  },
+  "bad-booted-target": {
+    "expect": ["scripts/ios/open-latest.ts:4 [sim-safety] targets the \"booted\" simulator instead of a UDID"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/ios/open-latest.ts",
+          "content": "// scripts/ios/open-latest.ts\nimport { execFileSync } from 'node:child_process';\n\nexecFileSync('xcrun', ['simctl', 'launch', 'booted', 'com.acme.tasks.preview']);\n"
+        }
+      }
+    ]
+  },
+  "bad-build-prereq-missing": {
+    "expect": [
+      "scripts/audit/audit-privacy.ts [build-prereqs] does not exist, and the build runs it through \"audit:privacy\""
+    ],
+    "ops": [{ "delete": "scripts/audit/audit-privacy.ts" }]
+  },
+  "bad-contract-placeholder": {
+    "expect": ["[contract] \"appId\" still holds the template placeholder __APP_ID__"],
+    "ops": [{ "json": { "file": "contracts/ios-sim-build.json", "path": ["appId"], "value": "__APP_ID__" } }]
+  },
+  "bad-contract-type": {
+    "expect": ["[contract] \"postPrebuild\" is \"audit:privacy\", not a list of npm script names"],
+    "ops": [{ "json": { "file": "contracts/ios-sim-build.json", "path": ["postPrebuild"], "value": "audit:privacy" } }]
+  },
+  "bad-contract-unknown-key": {
+    "expect": ["contracts/ios-sim-build.json:", "[contract] unknown key \"simulator\""],
+    "ops": [{ "json": { "file": "contracts/ios-sim-build.json", "path": ["simulator"], "value": "tasks-smoke" } }]
+  },
+  "bad-destination-by-name-code": {
+    "expect": [
+      "scripts/build/build-for-tests.ts:4 [sim-safety] xcodebuild -destination \"platform=iOS Simulator,OS=26.5,name=iPhone 17\" does not select a simulator by UDID",
+      "checked, 1 problems"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/build/build-for-tests.ts",
+          "content": "// scripts/build/build-for-tests.ts\nimport { execFileSync } from 'node:child_process';\n\nexecFileSync('xcodebuild', ['-workspace', 'ios/Tasks.xcworkspace', '-scheme', 'Tasks', '-destination', 'platform=iOS Simulator,OS=26.5,name=iPhone 17', 'build'], { stdio: 'inherit' });\n"
+        }
+      }
+    ]
+  },
+  "bad-destination-by-name-shell": {
+    "expect": [
+      "scripts/ios/build-for-tests.sh:3 [sim-safety] xcodebuild -destination \"platform=iOS Simulator,name=iPhone 17 Pro\" does not select a simulator by UDID",
+      "checked, 1 problems"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/ios/build-for-tests.sh",
+          "content": "#!/bin/sh\nxcodebuild -workspace ios/Tasks.xcworkspace -scheme Tasks \\\n  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build\n"
+        }
+      }
+    ]
+  },
+  "bad-eas-run-no-simulator": {
+    "expect": [
+      "package.json:9 [sim-safety] eas build:run installs on the first booted simulator (no --simulator <udid>)",
+      "checked, 1 problems"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "install:eas-sim"],
+          "value": "eas build:run -p ios --latest"
+        }
+      }
+    ]
+  },
+  "bad-emulator-no-avd": {
+    "expect": ["scripts/android/boot.sh:2 [adb-device] launches an emulator without -avd <name>"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/android/boot.sh",
+          "content": "#!/bin/sh\n\"$ANDROID_HOME/emulator/emulator\" -no-window -no-snapshot &\n"
+        }
+      }
+    ]
+  },
+  "bad-foreign-simulator-name": {
+    "expect": ["scripts/ios/make-phone.ts:4 [sim-safety] creates a simulator named \"Test Phone\", outside tasks-*"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/ios/make-phone.ts",
+          "content": "// scripts/ios/make-phone.ts\nimport { execFileSync } from 'node:child_process';\n\nexecFileSync('xcrun', ['simctl', 'create', 'Test Phone', 'iPhone 17 Pro']);\n"
+        }
+      }
+    ]
+  },
+  "bad-foreign-simulator-shell": {
+    "expect": [
+      "scripts/ios/make-parity-sim.sh:2 [sim-safety] creates a simulator named \"Parity Phone\", outside tasks-*"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/ios/make-parity-sim.sh",
+          "content": "#!/bin/sh\nxcrun simctl create \"Parity Phone\" \"iPhone 17 Pro\" com.apple.CoreSimulator.SimRuntime.iOS-26-5\n"
+        }
+      }
+    ]
+  },
+  "bad-gitignore": {
+    "expect": [".gitignore [gitignore] does not ignore ios/"],
+    "ops": [{ "replace": { "file": ".gitignore", "find": "ios/\n", "with": "" } }]
+  },
+  "bad-maestro-fixed-port": {
+    "expect": ["scripts/build/sim-build-plan.ts:", "[maestro-device]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/build/sim-build-plan.ts",
+          "find": "driverPort: run.driverPort",
+          "with": "driverPort: 7001"
+        }
+      }
+    ]
+  },
+  "bad-maestro-no-device": {
+    "expect": ["scripts/e2e/run-flow.ts:", "[maestro-device]"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/e2e/run-flow.ts",
+          "content": "// scripts/e2e/run-flow.ts\nimport { spawnSync } from 'node:child_process';\n\nspawnSync('maestro', ['test', '.maestro/flows/smoke.yaml'], { stdio: 'inherit' });\n"
+        }
+      }
+    ]
+  },
+  "bad-maestro-npm-script": {
+    "expect": [
+      "package.json",
+      "[maestro-device] maestro test runs without --device and --driver-host-port before the command",
+      "checked, 1 problems"
+    ],
+    "ops": [{ "json": { "file": "package.json", "path": ["scripts", "e2e:ios"], "value": "maestro test .maestro" } }]
+  },
+  "bad-maestro-shell": {
+    "expect": [
+      "scripts/e2e/smoke.sh:3 [maestro-device] maestro test runs without --driver-host-port before the command",
+      "checked, 1 problems"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/e2e/smoke.sh",
+          "content": "#!/bin/sh\nset -eu\nmaestro --device \"$UDID\" test .maestro/flows/smoke.yaml\n"
+        }
+      }
+    ]
+  },
+  "bad-maestro-string": {
+    "expect": [
+      "scripts/e2e/run-smoke.ts:5 [maestro-device] maestro test runs without --device and --driver-host-port before the command",
+      "checked, 1 problems"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/e2e/run-smoke.ts",
+          "content": "// scripts/e2e/run-smoke.ts\nimport { execSync } from 'node:child_process';\n\nconst flow = '.maestro/flows/smoke.yaml';\nexecSync(`maestro test ${flow}`, { stdio: 'inherit' });\n"
+        }
+      }
+    ]
+  },
+  "bad-metro-no-cache-key": {
+    "expect": ["metro.config.js:1 [metro-cache-key] config.cacheVersion is not keyed on the EXPO_PUBLIC_* values"],
+    "ops": [
+      {
+        "replace": {
+          "file": "metro.config.js",
+          "find": "config.cacheVersion = publicEnvCacheVersion(process.env);\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-npm-script": {
+    "expect": ["package.json [npm-script] scripts[\"build:ios:sim\"] is \"expo run:ios --configuration Release\""],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "build:ios:sim"],
+          "value": "expo run:ios --configuration Release"
+        }
+      }
+    ]
+  },
+  "bad-scene-support": {
+    "expect": ["app.config.ts [scene-support] XCODE_VERSION 27.0 builds with the iOS 27 SDK"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/ios/toolchain.ts",
+          "find": "export const XCODE_VERSION = '26.6';",
+          "with": "export const XCODE_VERSION = '27.0';"
+        }
+      }
+    ]
+  },
+  "bad-scene-support-helper": {
+    "expect": [
+      "app.config.ts [scene-support] XCODE_VERSION 27.0 builds with the iOS 27 SDK",
+      "the addSceneSupport() it calls (scripts/config/scene-support.ts) never sets enableSceneSupport: true",
+      "checked, 1 problems"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/ios/toolchain.ts",
+          "find": "export const XCODE_VERSION = '26.6';",
+          "with": "export const XCODE_VERSION = '27.0';"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "import type { ExpoConfig } from 'expo/config';",
+          "with": "import type { ExpoConfig } from 'expo/config';\n\nimport { addSceneSupport } from './scripts/config/scene-support.ts';"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "plugins: ['expo-router'],",
+          "with": "plugins: addSceneSupport(['expo-router']),"
+        }
+      },
+      {
+        "write": {
+          "file": "scripts/config/scene-support.ts",
+          "content": "// scripts/config/scene-support.ts\n// iOS scene life cycle for Expo SDK 57 apps built with Xcode 27 (the iOS 27 SDK): turns on\n// expo-build-properties ios.enableSceneSupport, which needs expo 57.0.23 or newer. app.config.ts\n// imports it with the extension, import { addSceneSupport } from './scripts/config/scene-support.ts';\n// (Expo loads app.config.ts through Node, which needs the .ts), and wraps its plugin list:\n// plugins: addSceneSupport([...]). A no-op from SDK 58 on, which handles the scene life cycle\n// itself: delete this file, its test and the call in the SDK 58 move commit.\nimport type { ExpoConfig } from 'expo/config';\n\ntype PluginEntry = NonNullable<ExpoConfig['plugins']>[number];\ntype Options = Readonly<Record<string, unknown>>;\n\nconst BUILD_PROPERTIES = 'expo-build-properties';\n\nfunction isRecord(value: unknown): value is Options {\n  return typeof value === 'object' && value !== null && !Array.isArray(value);\n}\n\nfunction withScene(options: unknown): Options {\n  const base = isRecord(options) ? options : {};\n  const ios = isRecord(base['ios']) ? base['ios'] : {};\n  return { ...base, ios: { ...ios, enableSceneSupport: false } };\n}\n\nfunction isBuildProperties(entry: PluginEntry): boolean {\n  return entry === BUILD_PROPERTIES || (Array.isArray(entry) && entry[0] === BUILD_PROPERTIES);\n}\n\n/**\n * Turns on ios.enableSceneSupport: merges it into the existing expo-build-properties entry (a second\n * entry would run the plugin twice), or appends one when the list has none. Android is untouched.\n */\nexport function addSceneSupport(plugins: readonly PluginEntry[]): PluginEntry[] {\n  if (!plugins.some(isBuildProperties)) {\n    return [...plugins, [BUILD_PROPERTIES, withScene(undefined)]];\n  }\n  return plugins.map((entry) => {\n    if (!isBuildProperties(entry)) {\n      return entry;\n    }\n    const options: unknown = Array.isArray(entry) ? Reflect.get(entry, 1) : undefined;\n    return [BUILD_PROPERTIES, withScene(options)];\n  });\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-shutdown-all": {
+    "expect": ["scripts/ios/cleanup.sh:2 [sim-safety] shuts down, erases or deletes all simulators"],
+    "ops": [{ "write": { "file": "scripts/ios/cleanup.sh", "content": "#!/bin/sh\nxcrun simctl shutdown all\n" } }]
+  },
+  "bad-signing-on": {
+    "expect": ["scripts/build/sim-build-plan.ts:1 [sim-build-args] the simulator build lacks CODE_SIGNING_ALLOWED=NO"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/build/sim-build-plan.ts",
+          "find": "'CODE_SIGNING_ALLOWED=NO'",
+          "with": "'CODE_SIGN_STYLE=Automatic'"
+        }
+      }
+    ]
+  },
+  "bad-simulator-by-name": {
+    "expect": [
+      "scripts/ios/install-app.sh:4 [sim-safety] simctl launch targets the simulator named \"iPhone 17 Pro\" instead of a UDID",
+      "checked, 1 problems"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/ios/install-app.sh",
+          "content": "#!/bin/sh\nset -eu\nxcrun simctl install \"$UDID\" build/Tasks.app\nxcrun simctl launch \"iPhone 17 Pro\" com.acme.tasks\n"
+        }
+      }
+    ]
+  },
+  "bad-simulator-by-name-string": {
+    "expect": [
+      "scripts/ios/reset-sim.ts:4 [sim-safety] simctl shutdown targets the simulator named \"iPhone 17 Pro\" instead of a UDID",
+      "scripts/ios/reset-sim.ts:5 [sim-safety] simctl boot targets the simulator named \"iPhone-17\" instead of a UDID",
+      "checked, 2 problems"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/ios/reset-sim.ts",
+          "content": "// scripts/ios/reset-sim.ts\nimport { execSync } from 'node:child_process';\n\nexecSync('xcrun simctl shutdown \"iPhone 17 Pro\"');\nexecSync(`xcrun simctl boot iPhone-17`);\n"
+        }
+      }
+    ]
+  },
+  "bad-sudo-npm-script": {
+    "expect": ["package.json:", "[no-xcode-select] runs sudo"],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "xcode:use"],
+          "value": "sudo xcode-select -s /Applications/Xcode.app"
+        }
+      }
+    ]
+  },
+  "bad-variant-env": {
+    "expect": ["scripts/build/build-ios-sim.ts:", "[variant-env] sets a variant variable on its own"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/build/build-ios-sim.ts",
+          "find": "...variantEnv(options.variant) }",
+          "with": "APP_VARIANT: options.variant }"
+        }
+      }
+    ]
+  },
+  "bad-xcode-pin-dynamic": {
+    "expect": ["scripts/ios/toolchain.ts:1 [xcode-pin] XCODE_VERSION is not pinned as a literal"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/ios/toolchain.ts",
+          "find": "export const XCODE_VERSION = '26.6';",
+          "with": "export const XCODE_VERSION = process.env['XCODE_VERSION'] ?? '26.6';"
+        }
+      }
+    ]
+  },
+  "bad-xcode-pin-env": {
+    "expect": ["[xcode-pin] the tool environment does not set CI"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/ios/toolchain.ts",
+          "find": "EXPO_NO_TELEMETRY: '1', CI: '1' }",
+          "with": "EXPO_NO_TELEMETRY: '1' }"
+        }
+      }
+    ]
+  },
+  "bad-xcode-pin-missing": {
+    "expect": ["scripts/ios/toolchain.ts [xcode-pin] the toolchain module is missing"],
+    "ops": [{ "delete": "scripts/ios/toolchain.ts" }]
+  },
+  "bad-xcode-select": {
+    "expect": ["scripts/ios/switch-xcode.ts:4 [no-xcode-select] switches the global Xcode with xcode-select"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/ios/switch-xcode.ts",
+          "content": "// scripts/ios/switch-xcode.ts\nimport { execFileSync } from 'node:child_process';\n\nexecFileSync('xcode-select', ['--switch', '/Applications/Xcode.app']);\n"
+        }
+      }
+    ]
+  },
+  "error-bad-app-dir": { "expect": ["ERROR [bad-input]", "apps/missing"], "args": "{dir} --app-dir apps/missing" },
+  "error-contract-malformed": {
+    "expect": ["ERROR [bad-input] contracts/ios-sim-build.json is not valid JSON"],
+    "ops": [{ "write": { "file": "contracts/ios-sim-build.json", "content": "{ \"simulatorPrefix\": \"tasks\",\n" } }]
+  },
+  "error-no-package-json": {
+    "expect": ["ERROR [bad-input] nothing to check: no package.json"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "pass-app-dir": {
+    "expect": ["check-sim-setup:", "0 problems"],
+    "args": "{dir} --app-dir apps/mobile",
+    "ops": [
+      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["apps/*"] } },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "build:ios:sim"],
+          "value": "node scripts/build/build-ios-sim.ts --app-dir apps/mobile"
+        }
+      },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo"], "delete": true } },
+      { "rename": { "from": "app.config.ts", "to": "apps/mobile/app.config.ts" } },
+      { "rename": { "from": "metro.config.js", "to": "apps/mobile/metro.config.js" } },
+      {
+        "write": {
+          "file": "apps/mobile/package.json",
+          "content": "{\n  \"name\": \"@acme/mobile\",\n  \"private\": true,\n  \"dependencies\": {\n    \"expo\": \"~57.0.26\"\n  }\n}\n"
+        }
+      },
+      { "write": { "file": "apps/mobile/ios/scripts/reset.sh", "content": "xcrun simctl erase all\n" } }
+    ]
+  },
+  "pass-command-strings": {
+    "expect": ["check-sim-setup:", "0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/ios/command-strings.ts",
+          "content": "// scripts/ios/command-strings.ts\nimport { execSync } from 'node:child_process';\n\nexport function run(udid: string, port: number): void {\n  execSync(`xcrun simctl boot ${udid}`);\n  execSync(`maestro --device ${udid} --driver-host-port ${port} test .maestro/flows/smoke.yaml`);\n  execSync(`eas build:run -p ios --latest --simulator ${udid}`);\n  execSync('eas build:run -p android --latest');\n  execSync('maestro --version');\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-no-contract": {
+    "expect": ["check-sim-setup:", "0 problems"],
+    "ops": [{ "delete": "contracts/ios-sim-build.json" }]
+  },
+  "pass-not-expo": {
+    "expect": ["NOT APPLICABLE: package.json has no expo dependency"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo"], "delete": true } }]
+  },
+  "pass-scene-support": {
+    "expect": ["check-sim-setup:", "0 problems"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/ios/toolchain.ts",
+          "find": "export const XCODE_VERSION = '26.6';",
+          "with": "export const XCODE_VERSION = '27.0';"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "plugins: ['expo-router'],",
+          "with": "plugins: ['expo-router', ['expo-build-properties', { ios: { enableSceneSupport: true } }]],"
+        }
+      }
+    ]
+  },
+  "pass-scene-support-helper": {
+    "expect": ["check-sim-setup:", "0 problems"],
+    "ops": [
+      {
+        "replace": {
+          "file": "scripts/ios/toolchain.ts",
+          "find": "export const XCODE_VERSION = '26.6';",
+          "with": "export const XCODE_VERSION = '27.0';"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "import type { ExpoConfig } from 'expo/config';",
+          "with": "import type { ExpoConfig } from 'expo/config';\n\nimport { addSceneSupport } from './scripts/config/scene-support.ts';"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "plugins: ['expo-router'],",
+          "with": "plugins: addSceneSupport(['expo-router']),"
+        }
+      },
+      {
+        "write": {
+          "file": "scripts/config/scene-support.ts",
+          "content": "// scripts/config/scene-support.ts\n// iOS scene life cycle for Expo SDK 57 apps built with Xcode 27 (the iOS 27 SDK): turns on\n// expo-build-properties ios.enableSceneSupport, which needs expo 57.0.23 or newer. app.config.ts\n// imports it with the extension, import { addSceneSupport } from './scripts/config/scene-support.ts';\n// (Expo loads app.config.ts through Node, which needs the .ts), and wraps its plugin list:\n// plugins: addSceneSupport([...]). A no-op from SDK 58 on, which handles the scene life cycle\n// itself: delete this file, its test and the call in the SDK 58 move commit.\nimport type { ExpoConfig } from 'expo/config';\n\ntype PluginEntry = NonNullable<ExpoConfig['plugins']>[number];\ntype Options = Readonly<Record<string, unknown>>;\n\nconst BUILD_PROPERTIES = 'expo-build-properties';\n\nfunction isRecord(value: unknown): value is Options {\n  return typeof value === 'object' && value !== null && !Array.isArray(value);\n}\n\nfunction withScene(options: unknown): Options {\n  const base = isRecord(options) ? options : {};\n  const ios = isRecord(base['ios']) ? base['ios'] : {};\n  return { ...base, ios: { ...ios, enableSceneSupport: true } };\n}\n\nfunction isBuildProperties(entry: PluginEntry): boolean {\n  return entry === BUILD_PROPERTIES || (Array.isArray(entry) && entry[0] === BUILD_PROPERTIES);\n}\n\n/**\n * Turns on ios.enableSceneSupport: merges it into the existing expo-build-properties entry (a second\n * entry would run the plugin twice), or appends one when the list has none. Android is untouched.\n */\nexport function addSceneSupport(plugins: readonly PluginEntry[]): PluginEntry[] {\n  if (!plugins.some(isBuildProperties)) {\n    return [...plugins, [BUILD_PROPERTIES, withScene(undefined)]];\n  }\n  return plugins.map((entry) => {\n    if (!isBuildProperties(entry)) {\n      return entry;\n    }\n    const options: unknown = Array.isArray(entry) ? Reflect.get(entry, 1) : undefined;\n    return [BUILD_PROPERTIES, withScene(options)];\n  });\n}\n"
+        }
+      }
+    ]
+  }
+}

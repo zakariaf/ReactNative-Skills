@@ -1,0 +1,217 @@
+{
+  "bad-build-number-beside-config": {
+    "expect": [
+      "FAIL app.config.ts [signoff-ui-changed] changed after the signed commit b2c3d4e5f6a7 (changed.diff): a line other than a build counter changed: `orientation: 'default',`"
+    ],
+    "args": "{dir} --changed-from changed.diff",
+    "ops": [
+      {
+        "write": {
+          "file": "changed.diff",
+          "content": "diff --git a/app.config.ts b/app.config.ts\nindex 9f1c2d4..1e7a3b0 100644\n--- a/app.config.ts\n+++ b/app.config.ts\n@@ -4 +4 @@\n-const IOS_BUILD_NUMBER = 14;\n+const IOS_BUILD_NUMBER = 15;\n@@ -12 +12 @@\n-    orientation: 'portrait',\n+    orientation: 'default',\n"
+        }
+      }
+    ]
+  },
+  "bad-fix-not-reshot": {
+    "expect": [
+      "[review-fix-round] finding F1 is marked fixed but cell tasks.default--dark--ar--largest--ios-phone-small was not re-shot"
+    ],
+    "ops": [
+      { "write": { "file": "changed.txt", "content": "README.md\n" } },
+      {
+        "replace": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "regex": true,
+          "find": "(\"tasks.default--dark--ar--largest--ios-phone-small\": \"([0-9a-f]{64})\"[\\s\\S]*?\"seen\": \\{\\s*\"tasks.default--dark--ar--largest--ios-phone-small\": \")[0-9a-f]{64}",
+          "with": "$1$2"
+        }
+      }
+    ]
+  },
+  "bad-fix-video-not-rerecorded": {
+    "expect": ["[review-fix-round] finding F3 is marked fixed but video press--ios--full was not recorded again"],
+    "ops": [
+      { "write": { "file": "changed.txt", "content": "README.md\n" } },
+      {
+        "replace": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "regex": true,
+          "find": "(\"press--ios--full\": \"([0-9a-f]{64})\"[\\s\\S]*?\"seen\": \\{\\s*\"press--ios--full\": \")[0-9a-f]{64}",
+          "with": "$1$2"
+        }
+      }
+    ]
+  },
+  "bad-missing": {
+    "expect": ["FAIL design-review [signoff-missing] no design review of version 2.0.0"],
+    "args": "{dir} --version 2.0.0 --changed-from changed.txt",
+    "ops": [{ "write": { "file": "changed.txt", "content": "\n" } }]
+  },
+  "bad-not-signed": {
+    "expect": ["[signoff-missing] the newest review of 1.0.0 (2026-10-01-1-0-0) is NOT SIGNED OFF"],
+    "ops": [
+      { "write": { "file": "changed.txt", "content": "\n" } },
+      {
+        "json": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "path": ["signoff", "verdict"],
+          "value": "NOT SIGNED OFF"
+        }
+      },
+      {
+        "json": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "path": ["signoff", "escalation"],
+          "value": "F1 survived the fix round; the design lead decides."
+        }
+      },
+      {
+        "json": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "path": ["findings", "F1", "status"],
+          "value": "escalated"
+        }
+      }
+    ]
+  },
+  "bad-record": {
+    "expect": ["[review-floor] finding F1: breaks the accessibility floor (text-scale) but is graded FIX"],
+    "ops": [
+      { "write": { "file": "changed.txt", "content": "\n" } },
+      {
+        "json": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "path": ["findings", "F1", "lens"],
+          "value": "floor"
+        }
+      },
+      {
+        "json": {
+          "file": "design-review/2026-10-01-1-0-0/review.json",
+          "path": ["findings", "F1", "floor"],
+          "value": "text-scale"
+        }
+      }
+    ]
+  },
+  "bad-stale": {
+    "expect": ["[signoff-stale] contracts/screens.json changed after the review (2026-10-01-1-0-0)"],
+    "ops": [
+      { "write": { "file": "changed.txt", "content": "\n" } },
+      {
+        "replace": {
+          "file": "contracts/screens.json",
+          "find": "\"name\": \"Tasks\"",
+          "with": "\"name\": \"All tasks\""
+        }
+      }
+    ]
+  },
+  "bad-ui-changed": {
+    "expect": [
+      "FAIL src/features/tasks/tasks-screen.tsx [signoff-ui-changed] changed after the signed commit b2c3d4e5f6a7 (changed.txt)"
+    ],
+    "ops": [{ "write": { "file": "changed.txt", "content": "README.md\nsrc/features/tasks/tasks-screen.tsx\n" } }]
+  },
+  "bad-ui-changed-config": {
+    "expect": ["FAIL app.config.ts [signoff-ui-changed]"],
+    "ops": [{ "write": { "file": "changed.txt", "content": "app.config.ts\n" } }]
+  },
+  "bad-ui-changed-config-import": {
+    "expect": [
+      "FAIL scripts/i18n/locale-names.ts [signoff-ui-changed] changed after the signed commit b2c3d4e5f6a7 (changed.txt); the app config imports it"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "changed.txt",
+          "content": "README.md\nscripts/release/notes.ts\nscripts/i18n/locale-names.ts\n"
+        }
+      },
+      {
+        "write": {
+          "file": "scripts/i18n/locale-names.ts",
+          "content": "// scripts/i18n/locale-names.ts\n// The app name on the home screen, per language.\nexport const LOCALE_NAMES = { en: 'Tasks', ar: 'المهام' } as const;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "scripts/i18n/native-locales.ts",
+          "content": "// scripts/i18n/native-locales.ts\n// The app name and the permission texts per language, for app.config.ts.\nimport { LOCALE_NAMES } from './locale-names';\n\nexport function nativeLocales(): Record<string, { CFBundleDisplayName: string }> {\n  return Object.fromEntries(Object.entries(LOCALE_NAMES).map(([tag, name]) => [tag, { CFBundleDisplayName: name }]));\n}\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "import type { ExpoConfig } from 'expo/config';",
+          "with": "import { nativeLocales } from './scripts/i18n/native-locales.ts';\n\nimport type { ExpoConfig } from 'expo/config';"
+        }
+      }
+    ]
+  },
+  "bad-ui-changed-entry": {
+    "expect": ["FAIL index.ts [signoff-ui-changed]"],
+    "ops": [{ "write": { "file": "changed.txt", "content": "index.ts\n" } }]
+  },
+  "bad-ui-changed-lockfile": {
+    "expect": ["FAIL package-lock.json [signoff-ui-changed]"],
+    "ops": [{ "write": { "file": "changed.txt", "content": "README.md\npackage-lock.json\n" } }]
+  },
+  "error-no-git": {
+    "expect": ["ERROR [bad-input] not a git repository, so the changes since the signed commit cannot be listed"],
+    "args": "{dir}"
+  },
+  "error-no-version": {
+    "expect": ["ERROR [bad-input] no version to release"],
+    "ops": [
+      { "write": { "file": "changed.txt", "content": "\n" } },
+      { "replace": { "file": "app.config.ts", "find": "version: '1.0.0',", "with": "" } }
+    ]
+  },
+  "error-version-computed": {
+    "expect": [
+      "ERROR [bad-input] no version to release: \"version\" in app.config.ts is computed, not a literal or a const of one"
+    ],
+    "ops": [
+      { "write": { "file": "changed.txt", "content": "README.md\n" } },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "version: '1.0.0',",
+          "with": "version: process.env.APP_VERSION ?? '0.0.0',"
+        }
+      }
+    ]
+  },
+  "pass-build-number-bump": {
+    "expect": [
+      "app.config.ts: only build-number lines changed since the signed commit (a release lane's bump), so it counts as unchanged",
+      "2 paths changed since, 0 of them user-facing",
+      "RESULT: PASS"
+    ],
+    "args": "{dir} --changed-from changed.diff",
+    "ops": [
+      {
+        "write": {
+          "file": "changed.diff",
+          "content": "diff --git a/README.md b/README.md\nindex 3b18e51..a0c2f3e 100644\n--- a/README.md\n+++ b/README.md\n@@ -1 +1,2 @@\n-# Tasks\n+# Tasks\n+-- release notes live in the store listing\ndiff --git a/app.config.ts b/app.config.ts\nindex 9f1c2d4..1e7a3b0 100644\n--- a/app.config.ts\n+++ b/app.config.ts\n@@ -4 +4 @@\n-const IOS_BUILD_NUMBER = 14;\n+const IOS_BUILD_NUMBER = 15;\n@@ -6 +6 @@\n-const ANDROID_VERSION_CODE = 14;\n+const ANDROID_VERSION_CODE = 15;\n@@ -17 +17 @@\n-      buildNumber: '14',\n+      buildNumber: '15',\n@@ -20 +20 @@\n-      versionCode: 14,\n+      versionCode: 15,\n"
+        }
+      }
+    ]
+  },
+  "pass-version-const": {
+    "expect": ["gate: version 1.0.0, review 2026-10-01-1-0-0", "RESULT: PASS"],
+    "ops": [
+      { "write": { "file": "changed.txt", "content": "README.md\n" } },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "export default function appConfig",
+          "with": "/** The store version: the release lanes keep it as one literal const. */\nconst APP_VERSION = '1.0.0';\n\nexport default function appConfig"
+        }
+      },
+      { "replace": { "file": "app.config.ts", "find": "version: '1.0.0',", "with": "version: APP_VERSION," } }
+    ]
+  }
+}

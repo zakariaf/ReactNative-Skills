@@ -1,0 +1,13 @@
+{
+  "permissions.camera.explain.body": "Take a photo of a receipt or a whiteboard and keep it with the task. Photos stay on this device unless you share them.",
+  "permissions.camera.explain.title": "Add photos to your tasks",
+  "permissions.camera.settings.body": "Camera access is off for this app. Turn on Camera in Settings to add photos to your tasks.",
+  "permissions.camera.settings.title": "Camera access is off",
+  "permissions.camera.unavailable.body": "This device has no camera this app can use, so photos cannot be taken here. The task works without a photo.",
+  "permissions.camera.unavailable.title": "No camera available",
+  "permissions.camera.usage-description": "Lets you add a photo to a task. Photos stay on this device unless you share them.",
+  "permissions.close": "Close",
+  "permissions.continue": "Continue",
+  "permissions.not-now": "No thanks",
+  "permissions.open-settings": "Open Settings"
+}

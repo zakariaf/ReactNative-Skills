@@ -1,0 +1,10 @@
+{
+  "variant": "production",
+  "ios": {
+    "infoPlist": {
+      "BGTaskSchedulerPermittedIdentifiers": ["com.expo.modules.backgroundtask.processing"],
+      "UIBackgroundModes": ["processing", "fetch"]
+    }
+  },
+  "android": {}
+}

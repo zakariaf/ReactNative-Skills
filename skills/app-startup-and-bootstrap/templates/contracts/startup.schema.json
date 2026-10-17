@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "startup.schema.json",
+  "title": "contracts/startup.json",
+  "description": "The app's facts about its startup, read by app-startup-and-bootstrap's check-startup. Every key is optional.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$comment": {
+      "type": "string"
+    },
+    "rootLayout": {
+      "type": "string",
+      "description": "The Expo Router root layout (default <routesDir>/_layout.tsx): the error net and the splash hold are its first imports, and it renders DirectionGate."
+    },
+    "appRoot": {
+      "type": "string",
+      "description": "The component that does the startup work with effects and mounts the providers (default <featuresDir>/root-navigator/app-root.tsx). Without it the root layout plays both parts."
+    },
+    "rootStack": {
+      "type": "string",
+      "description": "The component above the root navigator (default <featuresDir>/root-navigator/root-stack.tsx): the gesture root, MotionConfig, the navigation theme and the Stack."
+    },
+    "appRootOrder": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z][A-Za-z0-9_.]*(\\|[A-Z][A-Za-z0-9_.]*)*$"
+      },
+      "description": "JSX elements on the root path (the app root and the local provider components it renders, such as AppProviders or PreferencesRoot), outermost first; each listed element that is present must sit inside every earlier listed element that is present, and each is mounted once. A|B accepts either name."
+    },
+    "rootStackOrder": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z][A-Za-z0-9_.]*(\\|[A-Z][A-Za-z0-9_.]*)*$"
+      },
+      "description": "The same for the root stack file (default GestureHandlerRootView, KeyboardProvider, MotionConfig|RootMotion, NavigationThemeProvider, SessionProvider, AppFeedback|FeedbackProvider, AdsRoot, GamesRoot, AppStack|Stack); each is mounted once on the root path."
+    },
+    "maxBlockingMs": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10000,
+      "description": "The longest deadline createStartupGate may give blocking startup tasks (default 3000)."
+    },
+    "lifecycleFiles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Globs of files allowed to write from an AppState listener (default: the root flush hook). Every other buffered writer hands a Flusher to the app root."
+    },
+    "openCalls": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z_$][\\w$]*$"
+      },
+      "description": "Functions that open the data layer (default openDeviceData): each is called once in app code, in the app root's startup initializer."
+    }
+  }
+}

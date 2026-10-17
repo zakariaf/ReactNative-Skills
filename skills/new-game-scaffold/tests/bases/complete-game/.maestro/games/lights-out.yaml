@@ -1,0 +1,7 @@
+# .maestro/games/lights-out.yaml
+# Self-test stand-in: e2e-maestro writes the real flow.
+appId: com.example.tasks
+---
+- launchApp
+- tapOn:
+    id: game.board

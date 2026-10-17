@@ -1,0 +1,610 @@
+{
+  "bad-border-contrast": {
+    "expect": ["[non-text-contrast]", "app dark: border on background is 1.79:1 < 3:1"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/palette.ts",
+          "find": "  border: '#7A8190', // neutral.60\n",
+          "with": "  border: '#3A3F4A', // neutral.30\n",
+          "occurrence": 2
+        }
+      }
+    ]
+  },
+  "bad-canvas-declared-twice": {
+    "expect": [
+      "contracts/contrast.json:157 [contrast-contract]",
+      "declares the canvas surface palette src/features/stats/canvas/canvas-palettes.json"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/contrast.json",
+          "path": ["palettes", 2],
+          "value": {
+            "name": "progress-grid",
+            "file": "src/features/stats/canvas/canvas-palettes.json",
+            "sets": ["light", "dark"],
+            "edge": "edge",
+            "text": [["label", "cell"]]
+          }
+        }
+      }
+    ]
+  },
+  "bad-canvas-missing-set": {
+    "expect": [
+      "src/features/stats/canvas/canvas-palettes.json:1 [palette-shape]",
+      "set \"highContrast\" is missing or empty"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/canvas-surfaces.json",
+          "json": { "paletteSets": ["light", "dark", "highContrast"], "surfaces": [] }
+        }
+      }
+    ]
+  },
+  "bad-canvas-no-contrast-file": {
+    "expect": [
+      "src/features/stats/canvas/canvas-palettes.json:1 [canvas-contrast]",
+      "has palettes but no canvas-contrast.json"
+    ],
+    "ops": [{ "delete": "src/features/stats/canvas/canvas-contrast.json" }]
+  },
+  "bad-canvas-palettes-outside-surface": {
+    "expect": ["src/ui/brand-canvas/canvas-palettes.json:1 [contrast-contract]", "looks like a colour table"],
+    "ops": [{ "rename": { "from": "src/features/stats/canvas", "to": "src/ui/brand-canvas" } }]
+  },
+  "bad-canvas-text-contrast": {
+    "expect": [
+      "src/features/stats/canvas/canvas-palettes.json:9 [text-contrast]",
+      "canvas src/features/stats/canvas light: label on cell is 1.93:1 < 4.5:1"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/stats/canvas/canvas-palettes.json",
+          "find": "\"label\": \"#14213D\"",
+          "with": "\"label\": \"#9AA5B8\""
+        }
+      }
+    ]
+  },
+  "bad-canvas-unknown-key": {
+    "expect": [
+      "src/features/stats/canvas/canvas-contrast.json:4 [canvas-contrast]",
+      "unknown key \"grapics\" (did you mean \"graphics\"?)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/stats/canvas/canvas-contrast.json",
+          "find": "\"graphics\": [",
+          "with": "\"grapics\": ["
+        }
+      }
+    ]
+  },
+  "bad-canvas-unknown-token": {
+    "expect": [
+      "src/features/stats/canvas/canvas-contrast.json:3 [canvas-contrast]",
+      "[\"caption\",\"cell\"] names a token the palette lacks"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/stats/canvas/canvas-contrast.json",
+          "find": "\"text\": [[\"label\", \"cell\"]]",
+          "with": "\"text\": [[\"caption\", \"cell\"]]"
+        }
+      }
+    ]
+  },
+  "bad-categorical": {
+    "expect": ["[cvd-separation]", "--categorical", "protanopia", "0.007"],
+    "args": "{dir} --categorical #D62728,#2CA02C,#1F77B4,#FF7F0E"
+  },
+  "bad-categorical-without-contract": {
+    "expect": ["[contrast-contract]", "contracts/contrast.json is missing"],
+    "args": "{dir} --categorical #0072B2,#D55E00,#009E73",
+    "ops": [{ "delete": "contracts/contrast.json" }]
+  },
+  "bad-colorblind-variant": {
+    "expect": ["[text-contrast]", "app colorBlind.light: textMuted on background is 2.04:1 < 4.5:1"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/palette.ts",
+          "find": "export const PALETTE: Palette = { light: LIGHT, dark: DARK };",
+          "with": "export const PALETTE: Palette = {\n  light: LIGHT,\n  dark: DARK,\n  colorBlind: { light: { ...LIGHT, textMuted: '#A8AFBB' }, dark: DARK },\n};"
+        }
+      }
+    ]
+  },
+  "bad-contract-not-json": {
+    "expect": ["[contrast-contract]", "contracts/contrast.json is not valid JSON"],
+    "ops": [
+      {
+        "replace": {
+          "file": "contracts/contrast.json",
+          "find": "  \"exceptions\": []\n",
+          "with": "  \"exceptions\": [],\n"
+        }
+      }
+    ]
+  },
+  "bad-contract-unknown-key": {
+    "expect": [
+      "[contrast-contract]",
+      "contracts/contrast.json:26",
+      "palettes[0] has the unknown key \"grapics\" (did you mean \"graphics\"?)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "contracts/contrast.json",
+          "find": "\"graphics\": [",
+          "with": "\"grapics\": [",
+          "occurrence": 1
+        }
+      },
+      {
+        "replace": {
+          "file": "src/theme/palette.ts",
+          "find": "  border: '#7A8190', // neutral.60\n",
+          "with": "  border: '#D0D3D9', // neutral.85\n",
+          "occurrence": 1
+        }
+      }
+    ]
+  },
+  "bad-danger-surface": {
+    "expect": ["[text-contrast]", "app light: danger on dangerSurface is 4.42:1 < 4.5:1"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/palette.ts",
+          "find": "  dangerSurface: '#FDECEA', // red.96\n",
+          "with": "  dangerSurface: '#E1D0CE', // red.84\n"
+        }
+      }
+    ]
+  },
+  "bad-danger-text": {
+    "expect": ["[text-contrast]", "app light: danger on surface is 4.45:1 < 4.5:1"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/palette.ts",
+          "find": "  danger: '#B42318', // red.50\n",
+          "with": "  danger: '#D54439', // red.58\n"
+        }
+      }
+    ]
+  },
+  "bad-design-palette-undeclared": {
+    "expect": ["[contrast-contract]", "src/theme/brand-palette.ts:1", "is the theme palette"],
+    "ops": [
+      { "copy": { "from": "src/theme/palette.ts", "to": "src/theme/brand-palette.ts" } },
+      {
+        "write": {
+          "file": "contracts/design-system.json",
+          "json": {
+            "palettes": [
+              { "file": "src/theme/palette.ts", "export": "PALETTE", "token": "color" },
+              { "file": "src/theme/brand-palette.ts", "export": "PALETTE", "token": "brandColor" }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "bad-distinct-cvd": {
+    "expect": ["[cvd-separation]", "chart dark protanopia: series1, series2, series3, series4 are only"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/stats/chart-colors.ts",
+          "find": "    series3: '#F0E442',\n",
+          "with": "    series3: '#E69F01',\n"
+        }
+      }
+    ]
+  },
+  "bad-exception-no-reason": {
+    "expect": ["[contrast-contract]", "exceptions[0] has no \"reason\""],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/contrast.json",
+          "path": ["exceptions"],
+          "value": [
+            {
+              "palette": "chart",
+              "set": "light",
+              "fg": "grid",
+              "bg": "plot",
+              "reason": "",
+              "approvedBy": "design review 2026-10-01"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-exception-stale": {
+    "expect": ["[contrast-contract]", "exceptions[0] (chart light: grid on plot) matches no failing pair"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/contrast.json",
+          "path": ["exceptions"],
+          "value": [
+            {
+              "palette": "chart",
+              "set": "light",
+              "fg": "grid",
+              "bg": "plot",
+              "reason": "grid lines are decorative; every value is labelled",
+              "approvedBy": "design review 2026-10-01"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-fill-edge": {
+    "expect": [
+      "[shape-contrast]",
+      "app dark: primary on background has no 3:1 edge or ground (2.31:1 against border and background)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/palette.ts",
+          "find": "  primary: '#8AB4FF', // blue.77\n",
+          "with": "  primary: '#4A4F5C', // neutral.36\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/theme/palette.ts",
+          "find": "  onPrimary: '#0F1115', // neutral.18\n",
+          "with": "  onPrimary: '#FFFFFF', // neutral.100\n"
+        }
+      }
+    ]
+  },
+  "bad-gates": {
+    "expect": ["[a11y-gates]", "a11y.minTouchPt is 40, needs a number >= 44"],
+    "ops": [{ "json": { "file": "quality-gates.json", "path": ["a11y", "minTouchPt"], "value": 40 } }]
+  },
+  "bad-missing-set": {
+    "expect": ["[palette-shape]", "app: set \"dark\" is missing or empty"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/palette.ts",
+          "find": "export const PALETTE: Palette = { light: LIGHT, dark: DARK };",
+          "with": "export const PALETTE: Palette = { light: LIGHT };"
+        }
+      }
+    ]
+  },
+  "bad-muted-text": {
+    "expect": ["[text-contrast]", "src/theme/palette.ts", "app light: textMuted on background is 2.04:1 < 4.5:1"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/palette.ts",
+          "find": "  textMuted: '#525866', // neutral.46\n",
+          "with": "  textMuted: '#A8AFBB', // neutral.75\n"
+        }
+      }
+    ]
+  },
+  "bad-muted-text-dark": {
+    "expect": ["[text-contrast]", "src/theme/palette.ts:29", "app dark: textMuted on background is 2.33:1 < 4.5:1"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/palette.ts",
+          "find": "  textMuted: '#A8AFBB', // neutral.75\n",
+          "with": "  textMuted: '#4A505A', // neutral.30\n"
+        }
+      }
+    ]
+  },
+  "bad-no-contract": {
+    "expect": ["[contrast-contract]", "contracts/contrast.json is missing"],
+    "ops": [{ "delete": "contracts/contrast.json" }]
+  },
+  "bad-not-hex": {
+    "expect": ["[palette-shape]", "app: light: focus not #RRGGBB(AA)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/palette.ts",
+          "find": "  focus: '#1C4DB5', // blue.45\n",
+          "with": "  focus: 'royalblue',\n"
+        }
+      }
+    ]
+  },
+  "bad-palette-without-pairs": {
+    "expect": ["[contrast-contract]", "palette \"chart\" declares no text, graphics or shapes pair"],
+    "ops": [
+      { "json": { "file": "contracts/contrast.json", "path": ["palettes", 1, "text"], "delete": true } },
+      { "json": { "file": "contracts/contrast.json", "path": ["palettes", 1, "graphics"], "delete": true } },
+      { "json": { "file": "contracts/contrast.json", "path": ["palettes", 1, "shapes"], "delete": true } }
+    ]
+  },
+  "bad-runtime-import": {
+    "expect": ["[palette-shape]", "imports runtime values"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/palette.ts",
+          "find": "import type { ColorTokens, Palette } from './theme-types';\n",
+          "with": "import type { ColorTokens, Palette } from './theme-types';\nimport { BRAND_BLUE } from './brand';\n"
+        }
+      }
+    ]
+  },
+  "bad-series-text-pair": {
+    "expect": [
+      "[text-contrast]",
+      "src/features/stats/chart-colors.ts",
+      "chart light: markerLabel on marker is 2.91:1 < 4.5:1"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/stats/chart-colors.ts",
+          "find": "    markerLabel: '#FFFFFF',\n",
+          "with": "    markerLabel: '#F0C090',\n"
+        }
+      }
+    ]
+  },
+  "bad-set-keys": {
+    "expect": ["[palette-shape]", "chart: set \"dark\" has other tokens than \"light\""],
+    "ops": [
+      { "replace": { "file": "src/features/stats/chart-colors.ts", "find": "    marker: '#E69F00',\n", "with": "" } }
+    ]
+  },
+  "bad-shape-edge-and-ground": {
+    "expect": [
+      "[shape-contrast]",
+      "chart light: band on plot has no 3:1 edge or ground (1.39:1 against bandEdge and plot)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/stats/chart-colors.ts",
+          "find": "    bandEdge: '#0072B2',\n",
+          "with": "    bandEdge: '#9FC4DD',\n"
+        }
+      }
+    ]
+  },
+  "bad-theme-undeclared": {
+    "expect": [
+      "[contrast-contract]",
+      "src/theme/palette.ts:1",
+      "is the theme palette, but no palette in contracts/contrast.json declares its pairs"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/contrast.json",
+          "json": {
+            "$schema": "./contrast.schema.json",
+            "palettes": [
+              {
+                "name": "chart",
+                "file": "src/features/stats/chart-colors.ts",
+                "export": "CHART_COLORS",
+                "sets": ["light", "dark"],
+                "base": "plot",
+                "edge": "bandEdge",
+                "text": [["label", "plot"]],
+                "graphics": [["series1", "plot"]]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "bad-undeclared-colour-table": {
+    "expect": [
+      "[contrast-contract]",
+      "src/features/tasks/tag-colors.ts:1",
+      "looks like a colour table (its name and 6 hex colours)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/tag-colors.ts",
+          "content": "// src/features/tasks/tag-colors.ts\n// Planted: the colours a user picks for a tag, painted as chips; the contract never declares them.\nexport const TAG_COLORS = {\n  light: { chip: '#E8F1FB', chipText: '#0B4F8A', chipEdge: '#4F7FAF' },\n  dark: { chip: '#13263A', chipText: '#CFE3F7', chipEdge: '#6E9AC4' },\n} as const;\n"
+        }
+      }
+    ]
+  },
+  "bad-undeclared-colour-table-src-root": {
+    "expect": ["[contrast-contract]", "lib/tag-colors.ts:1", "looks like a colour table (its name and 4 hex colours)"],
+    "ops": [
+      { "write": { "file": "rn-skills.config.json", "json": { "srcDir": "." } } },
+      {
+        "write": {
+          "file": "lib/tag-colors.ts",
+          "content": "// lib/tag-colors.ts\n// Planted: with srcDir \".\" the whole repo is source, so this undeclared colour table is found.\nexport const TAG_COLORS = { light: { chip: \"#FFFFFF\", chipText: \"#EEEEEE\" }, dark: { chip: \"#000000\", chipText: \"#0A0A0A\" } } as const;\n"
+        }
+      }
+    ]
+  },
+  "bad-unknown-token": {
+    "expect": [
+      "[contrast-contract]",
+      "contracts/contrast.json",
+      "palette \"chart\": \"text\" entry [\"label\",\"legend\"] names a token the palette lacks"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "contracts/contrast.json",
+          "find": "[\"label\", \"plot\"]",
+          "with": "[\"label\", \"legend\"]"
+        }
+      }
+    ]
+  },
+  "error-nothing-to-check": {
+    "expect": ["ERROR [bad-input]", "nothing to check"],
+    "args": "{dir}/empty",
+    "ops": [{ "mkdir": "empty" }]
+  },
+  "pass-canvas-surface-from-contract": {
+    "expect": [
+      "check-contrast: 4 palettes, canvas surfaces, colour lists and gate files checked, 0 problems",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      { "rename": { "from": "src/features/stats/canvas", "to": "src/ui/brand-canvas" } },
+      {
+        "write": {
+          "file": "contracts/canvas-surfaces.json",
+          "json": {
+            "paletteSets": ["light", "dark"],
+            "surfaces": [{ "id": "brand-mark", "dir": "src/ui/brand-canvas", "kind": "timeline" }]
+          }
+        }
+      }
+    ]
+  },
+  "pass-categorical-okabe-ito": {
+    "expect": ["RESULT: PASS"],
+    "args": "{dir} --categorical #0072B2,#D55E00,#009E73,#CC79A7"
+  },
+  "pass-config-contract-path": {
+    "expect": ["check-contrast: 4 palettes", "RESULT: PASS"],
+    "ops": [
+      { "rename": { "from": "contracts/contrast.json", "to": "qa/contrast.json" } },
+      { "write": { "file": "rn-skills.config.json", "json": { "contrastContract": "qa/contrast.json" } } }
+    ]
+  },
+  "pass-contract-option-repo-relative": {
+    "expect": ["check-contrast: 4 palettes", "RESULT: PASS"],
+    "args": "{dir}/app --contract qa/contrast.json",
+    "ops": [
+      { "rename": { "from": "src", "to": "app/src" } },
+      { "rename": { "from": "test", "to": "app/test" } },
+      { "rename": { "from": ".maestro", "to": "app/.maestro" } },
+      { "rename": { "from": "package.json", "to": "app/package.json" } },
+      { "rename": { "from": "quality-gates.json", "to": "app/quality-gates.json" } },
+      { "rename": { "from": "contracts/contrast.json", "to": "app/qa/contrast.json" } }
+    ]
+  },
+  "pass-exception-recorded": {
+    "expect": [
+      "note: src/features/stats/chart-colors.ts chart light: grid on plot is 1.47:1 < 3:1 (exception: grid lines are decorative; every value is labelled; approved by design review 2026-10-01)",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/stats/chart-colors.ts",
+          "find": "    grid: '#6B7280',\n",
+          "with": "    grid: '#D1D5DB',\n"
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/contrast.json",
+          "path": ["exceptions"],
+          "value": [
+            {
+              "palette": "chart",
+              "set": "light",
+              "fg": "grid",
+              "bg": "plot",
+              "reason": "grid lines are decorative; every value is labelled",
+              "approvedBy": "design review 2026-10-01"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "pass-installed-skills-silent": {
+    "expect": ["check-contrast: 4 palettes", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "rn-skills.config.json",
+          "json": { "srcDir": ".", "canvasSurfaceDirs": ["src/features/*/canvas"] }
+        }
+      },
+      {
+        "write": {
+          "file": ".agents/skills/x/chart-colors.ts",
+          "content": "// .agents/skills/x/chart-colors.ts (an installed skill: planted, undeclared, unreadable pairs)\nexport const CHART_COLORS = { light: { plot: \"#FFFFFF\", line: \"#FFFF00\" }, dark: { plot: \"#000000\", line: \"#111111\" } } as const;\n"
+        }
+      },
+      {
+        "write": {
+          "file": ".agents/skills/x/tag-colors.ts",
+          "content": "// .agents/skills/x/tag-colors.ts (an installed skill)\nexport const TAG_COLORS = { light: { chip: \"#FFFFFF\", chipText: \"#EEEEEE\" }, dark: { chip: \"#000000\", chipText: \"#0A0A0A\" } } as const;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "skills/y/src/chart-colors.ts",
+          "content": "// skills/y/src/chart-colors.ts (a skill folder in the repo)\nexport const CHART_COLORS = { light: { plot: \"#FFFFFF\", line: \"#FFFF00\" }, dark: { plot: \"#000000\", line: \"#111111\" } } as const;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "skills/y/src/tag-colors.ts",
+          "content": "// skills/y/src/tag-colors.ts (a skill folder in the repo)\nexport const TAG_COLORS = { light: { chip: \"#FFFFFF\", chipText: \"#EEEEEE\" }, dark: { chip: \"#000000\", chipText: \"#0A0A0A\" } } as const;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/kit/SKILL.md",
+          "content": "---\nname: kit\ndescription: A vendored skill folder inside the app; its colour tables stay silent.\n---\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/kit/chart-colors.ts",
+          "content": "// src/vendor/kit/chart-colors.ts (inside a vendored skill folder)\nexport const CHART_COLORS = { light: { plot: \"#FFFFFF\", line: \"#FFFF00\" }, dark: { plot: \"#000000\", line: \"#111111\" } } as const;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/vendor/kit/tag-colors.ts",
+          "content": "// src/vendor/kit/tag-colors.ts (inside a vendored skill folder)\nexport const TAG_COLORS = { light: { chip: \"#FFFFFF\", chipText: \"#EEEEEE\" }, dark: { chip: \"#000000\", chipText: \"#0A0A0A\" } } as const;\n"
+        }
+      }
+    ]
+  },
+  "pass-no-gates": {
+    "expect": ["SKIP quality-gates.json [a11y-gates] not yet created (quality-gates creates it)", "RESULT: PASS"],
+    "ops": [{ "delete": "quality-gates.json" }]
+  },
+  "pass-template-contract": {
+    "expect": [
+      "check-contrast: 2 palettes, canvas surfaces, colour lists and gate files checked, 0 problems",
+      "RESULT: PASS"
+    ],
+    "base": [
+      { "templates": true, "firstLinePath": true },
+      { "from": "@tests/bases/contrast", "include": ["package.json", "quality-gates.json"] }
+    ]
+  }
+}

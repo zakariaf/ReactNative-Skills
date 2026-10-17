@@ -1,0 +1,1040 @@
+{
+  "bad-child-directed": {
+    "expect": [
+      "contracts/analytics.json:3 [child-directed] a child-directed app ships the third-party analytics SDK posthog-react-native"
+    ],
+    "ops": [{ "json": { "file": "contracts/analytics.json", "path": ["audience"], "value": "child-directed" } }]
+  },
+  "bad-consent-auto-grant": {
+    "expect": [
+      "src/features/tasks/use-first-run-model.ts:9 [consent-source] setConsent('granted') in a useEffect callback (runs without a tap): the app answers for the user"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-first-run-model.ts",
+          "lines": [
+            "// src/features/tasks/use-first-run-model.ts",
+            "import { useEffect } from 'react';",
+            "",
+            "import { useServices } from '@/services/services-context';",
+            "",
+            "export function useFirstRunModel(): void {",
+            "  const { analytics } = useServices();",
+            "  useEffect(() => {",
+            "    analytics.setConsent('granted');",
+            "  }, [analytics]);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-consent-covers-stale": {
+    "expect": [
+      "contracts/analytics.json",
+      "[consent-covers] sdk, endpoints or collects changed since consent version 1 was set (covers 000000000000, now"
+    ],
+    "ops": [{ "json": { "file": "contracts/analytics.json", "path": ["consent", "covers"], "value": "000000000000" } }]
+  },
+  "bad-consent-focus-grant": {
+    "expect": [
+      "src/features/tasks/use-task-list-focus.ts:9 [consent-source] setConsent('granted') in a useFocusEffect callback (runs without a tap): the app answers for the user"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-list-focus.ts",
+          "lines": [
+            "// src/features/tasks/use-task-list-focus.ts",
+            "import { useFocusEffect } from 'expo-router';",
+            "",
+            "import { useServices } from '@/services/services-context';",
+            "",
+            "export function useTaskListFocus(): void {",
+            "  const { analytics } = useServices();",
+            "  useFocusEffect(() => {",
+            "    analytics.setConsent('granted');",
+            "  });",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-consent-from-ads": {
+    "expect": [
+      "src/features/settings/use-ads-consent-model.ts:7 [consent-source] setConsent() derives the analytics answer from canRequestAds"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/settings/use-ads-consent-model.ts",
+          "lines": [
+            "// src/features/settings/use-ads-consent-model.ts",
+            "import { useServices } from '@/services/services-context';",
+            "",
+            "export function useAdsConsentModel(): (canRequestAds: boolean) => void {",
+            "  const { analytics } = useServices();",
+            "  return (canRequestAds) => {",
+            "    analytics.setConsent(canRequestAds ? 'granted' : 'denied');",
+            "  };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-consent-kit-grant": {
+    "expect": [
+      "src/services/analytics/analytics-root-kit.tsx:45 [consent-source] setConsent('granted') in a service, where no user acts"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/analytics/analytics-root-kit.tsx",
+          "find": "function ScreenViews({ analytics }: ScreenViewsProps): null {\n",
+          "with": "function ScreenViews({ analytics }: ScreenViewsProps): null {\n  analytics.setConsent('granted');\n"
+        }
+      }
+    ]
+  },
+  "bad-consent-other-port": {
+    "expect": ["src/services/analytics:1 [consent-ui] no screen calls analytics.setConsent()"],
+    "ops": [
+      { "delete": "src/features/settings/use-usage-data-model.ts" },
+      {
+        "write": {
+          "file": "src/hooks/use-crash-reporting-consent.ts",
+          "lines": [
+            "// src/hooks/use-crash-reporting-consent.ts",
+            "import { useEffect } from 'react';",
+            "",
+            "import { useServices } from '@/services/services-context';",
+            "",
+            "/** Crash-report consent is another question (crash-reporting-and-observability): it never answers analytics. */",
+            "export function useCrashReportingConsent(isGranted: boolean): void {",
+            "  const { crashReporter } = useServices();",
+            "  useEffect(() => {",
+            "    crashReporter.setConsent(isGranted);",
+            "  }, [crashReporter, isGranted]);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-consent-render-grant": {
+    "expect": [
+      "src/features/tasks/tasks-banner.tsx:6 [consent-source] setConsent('granted') directly in the body of TasksBanner (runs on render): the app answers for the user"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/tasks-banner.tsx",
+          "lines": [
+            "// src/features/tasks/tasks-banner.tsx",
+            "import { useAnalytics } from '@/services/analytics/analytics-context';",
+            "",
+            "export function TasksBanner(): null {",
+            "  const analytics = useAnalytics();",
+            "  analytics.setConsent('granted');",
+            "  return null;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-consent-root-grant": {
+    "expect": [
+      "src/services/create-root-kits.ts:61 [consent-source] setConsent('granted') in the composition root, where no user acts: the app answers for the user"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/create-root-kits.ts",
+          "find": "  const analytics = createAppAnalytics(data.errorLog, services.clock.nowMs);\n",
+          "with": "  const analytics = createAppAnalytics(data.errorLog, services.clock.nowMs);\n  analytics.setConsent('granted');\n"
+        }
+      }
+    ]
+  },
+  "bad-consent-ui-missing": {
+    "expect": ["src/services/analytics:1 [consent-ui] no screen calls analytics.setConsent()"],
+    "ops": [{ "delete": "src/features/settings/use-usage-data-model.ts" }]
+  },
+  "bad-consent-version-mismatch": {
+    "expect": ["[consent-covers] ANALYTICS_CONSENT_VERSION is 1, but contracts/analytics.json consent.version is 2"],
+    "ops": [{ "json": { "file": "contracts/analytics.json", "path": ["consent", "version"], "value": 2 } }]
+  },
+  "bad-contract-audience": {
+    "expect": ["contracts/analytics.json:4 [contract] audience must be general or child-directed"],
+    "ops": [{ "json": { "file": "contracts/analytics.json", "path": ["audience"], "value": "kids" } }]
+  },
+  "bad-contract-missing": {
+    "expect": ["contracts/analytics.json:1 [contract]"],
+    "ops": [{ "delete": "contracts/analytics.json" }]
+  },
+  "bad-declarations-device-id": {
+    "expect": ["[declarations] device-id is collected but not declared"],
+    "ops": [
+      { "json": { "file": "contracts/analytics.json", "path": ["collects", 1], "delete": true } },
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["sdks", "posthog-react-native", "collects", 1],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "bad-declarations-geoip": {
+    "expect": ["[declarations] coarse-location is collected but not declared"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/analytics/posthog-analytics-adapter.ts",
+          "find": "disableGeoip: true",
+          "with": "disableGeoip: false"
+        }
+      }
+    ]
+  },
+  "bad-declarations-identified-unlinked": {
+    "expect": ["[declarations] user-id is collected but not declared (identifies is true)"],
+    "ops": [
+      { "json": { "file": "contracts/analytics.json", "path": ["identifies"], "value": true } },
+      {
+        "replace": {
+          "file": "src/services/analytics/posthog-analytics-adapter.ts",
+          "find": "    personProfiles: 'never',\n",
+          "with": "    personProfiles: 'identified_only',\n"
+        }
+      }
+    ]
+  },
+  "bad-event-catalog": {
+    "expect": ["src/services/analytics/analytics-events.ts:55 [event-catalog] ANALYTICS_EVENTS is not plain data"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/analytics/analytics-events.ts",
+          "find": "  paywall_viewed: {",
+          "with": "  ...EXTRA_EVENTS,\n  paywall_viewed: {"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/analytics/analytics-events.ts",
+          "find": "/** Every event the app may send.",
+          "with": "const EXTRA_EVENTS = {} as const;\n\n/** Every event the app may send."
+        }
+      }
+    ]
+  },
+  "bad-event-name": {
+    "expect": ["src/services/analytics/analytics-events.ts:32 [event-name] TaskCreated is not snake_case"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/analytics/analytics-events.ts",
+          "find": "  task_created: {",
+          "with": "  TaskCreated: {"
+        }
+      }
+    ]
+  },
+  "bad-event-pii": {
+    "expect": [
+      "src/services/analytics/analytics-events.ts:53 [event-pii] paywall_viewed.task_title names personal data (title)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/analytics/analytics-events.ts",
+          "find": "props: { source: { kind: 'enum', values: ['settings', 'list_limit'] } },",
+          "with": "props: {\n      source: { kind: 'enum', values: ['settings', 'list_limit'] },\n      task_title: { kind: 'boolean' },\n    },"
+        }
+      }
+    ]
+  },
+  "bad-event-props": {
+    "expect": [
+      "src/services/analytics/analytics-events.ts:40 [event-props] task_completed.days_open: kind must be one of enum, boolean, count, route (never free text)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/analytics/analytics-events.ts",
+          "find": "days_open: { kind: 'count', max: 30 }",
+          "with": "days_open: { kind: 'string' }"
+        }
+      }
+    ]
+  },
+  "bad-event-purpose": {
+    "expect": ["src/services/analytics/analytics-events.ts:53 [event-purpose] event paywall_viewed has no purpose"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/analytics/analytics-events.ts",
+          "find": "purpose: 'Where the Premium offer is seen, to place it where it helps.',",
+          "with": "purpose: '',"
+        }
+      }
+    ]
+  },
+  "bad-event-reserved": {
+    "expect": [
+      "src/services/analytics/analytics-events.ts:53 [event-name] session_start is a name analytics vendors reserve"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/analytics/analytics-events.ts",
+          "find": "  paywall_viewed: {",
+          "with": "  session_start: {"
+        }
+      }
+    ]
+  },
+  "bad-files-missing": {
+    "expect": ["src/services/analytics/analytics-sanitize.ts:1 [files]"],
+    "ops": [{ "delete": "src/services/analytics/analytics-sanitize.ts" }]
+  },
+  "bad-gate-outside-root": {
+    "expect": ["src/features/tasks/use-local-analytics.ts:4 [sdk-lazy] createAnalytics() outside the root-kit registry"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-local-analytics.ts",
+          "lines": [
+            "// src/features/tasks/use-local-analytics.ts",
+            "import { createAnalytics } from '@/services/analytics/create-analytics';",
+            "",
+            "export const make = (options: Parameters<typeof createAnalytics>[0]) => createAnalytics(options);"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-identify": {
+    "expect": [
+      "src/services/analytics/posthog-analytics-adapter.ts:69 [identify] identify() although contracts/analytics.json identifies is false"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/analytics/posthog-analytics-adapter.ts",
+          "find": "optIn: () => client.optIn(),",
+          "with": "optIn: () => (client.identify('account'), client.optIn()),"
+        }
+      }
+    ]
+  },
+  "bad-key-literal": {
+    "expect": ["src/config/analytics-keys.ts:2 [key-literal] a PostHog project key is typed in code"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/config/analytics-keys.ts",
+          "lines": [
+            "// src/config/analytics-keys.ts",
+            "export const KEY = 'phX_0a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t';"
+          ]
+        }
+      },
+      { "replace": { "file": "src/config/analytics-keys.ts", "find": "phX_", "with": "phc_" } }
+    ]
+  },
+  "bad-key-public-env": {
+    "expect": [
+      "src/features/tasks/analytics-key.ts:2 [key-literal] EXPO_PUBLIC_ANALYTICS_KEY is inlined into the bundle"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/analytics-key.ts",
+          "lines": [
+            "// src/features/tasks/analytics-key.ts",
+            "export const key = process.env.EXPO_PUBLIC_ANALYTICS_KEY;"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-observe-autostart": {
+    "expect": ["package.json:1 [sdk-inventory] expo-observe dispatches startup metrics"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo-observe"], "value": "~57.0.25" } }]
+  },
+  "bad-observe-only": {
+    "expect": ["package.json:1 [sdk-inventory] expo-observe dispatches startup metrics", "RESULT: FAIL (1 problems)"],
+    "base": ["@tests/bases/app"],
+    "extends": null,
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "posthog-react-native"], "delete": true } },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-observe"], "value": "~57.0.25" } }
+    ]
+  },
+  "bad-options-default-optin": {
+    "expect": ["src/services/analytics/posthog-analytics-adapter.ts:1 [sdk-options] missing defaultOptIn:false"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/analytics/posthog-analytics-adapter.ts",
+          "find": "    defaultOptIn: false,\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-options-flags-reload": {
+    "expect": [
+      "src/services/analytics/posthog-analytics-adapter.ts:1 [sdk-options] missing disableRemoteFeatureFlags:true"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/analytics/posthog-analytics-adapter.ts",
+          "find": "    disableRemoteFeatureFlags: true,\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-options-queue-kept": {
+    "expect": [
+      "src/services/analytics/posthog-analytics-adapter.ts:1 [sdk-options] missing setPersistedProperty(PostHogPersistedProperty.Queue,null)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/analytics/posthog-analytics-adapter.ts",
+          "find": "      client.setPersistedProperty(PostHogPersistedProperty.Queue, null);\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/analytics/posthog-analytics-adapter.ts",
+          "find": "import { PostHog, PostHogPersistedProperty } from 'posthog-react-native';",
+          "with": "import { PostHog } from 'posthog-react-native';"
+        }
+      }
+    ]
+  },
+  "bad-options-reset-keeps-device-id": {
+    "expect": ["src/services/analytics/posthog-analytics-adapter.ts:1 [sdk-options] missing .reset([])"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/analytics/posthog-analytics-adapter.ts",
+          "find": "client.reset([]);",
+          "with": "client.reset();"
+        }
+      }
+    ]
+  },
+  "bad-options-session-replay": {
+    "expect": ["src/services/analytics/posthog-analytics-adapter.ts:59 [sdk-options] enableSessionReplay: true"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/analytics/posthog-analytics-adapter.ts",
+          "find": "enableSessionReplay: false",
+          "with": "enableSessionReplay: true"
+        }
+      }
+    ]
+  },
+  "bad-privacy-sync-drift": {
+    "expect": [
+      "contracts/privacy.json:5 [privacy-sync] sdks[\"posthog-react-native\"].collects lacks device-id linked=true tracking=false purposes=analytics"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["sdks", "posthog-react-native", "collects", 1, "linked"],
+          "value": false
+        }
+      }
+    ]
+  },
+  "bad-privacy-sync-missing-sdk": {
+    "expect": ["contracts/privacy.json:1 [privacy-sync] sdks has no \"posthog-react-native\" entry"],
+    "ops": [{ "json": { "file": "contracts/privacy.json", "path": ["sdks", "posthog-react-native"], "delete": true } }]
+  },
+  "bad-root-kit-missing": {
+    "expect": ["src/services/analytics/analytics-root-kit.tsx:1 [root-kit] no analytics root kit"],
+    "ops": [
+      {
+        "$comment": "No analytics root kit at all.",
+        "delete": [
+          "src/services/analytics/analytics-root-kit.tsx",
+          "src/services/analytics/analytics-root-kit.test.tsx"
+        ]
+      },
+      {
+        "replace": {
+          "file": "src/services/create-root-kits.ts",
+          "find": "  return [createAnalyticsKit({ analytics, errorLog: data.errorLog })];",
+          "with": "  void analytics;\n  return [];"
+        }
+      }
+    ]
+  },
+  "bad-root-kit-unregistered": {
+    "expect": [
+      "src/services/create-root-kits.ts:1 [root-kit] the registry creates the AnalyticsPort but never registers createAnalyticsKit"
+    ],
+    "ops": [
+      {
+        "$comment": "The registry creates the port but never registers the kit: useAnalytics() throws, no screen view, no flush.",
+        "replace": {
+          "file": "src/services/create-root-kits.ts",
+          "find": "  return [createAnalyticsKit({ analytics, errorLog: data.errorLog })];",
+          "with": "  void analytics;\n  return [];"
+        }
+      }
+    ]
+  },
+  "bad-screen-params-tracked": {
+    "expect": ["src/features/tasks/use-task-screen.ts:6 [screen-pathname] track() sends params"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-screen.ts",
+          "lines": [
+            "// src/features/tasks/use-task-screen.ts",
+            "import { useServices } from '@/services/services-context';",
+            "",
+            "export function useTaskScreen(params: { readonly id: string }): void {",
+            "  const { analytics } = useServices();",
+            "  analytics.track({ name: 'screen_view', props: { screen: params.id } });",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-screen-pathname": {
+    "expect": ["src/hooks/use-screen-views.ts:11 [screen-pathname] screen views read usePathname()"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/hooks/use-screen-views.ts",
+          "find": "import { useSegments } from 'expo-router';",
+          "with": "import { usePathname } from 'expo-router';"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/hooks/use-screen-views.ts",
+          "find": "const screen = screenNameFromSegments(useSegments());",
+          "with": "const screen = usePathname();"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/hooks/use-screen-views.ts",
+          "find": "import { screenNameFromSegments } from '@/services/analytics/screen-name';\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-screen-pathname-variable": {
+    "expect": ["src/features/tasks/use-where-model.ts:7 [screen-pathname] usePathname() in a file that calls track()"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-where-model.ts",
+          "lines": [
+            "// src/features/tasks/use-where-model.ts",
+            "import { usePathname } from 'expo-router';",
+            "",
+            "import { useServices } from '@/services/services-context';",
+            "",
+            "export function useWhereModel(): () => void {",
+            "  const where = usePathname();",
+            "  const { analytics } = useServices();",
+            "  return () => {",
+            "    analytics.track({ name: 'screen_view', props: { screen: where } });",
+            "  };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-screen-search-param": {
+    "expect": [
+      "src/features/tasks/use-task-detail-model.ts:7 [screen-pathname] mode from useLocalSearchParams() is sent in a track() call"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-detail-model.ts",
+          "lines": [
+            "// src/features/tasks/use-task-detail-model.ts",
+            "import { useLocalSearchParams } from 'expo-router';",
+            "",
+            "import { useServices } from '@/services/services-context';",
+            "",
+            "export function useTaskDetailModel(): () => void {",
+            "  const { id, mode } = useLocalSearchParams<{ id: string; mode: string }>();",
+            "  const { analytics } = useServices();",
+            "  return () => {",
+            "    analytics.track({ name: 'screen_view', props: { screen: mode } });",
+            "    void id;",
+            "  };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-sdk-autostart": {
+    "expect": ["package.json:1 [sdk-inventory] expo-insights sends an event on every cold start"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo-insights"], "value": "~57.0.20" } }]
+  },
+  "bad-sdk-clear-constructs": {
+    "expect": [
+      "[sdk-lazy] the vendor adapter is created outside createAnalytics({ createSdk })",
+      "src/services/create-root-kits.ts:53"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/create-root-kits.ts",
+          "find": "    clearSdkStorage: clearPosthogStorage,\n",
+          "with": "    clearSdkStorage: () => {\n      createPosthogAnalyticsAdapter({ apiKey: runtime.apiKey, host: runtime.host }).reset();\n      clearPosthogStorage();\n    },\n"
+        }
+      }
+    ]
+  },
+  "bad-sdk-clear-missing": {
+    "expect": [
+      "src/services/create-root-kits.ts:33 [sdk-clear] createAnalytics() gets no clearSdkStorage although posthog-react-native keeps its ids and unsent queue on the device"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/create-root-kits.ts",
+          "find": "    // A no or forget() with no client in this session deletes an earlier session's ids and queue.\n    clearSdkStorage: clearPosthogStorage,\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/create-root-kits.ts",
+          "find": "import {\n  clearPosthogStorage,\n  createPosthogAnalyticsAdapter,\n} from",
+          "with": "import { createPosthogAnalyticsAdapter } from"
+        }
+      }
+    ]
+  },
+  "bad-sdk-eager": {
+    "expect": [
+      "src/features/tasks/analytics-warmup.ts:4 [sdk-lazy] the vendor adapter is created outside createAnalytics({ createSdk })"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/analytics-warmup.ts",
+          "lines": [
+            "// src/features/tasks/analytics-warmup.ts",
+            "import { createPosthogAnalyticsAdapter } from '@/services/analytics/posthog-analytics-adapter';",
+            "",
+            "export const warm = createPosthogAnalyticsAdapter({ isTrackingAllowed: false, apiKey: 'k', host: 'h' });"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-sdk-import": {
+    "expect": ["src/features/tasks/use-tracker.ts:2 [sdk-import] imports posthog-react-native"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-tracker.ts",
+          "lines": [
+            "// src/features/tasks/use-tracker.ts",
+            "import { usePostHog } from 'posthog-react-native';",
+            "",
+            "export const useTracker = () => usePostHog();"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-sdk-module-singleton": {
+    "expect": [
+      "src/services/analytics/posthog-analytics-adapter.ts:9 [sdk-lazy] new PostHog runs outside the body of the exported create<Vendor>AnalyticsAdapter function"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/analytics/posthog-analytics-adapter.ts",
+          "lines": [
+            "// src/services/analytics/posthog-analytics-adapter.ts",
+            "// Planted: the client is built at module level, as vendor guides show, so importing the adapter",
+            "// constructs it at launch, before consent.",
+            "import { PostHog, PostHogPersistedProperty } from 'posthog-react-native';",
+            "",
+            "import type { AnalyticsSdk } from './analytics-port';",
+            "import type { AnalyticsSdkSetup } from './create-analytics';",
+            "",
+            "const client = new PostHog('key-from-somewhere', {",
+            "  host: 'https://eu.i.posthog.com',",
+            "  defaultOptIn: false,",
+            "  personProfiles: 'never',",
+            "  disableGeoip: true,",
+            "  captureAppLifecycleEvents: false,",
+            "  disableRemoteFeatureFlags: true,",
+            "  errorTracking: { autocapture: false },",
+            "});",
+            "",
+            "export type PostHogAdapterOptions = AnalyticsSdkSetup & { readonly apiKey: string; readonly host: string };",
+            "",
+            "export function createPosthogAnalyticsAdapter(_options: PostHogAdapterOptions): AnalyticsSdk {",
+            "  return {",
+            "    optIn: () => client.optIn(),",
+            "    capture: (name, props) => {",
+            "      client.capture(name, { ...props });",
+            "    },",
+            "    flush: () => client.flush(),",
+            "    optOut: () => client.optOut(),",
+            "    reset: () => {",
+            "      client.reset([]);",
+            "      client.setPersistedProperty(PostHogPersistedProperty.Queue, null);",
+            "    },",
+            "  };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-sdk-native-plugin": {
+    "expect": [
+      "package.json:1 [sdk-inventory] @posthog/react-native-plugin: PostHog's native plugin adds session replay, native crash capture and rage clicks"
+    ],
+    "ops": [
+      {
+        "json": { "file": "package.json", "path": ["dependencies", "@posthog/react-native-plugin"], "value": "2.12.0" }
+      }
+    ]
+  },
+  "bad-sdk-not-installed": {
+    "expect": ["[sdk-inventory] contract sdk posthog-react-native is not in package.json"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "posthog-react-native"], "delete": true } }]
+  },
+  "bad-sdk-replay-package": {
+    "expect": [
+      "package.json:1 [sdk-inventory] posthog-react-native-session-replay: records the screen: what the user typed and saw is collected"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["dependencies", "posthog-react-native-session-replay"],
+          "value": "1.6.0"
+        }
+      }
+    ]
+  },
+  "bad-sdk-second-vendor": {
+    "expect": [
+      "package.json:1 [sdk-inventory] mixpanel-react-native is installed but contracts/analytics.json does not declare it"
+    ],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "mixpanel-react-native"], "value": "3.0.0" } }]
+  },
+  "bad-test-imports-adapter": {
+    "expect": ["src/features/tasks/tasks-analytics.test.ts:2 [test-isolation] imports the vendor adapter"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/tasks-analytics.test.ts",
+          "lines": [
+            "// src/features/tasks/tasks-analytics.test.ts",
+            "import { createPosthogAnalyticsAdapter } from '@/services/analytics/posthog-analytics-adapter';",
+            "",
+            "it('creates', () => expect(createPosthogAnalyticsAdapter).toBeDefined());"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-test-imports-sdk": {
+    "expect": ["src/features/tasks/tasks-sdk.test.ts:2 [test-isolation] imports posthog-react-native"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/tasks-sdk.test.ts",
+          "lines": [
+            "// src/features/tasks/tasks-sdk.test.ts",
+            "import { PostHog } from 'posthog-react-native';",
+            "",
+            "it('exists', () => expect(PostHog).toBeDefined());"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-track-dynamic": {
+    "expect": ["src/features/tasks/use-tasks-model.ts:24 [track-literal] track() without an object literal"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "analytics.track({\n        name: 'task_created',",
+          "with": "const name = 'task_created' as const;\n      analytics.track({\n        name,"
+        }
+      }
+    ]
+  },
+  "bad-track-unknown": {
+    "expect": [
+      "src/features/tasks/use-tasks-model.ts:23 [track-literal] event task_title_typed is not in ANALYTICS_EVENTS"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "name: 'task_created',",
+          "with": "name: 'task_title_typed',"
+        }
+      }
+    ]
+  },
+  "bad-tracking-ad-id": {
+    "expect": [
+      "src/services/analytics/posthog-analytics-adapter.ts:69 [tracking] the adapter touches an advertising identifier (getAdvertisingId)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/analytics/posthog-analytics-adapter.ts",
+          "find": "optIn: () => client.optIn(),",
+          "with": "optIn: () => (client.register({ ad: getAdvertisingId() }), client.optIn()),"
+        }
+      }
+    ]
+  },
+  "bad-tracking-declared": {
+    "expect": ["[tracking] product-interaction is declared tracking: true although the contract says tracking: false"],
+    "ops": [
+      { "json": { "file": "contracts/analytics.json", "path": ["collects", 0, "tracking"], "value": true } },
+      {
+        "json": {
+          "file": "contracts/privacy.json",
+          "path": ["sdks", "posthog-react-native", "collects", 0, "tracking"],
+          "value": true
+        }
+      }
+    ]
+  },
+  "bad-tracking-option": {
+    "expect": [
+      "src/services/create-root-kits.ts:1 [tracking] createAnalytics gets a tracking option although the contract says tracking: false"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/services/create-root-kits.ts",
+          "find": "    // tracking: createExpoTrackingConsentAdapter({ onError }),",
+          "with": "    tracking: { requestTracking: () => Promise.resolve('authorized') },"
+        }
+      }
+    ]
+  },
+  "bad-wiring-drops-required-reasons": {
+    "expect": [
+      "app.config.ts:1 [manifest-wiring] ios.privacyManifests does not spread PRIVACY_MANIFESTS (src/config/privacy-manifest.ts)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "        ...PRIVACY_MANIFESTS,\n",
+          "with": "        NSPrivacyTracking: false,\n"
+        }
+      }
+    ]
+  },
+  "bad-wiring-manifest": {
+    "expect": [
+      "app.config.ts:1 [manifest-wiring] ios.privacyManifests.NSPrivacyCollectedDataTypes does not come from analyticsCollectedDataTypes()"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "NSPrivacyCollectedDataTypes: [...analyticsCollectedDataTypes(projectRoot)],",
+          "with": "NSPrivacyCollectedDataTypes: [],"
+        }
+      }
+    ]
+  },
+  "error-missing-root": {
+    "expect": ["ERROR [bad-input] nothing to check: repo root"],
+    "args": "{dir}/does-not-exist",
+    "ops": []
+  },
+  "error-no-package-json": {
+    "expect": ["ERROR [bad-input] nothing to check: the app's package.json"],
+    "ops": [{ "delete": "package.json" }]
+  },
+  "error-unknown-option": { "expect": ["ERROR [bad-input]"], "args": "{dir} --bogus", "ops": [] },
+  "pass-consent-literal-in-handler": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/settings/use-usage-data-model.ts",
+          "find": "    onShare: () => {\n      answer('granted');\n    },",
+          "with": "    onShare: () => {\n      analytics.setConsent('granted');\n      setConsent('granted');\n    },\n    onShareNow: () => analytics.setConsent('granted'),"
+        }
+      }
+    ]
+  },
+  "pass-no-app-config": {
+    "expect": [
+      "SKIP app.config.ts [manifest-wiring] not yet created (expo-project-bootstrap creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "app.config.ts" }]
+  },
+  "pass-no-privacy-contract": {
+    "expect": [
+      "SKIP contracts/privacy.json [privacy-sync] not yet created (privacy-and-store-declarations creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "contracts/privacy.json" }]
+  },
+  "pass-no-privacy-manifest-yet": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "        ...PRIVACY_MANIFESTS,\n",
+          "with": "        NSPrivacyTracking: false,\n"
+        }
+      },
+      { "delete": "src/config/privacy-manifest.ts" }
+    ]
+  },
+  "pass-no-vendor-no-ui": {
+    "expect": [
+      "note: contracts/analytics.json sdk is \"none\" (no vendor, nothing leaves the device): manifest-wiring and consent-ui apply once a vendor is chosen",
+      "RESULT: PASS"
+    ],
+    "extends": "pass-no-vendor-yet",
+    "ops": [
+      {
+        "$comment": "No vendor yet: no consent UI and no app.config analytics wiring are needed until one is chosen.",
+        "delete": [
+          "src/features/settings/use-usage-data-model.ts",
+          "src/features/settings/components/usage-data-prompt.tsx"
+        ]
+      },
+      {
+        "write": {
+          "file": "app.config.ts",
+          "lines": [
+            "// app.config.ts",
+            "import type { ExpoConfig } from 'expo/config';",
+            "",
+            "export default function appConfig(): ExpoConfig {",
+            "  return { name: 'Tasks', slug: 'tasks' };",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-no-vendor-yet": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "contracts/analytics.json", "path": ["sdk"], "value": "none" } },
+      { "json": { "file": "contracts/analytics.json", "path": ["endpoints"], "value": [] } },
+      { "json": { "file": "package.json", "path": ["dependencies", "posthog-react-native"], "delete": true } },
+      { "delete": "src/services/analytics/posthog-analytics-adapter.ts" },
+      {
+        "replace": {
+          "file": "src/services/create-root-kits.ts",
+          "find": "import {\n  clearPosthogStorage,\n  createPosthogAnalyticsAdapter,\n} from '@/services/analytics/posthog-analytics-adapter';\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/create-root-kits.ts",
+          "find": "return createPosthogAnalyticsAdapter({\n        ...setup,\n        apiKey: runtime.apiKey,\n        host: runtime.host,\n      });",
+          "with": "throw new Error(`no analytics vendor yet (${String(setup.isTrackingAllowed)})`);"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/services/create-root-kits.ts",
+          "find": "    // A no or forget() with no client in this session deletes an earlier session's ids and queue.\n    clearSdkStorage: clearPosthogStorage,\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "pass-not-applicable": {
+    "expect": [
+      "NOT APPLICABLE: no src/services/analytics/, no contracts/analytics.json and no analytics SDK in package.json"
+    ],
+    "base": ["@tests/bases/app"],
+    "extends": null,
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "posthog-react-native"], "delete": true } }]
+  },
+  "pass-observe-gated": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-observe"], "value": "~57.0.25" } },
+      {
+        "write": {
+          "file": "src/services/observe/observe-setup.ts",
+          "lines": [
+            "// src/services/observe/observe-setup.ts",
+            "import { Observe } from 'expo-observe';",
+            "",
+            "Observe.configure({ dispatchingEnabled: false });"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-search-param-for-work": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-done-model.ts",
+          "lines": [
+            "// src/features/tasks/use-task-done-model.ts",
+            "import { useLocalSearchParams } from 'expo-router';",
+            "",
+            "import { useServices } from '@/services/services-context';",
+            "",
+            "export function useTaskDoneModel(complete: (id: string) => void): () => void {",
+            "  const { id } = useLocalSearchParams<{ id: string }>();",
+            "  const { analytics } = useServices();",
+            "  return () => {",
+            "    complete(id);",
+            "    analytics.track({ name: 'task_created', props: { list_kind: 'inbox', has_due_date: false, has_reminder: false } });",
+            "  };",
+            "}"
+          ]
+        }
+      }
+    ]
+  }
+}

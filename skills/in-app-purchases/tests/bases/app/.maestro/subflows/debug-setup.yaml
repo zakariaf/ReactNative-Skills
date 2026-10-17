@@ -1,0 +1,8 @@
+# .maestro/subflows/debug-setup.yaml — the debug deep-link sub-flow (e2e-maestro owns the real one).
+appId: ${APP_ID}
+---
+- openLink: '${APP_SCHEME}://debug/setup?${QUERY}'
+- extendedWaitUntil:
+    visible:
+      id: '${WAIT_FOR}'
+    timeout: 15000

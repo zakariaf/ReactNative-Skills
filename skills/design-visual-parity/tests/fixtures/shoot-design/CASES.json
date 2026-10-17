@@ -1,0 +1,235 @@
+{
+  "bad-change-other-frames": {
+    "args": "--update-reference --change D-1 --frame tasks-default",
+    "ops": [
+      {
+        "write": {
+          "file": "post.json",
+          "json": [
+            {
+              "json": {
+                "file": "design/parity/manifest.json",
+                "path": ["referenceChanges"],
+                "value": [
+                  {
+                    "id": "D-1",
+                    "date": "2026-10-14",
+                    "frames": ["lists-default"],
+                    "variants": [],
+                    "what": "The add button became a filled button in both themes.",
+                    "why": "The reviewer approved the new button style on 2026-10-14."
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "bad-change-unlogged": { "args": "--update-reference" },
+  "bad-design-error": {
+    "args": "--out {dir}/.parity/design",
+    "ops": [
+      {
+        "replace": {
+          "file": "design/parity/mockup/index.html",
+          "find": "  </body>",
+          "with": "    <script>throw new Error('mockup script broke');</script>\n  </body>"
+        }
+      }
+    ]
+  },
+  "bad-design-text": {
+    "args": "--out {dir}/.parity/design",
+    "ops": [
+      {
+        "write": {
+          "file": "src/i18n/catalogs/en.json",
+          "content": "{\n \"tasks.summary.open\": \"Open tasks\",\n \"lists.delete-dialog.cancel\": \"Cancel\"\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-drift": [
+    {
+      "write": {
+        "file": "post.json",
+        "json": [
+          {
+            "replace": {
+              "file": "design/parity/mockup/index.html",
+              "find": "--surface: #f2f4f7;",
+              "with": "--surface: #f2f4f8;",
+              "occurrence": 1
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "bad-exactly-one-match": {
+    "args": "--out {dir}/.parity/design",
+    "ops": [
+      {
+        "replace": {
+          "file": "design/parity/mockup/index.html",
+          "find": "<ul class=\"rows\">\n          <li class=\"row\" data-testid=\"tasks.task-row.milk\">",
+          "with": "<p class=\"summary\" data-testid=\"tasks.summary\">Again</p><ul class=\"rows\">\n          <li class=\"row\" data-testid=\"tasks.task-row.milk\">"
+        }
+      }
+    ]
+  },
+  "bad-fonts": {
+    "args": "--out {dir}/.parity/design",
+    "ops": [
+      {
+        "replace": {
+          "file": "design/parity/mockup/index.html",
+          "find": "      :root {",
+          "with": "@font-face { font-family: 'Demo Sans'; src: url('fonts/DemoSans-Regular.ttf'); }\n      .title { font-family: 'Demo Sans'; }\n      :root {",
+          "occurrence": 1
+        }
+      }
+    ]
+  },
+  "bad-offline": {
+    "args": "--out {dir}/.parity/design",
+    "ops": [
+      {
+        "replace": {
+          "file": "design/parity/mockup/index.html",
+          "find": "<p class=\"summary\" data-testid=\"tasks.summary\">",
+          "with": "<img src=\"https://images.example.com/hero.png\" alt=\"\" /><p class=\"summary\" data-testid=\"tasks.summary\">"
+        }
+      }
+    ]
+  },
+  "bad-reference-changes": [
+    {
+      "write": {
+        "file": "post.json",
+        "json": [
+          {
+            "json": {
+              "file": "design/parity/manifest.json",
+              "path": ["referenceChanges"],
+              "value": [
+                {
+                  "id": "D-1",
+                  "date": "2026-10-14",
+                  "frames": ["tasks-default"],
+                  "variants": [],
+                  "what": "button",
+                  "why": "The reviewer approved the new button style on 2026-10-14."
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "bad-screen-reference-missing": [
+    { "write": { "file": "post.json", "json": [{ "delete": "design/screens/tasks-default.png" }] } }
+  ],
+  "bad-variant-derive": {
+    "args": "--out {dir}/.parity/design",
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/visual-parity.json",
+          "path": ["facts"],
+          "value": { "values": { "hasSync": [true, false] }, "design": { "hasSync": true }, "app": { "hasSync": true } }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/visual-parity.json",
+          "path": ["frames", "tasks-default", "when"],
+          "value": { "tasks.summary": { "hasSync": true } }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/visual-parity.json",
+          "path": ["frames", "tasks-default", "variants"],
+          "value": {
+            "no-sync": {
+              "when": { "hasSync": false },
+              "reason": "Builds without sync hide the open-task summary (reviewer).",
+              "derive": [{ "hide": "[data-testid='tasks.task-row.milk']" }]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "error-no-mockup": { "args": "--out {dir}/.parity/design", "ops": [{ "delete": "design/parity/mockup/index.html" }] },
+  "pass-change-logged": {
+    "args": "--update-reference --change D-1 --frame tasks-default",
+    "ops": [
+      {
+        "write": {
+          "file": "post.json",
+          "json": [
+            {
+              "json": {
+                "file": "design/parity/manifest.json",
+                "path": ["referenceChanges"],
+                "value": [
+                  {
+                    "id": "D-1",
+                    "date": "2026-10-14",
+                    "frames": ["tasks-default"],
+                    "variants": [],
+                    "what": "The add button became a filled button in both themes.",
+                    "why": "The reviewer approved the new button style on 2026-10-14."
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "pass-no-contract": { "args": "--check", "ops": [{ "delete": "contracts/visual-parity.json" }] },
+  "pass-out": { "args": "--out {dir}/.parity/design" },
+  "pass-variant": {
+    "args": "--out {dir}/.parity/design",
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/visual-parity.json",
+          "path": ["facts"],
+          "value": {
+            "values": { "hasSync": [true, false] },
+            "design": { "hasSync": true },
+            "app": { "hasSync": false }
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/visual-parity.json",
+          "path": ["frames", "tasks-default", "when"],
+          "value": { "tasks.summary": { "hasSync": true } }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/visual-parity.json",
+          "path": ["frames", "tasks-default", "variants"],
+          "value": {
+            "no-sync": {
+              "when": { "hasSync": false },
+              "reason": "Builds without sync hide the open-task summary (reviewer).",
+              "derive": [{ "hide": "[data-testid='tasks.summary']" }]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

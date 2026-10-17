@@ -1,0 +1,8 @@
+[reset-keeps-settings]
+src/features/settings/use-delete-everything.ts:10
+clears a whole key-value store (Storage.clearSync())
+src/features/settings/forget-cache.ts:4
+clears a whole key-value store (AsyncStorage.clear())
+src/services/cache/cache-store.ts:8
+clears a whole key-value store (storage.clearAll())
+RESULT: FAIL (3 problems)

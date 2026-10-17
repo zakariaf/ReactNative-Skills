@@ -1,0 +1,10 @@
+[
+  { "from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs" },
+  { "from": "scripts/lib/source-scan.mjs", "to": "scripts/lib/source-scan.mjs" },
+  { "from": "repo-templates/src/canvas/canvas-layout.ts", "to": "templates/src/canvas/canvas-layout.ts" },
+  { "from": "repo-templates/src/canvas/canvas-layout.test.ts", "to": "templates/src/canvas/canvas-layout.test.ts" },
+  { "from": "repo-templates/src/canvas/canvas-types.ts", "to": "templates/src/canvas/canvas-types.ts" },
+  { "from": "repo-templates/src/canvas/timeline/track.ts", "to": "templates/src/canvas/timeline/track.ts" },
+  { "from": "repo-templates/src/canvas/timeline/sample.ts", "to": "templates/src/canvas/timeline/sample.ts" },
+  { "from": "repo-templates/src/canvas/timeline/sample.test.ts", "to": "templates/src/canvas/timeline/sample.test.ts" }
+]

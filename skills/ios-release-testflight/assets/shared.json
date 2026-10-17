@@ -1,0 +1,16 @@
+[
+  {"from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs"},
+  {"from": "scripts/lib/plist.mjs", "to": "scripts/lib/plist.mjs"},
+  {"from": "scripts/lib/usage-strings.mjs", "to": "scripts/lib/usage-strings.mjs"},
+  {"from": "scripts/lib/ship-placeholders.mjs", "to": "scripts/lib/ship-placeholders.mjs"},
+  {"from": "repo-templates/scripts/ios/toolchain.ts", "to": "templates/scripts/ios/toolchain.ts"},
+  {"from": "repo-templates/scripts/ios/toolchain.test.ts", "to": "templates/scripts/ios/toolchain.test.ts"},
+  {"from": "repo-templates/scripts/clock/system-clock.ts", "to": "templates/scripts/clock/system-clock.ts"},
+  {"from": "repo-templates/scripts/clock/system-clock.test.ts", "to": "templates/scripts/clock/system-clock.test.ts"},
+  {"from": "repo-templates/src/config/app-variant.ts", "to": "templates/src/config/app-variant.ts"},
+  {"from": "repo-templates/src/config/app-variant.test.ts", "to": "templates/src/config/app-variant.test.ts"},
+  {"from": "repo-templates/scripts/asc/asc-jwt.ts", "to": "templates/scripts/asc/asc-jwt.ts"},
+  {"from": "repo-templates/scripts/asc/asc-jwt.test.ts", "to": "templates/scripts/asc/asc-jwt.test.ts"},
+  {"from": "repo-templates/scripts/asc/asc-credentials.ts", "to": "templates/scripts/asc/asc-credentials.ts"},
+  {"from": "repo-templates/scripts/asc/asc-client.ts", "to": "templates/scripts/asc/asc-client.ts"}
+]

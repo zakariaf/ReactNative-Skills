@@ -1,0 +1,11 @@
+[
+  { "from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs" },
+  { "from": "scripts/lib/app-modules.mjs", "to": "scripts/lib/app-modules.mjs" },
+  { "from": "repo-templates/src/core/result.ts", "to": "tests/bases/app/src/core/result.ts" },
+  { "from": "repo-templates/src/data/sql-driver.ts", "to": "tests/bases/app/src/data/sql-driver.ts" },
+  { "from": "repo-templates/src/data/migrations/migration-runner.ts", "to": "tests/bases/app/src/data/migrations/migration-runner.ts" },
+  { "from": "repo-templates/src/data/app-database.ts", "to": "tests/bases/app/src/data/app-database.ts" },
+  { "from": "repo-templates/src/data/database-schema.ts", "to": "tests/bases/app/src/data/database-schema.ts" },
+  { "from": "repo-templates/src/data/database-snapshots.ts", "to": "tests/bases/app/src/data/database-snapshots.ts" },
+  { "from": "repo-templates/src/data/to-storage-failure.ts", "to": "tests/bases/app/src/data/to-storage-failure.ts" }
+]

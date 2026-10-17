@@ -1,0 +1,8 @@
+{
+  "entries": [
+    { "path": "src/features/tasks/tasks-digest.golden.test.ts.snap.ios", "verdict": "intended", "note": "both planDigest headers gain 'open 2'; the three [contract] entries are unchanged; read line by line" },
+    { "path": "test/goldens/__image_snapshots__/progress-ring-phone.png", "verdict": "intended", "note": "ring stroke 6 -> 8 px as the redesign says; triage diff shows only the stroke edge" },
+    { "path": "test/goldens/__image_snapshots__/progress-ring-tablet.png", "verdict": "intended", "note": "same stroke change at tablet size; label and centre unchanged in the triage diff" },
+    { "path": "test/goldens/__image_snapshots__/old-badge-golden-test-ts-draws-the-badge-1-snap.png", "verdict": "orphan", "note": "the badge golden test was removed in the previous commit; no test claims this image" }
+  ]
+}

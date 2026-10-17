@@ -1,0 +1,13 @@
+{
+  "bad-ui-changed-watch": {
+    "expect": ["FAIL native/ios/Tasks/AppDelegate.swift [signoff-ui-changed]", "1 of them user-facing"],
+    "ops": [
+      {
+        "write": {
+          "file": "changed.txt",
+          "content": "native/ios/Tasks/AppDelegate.swift\nsrc/dev-tools/inspector.tsx\n"
+        }
+      }
+    ]
+  }
+}

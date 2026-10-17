@@ -1,0 +1,7 @@
+[
+  { "from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs" },
+  { "from": "scripts/lib/maestro-spawns.mjs", "to": "scripts/lib/maestro-spawns.mjs" },
+  { "from": "repo-templates/scripts/e2e/maestro-args.ts", "to": "templates/scripts/e2e/maestro-args.ts" },
+  { "from": "repo-templates/scripts/e2e/maestro-args.test.ts", "to": "templates/scripts/e2e/maestro-args.test.ts" },
+  { "from": "repo-templates/contracts/debug-links.json", "to": "tests/bases/app/contracts/debug-links.json" }
+]

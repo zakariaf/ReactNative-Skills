@@ -1,0 +1,5 @@
+[
+  { "from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs" },
+  { "from": "scripts/lib/app-modules.mjs", "to": "scripts/lib/app-modules.mjs" },
+  { "from": "repo-templates/src/theme/theme-types.ts", "to": "tests/bases/app/src/theme/theme-types.ts" }
+]

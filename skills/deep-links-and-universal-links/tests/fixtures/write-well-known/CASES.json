@@ -1,0 +1,32 @@
+{
+  "bad-drift": {
+    "expect": [
+      "FAIL well-known/preview.tasks.acme.dev/apple-app-site-association:1 [well-known-drift] differs from the contract and the app config"
+    ],
+    "ops": [
+      {
+        "$comment": "A web path was added to the contract after the files were written.",
+        "json": { "file": "contracts/deep-links.json", "path": ["webPaths", 3], "value": "/tasks" }
+      },
+      {
+        "replace": {
+          "file": "src/features/deep-links/link-routes.ts",
+          "find": "  { path: '/tasks/new' },\n",
+          "with": "  { path: '/tasks/new' },\n  { path: '/tasks' },\n"
+        }
+      }
+    ]
+  },
+  "error-no-hosts": {
+    "expect": ["ERROR [bad-input] nothing to write: contracts/deep-links.json lists no hosts"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/deep-links.json",
+          "path": ["hosts"],
+          "value": { "development": [], "preview": [], "production": [] }
+        }
+      }
+    ]
+  }
+}

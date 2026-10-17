@@ -1,0 +1,280 @@
+{
+  "bad-capture-failed": {
+    "expect": [
+      "FAIL reports/screenshots/ios/raw/phone/ar-dark [screenshot-capture-failed] ios/phone/ar-dark: maestro exited 1, see reports/screenshots/ios/raw/phone/ar-dark"
+    ],
+    "args": "{dir} --platform ios --screenshots",
+    "ops": [
+      { "json": { "file": "reports/screenshots/ios/summary.json", "path": [7], "delete": true } },
+      {
+        "json": {
+          "file": "reports/screenshots/ios/summary.json",
+          "path": [6],
+          "value": {
+            "label": "ios/phone/ar-dark",
+            "actual": null,
+            "baseline": null,
+            "result": {
+              "kind": "capture-failed",
+              "message": "maestro exited 1, see reports/screenshots/ios/raw/phone/ar-dark",
+              "outDir": "reports/screenshots/ios/raw/phone/ar-dark"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "bad-flow-failed": {
+    "expect": [
+      "FAIL .maestro/flows/journeys/02-complete-task-survives-kill.yaml [flow-failed] \"Completing a task offline survives a kill and a relaunch\" ERROR: Assertion is false"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "reports/e2e/ios/junit.xml",
+          "find": "status=\"SUCCESS\">\n      <properties>\n        <property name=\"tags\" value=\"smoke, journeys, offline\"/>\n      </properties>\n    </testcase>",
+          "with": "status=\"ERROR\">\n      <failure>Assertion is false: id: tasks.task-row.task-2 is visible</failure>\n    </testcase>"
+        }
+      }
+    ]
+  },
+  "bad-large-text-failed": {
+    "expect": [
+      "FAIL .maestro/flows/a11y/01-large-text-home.yaml [large-text-failed] phone-ar: \"The home screen grows with the largest text size\" ERROR"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "reports/e2e/ios/large-text/phone-ar/junit.xml",
+          "find": "status=\"SUCCESS\">\n      <properties>",
+          "with": "status=\"ERROR\">\n      <failure>Assertion is false: id: tasks.summary is visible</failure>\n      <properties>"
+        }
+      }
+    ]
+  },
+  "bad-large-text-missing": {
+    "expect": [
+      "FAIL reports/e2e/ios/large-text/tablet-ar/junit.xml [large-text-missing] 1 a11y flow(s) exist but the tablet ar large-text run left no report"
+    ],
+    "ops": [{ "delete": "reports/e2e/ios/large-text/tablet-ar" }]
+  },
+  "bad-large-text-no-locales": {
+    "expect": [
+      "FAIL contracts/e2e.json:1 [large-text-missing] 1 a11y flow(s) exist but contracts/e2e.json largeText.locales is empty"
+    ],
+    "ops": [{ "json": { "file": "contracts/e2e.json", "path": ["largeText"], "delete": true } }]
+  },
+  "bad-large-text-skipped": {
+    "expect": ["[run-filtered] the run skipped the large-text step"],
+    "ops": [{ "json": { "file": "reports/e2e/ios/run.json", "path": ["largeText"], "value": "skipped" } }]
+  },
+  "bad-matrix-incomplete": {
+    "expect": [
+      "FAIL reports/screenshots/ios/summary.json [matrix-incomplete] ios/phone/ar-dark has 1 screenshots, other ios sets have 2"
+    ],
+    "args": "{dir} --platform ios --screenshots",
+    "ops": [{ "json": { "file": "reports/screenshots/ios/summary.json", "path": [7], "delete": true } }]
+  },
+  "bad-network-allowlist": {
+    "expect": [
+      "[network-sockets] the app opened a socket outside allowHosts: ios 0C9E3F8A-51D2-4B7E-9A61-2F4D8C7B1E03 TCP 34.120.1.1:443"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/e2e.json",
+          "path": ["network"],
+          "value": { "mode": "allowlist", "allowHosts": ["api.example.com"] }
+        }
+      },
+      { "json": { "file": "reports/e2e/ios/run.json", "path": ["networkMode"], "value": "allowlist" } },
+      {
+        "write": {
+          "file": "reports/e2e/ios/network.txt",
+          "content": "ios 0C9E3F8A-51D2-4B7E-9A61-2F4D8C7B1E03 TCP 34.120.1.1:443\n"
+        }
+      }
+    ]
+  },
+  "bad-network-missing": {
+    "expect": [
+      "FAIL reports/e2e/ios/network.txt [network-sampler] is missing: every socket sampler creates it when it starts"
+    ],
+    "ops": [{ "delete": "reports/e2e/ios/network.txt" }]
+  },
+  "bad-network-sampler-blind": {
+    "expect": [
+      "FAIL reports/e2e/ios/network-samplers.json [network-sampler] the sampler on tasks-e2e-phone (0C9E3F8A-51D2-4B7E-9A61-2F4D8C7B1E03) found the app in 171 samples but never listed its sockets (last error: lsof: Command failed)"
+    ],
+    "ops": [
+      { "json": { "file": "reports/e2e/ios/network-samplers.json", "path": [0, "listErrors"], "value": 171 } },
+      {
+        "json": {
+          "file": "reports/e2e/ios/network-samplers.json",
+          "path": [0, "lastError"],
+          "value": "lsof: Command failed"
+        }
+      }
+    ]
+  },
+  "bad-network-sampler-dead": {
+    "expect": [
+      "FAIL reports/e2e/ios/network-samplers.json [network-sampler] the sampler on tasks-e2e-tablet (7B2D4E61-9C3A-4F85-B1D0-6E8A2C4F9D17) exited before the end of the run (exit code 1)"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "reports/e2e/ios/network-samplers.json",
+          "path": [1, "problems"],
+          "value": ["exited before the end of the run (exit code 1)"]
+        }
+      }
+    ]
+  },
+  "bad-network-sampler-device-missing": {
+    "expect": [
+      "FAIL reports/e2e/ios/network-samplers.json [network-sampler] tasks-e2e-tablet (7B2D4E61-9C3A-4F85-B1D0-6E8A2C4F9D17) ran flows but has no socket sampler"
+    ],
+    "ops": [{ "json": { "file": "reports/e2e/ios/network-samplers.json", "path": [1], "delete": true } }]
+  },
+  "bad-network-sampler-missing": {
+    "expect": [
+      "FAIL reports/e2e/ios/network-samplers.json [network-sampler] is missing, so no socket sampler was proven alive"
+    ],
+    "ops": [{ "delete": "reports/e2e/ios/network-samplers.json" }]
+  },
+  "bad-network-sampler-never-found-app": {
+    "expect": [
+      "FAIL reports/e2e/ios/network-samplers.json [network-sampler] the sampler on tasks-e2e-phone (0C9E3F8A-51D2-4B7E-9A61-2F4D8C7B1E03) never found the app in 212 samples (last error: pgrep: Command failed)"
+    ],
+    "ops": [
+      { "json": { "file": "reports/e2e/ios/network-samplers.json", "path": [0, "appSamples"], "value": 0 } },
+      {
+        "json": {
+          "file": "reports/e2e/ios/network-samplers.json",
+          "path": [0, "lastError"],
+          "value": "pgrep: Command failed"
+        }
+      }
+    ]
+  },
+  "bad-network-sockets": {
+    "expect": [
+      "FAIL reports/e2e/ios/network.txt:1 [network-sockets] the app opened a socket to another host (offline-only): ios 0C9E3F8A-51D2-4B7E-9A61-2F4D8C7B1E03 TCP 142.250.1.1:443"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "reports/e2e/ios/network.txt",
+          "content": "ios 0C9E3F8A-51D2-4B7E-9A61-2F4D8C7B1E03 TCP 142.250.1.1:443\n"
+        }
+      }
+    ]
+  },
+  "bad-no-flows": {
+    "expect": ["FAIL reports/e2e/ios/junit.xml:1 [no-flows] holds no test case"],
+    "ops": [
+      {
+        "write": {
+          "file": "reports/e2e/ios/junit.xml",
+          "content": "<?xml version='1.0' encoding='UTF-8'?>\n<testsuites>\n  <testsuite name=\"Test Suite\" tests=\"0\" failures=\"0\">\n  </testsuite>\n</testsuites>\n"
+        }
+      }
+    ]
+  },
+  "bad-run-filtered": {
+    "expect": ["FAIL reports/e2e/ios/run.json [run-filtered] the run was filtered with --include-tags smoke"],
+    "ops": [{ "json": { "file": "reports/e2e/ios/run.json", "path": ["includeTags"], "value": "smoke" } }]
+  },
+  "bad-run-record": {
+    "expect": ["FAIL reports/e2e/ios/run.json [run-record] is missing, so this is no runner run"],
+    "ops": [{ "delete": "reports/e2e/ios/run.json" }]
+  },
+  "bad-screenshot-changed": {
+    "expect": [
+      "FAIL .maestro/baselines/ios/phone/en-light/tasks.png [screenshot-changed] ios/phone/en-light/tasks: 1.25% of pixels differ"
+    ],
+    "args": "{dir} --platform ios --screenshots",
+    "ops": [
+      {
+        "replace": {
+          "file": "reports/screenshots/ios/summary.json",
+          "find": "\"kind\": \"match\",\n      \"diffRatio\": 0\n",
+          "with": "\"kind\": \"mismatch\",\n      \"diffRatio\": 0.0125,\n      \"diffPath\": \"reports/screenshots/ios/diff/phone/en-light/tasks.png\"\n",
+          "occurrence": 1
+        }
+      }
+    ]
+  },
+  "bad-screenshots-wrong-platform": {
+    "expect": [
+      "FAIL reports/screenshots/ios/summary.json [screenshot-platform] the row \"android/phone/en-light/tasks\" is not an ios screenshot"
+    ],
+    "args": "{dir} --platform ios --screenshots",
+    "ops": [
+      {
+        "replace": {
+          "file": "reports/screenshots/ios/summary.json",
+          "find": "\"label\": \"ios/",
+          "with": "\"label\": \"android/",
+          "all": true
+        }
+      }
+    ]
+  },
+  "bad-smoke-not-run": {
+    "expect": ["FAIL .maestro/flows/journeys/02-complete-task-survives-kill.yaml [smoke-not-run]"],
+    "ops": [
+      {
+        "replace": {
+          "file": "reports/e2e/ios/junit.xml",
+          "find": "file=\".maestro/flows/journeys/02-complete-task-survives-kill.yaml\"",
+          "with": "file=\".maestro/flows/journeys/03-other.yaml\""
+        }
+      }
+    ]
+  },
+  "error-no-junit": {
+    "expect": ["ERROR [bad-input] nothing to check: reports/e2e/ios/junit.xml does not exist"],
+    "ops": [{ "delete": "reports/e2e/ios/junit.xml" }]
+  },
+  "error-no-platform": { "expect": ["ERROR [bad-input] pass --platform ios or --platform android"], "args": "{dir}" },
+  "error-no-summary": {
+    "expect": ["ERROR [bad-input] nothing to check: reports/screenshots/ios/summary.json does not exist"],
+    "args": "{dir} --platform ios --screenshots",
+    "ops": [{ "delete": "reports/screenshots/ios/summary.json" }]
+  },
+  "pass-android": {
+    "expect": ["evidence: End-to-end (android): 2/2 flows pass"],
+    "args": "{dir} --platform android",
+    "ops": [
+      { "copy": { "from": "reports/e2e/ios", "to": "reports/e2e/android" } },
+      { "json": { "file": "reports/e2e/android/run.json", "path": ["platform"], "value": "android" } }
+    ]
+  },
+  "pass-network-off": {
+    "expect": ["evidence: Network: no runtime proof (contracts/e2e.json network.mode off)"],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/e2e.json",
+          "path": ["network"],
+          "value": { "mode": "off", "why": "local mock server only" }
+        }
+      },
+      { "json": { "file": "reports/e2e/ios/run.json", "path": ["networkMode"], "value": "off" } },
+      { "delete": "reports/e2e/ios/network.txt" }
+    ]
+  },
+  "pass-not-adopted": {
+    "expect": ["NOT APPLICABLE: the app has no Maestro E2E yet"],
+    "ops": [
+      { "delete": [".maestro", "contracts/e2e.json"] },
+      { "json": { "file": "package.json", "path": ["scripts"], "value": {} } }
+    ]
+  },
+  "pass-screenshots": {
+    "expect": ["evidence: Screenshots (ios): 8 captured in 4 sets, 0 changed"],
+    "args": "{dir} --platform ios --screenshots"
+  }
+}

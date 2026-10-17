@@ -1,0 +1,50 @@
+{
+  "base": [
+    "@tests/bases/app",
+    "@tests/bases/decoys"
+  ],
+  "ops": [
+    {
+      "write": {
+        "file": ".agents/skills/decoy/SKILL.md",
+        "content": "---\nname: decoy\ndescription: Planted findings that every scan must skip.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/decoy/SKILL.md",
+        "content": "---\nname: decoy\ndescription: Planted findings that every scan must skip.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/vendor/kit/SKILL.md",
+        "content": "---\nname: decoy\ndescription: Planted findings that every scan must skip.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "dist/variant-proof/production/_expo/static/js/ios/entry-5f0c1e9a.js",
+        "content": "__d(function(g,r,i,a,m,e,d){\"use strict\";var t=null;e.TEST_ONLY=t;e.variant=\"production\"},412,[]);\n__d(function(g,r,i,a,m,e,d){e.title=\"Tasks\"},413,[]);\n"
+      }
+    },
+    {
+      "write": {
+        "file": "dist/variant-proof/development/_expo/static/js/ios/entry-91b2d7c4.js",
+        "content": "__d(function(g,r,i,a,m,e,d){\"use strict\";var t=r(d[0]);e.TEST_ONLY=t;e.variant=\"development\"},412,[414]);\n__d(function(g,r,i,a,m,e,d){e.TEST_BUILD_SENTINEL=\"TASKS_TEST_BUILD_ONLY\"},414,[]);\n"
+      }
+    },
+    {
+      "write": {
+        "file": "dist/variant-proof/production/_expo/static/js/ios/entry-5f0c1e9a.js.map",
+        "content": "{\"version\":3,\"sources\":[\"TASKS_TEST_BUILD_ONLY\"]}\n"
+      }
+    },
+    {
+      "write": {
+        "file": "dist/variant-proof/production/metadata.json",
+        "content": "{\"version\":0,\"bundler\":\"metro\"}\n"
+      }
+    }
+  ]
+}

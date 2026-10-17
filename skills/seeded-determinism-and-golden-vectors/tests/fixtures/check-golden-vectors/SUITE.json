@@ -1,0 +1,15 @@
+{
+  "base": [
+    "@tests/bases/app",
+    {
+      "templates": true,
+      "firstLinePath": true,
+      "fill": {
+        "__FEATURE__": "daily-focus",
+        "__FEATURE_PASCAL__": "DailyFocus",
+        "__FEATURE_CAMEL__": "dailyFocus",
+        "__FEATURE_CONST__": "DAILY_FOCUS"
+      }
+    }
+  ]
+}

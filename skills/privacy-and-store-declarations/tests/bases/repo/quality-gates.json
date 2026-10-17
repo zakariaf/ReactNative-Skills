@@ -1,0 +1,4 @@
+{
+  "$comment": "Fixture: only the gatedPaths the privacy audit reads (the canonical file holds the whole gate set).",
+  "gatedPaths": ["quality-gates.json", "contracts/dependency-policy.json", "contracts/network-baseline.json", "contracts/privacy.json"]
+}

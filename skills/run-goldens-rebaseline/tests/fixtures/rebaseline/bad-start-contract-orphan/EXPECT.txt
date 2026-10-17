@@ -1,0 +1,2 @@
+FAIL src/features/tasks/tasks-moved.golden.test.ts.snap.ios:1 [contract-entry-changed] is an orphan (src/features/tasks/tasks-moved.golden.test.ts is gone) holding 1 contract entry
+RESULT: FAIL (1 problems)

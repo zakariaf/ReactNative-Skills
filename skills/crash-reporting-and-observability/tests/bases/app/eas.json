@@ -1,0 +1,23 @@
+{
+  "cli": { "version": ">= 18.0.0", "appVersionSource": "remote" },
+  "build": {
+    "base": { "node": "22.23.1" },
+    "development": {
+      "extends": "base",
+      "developmentClient": true,
+      "environment": "development",
+      "env": { "APP_VARIANT": "development", "EXPO_PUBLIC_APP_VARIANT": "development", "SENTRY_DISABLE_AUTO_UPLOAD": "true" }
+    },
+    "preview": {
+      "extends": "base",
+      "environment": "preview",
+      "env": { "APP_VARIANT": "preview", "EXPO_PUBLIC_APP_VARIANT": "preview" }
+    },
+    "production": {
+      "extends": "base",
+      "environment": "production",
+      "autoIncrement": true,
+      "env": { "APP_VARIANT": "production", "EXPO_PUBLIC_APP_VARIANT": "production" }
+    }
+  }
+}

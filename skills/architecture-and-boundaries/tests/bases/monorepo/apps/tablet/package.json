@@ -1,0 +1,15 @@
+{
+  "name": "@acme/tablet",
+  "version": "1.0.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "dependencies": {
+    "@acme/core": "*",
+    "@acme/ui": "*",
+    "expo": "~57.0.26",
+    "expo-haptics": "~57.0.3",
+    "expo-router": "~57.0.24",
+    "react": "19.2.3",
+    "react-native": "0.86.3"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "base": [
+    "@tests/bases/configs-app",
+    {
+      "templates": true,
+      "firstLinePath": true
+    }
+  ],
+  "renames": {
+    "dot-prettierrc.json": ".prettierrc.json",
+    "dot-prettierignore": ".prettierignore"
+  },
+  "ops": [
+    {
+      "replace": {
+        "file": ".prettierignore",
+        "find": "# tsconfig.json \"exclude\".\n",
+        "with": "# tsconfig.json \"exclude\".\nhandbook/\n"
+      }
+    },
+    {
+      "replace": {
+        "file": "eslint.config.mjs",
+        "find": "const PRE_EXISTING = [];",
+        "with": "const PRE_EXISTING = ['handbook/**'];"
+      }
+    },
+    {
+      "replace": {
+        "file": "tsconfig.json",
+        "find": "    \"skills\",\n",
+        "with": "    \"skills\",\n    \"handbook\",\n"
+      }
+    }
+  ]
+}

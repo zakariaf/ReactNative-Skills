@@ -1,0 +1,8 @@
+{
+  "$schema": "./canvas-input.schema.json",
+  "surfaces": [
+    { "id": "__SURFACE__", "dir": "src/features/__FEATURE__/canvas", "input": "intents" }
+  ],
+  "buttonComponents": ["PressableSurface"],
+  "gestureExempt": []
+}

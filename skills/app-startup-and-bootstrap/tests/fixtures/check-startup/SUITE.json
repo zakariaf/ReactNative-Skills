@@ -1,0 +1,1 @@
+{ "base": ["@tests/bases/app", { "templates": true, "firstLinePath": true }] }

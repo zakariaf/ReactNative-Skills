@@ -1,0 +1,7 @@
+/ios
+/android
+build/
+*.jks
+*.keystore
+*.aab
+credentials.json

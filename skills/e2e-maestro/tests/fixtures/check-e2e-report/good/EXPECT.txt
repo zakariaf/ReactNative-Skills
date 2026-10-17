@@ -1,0 +1,4 @@
+evidence: End-to-end (ios): 2/2 flows pass, quarantined: none
+evidence: Network (ios, offline-only): no disallowed socket
+2 sampler(s) alive to the end, 276 samples
+evidence: Large text (ios): 4/4 a11y flow runs pass

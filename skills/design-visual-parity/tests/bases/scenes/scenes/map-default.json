@@ -1,0 +1,151 @@
+{
+ "frame": "map-default",
+ "device": "test-phone",
+ "kind": "phone",
+ "size": {
+  "w": 160,
+  "h": 300
+ },
+ "background": "#FFFFFF",
+ "palettes": {
+  "dark": {
+   "#FFFFFF": "#111418",
+   "#1A1D23": "#F2F4F7",
+   "#F2F4F7": "#1E232B",
+   "#C9D1DC": "#3A4250",
+   "#4A5160": "#B8BFCC",
+   "#6B7280": "#9AA3B2",
+   "#2F6FED": "#5B8DF6",
+   "#1B3F8A": "#9DB8F9",
+   "#0B0D12": "#000000",
+   "#E8EEF9": "#202A3A",
+   "#C62828": "#FF8A80",
+   "#7A8599": "#5A6577"
+  }
+ },
+ "renders": [
+  {
+   "theme": "light",
+   "lang": "en"
+  }
+ ],
+ "elements": [
+  {
+   "testID": "map.screen",
+   "rect": [
+    0,
+    0,
+    160,
+    300
+   ]
+  },
+  {
+   "testID": "map.title",
+   "rect": [
+    12,
+    24,
+    60,
+    18
+   ],
+   "runs": [
+    {
+     "text": "Places",
+     "box": [
+      12,
+      24,
+      46,
+      18
+     ],
+     "color": "#1A1D23",
+     "font": "700 14px Demo Sans",
+     "ink": [
+      12,
+      27,
+      44,
+      12
+     ]
+    }
+   ]
+  },
+  {
+   "testID": "map.canvas",
+   "rect": [
+    0,
+    50,
+    160,
+    200
+   ],
+   "fill": "#E8EEF9",
+   "border": {
+    "w": 1,
+    "color": "#7A8599",
+    "style": "dashed"
+   }
+  },
+  {
+   "testID": "map.legend",
+   "rect": [
+    16,
+    200,
+    128,
+    36
+   ],
+   "fill": "#FFFFFF",
+   "border": {
+    "w": 2,
+    "color": "#1A1D23"
+   },
+   "runs": [
+    {
+     "text": "3 places nearby",
+     "box": [
+      24,
+      210,
+      100,
+      14
+     ],
+     "color": "#1A1D23",
+     "font": "400 14px Demo Sans",
+     "ink": [
+      24,
+      213,
+      96,
+      9
+     ]
+    }
+   ]
+  }
+ ],
+ "captures": [
+  {
+   "theme": "light",
+   "lang": "en",
+   "patch": {
+    "region": {
+     "x": 0,
+     "y": 50,
+     "w": 160,
+     "h": 200
+    },
+    "elements": {
+     "map.canvas": {
+      "fill": "#C9E4C5",
+      "border": null
+     }
+    },
+    "add": [
+     {
+      "testID": "map.pin",
+      "rect": [
+       60,
+       90,
+       14,
+       14
+      ],
+      "fill": "#C62828"
+     }
+    ]
+   }
+  }
+ ]
+}

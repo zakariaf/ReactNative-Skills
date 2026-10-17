@@ -1,0 +1,305 @@
+{
+  "bad-secret-env-file": {
+    "expect": ["[bundle-secret] the bundle contains the value of SENTRY_AUTH_TOKEN (from .env.production.local)"],
+    "args": "{dir} --bundle dist/variant-proof/production --variant production --env-file .env.production.local",
+    "ops": [
+      {
+        "write": {
+          "file": ".env.production.local",
+          "content": "SENTRY_AUTH_TOKEN=tok-0123456789abcdef\nEXPO_PUBLIC_TASKS_API_URL=https://api.example.com\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "dist/variant-proof/production/_expo/static/js/ios/entry-5f0c1e9a.js",
+          "find": "e.title=\"Tasks\"",
+          "with": "e.title=\"Tasks\";e.t=\"tok-0123456789abcdef\""
+        }
+      }
+    ]
+  },
+  "bad-secret-in-hermes-bytecode": {
+    "expect": [
+      "FAIL dist/variant-proof/production/_expo/static/js/ios/entry-packed.hbc [bundle-secret] the bundle contains an OpenAI API key"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "dist/variant-proof/production/_expo/static/js/ios/entry-packed.hbc",
+          "content": "Æ\u001f¼\u0003\u0000\u0000\u0000\u0000production\u0000Tasks\u0000passed to VirtualizedList._createRenderMask-pXroj-Rn5kRn5kRn5k0000aaaa1111bbbbatchedUpdatesImpl\u0000\u0001\u0002"
+        }
+      },
+      {
+        "replace": {
+          "file": "dist/variant-proof/production/_expo/static/js/ios/entry-packed.hbc",
+          "find": "Mask-pXroj-",
+          "with": "Mask-proj-"
+        }
+      }
+    ]
+  },
+  "bad-secret-llm": {
+    "expect": [
+      "FAIL dist/variant-proof/production/_expo/static/js/ios/entry-5f0c1e9a.js:2 [bundle-secret] the bundle contains an OpenAI API key"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "dist/variant-proof/production/_expo/static/js/ios/entry-5f0c1e9a.js",
+          "find": "e.title=\"Tasks\"",
+          "with": "e.title=\"Tasks\";e.k=\"sk-pXroj-0000aaaa1111bbbb2222cccc3333dddd\""
+        }
+      },
+      {
+        "replace": {
+          "file": "dist/variant-proof/production/_expo/static/js/ios/entry-5f0c1e9a.js",
+          "find": "sk-pXroj-",
+          "with": "sk-proj-"
+        }
+      }
+    ]
+  },
+  "bad-secret-pattern": {
+    "expect": [
+      "FAIL dist/variant-proof/production/_expo/static/js/ios/entry-5f0c1e9a.js:2 [bundle-secret] the bundle contains a PEM private key"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "dist/variant-proof/production/_expo/static/js/ios/entry-5f0c1e9a.js",
+          "find": "e.title=\"Tasks\"",
+          "with": "e.title=\"Tasks\";e.k=\"-----BEGIN PRIVATE XKEY-----\""
+        }
+      },
+      {
+        "replace": {
+          "file": "dist/variant-proof/production/_expo/static/js/ios/entry-5f0c1e9a.js",
+          "find": "PRIVATE XKEY",
+          "with": "PRIVATE KEY"
+        }
+      }
+    ]
+  },
+  "bad-secret-without-gate": {
+    "expect": [
+      "SKIP src/test-only.ts [bundle-sentinel] not yet created (debug-menu-and-test-hooks creates it)",
+      "FAIL dist/variant-proof/production/_expo/static/js/ios/entry-5f0c1e9a.js:2 [bundle-secret] the bundle contains a PEM private key"
+    ],
+    "ops": [
+      { "delete": ["src/test-only.ts", "src/test-only-entry.ts"] },
+      {
+        "replace": {
+          "file": "dist/variant-proof/production/_expo/static/js/ios/entry-5f0c1e9a.js",
+          "find": "e.title=\"Tasks\"",
+          "with": "e.title=\"Tasks\";e.k=\"-----BEGIN PRIVATE XKEY-----\""
+        }
+      },
+      {
+        "replace": {
+          "file": "dist/variant-proof/production/_expo/static/js/ios/entry-5f0c1e9a.js",
+          "find": "PRIVATE XKEY",
+          "with": "PRIVATE KEY"
+        }
+      }
+    ]
+  },
+  "bad-sentinel-in-hermes-bytecode": {
+    "expect": ["[bundle-sentinel] the production bundle contains the test-only sentinel \"TASKS_TEST_BUILD_ONLY\""],
+    "args": "{dir} --bundle dist/variant-proof/hbc --variant production",
+    "ops": [
+      {
+        "write": {
+          "file": "dist/variant-proof/hbc/_expo/static/js/ios/entry-77aa.hbc",
+          "base64": "xh+8A8EDGcgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwcm9kdWN0aW9uAFRBU0tTX1RFU1RfQlVJTERfT05MWQAAAQI="
+        }
+      }
+    ]
+  },
+  "bad-sentinel-in-production": {
+    "expect": [
+      "FAIL dist/variant-proof/production/_expo/static/js/ios/entry-5f0c1e9a.js:1 [bundle-sentinel] the production bundle contains the test-only sentinel \"TASKS_TEST_BUILD_ONLY\""
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "dist/variant-proof/production/_expo/static/js/ios/entry-5f0c1e9a.js",
+          "find": "var t=null;",
+          "with": "var t={s:\"TASKS_TEST_BUILD_ONLY\"};"
+        }
+      }
+    ]
+  },
+  "bad-sentinel-missing-in-development": {
+    "expect": [
+      "FAIL dist/variant-proof/development [bundle-sentinel] the development bundle lacks the test-only sentinel \"TASKS_TEST_BUILD_ONLY\""
+    ],
+    "args": "{dir} --bundle dist/variant-proof/development --variant development",
+    "ops": [
+      {
+        "replace": {
+          "file": "dist/variant-proof/development/_expo/static/js/ios/entry-91b2d7c4.js",
+          "find": "e.TEST_BUILD_SENTINEL=\"TASKS_TEST_BUILD_ONLY\"",
+          "with": "e.debug=null"
+        }
+      }
+    ]
+  },
+  "bad-sentinel-outside-src-in-production": {
+    "expect": [
+      "FAIL dist/variant-proof/production/_expo/static/js/ios/entry-5f0c1e9a.js:2 [bundle-sentinel] the production bundle contains the test-only sentinel \"TASKS_DEV_TOOLS_ONLY\""
+    ],
+    "ops": [
+      { "rename": { "from": "src/app", "to": "app" } },
+      { "delete": ["src/test-only.ts", "src/test-only-entry.ts"] },
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "import { TEST_ONLY } from '@/test-only';\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "  TEST_ONLY?.recordScreen('tasks');\n",
+          "with": ""
+        }
+      },
+      {
+        "write": {
+          "file": "app/_layout.tsx",
+          "content": "// app/_layout.tsx\nimport { Stack } from 'expo-router';\n\nconst DEV_TOOLS: unknown = process.env.EXPO_PUBLIC_APP_VARIANT === 'production' ? null : require('../dev/dev-tools');\n\nexport default function RootLayout(): React.JSX.Element {\n  void DEV_TOOLS;\n  return <Stack />;\n}\n"
+        }
+      },
+      {
+        "write": { "file": "dev/dev-tools.ts", "content": "// dev/dev-tools.ts\nexport function resetAll(): void {}\n" }
+      },
+      {
+        "replace": {
+          "file": "dev/dev-tools.ts",
+          "find": "export function resetAll(): void {}\n",
+          "with": "export function resetAll(): void {}\n\nexport const DEV_TOOLS_SENTINEL = 'TASKS_DEV_TOOLS_ONLY';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "dist/variant-proof/production/_expo/static/js/ios/entry-5f0c1e9a.js",
+          "find": "e.title=\"Tasks\"",
+          "with": "e.title=\"Tasks\";e.s=\"TASKS_DEV_TOOLS_ONLY\""
+        }
+      }
+    ]
+  },
+  "bad-sentinel-unknown": {
+    "expect": [
+      "FAIL src/test-only.ts:1 [bundle-sentinel] src/test-only.ts gates test-only code, but no test-only sentinel is known: the bundle proof cannot tell whether that code shipped"
+    ],
+    "ops": [{ "delete": "src/test-only-entry.ts" }]
+  },
+  "bad-sentinel-unknown-root-app-gate": {
+    "expect": [
+      "FAIL app/_layout.tsx:4 [bundle-sentinel] app/_layout.tsx gates test-only code, but no test-only sentinel is known"
+    ],
+    "ops": [
+      { "rename": { "from": "src/app", "to": "app" } },
+      { "delete": ["src/test-only.ts", "src/test-only-entry.ts"] },
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "import { TEST_ONLY } from '@/test-only';\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/features/tasks/use-tasks-model.ts",
+          "find": "  TEST_ONLY?.recordScreen('tasks');\n",
+          "with": ""
+        }
+      },
+      {
+        "write": {
+          "file": "app/_layout.tsx",
+          "content": "// app/_layout.tsx\nimport { Stack } from 'expo-router';\n\nconst DEV_TOOLS: unknown = process.env.EXPO_PUBLIC_APP_VARIANT === 'production' ? null : require('../dev/dev-tools');\n\nexport default function RootLayout(): React.JSX.Element {\n  void DEV_TOOLS;\n  return <Stack />;\n}\n"
+        }
+      },
+      {
+        "write": { "file": "dev/dev-tools.ts", "content": "// dev/dev-tools.ts\nexport function resetAll(): void {}\n" }
+      }
+    ]
+  },
+  "error-no-bundle-files": {
+    "expect": ["ERROR [bad-input] nothing to check: no bundle"],
+    "args": "{dir} --bundle src/app --variant production",
+    "ops": []
+  },
+  "error-no-bundle-option": {
+    "expect": ["ERROR [bad-input] nothing to check: no --bundle given"],
+    "args": "{dir} --variant production",
+    "ops": []
+  },
+  "error-unknown-variant": {
+    "expect": ["ERROR [bad-input] --variant must be one of development|preview|production, got \"staging\""],
+    "args": "{dir} --bundle dist/variant-proof/production --variant staging",
+    "ops": []
+  },
+  "pass-config-sentinel": {
+    "expect": ["0 problems"],
+    "args": "{dir} --bundle dist/variant-proof/development --variant development",
+    "ops": [
+      {
+        "write": {
+          "file": "rn-skills.config.json",
+          "content": "{ \"testOnlySentinels\": [\"TASKS_DEBUG_MENU_ONLY\"] }\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "dist/variant-proof/development/_expo/static/js/ios/entry-91b2d7c4.js",
+          "find": "e.variant=\"development\"",
+          "with": "e.variant=\"development\";e.menu=\"TASKS_DEBUG_MENU_ONLY\""
+        }
+      }
+    ]
+  },
+  "pass-development": {
+    "expect": ["check-variant-bundle: 1 bundle files checked, 0 problems"],
+    "args": "{dir} --bundle dist/variant-proof/development --variant development",
+    "ops": []
+  },
+  "pass-hermes-bytecode": {
+    "expect": ["check-variant-bundle: 1 bundle files checked, 0 problems"],
+    "args": "{dir} --bundle dist/variant-proof/hbc --variant production",
+    "ops": [
+      {
+        "write": {
+          "file": "dist/variant-proof/hbc/_expo/static/js/ios/entry-77aa.hbc",
+          "base64": "xh+8A8EDGcgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwcm9kdWN0aW9uAFRhc2tzAFRFU1RfT05MWQABAg=="
+        }
+      }
+    ]
+  },
+  "pass-hermes-packed-lookalikes": {
+    "expect": ["check-variant-bundle: 2 bundle files checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "dist/variant-proof/production/_expo/static/js/ios/entry-packed.hbc",
+          "content": "Æ\u001f¼\u0003\u0000\u0000\u0000\u0000production\u0000Tasks\u0000createRenderMask-image-0123456789abcdefghij\u0000desk-0123456789abcdefghijklmnop\u0000task-list-item-00aa11bb22cc33dd44ee55ff66\u0000pk_test_0000aaaa1111bbbb2222\u0001\u0002"
+        }
+      }
+    ]
+  },
+  "pass-no-test-only-gate": {
+    "expect": [
+      "SKIP src/test-only.ts [bundle-sentinel] not yet created (debug-menu-and-test-hooks creates it)",
+      "check-variant-bundle: 1 bundle files checked, 0 problems, 1 skipped"
+    ],
+    "ops": [{ "delete": ["src/test-only.ts", "src/test-only-entry.ts"] }]
+  },
+  "pass-preview-explicit-sentinel": {
+    "expect": ["0 problems"],
+    "args": "{dir} --bundle dist/variant-proof/development --variant preview --sentinel TASKS_TEST_BUILD_ONLY",
+    "ops": []
+  }
+}

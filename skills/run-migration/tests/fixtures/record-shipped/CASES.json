@@ -1,0 +1,126 @@
+{
+  "bad-not-ready": {
+    "expect": [
+      "FAIL test/sqlite/v0002-add-list-sort-order.test.ts:1 [content-test] version 2 (add-list-sort-order) has no content test",
+      "record-shipped: 8 versions and replays checked, 1 problems"
+    ],
+    "ops": [{ "delete": "test/sqlite/v0002-add-list-sort-order.test.ts" }]
+  },
+  "bad-replay-fails": {
+    "expect": ["FAIL src/data/migrations/fixtures/db-v1.sql:1 [every-path] upgrading db-v1 to v2 fails at version 2"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/migrations/v0002-add-list-sort-order.ts",
+          "find": "CREATE INDEX lists_by_sort_order",
+          "with": "INSERT INTO lists (id, name, created_at_ms) VALUES (1, 'Inbox', 0);\nCREATE INDEX lists_by_sort_order"
+        }
+      }
+    ]
+  },
+  "bad-step-not-in-list": {
+    "expect": [
+      "FAIL src/data/migrations/migrations.ts:1 [bump-by-one] step file v0002-add-list-sort-order.ts is not imported by migrations.ts"
+    ],
+    "ops": [
+      {
+        "$comment": "The step and its frozen db-v2.sql exist, but the list still ends at v1: no build runs v2 and the replay never loads db-v2.sql.",
+        "replace": {
+          "file": "src/data/migrations/migrations.ts",
+          "find": "import { ADD_LIST_SORT_ORDER } from './v0002-add-list-sort-order';\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/migrations/migrations.ts",
+          "find": "[CREATE_LISTS_AND_TASKS, ADD_LIST_SORT_ORDER]",
+          "with": "[CREATE_LISTS_AND_TASKS]"
+        }
+      }
+    ]
+  },
+  "bad-step-not-in-list-no-replay": {
+    "expect": [
+      "FAIL src/data/migrations/migrations.ts:1 [bump-by-one] step file v0002-add-list-sort-order.ts is not imported by migrations.ts",
+      "node:sqlite rules skipped (--no-replay)"
+    ],
+    "args": "{dir} --build 1.1.0+12 --date 2026-10-14 --no-replay",
+    "ops": [
+      {
+        "$comment": "The step and its frozen db-v2.sql exist, but the list still ends at v1: no build runs v2 and the replay never loads db-v2.sql.",
+        "replace": {
+          "file": "src/data/migrations/migrations.ts",
+          "find": "import { ADD_LIST_SORT_ORDER } from './v0002-add-list-sort-order';\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "src/data/migrations/migrations.ts",
+          "find": "[CREATE_LISTS_AND_TASKS, ADD_LIST_SORT_ORDER]",
+          "with": "[CREATE_LISTS_AND_TASKS]"
+        }
+      }
+    ]
+  },
+  "bad-two-pending": {
+    "expect": ["FAIL src/data/migrations/v0002-add-list-sort-order.ts:1 [bump-by-one] 2 versions are pending (v1, v2)"],
+    "ops": [{ "json": { "file": "contracts/schema-ledger.json", "path": ["shipped"], "value": [] } }]
+  },
+  "error-bad-date": {
+    "expect": ["ERROR [bad-input] --date 14/10/2026 is not YYYY-MM-DD"],
+    "args": "{dir} --build 1.1.0+12 --date 14/10/2026",
+    "ops": []
+  },
+  "error-no-build": { "expect": ["ERROR [bad-input] --build is required"], "args": "{dir}", "ops": [] },
+  "error-no-database": {
+    "expect": ["ERROR [bad-input] nothing to record: no src/data/migrations/migrations.ts"],
+    "ops": [{ "delete": "src/data/migrations" }]
+  },
+  "error-no-ledger": {
+    "expect": ["ERROR [bad-input] contracts/schema-ledger.json does not exist"],
+    "ops": [{ "delete": "contracts/schema-ledger.json" }]
+  },
+  "pass-adopt": {
+    "expect": [
+      "WOULD RECORD v1 create-lists-and-tasks: step 448a85393590, fixture 08cc5e6b8ee8, first shipped in before-ledger on 2026-10-14",
+      "WOULD RECORD v2 add-list-sort-order"
+    ],
+    "args": "{dir} --build before-ledger --date 2026-10-14 --adopt",
+    "ops": [{ "delete": "contracts/schema-ledger.json" }]
+  },
+  "pass-adopt-no-contracts-dir": {
+    "expect": [
+      "RECORDED v1 create-lists-and-tasks: step 448a85393590, fixture 08cc5e6b8ee8, first shipped in before-ledger on 2026-10-14",
+      "RECORDED v2 add-list-sort-order",
+      "contracts/schema-ledger.json now lists v1..v2",
+      "RESULT: PASS"
+    ],
+    "args": "{dir} --build before-ledger --date 2026-10-14 --adopt --yes",
+    "ops": [{ "delete": "contracts" }]
+  },
+  "pass-adopt-without-content-test": {
+    "expect": [
+      "WOULD RECORD v2 add-list-sort-order: step 3cc859f32bd9, fixture cb7f80fcfcf4, first shipped in before-ledger on 2026-10-14 (no content test: shipped before the ledger)"
+    ],
+    "args": "{dir} --build before-ledger --date 2026-10-14 --adopt",
+    "ops": [{ "delete": ["contracts/schema-ledger.json", "test/sqlite/v0002-add-list-sort-order.test.ts"] }]
+  },
+  "pass-nothing-pending": {
+    "expect": ["nothing to record: every version up to v2 is in contracts/schema-ledger.json"],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/schema-ledger.json",
+          "content": "{\n  \"$schema\": \"./schema-ledger.schema.json\",\n  \"$comment\": \"Every database schema version that ever reached a device (store, TestFlight, Play testing, a preview build, an EAS Update), in order, with the sha256 of its step file and frozen fixture. Append only: record-shipped adds an entry when a build or update with a new version first leaves the machine.\",\n  \"shipped\": [\n    {\n      \"version\": 1,\n      \"name\": \"create-lists-and-tasks\",\n      \"stepSha256\": \"448a853935900bcff7c0258edc03b5e1f0d6dd5b95894a64d85698dac7837338\",\n      \"fixtureSha256\": \"08cc5e6b8ee8ff48de9cd3595301dc573c9d594eaa7cba8f07a935385b18e6fd\",\n      \"firstShippedIn\": \"1.0.0 (1)\",\n      \"shippedOn\": \"2026-09-14\"\n    },\n    {\n      \"version\": 2,\n      \"name\": \"add-list-sort-order\",\n      \"stepSha256\": \"3cc859f32bd9a09e14ebeb92a175f5cdc7bd82c2d376911183bd42deda7e3fa0\",\n      \"fixtureSha256\": \"cb7f80fcfcf41a5bc29a38714ef48a4c26240176e3e77117b1eb2a820af24c22\",\n      \"firstShippedIn\": \"1.1.0 (12)\",\n      \"shippedOn\": \"2026-10-14\"\n    }\n  ]\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-yes": {
+    "expect": ["RECORDED v2 add-list-sort-order: step 3cc859f32bd9", "contracts/schema-ledger.json now lists v1..v2"],
+    "args": "{dir} --build 1.1.0+12 --date 2026-10-14 --yes",
+    "ops": []
+  }
+}

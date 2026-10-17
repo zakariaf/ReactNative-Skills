@@ -1,0 +1,6 @@
+{
+  "productionAppIds": ["com.example.tasks"],
+  "network": { "mode": "offline-only" },
+  "largeText": { "locales": ["en", "ar"] },
+  "screenshots": { "locales": ["en", "ar"], "devices": ["phone"] }
+}

@@ -1,0 +1,7 @@
+{
+  "base": "good",
+  "ops": [
+    { "write": { "file": "vendor/ui-kit/SKILL.md", "lines": ["---", "name: ui-kit", "description: Checks a vendored kit. Use when testing. Not for apps (none).", "---"] } },
+    { "write": { "file": "vendor/ui-kit/tests/fixtures/bad-planted/src/planted.ts", "lines": ["// A vendored skill's fixture: the scan must prune the folder that holds its SKILL.md.", "export const planted = '__FILL_PATTERN__';"] } }
+  ]
+}

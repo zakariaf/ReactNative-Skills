@@ -1,0 +1,132 @@
+{
+  "bad-doc-checksum": {
+    "expect": ["[checksum]", "current: checksum"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.sql",
+          "find": "\"tasksCompleted\":412",
+          "with": "\"tasksCompleted\":413",
+          "occurrence": 1
+        }
+      }
+    ]
+  },
+  "bad-doc-missing-backup": {
+    "expect": ["[slot-missing]", "the backup slot is missing"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.sql",
+          "find": "INSERT INTO document_slots [^\\n]*VALUES \\('backup'[^\\n]*\\n",
+          "with": "",
+          "regex": true
+        }
+      }
+    ]
+  },
+  "bad-doc-other-app": {
+    "expect": ["[app-id]", "appId is \"tasks-app\", expected \"notes-app\""],
+    "args": "{dir}/app.sql --expect-version 2 --max-version 2 --document --app-id notes-app"
+  },
+  "bad-doc-quarantine": {
+    "expect": ["[quarantine]", "document_quarantine holds 1 row(s)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.sql",
+          "find": "PRAGMA user_version = 2;",
+          "with": "INSERT INTO document_quarantine (quarantined_at_ms, slot, reason, schema_version, payload) VALUES (1, 'current', 'checksum', 1, '{}');\nPRAGMA user_version = 2;"
+        }
+      }
+    ]
+  },
+  "bad-doc-version-mismatch": {
+    "expect": ["[schema-version]", "current: payload schemaVersion 1 differs from the row's schema_version 2"],
+    "args": "{dir}/app.sql --expect-version 2 --max-version 2 --document --app-id tasks-app",
+    "ops": [{ "replace": { "file": "app.sql", "find": "VALUES ('current', 1, ", "with": "VALUES ('current', 2, " } }]
+  },
+  "bad-foreign-key": {
+    "expect": ["[foreign-keys]", "1 row(s) break a foreign key (first: tasks rowid 9 -> lists)"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.sql",
+          "find": "PRAGMA user_version = 2;",
+          "with": "INSERT INTO tasks (id, list_id, title, is_done, created_at_ms) VALUES (9, 99, 'Orphan', 0, 1);\nPRAGMA user_version = 2;"
+        }
+      }
+    ]
+  },
+  "bad-integrity": {
+    "expect": ["[integrity]", "CHECK constraint failed in tasks"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.sql",
+          "find": "PRAGMA user_version = 2;",
+          "with": "PRAGMA ignore_check_constraints = ON;\nUPDATE tasks SET is_done = 7 WHERE id = 1;\nPRAGMA user_version = 2;"
+        }
+      }
+    ]
+  },
+  "bad-never-migrated": {
+    "expect": ["[user-version]", "user_version is 0: no migration ever completed on this file"],
+    "ops": [
+      { "replace": { "file": "app.sql", "find": "PRAGMA user_version = 2;", "with": "PRAGMA user_version = 0;" } }
+    ]
+  },
+  "bad-newer-version": {
+    "expect": ["[newer-version]", "user_version 3 is newer than 2"],
+    "ops": [
+      { "replace": { "file": "app.sql", "find": "PRAGMA user_version = 2;", "with": "PRAGMA user_version = 3;" } }
+    ]
+  },
+  "bad-no-document-table": {
+    "expect": ["[no-document-table]", "the database has no document_slots table"],
+    "args": "{dir}/app.sql --expect-version 1 --document",
+    "base": [{ "from": "@skill/templates/src/data/migrations/fixtures/db-v1.sql", "to": "app.sql" }]
+  },
+  "bad-not-a-database": {
+    "expect": ["[open]", "not a readable SQLite database"],
+    "args": "{dir}/app.db --expect-version 2",
+    "ops": [
+      {
+        "write": {
+          "file": "app.db",
+          "content": "This file sits where app.db belongs, but it is plain text and not a SQLite database at all.\nThis file sits where app.db belongs, but it is plain text and not a SQLite database at all.\nThis file sits where app.db belongs, but it is plain text and not a SQLite database at all.\nThis file sits where app.db belongs, but it is plain text and not a SQLite database at all.\nThis file sits where app.db belongs, but it is plain text and not a SQLite database at all.\nThis file sits where app.db belongs, but it is plain text and not a SQLite database at all.\nThis file sits where app.db belongs, but it is plain text and not a SQLite database at all.\nThis file sits where app.db belongs, but it is plain text and not a SQLite database at all.\n"
+        }
+      }
+    ]
+  },
+  "bad-not-wal": {
+    "expect": ["[journal-mode]", "journal_mode is delete, not wal"],
+    "ops": [
+      {
+        "replace": { "file": "app.sql", "find": "PRAGMA journal_mode = WAL;", "with": "PRAGMA journal_mode = DELETE;" }
+      }
+    ]
+  },
+  "bad-page-damage": {
+    "expect": ["[integrity]", "integrity_check: database disk image is malformed", "RESULT: FAIL (1 problems)"],
+    "args": "{dir}/app.db --expect-version 1",
+    "ops": [
+      {
+        "write": {
+          "file": "app.db",
+          "base64": "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"
+        }
+      }
+    ]
+  },
+  "bad-version-mismatch": {
+    "expect": ["[user-version]", "user_version is 2, expected 3"],
+    "args": "{dir}/app.sql --expect-version 3 --max-version 3 --document --app-id tasks-app"
+  },
+  "error-no-input": { "expect": ["ERROR [bad-input] nothing to inspect"], "args": "--expect-version 2" },
+  "pass-tables-only": {
+    "expect": ["user_version: 1", "foreign_key_check: 0 row(s)", "RESULT: PASS"],
+    "args": "{dir}/app.sql --expect-version 1 --max-version 1",
+    "base": [{ "from": "@skill/templates/src/data/migrations/fixtures/db-v1.sql", "to": "app.sql" }]
+  }
+}

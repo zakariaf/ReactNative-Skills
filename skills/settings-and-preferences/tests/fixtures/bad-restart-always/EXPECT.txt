@@ -1,0 +1,3 @@
+[restart-on-direction-only]
+src/features/settings/restart-for-language.ts:4
+without the isRestartNeeded decision

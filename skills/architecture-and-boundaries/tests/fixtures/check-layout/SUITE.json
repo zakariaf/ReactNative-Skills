@@ -1,0 +1,23 @@
+{
+  "base": [
+    "@tests/bases/app",
+    {
+      "templates": true,
+      "firstLinePath": true,
+      "fill": {
+        "__CONCERN__": "connectivity",
+        "__PORT_NAME__": "Connectivity",
+        "__PORT_SUMMARY__": "Whether the device is online.",
+        "__QUERY__": "isOnline",
+        "__QUERY_SUMMARY__": "True while the device has a network connection.",
+        "__VALUE_TYPE__": "boolean",
+        "__VENDOR__": "expo-network",
+        "__ADAPTER_PASCAL__": "ExpoNetworkConnectivity",
+        "__VENDOR_SDK__": "expo-network",
+        "__VENDOR_CALL__": "getNetworkStateAsync",
+        "__MAPPING_EXPRESSION__": "answer.isConnected === true",
+        "__SAMPLE_VALUE__": "true"
+      }
+    }
+  ]
+}

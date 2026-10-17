@@ -1,0 +1,8 @@
+appId: ${APP_ID}
+name: Completing a task offline survives a kill and a relaunch
+tags: [smoke, journeys, offline]
+---
+- launchApp:
+    clearState: true
+- assertVisible:
+    id: 'tasks.list'

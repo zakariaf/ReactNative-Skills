@@ -1,0 +1,11 @@
+{
+  "crash.title": "Something went wrong",
+  "crash.body": "The app hit a problem it could not recover from. Restart it to carry on; your saved tasks are kept.",
+  "crash.restart": "Restart",
+  "tasks.error.not-found": "This task no longer exists.",
+  "tasks.error.title-taken": "A task called {title} already exists.",
+  "tasks.error.title-empty": "Give the task a title.",
+  "errors.storage-full": "Your device is out of space.",
+  "errors.storage-busy": "Storage is busy. Try again.",
+  "errors.storage-unavailable": "Saving is not possible right now."
+}

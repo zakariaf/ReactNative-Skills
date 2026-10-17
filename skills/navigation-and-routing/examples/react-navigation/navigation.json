@@ -1,0 +1,16 @@
+{
+  "$schema": "./navigation.schema.json",
+  "$comment": "contracts/navigation.json of a React Navigation 7 static app (the files above live in src/features/root-navigator/, the defaults of navigatorFile, containerFile, typesFile and paramsFile).",
+  "router": "react-navigation",
+  "home": "Home",
+  "routes": ["Welcome", "Home", "TaskDetail", "TaskEditor", "Compose", "Debug"],
+  "groups": [
+    { "name": "Onboarding", "if": "useIsOnboarding", "screens": ["Welcome"] },
+    { "name": "Main", "if": "useIsOnboarded", "screens": ["Home", "TaskDetail", "TaskEditor", "Compose"] },
+    { "name": "Debug", "if": "useIsTestBuild", "screens": ["Debug"] }
+  ],
+  "guarded": [{ "route": "TaskEditor", "hook": "src/features/task-editor/use-task-editor-model.ts" }],
+  "modals": ["Compose"],
+  "debugRoutes": [{ "route": "Debug", "file": "src/features/root-navigator/debug-route.tsx" }],
+  "placeholders": []
+}

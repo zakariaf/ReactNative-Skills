@@ -1,0 +1,2 @@
+[reducer-action]
+soundVolume is stored without clampPercent()

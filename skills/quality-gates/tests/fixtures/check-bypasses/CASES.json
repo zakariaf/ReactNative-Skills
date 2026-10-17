@@ -1,0 +1,211 @@
+{
+  "bad-code-commit-n": {
+    "expect": [
+      "FAIL scripts/release/commit-build.ts:5 [hook-bypass]",
+      "FAIL scripts/release/commit-build.ts:9 [hook-bypass]"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/release/commit-build.ts",
+          "content": "// scripts/release/commit-build.ts\nimport { execFileSync, execSync } from 'node:child_process';\n\nexport function commitBuild(message: string): void {\n  execFileSync('git', ['commit', '-n', '-m', message]);\n}\n\nexport function commitWip(): void {\n  execSync('git commit -anm \"wip\"');\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-code-no-verify": {
+    "expect": ["[hook-bypass]", "scripts/release/tag-build.ts:5"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/release/tag-build.ts",
+          "content": "// scripts/release/tag-build.ts\nimport { execFileSync } from 'node:child_process';\n\nexport function commitBuild(message: string): void {\n  execFileSync('git', ['commit', '--no-verify', '-m', message]);\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-commit-n-cluster": {
+    "expect": [
+      "FAIL package.json:16 [hook-bypass] \"git commit -nm\" bypasses the git hooks",
+      "FAIL scripts/release/tag.sh:3 [hook-bypass]"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "commit:wip"],
+          "value": "git add -A && git commit -nm \"wip\""
+        }
+      },
+      {
+        "write": {
+          "file": "scripts/release/tag.sh",
+          "content": "#!/bin/sh\n# Tags a release commit.\ngit commit -m \"chore: release\" -an\n"
+        }
+      }
+    ]
+  },
+  "bad-coverage-ignore": {
+    "expect": ["[coverage-ignore]", "src/stores/reset.ts:2"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/stores/reset.ts",
+          "content": "// src/stores/reset.ts\n/* istanbul ignore next */\nexport function reset(): number {\n  return 0;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-eslint-disable": {
+    "expect": ["[inline-lint-override]", "src/core/rng/pick.ts:2"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/rng/pick.ts",
+          "find": "// src/core/rng/pick.ts\n",
+          "with": "// src/core/rng/pick.ts\n// eslint-disable-next-line no-restricted-properties\n"
+        }
+      }
+    ]
+  },
+  "bad-eslint-quiet": {
+    "expect": ["[eslint-flag]", "eslint --quiet overrides the config"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["scripts", "lint"], "value": "eslint . --quiet --max-warnings 0" } }
+    ]
+  },
+  "bad-expired-exclude": {
+    "expect": ["[release-age-exclude]", ".npmrc:7", "expired on 2026-10-02"],
+    "ops": [{ "replace": { "file": ".npmrc", "find": "expires=2026-10-03", "with": "expires=2026-10-02" } }]
+  },
+  "bad-lefthook-env": {
+    "expect": ["[hook-bypass]", "\"LEFTHOOK=0\"", "package.json"],
+    "ops": [{ "json": { "file": "package.json", "path": ["scripts", "push:quick"], "value": "LEFTHOOK=0 git push" } }]
+  },
+  "bad-lefthook-uninstall": {
+    "expect": ["[hook-bypass]", "scripts/reset-hooks.sh:3", "\"lefthook uninstall\""],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/reset-hooks.sh",
+          "content": "#!/bin/sh\n# scripts/reset-hooks.sh: \"temporarily\" removes the git hooks\nnpx lefthook uninstall\n"
+        }
+      }
+    ]
+  },
+  "bad-max-warnings": {
+    "expect": ["[eslint-flag]", "--max-warnings 20 lets warnings pass"],
+    "ops": [{ "json": { "file": "package.json", "path": ["scripts", "lint"], "value": "eslint . --max-warnings 20" } }]
+  },
+  "bad-nested-build-folder": {
+    "expect": ["[ts-suppression]", "scripts/build/build-app.ts:2"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/build/build-app.ts",
+          "content": "// scripts/build/build-app.ts\n// @ts-ignore\nexport const scheme: number = 'Tasks';\n"
+        }
+      }
+    ]
+  },
+  "bad-no-verify-script": {
+    "expect": ["[hook-bypass]", "\"--no-verify\"", "package.json"],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "commit:quick"],
+          "value": "git commit --no-verify -m wip"
+        }
+      }
+    ]
+  },
+  "bad-pass-with-no-tests": {
+    "expect": ["[pass-with-no-tests]", "package.json"],
+    "ops": [{ "json": { "file": "package.json", "path": ["scripts", "test"], "value": "jest --ci --passWithNoTests" } }]
+  },
+  "bad-release-age-lowered": {
+    "expect": ["FAIL .npmrc:1 [release-age-lowered]", "min-release-age=6 (the policy is 7 days)"],
+    "ops": [{ "replace": { "file": ".npmrc", "find": "min-release-age=7\n", "with": "min-release-age=6\n" } }]
+  },
+  "bad-snapshot-update": {
+    "expect": ["[snapshot-auto-update]", "\"-u\" lets a script rewrite goldens"],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "test:golden"],
+          "value": "jest --ci --selectProjects golden -u"
+        }
+      }
+    ]
+  },
+  "bad-stryker-disable": {
+    "expect": ["[mutation-ignore]", "src/features/tasks/task-priority.ts:2"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/task-priority.ts",
+          "content": "// src/features/tasks/task-priority.ts\n// Stryker disable next-line all: the order is tuned by hand\nexport const PRIORITY_ORDER = ['high', 'normal', 'low'] as const;\n"
+        }
+      }
+    ]
+  },
+  "bad-ts-expect-error": {
+    "expect": ["[ts-expect-error-reason]", "src/core/rng/pick.ts:3"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/rng/pick.ts",
+          "find": "  return items[index];\n",
+          "with": "  // @ts-expect-error\n  return items[index];\n"
+        }
+      }
+    ]
+  },
+  "bad-ts-ignore": {
+    "expect": ["[ts-suppression]", "src/core/rng/pick.ts:3"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/core/rng/pick.ts",
+          "find": "  return items[index];\n",
+          "with": "  // @ts-ignore\n  return items[index];\n"
+        }
+      }
+    ]
+  },
+  "bad-undated-exclude": {
+    "expect": [
+      "FAIL .npmrc:10 [release-age-exclude]",
+      "exclude \"react-native-svg\" sits outside a dated block",
+      "FAIL .npmrc:11 [release-age-exclude]",
+      "exclude \"zustand\" sits outside a dated block"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".npmrc",
+          "find": "min-release-age-exclude[]=expo-*\n",
+          "with": "min-release-age-exclude[]=expo-*\n\nmin-release-age-exclude[]=react-native-svg\nmin-release-age-exclude = zustand\n"
+        }
+      }
+    ]
+  },
+  "bad-workflow-no-verify": {
+    "expect": ["[hook-bypass]", ".github/workflows/verify.yml", "\"--no-verify\""],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/verify.yml",
+          "find": "      - run: npm run verify # never --no-verify here either\n",
+          "with": "      - run: npm run verify # never --no-verify here either\n      - run: git push --no-verify origin HEAD\n"
+        }
+      }
+    ]
+  },
+  "error-bad-today": {
+    "expect": ["ERROR [bad-input] --today \"03-10-2026\" is not YYYY-MM-DD"],
+    "args": "{dir} --today 03-10-2026"
+  }
+}

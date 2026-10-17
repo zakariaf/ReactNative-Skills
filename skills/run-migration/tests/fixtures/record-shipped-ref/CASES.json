@@ -1,0 +1,90 @@
+{
+  "bad-fixture-edited-after-release": {
+    "expect": [
+      "FAIL src/data/migrations/fixtures/db-v2.sql:1 [ref] src/data/migrations/fixtures/db-v2.sql differs from v1.1.0"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "git-setup.json",
+          "lines": [
+            "{",
+            "  \"$comment\": \"The pending fixture was re-dumped after the release left.\",",
+            "  \"afterTag\": [",
+            "    { \"replace\": { \"file\": \"src/data/migrations/fixtures/db-v2.sql\", \"find\": \"PRAGMA user_version = 2;\", \"with\": \"-- re-dumped after the release\\nPRAGMA user_version = 2;\" } }",
+            "  ]",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-step-edited-after-release": {
+    "expect": [
+      "FAIL src/data/migrations/v0002-add-list-sort-order.ts:1 [ref] src/data/migrations/v0002-add-list-sort-order.ts differs from v1.1.0: recording now would pin bytes that never shipped"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "git-setup.json",
+          "lines": [
+            "{",
+            "  \"$comment\": \"The release left with v1.1.0; the pending step was edited afterwards. Recording from the working tree would pin bytes no phone runs.\",",
+            "  \"afterTag\": [",
+            "    { \"replace\": { \"file\": \"src/data/migrations/v0002-add-list-sort-order.ts\", \"find\": \"  version: 2,\\n\", \"with\": \"  version: 2,\\n  // reworded after the release\\n\" } }",
+            "  ]",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-step-not-in-ref": {
+    "expect": [
+      "FAIL src/data/migrations/v0002-add-list-sort-order.ts:1 [ref] src/data/migrations/v0002-add-list-sort-order.ts is not in v1.1.0: the build made from it does not carry version 2"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "git-setup.json",
+          "lines": [
+            "{",
+            "  \"$comment\": \"The build was made before the step was committed: it does not carry version 2.\",",
+            "  \"untracked\": [\"src/data/migrations/v0002-add-list-sort-order.ts\"]",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "error-not-a-git-repo": {
+    "expect": ["ERROR [bad-input] --ref v1.1.0 is not a commit"],
+    "ops": [{ "write": { "file": "git-setup.json", "lines": ["{ \"git\": false }"] } }]
+  },
+  "error-ref-not-a-commit": {
+    "expect": ["ERROR [bad-input] --ref v9.9.9 is not a commit"],
+    "ops": [{ "write": { "file": "git-setup.json", "lines": ["{ \"ref\": \"v9.9.9\" }"] } }]
+  },
+  "pass-commit-ref": {
+    "expect": ["hashed as HEAD holds them (the working tree matches)", "WOULD RECORD v2 add-list-sort-order"],
+    "ops": [
+      {
+        "write": {
+          "file": "git-setup.json",
+          "lines": [
+            "{ \"$comment\": \"--ref accepts any commit-ish, as EAS shows the build's commit: HEAD stands in for it.\", \"ref\": \"HEAD\" }"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-yes": {
+    "expect": [
+      "hashed as v1.1.0 holds them (the working tree matches)",
+      "RECORDED v2 add-list-sort-order: step 3cc859f32bd9, fixture cb7f80fcfcf4, first shipped in 1.1.0 (12)",
+      "contracts/schema-ledger.json now lists v1..v2"
+    ],
+    "args": "--yes",
+    "ops": []
+  }
+}

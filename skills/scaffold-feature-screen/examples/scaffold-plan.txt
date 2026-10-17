@@ -1,0 +1,53 @@
+# A dry run, the write and the check for a dynamic route in the reference Expo app (2026-10-14).
+# The frame note comes first, then catalogs and contracts (edit; the drafts per language: --title and
+# --body are source-language text, so ar gets them as drafts, while the invalid-link texts come from
+# the skill's Arabic template), then the code files (new). ar is in contracts/i18n.json
+# reviewLanguages, so no review-queue note. Prettier was installed, so the written files were
+# formatted with the app's own config.
+
+$ node <skill>/scripts/scaffold-feature.mjs . --feature list-detail --route "(app)/lists/[listId]" --title "List"
+note src/ui/screen-frame.tsx does not exist: the view's root is a plain View (react-components-and-hooks' ScreenFrame replaces it once the app has it)
+edit src/i18n/catalogs/ar.json (+4 keys, 2 drafts to translate)
+edit src/i18n/catalogs/en.json (+4 keys)
+drafts ar: list-detail.body, list-detail.title
+edit contracts/navigation.json (routes += "(app)/lists/[listId]", paramParsers += "(app)/lists/[listId]")
+edit contracts/screens.json (screens += "list-detail")
+new  src/app/(app)/lists/[listId].tsx
+new  src/features/list-detail/components/list-detail-invalid-link.tsx
+new  src/features/list-detail/list-detail-navigation.test.tsx
+new  src/features/list-detail/list-detail-params.test.ts
+new  src/features/list-detail/list-detail-params.ts
+new  src/features/list-detail/list-detail-screen.test.tsx
+new  src/features/list-detail/list-detail-screen.tsx
+new  src/features/list-detail/use-list-detail-model.test.tsx
+new  src/features/list-detail/use-list-detail-model.ts
+would write 9 new files and 4 edits for list-detail (dynamic route (app)/lists/[listId], param listId)
+dry run: nothing written; rerun with --write
+scaffold-feature: 13 planned files checked, 0 problems
+RESULT: PASS
+
+$ node <skill>/scripts/scaffold-feature.mjs . --feature list-detail --route "(app)/lists/[listId]" --title "List" --write
+note src/ui/screen-frame.tsx does not exist: the view's root is a plain View (react-components-and-hooks' ScreenFrame replaces it once the app has it)
+edit src/i18n/catalogs/ar.json (+4 keys, 2 drafts to translate)
+edit src/i18n/catalogs/en.json (+4 keys)
+drafts ar: list-detail.body, list-detail.title
+edit contracts/navigation.json (routes += "(app)/lists/[listId]", paramParsers += "(app)/lists/[listId]")
+edit contracts/screens.json (screens += "list-detail")
+new  src/app/(app)/lists/[listId].tsx
+new  src/features/list-detail/components/list-detail-invalid-link.tsx
+new  src/features/list-detail/list-detail-navigation.test.tsx
+new  src/features/list-detail/list-detail-params.test.ts
+new  src/features/list-detail/list-detail-params.ts
+new  src/features/list-detail/list-detail-screen.test.tsx
+new  src/features/list-detail/list-detail-screen.tsx
+new  src/features/list-detail/use-list-detail-model.test.tsx
+new  src/features/list-detail/use-list-detail-model.ts
+formatted 13 files with the app's Prettier
+wrote 9 new files and 4 edits for list-detail (dynamic route (app)/lists/[listId], param listId)
+next: npx jest src/features/list-detail --ci --maxWorkers=2, then node <this skill>/scripts/check-feature.mjs . --feature list-detail
+scaffold-feature: 13 planned files checked, 0 problems
+RESULT: PASS
+
+$ node <skill>/scripts/check-feature.mjs . --feature list-detail
+check-feature: 1 features checked, 0 problems
+RESULT: PASS

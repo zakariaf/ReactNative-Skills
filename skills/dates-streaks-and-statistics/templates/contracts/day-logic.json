@@ -1,0 +1,12 @@
+{
+  "$schema": "./day-logic.schema.json",
+  "modules": {
+    "dayStreak": "src/core/streaks/day-streak.ts",
+    "streakSummary": "src/core/streaks/streak-summary.ts",
+    "activityStats": "src/core/stats/activity-stats.ts",
+    "statsSummary": "src/core/stats/stats-summary.ts",
+    "recordCompletion": "src/core/stats/record-completion.ts"
+  },
+  "dayCode": [],
+  "uiCode": []
+}

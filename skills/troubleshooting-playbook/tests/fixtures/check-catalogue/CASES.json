@@ -1,0 +1,168 @@
+{
+  "$comment": "One planted problem per check-catalogue rule on a two-area catalogue (good/), --write, this skill's own catalogue (pass-own-catalogue), and bad input.",
+  "bad-catalogue-area-file": {
+    "expect": ["[catalogue-shape]", "area build has no file build.json"],
+    "ops": [{ "delete": "catalogue/build.json" }]
+  },
+  "bad-catalogue-shape": {
+    "expect": ["[catalogue-shape]", "version is not 2"],
+    "ops": [{ "json": { "file": "catalogue/index.json", "path": ["version"], "value": 1 } }]
+  },
+  "bad-entry-applies-to": {
+    "expect": ["[entry-applies-to]", "\"latest\""],
+    "ops": [
+      { "json": { "file": "catalogue/build.json", "path": ["entries", 1, "appliesTo"], "value": { "expo": "latest" } } }
+    ]
+  },
+  "bad-entry-banned-term": {
+    "expect": ["[entry-banned-term]", "the owner"],
+    "ops": [
+      {
+        "json": {
+          "file": "catalogue/release.json",
+          "path": ["entries", 0, "fix"],
+          "value": "Stop: the owner unlocks the keychain"
+        }
+      }
+    ]
+  },
+  "bad-entry-duplicate": {
+    "expect": ["[entry-duplicate]", "release-keychain-locked is also used in release.json"],
+    "ops": [
+      { "json": { "file": "catalogue/release.json", "path": ["entries", 2, "id"], "value": "release-keychain-locked" } }
+    ]
+  },
+  "bad-entry-id": {
+    "expect": ["[entry-id]", "signing-keychain"],
+    "ops": [{ "json": { "file": "catalogue/release.json", "path": ["entries", 0, "id"], "value": "signing-keychain" } }]
+  },
+  "bad-entry-match": {
+    "expect": ["[entry-match]", "ITMS-(9018"],
+    "ops": [{ "json": { "file": "catalogue/release.json", "path": ["entries", 0, "match"], "value": ["ITMS-(9018"] } }]
+  },
+  "bad-entry-match-broad": {
+    "expect": ["[entry-match-broad]", "matches almost any log line"],
+    "ops": [
+      {
+        "json": {
+          "file": "catalogue/release.json",
+          "path": ["entries", 0, "match"],
+          "value": ["errSecInternalComponent", ".*"]
+        }
+      }
+    ]
+  },
+  "bad-entry-needs-human": {
+    "expect": ["[entry-needs-human]"],
+    "ops": [{ "json": { "file": "catalogue/release.json", "path": ["entries", 0, "needsHuman"], "value": "yes" } }]
+  },
+  "bad-entry-platforms": {
+    "expect": ["[entry-platforms]"],
+    "ops": [{ "json": { "file": "catalogue/release.json", "path": ["entries", 0, "platforms"], "value": ["windows"] } }]
+  },
+  "bad-entry-shape": {
+    "expect": ["[entry-shape]", "unknown key owner"],
+    "ops": [{ "json": { "file": "catalogue/release.json", "path": ["entries", 0, "owner"], "value": true } }]
+  },
+  "bad-entry-skill": {
+    "expect": ["[entry-skill]", "iOS Release"],
+    "ops": [{ "json": { "file": "catalogue/release.json", "path": ["entries", 0, "skill"], "value": "iOS Release" } }]
+  },
+  "bad-entry-skill-unknown": {
+    "expect": ["[entry-skill-unknown]", "release-pipeline"],
+    "ops": [
+      { "json": { "file": "catalogue/release.json", "path": ["entries", 0, "skill"], "value": "release-pipeline" } }
+    ]
+  },
+  "bad-entry-status": {
+    "expect": ["[entry-status]", "status \"fixed\""],
+    "ops": [{ "json": { "file": "catalogue/release.json", "path": ["entries", 0, "status"], "value": "fixed" } }]
+  },
+  "bad-entry-text": {
+    "expect": ["[entry-text]", "fix is missing"],
+    "ops": [{ "json": { "file": "catalogue/release.json", "path": ["entries", 0, "fix"], "value": "" } }]
+  },
+  "bad-pitfall-id": {
+    "expect": ["[pitfall-id]", "pitfall rule build-config-missing-ts-extension has no catalogue entry"],
+    "args": "--catalogue {dir}/catalogue --references {dir}/references --queries {dir}/queries.tsv --pitfall-ids",
+    "ops": []
+  },
+  "bad-query-missing": {
+    "expect": ["[query-missing]", "release-version-code-used has match patterns but no recorded error line"],
+    "ops": [
+      {
+        "write": {
+          "file": "queries.tsv",
+          "content": "# fixture queries\nbuild-metro-cache-variant\tcheck-apk: production bundle still contains test-only code\nbuild-variant-mismatch\tError: EXPO_PUBLIC_APP_VARIANT=development must equal APP_VARIANT=production\nrelease-keychain-locked\tTasksApp.app: errSecInternalComponent\nrelease-store-slow\tprocessing takes longer than an hour at the store\n"
+        }
+      }
+    ]
+  },
+  "bad-query-not-first": {
+    "expect": ["[query-not-first]", "ranks build-metro-cache-variant first, not build-variant-mismatch"],
+    "ops": [
+      {
+        "write": {
+          "file": "queries.tsv",
+          "content": "# fixture queries\nbuild-metro-cache-variant\tcheck-apk: production bundle still contains test-only code\nbuild-variant-mismatch\tError: EXPO_PUBLIC_APP_VARIANT=development must equal APP_VARIANT=production\nrelease-keychain-locked\tTasksApp.app: errSecInternalComponent\nrelease-version-code-used\tError: Version code 14 has already been used.\nrelease-store-slow\tprocessing takes longer than an hour at the store\nbuild-variant-mismatch\tcheck-apk: production bundle still contains test-only code\n"
+        }
+      }
+    ]
+  },
+  "bad-query-not-found": {
+    "expect": ["[query-not-found]", "expected release-keychain-locked"],
+    "ops": [
+      {
+        "write": {
+          "file": "queries.tsv",
+          "content": "# fixture queries\nbuild-metro-cache-variant\tcheck-apk: production bundle still contains test-only code\nbuild-variant-mismatch\tError: EXPO_PUBLIC_APP_VARIANT=development must equal APP_VARIANT=production\nrelease-keychain-locked\tcodesign exited 1\nrelease-version-code-used\tError: Version code 14 has already been used.\nrelease-store-slow\tprocessing takes longer than an hour at the store\n"
+        }
+      }
+    ]
+  },
+  "bad-query-unknown-id": {
+    "expect": ["[query-unknown-id]", "queries.tsv:7"],
+    "ops": [
+      {
+        "write": {
+          "file": "queries.tsv",
+          "content": "# fixture queries\nbuild-metro-cache-variant\tcheck-apk: production bundle still contains test-only code\nbuild-variant-mismatch\tError: EXPO_PUBLIC_APP_VARIANT=development must equal APP_VARIANT=production\nrelease-keychain-locked\tTasksApp.app: errSecInternalComponent\nrelease-version-code-used\tError: Version code 14 has already been used.\nrelease-store-slow\tprocessing takes longer than an hour at the store\nrelease-gone\tsomething\n"
+        }
+      }
+    ]
+  },
+  "bad-reference-stale": {
+    "expect": ["[reference-stale]", "references/build.md"],
+    "ops": [
+      {
+        "replace": {
+          "file": "references/build.md",
+          "find": "Build failures.",
+          "with": "Build failures, edited by hand."
+        }
+      }
+    ]
+  },
+  "error-invalid-json": {
+    "expect": ["ERROR [bad-input]", "is not valid JSON"],
+    "ops": [{ "write": { "file": "catalogue/build.json", "content": "{ not json\n" } }]
+  },
+  "error-missing-catalogue": {
+    "expect": ["ERROR [bad-input]", "index.json does not exist"],
+    "ops": [{ "delete": "catalogue/index.json" }]
+  },
+  "pass-own-catalogue": { "expect": ["0 problems"], "args": "", "ops": [] },
+  "pass-write": {
+    "expect": ["wrote references/build.md", "wrote references/release.md"],
+    "args": "--catalogue {dir}/catalogue --references {dir}/references --queries {dir}/queries.tsv --write",
+    "ops": [
+      {
+        "replace": {
+          "file": "references/build.md",
+          "find": "Build failures.",
+          "with": "Build failures, edited by hand."
+        }
+      }
+    ]
+  }
+}

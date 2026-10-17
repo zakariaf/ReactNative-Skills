@@ -1,0 +1,13 @@
+{
+  "debug.menu.build": "Build: {variantText}",
+  "debug.menu.day": "Day: {dayText}",
+  "debug.menu.day-real": "Real calendar",
+  "debug.menu.errors": "Errors logged: {count, number}",
+  "debug.menu.motion": "Hold motion still",
+  "debug.menu.next-day": "Simulate the next day",
+  "debug.menu.offline": "Simulate offline",
+  "debug.menu.probe": "Canvas layout probes",
+  "debug.menu.real-day": "Back to the real day",
+  "debug.setup.applying": "Applying the debug link…",
+  "debug.setup.failed": "Debug link refused: {reasonText}"
+}

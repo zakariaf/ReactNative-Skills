@@ -1,0 +1,9 @@
+{
+  "$comment": "contracts/naming.json: this app's naming facts, read by the naming-conventions checkers. Every key is optional; the harness sets only extraE2eFolders and keeps the library defaults for the rest. The published* lists hold ids that are already live; the harness ships nothing, so it has none.",
+  "extraE2eFolders": [
+    {
+      "folder": "screenshots",
+      "why": "e2e-maestro's screenshot matrix (.maestro/screenshots/matrix.yaml): run by npm run screenshots:<platform> (scripts/e2e/capture-screenshots.ts), never by the flows step of the E2E runner."
+    }
+  ]
+}

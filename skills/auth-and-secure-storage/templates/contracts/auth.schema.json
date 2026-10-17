@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "auth.schema.json",
+  "title": "Sign-in facts of the app (auth-and-secure-storage)",
+  "type": "object",
+  "additionalProperties": false,
+  "if": { "properties": { "signIn": { "const": false } }, "required": ["signIn"] },
+  "then": { "required": ["signIn"] },
+  "else": { "required": ["protectedGroups", "signedOutRoutes", "signOutSteps", "createsAccounts"] },
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "signIn": {
+      "description": "Default true. false when the app keeps secrets in expo-secure-store (an API key, a database key) but nobody signs in: check-auth then runs the storage rules only and asks for none of the sign-in facts.",
+      "type": "boolean"
+    },
+    "sessionFactory": {
+      "description": "The function that creates the session; the file that calls it must pass every sign-out step. Default createSessionManager.",
+      "type": "string",
+      "pattern": "^[A-Za-z_$][\\w$]*$"
+    },
+    "protectedGroups": {
+      "description": "Route groups only a signed-in person may open, e.g. \"(app)\": each must sit inside a <Stack.Protected> (or Tabs/Drawer).",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "signedOutRoutes": {
+      "description": "Routes only a signed-out person sees, e.g. \"sign-in\": each must sit inside a .Protected element too.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "signOutSteps": {
+      "description": "Names of the sign-out steps besides the token wipe (query-cache, account-store, ...). A step x-y is written { name: 'x-y' } or made by xYStep(...).",
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+      "uniqueItems": true
+    },
+    "serverSignOutSteps": {
+      "description": "Names of the server steps that run before the wipe on signOut('user'), with the still-valid access token, under one deadline (push-registration, server-session).",
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+      "uniqueItems": true
+    },
+    "createsAccounts": {
+      "description": "true when people can create an account in the app: App Store guideline 5.1.1(v) and Google Play then require deleting it from inside the app.",
+      "type": "boolean"
+    },
+    "accountDeletionRoute": {
+      "description": "The repo path of the route file that starts account deletion (required when createsAccounts is true).",
+      "type": ["string", "null"]
+    },
+    "oauthSharedBrowserSession": {
+      "description": "null (the default: an ephemeral browser session), or the reason the app shares the system browser's cookies with the provider.",
+      "type": ["string", "null"]
+    },
+    "customAndroidBackupRules": {
+      "description": "null (the default: the expo-secure-store config plugin writes Android's backup rules), or the path of the app's own rules that exclude the SecureStore shared preferences.",
+      "type": ["string", "null"]
+    }
+  }
+}

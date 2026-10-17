@@ -1,0 +1,352 @@
+{
+  "bad-blank-line": {
+    "expect": ["[blank-line]", ":2 [blank-line]"],
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit c8813b684426e3dded95e0c1439158ccdba6a332\nchore(ui): tidy the button styles\nThe styles moved into the theme.\n\n==> files\n\nsrc/ui/button.tsx\n"
+        }
+      }
+    ]
+  },
+  "bad-body-missing": {
+    "expect": ["[body-missing] a feat commit has no body"],
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit 26bcde28e4906d8280633475381dd6da41fd879e\nfeat(tasks): add repeating reminders\n\n==> files\n\nsrc/features/tasks/task-draft.test.ts\nsrc/features/tasks/task-draft.ts\n"
+        }
+      }
+    ]
+  },
+  "bad-claude-settings": {
+    "expect": ["[gate-change-missing]", ".claude/settings.json"],
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit bf7f0f697e20fcadd076961d0a0b874792547beb\nchore(repo): allow the format command for the agent\n\nThe agent formats after every edit.\n\n==> files\n\n.claude/settings.json\n"
+        }
+      }
+    ]
+  },
+  "bad-comment-line": {
+    "expect": [":4 [comment-line]", "# Keep Gate-Change only"],
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit 8eb157007e072665044e1b6a1826a2ddcf95b634\nfeat(tasks): keep a draft when the app is killed\n\nAn unsaved task title now survives a restart.\n# Keep Gate-Change only when a gated path changed.\n\n==> files\n\nsrc/features/tasks/task-draft.test.ts\nsrc/features/tasks/task-draft.ts\n"
+        }
+      }
+    ]
+  },
+  "bad-design-baseline-without-trailer": {
+    "expect": ["[gate-change-missing]", "design/baselines/settings-light-en.png"],
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit deeb26c1721dbb53c08803061166aff3400d72c0\ntest(ui): accept the new settings design baseline\n\nThe approved design now has a wider row gap.\n\n==> files\n\ndesign/baselines/settings-light-en.png\n"
+        }
+      },
+      { "write": { "file": "quality-gates.json", "content": "{ \"gatedPaths\": [\"design/baselines/**\"] }\n" } }
+    ]
+  },
+  "bad-gate-change-missing": {
+    "expect": ["[gate-change-missing]", "eslint.config.mjs"],
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit 69c65b92640a2f048e4cc1cbe4d79a1c39db4d99\nchore(repo): reorder the lint config blocks\n\nPrettier moved two blocks.\n\n==> files\n\neslint.config.mjs\n"
+        }
+      }
+    ]
+  },
+  "bad-gate-change-unneeded": {
+    "expect": [":5 [gate-change-unneeded]"],
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit b907b72245cc69f558c66837c0c9ea37dd74ca51\nchore(ui): tidy the button styles\n\nOnly styles moved.\n\nGate-Change: the lint config changed a lot\n\n==> files\n\nsrc/ui/button.tsx\n"
+        }
+      }
+    ]
+  },
+  "bad-golden-without-trailer": {
+    "expect": ["[gate-change-missing]", "src/ui/__snapshots__/task-row.golden.test.ts.snap"],
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit bae0e172e67a8f1de9d14b157a75c3bc1c42cf49\ntest(ui): record the task row golden\n\nThe row shows the due date under the title.\n\n==> files\n\nsrc/ui/__snapshots__/task-row.golden.test.ts.snap\n"
+        }
+      }
+    ]
+  },
+  "bad-header-format": {
+    "expect": ["[header-format]", "Updated stuff."],
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit 36021117a6ab7527ed6f535c4e7f8be3efe2d218\nUpdated stuff.\n\n==> files\n\nsrc/ui/button.tsx\n"
+        }
+      }
+    ]
+  },
+  "bad-header-length": {
+    "expect": ["[header-length] header is 81 characters"],
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit 08fb318d8513b78f4045464cb87d441bcc629cb5\nfeat(tasks): keep a draft, repeat reminders, show the stats card and the new menu\n\nToo much at once.\n\n==> files\n\nsrc/features/tasks/task-draft.test.ts\nsrc/features/tasks/task-draft.ts\n"
+        }
+      }
+    ]
+  },
+  "bad-header-length-73": {
+    "expect": ["[header-length] header is 73 characters"],
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit 7d0296a06f703c7e5ba6251641ca2a55df92cb13\nchore(ui): tidy the button styles of the settings rows and premium screen\n\nBoundary case.\n\n==> files\n\nsrc/ui/button.tsx\n"
+        }
+      }
+    ]
+  },
+  "bad-header-scope": {
+    "expect": ["[header-scope] scope \"widgets\""],
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit 8b907ae2eb35cff562a43b36bda80a2d007725ad\nfeat(widgets): add the stats card\n\nThe card shows done tasks per week.\n\n==> files\n\nsrc/features/tasks/stats-card.tsx\n"
+        }
+      }
+    ]
+  },
+  "bad-header-type": {
+    "expect": ["[header-type] type \"feature\" is unknown"],
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit ce527281edd7dbc9942f2068b0590d8e414dd811\nfeature(tasks): keep a draft\n\nWhy it matters.\n\n==> files\n\nsrc/features/tasks/task-draft.test.ts\nsrc/features/tasks/task-draft.ts\n"
+        }
+      }
+    ]
+  },
+  "bad-perf-baseline-without-trailer": {
+    "expect": ["[gate-change-missing]", "perf-baselines/cold-start-android-emulator.json"],
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit 00a47e54e41730a2fd55ddd7478ae1ab0dffd04f\ntest(tooling): record the cold-start baseline\n\nThe first evidence run sets the median later runs must stay within.\n\n==> files\n\nperf-baselines/cold-start-android-emulator.json\n"
+        }
+      }
+    ]
+  },
+  "bad-placeholder-left": {
+    "expect": [":3 [placeholder-left] placeholder __WHY_THE_CHANGE_WAS_MADE__ is left"],
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit 54884c8751963dcbf85eb714493b1cce37459080\nchore(ui): tidy the button styles\n\n__WHY_THE_CHANGE_WAS_MADE__\n\n==> files\n\nsrc/ui/button.tsx\n"
+        }
+      }
+    ]
+  },
+  "bad-scope-missing": {
+    "expect": ["[scope-missing]"],
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit 200b48d6d07f07bb299e14f5e73825cba0e7d9fd\nfeat: add repeating reminders\n\nA reminder can repeat every week.\n\n==> files\n\nsrc/features/tasks/task-draft.test.ts\nsrc/features/tasks/task-draft.ts\n"
+        }
+      }
+    ]
+  },
+  "bad-spec-change-format": {
+    "expect": ["[spec-change-format]", "the test was wrong"],
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit 42434652b64b367f9e7a1bca6716fa62dcadde3d\ntest(tasks): expect weekly repeats to skip holidays\n\nThe expectation was off.\n\nSpec-Change: the test was wrong\n\n==> files\n\nsrc/features/tasks/repeat.test.ts\n"
+        }
+      }
+    ]
+  },
+  "bad-spec-ref-missing": {
+    "expect": ["[spec-ref-missing] the body names no requirement reference"],
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit 852189e66c731e8ba127c41987b964505e891e72\nfeat(tasks): add repeating reminders\n\nA reminder can now repeat every week.\n\n==> files\n\nsrc/features/tasks/task-draft.test.ts\nsrc/features/tasks/task-draft.ts\n"
+        }
+      },
+      {
+        "write": {
+          "file": "contracts/commits.json",
+          "content": "{ \"requirementRef\": { \"pattern\": \"\\\\bTASK-\\\\d+\\\\b\", \"required\": true } }\n"
+        }
+      }
+    ]
+  },
+  "bad-spec-ref-missing-fix": {
+    "expect": ["e313924:1 [spec-ref-missing]", "check-commits: 2 commit messages checked, 1 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit 707114f0d385f8189eaa978cb73e3e65b663ec03\nfeat(tasks): add repeating reminders\n\nTASK-12: a reminder can repeat every week.\n\n==> files\n\nsrc/features/tasks/task-draft.test.ts\nsrc/features/tasks/task-draft.ts\n==> commit e3139242bc11bee3d0298f07ad37c298ef863d3a\nfix(tasks): keep the draft after a crash\n\nThe draft was written only when the screen closed.\n\n==> files\n\nsrc/features/tasks/task-draft.test.ts\nsrc/features/tasks/task-draft.ts\n"
+        }
+      },
+      {
+        "write": {
+          "file": "contracts/commits.json",
+          "content": "{ \"requirementRef\": { \"pattern\": \"\\\\bTASK-\\\\d+\\\\b\", \"required\": true } }\n"
+        }
+      }
+    ]
+  },
+  "bad-subject-case": {
+    "expect": ["[subject-case]", "Keep the draft"],
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit 925ce2cd6d287b1501377b141d42a54cae3eb051\nfix(tasks): Keep the draft after a crash\n\nWhy it matters.\n\n==> files\n\nsrc/features/tasks/task-draft.test.ts\nsrc/features/tasks/task-draft.ts\n"
+        }
+      }
+    ]
+  },
+  "bad-subject-mood": {
+    "expect": ["[subject-mood] subject starts with \"fixed\""],
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit 8c52b4ea381fbe70028eeebb723715106f1e6082\nfix(tasks): fixed the draft after a crash\n\nWhy it matters.\n\n==> files\n\nsrc/features/tasks/task-draft.test.ts\nsrc/features/tasks/task-draft.ts\n"
+        }
+      }
+    ]
+  },
+  "bad-subject-vague": {
+    "expect": ["[subject-vague] subject \"wip\" says nothing"],
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit 1fd31619f8f02febcbe30981da5d75f728c39fed\nchore(ui): wip\n\n==> files\n\nsrc/ui/button.tsx\n"
+        }
+      }
+    ]
+  },
+  "bad-trailer-empty": {
+    "expect": ["[trailer-empty]", "Gate-Change: yes"],
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit 152d72f88f42660143e2f7f21b01e07a91af1c41\nchore(repo): reorder the lint config blocks\n\nPrettier moved two blocks.\n\nGate-Change: yes\n\n==> files\n\neslint.config.mjs\n"
+        }
+      }
+    ]
+  },
+  "bad-trailer-placement": {
+    "expect": [":3 [trailer-placement]", "[gate-change-missing]"],
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit 4610b9d03b467645d5c38abc70982c230d4f64f8\nchore(repo): reorder the lint config blocks\n\nGate-Change: reorder only, no rule changed\n\nPrettier moved two blocks.\n\n==> files\n\neslint.config.mjs\n"
+        }
+      }
+    ]
+  },
+  "bad-vectors-without-trailer": {
+    "expect": ["[gate-change-missing]", "src/core/rng/sfc32.vectors.json"],
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit 113f4135e06649e7a11e053129cbb87cd5a5356a\ntest(core): extend the rng golden vectors\n\nTen more draws pin the generator.\n\n==> files\n\nsrc/core/rng/sfc32.vectors.json\n"
+        }
+      }
+    ]
+  },
+  "pass-git-generated": {
+    "expect": ["check-commits: 2 commit messages checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit 4af771d93978d09d5cb12a8e704b635a1ed8acf7\nMerge branch 'feat/tasks-repeat'\n\n==> files\n\nsrc/features/tasks/repeat.ts\n==> commit abfaad6ac5c1ab2bef8ad760284f64549c66273e\nfixup! feat(tasks): add repeating reminders\n\n==> files\n\nsrc/features/tasks/task-draft.test.ts\nsrc/features/tasks/task-draft.ts\n"
+        }
+      }
+    ]
+  },
+  "pass-multi-package-scopes": {
+    "expect": ["check-commits: 2 commit messages checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "apps/mobile/package.json",
+          "content": "{ \"name\": \"@acme/mobile\", \"private\": true }\n"
+        }
+      },
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit 6b4c0784a7536c718a5f0f41fc8ec4aa41029b2c\nfeat(mobile): keep a draft when the app is killed\n\nAn unsaved task title survives a restart.\n\n==> files\n\napps/mobile/src/features/tasks/task-draft.ts\n==> commit 94e9a43971c4f0c81576ee055e3b41c9c4677a84\nfix(core): keep overdue state across time-zone changes\n\nThe due check compares date keys now.\n\n==> files\n\npackages/core/src/overdue.ts\n"
+        }
+      },
+      {
+        "write": {
+          "file": "package.json",
+          "content": "{ \"name\": \"tasks-repo\", \"private\": true, \"workspaces\": [\"apps/*\", \"packages/*\"] }\n"
+        }
+      },
+      {
+        "write": {
+          "file": "packages/core/package.json",
+          "content": "{ \"name\": \"@acme/core\", \"private\": true }\n"
+        }
+      }
+    ]
+  },
+  "pass-no-requirement-rule": {
+    "expect": ["check-commits: 1 commit messages checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit 36eab2152bb57db0aa4d432ab64ace59126ddd3a\nfeat(tasks): add repeating reminders\n\nA reminder can now repeat every week.\n\n==> files\n\nsrc/features/tasks/task-draft.test.ts\nsrc/features/tasks/task-draft.ts\n"
+        }
+      }
+    ]
+  },
+  "pass-perf-baseline-gated": {
+    "expect": ["check-commits: 1 commit messages checked, 0 problems"],
+    "ops": [
+      {
+        "write": {
+          "file": "commits.log",
+          "content": "==> commit 19deddce2abc1dd43b1253596ebc161ba2280324\ntest(tooling): record the cold-start baseline\n\nThe first evidence run sets the median later runs must stay within.\n\nGate-Change: first cold-start baseline from the evidence run\n\n==> files\n\nperf-baselines/cold-start-android-emulator.json\n"
+        }
+      }
+    ]
+  }
+}

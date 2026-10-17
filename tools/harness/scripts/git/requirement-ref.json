@@ -1,0 +1,5 @@
+{
+  "description": "The default requirement reference when contracts/commits.json names no pattern: #123, TASKS-12, a spec ID with dotted or lettered children (REQ-4.1, SCR-2a), spec 4.2, issue 31. The one source of the default: scripts/git/commit-config.ts reads it for the commit-msg hook, tdd-workflow's check-test-edits and spec-traceability's check-spec-refs read a synced copy, so a Spec-Change trailer the hook accepts also passes the history check.",
+  "pattern": "#\\d+\\b|\\b[A-Z][A-Z0-9]{1,9}-\\d+(?:\\.\\d+)*[a-z]?\\b|\\b(?:[Ss]pec|[Rr]equirement|[Ss]tory|[Ii]ssue|[Tt]icket)\\s+#?[\\w.-]*\\d",
+  "flags": "u"
+}

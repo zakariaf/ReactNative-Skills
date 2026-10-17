@@ -1,0 +1,11 @@
+{
+  "name": "tasks-fixture",
+  "private": true,
+  "main": "index.ts",
+  "dependencies": {
+    "@hookform/resolvers": "5.9.1",
+    "react-hook-form": "7.89.0",
+    "react-native-keyboard-controller": "1.21.9",
+    "valibot": "1.5.0"
+  }
+}

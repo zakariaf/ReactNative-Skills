@@ -1,0 +1,91 @@
+{
+  "generator": "daily-focus",
+  "fingerprint": "fnv1a32/canonical-json-v1",
+  "oracle": "scripts/oracles/daily-focus-oracle.ts",
+  "rows": [
+    {
+      "key": "2026-01-01",
+      "version": 1,
+      "fingerprint": "3fd9ac73",
+      "summary": "item-08 item-03 item-02",
+      "note": "first key the app pins"
+    },
+    {
+      "key": "2026-09-26",
+      "version": 1,
+      "fingerprint": "4b2e58bb",
+      "summary": "item-01 item-07 item-11",
+      "note": "historical key users have seen"
+    },
+    {
+      "key": "2026-12-31",
+      "version": 1,
+      "fingerprint": "bc1ae3ea",
+      "summary": "item-05 item-06 item-08",
+      "note": "year end"
+    },
+    {
+      "key": "2027-01-01",
+      "version": 1,
+      "fingerprint": "e41e74ca",
+      "summary": "item-09 item-08 item-02",
+      "note": "year start (rollover pair)"
+    },
+    {
+      "key": "2028-02-28",
+      "version": 1,
+      "fingerprint": "8b063608",
+      "summary": "item-01 item-09 item-04",
+      "note": "day before a leap day"
+    },
+    {
+      "key": "2028-02-29",
+      "version": 1,
+      "fingerprint": "47fa7c23",
+      "summary": "item-01 item-10 item-11",
+      "note": "leap day"
+    },
+    {
+      "key": "2028-03-01",
+      "version": 1,
+      "fingerprint": "5093fd6e",
+      "summary": "item-12 item-02 item-05",
+      "note": "day after a leap day"
+    },
+    {
+      "key": "2027-02-28",
+      "version": 1,
+      "fingerprint": "de9057f0",
+      "summary": "item-12 item-09 item-07",
+      "note": "day before the version 2 cutover"
+    },
+    {
+      "key": "2027-03-01",
+      "version": 2,
+      "fingerprint": "459e4098",
+      "summary": "item-02 item-03 item-07 item-11",
+      "note": "version 2 cutover day"
+    },
+    {
+      "key": "2027-12-31",
+      "version": 2,
+      "fingerprint": "8c37dc1c",
+      "summary": "item-03 item-10 item-08 item-14",
+      "note": "year end under version 2"
+    },
+    {
+      "key": "2028-01-01",
+      "version": 2,
+      "fingerprint": "b5d4d317",
+      "summary": "item-05 item-07 item-12 item-14",
+      "note": "year start under version 2"
+    },
+    {
+      "key": "2028-02-29",
+      "version": 2,
+      "fingerprint": "2f0b65b1",
+      "summary": "item-05 item-16 item-11 item-14",
+      "note": "leap day under version 2"
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "base": [{ "templates": true, "firstLinePath": true }, "@tests/bases/app"],
+  "ops": [
+    {
+      "write": {
+        "file": "src/vendor/rtl-kit/SKILL.md",
+        "content": "---\nname: rtl-kit\ndescription: A vendored skill folder inside the app; its planted findings stay silent.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "src/vendor/rtl-kit/kit-row.tsx",
+        "lines": [
+          "import { I18nManager, StyleSheet, Text } from 'react-native';",
+          "const styles = StyleSheet.create({ row: { flexDirection: 'row-reverse', marginLeft: 4, textAlign: 'right' } });",
+          "export const IS_RTL = I18nManager.isRTL;",
+          "export { styles, Text };"
+        ]
+      }
+    },
+    {
+      "write": {
+        "file": ".agents/skills/rtl-decoy/SKILL.md",
+        "content": "---\nname: rtl-decoy\ndescription: An installed skill; its fixtures plant RTL bugs on purpose.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": ".agents/skills/rtl-decoy/tests/src/row.tsx",
+        "lines": ["import { StyleSheet } from 'react-native';", "export const styles = StyleSheet.create({ row: { paddingRight: 4 } });"]
+      }
+    },
+    {
+      "write": {
+        "file": "skills/rtl-decoy/SKILL.md",
+        "content": "---\nname: rtl-decoy\ndescription: A skill folder in the app repo; never scanned.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/rtl-decoy/src/direction.ts",
+        "lines": ["import { I18nManager } from 'react-native';", "export const IS_RTL = I18nManager.isRTL;"]
+      }
+    }
+  ]
+}

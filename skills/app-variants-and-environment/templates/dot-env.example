@@ -1,0 +1,18 @@
+# .env.example — every variable the app and its builds read, with no real values.
+# Copy it to .env.local for local work (.env.local stays git-ignored; .gitignore needs the line
+# !.env.example so this file itself can be committed).
+#
+# EXPO_PUBLIC_* values are inlined into the JS bundle: anyone with the app can read them. A secret
+# never gets that prefix and never goes into any committed file: it lives as an EAS environment
+# variable with secret visibility (or a CI secret) and never reaches the app.
+
+# The build variant. eas.json profiles set both for builds; the EAS environments set both for
+# eas update. Locally, leave both unset (development) or set both to the same value.
+# APP_VARIANT=development
+# EXPO_PUBLIC_APP_VARIANT=development
+
+# A public value that differs per EAS environment (development, preview, production).
+# EXPO_PUBLIC_API_URL=
+
+# Build-time secrets: EAS secret (or sensitive) visibility only, never here.
+# SENTRY_AUTH_TOKEN=

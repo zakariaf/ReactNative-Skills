@@ -1,0 +1,165 @@
+{
+  "$comment": "Ban lists the checkers enforce. supplyChain is the floor every app keeps: compromised or protestware packages (scope anywhere: fail wherever they sit in package-lock.json) and npm-deprecated packages that stale examples still install (scope direct: fail as a direct dependency). profiles are opt-in, and offline-only bans everything no-telemetry bans (an app without network sends no telemetry): an app that lists a profile in contracts/dependency-policy.json \"profiles\" copies its entries into \"banned\" (the app's own gate reads only that file). Deprecation and compromise facts verified with npm view on 2026-10-03.",
+  "supplyChain": [
+    {
+      "pattern": "^flatmap-stream$",
+      "scope": "anywhere",
+      "reason": "the malicious payload of the 2018 event-stream compromise; npm replaced it with a security placeholder, so a copy means a stale or poisoned lockfile",
+      "useInstead": "regenerate the lockfile from a clean tree",
+      "source": "supply-chain"
+    },
+    {
+      "pattern": "^(node-ipc|peacenotwar)$",
+      "scope": "anywhere",
+      "reason": "protestware: node-ipc 10.1.1 to 10.1.3 overwrote files on some machines and later releases pull peacenotwar, which writes files to the desktop",
+      "useInstead": "remove the dependency that pulls it in (npm explain <pkg>)",
+      "source": "supply-chain"
+    },
+    {
+      "pattern": "^expo-cli$",
+      "scope": "direct",
+      "reason": "deprecated: the global Expo CLI was superseded by the local CLI (npx expo) and eas-cli",
+      "useInstead": "npx expo (comes with expo), and EAS CLI installed globally (npm install -g --min-release-age=7 --ignore-scripts eas-cli@<x.y.z>), never through npx inside the repo",
+      "source": "supply-chain"
+    },
+    {
+      "pattern": "^(react-native-unimodules|expo-random)$",
+      "scope": "direct",
+      "reason": "deprecated: react-native-unimodules was replaced by the expo package, expo-random by expo-crypto",
+      "useInstead": "expo, expo-crypto",
+      "source": "supply-chain"
+    },
+    {
+      "pattern": "^@react-native-community/async-storage$",
+      "scope": "direct",
+      "reason": "deprecated: the package moved to @react-native-async-storage/async-storage and this name gets no fixes",
+      "useInstead": "expo-sqlite/kv-store (or the maintained name, if the app's policy allows it)",
+      "source": "supply-chain"
+    },
+    {
+      "pattern": "^metro-react-native-babel-preset$",
+      "scope": "direct",
+      "reason": "deprecated: replaced by @react-native/babel-preset, which babel-preset-expo already includes",
+      "useInstead": "babel-preset-expo (comes with expo)",
+      "source": "supply-chain"
+    },
+    {
+      "pattern": "^(request|node-sass|expo-firebase-analytics)$",
+      "scope": "direct",
+      "reason": "deprecated and unmaintained (request since 2020, node-sass unsupported, expo-firebase-analytics retired)",
+      "useInstead": "the built-in fetch; sass; an analytics SDK behind a port (analytics-and-consent)",
+      "source": "supply-chain"
+    }
+  ],
+  "profiles": {
+    "offline-only": [
+      {
+        "pattern": "^expo-updates$",
+        "scope": "anywhere",
+        "reason": "offline-only: OTA updates are network traffic",
+        "useInstead": "reloadAppAsync from expo to restart; ship changes through the stores",
+        "source": "profile:offline-only"
+      },
+      {
+        "pattern": "^expo-dev-client$",
+        "scope": "anywhere",
+        "reason": "offline-only: development builds open a network inspector and load bundles from Metro; test release builds instead",
+        "useInstead": "release builds on a named simulator or emulator",
+        "source": "profile:offline-only"
+      },
+      {
+        "pattern": "^@react-native-community/netinfo$",
+        "scope": "anywhere",
+        "reason": "offline-only: its default reachability check fetches a Google URL from the app",
+        "useInstead": "expo-network behind ConnectivityPort",
+        "source": "profile:offline-only"
+      },
+      {
+        "pattern": "^(react-native-purchases|react-native-purchases-ui)$",
+        "scope": "anywhere",
+        "reason": "offline-only: every purchase goes through RevenueCat's servers",
+        "useInstead": "expo-iap behind PurchasePort",
+        "source": "profile:offline-only"
+      },
+      {
+        "pattern": "^(firebase|@react-native-firebase/.+)$",
+        "scope": "anywhere",
+        "reason": "offline-only: a backend and analytics",
+        "useInstead": "no replacement; the profile rules this feature out",
+        "source": "profile:offline-only"
+      },
+      {
+        "pattern": "^(@sentry/.+|sentry-expo|@bugsnag/.+|@datadog/.+)$",
+        "scope": "anywhere",
+        "reason": "offline-only: crash reporting services send reports over the network",
+        "useInstead": "a local error log (ErrorLogPort)",
+        "source": "profile:offline-only"
+      },
+      {
+        "pattern": "^(expo-insights|expo-observe|expo-app-metrics)$",
+        "scope": "anywhere",
+        "reason": "offline-only: Expo telemetry services",
+        "useInstead": "no replacement; the profile rules this feature out",
+        "source": "profile:offline-only"
+      },
+      {
+        "pattern": "^expo-notifications$",
+        "scope": "anywhere",
+        "reason": "offline-only: push registration contacts Apple, Google and Expo servers",
+        "useInstead": "no replacement (or a local-only notification module the profile reviews)",
+        "source": "profile:offline-only"
+      },
+      {
+        "pattern": "^(@amplitude/.+|expo-analytics-amplitude|@segment/.+|posthog-react-native|mixpanel-react-native)$",
+        "scope": "anywhere",
+        "reason": "offline-only: product analytics send events over the network",
+        "useInstead": "no replacement; the profile rules this feature out",
+        "source": "profile:offline-only"
+      },
+      {
+        "pattern": "^(react-native-webview|expo-web-browser)$",
+        "scope": "anywhere",
+        "reason": "offline-only: web views are a network surface",
+        "useInstead": "OS hand-off links through Linking",
+        "source": "profile:offline-only"
+      },
+      {
+        "pattern": "^(axios|ky|got|node-fetch|cross-fetch)$",
+        "scope": "direct",
+        "reason": "offline-only: the app makes no requests (some tools pull these in transitively, so only direct dependencies count)",
+        "useInstead": "nothing in the app; Node's built-in fetch in tooling",
+        "source": "profile:offline-only"
+      }
+    ],
+    "no-telemetry": [
+      {
+        "pattern": "^(firebase|@react-native-firebase/.+)$",
+        "scope": "anywhere",
+        "reason": "no-telemetry: a backend and analytics",
+        "useInstead": "no replacement; the profile rules this feature out",
+        "source": "profile:no-telemetry"
+      },
+      {
+        "pattern": "^(@sentry/.+|sentry-expo|@bugsnag/.+|@datadog/.+)$",
+        "scope": "anywhere",
+        "reason": "no-telemetry: crash reporting services",
+        "useInstead": "a local error log (ErrorLogPort)",
+        "source": "profile:no-telemetry"
+      },
+      {
+        "pattern": "^(expo-insights|expo-observe|expo-app-metrics)$",
+        "scope": "anywhere",
+        "reason": "no-telemetry: Expo telemetry services",
+        "useInstead": "no replacement; the profile rules this feature out",
+        "source": "profile:no-telemetry"
+      },
+      {
+        "pattern": "^(@amplitude/.+|expo-analytics-amplitude|@segment/.+|posthog-react-native|mixpanel-react-native)$",
+        "scope": "anywhere",
+        "reason": "no-telemetry: product analytics",
+        "useInstead": "no replacement; the profile rules this feature out",
+        "source": "profile:no-telemetry"
+      }
+    ]
+  }
+}

@@ -1,0 +1,61 @@
+# lefthook.yml: git hooks for the app (lefthook 2.x). Owned by the quality-gates skill.
+# Installed by `npm install` through the root "prepare" script. Never bypass with --no-verify,
+# LEFTHOOK=0, skip: or only:. Each secret glob is listed with and without **/ (a root file needs both).
+assert_lefthook_installed: true
+output:
+  - summary
+  - failure
+
+pre-commit:
+  parallel: true
+  jobs:
+    - name: no-secrets
+      glob:
+        - '*.p8'
+        - '*.p12'
+        - '*.mobileprovision'
+        - '*.keystore'
+        - '*.jks'
+        - 'AuthKey_*'
+        - '**/AuthKey_*'
+        - 'ApiKey_*'
+        - '**/ApiKey_*'
+        - '*.pem'
+        - 'credentials.json'
+        - '**/credentials.json'
+        - '*service-account*.json'
+        - '**/*service-account*.json'
+        - 'key.properties'
+        - '**/key.properties'
+        - 'keystore.properties'
+        - '**/keystore.properties'
+        - '.env*'
+        - '**/.env*'
+      exclude:
+        - '.env.example'
+        - '**/.env.example'
+      run: echo "Refusing to commit a secret or signing file:" {staged_files} >&2; exit 1
+    - name: format
+      glob: '*.{ts,tsx,js,mjs,cjs,json,md,yml,yaml}'
+      run: npx prettier --check {staged_files}
+    - name: lint
+      glob: '*.{ts,tsx,js,mjs,cjs}'
+      run: npx eslint --max-warnings 0 --no-warn-ignored {staged_files}
+    - name: typecheck
+      glob: '*.{ts,tsx,json}'
+      run: npm run -s typecheck
+    - name: test-related
+      glob: '*.{ts,tsx,json}'
+      run: npx jest --ci --bail --findRelatedTests --passWithNoTests {staged_files}
+
+# The commit-message check (format, Gate-Change trailer against quality-gates.json gatedPaths) is
+# created by the git-commits-and-reporting skill.
+commit-msg:
+  jobs:
+    - name: commit-message
+      run: node scripts/git/check-commit-message.ts {1}
+
+pre-push:
+  jobs:
+    - name: verify
+      run: npm run verify

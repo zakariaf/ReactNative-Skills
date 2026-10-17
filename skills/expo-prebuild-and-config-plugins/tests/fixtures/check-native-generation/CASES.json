@@ -1,0 +1,1218 @@
+{
+  "bad-auto-plugin-listed": {
+    "expect": [
+      "FAIL app.config.ts:",
+      "[auto-plugin-listed]",
+      "expo-image-picker is installed",
+      "Android RECORD_AUDIO permission"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    [\n      'expo-image-picker',\n      {\n        photosPermission: 'Tasks attaches the photos you pick to a task.',\n        cameraPermission: 'Tasks attaches the photos you take to a task.',\n        microphonePermission: false,\n      },\n    ],\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-auto-plugin-listed-variant": {
+    "expect": ["[auto-plugin-listed]", "expo-file-system is installed", "(APP_VARIANT=preview, production)"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-file-system"], "value": "~57.0.7" } },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "function plugins(): NonNullable<ExpoConfig['plugins']> {\n  return [\n    'expo-router',",
+          "with": "function plugins(): NonNullable<ExpoConfig['plugins']> {\n  return [\n    ...(process.env['APP_VARIANT'] === 'development' ? ['expo-file-system'] : []),\n    'expo-router',"
+        }
+      }
+    ]
+  },
+  "bad-builtin-first": {
+    "expect": [
+      "plugins/with-url-queries.ts:9 [builtin-first]",
+      "the iOS URL query schemes",
+      "plugins/with-url-queries.ts:13 [builtin-first]",
+      "expo-build-properties' android.manifestQueries"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "plugins/with-url-queries.ts",
+          "content": "// plugins/with-url-queries.ts\nimport { withAndroidManifest, withInfoPlist } from 'expo/config-plugins.js';\n\nimport type { ConfigPlugin } from 'expo/config-plugins.js';\n\nconst withUrlQueries: ConfigPlugin = (config) => {\n  const withIos = withInfoPlist(config, (next) => ({\n    ...next,\n    modResults: { ...next.modResults, LSApplicationQueriesSchemes: ['mailto'] },\n  }));\n  return withAndroidManifest(withIos, (next) => {\n    const manifest = next.modResults.manifest;\n    if (!JSON.stringify(manifest.queries).includes('mailto')) {\n      manifest.queries = [...manifest.queries, { intent: [{ data: [{ $: { 'android:scheme': 'mailto' } }] }] }];\n    }\n    return next;\n  });\n};\n\nexport default withUrlQueries;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "plugins/with-url-queries.test.ts",
+          "content": "// plugins/with-url-queries.test.ts\nimport plugin from './with-url-queries.ts';\n\ndescribe('withUrlQueries', () => {\n  it('is a function', () => {\n    expect(typeof plugin).toBe('function');\n  });\n});\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    'expo-router',\n",
+          "with": "    'expo-router',\n    './plugins/with-url-queries.ts',\n"
+        }
+      }
+    ]
+  },
+  "bad-builtin-first-maven": {
+    "expect": ["plugins/with-vendor-repo.ts:11 [builtin-first]", "expo-build-properties' android.extraMavenRepos"],
+    "ops": [
+      {
+        "write": {
+          "file": "plugins/with-vendor-repo.ts",
+          "content": "// plugins/with-vendor-repo.ts\nimport { CodeGenerator, withProjectBuildGradle } from 'expo/config-plugins.js';\n\nimport type { ConfigPlugin } from 'expo/config-plugins.js';\n\nconst withVendorRepo: ConfigPlugin = (config) =>\n  withProjectBuildGradle(config, (next) => {\n    next.modResults.contents = CodeGenerator.mergeContents({\n      tag: 'with-vendor-repo',\n      src: next.modResults.contents,\n      newSrc: \"    maven { url 'https://maven.example.com/releases' }\",\n      anchor: /mavenCentral\\(\\)/,\n      offset: 1,\n      comment: '//',\n    }).contents;\n    return next;\n  });\n\nexport default withVendorRepo;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "plugins/with-vendor-repo.test.ts",
+          "content": "// plugins/with-vendor-repo.test.ts\nimport plugin from './with-vendor-repo.ts';\n\ndescribe('withVendorRepo', () => {\n  it('is a function', () => {\n    expect(typeof plugin).toBe('function');\n  });\n});\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    'expo-router',\n",
+          "with": "    'expo-router',\n    './plugins/with-vendor-repo.ts',\n"
+        }
+      }
+    ]
+  },
+  "bad-builtin-first-sdk-version": {
+    "expect": ["plugins/with-min-sdk.ts:8 [builtin-first]", "an Android SDK or toolchain version"],
+    "ops": [
+      {
+        "write": {
+          "file": "plugins/with-min-sdk.ts",
+          "content": "// plugins/with-min-sdk.ts\nimport { withAppBuildGradle } from 'expo/config-plugins.js';\n\nimport type { ConfigPlugin } from 'expo/config-plugins.js';\n\nconst withMinSdk: ConfigPlugin = (config) =>\n  withAppBuildGradle(config, (next) => {\n    if (next.modResults.contents.includes('minSdkVersion 28')) return next;\n    return { ...next, modResults: { ...next.modResults, contents: next.modResults.contents.replace(/minSdkVersion \\S+/, 'minSdkVersion 28') } };\n  });\n\nexport default withMinSdk;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "plugins/with-min-sdk.test.ts",
+          "content": "// plugins/with-min-sdk.test.ts\nimport plugin from './with-min-sdk.ts';\n\ndescribe('withMinSdk', () => {\n  it('is a function', () => {\n    expect(typeof plugin).toBe('function');\n  });\n});\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    'expo-router',\n",
+          "with": "    'expo-router',\n    './plugins/with-min-sdk.ts',\n"
+        }
+      }
+    ]
+  },
+  "bad-config-deterministic": {
+    "expect": ["FAIL app.config.ts:", "[config-deterministic]", "differ at extra.buildId"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    extra: { eas: { projectId: '00000000-0000-4000-8000-000000000000' } },",
+          "with": "    extra: { eas: { projectId: '00000000-0000-4000-8000-000000000000' }, buildId: Math.random().toString(36) },"
+        }
+      }
+    ]
+  },
+  "bad-config-evaluates": {
+    "expect": ["app.config.ts:1 [config-evaluates]", "fails for APP_VARIANT=preview", "no preview identity yet"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "  const variant = variantOf(process.env);\n",
+          "with": "  const variant = variantOf(process.env);\n  if (variant === 'preview') throw new Error('no preview identity yet');\n"
+        }
+      }
+    ]
+  },
+  "bad-config-evaluates-promise": {
+    "expect": ["FAIL app.config.ts:", "[config-evaluates]", "returns a Promise"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "export default function appConfig({ config }: ConfigContext): ExpoConfig {",
+          "with": "export default async function appConfig({ config }: ConfigContext): Promise<ExpoConfig> {"
+        }
+      }
+    ]
+  },
+  "bad-config-mods-helper": {
+    "expect": ["app.config.ts:5 [config-mods]", "applies config-plugin helpers from expo/config-plugins.js"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "import type { ConfigContext, ExpoConfig } from 'expo/config';\n",
+          "with": "import type { ConfigContext, ExpoConfig } from 'expo/config';\nimport { withInfoPlist } from 'expo/config-plugins.js';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    plugins: plugins(),\n",
+          "with": "    plugins: plugins(),\n    ...withInfoPlist({ name: 'x', slug: 'x' }, (next) => next),\n"
+        }
+      }
+    ]
+  },
+  "bad-config-mods-local-import": {
+    "expect": ["app.config.ts:5 [config-mods]", "imports the local plugin ./plugins/with-android-optional-features.ts"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "import type { ConfigContext, ExpoConfig } from 'expo/config';\n",
+          "with": "import type { ConfigContext, ExpoConfig } from 'expo/config';\nimport withAndroidOptionalFeatures from './plugins/with-android-optional-features.ts';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "  return {\n    ...config,",
+          "with": "  return withAndroidOptionalFeatures({\n    ...config,"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    extra: { eas: { projectId: '00000000-0000-4000-8000-000000000000' } },\n  };",
+          "with": "    extra: { eas: { projectId: '00000000-0000-4000-8000-000000000000' } },\n  }, { features: ['android.hardware.camera'] });"
+        }
+      }
+    ]
+  },
+  "bad-config-null": {
+    "expect": ["FAIL app.config.ts:", "[config-null]", "extra.storeId", "serializes null as {}"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    extra: { eas: { projectId: '00000000-0000-4000-8000-000000000000' } },",
+          "with": "    extra: { eas: { projectId: '00000000-0000-4000-8000-000000000000' }, storeId: null },"
+        }
+      }
+    ]
+  },
+  "bad-dangerous-mod": {
+    "expect": [
+      "plugins/with-xcode-node-options.ts:12 [dangerous-mod]",
+      "without a \"// dangerous-mod: <reason>\" comment"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "plugins/with-xcode-node-options.ts",
+          "content": "// plugins/with-xcode-node-options.ts\nimport { readFileSync, writeFileSync } from 'node:fs';\nimport { join } from 'node:path';\n\nimport { withDangerousMod } from 'expo/config-plugins.js';\n\nimport type { ConfigPlugin } from 'expo/config-plugins.js';\n\nconst LINE = 'export NODE_OPTIONS=--max-old-space-size=4096';\n\nconst withXcodeNodeOptions: ConfigPlugin = (config) =>\n  withDangerousMod(config, [\n    'ios',\n    (next) => {\n      const file = join(next.modRequest.platformProjectRoot, '.xcode.env');\n      const contents = readFileSync(file, 'utf8');\n      if (!contents.includes(LINE)) writeFileSync(file, `${contents.trimEnd()}\\n${LINE}\\n`);\n      return next;\n    },\n  ]);\n\nexport default withXcodeNodeOptions;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "plugins/with-xcode-node-options.test.ts",
+          "content": "// plugins/with-xcode-node-options.test.ts\nimport plugin from './with-xcode-node-options.ts';\n\ndescribe('withXcodeNodeOptions', () => {\n  it('is a function', () => {\n    expect(typeof plugin).toBe('function');\n  });\n});\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    'expo-router',\n",
+          "with": "    'expo-router',\n    './plugins/with-xcode-node-options.ts',\n"
+        }
+      }
+    ]
+  },
+  "bad-dangerous-mod-write-outside": {
+    "expect": ["plugins/with-build-stamp.ts:7 [dangerous-mod]", "writeFileSync outside a dangerous mod"],
+    "ops": [
+      {
+        "write": {
+          "file": "plugins/with-build-stamp.ts",
+          "content": "// plugins/with-build-stamp.ts\nimport { writeFileSync } from 'node:fs';\n\nimport type { ConfigPlugin } from 'expo/config-plugins.js';\n\nconst withBuildStamp: ConfigPlugin = (config) => {\n  writeFileSync('build-stamp.txt', config.slug);\n  return config;\n};\n\nexport default withBuildStamp;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "plugins/with-build-stamp.test.ts",
+          "content": "// plugins/with-build-stamp.test.ts\nimport plugin from './with-build-stamp.ts';\n\ndescribe('withBuildStamp', () => {\n  it('is a function', () => {\n    expect(typeof plugin).toBe('function');\n  });\n});\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    'expo-router',\n",
+          "with": "    'expo-router',\n    './plugins/with-build-stamp.ts',\n"
+        }
+      }
+    ]
+  },
+  "bad-easignore-native": {
+    "expect": [".easignore:1 [easignore-native]", "does not ignore ios/"],
+    "ops": [{ "write": { "file": ".easignore", "lines": ["node_modules/", ".expo/", "/android"] } }]
+  },
+  "bad-native-edit-plistbuddy-ts": {
+    "expect": ["scripts/release/bump-ios-build.ts:6 [native-edit]", "(PlistBuddy)"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/release/bump-ios-build.ts",
+          "content": "// scripts/release/bump-ios-build.ts\n// Sets the iOS build number in the generated Info.plist.\nimport { execFileSync } from 'node:child_process';\n\nexport function bumpIosBuild(build: number): void {\n  execFileSync('/usr/libexec/PlistBuddy', ['-c', `Set :CFBundleVersion ${build}`, 'ios/Tasks/Info.plist']);\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-native-edit-script": {
+    "expect": ["scripts/release/add-maps-key.ts:8 [native-edit]", "writeFileSync"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/release/add-maps-key.ts",
+          "content": "// scripts/release/add-maps-key.ts\nimport { readFileSync, writeFileSync } from 'node:fs';\n\nconst MANIFEST = 'android/app/src/main/AndroidManifest.xml';\n\nexport function addMapsKey(key: string): void {\n  const text = readFileSync(MANIFEST, 'utf8');\n  writeFileSync('android/app/src/main/AndroidManifest.xml', text.replace('</application>', `<meta-data android:name=\"maps\" android:value=\"${key}\"/></application>`));\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-native-edit-sed": {
+    "expect": ["FAIL package.json:", "[native-edit]", "writes into a generated native folder"],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["scripts", "postprebuild"],
+          "value": "sed -i '' 's/UIStatusBarHidden/UIStatusBarStyle/' ios/Tasks/Info.plist"
+        }
+      }
+    ]
+  },
+  "bad-native-edit-sed-ts": {
+    "expect": ["scripts/release/bump-android-code.ts:6 [native-edit]", "(sed)"],
+    "ops": [
+      {
+        "write": {
+          "file": "scripts/release/bump-android-code.ts",
+          "content": "// scripts/release/bump-android-code.ts\n// Sets versionCode in the generated Gradle file.\nimport { execSync } from 'node:child_process';\n\nexport function bumpVersionCode(code: number): void {\n  execSync(`sed -i '' 's/versionCode [0-9]*/versionCode ${code}/' android/app/build.gradle`);\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-native-edit-tee": {
+    "expect": ["FAIL .github/workflows/ci.yml:", "[native-edit]", "(tee)"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "      - run: npx expo prebuild --clean --platform android\n",
+          "with": "      - run: npx expo prebuild --clean --platform android\n      - run: echo 'org.gradle.jvmargs=-Xmx4g' | tee -a android/gradle.properties\n"
+        }
+      }
+    ]
+  },
+  "bad-native-edit-workflow": {
+    "expect": ["FAIL .github/workflows/ci.yml:", "[native-edit]", "(cp)"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "      - run: npx expo prebuild --clean --platform android\n",
+          "with": "      - run: npx expo prebuild --clean --platform android\n      - run: cp secrets/google-services.json android/app/\n"
+        }
+      }
+    ]
+  },
+  "bad-native-ignore-scope": {
+    "expect": ["FAIL .gitignore:", "[native-ignore-scope]", "\"ios/\" also ignores modules/task-widget/ios/"],
+    "ops": [
+      { "replace": { "file": ".gitignore", "find": "/ios\n/android\n", "with": "ios/\nandroid/\n" } },
+      { "write": { "file": "modules/task-widget/ios/TaskWidgetModule.swift", "content": "import ExpoModulesCore\n" } },
+      {
+        "write": {
+          "file": "modules/task-widget/expo-module.config.json",
+          "content": "{ \"platforms\": [\"apple\", \"android\"] }\n"
+        }
+      }
+    ]
+  },
+  "bad-native-ignored": {
+    "expect": [
+      ".gitignore:1 [native-ignored]",
+      "ios/ is not git-ignored",
+      "[native-ignored]",
+      "android/ is not git-ignored"
+    ],
+    "ops": [{ "replace": { "file": ".gitignore", "find": "/ios\n/android\n", "with": "" } }]
+  },
+  "bad-native-mode-committed-missing": {
+    "expect": [
+      "FAIL contracts/native-generation.json:",
+      "[native-mode]",
+      "\"committed\" mode, but android/ does not exist"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/native-generation.json",
+          "content": "{\n  \"mode\": \"committed\",\n  \"reason\": \"The app embeds a vendor SDK whose Xcode setup no config plugin automates; the native team edits ios/ and android/ by hand.\",\n  \"decidedOn\": \"2026-10-04\"\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "ios/Tasks/Info.plist",
+          "content": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<plist version=\"1.0\"><dict/></plist>\n"
+        }
+      },
+      { "json": { "file": "package.json", "path": ["scripts", "native:generate"], "delete": true } },
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "      - run: npx expo prebuild --clean --platform android\n",
+          "with": ""
+        }
+      },
+      { "replace": { "file": ".gitignore", "find": "/ios\n/android\n", "with": "" } }
+    ]
+  },
+  "bad-native-mode-committed-no-reason": {
+    "expect": [
+      "FAIL contracts/native-generation.json:",
+      "[native-mode]",
+      "without a \"reason\"",
+      "without \"decidedOn\""
+    ],
+    "ops": [
+      { "write": { "file": "contracts/native-generation.json", "content": "{ \"mode\": \"committed\" }\n" } },
+      {
+        "write": {
+          "file": "ios/Tasks/Info.plist",
+          "content": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<plist version=\"1.0\"><dict/></plist>\n"
+        }
+      },
+      { "write": { "file": "android/app/build.gradle", "content": "android { namespace \"com.example.tasks\" }\n" } },
+      { "json": { "file": "package.json", "path": ["scripts", "native:generate"], "delete": true } },
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "      - run: npx expo prebuild --clean --platform android\n",
+          "with": ""
+        }
+      },
+      { "replace": { "file": ".gitignore", "find": "/ios\n/android\n", "with": "" } }
+    ]
+  },
+  "bad-native-mode-committed-prebuild": {
+    "expect": [
+      "FAIL .github/workflows/ci.yml:",
+      "[native-mode]",
+      "runs npx expo prebuild although the native folders are committed"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/native-generation.json",
+          "content": "{\n  \"mode\": \"committed\",\n  \"reason\": \"The app embeds a vendor SDK whose Xcode setup no config plugin automates; the native team edits ios/ and android/ by hand.\",\n  \"decidedOn\": \"2026-10-04\"\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "ios/Tasks/Info.plist",
+          "content": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<plist version=\"1.0\"><dict/></plist>\n"
+        }
+      },
+      { "write": { "file": "android/app/build.gradle", "content": "android { namespace \"com.example.tasks\" }\n" } },
+      { "json": { "file": "package.json", "path": ["scripts", "native:generate"], "delete": true } },
+      { "replace": { "file": ".gitignore", "find": "/ios\n/android\n", "with": "" } }
+    ]
+  },
+  "bad-native-mode-committed-prebuild-command": {
+    "expect": [
+      "eas.json:7 [native-mode]",
+      "build.preview.prebuildCommand is set, but EAS Build skips prebuild when ios/ and android/ are committed"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/native-generation.json",
+          "content": "{\n  \"mode\": \"committed\",\n  \"reason\": \"The app embeds a vendor SDK whose Xcode setup no config plugin automates; the native team edits ios/ and android/ by hand.\",\n  \"decidedOn\": \"2026-10-04\"\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "ios/Tasks/Info.plist",
+          "content": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<plist version=\"1.0\"><dict/></plist>\n"
+        }
+      },
+      { "write": { "file": "android/app/build.gradle", "content": "android { namespace \"com.example.tasks\" }\n" } },
+      { "json": { "file": "package.json", "path": ["scripts", "native:generate"], "delete": true } },
+      { "replace": { "file": ".gitignore", "find": "/ios\n/android\n", "with": "" } },
+      {
+        "write": {
+          "file": "eas.json",
+          "content": "{\n  \"cli\": { \"version\": \">= 18.0.0\", \"appVersionSource\": \"remote\" },\n  \"build\": {\n    \"development\": { \"developmentClient\": true, \"distribution\": \"internal\" },\n    \"preview\": {\n      \"distribution\": \"internal\",\n      \"prebuildCommand\": \"prebuild --template ./native-template.tgz\"\n    },\n    \"production\": { \"autoIncrement\": true }\n  }\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-native-mode-invalid": {
+    "expect": ["FAIL contracts/native-generation.json:", "[native-mode]", "\"mode\" is \"manual\""],
+    "ops": [{ "json": { "file": "contracts/native-generation.json", "path": ["mode"], "value": "manual" } }]
+  },
+  "bad-native-tracked": {
+    "expect": ["ios/Tasks/Info.plist:1 [native-tracked]", "git tracks 1 file(s) under ios/ or android/"],
+    "ops": [
+      {
+        "write": {
+          "file": "ios/Tasks/Info.plist",
+          "content": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<plist version=\"1.0\"><dict/></plist>\n"
+        }
+      }
+    ]
+  },
+  "bad-plugin-duplicate": {
+    "expect": ["FAIL app.config.ts:", "[plugin-duplicate]", "expo-image-picker is listed 2 times"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    'expo-router',\n",
+          "with": "    'expo-router',\n    ['expo-image-picker', { microphonePermission: false }],\n"
+        }
+      }
+    ]
+  },
+  "bad-plugin-duplicate-local": {
+    "expect": ["[plugin-duplicate]", "plugins/with-android-optional-features.ts is listed 2 times"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    'expo-router',\n",
+          "with": "    'expo-router',\n    './plugins/with-android-optional-features',\n"
+        }
+      }
+    ]
+  },
+  "bad-plugin-entry-function": {
+    "expect": ["FAIL app.config.ts:", "[plugin-entry]", "imported function withNothing"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "function plugins(): NonNullable<ExpoConfig['plugins']> {\n  return [\n    'expo-router',",
+          "with": "const withNothing = (config: ExpoConfig): ExpoConfig => config;\n\nfunction plugins(): NonNullable<ExpoConfig['plugins']> {\n  return [\n    'expo-router',\n    withNothing,"
+        }
+      }
+    ]
+  },
+  "bad-plugin-entry-hoisted": {
+    "expect": [
+      "FAIL app.config.ts:",
+      "[plugin-entry]",
+      "expo-file-system is not a dependency in package.json: it resolves only because another package installs it (hoisting)",
+      "npx expo install expo-file-system to make it a direct dependency, then keep the entry"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "node_modules/expo-file-system/package.json",
+          "content": "{\"name\":\"expo-file-system\",\"version\":\"57.0.9\",\"main\":\"build/index.js\"}\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    'expo-router',\n",
+          "with": "    'expo-router',\n    ['expo-file-system', { enableFileSharing: true }],\n"
+        }
+      }
+    ]
+  },
+  "bad-plugin-entry-missing-file": {
+    "expect": ["FAIL app.config.ts:", "[plugin-entry]", "./plugins/with-ios-backup.ts does not exist"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    'expo-router',\n",
+          "with": "    'expo-router',\n    './plugins/with-ios-backup.ts',\n"
+        }
+      }
+    ]
+  },
+  "bad-plugin-entry-no-default": {
+    "expect": ["plugins/with-share-target.ts:1 [plugin-entry]", "has no default export"],
+    "ops": [
+      {
+        "write": {
+          "file": "plugins/with-share-target.ts",
+          "content": "// plugins/with-share-target.ts\nexport const withShareTarget = (config: unknown): unknown => config;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "plugins/with-share-target.test.ts",
+          "content": "// plugins/with-share-target.test.ts\nimport { withShareTarget } from './with-share-target.ts';\n\ndescribe('withShareTarget', () => {\n  it('returns the config', () => {\n    expect(withShareTarget({})).toStrictEqual({});\n  });\n});\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    'expo-router',\n",
+          "with": "    'expo-router',\n    './plugins/with-share-target.ts',\n"
+        }
+      }
+    ]
+  },
+  "bad-plugin-entry-no-plugin": {
+    "expect": ["FAIL app.config.ts:", "[plugin-entry]", "tasks-kit ships no config plugin"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "tasks-kit"], "value": "1.0.0" } },
+      {
+        "write": {
+          "file": "node_modules/tasks-kit/package.json",
+          "content": "{ \"name\": \"tasks-kit\", \"version\": \"1.0.0\" }\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    'expo-router',\n",
+          "with": "    'expo-router',\n    'tasks-kit',\n"
+        }
+      }
+    ]
+  },
+  "bad-plugin-entry-not-dependency": {
+    "expect": ["FAIL app.config.ts:", "[plugin-entry]", "expo-camera is not a dependency"],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    'expo-router',\n",
+          "with": "    'expo-router',\n    ['expo-camera', { cameraPermission: 'Tasks scans a document into a task.' }],\n"
+        }
+      }
+    ]
+  },
+  "bad-plugin-entry-outside": {
+    "expect": ["FAIL app.config.ts:", "[plugin-entry]", "lives outside plugins/"],
+    "ops": [
+      {
+        "write": {
+          "file": "config/with-share-target.ts",
+          "content": "// config/with-share-target.ts\nconst withShareTarget = (config: unknown): unknown => config;\n\nexport default withShareTarget;\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    'expo-router',\n",
+          "with": "    'expo-router',\n    './config/with-share-target.ts',\n"
+        }
+      }
+    ]
+  },
+  "bad-plugin-import-bare": {
+    "expect": [
+      "FAIL plugins/with-android-optional-features.ts:",
+      "[plugin-import]",
+      "imports 'expo/config-plugins' on SDK 57"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "plugins/with-android-optional-features.ts",
+          "find": "import { withAndroidManifest } from 'expo/config-plugins.js';",
+          "with": "import { withAndroidManifest } from 'expo/config-plugins';"
+        }
+      }
+    ]
+  },
+  "bad-plugin-import-scoped": {
+    "expect": ["FAIL plugins/with-android-optional-features.ts:", "[plugin-import]", "imports @expo/config-plugins"],
+    "ops": [
+      {
+        "replace": {
+          "file": "plugins/with-android-optional-features.ts",
+          "find": "import { withAndroidManifest } from 'expo/config-plugins.js';",
+          "with": "import { withAndroidManifest } from '@expo/config-plugins';"
+        }
+      }
+    ]
+  },
+  "bad-plugin-import-sdk-58": {
+    "expect": ["[plugin-import]", "imports 'expo/config-plugins.js' on SDK 58"],
+    "ops": [
+      {
+        "write": {
+          "file": "node_modules/expo/package.json",
+          "content": "{ \"name\": \"expo\", \"version\": \"58.0.3\", \"main\": \"index.js\" }\n"
+        }
+      },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo"], "value": "~58.0.3" } }
+    ]
+  },
+  "bad-plugin-test-missing": {
+    "expect": ["plugins/with-android-optional-features.ts:1 [plugin-test]", "has no test beside it"],
+    "ops": [{ "delete": "plugins/with-android-optional-features.test.ts" }]
+  },
+  "bad-plugin-test-no-import": {
+    "expect": ["plugins/with-android-optional-features.test.ts:1 [plugin-test]", "the test never imports the plugin"],
+    "ops": [
+      {
+        "write": {
+          "file": "plugins/with-android-optional-features.test.ts",
+          "content": "// plugins/with-android-optional-features.test.ts\ndescribe('withAndroidOptionalFeatures', () => {\n  it('runs', () => {\n    expect(1).toBe(1);\n  });\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-plugin-test-unreached": {
+    "expect": ["plugins/with-android-optional-features.test.ts:1 [plugin-test]", "Jest never runs"],
+    "ops": [{ "replace": { "file": "jest.config.js", "find": ", '<rootDir>/plugins/**/'", "with": "" } }]
+  },
+  "bad-plugin-test-unreached-package-json": {
+    "expect": [
+      "plugins/with-android-optional-features.test.ts:1 [plugin-test]",
+      "no project in package.json \"jest\" matches plugins/"
+    ],
+    "ops": [
+      { "delete": "jest.config.js" },
+      { "json": { "file": "package.json", "path": ["jest"], "value": { "testMatch": ["<rootDir>/src/**/*.test.ts"] } } }
+    ]
+  },
+  "bad-prebuild-clean": {
+    "expect": ["FAIL package.json:", "[prebuild-clean]", "runs npx expo prebuild --no-clean"],
+    "ops": [
+      {
+        "json": { "file": "package.json", "path": ["scripts", "native:generate"], "value": "expo prebuild --no-clean" }
+      }
+    ]
+  },
+  "bad-prebuild-clean-eas": {
+    "expect": ["eas.json:7 [prebuild-clean]", "build.preview.prebuildCommand runs \"prebuild --no-clean\" on EAS Build"],
+    "ops": [
+      {
+        "write": {
+          "file": "eas.json",
+          "content": "{\n  \"cli\": { \"version\": \">= 18.0.0\", \"appVersionSource\": \"remote\" },\n  \"build\": {\n    \"development\": { \"developmentClient\": true, \"distribution\": \"internal\" },\n    \"preview\": {\n      \"distribution\": \"internal\",\n      \"prebuildCommand\": \"prebuild --no-clean\"\n    },\n    \"production\": { \"autoIncrement\": true }\n  }\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-single-config-app-json": {
+    "expect": ["app.json:1 [single-config]", "sits beside app.config.ts"],
+    "ops": [
+      { "write": { "file": "app.json", "lines": ["{ \"expo\": { \"name\": \"Tasks\", \"slug\": \"tasks\" } }"] } }
+    ]
+  },
+  "bad-single-config-js-only": {
+    "expect": ["app.config.js:1 [single-config]", "not app.config.ts"],
+    "ops": [
+      { "rename": { "from": "app.config.ts", "to": "app.config.js" } },
+      {
+        "replace": {
+          "file": "app.config.js",
+          "find": "import type { ConfigContext, ExpoConfig } from 'expo/config';\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.js",
+          "find": "function variantOf(env: Record<string, string | undefined>): Variant {",
+          "with": "function variantOf(env) {"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.js",
+          "find": "type Variant = 'development' | 'preview' | 'production';\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.js",
+          "find": "function plugins(): NonNullable<ExpoConfig['plugins']> {",
+          "with": "function plugins() {"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.js",
+          "find": "export default function appConfig({ config }: ConfigContext): ExpoConfig {",
+          "with": "export default function appConfig({ config }) {"
+        }
+      }
+    ]
+  },
+  "bad-single-config-second-config": {
+    "expect": ["app.config.js:1 [single-config]", "is never read"],
+    "ops": [{ "write": { "file": "app.config.js", "content": "module.exports = { name: 'Tasks', slug: 'tasks' };\n" } }]
+  },
+  "bad-text-mod-idempotent": {
+    "expect": [
+      "plugins/with-gradle-flavors.ts:7 [text-mod-idempotent]",
+      "withAppBuildGradle edits native source as text without a guard"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "plugins/with-gradle-flavors.ts",
+          "content": "// plugins/with-gradle-flavors.ts\nimport { withAppBuildGradle } from 'expo/config-plugins.js';\n\nimport type { ConfigPlugin } from 'expo/config-plugins.js';\n\nconst withGradleFlavors: ConfigPlugin = (config) =>\n  withAppBuildGradle(config, (next) => ({\n    ...next,\n    modResults: { ...next.modResults, contents: `${next.modResults.contents}\\nandroid { flavorDimensions 'tier' }\\n` },\n  }));\n\nexport default withGradleFlavors;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "plugins/with-gradle-flavors.test.ts",
+          "content": "// plugins/with-gradle-flavors.test.ts\nimport plugin from './with-gradle-flavors.ts';\n\ndescribe('withGradleFlavors', () => {\n  it('is a function', () => {\n    expect(typeof plugin).toBe('function');\n  });\n});\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    'expo-router',\n",
+          "with": "    'expo-router',\n    './plugins/with-gradle-flavors.ts',\n"
+        }
+      }
+    ]
+  },
+  "bad-text-mod-idempotent-dangerous-append": {
+    "expect": [
+      "plugins/with-xcode-node-options.ts:11 [text-mod-idempotent]",
+      "withDangerousMod edits native source as text without a guard (appendFileSync appends)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "plugins/with-xcode-node-options.ts",
+          "content": "// plugins/with-xcode-node-options.ts\nimport { appendFileSync } from 'node:fs';\nimport { join } from 'node:path';\n\nimport { withDangerousMod } from 'expo/config-plugins.js';\n\nimport type { ConfigPlugin } from 'expo/config-plugins.js';\n\nconst withXcodeNodeOptions: ConfigPlugin = (config) =>\n  // dangerous-mod: no typed mod or config key writes ios/.xcode.env, which the bundle build phase sources\n  withDangerousMod(config, [\n    'ios',\n    (next) => {\n      appendFileSync(join(next.modRequest.platformProjectRoot, '.xcode.env'), '\\nexport NODE_OPTIONS=--max-old-space-size=4096\\n');\n      return next;\n    },\n  ]);\n\nexport default withXcodeNodeOptions;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "plugins/with-xcode-node-options.test.ts",
+          "content": "// plugins/with-xcode-node-options.test.ts\nimport plugin from './with-xcode-node-options.ts';\n\ndescribe('withXcodeNodeOptions', () => {\n  it('is a function', () => {\n    expect(typeof plugin).toBe('function');\n  });\n});\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    'expo-router',\n",
+          "with": "    'expo-router',\n    './plugins/with-xcode-node-options.ts',\n"
+        }
+      }
+    ]
+  },
+  "bad-text-mod-idempotent-read-write": {
+    "expect": ["plugins/with-xcode-node-options.ts:13 [text-mod-idempotent]", "reads file and writes it back"],
+    "ops": [
+      {
+        "write": {
+          "file": "plugins/with-xcode-node-options.ts",
+          "content": "// plugins/with-xcode-node-options.ts\nimport { readFileSync, writeFileSync } from 'node:fs';\nimport { join } from 'node:path';\n\nimport { withDangerousMod } from 'expo/config-plugins.js';\n\nimport type { ConfigPlugin } from 'expo/config-plugins.js';\n\nconst LINE = 'export NODE_OPTIONS=--max-old-space-size=4096';\n\nconst withXcodeNodeOptions: ConfigPlugin = (config) =>\n  // dangerous-mod: no typed mod or config key writes ios/.xcode.env, which the bundle build phase sources\n  withDangerousMod(config, ['ios', (next) => addLine(next, join(next.modRequest.platformProjectRoot, '.xcode.env'))]);\n\nfunction addLine<T>(next: T, file: string): T {\n  const contents = readFileSync(file, 'utf8');\n  writeFileSync(file, `${contents.trimEnd()}\\n${LINE}\\n`);\n  return next;\n}\n\nexport default withXcodeNodeOptions;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "plugins/with-xcode-node-options.test.ts",
+          "content": "// plugins/with-xcode-node-options.test.ts\nimport plugin from './with-xcode-node-options.ts';\n\ndescribe('withXcodeNodeOptions', () => {\n  it('is a function', () => {\n    expect(typeof plugin).toBe('function');\n  });\n});\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    'expo-router',\n",
+          "with": "    'expo-router',\n    './plugins/with-xcode-node-options.ts',\n"
+        }
+      }
+    ]
+  },
+  "bad-text-mod-idempotent-validated": {
+    "expect": [
+      "plugins/with-extra-pods.ts:19 [text-mod-idempotent]",
+      "withPodfile edits native source as text without a guard"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "plugins/with-extra-pods.ts",
+          "content": "// plugins/with-extra-pods.ts\nimport { withPodfile } from 'expo/config-plugins.js';\n\nimport type { ConfigPlugin } from 'expo/config-plugins.js';\n\ntype ExtraPodsOptions = { readonly pods: readonly string[] };\n\nconst POD_NAME = /^[A-Za-z][A-Za-z0-9_-]*$/;\n\nfunction validatePods(options: ExtraPodsOptions): readonly string[] {\n  for (const pod of options.pods) {\n    if (!POD_NAME.test(pod)) throw new Error(`withExtraPods: \"${pod}\" is not a pod name.`);\n  }\n  return options.pods;\n}\n\nconst withExtraPods: ConfigPlugin<ExtraPodsOptions> = (config, options) => {\n  const pods = validatePods(options);\n  return withPodfile(config, (next) => {\n    const lines = pods.map((pod) => `  pod '${pod}'`).join('\\n');\n    next.modResults.contents = next.modResults.contents.replace('use_expo_modules!', `use_expo_modules!\\n${lines}`);\n    return next;\n  });\n};\n\nexport default withExtraPods;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "plugins/with-extra-pods.test.ts",
+          "content": "// plugins/with-extra-pods.test.ts\nimport plugin from './with-extra-pods.ts';\n\ndescribe('withExtraPods', () => {\n  it('is a function', () => {\n    expect(typeof plugin).toBe('function');\n  });\n});\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    'expo-router',\n",
+          "with": "    'expo-router',\n    ['./plugins/with-extra-pods.ts', { pods: ['Lottie'] }],\n"
+        }
+      }
+    ]
+  },
+  "error-bad-contract-json": {
+    "expect": ["ERROR [bad-input] contracts/native-generation.json is not valid JSON"],
+    "ops": [{ "write": { "file": "contracts/native-generation.json", "content": "{ \"mode\": \"generated\", }\n" } }]
+  },
+  "error-bad-env": {
+    "expect": ["ERROR [bad-input] --env TASKS_FLAG is not KEY=VALUE"],
+    "args": "{dir} --env TASKS_FLAG",
+    "ops": []
+  },
+  "error-missing-package": {
+    "expect": ["ERROR [bad-input] app.config.ts imports a package that is not installed"],
+    "ops": [
+      { "delete": "node_modules" },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "import type { ConfigContext, ExpoConfig } from 'expo/config';\n",
+          "with": "import type { ConfigContext, ExpoConfig } from 'expo/config';\nimport { taskDefaults } from 'tasks-config-kit';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    plugins: plugins(),\n",
+          "with": "    plugins: plugins(),\n    description: String(taskDefaults),\n"
+        }
+      }
+    ]
+  },
+  "error-no-app-config": {
+    "expect": ["ERROR [bad-input] nothing to check: no app config"],
+    "ops": [{ "delete": "app.config.ts" }]
+  },
+  "pass-auto-plugin-transitive-blocked": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "node_modules/expo-file-system/package.json",
+          "content": "{\"name\":\"expo-file-system\",\"version\":\"57.0.9\",\"main\":\"build/index.js\"}\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    android: { package: `com.example.tasks${suffix}` },\n",
+          "with": "    android: {\n      package: `com.example.tasks${suffix}`,\n      blockedPermissions: ['READ_EXTERNAL_STORAGE', 'android.permission.WRITE_EXTERNAL_STORAGE'],\n    },\n"
+        }
+      }
+    ]
+  },
+  "pass-auto-plugin-transitive-blocked-wrong-case": {
+    "expect": [
+      "note: expo-file-system is installed through another package, not as a dependency",
+      "block android.permission.READ_EXTERNAL_STORAGE, android.permission.WRITE_EXTERNAL_STORAGE in android.blockedPermissions",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "node_modules/expo-file-system/package.json",
+          "content": "{\"name\":\"expo-file-system\",\"version\":\"57.0.9\",\"main\":\"build/index.js\"}\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    android: { package: `com.example.tasks${suffix}` },\n",
+          "with": "    android: {\n      package: `com.example.tasks${suffix}`,\n      blockedPermissions: ['READ_EXTERNAL_STORAGE', 'android.permission.write_external_storage'],\n    },\n"
+        }
+      }
+    ]
+  },
+  "pass-auto-plugin-transitive-note": {
+    "expect": [
+      "note: expo-location is installed through another package, not as a dependency",
+      "To set its options, make it a direct dependency first (npx expo install expo-location), then list it",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "node_modules/expo-location/package.json",
+          "content": "{ \"name\": \"expo-location\", \"version\": \"57.0.4\", \"main\": \"build/index.js\" }\n"
+        }
+      }
+    ]
+  },
+  "pass-auto-plugin-transitive-partial-block": {
+    "expect": [
+      "note: expo-file-system is installed through another package, not as a dependency",
+      "it adds the Android READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE and INTERNET permissions",
+      "To keep out what the app does not need, block android.permission.READ_EXTERNAL_STORAGE, android.permission.WRITE_EXTERNAL_STORAGE in android.blockedPermissions",
+      "listing the package does not remove them",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "node_modules/expo-file-system/package.json",
+          "content": "{\"name\":\"expo-file-system\",\"version\":\"57.0.9\",\"main\":\"build/index.js\"}\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    android: { package: `com.example.tasks${suffix}` },\n",
+          "with": "    android: { package: `com.example.tasks${suffix}`, blockedPermissions: ['READ_EXTERNAL_STORAGE'] },\n"
+        }
+      }
+    ]
+  },
+  "pass-committed": {
+    "expect": [
+      "note: committed mode: plugins, ios.infoPlist reach ios/ and android/ only through prebuild",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/native-generation.json",
+          "content": "{\n  \"mode\": \"committed\",\n  \"reason\": \"The app embeds a vendor SDK whose Xcode setup no config plugin automates; the native team edits ios/ and android/ by hand.\",\n  \"decidedOn\": \"2026-10-04\"\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "ios/Tasks/Info.plist",
+          "content": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<plist version=\"1.0\"><dict/></plist>\n"
+        }
+      },
+      { "write": { "file": "android/app/build.gradle", "content": "android { namespace \"com.example.tasks\" }\n" } },
+      { "json": { "file": "package.json", "path": ["scripts", "native:generate"], "delete": true } },
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "      - run: npx expo prebuild --clean --platform android\n",
+          "with": ""
+        }
+      },
+      { "replace": { "file": ".gitignore", "find": "/ios\n/android\n", "with": "" } }
+    ]
+  },
+  "pass-dangerous-mod-justified": {
+    "expect": ["check-native-generation:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "plugins/with-xcode-node-options.ts",
+          "content": "// plugins/with-xcode-node-options.ts\nimport { readFileSync, writeFileSync } from 'node:fs';\nimport { join } from 'node:path';\n\nimport { withDangerousMod } from 'expo/config-plugins.js';\n\nimport type { ConfigPlugin } from 'expo/config-plugins.js';\n\nconst LINE = 'export NODE_OPTIONS=--max-old-space-size=4096';\n\nconst withXcodeNodeOptions: ConfigPlugin = (config) =>\n  // dangerous-mod: no typed mod or config key writes ios/.xcode.env, which the bundle build phase sources\n  withDangerousMod(config, [\n    'ios',\n    (next) => {\n      const file = join(next.modRequest.platformProjectRoot, '.xcode.env');\n      const contents = readFileSync(file, 'utf8');\n      if (!contents.includes(LINE)) writeFileSync(file, `${contents.trimEnd()}\\n${LINE}\\n`);\n      return next;\n    },\n  ]);\n\nexport default withXcodeNodeOptions;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "plugins/with-xcode-node-options.test.ts",
+          "content": "// plugins/with-xcode-node-options.test.ts\nimport plugin from './with-xcode-node-options.ts';\n\ndescribe('withXcodeNodeOptions', () => {\n  it('is a function', () => {\n    expect(typeof plugin).toBe('function');\n  });\n});\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    'expo-router',\n",
+          "with": "    'expo-router',\n    './plugins/with-xcode-node-options.ts',\n"
+        }
+      }
+    ]
+  },
+  "pass-dangerous-mod-whole-file": {
+    "expect": ["check-native-generation:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "plugins/with-backup-rules.ts",
+          "content": "// plugins/with-backup-rules.ts\nimport { mkdirSync, writeFileSync } from 'node:fs';\nimport { dirname, join } from 'node:path';\n\nimport { withDangerousMod } from 'expo/config-plugins.js';\n\nimport type { ConfigPlugin } from 'expo/config-plugins.js';\n\n/** Android 12+ backup rules: keep the database, leave the cache out. */\nconst RULES = `<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<data-extraction-rules>\n  <cloud-backup>\n    <include domain=\"database\" path=\".\" />\n    <exclude domain=\"sharedpref\" path=\"cache.xml\" />\n  </cloud-backup>\n</data-extraction-rules>\n`;\n\nconst withBackupRules: ConfigPlugin = (config) =>\n  // dangerous-mod: no typed mod writes a new res/xml resource; the file is written whole on every run\n  withDangerousMod(config, [\n    'android',\n    (next) => {\n      const file = join(next.modRequest.platformProjectRoot, 'app/src/main/res/xml/data_extraction_rules.xml');\n      mkdirSync(dirname(file), { recursive: true });\n      writeFileSync(file, RULES);\n      return next;\n    },\n  ]);\n\nexport default withBackupRules;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "plugins/with-backup-rules.test.ts",
+          "content": "// plugins/with-backup-rules.test.ts\nimport plugin from './with-backup-rules.ts';\n\ndescribe('withBackupRules', () => {\n  it('is a function', () => {\n    expect(typeof plugin).toBe('function');\n  });\n});\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    'expo-router',\n",
+          "with": "    'expo-router',\n    './plugins/with-backup-rules.ts',\n"
+        }
+      }
+    ]
+  },
+  "pass-jest-in-package-json": {
+    "expect": ["check-native-generation:", "RESULT: PASS"],
+    "ops": [
+      { "delete": "jest.config.js" },
+      {
+        "json": {
+          "file": "package.json",
+          "path": ["jest"],
+          "value": {
+            "testMatch": ["<rootDir>/src/**/*.test.ts", "<rootDir>/plugins/**/*.test.ts", "<rootDir>/test/**/*.test.ts"]
+          }
+        }
+      }
+    ]
+  },
+  "pass-native-ignore-build-output": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      { "replace": { "file": ".gitignore", "find": "dist/\n", "with": "dist/\ndist-audit/\n" } },
+      {
+        "write": {
+          "file": "dist-audit/_expo/static/js/ios/index.js",
+          "content": "// build output of npx expo export, ignored with its folder\n"
+        }
+      },
+      {
+        "write": {
+          "file": "dist-audit/_expo/static/js/android/index.js",
+          "content": "// build output of npx expo export, ignored with its folder\n"
+        }
+      }
+    ]
+  },
+  "pass-native-reads": {
+    "expect": ["check-native-generation:", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": ".github/workflows/ci.yml",
+          "find": "      - run: npx expo prebuild --clean --platform android\n",
+          "with": "      - run: npx expo prebuild --clean --platform android\n      - run: ./android/gradlew -p android assembleRelease 2>&1 | tee build/gradle.log\n      - run: xcodebuild -workspace ios/Tasks.xcworkspace -scheme Tasks -destination \"id=$UDID\" build | tee build/xcodebuild.log\n      - run: xcodebuild -project ios/Tasks.xcodeproj -showBuildSettings -json > build/settings.json\n      - run: /usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' ios/Tasks/Info.plist\n      - run: git apply patches/ios-podfile-lock.patch --check\n"
+        }
+      },
+      {
+        "write": {
+          "file": "scripts/release/read-ios-build.ts",
+          "content": "// scripts/release/read-ios-build.ts\n// Reads the build number prebuild wrote into the generated Info.plist (read-only).\nimport { execFileSync } from 'node:child_process';\n\nexport function readIosBuild(): string {\n  return execFileSync('plutil', ['-extract', 'CFBundleVersion', 'raw', 'ios/Tasks/Info.plist'], { encoding: 'utf8' }).trim();\n}\n\nexport function readSigningSettings(): string {\n  return execFileSync('xcodebuild', ['-project', 'ios/Tasks.xcodeproj', '-showBuildSettings', '-json'], { encoding: 'utf8' });\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-no-jest-config": {
+    "expect": [
+      "SKIP jest.config.js [plugin-test] not yet created (unit-and-component-tests creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [{ "delete": "jest.config.js" }]
+  },
+  "pass-not-expo": {
+    "expect": ["NOT APPLICABLE: expo is not a dependency in package.json"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo"], "delete": true } }]
+  },
+  "pass-sdk-58": {
+    "expect": ["check-native-generation:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "node_modules/expo/package.json",
+          "content": "{ \"name\": \"expo\", \"version\": \"58.0.3\", \"main\": \"index.js\" }\n"
+        }
+      },
+      { "json": { "file": "package.json", "path": ["dependencies", "expo"], "value": "~58.0.3" } },
+      {
+        "replace": {
+          "file": "plugins/with-android-optional-features.ts",
+          "find": "from 'expo/config-plugins.js';",
+          "with": "from 'expo/config-plugins';",
+          "count": 2
+        }
+      },
+      {
+        "replace": {
+          "file": "plugins/with-android-optional-features.test.ts",
+          "find": "from 'expo/config-plugins.js';",
+          "with": "from 'expo/config-plugins';"
+        }
+      },
+      {
+        "replace": {
+          "file": "test/config-plugins/run-mod.test.ts",
+          "find": "from 'expo/config-plugins.js';",
+          "with": "from 'expo/config-plugins';",
+          "count": 2
+        }
+      }
+    ]
+  },
+  "pass-text-mod-guard-in-helper": {
+    "expect": ["check-native-generation:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "plugins/with-extra-pods.ts",
+          "content": "// plugins/with-extra-pods.ts\nimport { withPodfile } from 'expo/config-plugins.js';\n\nimport type { ConfigPlugin } from 'expo/config-plugins.js';\n\ntype ExtraPodsOptions = { readonly pods: readonly string[] };\n\nconst POD_NAME = /^[A-Za-z][A-Za-z0-9_-]*$/;\n\nfunction validatePods(options: ExtraPodsOptions): readonly string[] {\n  for (const pod of options.pods) {\n    if (!POD_NAME.test(pod)) throw new Error(`withExtraPods: \"${pod}\" is not a pod name.`);\n  }\n  return options.pods;\n}\n\nconst withExtraPods: ConfigPlugin<ExtraPodsOptions> = (config, options) => {\n  const pods = validatePods(options);\n  return withPodfile(config, (next) => {\n    next.modResults.contents = addPods(next.modResults.contents, pods);\n    return next;\n  });\n};\n\n/** Adds each pod once, after use_expo_modules!; a pod already listed is left alone. */\nexport const addPods = (contents: string, pods: readonly string[]): string =>\n  pods.reduce((text, pod) => (text.includes(`pod '${pod}'`) ? text : text.replace('use_expo_modules!', `use_expo_modules!\\n  pod '${pod}'`)), contents);\n\nexport default withExtraPods;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "plugins/with-extra-pods.test.ts",
+          "content": "// plugins/with-extra-pods.test.ts\nimport plugin from './with-extra-pods.ts';\n\ndescribe('withExtraPods', () => {\n  it('is a function', () => {\n    expect(typeof plugin).toBe('function');\n  });\n});\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    'expo-router',\n",
+          "with": "    'expo-router',\n    ['./plugins/with-extra-pods.ts', { pods: ['Lottie'] }],\n"
+        }
+      }
+    ]
+  },
+  "pass-text-mod-guard-in-lib": {
+    "expect": ["check-native-generation:", "RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "plugins/lib/gradle-blocks.ts",
+          "content": "// plugins/lib/gradle-blocks.ts\nimport { CodeGenerator } from 'expo/config-plugins.js';\n\n/**\n * Adds lines after the first match of `anchor` once, inside a tagged block that a second run finds\n * and replaces (CodeGenerator.mergeContents), so a rerun never duplicates them.\n */\nexport function addGradleLines(contents: string, tag: string, anchor: RegExp, lines: readonly string[]): string {\n  return CodeGenerator.mergeContents({ tag, src: contents, newSrc: lines.join('\\n'), anchor, offset: 1, comment: '//' }).contents;\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "plugins/with-vendor-sdk.ts",
+          "content": "// plugins/with-vendor-sdk.ts\nimport { withAppBuildGradle } from 'expo/config-plugins.js';\n\nimport { addGradleLines } from './lib/gradle-blocks.ts';\n\nimport type { ConfigPlugin } from 'expo/config-plugins.js';\n\ntype VendorSdkOptions = { readonly version: string };\n\nconst VERSION = /^\\d+\\.\\d+\\.\\d+$/;\n\nconst withVendorSdk: ConfigPlugin<VendorSdkOptions> = (config, { version }) => {\n  if (!VERSION.test(version)) throw new Error(`withVendorSdk: \"${version}\" is not a version.`);\n  return withAppBuildGradle(config, (next) => {\n    next.modResults.contents = addGradleLines(next.modResults.contents, 'with-vendor-sdk', /^dependencies\\s*\\{/m, [\n      `    implementation \"com.example.vendor:sdk:${version}\"`,\n    ]);\n    return next;\n  });\n};\n\nexport default withVendorSdk;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "plugins/with-vendor-sdk.test.ts",
+          "content": "// plugins/with-vendor-sdk.test.ts\nimport plugin from './with-vendor-sdk.ts';\n\ndescribe('withVendorSdk', () => {\n  it('is a function', () => {\n    expect(typeof plugin).toBe('function');\n  });\n});\n"
+        }
+      },
+      {
+        "write": {
+          "file": "plugins/with-packaging-excludes.ts",
+          "content": "// plugins/with-packaging-excludes.ts\nimport { withAppBuildGradle } from 'expo/config-plugins.js';\n\nimport * as gradle from './lib/gradle-blocks.ts';\n\nimport type { ConfigPlugin } from 'expo/config-plugins.js';\n\nconst withPackagingExcludes: ConfigPlugin = (config) =>\n  withAppBuildGradle(config, (next) => ({\n    ...next,\n    modResults: {\n      ...next.modResults,\n      contents: gradle.addGradleLines(next.modResults.contents, 'with-packaging-excludes', /^android\\s*\\{/m, [\n        \"    packaging { resources { excludes += ['META-INF/LICENSE*'] } }\",\n      ]),\n    },\n  }));\n\nexport default withPackagingExcludes;\n"
+        }
+      },
+      {
+        "write": {
+          "file": "plugins/with-packaging-excludes.test.ts",
+          "content": "// plugins/with-packaging-excludes.test.ts\nimport plugin from './with-packaging-excludes.ts';\n\ndescribe('withPackagingExcludes', () => {\n  it('is a function', () => {\n    expect(typeof plugin).toBe('function');\n  });\n});\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "    'expo-router',\n",
+          "with": "    'expo-router',\n    ['./plugins/with-vendor-sdk.ts', { version: '4.2.0' }],\n    './plugins/with-packaging-excludes.ts',\n"
+        }
+      }
+    ]
+  },
+  "pass-unanchored-note": {
+    "expect": ["note: .gitignore line", "is not anchored", "RESULT: PASS"],
+    "ops": [{ "replace": { "file": ".gitignore", "find": "/ios\n/android\n", "with": "ios/\nandroid/\n" } }]
+  }
+}

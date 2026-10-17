@@ -1,0 +1,29 @@
+{
+  "bad-pack-hand-edited": {
+    "expect": ["[pack-stale]", "src/games/lights-out/levels/pack-1.json", "entry 0: committed"],
+    "ops": [
+      {
+        "$comment": "A hand-edited star threshold: the plan generates [0, 20, 24].",
+        "replace": {
+          "file": "src/games/lights-out/levels/pack-1.json",
+          "find": "\"thresholds\": [0, 20, 24]",
+          "with": "\"thresholds\": [0, 20, 30]",
+          "occurrence": 1
+        }
+      }
+    ]
+  },
+  "bad-pack-unformatted": {
+    "expect": [
+      "[pack-format]",
+      "src/games/lights-out/levels/pack-2.json:8",
+      "holds the right levels but not the bytes generate-levels.ts writes"
+    ],
+    "ops": [
+      {
+        "$comment": "The right levels written in plain JSON.stringify layout: thresholds spread over five lines instead of Prettier's one.",
+        "reformat": { "file": "src/games/lights-out/levels/pack-2.json" }
+      }
+    ]
+  }
+}

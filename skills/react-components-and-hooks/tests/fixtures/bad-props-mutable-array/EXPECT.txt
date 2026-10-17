@@ -1,0 +1,3 @@
+[props-readonly] TaskTagsProps.tags is a mutable array
+src/features/tasks/components/task-tags.tsx:9
+RESULT: FAIL (1 problems)

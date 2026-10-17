@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Native library decisions",
+  "description": "One entry per direct native dependency that check-native-libraries.mjs classifies as interop (legacy architecture code run through React Native's interop layer), or whose classification the app overrides with evidence.",
+  "type": "object",
+  "required": ["libraries"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "libraries": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["architecture", "decision", "reason", "evidence", "recheckBy"],
+        "additionalProperties": false,
+        "properties": {
+          "architecture": {
+            "enum": ["interop", "new"],
+            "description": "interop: the package ships legacy architecture code and runs through the interop layer. new: the package is native on the New Architecture although the checker classifies it otherwise (for example a JSI library without codegenConfig), or it is excluded from expo-doctor's directory check; the evidence says which."
+          },
+          "decision": {
+            "enum": ["keep", "replace"],
+            "description": "keep: the app ships it on the interop layer for now. replace: a move to replaceWith is planned."
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 10,
+            "description": "Why the app needs this package now."
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 10,
+            "description": "What was checked and where: the React Native Directory entry, the library's issue, the screens tested on an iOS simulator and an Android emulator."
+          },
+          "recheckBy": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "description": "The date by which the entry is checked again (the interop layer is scheduled for removal; every SDK move is a recheck too)."
+          },
+          "replaceWith": {
+            "type": "string",
+            "description": "The package or local module that replaces it (decision replace)."
+          }
+        }
+      }
+    }
+  }
+}
