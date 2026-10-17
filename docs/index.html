@@ -9,146 +9,269 @@
 <meta property="og:description" content="79 self-verifying skills for Expo apps: rules with reasons, compiling templates, and a checker that proves the work.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://zakaria.dev/ReactNative-Skills/">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%233f7cf4'/%3E%3Cpath d='M9 16.5l4.5 4.5L23 11.5' stroke='white' stroke-width='3.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#F7F4EC" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1628" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2314213D'/%3E%3Cpath d='M9 16.5l4.5 4.5L23 11.5' stroke='%23F7F4EC' stroke-width='3.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <style>
   :root{
-    --bg:#f7f9fc; --bg-soft:#eef2f8; --panel:#ffffff; --panel-2:#f3f6fb;
-    --border:#dfe5ee; --border-soft:#e8edf4;
-    --text:#111826; --muted:#4f5c73; --faint:#7b879b;
-    --accent:#2457d6; --accent-soft:rgba(36,87,214,.10);
-    --ok:#137a4b; --ok-soft:rgba(19,122,75,.12); --warn:#9a5b00; --warn-soft:rgba(154,91,0,.12);
-    --games:#7a3fd1; --games-soft:rgba(122,63,209,.12);
-    --radius:14px; --maxw:1140px;
-    --shadow:0 1px 2px rgba(16,24,40,.05),0 10px 28px rgba(16,24,40,.07);
+    --bg:#F7F4EC; --bg-soft:#F1ECE0; --panel:#FFFDF7; --panel-2:#F4EFE3;
+    --border:rgba(20,33,61,.16); --border-soft:rgba(20,33,61,.09);
+    --text:#14213D; --muted:#4A5470; --faint:#7D8497;
+    --accent:#2457D6; --accent-soft:rgba(36,87,214,.09);
+    --ok:#137A4B; --ok-soft:rgba(19,122,75,.11); --fail:#B3261E; --fail-soft:rgba(179,38,30,.1);
+    --warn:#9a5b00; --warn-soft:rgba(154,91,0,.11);
+    --games:#6B3FC7; --games-soft:rgba(107,63,199,.11);
+    --term:#14213D; --term-text:#EDEAE0; --term-dim:rgba(237,234,224,.5);
+    --term-red:#FF8A80; --term-green:#7EE2A8; --term-blue:#8FB0FF;
+    --radius:14px; --maxw:1160px;
+    --shadow:0 1px 0 rgba(20,33,61,.03),0 30px 60px -36px rgba(20,33,61,.38);
+    --serif:"Iowan Old Style","Charter","Georgia","Cambria","Noto Serif",serif;
     --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
     --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --ease:cubic-bezier(.2,.7,.2,1);
     color-scheme:light;
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
-      --bg:#0b0e13; --bg-soft:#10141b; --panel:#141a23; --panel-2:#19202b;
-      --border:#253042; --border-soft:#1d2532;
-      --text:#e7ecf3; --muted:#a3b0c2; --faint:#7a8799;
-      --accent:#7aa5ff; --accent-soft:rgba(122,165,255,.14);
-      --ok:#4fd39a; --ok-soft:rgba(79,211,154,.13); --warn:#f0b43c; --warn-soft:rgba(240,180,60,.14);
-      --games:#b892ff; --games-soft:rgba(184,146,255,.14);
-      --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 30px rgba(0,0,0,.3);
+      --bg:#0E1628; --bg-soft:#121C31; --panel:#16213A; --panel-2:#1B2742;
+      --border:rgba(242,238,227,.16); --border-soft:rgba(242,238,227,.08);
+      --text:#F2EEE3; --muted:#B9BFCC; --faint:#8790A3;
+      --accent:#8FB0FF; --accent-soft:rgba(143,176,255,.12);
+      --ok:#6FD6A0; --ok-soft:rgba(111,214,160,.12); --fail:#FF8A80; --fail-soft:rgba(255,138,128,.12);
+      --warn:#F0B43C; --warn-soft:rgba(240,180,60,.13);
+      --games:#B892FF; --games-soft:rgba(184,146,255,.13);
+      --term:#0A1120;
+      --shadow:0 1px 0 rgba(0,0,0,.3),0 30px 60px -30px rgba(0,0,0,.6);
       color-scheme:dark;
     }
   }
   :root[data-theme="dark"]{
-    --bg:#0b0e13; --bg-soft:#10141b; --panel:#141a23; --panel-2:#19202b;
-    --border:#253042; --border-soft:#1d2532;
-    --text:#e7ecf3; --muted:#a3b0c2; --faint:#7a8799;
-    --accent:#7aa5ff; --accent-soft:rgba(122,165,255,.14);
-    --ok:#4fd39a; --ok-soft:rgba(79,211,154,.13); --warn:#f0b43c; --warn-soft:rgba(240,180,60,.14);
-    --games:#b892ff; --games-soft:rgba(184,146,255,.14);
-    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 30px rgba(0,0,0,.3);
+    --bg:#0E1628; --bg-soft:#121C31; --panel:#16213A; --panel-2:#1B2742;
+    --border:rgba(242,238,227,.16); --border-soft:rgba(242,238,227,.08);
+    --text:#F2EEE3; --muted:#B9BFCC; --faint:#8790A3;
+    --accent:#8FB0FF; --accent-soft:rgba(143,176,255,.12);
+    --ok:#6FD6A0; --ok-soft:rgba(111,214,160,.12); --fail:#FF8A80; --fail-soft:rgba(255,138,128,.12);
+    --warn:#F0B43C; --warn-soft:rgba(240,180,60,.13);
+    --games:#B892FF; --games-soft:rgba(184,146,255,.13);
+    --term:#0A1120;
+    --shadow:0 1px 0 rgba(0,0,0,.3),0 30px 60px -30px rgba(0,0,0,.6);
     color-scheme:dark;
   }
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
-  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{transition:none!important}}
   body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
   a{color:var(--accent)}
   code,.mono{font-family:var(--mono)}
   .wrap{max-width:var(--maxw);margin:0 auto;padding:0 16px}
-  @media (min-width:720px){.wrap{padding:0 24px}}
+  @media (min-width:720px){.wrap{padding:0 28px}}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
   .skip{position:absolute;left:-999px;top:8px;background:var(--panel);padding:8px 12px;border-radius:8px;z-index:100}
   .skip:focus{left:8px}
   :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .serif{font-family:var(--serif);font-weight:400;letter-spacing:-.015em}
+  .label{font-size:12.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
+  /* paper grain, very light */
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.05;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+  :root[data-theme="dark"] body::before{mix-blend-mode:screen;opacity:.035}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) body::before{mix-blend-mode:screen;opacity:.035}}
+  main,footer,header{position:relative;z-index:1}
+
   /* nav */
-  header.nav{position:sticky;top:0;z-index:50;backdrop-filter:saturate(140%) blur(10px);background:color-mix(in srgb,var(--bg) 85%,transparent);border-bottom:1px solid var(--border-soft)}
-  .nav-in{display:flex;align-items:center;gap:12px;height:58px}
-  .brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--text);text-decoration:none;white-space:nowrap}
-  .logo{width:26px;height:26px;border-radius:7px;background:var(--accent);display:grid;place-items:center;flex:none}
-  .nav-links{margin-left:auto;display:flex;align-items:center;gap:4px}
+  header.nav{position:sticky;top:0;z-index:50;backdrop-filter:saturate(140%) blur(12px);-webkit-backdrop-filter:saturate(140%) blur(12px);background:color-mix(in srgb,var(--bg) 82%,transparent);border-bottom:1px solid transparent;transition:border-color .3s}
+  header.nav.scrolled{border-bottom-color:var(--border-soft)}
+  .nav-in{display:flex;align-items:center;gap:12px;height:60px}
+  .brand{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-weight:600;font-size:14.5px;color:var(--text);text-decoration:none;white-space:nowrap}
+  .logo{width:26px;height:26px;border-radius:7px;background:var(--text);display:grid;place-items:center;flex:none}
+  .logo path{stroke:var(--bg)}
+  .nav-links{margin-left:auto;display:flex;align-items:center;gap:2px}
   .nav-links a{padding:8px 10px;border-radius:9px;color:var(--muted);font-size:14px;font-weight:500;text-decoration:none}
-  .nav-links a:hover{color:var(--text);background:var(--panel-2)}
-  .icon-btn{display:inline-grid;place-items:center;min-width:36px;height:36px;padding:0 8px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--muted);cursor:pointer;font-size:13px;font-family:var(--sans)}
+  .nav-links a:hover{color:var(--text);background:var(--accent-soft)}
+  .icon-btn{display:inline-grid;place-items:center;min-width:36px;height:36px;padding:0 10px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--muted);cursor:pointer;font-size:13px;font-family:var(--sans);transition:color .2s,border-color .2s}
   .icon-btn:hover{color:var(--text);border-color:var(--accent)}
-  @media (max-width:640px){.nav-links a.hide-sm{display:none}}
+  @media (max-width:720px){.nav-links a.hide-sm{display:none}}
+
+  /* reveal on scroll */
+  .rv{opacity:0;transform:translateY(22px);filter:blur(4px);transition:opacity .9s var(--ease),transform .9s var(--ease),filter .9s var(--ease);transition-delay:var(--d,0s)}
+  .rv.in{opacity:1;transform:none;filter:none}
+
   /* hero */
-  .hero{padding:56px 0 28px}
-  .pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
-  .pill{padding:4px 11px;border:1px solid var(--border);background:var(--panel);border-radius:999px;font-size:12.5px;color:var(--muted);font-weight:500}
-  h1{font-size:clamp(30px,5.4vw,52px);line-height:1.08;letter-spacing:-.025em;margin:0 0 16px;font-weight:800}
-  h1 em{font-style:normal;color:var(--accent)}
-  .lede{font-size:clamp(16px,2vw,19px);color:var(--muted);max-width:680px;margin:0 0 24px}
-  .result{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:13px;background:var(--ok-soft);color:var(--ok);padding:3px 9px;border-radius:7px;font-weight:600}
-  .cmd{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px 10px 10px 14px;font-family:var(--mono);font-size:13.5px;box-shadow:var(--shadow);max-width:620px;margin-top:10px}
+  .hero{padding:72px 0 40px}
+  .hero-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:56px;align-items:center}
+  @media (max-width:980px){.hero-grid{grid-template-columns:minmax(0,1fr);gap:40px}}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,6.4vw,76px);line-height:1.02;letter-spacing:-.03em;margin:18px 0 22px}
+  h1 em{font-style:italic;color:var(--accent)}
+  h1 .w{display:inline-block;opacity:0;transform:translateY(.4em);filter:blur(6px);animation:word .9s var(--ease) forwards;animation-delay:calc(var(--i) * 70ms + 150ms)}
+  @keyframes word{to{opacity:1;transform:none;filter:none}}
+  .lede{font-size:clamp(17px,1.9vw,19.5px);color:var(--muted);max-width:600px;margin:0 0 26px;line-height:1.6}
+  .result{display:inline-flex;align-items:center;font-family:var(--mono);font-size:.82em;background:var(--ok-soft);color:var(--ok);padding:2px 8px;border-radius:7px;font-weight:700;white-space:nowrap}
+  .cmd{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:9px 9px 9px 14px;font-family:var(--mono);font-size:13.5px;max-width:560px;margin-top:10px;box-shadow:var(--shadow)}
   .cmd code{overflow-x:auto;white-space:nowrap;flex:1;min-width:0}
   .cmd .pr{color:var(--accent);font-weight:700;flex:none}
-  .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:36px 0 0}
-  .stat{background:var(--panel);border:1px solid var(--border-soft);border-radius:var(--radius);padding:16px 18px}
-  .stat .n{font-size:24px;font-weight:800;letter-spacing:-.02em}
-  .stat .l{color:var(--muted);font-size:13px}
-  @media (max-width:720px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  .pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}
+  .pill{padding:5px 12px;border:1px solid var(--border);border-radius:999px;font-size:12.5px;color:var(--muted);font-weight:500}
+
+  /* the live checker */
+  .term{background:var(--term);color:var(--term-text);border-radius:16px;box-shadow:0 50px 90px -45px rgba(20,33,61,.7),0 0 0 1px rgba(255,255,255,.04) inset;overflow:hidden;font-family:var(--mono)}
+  .term-head{height:42px;display:flex;align-items:center;gap:8px;padding:0 16px;border-bottom:1px solid rgba(255,255,255,.07);font-size:12.5px;color:var(--term-dim)}
+  .term-head i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.16)}
+  .term-head span{margin-left:8px}
+  .term-body{padding:22px 22px 24px;font-size:13.5px;line-height:1.85;min-height:356px}
+  .term-body .ln{white-space:pre-wrap;word-break:break-word;opacity:0;transform:translateY(6px);transition:opacity .35s var(--ease),transform .35s var(--ease)}
+  .term-body .ln.on{opacity:1;transform:none}
+  .term-body .p{color:var(--term-blue)}
+  .term-body .r{color:var(--term-red)}
+  .term-body .g{color:var(--term-green)}
+  .term-body .d{color:var(--term-dim)}
+  .term-body .big{font-size:17px;font-weight:700;margin-top:6px}
+  .caret{display:inline-block;width:.6em;height:1.1em;vertical-align:-.18em;background:var(--term-blue);margin-left:2px;animation:blink 1.1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .term-foot{display:flex;gap:16px;flex-wrap:wrap;padding:12px 22px;border-top:1px solid rgba(255,255,255,.07);font-size:12px;color:var(--term-dim)}
+  .term-foot b{color:var(--term-green);font-weight:700}
+
+  /* proof band */
+  .proof{padding:30px 0 10px}
+  .nums{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+  .num{padding:26px 22px 24px;border-left:1px solid var(--border-soft)}
+  .num:first-child{border-left:0;padding-left:0}
+  .num .n{font-family:var(--serif);font-size:clamp(38px,5vw,60px);line-height:1;letter-spacing:-.03em}
+  .num .l{color:var(--muted);font-size:14px;margin-top:8px}
+  @media (max-width:760px){.nums{grid-template-columns:repeat(2,minmax(0,1fr))}.num:nth-child(3){border-left:0;padding-left:0}.num:nth-child(n+3){border-top:1px solid var(--border-soft)}}
+  .ribbon{position:relative;overflow:hidden;margin-top:26px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+  .ribbon-track{display:flex;gap:30px;width:max-content;animation:drift 120s linear infinite}
+  .ribbon:hover .ribbon-track{animation-play-state:paused}
+  @keyframes drift{to{transform:translateX(-50%)}}
+  .bug{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:13px;color:var(--muted);white-space:nowrap}
+  .bug .x{color:var(--fail);font-weight:700}
+  .bug .c{color:var(--ok);font-size:11.5px;font-weight:600;letter-spacing:.04em}
+  .ribbon-cap{color:var(--faint);font-size:13.5px;margin:12px 0 0}
+
   /* sections */
-  section{padding:44px 0}
-  .kicker{color:var(--accent);font-weight:700;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase}
-  h2{font-size:clamp(22px,3.2vw,30px);letter-spacing:-.02em;margin:6px 0 6px;font-weight:800}
-  .sub{color:var(--muted);max-width:680px;margin:0 0 20px}
-  .feat{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
-  .fcard{background:var(--panel);border:1px solid var(--border-soft);border-radius:var(--radius);padding:20px}
-  .fcard h3{margin:0 0 6px;font-size:16px}
-  .fcard p{margin:0;color:var(--muted);font-size:14px}
+  section{padding:84px 0}
+  h2{font-family:var(--serif);font-weight:400;font-size:clamp(32px,4.4vw,52px);line-height:1.08;letter-spacing:-.025em;margin:12px 0 14px}
+  h2 em{font-style:italic;color:var(--accent)}
+  .sub{color:var(--muted);max-width:640px;margin:0 0 34px;font-size:17px}
+
+  /* why */
+  .feat{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--border)}
+  @media (max-width:900px){.feat{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (max-width:600px){.feat{grid-template-columns:minmax(0,1fr)}}
+  .fitem{padding:28px 26px 30px 0;border-bottom:1px solid var(--border-soft)}
+  .fitem .k{font-family:var(--mono);font-size:12.5px;color:var(--accent);font-weight:600}
+  .fitem h3{font-family:var(--serif);font-weight:400;font-size:25px;letter-spacing:-.015em;line-height:1.2;margin:10px 0 8px}
+  .fitem p{margin:0;color:var(--muted);font-size:15px}
+
+  /* anatomy */
+  .anat{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:56px}
+  @media (max-width:900px){.anat{grid-template-columns:minmax(0,1fr);gap:20px}}
+  .tree-wrap{position:sticky;top:110px;align-self:start}
+  @media (max-width:900px){.tree-wrap{position:static}}
+  .tree{font-family:var(--mono);font-size:clamp(17px,1.8vw,22px);line-height:2.2;margin-top:6px}
+  .tree div{color:var(--muted);transition:color .4s,transform .4s var(--ease)}
+  .tree div.on{color:var(--accent);transform:translateX(8px)}
+  .tree div:first-child{color:var(--text)}
+  .tree-note{color:var(--faint);font-size:14px;margin-top:18px;max-width:340px}
+  .steps{display:flex;flex-direction:column;gap:60px}
+  .step .k{font-family:var(--mono);font-size:12.5px;color:var(--accent);font-weight:600}
+  .step h3{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3vw,34px);letter-spacing:-.02em;line-height:1.15;margin:8px 0 10px}
+  .step > p{color:var(--muted);margin:0 0 20px;max-width:560px}
+  .paper{background:var(--panel);border:1px solid var(--border-soft);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+  .paper-head{height:40px;display:flex;align-items:center;gap:7px;padding:0 16px;border-bottom:1px solid var(--border-soft);font-family:var(--mono);font-size:12.5px;color:var(--faint)}
+  .paper-head i{width:9px;height:9px;border-radius:50%;background:var(--border)}
+  .paper-head span{margin-left:8px}
+  .paper-body{padding:22px 24px}
+  .md-h{font-family:var(--mono);font-size:12.5px;color:var(--faint);margin:0 0 8px}
+  .rule{font-family:var(--serif);font-size:21px;line-height:1.35;margin:0}
+  .rule b{color:var(--accent);font-weight:400}
+  .why{color:var(--muted);font-family:var(--serif);font-size:16.5px;margin:10px 0 0}
+  .why b{color:var(--text);font-weight:700}
+  .bars{display:flex;flex-direction:column;gap:9px;margin:4px 0 0}
+  .bars div{display:flex;gap:10px;align-items:center;font-family:var(--mono);font-size:12.5px;color:var(--accent)}
+  .bars i{height:7px;border-radius:4px;background:var(--border-soft)}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px;margin-top:16px;font-family:var(--serif);font-size:17px}
+  .two .label{font-size:11px}
+  .files{font-family:var(--mono);font-size:13.5px;line-height:2;color:var(--text)}
+  .code{font-family:var(--mono);font-size:13px;line-height:1.75;white-space:pre;overflow-x:auto}
+  .code .c{color:var(--faint)} .code .k{color:var(--accent)} .code .s{color:var(--ok)}
+  .gates{display:flex;gap:18px;flex-wrap:wrap;padding:12px 24px;border-top:1px solid var(--border-soft);font-family:var(--mono);font-size:13px;color:var(--muted)}
+  .gates b{color:var(--ok)}
+
   /* install */
-  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-  .tab{padding:7px 13px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--muted);cursor:pointer;font-size:13.5px;font-weight:600;font-family:var(--sans)}
-  .tab[aria-selected="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
-  .panel-code{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow)}
-  .panel-code pre{margin:0;font-family:var(--mono);font-size:13.5px;white-space:pre-wrap;word-break:break-word;line-height:1.7}
-  .panel-code .c{color:var(--faint)}
-  .panel-code p{margin:10px 0 0;color:var(--muted);font-size:14px}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+  .tab{padding:8px 15px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:14px;font-weight:600;font-family:var(--sans);transition:all .25s var(--ease)}
+  .tab:hover{color:var(--text)}
+  .tab[aria-selected="true"]{background:var(--text);border-color:var(--text);color:var(--bg)}
+  .install-term .term-body{min-height:0}
+  .install-term pre{margin:0;font-family:var(--mono);font-size:14px;white-space:pre-wrap;word-break:break-word;line-height:1.85;color:var(--term-text)}
+  .install-term pre .c{color:var(--term-dim)}
+  .install-term p{margin:14px 0 0;color:var(--term-dim);font-family:var(--sans);font-size:14.5px}
+  .install-term p code{color:var(--term-text)}
+  .install-term a{color:var(--term-blue)}
+  [role="tabpanel"]{animation:fade .4s var(--ease)}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}}
+
   /* catalogue */
-  .controls{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
-  .search{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px 14px}
-  .search input{border:0;outline:0;background:transparent;color:var(--text);font-size:15px;width:100%;font-family:var(--sans)}
+  .controls{display:flex;flex-direction:column;gap:12px;margin-bottom:22px}
+  .search{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:13px 16px;box-shadow:var(--shadow);transition:border-color .2s}
+  .search svg{flex:none;color:var(--faint)}
+  .search input{border:0;outline:0;background:transparent;color:var(--text);font-size:16px;width:100%;font-family:var(--sans)}
   .search:focus-within{border-color:var(--accent)}
-  .filter-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-  .filter-row .lbl{font-size:12.5px;color:var(--faint);font-weight:600;margin-right:4px}
-  .chip{padding:6px 12px;border-radius:999px;border:1px solid var(--border);background:var(--panel);color:var(--muted);cursor:pointer;font-size:13px;font-weight:600;font-family:var(--sans)}
-  .chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
-  .chip .c{opacity:.65;font-weight:500;margin-left:3px}
-  .count-line{color:var(--faint);font-size:13px;margin:0 0 14px}
-  .group{margin-bottom:30px}
-  .group-h{display:flex;align-items:baseline;gap:10px;margin:0 0 14px;padding-bottom:8px;border-bottom:1px solid var(--border-soft)}
-  .group-h h3{margin:0;font-size:17px}
+  .filter-row{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+  .filter-row .lbl{font-size:12px;color:var(--faint);font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-right:6px}
+  .chip{padding:6px 13px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:13px;font-weight:600;font-family:var(--sans);transition:all .2s var(--ease)}
+  .chip:hover{color:var(--text);border-color:var(--text)}
+  .chip[aria-pressed="true"]{background:var(--text);border-color:var(--text);color:var(--bg)}
+  .chip .c{opacity:.6;font-weight:500;margin-left:4px}
+  .count-line{color:var(--faint);font-size:13.5px;margin:0 0 18px}
+  .group{margin-bottom:40px}
+  .group-h{display:flex;align-items:baseline;gap:12px;margin:0 0 16px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+  .group-h h3{margin:0;font-family:var(--serif);font-weight:400;font-size:26px;letter-spacing:-.015em}
   .group-h .cnt{color:var(--faint);font-size:13px;font-family:var(--mono)}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:14px}
-  .card{background:var(--panel);border:1px solid var(--border-soft);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
-  .card:hover{border-color:var(--accent)}
+  .card{background:var(--panel);border:1px solid var(--border-soft);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:10px;min-width:0;transition:transform .35s var(--ease),box-shadow .35s var(--ease),border-color .35s;animation:rise .5s var(--ease) both;animation-delay:var(--d,0s)}
+  .card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--border)}
+  @keyframes rise{from{opacity:0;transform:translateY(12px)}}
   .card .top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .card h4{margin:0;font-family:var(--mono);font-size:14.5px;font-weight:600;word-break:break-word}
   .card h4 a{color:var(--text);text-decoration:none}
   .card h4 a:hover{color:var(--accent);text-decoration:underline}
-  .desc{color:var(--muted);font-size:13.8px;line-height:1.55;flex:1;margin:0}
+  .desc{color:var(--muted);font-size:14px;line-height:1.55;flex:1;margin:0}
   .desc .when{display:block;margin-top:6px;color:var(--faint);font-size:13px}
-  .tag{font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px;letter-spacing:.02em;text-transform:uppercase}
+  .tag{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:6px;letter-spacing:.06em;text-transform:uppercase}
   .tag.games{background:var(--games-soft);color:var(--games)}
   .tag.manual{background:var(--warn-soft);color:var(--warn)}
   .tag.checker{background:var(--ok-soft);color:var(--ok)}
-  .inst{display:flex;align-items:center;gap:8px;background:var(--panel-2);border:1px solid var(--border-soft);border-radius:9px;padding:6px 6px 6px 10px;font-family:var(--mono);font-size:12.3px;min-width:0}
+  .inst{display:flex;align-items:center;gap:8px;background:var(--panel-2);border:1px solid var(--border-soft);border-radius:9px;padding:5px 5px 5px 10px;font-family:var(--mono);font-size:12.3px;min-width:0}
   .inst code{overflow-x:auto;white-space:nowrap;flex:1;min-width:0;color:var(--text)}
   .inst .k{color:var(--faint);flex:none}
   .inst button{flex:none;height:28px;min-width:0;font-size:12px}
-  .empty{text-align:center;color:var(--muted);padding:48px 0}
-  footer{border-top:1px solid var(--border-soft);padding:32px 0;margin-top:20px;color:var(--muted);font-size:14px}
-  .foot-in{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+  .empty{text-align:center;color:var(--muted);padding:48px 0;font-family:var(--serif);font-size:20px}
+
+  footer{border-top:1px solid var(--border);padding:56px 0 40px;margin-top:20px;color:var(--muted);font-size:14px}
+  .foot-big{font-family:var(--serif);font-size:clamp(28px,3.6vw,40px);letter-spacing:-.02em;color:var(--text);margin:0 0 22px;line-height:1.15}
+  .foot-big em{font-style:italic;color:var(--accent)}
+  .foot-in{display:flex;gap:18px;flex-wrap:wrap;align-items:center}
   .foot-in a{color:var(--muted)}
   .foot-in .sp{margin-left:auto}
-  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);opacity:0;background:var(--text);color:var(--bg);padding:9px 16px;border-radius:10px;font-size:13.5px;font-weight:600;transition:opacity .2s;pointer-events:none;z-index:100}
-  .toast.show{opacity:1}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,10px);opacity:0;background:var(--text);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:13.5px;font-weight:600;transition:opacity .25s,transform .25s var(--ease);pointer-events:none;z-index:100}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto}
+    *,*::before,*::after{animation:none!important;transition:none!important}
+    .rv,h1 .w{opacity:1!important;transform:none!important;filter:none!important}
+    .term-body .ln{opacity:1;transform:none}
+  }
 </style>
 </head>
 <body>
 <a class="skip" href="#skills">Skip to the skills</a>
-<header class="nav">
+<header class="nav" id="nav">
   <div class="wrap nav-in">
-    <a class="brand" href="#top"><span class="logo" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>React Native Agent Skills</a>
+    <a class="brand" href="#top"><span class="logo" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>ReactNative-Skills</a>
     <nav class="nav-links" aria-label="Main">
       <a href="#why" class="hide-sm">Why</a>
+      <a href="#anatomy" class="hide-sm">Anatomy</a>
       <a href="#install" class="hide-sm">Install</a>
       <a href="#skills" class="hide-sm">Skills</a>
       <a href="https://github.com/zakariaf/ReactNative-Skills" rel="noopener">GitHub</a>
@@ -159,73 +282,169 @@
 
 <main id="top">
   <section class="hero">
-    <div class="wrap">
-      <div class="pills">
-        <span class="pill" id="pill-count">79 skills</span>
-        <span class="pill">Expo SDK 57 · React Native 0.86</span>
-        <span class="pill">iOS + Android</span>
-        <span class="pill">Agent Skills standard</span>
-        <span class="pill">MIT</span>
+    <div class="wrap hero-grid">
+      <div>
+        <div class="label rv">Open source &nbsp;·&nbsp; Agent Skills standard</div>
+        <h1 id="headline">Agent skills for Expo apps that <em>prove their work</em>.</h1>
+        <p class="lede rv" style="--d:.5s">Rules with their reasons, a workflow, templates that compile in a real Expo app, and a definition of done that ends in a checker printing <span class="result">RESULT: PASS</span>. Every checker is tested against planted bugs.</p>
+        <div class="rv" style="--d:.65s">
+          <div class="cmd"><span class="pr">/</span><code>plugin marketplace add zakariaf/ReactNative-Skills</code><button class="icon-btn" type="button" data-copy="/plugin marketplace add zakariaf/ReactNative-Skills" aria-label="Copy the marketplace command">Copy</button></div>
+          <div class="cmd"><span class="pr">/</span><code>plugin install react-native@react-native-skills</code><button class="icon-btn" type="button" data-copy="/plugin install react-native@react-native-skills" aria-label="Copy the install command">Copy</button></div>
+        </div>
+        <div class="pills rv" style="--d:.8s">
+          <span class="pill" id="pill-count">79 skills</span>
+          <span class="pill">Expo SDK 57 · React Native 0.86</span>
+          <span class="pill">iOS + Android</span>
+          <span class="pill">MIT</span>
+        </div>
       </div>
-      <h1>Agent skills for Expo apps that <em>prove their work</em>.</h1>
-      <p class="lede">Rules with their reasons, a workflow, templates that compile in a real Expo app, and a definition of done that ends in a checker printing <span class="result">RESULT: PASS</span>. Every checker is tested against planted bugs.</p>
-      <div class="cmd"><span class="pr">/</span><code>plugin marketplace add zakariaf/ReactNative-Skills</code><button class="icon-btn" type="button" data-copy="/plugin marketplace add zakariaf/ReactNative-Skills" aria-label="Copy the marketplace command">Copy</button></div>
-      <div class="cmd"><span class="pr">/</span><code>plugin install react-native@react-native-skills</code><button class="icon-btn" type="button" data-copy="/plugin install react-native@react-native-skills" aria-label="Copy the install command">Copy</button></div>
-      <div class="stats">
-        <div class="stat"><div class="n" id="s-skills">79</div><div class="l">skills</div></div>
-        <div class="stat"><div class="n" id="s-cats">13</div><div class="l">categories</div></div>
-        <div class="stat"><div class="n" id="s-checkers">0</div><div class="l">skills with self-tested checkers</div></div>
-        <div class="stat"><div class="n">2</div><div class="l">plugins: core and games</div></div>
+
+      <div class="rv" style="--d:.35s">
+        <div class="term" aria-hidden="true">
+          <div class="term-head"><i></i><i></i><i></i><span>forms-and-input · scripts/check-forms.mjs</span></div>
+          <div class="term-body" id="live"></div>
+          <div class="term-foot"><span>A planted bug, caught by its rule</span><span style="margin-left:auto">then <b>RESULT: PASS</b></span></div>
+        </div>
+        <p class="sr">An example run: the forms-and-input checker reports onChange={field.onChange} on a TextInput at src/ui/form/code-field.tsx line 11 under rule field-on-change and prints RESULT: FAIL (1 problems); after the field binds onChangeText it prints RESULT: PASS.</p>
       </div>
     </div>
   </section>
 
-  <section id="why" style="background:var(--bg-soft);border-top:1px solid var(--border-soft);border-bottom:1px solid var(--border-soft)">
+  <section class="proof" aria-label="By the numbers">
     <div class="wrap">
-      <div class="kicker">Why it is different</div>
-      <h2>Not advice: work an agent can prove</h2>
+      <div class="nums">
+        <div class="num rv"><div class="n" data-count="79" id="s-skills">79</div><div class="l">skills</div></div>
+        <div class="num rv" style="--d:.08s"><div class="n" data-count="79" id="s-checkers">79</div><div class="l">end in a self-tested checker</div></div>
+        <div class="num rv" style="--d:.16s"><div class="n" data-count="6400" data-suffix="+">6,400+</div><div class="l">checker cases, run in CI</div></div>
+        <div class="num rv" style="--d:.24s"><div class="n" data-count="12" id="s-cats">12</div><div class="l">categories, 2 plugins</div></div>
+      </div>
+      <div class="ribbon" aria-hidden="true"><div class="ribbon-track" id="ribbon"></div></div>
+      <p class="ribbon-cap">Every checker is tested against planted bugs like these. One that stops catching its bug fails CI.</p>
+    </div>
+  </section>
+
+  <section id="why">
+    <div class="wrap">
+      <div class="label rv">Why it is different</div>
+      <h2 class="rv">Not advice: <em>work an agent can prove</em>.</h2>
       <div class="feat">
-        <div class="fcard"><h3>A checker ends every skill</h3><p>A zero-dependency Node script reads your repo and prints <code>RESULT: PASS</code> or each problem with a file, line, rule and fix.</p></div>
-        <div class="fcard"><h3>Checkers tested on planted bugs</h3><p>Each skill's self-test plants one bug per case that must fail for exactly its rule, and clean cases that must pass.</p></div>
-        <div class="fcard"><h3>Templates that compile</h3><p>Templates are complete files proven in a reference Expo SDK 57 app: strict TypeScript, ESLint with zero warnings, Jest and Prettier.</p></div>
-        <div class="fcard"><h3>One stack, both platforms</h3><p>Expo Router, Zustand, TanStack Query, expo-sqlite, react-intl, Reanimated, Skia and EAS, with iOS and Android stated side by side.</p></div>
-        <div class="fcard"><h3>Self-contained</h3><p>A skill works installed alone, never points outside its folder, names every device it uses and stops to ask before anything outward-facing.</p></div>
-        <div class="fcard"><h3>Any agent</h3><p>Claude Code plugins, a Codex manifest, <code>AGENTS.md</code> with an intent map, and a machine-readable <code>skills.json</code>.</p></div>
+        <div class="fitem rv"><div class="k">01</div><h3>A checker ends every skill</h3><p>A zero-dependency Node script reads your repo and prints <code>RESULT: PASS</code>, or each problem with a file, line, rule and fix.</p></div>
+        <div class="fitem rv" style="--d:.08s"><div class="k">02</div><h3>Checkers tested on planted bugs</h3><p>Each skill's self-test plants one bug per case that must fail for exactly its rule, and clean cases that must pass.</p></div>
+        <div class="fitem rv" style="--d:.16s"><div class="k">03</div><h3>Templates that compile</h3><p>Complete files proven in a reference Expo SDK 57 app: strict TypeScript, ESLint with zero warnings, Jest and Prettier.</p></div>
+        <div class="fitem rv"><div class="k">04</div><h3>One stack, both platforms</h3><p>Expo Router, Zustand, TanStack Query, expo-sqlite, react-intl, Reanimated, Skia and EAS, with iOS and Android stated side by side.</p></div>
+        <div class="fitem rv" style="--d:.08s"><div class="k">05</div><h3>Self-contained</h3><p>A skill works installed alone, never points outside its folder, names every device it uses and stops to ask before anything outward-facing.</p></div>
+        <div class="fitem rv" style="--d:.16s"><div class="k">06</div><h3>Any agent</h3><p>Claude Code plugins, a Codex manifest, <code>AGENTS.md</code> with an intent map, and a machine-readable <code>skills.json</code>.</p></div>
       </div>
     </div>
   </section>
 
-  <section id="install">
+  <section id="anatomy" style="padding-top:40px">
     <div class="wrap">
-      <div class="kicker">Install</div>
-      <h2>Add the skills to your agent</h2>
-      <p class="sub">Start every task with <code>react-native-conventions-index</code>: it routes the task to the skills that apply and gives the build order.</p>
-      <div class="tabs" role="tablist" aria-label="Install options">
+      <div class="label rv">Anatomy of a skill</div>
+      <h2 class="rv">Every skill is a folder, <em>with four parts</em>.</h2>
+      <div class="anat">
+        <div class="tree-wrap">
+          <div class="tree" id="tree" aria-hidden="true">
+            <div>forms-and-input/</div><div data-part="0">├── SKILL.md</div><div data-part="1">├── references/</div><div data-part="2">├── templates/</div><div data-part="3">└── scripts/</div>
+          </div>
+          <p class="tree-note">A real one, from the catalogue below. Scroll through its parts.</p>
+        </div>
+        <div class="steps">
+          <article class="step rv" data-step="0">
+            <div class="k">SKILL.md</div>
+            <h3>Numbered rules, each with its reason</h3>
+            <p>A step-by-step workflow and a definition of done the agent can check, not a list of tips.</p>
+            <div class="paper">
+              <div class="paper-head"><i></i><i></i><i></i><span>forms-and-input/SKILL.md</span></div>
+              <div class="paper-body">
+                <p class="md-h">## Rules that must hold</p>
+                <p class="rule"><b>9.</b> Fields bind the React Native way: <code>onChangeText</code>, <code>onBlur</code>, <code>ref</code>.</p>
+                <p class="why"><b>Why:</b> react-hook-form reads <code>event.target.value</code>, which a React Native change event lacks, so the field would hold <code>undefined</code>.</p>
+                <p class="md-h" style="margin-top:20px">## Workflow</p>
+                <div class="bars"><div>1.<i style="width:62%"></i></div><div>2.<i style="width:48%"></i></div><div>3.<i style="width:56%"></i></div></div>
+                <p class="md-h" style="margin-top:20px">## Definition of done</p>
+                <p class="files" style="margin:0"><span style="color:var(--ok)">☑</span> check-forms.mjs prints <b style="color:var(--ok)">RESULT: PASS</b></p>
+              </div>
+            </div>
+          </article>
+          <article class="step rv" data-step="1">
+            <div class="k">references/</div>
+            <h3>The deeper knowledge, for both platforms</h3>
+            <p>Checked against Expo SDK 57 and React Native 0.86, and loaded only when the skill points to it.</p>
+            <div class="paper">
+              <div class="paper-head"><i></i><i></i><i></i><span>forms-and-input/references/</span></div>
+              <div class="paper-body">
+                <div class="files">schemas-and-messages.md<br>fields-and-autofill.md<br>keyboard-focus-and-submit.md<br>async-checks-and-server-errors.md<br>checks-and-tests.md</div>
+                <div class="two"><span class="label">iOS</span><span class="label">Android</span><span>VoiceOver</span><span>TalkBack</span><span class="mono" style="font-size:14px">simctl</span><span class="mono" style="font-size:14px">adb</span><span>App Store</span><span>Google Play</span></div>
+              </div>
+            </div>
+          </article>
+          <article class="step rv" data-step="2">
+            <div class="k">templates/</div>
+            <h3>Real files that compile and pass their tests</h3>
+            <p>Complete files, not snippets, proven inside a reference Expo app before they ship.</p>
+            <div class="paper">
+              <div class="paper-head"><i></i><i></i><i></i><span>templates/src/ui/form/field-kinds.ts</span></div>
+              <div class="paper-body"><div class="code"><span class="c">// The input presets a text field picks by name. One kind fixes</span>
+<span class="c">// the keyboard, autofill, capitalization and secure entry together.</span>
+<span class="k">import type</span> { TextInputProps } <span class="k">from</span> <span class="s">'react-native'</span>;
+
+<span class="k">export type</span> FieldKind =
+  | <span class="s">'sentence'</span> | <span class="s">'name'</span> | <span class="s">'email'</span>
+  | <span class="s">'current-password'</span> | <span class="s">'new-password'</span>
+  | <span class="s">'one-time-code'</span> | <span class="s">'phone'</span> | <span class="s">'decimal'</span>;</div></div>
+              <div class="gates"><span><b>✓</b> tsc --strict</span><span><b>✓</b> eslint</span><span><b>✓</b> jest</span><span><b>✓</b> prettier</span></div>
+            </div>
+          </article>
+          <article class="step rv" data-step="3">
+            <div class="k">scripts/</div>
+            <h3>A checker that ends in one word</h3>
+            <p>It reviews your code and prints <span class="result">RESULT: PASS</span> or FAIL, each problem with a file, a line, a rule and a fix. Agents, CI and people read it the same way.</p>
+            <div class="term">
+              <div class="term-head"><i></i><i></i><i></i><span>scripts/check-forms.mjs</span></div>
+              <div class="term-body" style="min-height:0"><div class="ln on"><span class="p">$</span> node scripts/check-forms.mjs .</div><div class="ln on r">src/ui/form/code-field.tsx:11 [field-on-change]
+  onChange={field.onChange} on &lt;TextInput&gt;</div><div class="ln on r big">RESULT: FAIL (1 problems)</div></div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="install" style="background:var(--bg-soft);border-top:1px solid var(--border-soft);border-bottom:1px solid var(--border-soft)">
+    <div class="wrap">
+      <div class="label rv">Install</div>
+      <h2 class="rv">Add the skills to <em>your agent</em>.</h2>
+      <p class="sub rv">Start every task with <code>react-native-conventions-index</code>: it routes the task to the skills that apply and gives the build order.</p>
+      <div class="tabs rv" role="tablist" aria-label="Install options">
         <button class="tab" type="button" role="tab" id="tab-claude" aria-controls="panel-claude" aria-selected="true">Claude Code</button>
         <button class="tab" type="button" role="tab" id="tab-codex" aria-controls="panel-codex" aria-selected="false">Codex</button>
         <button class="tab" type="button" role="tab" id="tab-any" aria-controls="panel-any" aria-selected="false">Any agent</button>
       </div>
-      <div class="panel-code">
-        <div role="tabpanel" id="panel-claude" aria-labelledby="tab-claude"><pre><span class="c"># the marketplace, the core plugin, and the optional game skills</span>
+      <div class="term install-term rv">
+        <div class="term-head"><i></i><i></i><i></i><span>install</span></div>
+        <div class="term-body">
+          <div role="tabpanel" id="panel-claude" aria-labelledby="tab-claude"><pre><span class="c"># the marketplace, the core plugin, and the optional game skills</span>
 /plugin marketplace add zakariaf/ReactNative-Skills
 /plugin install react-native@react-native-skills
 /plugin install react-native-games@react-native-skills</pre><p>Skills load on their own when a task matches; run one by name as <code>/react-native:&lt;skill&gt;</code> or <code>/react-native-games:&lt;skill&gt;</code>.</p></div>
-        <div role="tabpanel" id="panel-codex" aria-labelledby="tab-codex" hidden><pre><span class="c"># the repository is a Codex plugin: .codex-plugin/plugin.json, skills in ./skills/</span>
+          <div role="tabpanel" id="panel-codex" aria-labelledby="tab-codex" hidden><pre><span class="c"># the repository is a Codex plugin: .codex-plugin/plugin.json, skills in ./skills/</span>
 git clone https://github.com/zakariaf/ReactNative-Skills</pre><p>Install it the way your Codex version adds plugins from a Git repository. The Codex manifest ships all 79 skills; the game skills load only for game tasks.</p></div>
-        <div role="tabpanel" id="panel-any" aria-labelledby="tab-any" hidden><pre><span class="c"># the open skills CLI places skills where your agent reads them</span>
+          <div role="tabpanel" id="panel-any" aria-labelledby="tab-any" hidden><pre><span class="c"># the open skills CLI places skills where your agent reads them</span>
 npx skills add zakariaf/ReactNative-Skills
 npx skills add zakariaf/ReactNative-Skills --skill forms-and-input</pre><p>Then give your agent <a href="https://github.com/zakariaf/ReactNative-Skills/blob/main/AGENTS.md">AGENTS.md</a>: how to pick, load and report, plus the intent map.</p></div>
+        </div>
       </div>
     </div>
   </section>
 
   <section id="skills">
     <div class="wrap">
-      <div class="kicker">Catalogue</div>
-      <h2>The skills</h2>
-      <p class="sub">Search by task, file, error or tool. Each card says what the skill does, when to load it, and how to install it on its own.</p>
+      <div class="label rv">Catalogue</div>
+      <h2 class="rv">The <em>skills</em>.</h2>
+      <p class="sub rv">Search by task, file, error or tool. Each card says what the skill does, when to load it, and how to install it on its own.</p>
       <div class="controls">
-        <label class="search"><span class="sr" style="color:var(--faint)" aria-hidden="true">Search</span><input id="q" type="search" placeholder="forms, sqlite, testflight, maestro, rtl, white screen..." autocomplete="off" aria-label="Search skills"></label>
+        <label class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" type="search" placeholder="forms, sqlite, testflight, maestro, rtl, white screen..." autocomplete="off" aria-label="Search skills"></label>
         <div class="filter-row" id="plugins" aria-label="Filter by plugin"></div>
         <div class="filter-row" id="chips" aria-label="Filter by category"></div>
       </div>
@@ -237,13 +456,15 @@ npx skills add zakariaf/ReactNative-Skills --skill forms-and-input</pre><p>Then 
 </main>
 
 <footer>
-  <div class="wrap foot-in">
-    <span>React Native Agent Skills</span>
-    <a href="https://github.com/zakariaf/ReactNative-Skills" rel="noopener">GitHub</a>
-    <a href="https://github.com/zakariaf/ReactNative-Skills/blob/main/CONTRIBUTING.md" rel="noopener">Contributing</a>
-    <a href="https://github.com/zakariaf/ReactNative-Skills/blob/main/skills.json" rel="noopener">skills.json</a>
-    <a href="https://agentskills.io" rel="noopener">Agent Skills standard</a>
-    <span class="sp">MIT © 2026 Zakaria Fatahi</span>
+  <div class="wrap">
+    <p class="foot-big">Free and open source. <em>Feedback and contributions welcome.</em></p>
+    <div class="foot-in">
+      <a href="https://github.com/zakariaf/ReactNative-Skills" rel="noopener">GitHub</a>
+      <a href="https://github.com/zakariaf/ReactNative-Skills/blob/main/CONTRIBUTING.md" rel="noopener">Contributing</a>
+      <a href="https://github.com/zakariaf/ReactNative-Skills/blob/main/skills.json" rel="noopener">skills.json</a>
+      <a href="https://agentskills.io" rel="noopener">Agent Skills standard</a>
+      <span class="sp">MIT © 2026 Zakaria Fatahi</span>
+    </div>
   </div>
 </footer>
 
@@ -261,6 +482,7 @@ npx skills add zakariaf/ReactNative-Skills --skill forms-and-input</pre><p>Then 
     { key: 'react-native', label: 'react-native (core)' },
     { key: 'react-native-games', label: 'react-native-games (optional)' }
   ];
+  var calm = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
 
   // Theme: follows the system until the visitor picks one.
   var root = document.documentElement;
@@ -276,6 +498,11 @@ npx skills add zakariaf/ReactNative-Skills --skill forms-and-input</pre><p>Then 
     try { localStorage.setItem('rns-theme', next); } catch (e) {}
     paintThemeButton();
   });
+
+  // The nav gets its hairline once the page scrolls.
+  var nav = document.getElementById('nav');
+  function onScroll() { nav.classList.toggle('scrolled', window.scrollY > 8); }
+  window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
 
   // Copy buttons.
   var toast = document.getElementById('toast');
@@ -310,11 +537,108 @@ npx skills add zakariaf/ReactNative-Skills --skill forms-and-input</pre><p>Then 
     });
   });
 
-  // Stats.
-  document.getElementById('s-skills').textContent = SKILLS.length;
+  // Stats come from the generated data; the HTML holds the same numbers for crawlers.
+  var checkers = SKILLS.filter(function (s) { return s.checker; }).length;
+  document.getElementById('s-skills').setAttribute('data-count', SKILLS.length);
+  document.getElementById('s-checkers').setAttribute('data-count', checkers);
+  document.getElementById('s-cats').setAttribute('data-count', CATS.length);
   document.getElementById('pill-count').textContent = SKILLS.length + ' skills';
-  document.getElementById('s-cats').textContent = CATS.length;
-  document.getElementById('s-checkers').textContent = SKILLS.filter(function (s) { return s.checker; }).length;
+
+  // The headline arrives word by word.
+  var h1 = document.getElementById('headline');
+  if (!calm) {
+    var i = 0;
+    (function split(node) {
+      Array.prototype.slice.call(node.childNodes).forEach(function (child) {
+        if (child.nodeType === 3) {
+          var frag = document.createDocumentFragment();
+          child.textContent.split(/(\s+)/).forEach(function (part) {
+            if (!part) return;
+            if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(part)); return; }
+            var w = document.createElement('span'); w.className = 'w'; w.style.setProperty('--i', i++); w.textContent = part; frag.appendChild(w);
+          });
+          node.replaceChild(frag, child);
+        } else split(child);
+      });
+    })(h1);
+  }
+
+  // Reveal on scroll, and count numbers up the first time they show.
+  function countUp(el) {
+    var to = +el.getAttribute('data-count'), suffix = el.getAttribute('data-suffix') || '';
+    if (calm) { el.textContent = to.toLocaleString('en-US') + suffix; return; }
+    var t0 = performance.now(), dur = 1400;
+    (function tick(now) {
+      var p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(to * e).toLocaleString('en-US') + (p === 1 ? suffix : '');
+      if (p < 1) requestAnimationFrame(tick);
+    })(t0);
+  }
+  var seen = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('in');
+      var n = entry.target.querySelector('[data-count]');
+      if (n) countUp(n);
+      seen.unobserve(entry.target);
+    });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
+  document.querySelectorAll('.rv').forEach(function (el) { seen.observe(el); });
+
+  // The tree lights the part whose step is in the middle of the screen.
+  var treeParts = document.querySelectorAll('#tree [data-part]');
+  var lit = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      var k = entry.target.getAttribute('data-step');
+      treeParts.forEach(function (el) { el.classList.toggle('on', el.getAttribute('data-part') === k); });
+    });
+  }, { rootMargin: '-45% 0px -45% 0px' });
+  document.querySelectorAll('[data-step]').forEach(function (el) { lit.observe(el); });
+
+  // Planted bugs drift by; the list is doubled so the loop has no seam.
+  var BUGS = ['bad-field-on-change', 'bad-schema-message-missing', 'bad-react-dot-memo', 'bad-render-date', 'bad-input-preset-email', 'bad-isrtl', 'bad-pad-done-bar', 'bad-no-clamp', 'bad-controller-rules', 'bad-scrollview-optional-map', 'bad-dimensions', 'bad-rn-safe-area-view', 'bad-effect-focus-callback', 'bad-publish-first', 'bad-loose-schema', 'bad-error-message-translated', 'bad-reset-replaces-settings', 'bad-focus-effect-timer', 'bad-missing-case', 'bad-testid-optional', 'bad-touchable-in-feature', 'bad-shared-value', 'bad-latin-digits-transform-number', 'bad-effect-return-subscription', 'bad-render-new-date', 'bad-input-label', 'bad-effect-no-cleanup', 'bad-keyboard-aware-scroll-animated', 'bad-field-ref', 'bad-async-hydrate', 'bad-zustand-persist', 'bad-key-extractor-index', 'bad-latin-digits-number-parse', 'bad-default-mismatch'];
+  var ribbon = BUGS.map(function (b) { return '<span class="bug"><span class="x">✕</span>' + b + '<span class="c">CAUGHT</span></span>'; }).join('');
+  document.getElementById('ribbon').innerHTML = ribbon + ribbon;
+
+  // The live checker: a planted bug fails, the fix lands, then it passes; then again.
+  var live = document.getElementById('live');
+  var SCRIPT = [
+    { type: '<span class="p">$</span> ', text: 'node scripts/check-forms.mjs .', wait: 500 },
+    { html: '<span class="r">src/ui/form/code-field.tsx:11 [field-on-change]\n  onChange={field.onChange} on &lt;TextInput&gt;</span>', wait: 450 },
+    { html: '<span class="r big">RESULT: FAIL (1 problems)</span>', wait: 1500 },
+    { html: '<span class="d">  code-field.tsx:11</span>', wait: 250 },
+    { html: '<span class="r">- onChange={field.onChange}</span>', wait: 300 },
+    { html: '<span class="g">+ onChangeText={field.onChange}</span>', wait: 900 },
+    { type: '<span class="p">$</span> ', text: 'node scripts/check-forms.mjs .', wait: 550 },
+    { html: '<span class="g big">RESULT: PASS</span>', wait: 4200 }
+  ];
+  function line(html) { var d = document.createElement('div'); d.className = 'ln'; d.innerHTML = html; live.appendChild(d); requestAnimationFrame(function () { requestAnimationFrame(function () { d.classList.add('on'); }); }); return d; }
+  if (calm) {
+    SCRIPT.forEach(function (s) { var d = line(s.html || s.type + s.text); d.classList.add('on'); });
+  } else {
+    var timer, running = false;
+    var play = function () {
+      live.innerHTML = ''; var k = 0;
+      (function next() {
+        if (k >= SCRIPT.length) { timer = setTimeout(play, 600); return; }
+        var s = SCRIPT[k++];
+        if (s.html) { line(s.html); timer = setTimeout(next, s.wait); return; }
+        var d = line(s.type + '<span class="t"></span><span class="caret"></span>'), t = d.querySelector('.t'), c = 0;
+        (function type() {
+          t.textContent = s.text.slice(0, ++c);
+          if (c < s.text.length) timer = setTimeout(type, 28 + Math.random() * 40);
+          else { d.querySelector('.caret').remove(); timer = setTimeout(next, s.wait); }
+        })();
+      })();
+    };
+    // Only animate while the terminal can be seen.
+    new IntersectionObserver(function (entries) {
+      var vis = entries[0].isIntersecting;
+      if (vis && !running) { running = true; play(); }
+      if (!vis && running) { running = false; clearTimeout(timer); }
+    }).observe(live);
+  }
 
   // State, kept in the URL hash so a filtered view can be shared: #q=sqlite&cat=data&plugin=react-native
   var state = { q: '', cat: 'all', plugin: 'all' };
@@ -370,7 +694,7 @@ npx skills add zakariaf/ReactNative-Skills --skill forms-and-input</pre><p>Then 
   var input = document.getElementById('q');
   input.addEventListener('input', function () { state.q = input.value.trim(); update(); });
 
-  function card(skill) {
+  function card(skill, k) {
     var parts = splitDescription(skill.description);
     var tags = '';
     if (skill.plugin === 'react-native-games') tags += '<span class="tag games">games</span>';
@@ -378,7 +702,7 @@ npx skills add zakariaf/ReactNative-Skills --skill forms-and-input</pre><p>Then 
     if (skill.checker) tags += '<span class="tag checker" title="Ends in a checker that prints RESULT: PASS, proven by its own planted-bug self-test">checker</span>';
     var invoke = '/' + skill.plugin + ':' + skill.name;
     var install = 'npx skills add ' + REPO + ' --skill ' + skill.name;
-    return '<article class="card">' +
+    return '<article class="card" style="--d:' + Math.min(k, 8) * 0.04 + 's">' +
       '<div class="top"><h4><a href="' + GH + esc(skill.path) + '/SKILL.md" rel="noopener">' + esc(skill.name) + '</a></h4>' + tags + '</div>' +
       '<p class="desc">' + esc(parts.lead) + (parts.when ? '<span class="when">' + esc(parts.when) + '</span>' : '') + '</p>' +
       '<div class="inst"><span class="k">Claude</span><code>' + esc(invoke) + '</code><button class="icon-btn" type="button" data-copy="' + esc(invoke) + '" aria-label="Copy ' + esc(invoke) + '">Copy</button></div>' +
