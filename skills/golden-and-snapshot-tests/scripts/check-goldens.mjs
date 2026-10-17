@@ -439,7 +439,8 @@ function checkWiring(root, setup, report) {
   if (ignoreSkip) report.skip({ file: '.gitignore', rule: 'diff-output-ignored', message: ignoreSkip });
   else {
     checked += 1;
-    const lines = read(root, '.gitignore').split('\n').map((line) => line.trim());
+    // A leading / only anchors the pattern to the root; it ignores the same folder.
+    const lines = read(root, '.gitignore').split('\n').map((line) => line.trim().replace(/^\/(?!\*)/, ''));
     for (const needed of ['reports/', '**/__image_snapshots__/__diff_output__/']) if (!lines.includes(needed) && !lines.includes(needed.replace(/\/$/, ''))) report.problem({ file: '.gitignore', line: 1, rule: 'diff-output-ignored', message: `does not list ${needed}`, fix: `Add the line ${needed}; diff images are never committed.` });
   }
   return checked;

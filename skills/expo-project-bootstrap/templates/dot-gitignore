@@ -1,5 +1,6 @@
 # dependencies and generated projects (Continuous Native Generation rebuilds the root ios/ and android/;
-# anchored, so scripts/ios/ and a local module's modules/<name>/ios/ native source stay committed;
+# output folders are anchored to the root, so scripts/ios/, scripts/build/, src/features/reports/ and a
+# local module's modules/<name>/ios/ native source stay committed;
 # when multi-package, each app's own .gitignore from the Expo template covers apps/<app>/ios, or add
 # apps/*/ios and apps/*/android here)
 node_modules/
@@ -8,19 +9,19 @@ expo-env.d.ts
 /ios
 /android
 .kotlin/
-build/
-dist/
-web-build/
+/build/
+/dist/
+/web-build/
 *.orig.*
 .metro-health-check*
 *.tsbuildinfo
 npm-debug.*
 # reports, coverage, mutation sandboxes, skill tooling installs, the pinned Maestro install (e2e-maestro)
 # and the parity captures, reports and sheets (design-visual-parity: several MB per run)
-coverage/
-reports/
+/coverage/
+/reports/
 .parity/
-dist-audit/
+/dist-audit/
 .stryker-tmp/
 .skill-tooling/
 /tools/maestro/
