@@ -2006,5 +2006,99 @@
         }
       }
     ]
+  },
+  "pass-eslint-stricter-block": {
+    "expect": [
+      "check-configs: 5 config areas checked, 0 problems"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "const IS_MULTI_PACKAGE = false;\n",
+          "with": "const IS_MULTI_PACKAGE = false;\n// Stricter-only additions for the core folder: Date.UTC builds an instant from calendar fields.\nconst CORE_EXTRA_SYNTAX = [\n  {\n    selector: \"CallExpression[callee.object.name='Date'][callee.property.name='UTC']\",\n    message: 'Core code takes instants from the clock port, never Date.UTC.',\n  },\n];\nconst CORE_EXTRA_IMPORT = { name: 'lodash', message: 'Core code imports no utility library.' };\nconst CORE_EXTRA_PATTERN = { group: ['lodash/*'], message: 'Core code imports no utility library.' };\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "        patterns: [NODE_BUILTINS, PURE_IMPORTS, PURE_ALIAS],\n      }),\n    },\n  },\n\n  // 5b. Deterministic code: integer-safe arithmetic only.\n",
+          "with": "        patterns: [NODE_BUILTINS, PURE_IMPORTS, PURE_ALIAS],\n      }),\n    },\n  },\n  // 5a+. Stricter only: the core folder also keeps out a utility library.\n  {\n    files: ['src/core/**/*.ts'],\n    rules: {\n      'no-restricted-imports': restrictedImports({\n        paths: [...RUNTIME_PATHS, CORE_EXTRA_IMPORT],\n        patterns: [NODE_BUILTINS, PURE_IMPORTS, PURE_ALIAS, CORE_EXTRA_PATTERN],\n      }),\n    },\n  },\n\n  // 5b. Deterministic code: integer-safe arithmetic only.\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "    rules: { 'no-restricted-syntax': [...runtimeSyntax(), ...DETERMINISM_SYNTAX] },\n  },\n\n  // 5c. File-level exemptions",
+          "with": "    rules: { 'no-restricted-syntax': [...runtimeSyntax(), ...DETERMINISM_SYNTAX] },\n  },\n  // 5b+. Stricter only: no Date.UTC in the core dates folder.\n  {\n    files: ['src/core/dates/**/*.ts'],\n    rules: { 'no-restricted-syntax': [...runtimeSyntax(), ...DETERMINISM_SYNTAX, ...CORE_EXTRA_SYNTAX] },\n  },\n\n  // 5c. File-level exemptions"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "\n  // 5. App runtime code",
+          "with": "\n  // 4+. Stricter only: no utility library in any TypeScript file.\n  {\n    files: ALL_TS,\n    rules: { 'no-restricted-imports': restrictedImports({ paths: [CORE_EXTRA_IMPORT] }) },\n  },\n\n  // 5. App runtime code"
+        }
+      }
+    ]
+  },
+  "bad-eslint-stricter-block": {
+    "expect": [
+      "the block for files: 'src/features/**/*.ts' reaches files the block before it (files: DETERMINISTIC) does not cover (src/features/**/*.ts) [stricter-block]",
+      "[eslint-weakened] a block beyond the canonical ones reaches every file under 'src/features/**/*.ts'; it replaces those files' rule options [exemption-scope]",
+      "the block for files: 'src/core/**/*.ts' does not keep every entry of the block before it for no-restricted-imports [stricter-block]"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "const IS_MULTI_PACKAGE = false;\n",
+          "with": "const IS_MULTI_PACKAGE = false;\n// Stricter-only additions for the core folder: Date.UTC builds an instant from calendar fields.\nconst CORE_EXTRA_SYNTAX = [\n  {\n    selector: \"CallExpression[callee.object.name='Date'][callee.property.name='UTC']\",\n    message: 'Core code takes instants from the clock port, never Date.UTC.',\n  },\n];\nconst CORE_EXTRA_IMPORT = { name: 'lodash', message: 'Core code imports no utility library.' };\nconst CORE_EXTRA_PATTERN = { group: ['lodash/*'], message: 'Core code imports no utility library.' };\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "        patterns: [NODE_BUILTINS, PURE_IMPORTS, PURE_ALIAS],\n      }),\n    },\n  },\n\n  // 5b. Deterministic code: integer-safe arithmetic only.\n",
+          "with": "        patterns: [NODE_BUILTINS, PURE_IMPORTS, PURE_ALIAS],\n      }),\n    },\n  },\n  // 5a+. Stricter only: the core folder also keeps out a utility library.\n  {\n    files: ['src/core/**/*.ts'],\n    rules: {\n      'no-restricted-imports': restrictedImports({\n        paths: [...without(RUNTIME_PATHS, REACT_INTL_IMPORT), CORE_EXTRA_IMPORT],\n        patterns: [NODE_BUILTINS, PURE_IMPORTS, PURE_ALIAS],\n      }),\n    },\n  },\n\n  // 5b. Deterministic code: integer-safe arithmetic only.\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "    rules: { 'no-restricted-syntax': [...runtimeSyntax(), ...DETERMINISM_SYNTAX] },\n  },\n\n  // 5c. File-level exemptions",
+          "with": "    rules: { 'no-restricted-syntax': [...runtimeSyntax(), ...DETERMINISM_SYNTAX] },\n  },\n  // 5b+. Stricter only: no Date.UTC in the core dates folder.\n  {\n    files: ['src/features/**/*.ts'],\n    rules: { 'no-restricted-syntax': [...runtimeSyntax(), ...DETERMINISM_SYNTAX, ...CORE_EXTRA_SYNTAX] },\n  },\n\n  // 5c. File-level exemptions"
+        }
+      }
+    ]
+  },
+  "bad-eslint-stricter-block-rule": {
+    "expect": [
+      "the block for files: 'src/core/dates/**/*.ts' sets no-restricted-properties, which the block before it (files: DETERMINISTIC) does not set [stricter-block]",
+      "the block for files: 'src/core/dates/**/*.ts' does not keep every entry of the block before it for no-restricted-syntax [stricter-block]"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "const IS_MULTI_PACKAGE = false;\n",
+          "with": "const IS_MULTI_PACKAGE = false;\n// Stricter-only additions for the core folder: Date.UTC builds an instant from calendar fields.\nconst CORE_EXTRA_SYNTAX = [\n  {\n    selector: \"CallExpression[callee.object.name='Date'][callee.property.name='UTC']\",\n    message: 'Core code takes instants from the clock port, never Date.UTC.',\n  },\n];\nconst CORE_EXTRA_IMPORT = { name: 'lodash', message: 'Core code imports no utility library.' };\nconst CORE_EXTRA_PATTERN = { group: ['lodash/*'], message: 'Core code imports no utility library.' };\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "    rules: { 'no-restricted-syntax': [...runtimeSyntax(), ...DETERMINISM_SYNTAX] },\n  },\n\n  // 5c. File-level exemptions",
+          "with": "    rules: { 'no-restricted-syntax': [...runtimeSyntax(), ...DETERMINISM_SYNTAX] },\n  },\n  // 5b+. Stricter only: no Date.UTC in the core dates folder.\n  {\n    files: ['src/core/dates/**/*.ts'],\n    rules: { 'no-restricted-syntax': [...runtimeSyntax(['newDate']), ...DETERMINISM_SYNTAX, ...CORE_EXTRA_SYNTAX] },\n  },\n\n  // 5c. File-level exemptions"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "    rules: { 'no-restricted-syntax': [...runtimeSyntax(['newDate']), ...DETERMINISM_SYNTAX, ...CORE_EXTRA_SYNTAX] },",
+          "with": "    rules: {\n      'no-restricted-syntax': [...runtimeSyntax(['newDate']), ...DETERMINISM_SYNTAX, ...CORE_EXTRA_SYNTAX],\n      'no-restricted-properties': ['error', ...RESTRICTED_PROPERTIES],\n    },"
+        }
+      }
+    ]
   }
 }

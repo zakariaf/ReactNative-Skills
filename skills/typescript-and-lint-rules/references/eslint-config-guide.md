@@ -15,7 +15,7 @@ or when a new folder, adapter or exemption is needed.
 - How check-configs reads the config
 - The file-exact exemptions
 - Blocks other skills own
-- Adding an exception, step by step (and lifting a ban for a scoped doNotAdd entry's importers)
+- Adding an exception, step by step (lifting a ban for a scoped doNotAdd entry's importers; adding a stricter block)
 - Prettier
 - knip
 - Troubleshooting
@@ -237,7 +237,7 @@ verbatim, like the `RESTRICTED_PROPERTIES` messages: an edit in place fails `esl
 | Part | Rule | Allowed to differ |
 |---|---|---|
 | each canonical block (its `files`, `ignores`, `rules`, `extends` and options) | present, unchanged, in the template's order (`[canonical-block]`): a later block replaces an earlier one's options, so order is part of the config | nothing; when multi-package, see that section |
-| every other block | names exact files: each `files` entry has a literal file name as its last segment (`src/services/perf/frame-sampler-adapter.ts`, `src/**/test-only.ts`); a block without `files`, a folder glob, a name pattern (`src/**/use-*.ts`) or a `files` value that is not a string list fails (`[exemption-scope]`); the one exception is the sanctioned lift of a scoped `doNotAdd` entry, which may name its `allowIn` glob (`[scoped-lift]`, "Adding an exception") | anything inside it, within the other rules (`[fresh-list]`, `[option-redeclared]`, `eslint-rule-off`) |
+| every other block | names exact files: each `files` entry has a literal file name as its last segment (`src/services/perf/frame-sampler-adapter.ts`, `src/**/test-only.ts`); a block without `files`, a folder glob, a name pattern (`src/**/use-*.ts`) or a `files` value that is not a string list fails (`[exemption-scope]`); the exceptions are the sanctioned lift of a scoped `doNotAdd` entry, which may name its `allowIn` glob (`[scoped-lift]`), and a stricter-only block right after a canonical block (`[stricter-block]`), both in "Adding an exception" | anything inside it, within the other rules (`[fresh-list]`, `[option-redeclared]`, `eslint-rule-off`) |
 | the file groups | `[file-group]` (above) | widening groups gain globs; exemption groups gain exact file names |
 | every other top-level `const` (shared lists, selectors, helpers) | verbatim (`[canonical-const]`) | `PRE_EXISTING`, `IS_MULTI_PACKAGE` and `PACKAGE_IMPORT_EXTENSION` are the app's to fill; `VENDOR_SDK_PATHS` and `BANNED_PACKAGE_PATHS` gain entries but never lose one; new consts are allowed |
 | the items of `defineConfig([...])` that are not blocks | only `globalIgnores(...)`, `expoConfig` and `prettierConfig` (`[config-item]`) | nothing |
@@ -381,6 +381,42 @@ sanctioned value of that rule besides the canonical one (`ts-lint-baseline.json`
 
 A new rules test file then needs no config change. architecture-and-boundaries' `check-boundaries.mjs`
 reads the same `allowIn`, so both gates agree on who may import the package.
+
+### Adding a stricter block
+
+A block that only adds bans is not an exception, and it may name a folder. First widen a file group
+when the canonical block already holds the bans you want: the widening groups (`ALL_TS`, `RUNTIME`,
+`PURE`, `DETERMINISTIC`) gain any glob, because each of their blocks only bans (a shared package in
+`DETERMINISTIC`: `'packages/shared/src/**/*.ts'`). For bans the canonical config does not have (one
+package keeps out `Date.UTC` or a library), add a block that
+
+- sits directly after the canonical block whose rule it lengthens (a later block replaces a rule's
+  options, so right after that block it adds to exactly what those files had);
+- reaches only files that block reaches (`src/core/dates/**/*.ts` after the `DETERMINISTIC` block,
+  `packages/shared/src/**/*.ts` once the group lists it);
+- sets only `no-restricted-*` rules that block sets, each to the canonical value with entries
+  appended: `[...runtimeSyntax(), ...DETERMINISM_SYNTAX, ...SHARED_SYNTAX]`, or
+  `restrictedImports({ paths: [...RUNTIME_PATHS, EXTRA], patterns: [NODE_BUILTINS, PURE_IMPORTS,
+  PURE_ALIAS, EXTRA_PATTERN] })`; the new lists are new consts.
+
+```js
+const SHARED_SYNTAX = [
+  {
+    selector: "CallExpression[callee.object.name='Date'][callee.property.name='UTC']",
+    message: 'Shared code takes instants from the clock port, never Date.UTC.',
+  },
+];
+// ... right after block 5b:
+{
+  files: ['packages/shared/src/**/*.ts'],
+  rules: { 'no-restricted-syntax': [...runtimeSyntax(), ...DETERMINISM_SYNTAX, ...SHARED_SYNTAX] },
+},
+```
+
+`check-configs.mjs` accepts such a block (it is not counted as a fresh list) and reports each break of
+the three conditions as `eslint-weakened [stricter-block]`, next to `[exemption-scope]`. A canonical
+block later in the config still replaces the rule for the files it reaches, so check the result with
+`npx eslint --print-config <file>`.
 
 Editing `eslint.config.mjs`, `.prettierrc.json` or a `tsconfig*.json` may show the developer a
 permission prompt (they are `ask` paths in `.claude/settings.json`). That is expected: say in one plain

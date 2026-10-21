@@ -31,7 +31,8 @@ the forbidden patterns, the TSDoc contract, and two checkers that prove the repo
    code. The canonical blocks, file groups and shared lists stay as the template ships them; an
    exception is a new block that names exact files and rebuilds the rule from the shared lists, with a
    reason comment and a `Gate-Change:` trailer (a package a scoped `doNotAdd` entry lets some files
-   import is lifted for exactly its `allowIn` globs, `test/rules/**`). Why: a later flat-config block replaces a rule's
+   import is lifted for exactly its `allowIn` globs, `test/rules/**`; a block that only appends bans
+   to the canonical block right before it may name a folder). Why: a later flat-config block replaces a rule's
    options, it does not merge, so a fresh short list, a widened group or a folder-wide block silently
    drops every other ban, however it is spelled.
 5. **Stay inside the limits.** 250 code lines per file (400 in tests), 40 per `.ts` function, 80 per
@@ -225,6 +226,7 @@ and `.gitignore`, with its knip workspace's `entry` the one file the deploy buil
 | `scripts/lib/workspaces.mjs` | Workspace and Expo-app detection for the multi-package checks (synced) | Only when changing a checker |
 | `scripts/lib/app-scope.mjs` | Which repo paths are app code and whether an ignore entry reaches them (this skill's own helper, used by both checkers) | Only when changing a checker |
 | `scripts/lib/eslint-lifts.mjs` | Decides whether a block that lifts a banned package is the sanctioned lift of a scoped `doNotAdd` entry (its `allowIn` files, nothing else changed) (this skill's own helper) | Only when changing check-configs |
+| `scripts/lib/eslint-stricter.mjs` | Decides whether an extra block only adds bans (right after a canonical block, within its files, its `no-restricted-*` lists lengthened) (this skill's own helper) | Only when changing check-configs |
 | `scripts/lib/eslint-structure.mjs` | Reads an `eslint.config.mjs` without running it: consts, blocks, the files each block reaches (this skill's own helper) | Only when changing check-configs |
 | `assets/ts-lint-baseline.json` | The canonical compiler options, programs, required ESLint settings, limits, pins, knip rules | When a verified setting changes (stop and ask) |
 | `assets/shared.json` | The shared files this skill copies in | When adding a shared file |
