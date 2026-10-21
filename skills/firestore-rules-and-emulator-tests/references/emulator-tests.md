@@ -168,10 +168,19 @@ describe('users/{uid}/attachments/{fileName}', () => { ... });
 ## Keeping the rules tests out of the unit run
 
 The canonical `jest.config.js` (owned by unit-and-component-tests) runs every `*.test.ts` under
-`test/` in its unit project. Until its ignore list holds `'\\.rules\\.test\\.'` (beside the golden,
-sim and android patterns), `npm test` also picks up the rules tests and they fail there for want of an
-emulator. Add the pattern there, through that skill, in the same change that adds the first rules
-test; this skill never edits that config.
+`test/` in its unit project, so without an ignore `npm test` also picks up the rules tests and they
+fail there for want of an emulator. The canonical config carries that ignore itself: once
+`jest.emulator.config.js` exists at the repo root, its unit project adds `'\\.rules\\.test\\.'` to
+`testPathIgnorePatterns` (`HAS_RULES_TESTS`, after the golden, sim and android patterns). Copy the
+current canonical `jest.config.js` (a single app and a workspace repo alike) rather than adding the
+pattern by hand: quality-gates' `check-gate-wiring` compares the config with the canonical one, so a
+hand-edited ignore list fails `[jest-scope]`.
+
+The resolved config then holds the pattern, so the app's `quality-gates.json` names it too, in the
+same gate change that adds `jest.emulator.config.js`: `"\\.rules\\.test\\."` at the end of
+`jest.projects.unit.testPathIgnorePatterns`, after `"\\.android\\.test\\."`. check-gate-wiring
+accepts that entry only while `jest.emulator.config.js` exists. This skill edits neither file; the
+change goes through unit-and-component-tests and quality-gates with a `Gate-Change:` trailer.
 
 ## Proving the tests have teeth
 

@@ -92,8 +92,11 @@ both kinds. Verified on 2026-10-21 with firebase-tools 15.33.0, `@firebase/rules
    against a broken rule proves nothing (emulator-tests reference, "Proving the tests have teeth").
 6. **Wire the gate through the owning skills** (toolchain-and-ci reference, "Reaching the gate and
    CI"): `test:rules` in quality-gates' `verifyExtraSteps`; the rules, `firebase.json`, the contract,
-   the Jest config and `test/rules/**` in `gatedPaths`; `'\\.rules\\.test\\.'` in the unit project's
-   ignore list of `jest.config.js` (unit-and-component-tests); `assertSucceeds` and `assertFails` in
+   the Jest config and `test/rules/**` in `gatedPaths`; the current canonical `jest.config.js`
+   (unit-and-component-tests), whose unit project leaves `*.rules.test.ts` out by itself once
+   `jest.emulator.config.js` exists, with `'\\.rules\\.test\\.'` added after the android entry of
+   `quality-gates.json` `jest.projects.unit.testPathIgnorePatterns` in the same gate change (never a
+   hand-edited ignore list: emulator-tests reference); `assertSucceeds` and `assertFails` in
    `jest/expect-expect`'s `assertFunctionNames` (typescript-and-lint-rules); the JDK 21 step and the <!-- stack-pin-ignore: the Firebase emulators' JDK -->
    jar cache in the CI verify job (ci-pipeline-and-gates).
 7. **Run the checker:** `node ${CLAUDE_SKILL_DIR}/scripts/check-rules-tests.mjs .` (repo root,
@@ -112,8 +115,9 @@ both kinds. Verified on 2026-10-21 with firebase-tools 15.33.0, `@firebase/rules
       `hasOnly`/`hasAll`/`affectedKeys`, type checks and `request.time`; Storage checks owner, type
       and size.
 - [ ] `npm run test:rules` passes with `--project demo-<app>`, and breaking a rule makes a test fail.
-- [ ] The tooling is pinned exactly, with dependency-policy rows; the gate, gated paths, unit-project
-      ignore and CI steps are in place, or listed in the report for their owner skills.
+- [ ] The tooling is pinned exactly, with dependency-policy rows; the gate, gated paths, the
+      canonical `jest.config.js` with the rules ignore in `quality-gates.json`, and CI steps are in
+      place, or listed in the report for their owner skills.
 - [ ] Deploying is left to the developer and named in the report.
 - [ ] `node ${CLAUDE_SKILL_DIR}/scripts/check-rules-tests.mjs .` prints `RESULT: PASS`
 
@@ -168,9 +172,9 @@ and no `firebase-tools` dependency, so the skill is not applied yet.
 
 - `firebase-rnfb` - the app-side Firestore and Storage code whose writes these rules allow.
 - `cloud-functions-backend` - the Admin SDK writes behind server-only documents.
-- `unit-and-component-tests` - the canonical `jest.config.js` that must leave `*.rules.test.ts` out.
+- `unit-and-component-tests` - the canonical `jest.config.js`, whose unit project leaves `*.rules.test.ts` out once `jest.emulator.config.js` exists.
 - `typescript-and-lint-rules` - the canonical ESLint config whose `jest/expect-expect` must accept `assertSucceeds` and `assertFails`.
-- `quality-gates` - `verifyExtraSteps` and `gatedPaths` for the rules and their tests.
+- `quality-gates` - `verifyExtraSteps` and `gatedPaths` for the rules and their tests, and the rules ignore in `quality-gates.json` `jest.projects.unit`.
 - `ci-pipeline-and-gates` - the JDK step and emulator jar cache in the CI verify job.
 - `dependency-management` - the policy rows for the pinned Firebase tooling.
 - `tdd-workflow` - red, green, then prove the test catches the broken rule.
