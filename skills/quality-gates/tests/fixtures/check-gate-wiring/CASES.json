@@ -250,7 +250,7 @@
   "bad-ignored-paths-widened": {
     "expect": [
       "[jest-scope]",
-      "jest.config.js:71",
+      "jest.config.js:73",
       "const IGNORED_PATHS is"
     ],
     "ops": [

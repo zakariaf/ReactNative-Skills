@@ -53,7 +53,8 @@ const SPEC = {
     '                            named after its folder: functions)',
     '  jest-orphan-tests         a file that Jest\'s defaults, jest-expo or Expo\'s guide treat as a test (*.test|spec.[jt]s(x),',
     '                            a test under __tests__/, *-test.[jt]s(x)), anywhere in the repo, is run by no project and',
-    '                            not by jest.sim.config.js (silently never run), or by more than one project (run twice).',
+    '                            not by jest.sim.config.js or jest.emulator.config.js (the security-rules tests) (silently',
+    '                            never run), or by more than one project (run twice).',
     '                            Left out: installed skills, the Maestro folder, a folder that is not a workspace but runs',
     '                            its own tests (its own Jest, Vitest, Playwright or Cypress config, a deno.json, or a',
     '                            package.json test script), the folders a root playwright.config testDir or cypress.config',
@@ -611,14 +612,28 @@ function orphanFix(rel, layout) {
   return 'Put the test where a project matches it: copy TEST_ROOTS and testMatch from templates/jest.config.js (tests sit in src/, scripts/, plugins/ or test/ as <unit>.test.ts(x)).';
 }
 
-/** Every test file runs in exactly one place: one Jest project, or the simulation config. */
+/**
+ * The security-rules config (firestore-rules-and-emulator-tests) when it exists and loads, else null:
+ * its *.rules.test.ts files run inside the Firebase emulators, never in npm test, and the canonical
+ * unit project leaves them out while it exists (HAS_RULES_TESTS). That skill checks its contents.
+ */
+function emulatorRunner(root, report) {
+  const rel = 'jest.emulator.config.js';
+  if (!existsSync(join(root, rel))) return null;
+  const config = loadConfig(root, rel, report);
+  return config ? { ...config, displayName: rel } : null;
+}
+
+/** Every test file runs in exactly one place: one Jest project, the simulation config or the security-rules config. */
 function checkOrphans(root, layout, projects, simConfig, testFiles, report) {
-  const runners = [...projects, ...(simConfig ? [simConfig] : [])].map((config) => ({ name: String(config.displayName ?? '?'), runs: runnerOf(root, config) }));
+  const emulator = emulatorRunner(root, report);
+  const runners = [...projects, ...(simConfig ? [simConfig] : []), ...(emulator ? [emulator] : [])].map((config) => ({ name: String(config.displayName ?? '?'), runs: runnerOf(root, config) }));
   for (const rel of testFiles) {
     if (SIM_TEST.test(rel) && !simConfig && !existsSync(join(root, 'jest.sim.config.js'))) continue; // sim-config reports it
     const names = runners.filter(({ runs }) => runs(rel)).map(({ name }) => name);
     const projectList = projects.map((project) => project.displayName ?? '?').join(', ');
-    if (names.length === 0) report.problem({ file: rel, line: 1, rule: 'jest-orphan-tests', message: simConfig ? `neither a Jest project (${projectList}) nor jest.sim.config.js runs this test, so it never runs` : `no Jest project (${projectList}) runs this test, so it never runs`, fix: orphanFix(rel, layout) });
+    const others = [simConfig ? 'jest.sim.config.js' : null, emulator ? 'jest.emulator.config.js' : null].filter((name) => name !== null);
+    if (names.length === 0) report.problem({ file: rel, line: 1, rule: 'jest-orphan-tests', message: others.length === 0 ? `no Jest project (${projectList}) runs this test, so it never runs` : `neither a Jest project (${projectList}) nor ${others.join(' nor ')} runs this test, so it never runs`, fix: orphanFix(rel, layout) });
     else if (names.length > 1) report.problem({ file: rel, line: 1, rule: 'jest-orphan-tests', message: `runs in ${names.length} places (${names.join(', ')}), so every run executes it twice`, fix: 'Leave it out of all but one: the unit project drops goldens, simulations and *.android.test.* through testPathIgnorePatterns (templates/jest.config.js).' });
   }
 }

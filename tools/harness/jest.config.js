@@ -4,6 +4,8 @@
 //           'golden' (*.golden.test.ts only: data goldens, and pixel goldens in Skia's CanvasKit env
 //           once the app depends on Skia).
 // Simulations (*.sim.test.ts) are NOT here: they run via jest.sim.config.js (`npm run test:sim`).
+// Security-rules tests (*.rules.test.ts) are NOT here either once jest.emulator.config.js exists:
+// they run inside the Firebase emulators (`npm run test:rules`).
 const fs = require('node:fs');
 const path = require('node:path');
 
@@ -116,6 +118,11 @@ const TEST_ROOTS = [
 // test of the plugin's output fails once its directive file is mutated; mutation runs leave it out.
 const IS_MUTATION_RUN = process.env.STRYKER_MUTATOR_WORKER !== undefined;
 
+// Security-rules tests (*.rules.test.ts in test/rules/) run only inside the Firebase emulators,
+// through jest.emulator.config.js (firestore-rules-and-emulator-tests); once that config exists the
+// unit project leaves them out, and nothing else does.
+const HAS_RULES_TESTS = fs.existsSync(path.join(__dirname, 'jest.emulator.config.js'));
+
 const unitProject = {
   ...SHARED,
   displayName: 'unit',
@@ -125,6 +132,7 @@ const unitProject = {
     '\\.golden\\.test\\.',
     '\\.sim\\.test\\.',
     '\\.android\\.test\\.',
+    ...(HAS_RULES_TESTS ? ['\\.rules\\.test\\.'] : []),
     ...(IS_MUTATION_RUN ? ['/quality/worklet-transform\\.test\\.'] : []),
   ],
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],

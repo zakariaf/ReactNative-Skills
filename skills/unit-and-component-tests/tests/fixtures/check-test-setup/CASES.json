@@ -1,7 +1,7 @@
 {
   "bad-android-preset": {
     "expect": [
-      "jest.config.js:138 [jest-android-project] android preset is \"jest-expo/ios\", not \"jest-expo/android\""
+      "jest.config.js:146 [jest-android-project] android preset is \"jest-expo/ios\", not \"jest-expo/android\""
     ],
     "ops": [
       {
@@ -58,7 +58,7 @@
   },
   "bad-coverage-keys-gone": {
     "expect": [
-      "jest.config.js:168 [coverage-threshold-keys] the logic threshold key ./src/data/ is gone"
+      "jest.config.js:176 [coverage-threshold-keys] the logic threshold key ./src/data/ is gone"
     ],
     "ops": [
       {
@@ -72,7 +72,7 @@
   },
   "bad-coverage-report": {
     "expect": [
-      "jest.config.js:199 [coverage-report] coverage is not written to <rootDir>/reports/coverage with the json-summary reporter"
+      "jest.config.js:207 [coverage-report] coverage is not written to <rootDir>/reports/coverage with the json-summary reporter"
     ],
     "ops": [
       {
@@ -86,7 +86,7 @@
   },
   "bad-coverage-scope-extra": {
     "expect": [
-      "jest.config.js:198 [coverage-scope] collectCoverageFrom leaves out !<rootDir>/src/features/**"
+      "jest.config.js:206 [coverage-scope] collectCoverageFrom leaves out !<rootDir>/src/features/**"
     ],
     "ops": [
       {
@@ -114,7 +114,7 @@
   },
   "bad-golden-env": {
     "expect": [
-      "jest.config.js:161 [jest-golden-project] golden testEnvironment is undefined"
+      "jest.config.js:169 [jest-golden-project] golden testEnvironment is undefined"
     ],
     "ops": [
       {
@@ -128,7 +128,7 @@
   },
   "bad-golden-loads-unit-setup": {
     "expect": [
-      "jest.config.js:154 [jest-golden-project] golden loads <rootDir>/jest.setup.ts, whose inert Skia mock replaces CanvasKit"
+      "jest.config.js:162 [jest-golden-project] golden loads <rootDir>/jest.setup.ts, whose inert Skia mock replaces CanvasKit"
     ],
     "ops": [
       {
@@ -142,7 +142,7 @@
   },
   "bad-golden-no-setup-without-skia": {
     "expect": [
-      "jest.config.js:159 [jest-golden-project] golden does not load <rootDir>/jest.setup.ts (without Skia, goldens run with the unit set-up)"
+      "jest.config.js:167 [jest-golden-project] golden does not load <rootDir>/jest.setup.ts (without Skia, goldens run with the unit set-up)"
     ],
     "ops": [
       {
@@ -179,7 +179,7 @@
   },
   "bad-golden-without-skia": {
     "expect": [
-      "jest.config.js:162 [jest-golden-project] golden uses Skia's CanvasKit environment, but the app does not depend on @shopify/react-native-skia"
+      "jest.config.js:170 [jest-golden-project] golden uses Skia's CanvasKit environment, but the app does not depend on @shopify/react-native-skia"
     ],
     "ops": [
       {
@@ -313,7 +313,7 @@
   },
   "bad-mock-reset": {
     "expect": [
-      "jest.config.js:101 [jest-mock-reset] project \"unit\" does not set clearMocks and restoreMocks to true"
+      "jest.config.js:103 [jest-mock-reset] project \"unit\" does not set clearMocks and restoreMocks to true"
     ],
     "ops": [
       {
@@ -340,9 +340,9 @@
   },
   "bad-no-alias-mapper": {
     "expect": [
-      "jest.config.js:96 [jest-alias-mapper] project \"unit\" does not map @/* to its source under <rootDir>",
-      "jest.config.js:96 [jest-alias-mapper] project \"android\" does not map @/*",
-      "jest.config.js:96 [jest-alias-mapper] project \"golden\" does not map @/*"
+      "jest.config.js:98 [jest-alias-mapper] project \"unit\" does not map @/* to its source under <rootDir>",
+      "jest.config.js:98 [jest-alias-mapper] project \"android\" does not map @/*",
+      "jest.config.js:98 [jest-alias-mapper] project \"golden\" does not map @/*"
     ],
     "ops": [
       {
@@ -356,7 +356,7 @@
   },
   "bad-no-android-project": {
     "expect": [
-      "jest.config.js:191 [jest-projects] projects are [unit, golden]: the android project is missing"
+      "jest.config.js:199 [jest-projects] projects are [unit, golden]: the android project is missing"
     ],
     "ops": [
       {
@@ -415,7 +415,7 @@
   },
   "bad-one-project": {
     "expect": [
-      "jest.config.js:191 [jest-projects] projects are [unit, android]: the app depends on @shopify/react-native-skia but the golden project is missing"
+      "jest.config.js:199 [jest-projects] projects are [unit, android]: the app depends on @shopify/react-native-skia but the golden project is missing"
     ],
     "ops": [
       {
@@ -430,7 +430,7 @@
   "bad-orphan-data-golden": {
     "expect": [
       "src/core/task-filter.golden.test.ts:1 [jest-orphan-tests] neither a Jest project (unit, android) nor jest.sim.config.js runs this test, so it never runs",
-      "jest.config.js:191 [jest-projects] projects are [unit, android]: src/core/task-filter.golden.test.ts is a golden test but the golden project is missing",
+      "jest.config.js:199 [jest-projects] projects are [unit, android]: src/core/task-filter.golden.test.ts is a golden test but the golden project is missing",
       "package.json:6 [test-script] script \"test:golden\" is missing"
     ],
     "ops": [
@@ -652,7 +652,7 @@
   },
   "bad-setup-file-missing": {
     "expect": [
-      "jest.config.js:130 [jest-setup-file-missing] project \"unit\" loads test/setup-extra.ts, which does not exist"
+      "jest.config.js:138 [jest-setup-file-missing] project \"unit\" loads test/setup-extra.ts, which does not exist"
     ],
     "ops": [
       {
@@ -738,9 +738,9 @@
   },
   "bad-skills-not-ignored": {
     "expect": [
-      "jest.config.js:97 [jest-ignored-paths] project \"unit\" does not ignore skills, .agents, .claude in modulePathIgnorePatterns",
-      "jest.config.js:97 [jest-ignored-paths] project \"android\" does not ignore skills, .agents, .claude",
-      "jest.config.js:97 [jest-ignored-paths] project \"golden\" does not ignore skills, .agents, .claude",
+      "jest.config.js:99 [jest-ignored-paths] project \"unit\" does not ignore skills, .agents, .claude in modulePathIgnorePatterns",
+      "jest.config.js:99 [jest-ignored-paths] project \"android\" does not ignore skills, .agents, .claude",
+      "jest.config.js:99 [jest-ignored-paths] project \"golden\" does not ignore skills, .agents, .claude",
       "jest.sim.config.js:18 [jest-ignored-paths] the sim config does not ignore skills, .agents, .claude"
     ],
     "ops": [
@@ -962,8 +962,8 @@
   },
   "bad-threshold-lowered": {
     "expect": [
-      "jest.config.js:181 [coverage-threshold] global coverage threshold is weaker than 90/90/90/85 (lines 80 < 90)",
-      "jest.config.js:167 [coverage-threshold] logic threshold ./src/core/ is weaker than 95/95/95/90 (branches 80 < 90)"
+      "jest.config.js:189 [coverage-threshold] global coverage threshold is weaker than 90/90/90/85 (lines 80 < 90)",
+      "jest.config.js:175 [coverage-threshold] logic threshold ./src/core/ is weaker than 95/95/95/90 (branches 80 < 90)"
     ],
     "ops": [
       {
@@ -984,7 +984,7 @@
   },
   "bad-transform-missing-router": {
     "expect": [
-      "jest.config.js:60 [jest-transform] project \"unit\" does not transpile standard-navigation"
+      "jest.config.js:62 [jest-transform] project \"unit\" does not transpile standard-navigation"
     ],
     "ops": [
       {
@@ -998,7 +998,7 @@
   },
   "bad-unit-testmatch": {
     "expect": [
-      "jest.config.js:121 [jest-unit-project] unit testMatch does not cover test",
+      "jest.config.js:128 [jest-unit-project] unit testMatch does not cover test",
       "test/render-with-providers.test.tsx:1 [jest-orphan-tests]"
     ],
     "ops": [
@@ -1635,6 +1635,54 @@
           "file": "jest.config.js",
           "find": "    '<rootDir>/src/**/*.{ts,tsx}',\n",
           "with": "    '<rootDir>/{apps,packages}/*/src/**/*.{ts,tsx}',\n"
+        }
+      }
+    ]
+  },
+  "pass-rules-tests-own-config": {
+    "expect": [
+      "check-test-setup: 1 repo checked, 0 problems",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "$comment": "firestore-rules-and-emulator-tests adopted: jest.emulator.config.js runs test/rules/*.rules.test.ts inside the Firebase emulators, and the canonical unit project leaves those files out (HAS_RULES_TESTS); they are that config's tests, not orphans.",
+        "write": {
+          "file": "jest.emulator.config.js",
+          "content": "// jest.emulator.config.js — the 'emulator' Jest project: security-rules tests (*.rules.test.ts in\n// test/rules/), run only inside `firebase emulators:exec` (npm run test:rules).\n/** @type {import('jest').Config} */\nmodule.exports = {\n  rootDir: __dirname,\n  displayName: 'emulator',\n  testEnvironment: 'node',\n  testMatch: ['<rootDir>/test/rules/**/*.rules.test.ts'],\n  maxWorkers: 1,\n};\n"
+        }
+      },
+      {
+        "write": {
+          "file": "test/rules/firestore.rules.test.ts",
+          "content": "import { assertFails } from '@firebase/rules-unit-testing';\n\ndescribe('/users/{uid}/tasks/{taskId}', () => {\n  it('denies a signed-out read', async () => {\n    await assertFails(Promise.reject(new Error('denied')));\n  });\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-rules-tests-in-unit": {
+    "expect": [
+      "test/rules/firestore.rules.test.ts:1 [jest-orphan-tests] runs in 2 places (unit, jest.emulator.config.js)"
+    ],
+    "ops": [
+      {
+        "$comment": "A unit project that no longer leaves the rules tests out runs them twice, once without the emulators.",
+        "write": {
+          "file": "jest.emulator.config.js",
+          "content": "// jest.emulator.config.js — the 'emulator' Jest project: security-rules tests (*.rules.test.ts in\n// test/rules/), run only inside `firebase emulators:exec` (npm run test:rules).\n/** @type {import('jest').Config} */\nmodule.exports = {\n  rootDir: __dirname,\n  displayName: 'emulator',\n  testEnvironment: 'node',\n  testMatch: ['<rootDir>/test/rules/**/*.rules.test.ts'],\n  maxWorkers: 1,\n};\n"
+        }
+      },
+      {
+        "write": {
+          "file": "test/rules/firestore.rules.test.ts",
+          "content": "import { assertFails } from '@firebase/rules-unit-testing';\n\ndescribe('/users/{uid}/tasks/{taskId}', () => {\n  it('denies a signed-out read', async () => {\n    await assertFails(Promise.reject(new Error('denied')));\n  });\n});\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "    ...(HAS_RULES_TESTS ? ['\\\\.rules\\\\.test\\\\.'] : []),\n",
+          "with": ""
         }
       }
     ]
