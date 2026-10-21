@@ -153,5 +153,74 @@
         }
       }
     ]
+  },
+  "pass-package-scripts-are-tooling": {
+    "expect": [
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "$comment": "a pure package's scripts/ folder is Node tooling (a vector writer or an independent oracle), never bundled: Node built-ins and ../ are fine there",
+        "write": {
+          "file": "packages/core/scripts/vectors/write-price-vectors.ts",
+          "lines": [
+            "// packages/core/scripts/vectors/write-price-vectors.ts",
+            "import { writeFileSync } from 'node:fs';",
+            "",
+            "import { formatPrice } from '../../src/money/format-price.ts';",
+            "",
+            "writeFileSync('price.vectors.json', JSON.stringify([formatPrice(100)]));"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-package-imports-its-scripts": {
+    "expect": [
+      "[no-tooling-import]",
+      "packages/core/src/money/price-vectors.ts:1"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "packages/core/scripts/vectors/write-price-vectors.ts",
+          "lines": [
+            "// packages/core/scripts/vectors/write-price-vectors.ts",
+            "import { writeFileSync } from 'node:fs';",
+            "",
+            "import { formatPrice } from '../../src/money/format-price.ts';",
+            "",
+            "writeFileSync('price.vectors.json', JSON.stringify([formatPrice(100)]));"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "packages/core/src/money/price-vectors.ts",
+          "lines": [
+            "export { formatPrice } from '../../scripts/vectors/write-price-vectors.ts';"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-package-src-node-builtin": {
+    "expect": [
+      "[node-builtin]",
+      "packages/core/src/money/read-rates.ts:1"
+    ],
+    "ops": [
+      {
+        "$comment": "the scripts/ exception stops at scripts/: the package's src/ stays bundled code",
+        "write": {
+          "file": "packages/core/src/money/read-rates.ts",
+          "lines": [
+            "import { readFileSync } from 'node:fs';",
+            "",
+            "export const readRates = (): string => readFileSync('rates.json', 'utf8');"
+          ]
+        }
+      }
+    ]
   }
 }

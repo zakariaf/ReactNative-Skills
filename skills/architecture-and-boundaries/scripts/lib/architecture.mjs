@@ -356,7 +356,12 @@ export function loadArchitecture(root, options = {}) {
     const scope = scopeOf(rel);
     const info = { rel, scope, zone: 'outside', feature: null, game: null, gamePart: null, module: null, isTest: TEST_NAME.test(rel), isNode: false, isPure: false };
     const L = scope.layout;
-    if (scope.kind === 'package') {
+    if (scope.kind === 'package' && L && under(rel, L.scriptsDir)) {
+      // A package's scripts/ (a vector writer, an independent oracle) is Node tooling beside the
+      // package, never bundled: its exports map serves src/ only.
+      info.zone = 'node';
+      info.isNode = true;
+    } else if (scope.kind === 'package') {
       info.zone = 'package';
       info.isNode = scope.isNode;
       info.isPure = scope.isPure;

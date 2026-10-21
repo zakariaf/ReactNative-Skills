@@ -322,5 +322,26 @@
         }
       }
     ]
+  },
+  "pass-package-scripts-are-tooling": {
+    "expect": [
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "$comment": "a package's scripts/ folder is Node tooling beside the package (check-boundaries treats it as Node world)",
+        "write": {
+          "file": "packages/core/scripts/vectors/write-price-vectors.ts",
+          "lines": [
+            "// packages/core/scripts/vectors/write-price-vectors.ts",
+            "import { writeFileSync } from 'node:fs';",
+            "",
+            "import { formatPrice } from '../../src/money/format-price.ts';",
+            "",
+            "writeFileSync('price.vectors.json', JSON.stringify([formatPrice(100)]));"
+          ]
+        }
+      }
+    ]
   }
 }
