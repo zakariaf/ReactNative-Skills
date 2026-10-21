@@ -23,8 +23,10 @@ const TODAY = ['--today', '2026-10-14'];
 const VARS = variablesFrom({ appId: 'com.acme.tasks', name: 'Tasks' });
 // The root base as a workspace program extends it, two folders up (built from parts on purpose).
 const ROOT_BASE = ['..', '..', 'tsconfig.base.json'].join('/');
-// The scripts that take another form when multi-package (root, every workspace, every Expo app).
-const MULTI = JSON.parse(readFileSync(new URL('../assets/package-scripts.multi-package.json', import.meta.url), 'utf8'));
+// The scripts that take another form when multi-package (root and every workspace); export:audit runs in apps/tasks.
+const MULTI_FILE = JSON.parse(readFileSync(new URL('../assets/package-scripts.multi-package.json', import.meta.url), 'utf8'));
+const fillApp = (command) => command.replaceAll('<app-dir>', 'apps/tasks').replaceAll('<to-root>', ['..', '..'].join('/'));
+const MULTI = { ...MULTI_FILE, scripts: Object.fromEntries(Object.entries(MULTI_FILE.scripts).map(([name, command]) => [name, fillApp(command)])) };
 
 const write = (dir, rel, content) => {
   mkdirSync(dirname(join(dir, rel)), { recursive: true });
@@ -65,7 +67,7 @@ function moveIntoWorkspaces(dir) {
   for (const rel of ['app.config.ts', 'metro.config.js', 'src', 'assets']) renameSync(join(dir, rel), join(dir, 'apps', 'tasks', rel));
   rmSync(join(dir, 'apps', 'tasks', 'src', 'tsconfig.json'));
   writeJson(dir, 'apps/tasks/tsconfig.json', { extends: ROOT_BASE, compilerOptions: { types: ['jest'], paths: { '@/*': ['./src/*'] } }, include: ['**/*', '.expo/types/**/*.ts'] });
-  writeJson(dir, 'apps/tasks/package.json', { name: '@acme/tasks', version: '1.0.0', private: true, main: 'expo-router/entry', scripts: { start: 'expo start', android: 'expo start --android', ios: 'expo start --ios', web: 'expo start --web', ...MULTI.workspaceScripts, ...MULTI.appScripts }, dependencies: { '@acme/ui': '*', ...root.dependencies } });
+  writeJson(dir, 'apps/tasks/package.json', { name: '@acme/tasks', version: '1.0.0', private: true, main: 'expo-router/entry', scripts: { start: 'expo start', android: 'expo start --android', ios: 'expo start --ios', web: 'expo start --web', ...MULTI.workspaceScripts }, dependencies: { '@acme/ui': '*', ...root.dependencies } });
   writeJson(dir, 'packages/ui/package.json', { name: '@acme/ui', version: '1.0.0', private: true, type: 'module', exports: { './*': './src/*' }, scripts: { ...MULTI.workspaceScripts }, peerDependencies: { react: '*', 'react-native': '*', 'react-native-reanimated': '*' } });
   writeJson(dir, 'packages/ui/tsconfig.json', { extends: ROOT_BASE, compilerOptions: { types: ['jest'] }, include: ['src/**/*'] });
   write(dir, 'packages/ui/src/press-scale.ts', 'export const PRESS_SCALE = 0.96;\n');

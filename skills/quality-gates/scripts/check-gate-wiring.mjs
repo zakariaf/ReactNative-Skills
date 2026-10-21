@@ -129,11 +129,22 @@ function coreSteps() {
   return [...list.matchAll(/'([^']+)'/g)].map((match) => match[1]);
 }
 
+/**
+ * A workspace-form command for one Expo app workspace: <app-dir> is its folder, <to-root> the way back up.
+ * With several apps the one the repo's own script names is the baseline (else the first).
+ */
+function fillAppDir(command, appWorkspaces, actual) {
+  if (!command.includes('<app-dir>') || appWorkspaces.length === 0) return command;
+  const forms = appWorkspaces.map((dir) => command.replaceAll('<app-dir>', dir).replaceAll('<to-root>', dir.split('/').map(() => '..').join('/')));
+  return forms.find((form) => form === actual) ?? forms[0];
+}
+
 /** The baseline scripts: the canonical map, with the workspace forms when multi-package. */
-function baselineScripts(layout) {
+function baselineScripts(ctx) {
   const scripts = readJson(join(TEMPLATES, 'package-scripts.json'));
-  if (layout.mode !== 'monorepo') return scripts;
-  return { ...scripts, ...readJson(join(SKILL, 'assets', 'package-scripts.multi-package.json')).scripts };
+  if (ctx.layout.mode !== 'monorepo') return scripts;
+  const multi = readJson(join(SKILL, 'assets', 'package-scripts.multi-package.json')).scripts;
+  return { ...scripts, ...Object.fromEntries(Object.entries(multi).map(([name, command]) => [name, fillAppDir(command, ctx.appWorkspaces, ctx.pkg.scripts?.[name])])) };
 }
 
 /** The single app's program in the canonical typescript.projects; multi-package, each Expo app workspace's own. */
@@ -647,7 +658,6 @@ run(async () => {
   const layout = resolveLayout(root);
   const report = createReporter({ name: 'check-gate-wiring', json: options.json });
   const ownTools = ownToolFiles();
-  const scripts = baselineScripts(layout);
   const present = new Set();
   let checked = 0;
   for (const rel of [...OWN_CONFIGS, ...ownTools]) {
@@ -665,6 +675,7 @@ run(async () => {
   const prefixes = workspacePrefixes(layout, pkg);
   const appWorkspaces = layout.workspaces.map((workspace) => workspace.dir).filter((dir) => isExpoApp(root, dir));
   const ctx = { root, layout, pkg, prefixes, appWorkspaces, sourceWorkspaces: workspacesWithSource(root, layout) };
+  const scripts = baselineScripts(ctx);
   const baseline = baselineGates(scripts, ctx);
   checkScripts(root, layout, pkg, scripts, report);
   const gates = present.has('quality-gates.json') ? tryJson(root, 'quality-gates.json', 'gate-weakened', report) : null;

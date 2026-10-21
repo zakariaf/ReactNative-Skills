@@ -600,6 +600,35 @@
       }
     ]
   },
+  "bad-multi-package-export-audit-folder": {
+    "expect": [
+      "FAIL package.json:1 [npm-script] script \"export:audit\" is \"cd packages/core && APP_VARIANT=production"
+    ],
+    "extends": "pass-multi-package",
+    "ops": [
+      {
+        "$comment": "the export runs in a workspace that is no Expo app",
+        "json": {
+          "file": "package.json",
+          "path": [
+            "scripts",
+            "export:audit"
+          ],
+          "value": "cd packages/core && APP_VARIANT=production EXPO_PUBLIC_APP_VARIANT=production expo export --platform ios --platform android --source-maps --output-dir ../../dist-audit"
+        }
+      },
+      {
+        "json": {
+          "file": "quality-gates.json",
+          "path": [
+            "npmScripts",
+            "export:audit"
+          ],
+          "value": "cd packages/core && APP_VARIANT=production EXPO_PUBLIC_APP_VARIANT=production expo export --platform ios --platform android --source-maps --output-dir ../../dist-audit"
+        }
+      }
+    ]
+  },
   "bad-multi-package-gates-widened": {
     "expect": [
       "[gate-weakened] jest.collectCoverageFrom is",
@@ -1204,7 +1233,7 @@
             "scripts",
             "export:audit"
           ],
-          "value": "npm run -s export:audit --workspaces --if-present"
+          "value": "cd apps/mobile && APP_VARIANT=production EXPO_PUBLIC_APP_VARIANT=production expo export --platform ios --platform android --source-maps --output-dir ../../dist-audit"
         }
       },
       {
@@ -1214,7 +1243,7 @@
             "npmScripts",
             "export:audit"
           ],
-          "value": "npm run -s export:audit --workspaces --if-present"
+          "value": "cd apps/mobile && APP_VARIANT=production EXPO_PUBLIC_APP_VARIANT=production expo export --platform ios --platform android --source-maps --output-dir ../../dist-audit"
         }
       },
       {
@@ -1286,7 +1315,7 @@
       {
         "write": {
           "file": "apps/mobile/package.json",
-          "content": "{\"name\": \"@acme/mobile\", \"private\": true, \"scripts\": {\"typecheck\": \"tsc --noEmit -p tsconfig.json\", \"export:audit\": \"APP_VARIANT=production EXPO_PUBLIC_APP_VARIANT=production expo export --platform ios --platform android --source-maps --output-dir ../../dist-audit\"}}\n"
+          "content": "{\"name\": \"@acme/mobile\", \"private\": true, \"scripts\": {\"typecheck\": \"tsc --noEmit -p tsconfig.json\"}}\n"
         }
       },
       {

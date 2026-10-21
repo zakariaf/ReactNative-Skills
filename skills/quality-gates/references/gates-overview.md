@@ -179,16 +179,17 @@ from there. `assets/package-scripts.multi-package.json` holds every script that 
 - `typecheck` becomes `tsc --noEmit -p tsconfig.json && npm run -s typecheck --workspaces`, and every
   workspace has its own `typecheck` script (`tsc --noEmit -p tsconfig.json`); without `--if-present`, a
   workspace that lacks it fails loudly.
-- `export:audit` becomes `npm run -s export:audit --workspaces --if-present`, and each Expo app
-  workspace has its own `export:audit` (the file's `appScripts`): the single app's `expo export`
-  command with `--output-dir` pointing two folders up, at the repo root's `dist-audit/`. The root form
-  of the single app fails after the move: Metro, started at the root, falls back to `expo/AppEntry`,
-  which imports an `App` file the root does not have, and stops with "Unable to resolve module". Run
-  inside the app it finds `expo-router/entry`, and the export still lands at the repo root, where
+- `export:audit` becomes `cd <app-dir> && <the single app's expo export command>` with
+  `--output-dir <to-root>/dist-audit`, where `<app-dir>` is the Expo app workspace (`apps/mobile`) and
+  `<to-root>` the way back up to the repo root (two folders for `apps/mobile`); the checks fill both
+  from the workspaces. The root form of the single app fails after the move: Metro, started at the
+  root, falls back to `expo/AppEntry`, which imports an `App` file the root does not have, and stops
+  with "Unable to resolve module". Run inside the app it finds `expo-router/entry`, and the export still
+  lands at the repo root, where
   `audit:licenses` (its `dist-audit/**` source maps) and the bundle audit read it (verified on Expo
   SDK 57 in an npm-workspaces app with one app workspace on 2026-10-21; re-verify:
-  `npm run -s export:audit && npm run -s audit:licenses` from the root). Several apps write the same
-  folder one after another; that case was not verified.
+  `npm run -s export:audit && npm run -s audit:licenses` from the root). The form exports one app;
+  with several apps the checks accept it for any one of them, and auditing each is not covered yet.
 
 `quality-gates.json` lists every workspace program under `typescript.projects` (a glob such as
 `apps/*/tsconfig.json` covers new ones; each Expo app's program keeps the single app's `["jest"]`), the

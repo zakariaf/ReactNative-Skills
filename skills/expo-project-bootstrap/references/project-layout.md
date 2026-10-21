@@ -239,12 +239,12 @@ app's files and merge by hand. The rules that hold there, each checked by `check
   `apps/*/android`).
 - **Two root scripts take their workspace form** (`root-scripts`, from
   `assets/package-scripts.multi-package.json`, quality-gates' list): `typecheck` runs the root program
-  and then `npm run -s typecheck --workspaces`, and `export:audit` runs `npm run -s export:audit
-  --workspaces --if-present`. Every workspace keeps `"typecheck": "tsc --noEmit -p tsconfig.json"`
-  (`workspace-layout`; without `--if-present` a workspace that lacks it fails the root run), and every
-  Expo app keeps its own `export:audit` (`app-manifest`): the single app's `expo export` command with
-  `--output-dir` two folders up, so the export lands in the root `dist-audit/` where `audit:licenses`
-  reads its source maps. The single-app `export:audit` fails after the move: Metro, started at the
+  and then `npm run -s typecheck --workspaces`, and `export:audit` is `cd <app-dir> && ` followed by the
+  single app's `expo export` command with `--output-dir <to-root>/dist-audit` (`<app-dir>` the Expo app
+  workspace, `apps/tasks`; `<to-root>` the way back up, two folders), so the export lands in the root
+  `dist-audit/` where `audit:licenses` reads its source maps. Every workspace keeps `"typecheck": "tsc
+  --noEmit -p tsconfig.json"` (`workspace-layout`, `app-manifest` for an app; without `--if-present` a
+  workspace that lacks it fails the root run). The single-app `export:audit` fails after the move: Metro, started at the
   root, falls back to `expo/AppEntry` and cannot resolve its `App` import (verified on Expo SDK 57 on
   2026-10-21; re-verify: `npm run -s export:audit && npm run -s audit:licenses`). `quality-gates.json`
   `npmScripts` restates both in the same gate change.

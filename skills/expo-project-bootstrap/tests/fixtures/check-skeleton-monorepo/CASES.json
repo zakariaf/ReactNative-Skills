@@ -1,24 +1,4 @@
 {
-  "bad-app-export-audit": {
-    "expect": [
-      "apps/tasks/package.json:",
-      "[app-manifest] script \"export:audit\" differs from the canonical command",
-      "--output-dir ../../dist-audit"
-    ],
-    "ops": [
-      {
-        "$comment": "the app writes its export inside apps/tasks, where neither audit looks",
-        "json": {
-          "file": "apps/tasks/package.json",
-          "path": [
-            "scripts",
-            "export:audit"
-          ],
-          "value": "APP_VARIANT=production EXPO_PUBLIC_APP_VARIANT=production expo export --platform ios --platform android --source-maps --output-dir dist-audit"
-        }
-      }
-    ]
-  },
   "bad-app-lockstep": {
     "expect": [
       "[app-lockstep] react-native-reanimated differs between apps: apps/admin=4.5.0, apps/tasks=4.5.1"
@@ -100,6 +80,35 @@
             "exports"
           ],
           "delete": true
+        }
+      }
+    ]
+  },
+  "bad-root-export-audit-folder": {
+    "expect": [
+      "[root-scripts] script \"export:audit\" differs from the canonical command Fix: Set it to: cd apps/tasks && APP_VARIANT=production",
+      "--output-dir ../../dist-audit"
+    ],
+    "ops": [
+      {
+        "$comment": "the export writes inside the app, where neither audit looks",
+        "json": {
+          "file": "package.json",
+          "path": [
+            "scripts",
+            "export:audit"
+          ],
+          "value": "cd apps/tasks && APP_VARIANT=production EXPO_PUBLIC_APP_VARIANT=production expo export --platform ios --platform android --source-maps --output-dir dist-audit"
+        }
+      },
+      {
+        "json": {
+          "file": "quality-gates.json",
+          "path": [
+            "npmScripts",
+            "export:audit"
+          ],
+          "value": "cd apps/tasks && APP_VARIANT=production EXPO_PUBLIC_APP_VARIANT=production expo export --platform ios --platform android --source-maps --output-dir dist-audit"
         }
       }
     ]
@@ -254,7 +263,7 @@
   },
   "bad-workspace-typecheck-missing": {
     "expect": [
-      "FAIL packages/ui/package.json:1 [workspace-layout] script \"typecheck\" is missing (the root typecheck runs it in every workspace"
+      "FAIL packages/ui/package.json:1 [workspace-layout] script \"typecheck\" is missing (the root runs it in every workspace"
     ],
     "ops": [
       {

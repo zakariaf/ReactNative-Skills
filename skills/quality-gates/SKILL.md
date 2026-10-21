@@ -105,8 +105,8 @@ is missing, weakened or bypassed.
    `RESULT: PASS`. Before a push, `npm run verify` must be green.
 
 **When multi-package** (npm workspaces): `typecheck` and `export:audit` take the workspace forms in
-`assets/package-scripts.multi-package.json` (each workspace keeps its own `typecheck` script, each
-Expo app its own `export:audit`, which runs `expo export` inside the app into the root `dist-audit/`),
+`assets/package-scripts.multi-package.json` (each workspace keeps its own `typecheck` script, and
+`export:audit` runs `expo export` inside the Expo app workspace into the root `dist-audit/`),
 `quality-gates.json` lists every workspace program under `typescript.projects` (a glob such as
 `apps/*/tsconfig.json` covers new ones; the app program keeps `["jest"]`), the ESLint probes name the
 app workspace (`apps/<app>/src/core/gate-probe.ts`), knip gets one `workspaces` entry per package, and the one
@@ -188,7 +188,7 @@ compares the Jest scope with the canonical one, workspace prefixes stripped.
 | `templates/dot-npmrc` | dependency-management's `.npmrc` policy (synced; copy as `.npmrc`) | Only when its owner has not written it |
 | `assets/claude-settings.json` | The deny rules (iOS and Android keys, hook bypasses), the ask rules (gate files), the PostToolUse and Stop hooks (canonical, owned here, synced; merge into `.claude/settings.json`) | Workflow step 2 |
 | `assets/jest-config-baseline.js` | unit-and-component-tests' canonical `jest.config.js` (synced, never copied into the app): the scope values `jest-scope` compares with | Read only to see the canonical scope |
-| `assets/package-scripts.multi-package.json` | The root scripts that change when multi-package (`typecheck`, `export:audit`), the script every workspace keeps and the one every Expo app keeps (synced; do not edit here) | When package.json has workspaces |
+| `assets/package-scripts.multi-package.json` | The root scripts that change when multi-package (`typecheck`, `export:audit` with the app folder as `<app-dir>`) and the script every workspace keeps (synced; do not edit here) | When package.json has workspaces |
 | `assets/gate-question.md` | The one-message note to the developer when a gate looks wrong | Workflow step 5 |
 | `assets/shared.json` | Declares the files synced from the library (edit the canonical copies, never these) | When adding a shared file |
 | `scripts/check-gate-wiring.mjs` | Checks gate files, scripts and their targets, hooks (commands byte for byte), settings and the local overrides, `.npmrc`, linter options, thresholds and logic folder keys, the Jest coverage and test scope, verify extra steps, knip reasons, that `quality-gates.json` is no weaker than the baseline, and that no gate reaches into agent folders while knip ignores them (14 rules) | Workflow steps 3 and 8 |

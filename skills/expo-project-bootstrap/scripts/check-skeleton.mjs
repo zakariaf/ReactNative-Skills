@@ -33,8 +33,8 @@ const SPEC = {
     '  template-leftover placeholder',
     'When multi-package (package.json "workspaces"): workspace-layout package-manifest app-lockstep root-runtime,',
     '  and root-overrides also covers react, react-native and every "*" peer of a shared package. root-scripts',
-    '  then expects the workspace forms of assets/package-scripts.multi-package.json (typecheck, export:audit),',
-    '  every workspace its own typecheck (workspace-layout) and every Expo app its own export:audit (app-manifest).',
+    '  then expects the workspace forms of assets/package-scripts.multi-package.json (typecheck; export:audit run',
+    '  inside the Expo app workspace, <app-dir> filled in), and every workspace its own typecheck (workspace-layout).',
     '  A workspace declaring "engines.node" or a "bin" is Node tooling (a Cloud Functions backend): node types, and',
     '  no exports map needed. Every declared workspace folder counts as app code, never as pre-existing.',
     'Reads rn-skills.config.json (optional): the layout keys (srcDir, routesDir, contractsDir; per workspace under',
@@ -70,9 +70,16 @@ const TEMPLATE_TOKEN = /__[A-Z][A-Z0-9_]*__/g;
 const NOT_PLACEHOLDERS = new Set(['__DEV__']);
 
 const template = (rel) => readFileSync(join(TEMPLATES, rel), 'utf8');
-/** The scripts that change when multi-package: { scripts (root), workspaceScripts (every workspace), appScripts (every Expo app) }. */
-/** The way up from apps/<app> to the repo root in the canonical app scripts (built from parts on purpose). */
-const APPS_DEPTH_UP = ['..', '..', ''].join('/');
+/** The scripts that change when multi-package: { scripts (root; export:audit names the Expo app), workspaceScripts (every workspace) }. */
+/**
+ * A workspace-form command for one Expo app workspace: <app-dir> is its folder, <to-root> the way back up.
+ * With several apps the one the repo's own script names is the canonical one (else the first).
+ */
+function fillAppDir(command, appDirs, actual) {
+  if (!command.includes('<app-dir>') || appDirs.length === 0) return command;
+  const forms = appDirs.map((dir) => command.replaceAll('<app-dir>', dir).replaceAll('<to-root>', dir.split('/').map(() => '..').join('/')));
+  return forms.find((form) => form === actual) ?? forms[0];
+}
 const multiPackageScripts = () => JSON.parse(readFileSync(join(ASSETS, 'package-scripts.multi-package.json'), 'utf8'));
 const templateJson = (rel) => JSON.parse(template(rel));
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -113,7 +120,7 @@ function checkRootManifest(ctx, add) {
   const pkg = read.value;
   const want = JSON.parse(readFileSync(join(ASSETS, 'skeleton-package.json'), 'utf8'));
   // When multi-package, typecheck and export:audit take their workspace forms (quality-gates' list).
-  if (ctx.monorepo) want.scripts = { ...want.scripts, ...multiPackageScripts().scripts };
+  if (ctx.monorepo) want.scripts = { ...want.scripts, ...Object.fromEntries(Object.entries(multiPackageScripts().scripts).map(([name, command]) => [name, fillAppDir(command, ctx.apps.map((app) => app.dir), pkg.scripts?.[name])])) };
   if (pkg.private !== true) add('package.json', 1, 'root-manifest', 'must be "private": true (an app is never published to npm)', 'Set "private": true.');
   if (!same(pkg.engines, want.engines)) add('package.json', 1, 'root-manifest', `engines must be ${JSON.stringify(want.engines)} (Node 22.18 strips types for app.config.ts and the scripts; npm 11.17 reads the dated excludes)`, 'Copy "engines" from the template.');
   if (!ctx.monorepo) {
@@ -254,23 +261,16 @@ function checkMonorepo(ctx, add) {
   }
 }
 
-/**
- * The root runs typecheck in every workspace (npm run -s typecheck --workspaces, no --if-present) and
- * export:audit in every Expo app, so each keeps its own script; the app's export writes to dist-audit/
- * at the repo root: the canonical command climbs from apps/<app>, adjusted here to the app's depth.
- */
+/** The root runs typecheck in every workspace (npm run -s typecheck --workspaces, no --if-present), so each keeps its own script. */
 function checkWorkspaceScripts(ctx, add) {
-  const { workspaceScripts, appScripts } = multiPackageScripts();
+  const { workspaceScripts } = multiPackageScripts();
   for (const w of ctx.layout.workspaces) {
     const isApp = ctx.apps.some((app) => app.dir === w.dir);
-    const up = posix.relative(w.dir, '.');
-    const wanted = { ...workspaceScripts, ...(isApp ? Object.fromEntries(Object.entries(appScripts).map(([name, command]) => [name, command.replaceAll(APPS_DEPTH_UP, `${up}/`)])) : {}) };
     const rel = `${w.dir}/package.json`;
-    for (const [name, command] of Object.entries(wanted)) {
+    for (const [name, command] of Object.entries(workspaceScripts)) {
       const actual = w.manifest?.scripts?.[name];
       if (actual === command) continue;
-      const why = name === 'typecheck' ? 'the root typecheck runs it in every workspace and fails on a workspace without it' : 'the root export:audit runs it in every Expo app: expo export inside the app finds its entry, and the export lands in the root dist-audit/ the audits read';
-      add(rel, lineMatching(ctx.text(rel) ?? '', new RegExp(`"${name.replace(/[:]/g, '\\:')}":`)), isApp ? 'app-manifest' : 'workspace-layout', `script "${name}" ${actual === undefined ? 'is missing' : 'differs from the canonical command'} (${why})`, `Set it to: ${command}`);
+      add(rel, lineMatching(ctx.text(rel) ?? '', new RegExp(`"${name.replace(/[:]/g, '\\:')}":`)), isApp ? 'app-manifest' : 'workspace-layout', `script "${name}" ${actual === undefined ? 'is missing' : 'differs from the canonical command'} (the root runs it in every workspace with --workspaces and fails on a workspace without it)`, `Set it to: ${command}`);
     }
   }
 }
