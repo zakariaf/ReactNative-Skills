@@ -123,7 +123,7 @@ config: the checker covers resolved paths and subpaths, ESLint gives the editor 
 
 | File and key | Owner | Effect here |
 |---|---|---|
-| `contracts/dependency-policy.json` `doNotAdd` (`{ package: reason }`) | dependency-management | each package is a `banned-package` with the policy's reason; the contract's `bannedPackages` wins for the same name. A malformed file prints a `note:` (its own checker reports it) |
+| `contracts/dependency-policy.json` `doNotAdd` (`{ package: reason }`, or `{ package: { reason, where, allowIn } }`) | dependency-management | each package is a `banned-package` with the policy's reason, except in the files a scoped entry's `allowIn` globs match (`test/rules/**`); the contract's `bannedPackages` wins for the same name (and has no `allowIn`). A malformed file prints a `note:` (its own checker reports it) |
 | `rn-skills.config.json` `devOnlyRequires` (`["./dev-tools/*"]`, `require()` specifier globs) | app-variants-and-environment | a matching `require()` is debug-bundle tooling, not test-only code: `test-only-gate` lets it pass outside the gate. Anything but a list of strings is exit 2 |
 
 ## Exceptions with reasons

@@ -320,8 +320,9 @@ function bannedFix(arch, name) {
 
 function packageProblems(arch, node, info, entry, add) {
   const name = entry.target.name;
-  const banned = arch.settings.bannedPackages[name];
-  if (banned) add('banned-package', `imports ${name}: ${banned}`, bannedFix(arch, name));
+  const allowIn = arch.settings.bannedAllowIn[name] ?? [];
+  const banned = arch.anyGlob(node.rel, allowIn) ? null : arch.settings.bannedPackages[name];
+  if (banned) add('banned-package', `imports ${name}: ${banned}${allowIn.length > 0 ? ` (only ${allowIn.join(', ')} may import it)` : ''}`, bannedFix(arch, name));
   if (info.isBundled) {
     const port = arch.settings.vendorSdks[name];
     const onlyFiles = arch.vendorFilesFor(node.rel, name);

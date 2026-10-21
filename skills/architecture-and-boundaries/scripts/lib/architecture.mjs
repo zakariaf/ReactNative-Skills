@@ -172,23 +172,28 @@ function mergeMap(base, extra) {
 export const POLICY_FILE = 'dependency-policy.json';
 
 /**
- * dependency-management's install policy: { rel, doNotAdd: { package: reason }, note }. Its doNotAdd
- * map joins bannedPackages, so the developer keeps one list. A missing file is fine; a malformed one is
- * that skill's checker's to report, so here it only yields a note.
+ * dependency-management's install policy: { rel, doNotAdd: { package: reason }, allowIn: { package:
+ * [globs] }, note }. Its doNotAdd map joins bannedPackages, so the developer keeps one list. An entry
+ * is a reason, or { reason, where, allowIn } (kept out of some places only, imported only by the files
+ * allowIn matches: the JS SDK for the rules tests under test/rules/). A missing file is fine; a
+ * malformed one is that skill's checker's to report, so here it only yields a note.
  */
 function readPolicy(root, layout) {
   const rel = posix.join(layout.contractsDir, POLICY_FILE);
   const path = join(root, rel);
-  if (!existsSync(path)) return { rel, doNotAdd: {}, note: null };
+  if (!existsSync(path)) return { rel, doNotAdd: {}, allowIn: {}, note: null };
   try {
     const data = parseJsonc(readFileSync(path, 'utf8'));
     const map = data?.doNotAdd;
-    if (map === undefined) return { rel, doNotAdd: {}, note: null };
-    if (map === null || typeof map !== 'object' || Array.isArray(map)) return { rel, doNotAdd: {}, note: `note: ${rel} doNotAdd is not an object; its packages are not banned here` };
-    const doNotAdd = Object.fromEntries(Object.entries(map).filter(([, reason]) => typeof reason === 'string' && reason.trim() !== ''));
-    return { rel, doNotAdd, note: null };
+    if (map === undefined) return { rel, doNotAdd: {}, allowIn: {}, note: null };
+    if (map === null || typeof map !== 'object' || Array.isArray(map)) return { rel, doNotAdd: {}, allowIn: {}, note: `note: ${rel} doNotAdd is not an object; its packages are not banned here` };
+    const text = (value) => typeof value === 'string' && value.trim() !== '';
+    const reasonOf = (entry) => (text(entry) ? entry : entry !== null && typeof entry === 'object' && text(entry.reason) ? entry.reason : null);
+    const doNotAdd = Object.fromEntries(Object.entries(map).map(([name, entry]) => [name, reasonOf(entry)]).filter(([, reason]) => reason !== null));
+    const allowIn = Object.fromEntries(Object.entries(map).filter(([name, entry]) => name in doNotAdd && Array.isArray(entry?.allowIn)).map(([name, entry]) => [name, entry.allowIn.filter(text)]));
+    return { rel, doNotAdd, allowIn, note: null };
   } catch (error) {
-    return { rel, doNotAdd: {}, note: `note: ${rel} is not valid JSON (${error.message}); its doNotAdd packages are not banned here` };
+    return { rel, doNotAdd: {}, allowIn: {}, note: `note: ${rel} is not valid JSON (${error.message}); its doNotAdd packages are not banned here` };
   }
 }
 
@@ -245,6 +250,8 @@ export function loadArchitecture(root, options = {}) {
     serverPackages: DEFAULTS.serverPackages,
     bannedPackages: mergeMap(mergeMap(DEFAULTS.bannedPackages, policy.doNotAdd), c.bannedPackages),
     bannedSources,
+    // Files that may still import a banned package (the policy's allowIn; a contract ban has none).
+    bannedAllowIn: Object.fromEntries(Object.entries(policy.allowIn).filter(([name]) => bannedSources[name] === 'policy')),
     policyFile: policy.rel,
     nodeWorldMarkers: DEFAULTS.nodeWorldMarkers,
     testOnlyVariable: DEFAULTS.testOnlyVariable,
