@@ -32,7 +32,11 @@ const SPEC = {
     '  lefthook quality-gates gate-scope stryker-config claude-settings agents lockfile install-scripts one-react',
     '  template-leftover placeholder',
     'When multi-package (package.json "workspaces"): workspace-layout package-manifest app-lockstep root-runtime,',
-    '  and root-overrides also covers react, react-native and every "*" peer of a shared package.',
+    '  and root-overrides also covers react, react-native and every "*" peer of a shared package. root-scripts',
+    '  then expects the workspace forms of assets/package-scripts.multi-package.json (typecheck, export:audit),',
+    '  every workspace its own typecheck (workspace-layout) and every Expo app its own export:audit (app-manifest).',
+    '  A workspace declaring "engines.node" or a "bin" is Node tooling (a Cloud Functions backend): node types, and',
+    '  no exports map needed. Every declared workspace folder counts as app code, never as pre-existing.',
     'Reads rn-skills.config.json (optional): the layout keys (srcDir, routesDir, contractsDir; per workspace under',
     '  "workspaces", relative to the workspace), "dependencyPolicy", "layoutEntries" (extra top-level names that',
     '  belong to the app) and "agentInstructions": "parent-repo" (an app nested in a repository: AGENTS.md must sit',
@@ -66,6 +70,10 @@ const TEMPLATE_TOKEN = /__[A-Z][A-Z0-9_]*__/g;
 const NOT_PLACEHOLDERS = new Set(['__DEV__']);
 
 const template = (rel) => readFileSync(join(TEMPLATES, rel), 'utf8');
+/** The scripts that change when multi-package: { scripts (root), workspaceScripts (every workspace), appScripts (every Expo app) }. */
+/** The way up from apps/<app> to the repo root in the canonical app scripts (built from parts on purpose). */
+const APPS_DEPTH_UP = ['..', '..', ''].join('/');
+const multiPackageScripts = () => JSON.parse(readFileSync(join(ASSETS, 'package-scripts.multi-package.json'), 'utf8'));
 const templateJson = (rel) => JSON.parse(template(rel));
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const depsOf = (manifest) => ({ ...(manifest?.dependencies ?? {}), ...(manifest?.devDependencies ?? {}) });
@@ -104,6 +112,8 @@ function checkRootManifest(ctx, add) {
   if (!read.ok) return read.error === 'missing' ? undefined : add('package.json', 1, 'root-manifest', read.error, 'Fix the JSON.');
   const pkg = read.value;
   const want = JSON.parse(readFileSync(join(ASSETS, 'skeleton-package.json'), 'utf8'));
+  // When multi-package, typecheck and export:audit take their workspace forms (quality-gates' list).
+  if (ctx.monorepo) want.scripts = { ...want.scripts, ...multiPackageScripts().scripts };
   if (pkg.private !== true) add('package.json', 1, 'root-manifest', 'must be "private": true (an app is never published to npm)', 'Set "private": true.');
   if (!same(pkg.engines, want.engines)) add('package.json', 1, 'root-manifest', `engines must be ${JSON.stringify(want.engines)} (Node 22.18 strips types for app.config.ts and the scripts; npm 11.17 reads the dated excludes)`, 'Copy "engines" from the template.');
   if (!ctx.monorepo) {
@@ -205,12 +215,16 @@ function checkMonorepo(ctx, add) {
       if (!declared.has(dir)) add(rel, 1, 'workspace-layout', `${dir} has a package.json but no "workspaces" glob matches it, so npm never links or installs it`, 'Add it to "workspaces" (a new package is an architecture decision: ask first), or remove the folder.');
     }
   }
+  checkWorkspaceScripts(ctx, add);
   const scopes = new Set(ws.map((w) => /^(@[^/]+)\//.exec(w.name ?? '')?.[1]).filter(Boolean));
   for (const w of ws.filter((item) => !ctx.apps.some((app) => app.dir === item.dir))) {
     const rel = `${w.dir}/package.json`;
     const m = w.manifest ?? {};
     if (m.private !== true || !/^@[^/]+\/[a-z0-9-]+$/.test(m.name ?? '') || scopes.size > 1) add(rel, 1, 'package-manifest', `must be private and named @<org>/<package> in the one workspace scope (found ${JSON.stringify(m.name)})`, 'Name every workspace @<org>/<name> with the same scope and set "private": true.');
-    if (!same(m.exports, { './*': './src/*' }) && !(typeof m.exports === 'object' && m.exports?.['./*'] === './src/*')) add(rel, 1, 'package-manifest', 'exports must map "./*" to "./src/*" (TypeScript source, no build step, no barrel)', 'Set "exports": { "./*": "./src/*" }.');
+    // Node tooling nothing imports (a Cloud Functions backend: its deploy bundle is "main") may have no exports map.
+    const nodeTooling = m.engines?.node !== undefined || m.bin !== undefined;
+    const sourceExports = same(m.exports, { './*': './src/*' }) || (typeof m.exports === 'object' && m.exports?.['./*'] === './src/*');
+    if (!sourceExports && !(nodeTooling && m.exports === undefined)) add(rel, 1, 'package-manifest', 'exports must map "./*" to "./src/*" (TypeScript source, no build step, no barrel)', 'Set "exports": { "./*": "./src/*" }.');
     for (const [name, spec] of Object.entries(depsOf(m))) {
       if (ws.some((item) => item.name === name)) continue;
       if (!EXACT_VERSION.test(spec)) add(rel, 1, 'pin-exact', `${name} is "${spec}", not an exact version`, 'Pin it exactly; a native module a shared package imports is a "*" peer instead.');
@@ -236,6 +250,27 @@ function checkMonorepo(ctx, add) {
       if (specs.length === 0) continue;
       const pinned = pkg.overrides?.[name];
       if (typeof pinned !== 'string' || !EXACT_VERSION.test(pinned) || !specs.every((item) => inRange(pinned, item))) add('package.json', 1, 'root-overrides', `overrides.${name} is ${pinned ?? 'missing'}; ${w.dir} peers on it with "*", so it must be pinned at the exact version the apps install for "${specs[0]}"`, `Set "${name}": "<the version npm ls ${name} shows for the apps>" in "overrides", then npm install (a "*" peer otherwise lets npm put its newest release at the root next to the app's: duplicate native modules).`);
+    }
+  }
+}
+
+/**
+ * The root runs typecheck in every workspace (npm run -s typecheck --workspaces, no --if-present) and
+ * export:audit in every Expo app, so each keeps its own script; the app's export writes to dist-audit/
+ * at the repo root: the canonical command climbs from apps/<app>, adjusted here to the app's depth.
+ */
+function checkWorkspaceScripts(ctx, add) {
+  const { workspaceScripts, appScripts } = multiPackageScripts();
+  for (const w of ctx.layout.workspaces) {
+    const isApp = ctx.apps.some((app) => app.dir === w.dir);
+    const up = posix.relative(w.dir, '.');
+    const wanted = { ...workspaceScripts, ...(isApp ? Object.fromEntries(Object.entries(appScripts).map(([name, command]) => [name, command.replaceAll(APPS_DEPTH_UP, `${up}/`)])) : {}) };
+    const rel = `${w.dir}/package.json`;
+    for (const [name, command] of Object.entries(wanted)) {
+      const actual = w.manifest?.scripts?.[name];
+      if (actual === command) continue;
+      const why = name === 'typecheck' ? 'the root typecheck runs it in every workspace and fails on a workspace without it' : 'the root export:audit runs it in every Expo app: expo export inside the app finds its entry, and the export lands in the root dist-audit/ the audits read';
+      add(rel, lineMatching(ctx.text(rel) ?? '', new RegExp(`"${name.replace(/[:]/g, '\\:')}":`)), isApp ? 'app-manifest' : 'workspace-layout', `script "${name}" ${actual === undefined ? 'is missing' : 'differs from the canonical command'} (${why})`, `Set it to: ${command}`);
     }
   }
 }

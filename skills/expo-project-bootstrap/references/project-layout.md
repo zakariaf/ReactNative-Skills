@@ -195,6 +195,10 @@ a template file it plans as neither is new demo content: add it to `LEFTOVERS` i
 For several apps that share code: npm workspaces `"workspaces": ["apps/*", "packages/*"]`, each app
 an Expo app in `apps/<app>` (its own `package.json`, `app.config.ts`, `metro.config.js`,
 `tsconfig.json`, `src/`, `assets/`), shared code in `packages/<name>` consumed as TypeScript source.
+A Node backend that deploys on its own (Cloud Functions in `functions/`, cloud-functions-backend) is
+one more workspace, listed by its folder (`"workspaces": ["apps/*", "packages/*", "functions"]`) and
+recorded in `contracts/architecture.json` as a Node-world package (architecture-and-boundaries, When
+multi-package).
 
 How to get there: bootstrap the single app first (every gate green), then move `app.config.ts`,
 `metro.config.js`, `src/` and `assets/` into `apps/<app>/`, give the app its own `package.json` with
@@ -233,3 +237,19 @@ app's files and merge by hand. The rules that hold there, each checked by `check
   makes every file an entry, so a dead file is never reported otherwise; `knip-config`).
 - Each app's generated native folders join `.gitignore` and `.prettierignore` (`apps/*/ios`,
   `apps/*/android`).
+- **Two root scripts take their workspace form** (`root-scripts`, from
+  `assets/package-scripts.multi-package.json`, quality-gates' list): `typecheck` runs the root program
+  and then `npm run -s typecheck --workspaces`, and `export:audit` runs `npm run -s export:audit
+  --workspaces --if-present`. Every workspace keeps `"typecheck": "tsc --noEmit -p tsconfig.json"`
+  (`workspace-layout`; without `--if-present` a workspace that lacks it fails the root run), and every
+  Expo app keeps its own `export:audit` (`app-manifest`): the single app's `expo export` command with
+  `--output-dir` two folders up, so the export lands in the root `dist-audit/` where `audit:licenses`
+  reads its source maps. The single-app `export:audit` fails after the move: Metro, started at the
+  root, falls back to `expo/AppEntry` and cannot resolve its `App` import (verified on Expo SDK 57 on
+  2026-10-21; re-verify: `npm run -s export:audit && npm run -s audit:licenses`). `quality-gates.json`
+  `npmScripts` restates both in the same gate change.
+- **A Node backend workspace** is Node tooling: its `package.json` declares `"engines": { "node": ...
+  }`, so its program may list `node` types (`tsconfig-program`), and it may have no `exports` map, its
+  deploy bundle being `"main"` (`package-manifest`; nothing imports it). It is still private and in the
+  one scope (`@<org>/functions`). Every declared workspace folder is app code, so `functions/` needs no
+  `"layoutEntries"` entry and joins no ignore list.

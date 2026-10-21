@@ -6,7 +6,8 @@
 //   shipped templates are what is tested), with a pre-existing docs/ folder and a lockfile shaped
 //   like npm 11 writes it, and fails each planted bug (tests/fixtures/check-skeleton/bad-*/).
 //   check-skeleton.mjs, multi-package: the same repo moved into npm workspaces (apps/tasks and
-//   packages/ui) passes, and the workspace rules catch their planted bugs.
+//   packages/ui, with the workspace forms of the scripts) passes, and the workspace rules catch their
+//   planted bugs.
 //   check-skeleton.mjs, nested: an app inside a larger repository takes its AGENTS.md from there, and
 //   only from a folder up to that repository's top level (.git).
 // Run: node ${CLAUDE_SKILL_DIR}/scripts/selftest.mjs [--case <glob>] [--materialize <dir>]
@@ -22,6 +23,8 @@ const TODAY = ['--today', '2026-10-14'];
 const VARS = variablesFrom({ appId: 'com.acme.tasks', name: 'Tasks' });
 // The root base as a workspace program extends it, two folders up (built from parts on purpose).
 const ROOT_BASE = ['..', '..', 'tsconfig.base.json'].join('/');
+// The scripts that take another form when multi-package (root, every workspace, every Expo app).
+const MULTI = JSON.parse(readFileSync(new URL('../assets/package-scripts.multi-package.json', import.meta.url), 'utf8'));
 
 const write = (dir, rel, content) => {
   mkdirSync(dirname(join(dir, rel)), { recursive: true });
@@ -62,12 +65,14 @@ function moveIntoWorkspaces(dir) {
   for (const rel of ['app.config.ts', 'metro.config.js', 'src', 'assets']) renameSync(join(dir, rel), join(dir, 'apps', 'tasks', rel));
   rmSync(join(dir, 'apps', 'tasks', 'src', 'tsconfig.json'));
   writeJson(dir, 'apps/tasks/tsconfig.json', { extends: ROOT_BASE, compilerOptions: { types: ['jest'], paths: { '@/*': ['./src/*'] } }, include: ['**/*', '.expo/types/**/*.ts'] });
-  writeJson(dir, 'apps/tasks/package.json', { name: '@acme/tasks', version: '1.0.0', private: true, main: 'expo-router/entry', scripts: { start: 'expo start', android: 'expo start --android', ios: 'expo start --ios', web: 'expo start --web' }, dependencies: { '@acme/ui': '*', ...root.dependencies } });
-  writeJson(dir, 'packages/ui/package.json', { name: '@acme/ui', version: '1.0.0', private: true, type: 'module', exports: { './*': './src/*' }, peerDependencies: { react: '*', 'react-native': '*', 'react-native-reanimated': '*' } });
+  writeJson(dir, 'apps/tasks/package.json', { name: '@acme/tasks', version: '1.0.0', private: true, main: 'expo-router/entry', scripts: { start: 'expo start', android: 'expo start --android', ios: 'expo start --ios', web: 'expo start --web', ...MULTI.workspaceScripts, ...MULTI.appScripts }, dependencies: { '@acme/ui': '*', ...root.dependencies } });
+  writeJson(dir, 'packages/ui/package.json', { name: '@acme/ui', version: '1.0.0', private: true, type: 'module', exports: { './*': './src/*' }, scripts: { ...MULTI.workspaceScripts }, peerDependencies: { react: '*', 'react-native': '*', 'react-native-reanimated': '*' } });
   writeJson(dir, 'packages/ui/tsconfig.json', { extends: ROOT_BASE, compilerOptions: { types: ['jest'] }, include: ['src/**/*'] });
   write(dir, 'packages/ui/src/press-scale.ts', 'export const PRESS_SCALE = 0.96;\n');
   const { dependencies, ...rest } = root;
-  writeJson(dir, 'package.json', { ...rest, workspaces: ['apps/*', 'packages/*'], overrides: { ...root.overrides, react: dependencies.react, 'react-native': dependencies['react-native'], 'react-native-reanimated': dependencies['react-native-reanimated'] } });
+  writeJson(dir, 'package.json', { ...rest, scripts: { ...rest.scripts, ...MULTI.scripts }, workspaces: ['apps/*', 'packages/*'], overrides: { ...root.overrides, react: dependencies.react, 'react-native': dependencies['react-native'], 'react-native-reanimated': dependencies['react-native-reanimated'] } });
+  const gates = readJson(dir, 'quality-gates.json');
+  writeJson(dir, 'quality-gates.json', { ...gates, npmScripts: { ...gates.npmScripts, ...MULTI.scripts } });
   const knip = readJson(dir, 'knip.json');
   writeJson(dir, 'knip.json', { ...knip, workspaces: { 'packages/ui': { includeEntryExports: true } } });
   writeLockfile(dir, ['apps/tasks', 'packages/ui']);
