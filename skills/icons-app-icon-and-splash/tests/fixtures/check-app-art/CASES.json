@@ -148,6 +148,27 @@
     "expect": ["FAIL assets/icons/production/icon-tinted.png [art-missing] the tinted image is missing"],
     "ops": [{ "delete": "assets/icons/production/icon-tinted.png" }]
   },
+  "bad-monorepo-unwired-dependency": {
+    "expect": ["FAIL apps/mobile/package.json:1 [art-unwired] expo-splash-screen is not a dependency"],
+    "ops": [
+      { "json": { "file": "package.json", "path": ["dependencies", "expo-splash-screen"], "delete": true } },
+      { "rename": { "from": "app.config.ts", "to": "apps/mobile/app.config.ts" } },
+      { "rename": { "from": "contracts", "to": "apps/mobile/contracts" } },
+      { "rename": { "from": "design", "to": "apps/mobile/design" } },
+      { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+      { "rename": { "from": "scripts", "to": "apps/mobile/scripts" } },
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      { "rename": { "from": "tsconfig.json", "to": "apps/mobile/tsconfig.json" } },
+      { "rename": { "from": "assets", "to": "apps/mobile/assets" } },
+      {
+        "write": {
+          "file": "package.json",
+          "json": { "name": "tasks", "private": true, "workspaces": ["apps/*", "packages/*"] }
+        }
+      },
+      { "write": { "file": "packages/shared/package.json", "json": { "name": "@tasks/shared", "private": true } } }
+    ]
+  },
   "bad-play-icon": {
     "expect": ["FAIL assets/store/play-icon.png [art-store-opaque] the Play icon has transparent pixels"],
     "ops": [
@@ -431,6 +452,26 @@
         }
       },
       { "delete": ["assets/icons/production/icon-dark.png", "src/ui/icons/brand-mark.ts"] }
+    ]
+  },
+  "pass-monorepo": {
+    "expect": ["apps: apps/mobile", "check-app-art: 10 images and configs checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      { "rename": { "from": "app.config.ts", "to": "apps/mobile/app.config.ts" } },
+      { "rename": { "from": "contracts", "to": "apps/mobile/contracts" } },
+      { "rename": { "from": "design", "to": "apps/mobile/design" } },
+      { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+      { "rename": { "from": "scripts", "to": "apps/mobile/scripts" } },
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      { "rename": { "from": "tsconfig.json", "to": "apps/mobile/tsconfig.json" } },
+      { "rename": { "from": "assets", "to": "apps/mobile/assets" } },
+      {
+        "write": {
+          "file": "package.json",
+          "json": { "name": "tasks", "private": true, "workspaces": ["apps/*", "packages/*"] }
+        }
+      },
+      { "write": { "file": "packages/shared/package.json", "json": { "name": "@tasks/shared", "private": true } } }
     ]
   },
   "pass-no-theme-types": {

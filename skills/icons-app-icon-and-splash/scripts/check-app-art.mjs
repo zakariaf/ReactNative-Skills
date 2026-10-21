@@ -11,6 +11,7 @@ import { existsSync, readFileSync, statSync } from 'node:fs';
 import { basename, join, posix } from 'node:path';
 
 import { createReporter, lineOf, maskComments, notYetCreated, parseArgs, readPng, requireDir, resolveLayout, run, toPosix } from './check-lib.mjs';
+import { forEachExpoApp } from './lib/expo-apps.mjs';
 import { readArtContract } from './lib/art-contract.mjs';
 import { enableAppImports, errorText } from './lib/app-modules.mjs';
 import { pathBounds } from './lib/svg-path.mjs';
@@ -58,7 +59,7 @@ const SPEC = {
     'or glyphArea). SKIP: brand-mark-shape colour roles while src/theme/theme-types.ts is not yet created',
     '(design-system-structure creates it). Whether the PNGs are current is render-app-art.ts --check (it',
     're-renders). Hand-made art is not checked here (references/app-icon-and-splash.md, "Hand-made art").',
-    'When multi-package, run it once per app folder. Regenerate with: node scripts/art/render-app-art.ts',
+    'In a workspace repo each Expo app workspace (apps/mobile) is checked from the repo root. Regenerate with: node scripts/art/render-app-art.ts',
   ].join('\n'),
 };
 
@@ -386,16 +387,14 @@ async function checkBrandMark(report, root, { file, themeTypes }) {
   });
 }
 
-run(async () => {
-  const { options, positionals } = parseArgs(process.argv.slice(2), SPEC);
-  const root = requireDir(positionals[0] ?? '.', 'app root');
+/** One Expo app: its own folder is the root its contract, renderer and images are read from. */
+async function checkApp(root, options, report) {
   const layout = resolveLayout(root);
   const contract = readArtContract(root, layout.contractsDir, options.contract);
-  const report = createReporter({ name: 'check-app-art', json: options.json });
   // A contract that holds only check-icons' allow-lists ("icons") does not adopt the art pipeline.
   if (!contract.declaresArt && !existsSync(join(root, RENDERER))) {
     const why = contract.exists ? `${contract.file} declares no rendered art (no outputs, optional or glyphArea)` : `no ${contract.file}`;
-    return report.notApplicable(`the app does not render its app art in code (no ${RENDERER}; ${why})`);
+    return { notApplicable: `the app does not render its app art in code (no ${RENDERER}; ${why})` };
   }
   await checkBrandMark(report, root, {
     file: toPosix(options['brand-mark'] ?? posix.join(layout.uiDir, 'icons', 'brand-mark.ts')),
@@ -403,5 +402,14 @@ run(async () => {
   });
   const splashWidth = checkWiring(report, root, contract);
   const checked = checkImages(report, root, contract, { splashWidth });
-  return report.finish({ checked: checked + 1, unit: 'images and configs' });
+  return { checked: checked + 1 };
+}
+
+run(async () => {
+  const { options, positionals } = parseArgs(process.argv.slice(2), SPEC);
+  const root = requireDir(positionals[0] ?? '.', 'app root');
+  const report = createReporter({ name: 'check-app-art', json: options.json });
+  const result = await forEachExpoApp(root, report, (appRoot, appReport) => checkApp(appRoot, options, appReport));
+  if (result.notApplicable !== null) return report.notApplicable(result.notApplicable);
+  return report.finish({ checked: result.checked, unit: 'images and configs' });
 });

@@ -101,7 +101,8 @@ source bans, the rendered PNGs against each platform's rules, the config wiring 
 8. **Run the checks** from the app root and loop until all pass: `npx tsc --noEmit` for both programs,
    `npx eslint <changed paths> --max-warnings 0`, `npx jest src/ui/icons scripts/art --ci`,
    `node scripts/art/build-icon-paths.ts --check`, `node scripts/art/render-app-art.ts --check`, then
-   the two checkers below. When multi-package, run each in every app folder. Once per app, put both
+   the two checkers below. In a workspace repo run the checkers from the repo root (each Expo app
+   workspace, `apps/mobile`, is checked as an app) and the scripts in each app folder. Once per app, put both
    `--check` runs in the verify gate: add `"art:check": "node scripts/art/build-icon-paths.ts --check
    && node scripts/art/render-app-art.ts --check"` to `package.json` scripts and append `"art:check"`
    to `verifyExtraSteps` in `quality-gates.json` (quality-gates' rule; a gated file, so the commit
@@ -162,10 +163,10 @@ source bans, the rendered PNGs against each platform's rules, the config wiring 
 | `templates/contracts/` | app-art.json and its schema: where each image lives, optional images, glyph area, check-icons' allow-lists (an app that needs only the allow-lists keeps just the `icons` key) | Workflow steps 2 and 6 |
 | `templates/scripts/art/` | build-icon-paths.ts, render-icon-sheet.ts, render-app-art.ts, app-art-config.ts (`iosAppearanceIcon`, `splashPlugin`), app-art-contract.ts, art-cli.ts (`--help`, bad-flag errors, exit codes), load-headless-skia.ts, and their tests | Workflow steps 2, 4 and 6 |
 | `templates/src/ui/icons/` | icon-paths.ts (generated), icon-raster.ts, icon.tsx, brand-mark-art.ts, brand-mark.ts (demo mark), brand-tile.tsx, picture.tsx, mark-paths.tsx, with unit and golden tests | Workflow steps 2, 3 and 5 |
-| `assets/shared.json` | The shared files this skill copies in (check-lib, app-modules, the canonical theme types for the fixtures) | When adding a shared file |
+| `assets/shared.json` | The shared files this skill copies in (check-lib, app-modules, the Expo-app workspace finder, the canonical theme types for the fixtures) | When adding a shared file |
 | `scripts/check-icons.mjs` | Checker: icon set vs layers (names, directional list, syntax, grid, coverage), generated header, and the icon-library, emoji and image bans in app source | Workflow step 8 |
 | `scripts/check-app-art.mjs` | Checker: the rendered PNGs per platform rule, the splash width, the config wiring and dependency, the brand mark | Workflow step 8 |
-| `scripts/lib/` | art-contract.mjs (reads `contracts/app-art.json`), svg-path.mjs (SVG path reader), icon-coverage.mjs (a path vs its layers, without Skia), app-modules.mjs (synced: imports the app's plain TypeScript) | Never directly |
+| `scripts/lib/` | art-contract.mjs (reads `contracts/app-art.json`), svg-path.mjs (SVG path reader), icon-coverage.mjs (a path vs its layers, without Skia), app-modules.mjs (synced: imports the app's plain TypeScript), expo-apps.mjs (synced: finds each Expo app workspace) | Never directly |
 | `scripts/check-lib.mjs` | Shared script helper, synced from the library (do not edit here) | Never by hand |
 | `scripts/selftest.mjs` | Proves both checkers on the templates and planted bugs | After changing a checker |
 | `tests/` | `bases/app/` (the fixture app) and `fixtures/` (good, pass, bad and error cases; images generated at run time) | When adding a rule |

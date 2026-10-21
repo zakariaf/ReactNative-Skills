@@ -179,8 +179,13 @@ not count. Dark and tinted count as wired when `iosAppearanceIcon(` appears in a
 What it cannot see: a branch that picks the helper for the wrong variant, a path built in another
 module, or a computed value. `npx expo config --type public` per variant is the real proof; run it.
 
-**When multi-package:** run the renderer and the checkers once per app folder
+**When multi-package:** run the renderer once per app folder
 (`cd apps/mobile && node scripts/art/render-app-art.ts`); each app has its own contract and mark.
+`check-icons.mjs` and `check-app-art.mjs` run from the repo root: in a workspace repo (`package.json`
+`"workspaces"`) whose root is no app, each Expo app workspace (an `app.config.*` or `app.json`, else an
+`expo` dependency) is checked as an app with its own `contracts/app-art.json`, and every problem names
+the file from the root (`apps/mobile/src/i18n/catalogs/en.json:3 [no-emoji]`). Passing the app folder
+checks that app alone.
 
 ## Icon Composer (iOS 26) instead of flat appearances
 
