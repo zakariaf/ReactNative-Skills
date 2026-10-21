@@ -130,7 +130,8 @@ switched on in the contract or the tokens (`no-gradient`, `no-pill`, `PRESS.kind
    nothing more. Bundle a font only when the design names one: copy the TTFs (each named after its
    PostScript name) and their licences into `assets/fonts/`, replace the contract's `"system"` with
    the files and each `shasum -a 256`, add the `expo-font` plugin entry (`npx expo install expo-font`),
-   name a family per weight in `src/theme/fonts.ts`, and copy each tall script's hhea values into
+   name a family per weight in `src/theme/fonts.ts` (a separate display face, when the design names
+   one, in `DISPLAY_FONTS`), and copy each tall script's hhea values into
    `TALL_SCRIPT_METRICS` (the checker prints them; the reference gives Noto Sans as a worked example).
 5. **Wire dark mode and the providers.** Set `userInterfaceStyle: 'automatic'`, run
    `npx expo install expo-system-ui`, and mount `AppThemeProvider` (with `onError` from the error
@@ -225,7 +226,7 @@ switched on in the contract or the tokens (`no-gradient`, `no-pill`, `PRESS.kind
 | [references/layout-and-shape-tokens.md](references/layout-and-shape-tokens.md) | Spacing scale and named layout steps, the screen frame under Android 15/16 edge-to-edge and safe-area insets, the centred column on wide windows, radii, strokes (dashed state cues, icon strokes), elevation levels, touch targets, component measurements | Workflow step 2, and when laying out a screen |
 | [references/theme-in-react-native.md](references/theme-in-react-native.md) | File map, mounting with the navigation theme (Expo Router, React Navigation appendix), the root view, dark mode on both platforms, light-only apps, makeStyles, shadows, the press surface looks, RTL, what is verified | Workflow steps 2 and 5 |
 | [references/palettes-and-contrast.md](references/palettes-and-contrast.md) | Pairs, the contrast contract, core and default pairs, shapes, translucent colours, exceptions, write-palette, fixing a pair, dark sets, colour-blind variants, palette rule ids | Workflow step 3, any contrast question |
-| [references/text-and-fonts.md](references/text-and-fonts.md) | AppText and its direction on both platforms, roles, the pixel grid and the font scale, glyph nudges, tall scripts and the guard, balanced text, tabular figures, bundled fonts and the demo fonts' source, the system font, the object-syntax alternative, font scaling | Workflow step 4, any text work |
+| [references/text-and-fonts.md](references/text-and-fonts.md) | AppText and its direction on both platforms, roles, the pixel grid and the font scale, glyph nudges, tall scripts and the guard, balanced text, tabular figures, bundled fonts and the demo fonts' source, a separate display face, the system font, the object-syntax alternative, font scaling | Workflow step 4, any text work |
 | [references/motion-tokens.md](references/motion-tokens.md) | Motion tokens, complete springs, what no-raw-duration and no-raw-spring see, the reduce-motion table, reduce motion in code | Any animation |
 | `templates/src/theme/` | Theme types, token modules (with `PRESS`), fonts (system font by default), palette and its core-pair test, contrast, theme set, context, `AppThemeProvider`, `NavigationThemeProvider`, makeStyles, text locale and its hook, text style hook, shadow helpers (each with its test); synced from the canonical copy | Workflow steps 2 and 5 (copy) |
 | `templates/src/ui/` | AppText (+ iOS, Android and balance tests), the balance hook (+ test), the press feedback context (+ test; all synced), PressableSurface (+ iOS and Android tests) | Workflow step 2 (copy) |

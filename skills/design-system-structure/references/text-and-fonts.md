@@ -18,7 +18,7 @@ and the React Native files named below.
 - Balanced display text
 - Tabular figures
 - System font (the template default)
-- Fonts: choosing, naming, bundling, pinning
+- Fonts: choosing, naming, bundling, pinning, a display face
 - Every script of the app's languages
 - One family name with fontWeight (fenced alternative)
 - Font scaling
@@ -220,7 +220,7 @@ demo) and look at the screens with Arabic, Devanagari or Thai text on both platf
 platforms (not measured here). Bundle the script's font when the design needs exact boxes or names a
 typeface (next section).
 
-## Fonts: choosing, naming, bundling, pinning
+## Fonts: choosing, naming, bundling, pinning, a display face
 
 Bundling is the opt-in for a design that names a typeface. It starts in the contract: replace
 `"fonts": "system"` with `{ "dir": "assets/fonts", "files": [...], "licences": {...} }`. From then
@@ -269,6 +269,21 @@ again.
 5. **Pick per script.** `SCRIPT_FONTS` maps each script to its families; `LANGUAGE_SCRIPTS` maps
    language subtags to scripts; the font follows the language of the text, so an autonym in a
    language list (`language="ar"`) uses its own script in an English UI.
+6. **A separate display face (optional).** A design that pairs a display typeface with its text face
+   (a geometric display family for headings and numbers over a humanist text family) names it in
+   `DISPLAY_FONTS`, keyed by script like `SCRIPT_FONTS` and pinned the same way (one file per
+   weight, file name = PostScript name, each file in the contract's `fonts.files`, the `expo-font`
+   entry and, for a tall script, `TALL_SCRIPT_METRICS`). `scriptFontFor` gives the display face to
+   every role whose `face` is `display` (the template's `display`, `title`, `heading` and `number`
+   roles) and to `brand` text (the product name, in the Latin display face in every language); `text`
+   roles (`body`, `label`, `caption`) keep `SCRIPT_FONTS`. A script with no entry draws display text
+   with its own bold, so an Arabic UI keeps its Arabic family while Latin headings use the display
+   face: `DISPLAY_FONTS = { latin: { regular: 'Fraunces-Bold', medium: 'Fraunces-Bold', semibold:
+   'Fraunces-Bold', bold: 'Fraunces-Bold' } }` (display text is bold, so every weight may name the
+   one bold file). The text face may stay the system font (`latin: null`) under a bundled display
+   face. check-design-system holds the display families to the same `font-family`, `font-files` and
+   `font-plugin` rules, fails a key that is no `SCRIPT_FONTS` script (no text could pick it), and
+   asks a tall script's display family for its metrics (`tall-script-overflow-guard`).
 
 ## Every script of the app's languages
 

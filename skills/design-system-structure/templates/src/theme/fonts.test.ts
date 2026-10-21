@@ -57,6 +57,37 @@ describe('scriptFontFor', () => {
   });
 });
 
+describe('scriptFontFor with a display face', () => {
+  const display = {
+    latin: {
+      regular: 'LatinDisplay-Bold',
+      medium: 'LatinDisplay-Bold',
+      semibold: 'LatinDisplay-Bold',
+      bold: 'LatinDisplay-Bold',
+    },
+  } as const;
+
+  it.each([
+    { language: 'en', weight: 'regular', face: 'display', family: 'LatinDisplay-Bold' },
+    { language: 'ar', weight: 'bold', face: 'brand', family: 'LatinDisplay-Bold' },
+    { language: 'en', weight: 'semibold', face: 'text', family: 'Latin-SemiBold' },
+    { language: 'ar', weight: 'regular', face: 'display', family: 'Arabic-Bold' },
+  ] as const)('picks $family for $language $face $weight', ({ language, weight, face, family }) => {
+    expect(
+      scriptFontFor(language, { weight, face }, { scripts: BUNDLED, display }).fontFamily,
+    ).toBe(family);
+  });
+
+  it('draws display text in the display face over a system text font', () => {
+    const tables = { scripts: SYSTEM_FONT, display };
+
+    expect(scriptFontFor('en', { weight: 'bold', face: 'display' }, tables).fontFamily).toBe(
+      'LatinDisplay-Bold',
+    );
+    expect(scriptFontFor('en', { weight: 'bold', face: 'text' }, tables).fontFamily).toBeNull();
+  });
+});
+
 describe('scriptFontFor with the system font', () => {
   it.each([
     { weight: 'regular', face: 'text', fontWeight: '400' },

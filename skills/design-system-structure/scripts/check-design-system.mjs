@@ -56,7 +56,8 @@ const SPEC = {
     '  font-family                 a family in fonts.ts has no bundled file of that name, or its PostScript name differs',
     '                              (fonts.weightBy "fontWeight": the family is a fontFamily of the expo-font entry); fonts.ts',
     '                              names a family while the contract says "fonts": "system"; or the contract bundles files',
-    '                              while fonts.ts draws every script with the system font',
+    '                              while fonts.ts draws every script with the system font; DISPLAY_FONTS (an optional display',
+    '                              face per script) is held to the same rules and keyed by a SCRIPT_FONTS script',
     '  font-files                  (bundled fonts) a contract font is missing, differs from its sha256, or its family has',
     '                              no licence file',
     '  font-plugin                 (bundled fonts) the expo-font config plugin entry is missing or misses a contract font',
@@ -473,10 +474,19 @@ function checkGuardShape(ctx) {
   }
 }
 
+/** The optional display typeface per script (fonts.ts DISPLAY_FONTS; none in an app that has no such export). */
+const displayFontsOf = (fonts) => (fonts?.DISPLAY_FONTS !== null && typeof fonts?.DISPLAY_FONTS === 'object' ? fonts.DISPLAY_FONTS : {});
+
+/** Every bundled family a script draws with: [{ family, table }] from SCRIPT_FONTS and DISPLAY_FONTS. */
+function familiesOfScript(fonts, script) {
+  const tables = [['SCRIPT_FONTS', fonts.SCRIPT_FONTS?.[script]], ['DISPLAY_FONTS', displayFontsOf(fonts)[script]]];
+  return tables.flatMap(([table, byWeight]) => (byWeight !== null && typeof byWeight === 'object' ? Object.values(byWeight).map((family) => ({ family, table })) : []));
+}
+
 /** { tall: every tall script, bundled: those with bundled families (the guard needs their metrics) }. */
 function tallScriptsOf(fonts) {
   const tall = fonts.TALL_SCRIPTS instanceof Set ? [...fonts.TALL_SCRIPTS] : Array.isArray(fonts.TALL_SCRIPTS) ? fonts.TALL_SCRIPTS : [];
-  return { tall, bundled: tall.filter((script) => fonts.SCRIPT_FONTS?.[script] !== null && fonts.SCRIPT_FONTS?.[script] !== undefined) };
+  return { tall, bundled: tall.filter((script) => familiesOfScript(fonts, script).length > 0) };
 }
 
 function checkTallMetrics(ctx, fonts) {
@@ -487,8 +497,8 @@ function checkTallMetrics(ctx, fonts) {
   const onSystemFont = tall.filter((script) => !bundled.includes(script));
   if (onSystemFont.length > 0) ctx.report.note(`tall-script-overflow-guard: ${onSystemFont.join(', ')} use${onSystemFont.length === 1 ? 's' : ''} the system font, which has no font file to read metrics from, so no guard is computed for it; its tall line heights are still checked`);
   for (const script of bundled) {
-    for (const family of Object.values(fonts.SCRIPT_FONTS[script])) {
-      if (!metrics[family]) ctx.report.problem({ file, line: lineOfPattern(source, /TALL_SCRIPT_METRICS/), rule: 'tall-script-overflow-guard', message: `the tall script ${script} uses ${family}, which has no TALL_SCRIPT_METRICS entry`, fix: 'Add its hhea unitsPerEm, ascender and descender (check-design-system reads them from the font file).' });
+    for (const { family, table } of familiesOfScript(fonts, script)) {
+      if (!metrics[family]) ctx.report.problem({ file, line: lineOfPattern(source, /TALL_SCRIPT_METRICS/), rule: 'tall-script-overflow-guard', message: `the tall script ${script} uses ${family}${table === 'DISPLAY_FONTS' ? ' (DISPLAY_FONTS)' : ''}, which has no TALL_SCRIPT_METRICS entry`, fix: 'Add its hhea unitsPerEm, ascender and descender (check-design-system reads them from the font file).' });
     }
   }
   for (const [family, want] of Object.entries(metrics)) {
@@ -650,7 +660,7 @@ function checkFontPlugin(ctx, fontsSpec) {
  */
 function checkFontsDrawn(ctx, fonts, fontsSpec) {
   ctx.checked += 1;
-  const drawn = Object.values(fonts.SCRIPT_FONTS ?? {}).some((byWeight) => byWeight !== null && typeof byWeight === 'object' && Object.keys(byWeight).length > 0);
+  const drawn = [...Object.values(fonts.SCRIPT_FONTS ?? {}), ...Object.values(displayFontsOf(fonts))].some((byWeight) => byWeight !== null && typeof byWeight === 'object' && Object.keys(byWeight).length > 0);
   if (drawn) return;
   const source = ctx.source(ctx.paths.fonts) ?? '';
   ctx.report.problem({ file: ctx.paths.fonts, line: lineOfExport(source, 'SCRIPT_FONTS'), rule: 'font-family', message: `the contract bundles ${fontsSpec.files.map((entry) => entry.file).join(', ')}, but every script of SCRIPT_FONTS is null, so no text draws with them and the build embeds fonts nobody sees`, fix: `Name a family per weight in SCRIPT_FONTS (file name = PostScript name), or keep the system font: write "fonts": "${SYSTEM_FONT}" in ${ctx.contractRel} and remove the files and the expo-font entry (references/text-and-fonts.md, "System font").` });
@@ -715,7 +725,8 @@ function checkScriptCoverage(ctx, fonts) {
 
 function checkFonts(ctx, fonts) {
   if (!ctx.contract) return;
-  const families = fonts ? [...new Set([...Object.values(fonts.SCRIPT_FONTS ?? {}).flatMap((byWeight) => Object.values(byWeight ?? {})), ...Object.keys(fonts.TALL_SCRIPT_METRICS ?? {})])] : [];
+  const families = fonts ? [...new Set([...[...Object.values(fonts.SCRIPT_FONTS ?? {}), ...Object.values(displayFontsOf(fonts))].flatMap((byWeight) => Object.values(byWeight ?? {})), ...Object.keys(fonts.TALL_SCRIPT_METRICS ?? {})])] : [];
+  if (fonts) checkDisplayScripts(ctx, fonts);
   const fontsSpec = bundledFonts(ctx.contract);
   if (fontsSpec === null) {
     ctx.report.note(`font rules: the contract says "fonts": "${SYSTEM_FONT}", so no file, pin, licence or expo-font entry is checked`);
@@ -727,6 +738,16 @@ function checkFonts(ctx, fonts) {
   if (fonts) checkScriptCoverage(ctx, fonts);
   checkFontFamilies(ctx, fontsSpec, families);
   checkFontPlugin(ctx, fontsSpec);
+}
+
+/** A DISPLAY_FONTS entry is a display face of a script the app has: its key is a SCRIPT_FONTS script. */
+function checkDisplayScripts(ctx, fonts) {
+  const source = ctx.source(ctx.paths.fonts) ?? '';
+  for (const script of Object.keys(displayFontsOf(fonts))) {
+    ctx.checked += 1;
+    if (Object.hasOwn(fonts.SCRIPT_FONTS ?? {}, script)) continue;
+    ctx.report.problem({ file: ctx.paths.fonts, line: lineOfPattern(source, new RegExp(`\\b${escapeRegExp(script)}\\s*:`)), rule: 'font-family', message: `DISPLAY_FONTS names the script '${script}', which SCRIPT_FONTS does not have, so no text ever picks that display face`, fix: 'Key DISPLAY_FONTS by a ScriptKey of SCRIPT_FONTS (latin for a Latin display face), or remove the entry.' });
+  }
 }
 
 /** The key of the object literal around `index` (ios in `ios: { userInterfaceStyle }`), or null at the top. */

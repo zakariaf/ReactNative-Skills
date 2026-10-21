@@ -193,6 +193,46 @@
       }
     ]
   },
+  "bad-display-font-script": {
+    "expect": ["[font-family] DISPLAY_FONTS names the script 'greek', which SCRIPT_FONTS does not have"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/fonts.ts",
+          "find": "/** fontWeight for the system font (never for a bundled family). */\n",
+          "with": "export const DISPLAY_FONTS = {\n  greek: {\n    regular: 'NotoSans-Bold',\n    medium: 'NotoSans-Bold',\n    semibold: 'NotoSans-Bold',\n    bold: 'NotoSans-Bold',\n  },\n} as const;\n\n/** fontWeight for the system font (never for a bundled family). */\n"
+        }
+      }
+    ]
+  },
+  "bad-display-font-tall-metrics": {
+    "expect": [
+      "[tall-script-overflow-guard] the tall script arabic uses NotoSans-Bold (DISPLAY_FONTS), which has no TALL_SCRIPT_METRICS entry"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/fonts.ts",
+          "find": "/** fontWeight for the system font (never for a bundled family). */\n",
+          "with": "export const DISPLAY_FONTS = {\n  arabic: {\n    regular: 'NotoSans-Bold',\n    medium: 'NotoSans-Bold',\n    semibold: 'NotoSans-Bold',\n    bold: 'NotoSans-Bold',\n  },\n} as const;\n\n/** fontWeight for the system font (never for a bundled family). */\n"
+        }
+      }
+    ]
+  },
+  "bad-display-font-unbundled": {
+    "expect": [
+      "src/theme/fonts.ts:40 [font-family] fonts.ts names 'Fraunces-Bold', but no bundled font file is called Fraunces-Bold.ttf"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/fonts.ts",
+          "find": "/** fontWeight for the system font (never for a bundled family). */\n",
+          "with": "export const DISPLAY_FONTS = {\n  latin: {\n    regular: 'Fraunces-Bold',\n    medium: 'Fraunces-Bold',\n    semibold: 'Fraunces-Bold',\n    bold: 'Fraunces-Bold',\n  },\n} as const;\n\n/** fontWeight for the system font (never for a bundled family). */\n"
+        }
+      }
+    ]
+  },
   "bad-font-family": {
     "expect": [
       "[font-family] fonts.ts names 'Noto Sans', but no bundled font file is called Noto Sans.ttf",
@@ -1321,6 +1361,18 @@
               }
             ]
           }
+        }
+      }
+    ]
+  },
+  "pass-display-font": {
+    "expect": ["check-design-system:", "RESULT: PASS"],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/theme/fonts.ts",
+          "find": "/** fontWeight for the system font (never for a bundled family). */\n",
+          "with": "export const DISPLAY_FONTS = {\n  latin: {\n    regular: 'NotoSans-Bold',\n    medium: 'NotoSans-Bold',\n    semibold: 'NotoSans-Bold',\n    bold: 'NotoSans-Bold',\n  },\n} as const;\n\n/** fontWeight for the system font (never for a bundled family). */\n"
         }
       }
     ]
