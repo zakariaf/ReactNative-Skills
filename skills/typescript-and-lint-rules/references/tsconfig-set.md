@@ -188,6 +188,11 @@ npm workspaces `apps/*` and `packages/*`, packages consumed as TypeScript source
   `check-configs` requires the entry wherever the file exists (`tsconfig-world`) and counts it as
   canonical, never as an ignore that skips app code (`ignore-app-code`). A Node backend workspace
   (`functions/`, which declares `"engines": { "node": ... }`) is Node tooling and may list `node`.
+  `check-source.mjs` treats it as Node-run code too, like `scripts/`: its `node:crypto` import is
+  fine, while app code that imports one of its files fails `node-world-import`. It reads the backend
+  from `package.json` `workspaces` (outside `packages/`, no Expo app) and from
+  `contracts/architecture.json` (architecture-and-boundaries), where a workspace with `"world":
+  "node"` (a server-only package) joins the Node world and `"world": "app"` keeps one in the app.
 - An extensionless import does not resolve through an `exports` wildcard in `tsc`, so every relative
   and workspace import writes its extension (`./x.ts`, `@acme/ui/button.tsx`). Set
   `IS_MULTI_PACKAGE = true` in `eslint.config.mjs` and extend `PACKAGE_IMPORT_EXTENSION`'s pattern
