@@ -5,7 +5,15 @@
       ".prettierrc.json [prettier-option] .prettierrc.json does not exist",
       "knip.json [knip-config] knip.json does not exist"
     ],
-    "ops": [{ "delete": ["eslint.config.mjs", ".prettierrc.json", "knip.json"] }]
+    "ops": [
+      {
+        "delete": [
+          "eslint.config.mjs",
+          ".prettierrc.json",
+          "knip.json"
+        ]
+      }
+    ]
   },
   "bad-eslint-allow-list": {
     "expect": [
@@ -32,7 +40,13 @@
       "[eslint-weakened] the file group ATT_ADAPTER adds 'src/services/*/*-adapter.ts', which reaches a whole folder; an exemption group adds only exact file names [file-group]"
     ],
     "ops": [
-      { "replace": { "file": "eslint.config.mjs", "find": "  ATT_IMPORT,\n", "with": "" } },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  ATT_IMPORT,\n",
+          "with": ""
+        }
+      },
       {
         "replace": {
           "file": "eslint.config.mjs",
@@ -40,7 +54,13 @@
           "with": "const ATT_ADAPTER = ['src/services/*/*-adapter.ts'];"
         }
       },
-      { "replace": { "file": "eslint.config.mjs", "find": "  vendor('expo-sqlite', 'SqlDriver'),\n", "with": "" } }
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  vendor('expo-sqlite', 'SqlDriver'),\n",
+          "with": ""
+        }
+      }
     ]
   },
   "bad-eslint-block-scope": {
@@ -196,8 +216,20 @@
           "with": "'no-restricted-globals': ['error', ...TEST_GLOBALS],"
         }
       },
-      { "replace": { "file": "eslint.config.mjs", "find": "  asyncHandler: {", "with": "  asyncHandlerDraft: {" } },
-      { "replace": { "file": "eslint.config.mjs", "find": "    ...PRE_EXISTING,\n", "with": "" } },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  asyncHandler: {",
+          "with": "  asyncHandlerDraft: {"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "    ...PRE_EXISTING,\n",
+          "with": ""
+        }
+      },
       {
         "write": {
           "file": "research/tools/check-notes.mjs",
@@ -205,7 +237,11 @@
         }
       },
       {
-        "replace": { "file": "eslint.config.mjs", "find": "  handlerBody: {", "with": "  handlerBodyDraft: {" },
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  handlerBody: {",
+          "with": "  handlerBodyDraft: {"
+        },
         "$comment": "the verifier's handler hole: onPress={() => Linking.openURL(url)} passes without it"
       }
     ]
@@ -276,8 +312,20 @@
           "with": "{ object: 'Date', property: 'now', message: 'Use an injected clock.' },"
         }
       },
-      { "replace": { "file": "eslint.config.mjs", "find": "    'skills/**',\n", "with": "" } },
-      { "replace": { "file": "eslint.config.mjs", "find": "    '.agents/**',\n", "with": "" } }
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "    'skills/**',\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "    '.agents/**',\n",
+          "with": ""
+        }
+      }
     ]
   },
   "bad-eslint-name-globs": {
@@ -309,7 +357,12 @@
           "with": "  prettierConfig,\n  { rules: {} },\n]);"
         }
       },
-      { "write": { "file": ".eslintrc.json", "content": "{ \"root\": true }\n" } }
+      {
+        "write": {
+          "file": ".eslintrc.json",
+          "content": "{ \"root\": true }\n"
+        }
+      }
     ]
   },
   "bad-eslint-string-files": {
@@ -408,7 +461,13 @@
       "[eslint-weakened] a linterOptions block appears 2 times; the canonical config has 1 [linter-options]"
     ],
     "ops": [
-      { "replace": { "file": "eslint.config.mjs", "find": "noInlineConfig: true,", "with": "noInlineConfig: false," } },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "noInlineConfig: true,",
+          "with": "noInlineConfig: false,"
+        }
+      },
       {
         "replace": {
           "file": "eslint.config.mjs",
@@ -567,16 +626,78 @@
       "knip.json:1 [knip-config] entry adds \"src/features/**/*.ts\"; every export of an entry file counts as used"
     ],
     "ops": [
-      { "json": { "file": "knip.json", "path": ["rules", "exports"], "value": "warn" } },
-      { "json": { "file": "knip.json", "path": ["rules", "files"], "delete": true } },
-      { "write": { "file": ".knip.json", "content": "{ \"rules\": { \"exports\": \"off\" } }\n" } },
+      {
+        "json": {
+          "file": "knip.json",
+          "path": [
+            "rules",
+            "exports"
+          ],
+          "value": "warn"
+        }
+      },
+      {
+        "json": {
+          "file": "knip.json",
+          "path": [
+            "rules",
+            "files"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "write": {
+          "file": ".knip.json",
+          "content": "{ \"rules\": { \"exports\": \"off\" } }\n"
+        }
+      },
       {
         "$comment": "verified: with these keys npx knip exits 0 over a planted dead export",
-        "json": { "file": "knip.json", "path": ["exclude"], "value": ["exports", "types"] }
+        "json": {
+          "file": "knip.json",
+          "path": [
+            "exclude"
+          ],
+          "value": [
+            "exports",
+            "types"
+          ]
+        }
       },
-      { "json": { "file": "knip.json", "path": ["ignore"], "value": ["src/**"] } },
-      { "json": { "file": "knip.json", "path": ["project"], "value": ["*.ts", "src/**/*.{ts,tsx}"] } },
-      { "json": { "file": "knip.json", "path": ["entry", 4], "value": "src/features/**/*.ts" } }
+      {
+        "json": {
+          "file": "knip.json",
+          "path": [
+            "ignore"
+          ],
+          "value": [
+            "src/**"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "knip.json",
+          "path": [
+            "project"
+          ],
+          "value": [
+            "*.ts",
+            "src/**/*.{ts,tsx}"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "knip.json",
+          "path": [
+            "entry",
+            4
+          ],
+          "value": "src/features/**/*.ts"
+        }
+      }
     ]
   },
   "bad-monorepo": {
@@ -587,7 +708,17 @@
       "apps/mobile/eslint.config.mjs [config-stray] a workspace has its own eslint config"
     ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["apps/*"] } },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "workspaces"
+          ],
+          "value": [
+            "apps/*"
+          ]
+        }
+      },
       {
         "write": {
           "file": "apps/mobile/package.json",
@@ -601,14 +732,53 @@
         }
       },
       {
-        "json": { "file": "apps/mobile/tsconfig.json", "path": ["compilerOptions", "types"], "value": ["jest", "node"] }
+        "json": {
+          "file": "apps/mobile/tsconfig.json",
+          "path": [
+            "compilerOptions",
+            "types"
+          ],
+          "value": [
+            "jest",
+            "node"
+          ]
+        }
       },
-      { "json": { "file": "apps/mobile/tsconfig.json", "path": ["compilerOptions", "strict"], "value": false } },
-      { "write": { "file": "apps/mobile/eslint.config.mjs", "content": "export default [];\n" } },
+      {
+        "json": {
+          "file": "apps/mobile/tsconfig.json",
+          "path": [
+            "compilerOptions",
+            "strict"
+          ],
+          "value": false
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/eslint.config.mjs",
+          "content": "export default [];\n"
+        }
+      },
       {
         "write": {
           "file": "apps/web/package.json",
           "content": "{\n  \"name\": \"@acme/web\",\n  \"private\": true,\n  \"dependencies\": {\n    \"expo\": \"~57.0.26\"\n  }\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-monorepo-app-env": {
+    "expect": [
+      "FAIL tsconfig.json:1 [tsconfig-world] exclude lacks \"apps/mobile/src/app-env.d.ts\""
+    ],
+    "extends": "pass-monorepo-app-env",
+    "ops": [
+      {
+        "replace": {
+          "file": "tsconfig.json",
+          "find": ",\n    \"apps/mobile/src/app-env.d.ts\"\n",
+          "with": "\n"
         }
       }
     ]
@@ -621,7 +791,17 @@
       "check-configs: 5 config areas checked, 3 problems"
     ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["apps/*"] } },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "workspaces"
+          ],
+          "value": [
+            "apps/*"
+          ]
+        }
+      },
       {
         "write": {
           "file": "apps/mobile/package.json",
@@ -634,7 +814,18 @@
           "content": "{\n  \"extends\": \"../../tsconfig.base.json\",\n  \"compilerOptions\": {\n    \"types\": [\n      \"jest\"\n    ],\n    \"paths\": {\n      \"@/*\": [\n        \"./src/*\"\n      ]\n    }\n  },\n  \"include\": [\n    \"**/*.ts\",\n    \"**/*.tsx\"\n  ]\n}\n"
         }
       },
-      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["apps/*", "packages/*"] } },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "workspaces"
+          ],
+          "value": [
+            "apps/*",
+            "packages/*"
+          ]
+        }
+      },
       {
         "write": {
           "file": "packages/native-kit/package.json",
@@ -653,8 +844,18 @@
           "content": "{\n  \"platforms\": [\"apple\", \"android\"],\n  \"apple\": { \"modules\": [\"NativeKitModule\"] }\n}\n"
         }
       },
-      { "write": { "file": "packages/native-kit/src/index.ts", "content": "export const nativeKit = 'native-kit';\n" } },
-      { "write": { "file": "apps/mobile/src/app/index.tsx", "content": "export const route = 'index';\n" } },
+      {
+        "write": {
+          "file": "packages/native-kit/src/index.ts",
+          "content": "export const nativeKit = 'native-kit';\n"
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/src/app/index.tsx",
+          "content": "export const route = 'index';\n"
+        }
+      },
       {
         "replace": {
           "file": ".prettierignore",
@@ -662,7 +863,12 @@
           "with": "\nhandbook/\napps/*/ios/\napps/*/src/\npackages/*/ios/\n"
         }
       },
-      { "write": { "file": "packages/native-kit/ios/NativeKitModule.swift", "content": "import ExpoModulesCore\n" } }
+      {
+        "write": {
+          "file": "packages/native-kit/ios/NativeKitModule.swift",
+          "content": "import ExpoModulesCore\n"
+        }
+      }
     ]
   },
   "bad-package": {
@@ -680,28 +886,104 @@
       "package.json:1 [lint-script] script \"lint:report\" swallows eslint's exit code (eslint ... | tee reports/lint.txt)"
     ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["devDependencies", "eslint"], "value": "10.0.0" } },
-      { "json": { "file": "package.json", "path": ["devDependencies", "typescript"], "value": "^7.0.0" } },
-      { "json": { "file": "package.json", "path": ["devDependencies", "globals"], "delete": true } },
-      { "json": { "file": "package.json", "path": ["devDependencies", "eslint-config-expo"], "value": "~57.0.2" } },
-      { "json": { "file": "package.json", "path": ["scripts", "lint"], "value": "eslint . --quiet" } },
-      { "json": { "file": "package.json", "path": ["overrides", "@typescript-eslint/utils"], "delete": true } },
-      { "json": { "file": "package.json", "path": ["overrides", "@typescript-eslint/parser"], "value": "8.71.0" } },
       {
         "json": {
           "file": "package.json",
-          "path": ["scripts", "lint:app"],
+          "path": [
+            "devDependencies",
+            "eslint"
+          ],
+          "value": "10.0.0"
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "devDependencies",
+            "typescript"
+          ],
+          "value": "^7.0.0"
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "devDependencies",
+            "globals"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "devDependencies",
+            "eslint-config-expo"
+          ],
+          "value": "~57.0.2"
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "scripts",
+            "lint"
+          ],
+          "value": "eslint . --quiet"
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "overrides",
+            "@typescript-eslint/utils"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "overrides",
+            "@typescript-eslint/parser"
+          ],
+          "value": "8.71.0"
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "scripts",
+            "lint:app"
+          ],
           "value": "eslint src --max-warnings 0 --ignore-pattern src/legacy/**"
         }
       },
       {
         "$comment": "verified: the lint gate stays green whatever eslint reports",
-        "json": { "file": "package.json", "path": ["scripts", "lint:ci"], "value": "eslint . --max-warnings 0 || true" }
+        "json": {
+          "file": "package.json",
+          "path": [
+            "scripts",
+            "lint:ci"
+          ],
+          "value": "eslint . --max-warnings 0 || true"
+        }
       },
       {
         "json": {
           "file": "package.json",
-          "path": ["scripts", "lint:report"],
+          "path": [
+            "scripts",
+            "lint:report"
+          ],
           "value": "eslint . --max-warnings 0 | tee reports/lint.txt"
         }
       }
@@ -718,19 +1000,66 @@
       "eslint.config.cts [config-stray] eslint.config.cts is a second eslint config"
     ],
     "ops": [
-      { "json": { "file": ".prettierrc.json", "path": ["printWidth"], "value": 120 } },
-      { "json": { "file": ".prettierrc.json", "path": ["singleQuote"], "value": false } },
-      { "write": { "file": "prettier.config.js", "content": "module.exports = { semi: false };\n" } },
+      {
+        "json": {
+          "file": ".prettierrc.json",
+          "path": [
+            "printWidth"
+          ],
+          "value": 120
+        }
+      },
+      {
+        "json": {
+          "file": ".prettierrc.json",
+          "path": [
+            "singleQuote"
+          ],
+          "value": false
+        }
+      },
+      {
+        "write": {
+          "file": "prettier.config.js",
+          "content": "module.exports = { semi: false };\n"
+        }
+      },
       {
         "$comment": "verified: prettier --find-config-path returns package.json (Prettier 3.9.9 reads it before .prettierrc.json)",
-        "json": { "file": "package.json", "path": ["prettier"], "value": { "semi": false } }
+        "json": {
+          "file": "package.json",
+          "path": [
+            "prettier"
+          ],
+          "value": {
+            "semi": false
+          }
+        }
       },
-      { "json": { "file": "package.json", "path": ["eslintConfig"], "value": { "extends": "expo" } } },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "eslintConfig"
+          ],
+          "value": {
+            "extends": "expo"
+          }
+        }
+      },
       {
         "$comment": "verified: prettier --find-config-path returns the nested file for files below it",
-        "write": { "file": "src/features/.prettierrc.json", "content": "{ \"printWidth\": 140 }\n" }
+        "write": {
+          "file": "src/features/.prettierrc.json",
+          "content": "{ \"printWidth\": 140 }\n"
+        }
       },
-      { "write": { "file": "eslint.config.cts", "content": "export default [];\n" } }
+      {
+        "write": {
+          "file": "eslint.config.cts",
+          "content": "export default [];\n"
+        }
+      }
     ]
   },
   "bad-prettier-ignore": {
@@ -742,10 +1071,33 @@
       "[ignore-pre-existing] the pre-existing file notes.md is not ignored"
     ],
     "ops": [
-      { "replace": { "file": ".prettierignore", "find": "\nskills/\n", "with": "\n" } },
-      { "replace": { "file": ".prettierignore", "find": "\n.agents/\n", "with": "\n" } },
-      { "replace": { "file": ".prettierignore", "find": "\nhandbook/\n", "with": "\n__PRE_EXISTING__\n" } },
-      { "write": { "file": "notes.md", "content": "# Notes\n\nkept   by hand\n" } }
+      {
+        "replace": {
+          "file": ".prettierignore",
+          "find": "\nskills/\n",
+          "with": "\n"
+        }
+      },
+      {
+        "replace": {
+          "file": ".prettierignore",
+          "find": "\n.agents/\n",
+          "with": "\n"
+        }
+      },
+      {
+        "replace": {
+          "file": ".prettierignore",
+          "find": "\nhandbook/\n",
+          "with": "\n__PRE_EXISTING__\n"
+        }
+      },
+      {
+        "write": {
+          "file": "notes.md",
+          "content": "# Notes\n\nkept   by hand\n"
+        }
+      }
     ]
   },
   "bad-prettier-ignore-native-unanchored": {
@@ -764,7 +1116,13 @@
           ]
         }
       },
-      { "replace": { "file": ".prettierignore", "find": "\n/ios/\n", "with": "\nios/\n" } }
+      {
+        "replace": {
+          "file": ".prettierignore",
+          "find": "\n/ios/\n",
+          "with": "\nios/\n"
+        }
+      }
     ]
   },
   "bad-tsconfig-alias": {
@@ -776,8 +1134,15 @@
       {
         "json": {
           "file": "src/tsconfig.json",
-          "path": ["compilerOptions", "paths"],
-          "value": { "@/*": ["./features/*"] }
+          "path": [
+            "compilerOptions",
+            "paths"
+          ],
+          "value": {
+            "@/*": [
+              "./features/*"
+            ]
+          }
         }
       }
     ]
@@ -793,21 +1158,77 @@
       "tsconfig.base.json:1 [tsconfig-base-option] sets the top-level key \"exclude\", which every program that does not set its own inherits"
     ],
     "ops": [
-      { "json": { "file": "tsconfig.base.json", "path": ["compilerOptions", "strict"], "value": false } },
       {
         "json": {
           "file": "tsconfig.base.json",
-          "path": ["compilerOptions", "noUncheckedIndexedAccess"],
+          "path": [
+            "compilerOptions",
+            "strict"
+          ],
+          "value": false
+        }
+      },
+      {
+        "json": {
+          "file": "tsconfig.base.json",
+          "path": [
+            "compilerOptions",
+            "noUncheckedIndexedAccess"
+          ],
           "delete": true
         }
       },
-      { "json": { "file": "tsconfig.base.json", "path": ["compilerOptions", "noUnusedLocals"], "value": true } },
-      { "json": { "file": "tsconfig.base.json", "path": ["compilerOptions", "noImplicitAny"], "value": false } },
-      { "json": { "file": "tsconfig.base.json", "path": ["compilerOptions", "strictFunctionTypes"], "value": false } },
-      { "json": { "file": "tsconfig.base.json", "path": ["compilerOptions", "allowJs"], "value": true } },
+      {
+        "json": {
+          "file": "tsconfig.base.json",
+          "path": [
+            "compilerOptions",
+            "noUnusedLocals"
+          ],
+          "value": true
+        }
+      },
+      {
+        "json": {
+          "file": "tsconfig.base.json",
+          "path": [
+            "compilerOptions",
+            "noImplicitAny"
+          ],
+          "value": false
+        }
+      },
+      {
+        "json": {
+          "file": "tsconfig.base.json",
+          "path": [
+            "compilerOptions",
+            "strictFunctionTypes"
+          ],
+          "value": false
+        }
+      },
+      {
+        "json": {
+          "file": "tsconfig.base.json",
+          "path": [
+            "compilerOptions",
+            "allowJs"
+          ],
+          "value": true
+        }
+      },
       {
         "$comment": "verified: with Buffer.from() planted in an unimported src/features file, tsc -p src/tsconfig.json exits 0",
-        "json": { "file": "tsconfig.base.json", "path": ["exclude"], "value": ["${configDir}/features"] }
+        "json": {
+          "file": "tsconfig.base.json",
+          "path": [
+            "exclude"
+          ],
+          "value": [
+            "${configDir}/features"
+          ]
+        }
       }
     ]
   },
@@ -822,7 +1243,9 @@
       {
         "json": {
           "file": "tsconfig.json",
-          "path": ["exclude"],
+          "path": [
+            "exclude"
+          ],
           "value": [
             "node_modules",
             "ios",
@@ -841,8 +1264,14 @@
       {
         "json": {
           "file": "src/tsconfig.json",
-          "path": ["include"],
-          "value": ["**/*", "../.expo/types/**/*.ts", "../expo-env.d.ts"]
+          "path": [
+            "include"
+          ],
+          "value": [
+            "**/*",
+            "../.expo/types/**/*.ts",
+            "../expo-env.d.ts"
+          ]
         }
       }
     ]
@@ -852,7 +1281,14 @@
       "src/tsconfig.json [tsconfig-missing] src/tsconfig.json does not exist",
       "src/app-env.d.ts:1 [app-env] does not exist"
     ],
-    "ops": [{ "delete": ["src/tsconfig.json", "src/app-env.d.ts"] }]
+    "ops": [
+      {
+        "delete": [
+          "src/tsconfig.json",
+          "src/app-env.d.ts"
+        ]
+      }
+    ]
   },
   "bad-tsconfig-pre-existing": {
     "expect": [
@@ -899,11 +1335,61 @@
       "src/tsconfig.json:1 [tsconfig-world] exclude lists \"features/legacy\"; excluding a folder from the app program drops the no-Node-types guarantee"
     ],
     "ops": [
-      { "json": { "file": "src/tsconfig.json", "path": ["extends"], "value": "../tsconfig.json" } },
-      { "json": { "file": "src/tsconfig.json", "path": ["compilerOptions", "skipLibCheck"], "value": true } },
-      { "json": { "file": "src/tsconfig.json", "path": ["compilerOptions", "types"], "value": ["jest", "node"] } },
-      { "json": { "file": "tsconfig.json", "path": ["compilerOptions", "lib"], "value": ["ESNext"] } },
-      { "json": { "file": "src/tsconfig.json", "path": ["exclude"], "value": ["features/legacy"] } }
+      {
+        "json": {
+          "file": "src/tsconfig.json",
+          "path": [
+            "extends"
+          ],
+          "value": "../tsconfig.json"
+        }
+      },
+      {
+        "json": {
+          "file": "src/tsconfig.json",
+          "path": [
+            "compilerOptions",
+            "skipLibCheck"
+          ],
+          "value": true
+        }
+      },
+      {
+        "json": {
+          "file": "src/tsconfig.json",
+          "path": [
+            "compilerOptions",
+            "types"
+          ],
+          "value": [
+            "jest",
+            "node"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "tsconfig.json",
+          "path": [
+            "compilerOptions",
+            "lib"
+          ],
+          "value": [
+            "ESNext"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "src/tsconfig.json",
+          "path": [
+            "exclude"
+          ],
+          "value": [
+            "features/legacy"
+          ]
+        }
+      }
     ]
   },
   "bad-tsconfig-typed-routes": {
@@ -912,37 +1398,86 @@
       "typed routes are a global augmentation nothing imports",
       "src/tsconfig.json:1 [tsconfig-world] include \"../scripts/**/*.ts\" pulls Node-world files into the app program"
     ],
-    "ops": [{ "json": { "file": "src/tsconfig.json", "path": ["include"], "value": ["**/*", "../scripts/**/*.ts"] } }]
+    "ops": [
+      {
+        "json": {
+          "file": "src/tsconfig.json",
+          "path": [
+            "include"
+          ],
+          "value": [
+            "**/*",
+            "../scripts/**/*.ts"
+          ]
+        }
+      }
+    ]
   },
   "error-bad-area": {
-    "expect": ["ERROR [bad-input] --only lint is not an area"],
+    "expect": [
+      "ERROR [bad-input] --only lint is not an area"
+    ],
     "args": "{dir} --only lint",
     "ops": []
   },
   "error-no-package": {
-    "expect": ["ERROR [bad-input] nothing to check:", "has no package.json"],
-    "ops": [{ "delete": "package.json" }]
+    "expect": [
+      "ERROR [bad-input] nothing to check:",
+      "has no package.json"
+    ],
+    "ops": [
+      {
+        "delete": "package.json"
+      }
+    ]
   },
   "pass-expo-repo-files": {
-    "expect": ["check-configs: 5 config areas checked, 0 problems"],
+    "expect": [
+      "check-configs: 5 config areas checked, 0 problems"
+    ],
     "ops": [
-      { "write": { "file": "store.config.json", "content": "{ \"configVersion\": 0, \"apple\": { \"info\": {} } }\n" } },
-      { "write": { "file": "google-services.json", "content": "{ \"project_info\": {} }\n" } },
+      {
+        "write": {
+          "file": "store.config.json",
+          "content": "{ \"configVersion\": 0, \"apple\": { \"info\": {} } }\n"
+        }
+      },
+      {
+        "write": {
+          "file": "google-services.json",
+          "content": "{ \"project_info\": {} }\n"
+        }
+      },
       {
         "write": {
           "file": "react-native.config.js",
           "content": "// react-native.config.js: autolinking settings the app uses.\nmodule.exports = { dependencies: {} };\n"
         }
       },
-      { "write": { "file": "patches/expo-router+57.0.24.patch", "content": "diff --git a/x b/x\n" } },
-      { "write": { "file": "CONTRIBUTING.md", "content": "# Contributing\n" } },
+      {
+        "write": {
+          "file": "patches/expo-router+57.0.24.patch",
+          "content": "diff --git a/x b/x\n"
+        }
+      },
+      {
+        "write": {
+          "file": "CONTRIBUTING.md",
+          "content": "# Contributing\n"
+        }
+      },
       {
         "write": {
           "file": "global.d.ts",
           "content": "// global.d.ts: an ambient declaration the root program reads.\nexport {};\n"
         }
       },
-      { "write": { "file": "pnpm-lock.yaml", "content": "lockfileVersion: '9.0'\n" } },
+      {
+        "write": {
+          "file": "pnpm-lock.yaml",
+          "content": "lockfileVersion: '9.0'\n"
+        }
+      },
       {
         "write": {
           "file": "modules/task-widget/index.ts",
@@ -952,9 +1487,21 @@
     ]
   },
   "pass-monorepo": {
-    "expect": ["check-configs: 5 config areas checked, 0 problems"],
+    "expect": [
+      "check-configs: 5 config areas checked, 0 problems"
+    ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["apps/*"] } },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "workspaces"
+          ],
+          "value": [
+            "apps/*"
+          ]
+        }
+      },
       {
         "write": {
           "file": "apps/mobile/package.json",
@@ -1031,9 +1578,44 @@
       }
     ]
   },
+  "pass-monorepo-app-env": {
+    "expect": [
+      "check-configs: 5 config areas checked, 0 problems"
+    ],
+    "extends": "pass-monorepo",
+    "ops": [
+      {
+        "$comment": "the app workspace's process declaration leaves the root program in its workspace form (the root program has @types/node; both declarations together are TS2339)",
+        "write": {
+          "file": "apps/mobile/src/app-env.d.ts",
+          "content": "declare const process: { env: Record<string, string | undefined> };\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "tsconfig.json",
+          "find": "    \"src/app-env.d.ts\"\n",
+          "with": "    \"src/app-env.d.ts\",\n    \"apps/mobile/src/app-env.d.ts\"\n"
+        }
+      }
+    ]
+  },
   "pass-only-eslint": {
-    "expect": ["check-configs: 1 config areas checked, 0 problems"],
+    "expect": [
+      "check-configs: 1 config areas checked, 0 problems"
+    ],
     "args": "{dir} --only eslint",
-    "ops": [{ "json": { "file": "tsconfig.base.json", "path": ["compilerOptions", "strict"], "value": false } }]
+    "ops": [
+      {
+        "json": {
+          "file": "tsconfig.base.json",
+          "path": [
+            "compilerOptions",
+            "strict"
+          ],
+          "value": false
+        }
+      }
+    ]
   }
 }

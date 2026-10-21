@@ -4,7 +4,7 @@
 // Run from the app repo root: node ${CLAUDE_SKILL_DIR}/scripts/check-configs.mjs [repo-root] [options]
 
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { join, posix } from 'node:path';
+import { basename, join, posix } from 'node:path';
 
 import { createReporter, fail, globToRegExp, parseArgs, parseJsonc, readTsconfigPaths, requireDir, resolveLayout, run, walk, walkRepo } from './check-lib.mjs';
 import { appFiles, appTops, coversAppCode, nativeScope } from './lib/app-scope.mjs';
@@ -87,7 +87,9 @@ const SPEC = {
     'ignore-app-code keeps every ignore list out of them).',
     'When multi-package (package.json "workspaces"): every workspace tsconfig extends the root tsconfig.base.json and an',
     'Expo app workspace never lists node types; workspace ESLint, Prettier or knip configs are strays; .prettierignore',
-    'ignores each Expo app workspace\'s ios/ and android/ (apps/*/ios/, apps/*/android/).',
+    'ignores each Expo app workspace\'s ios/ and android/ (apps/*/ios/, apps/*/android/); the root tsconfig.json',
+    'excludes each Expo app workspace\'s app-env.d.ts where it exists (apps/mobile/src/app-env.d.ts, the workspace',
+    'form of src/app-env.d.ts: tsconfig-world when missing, never ignore-app-code).',
     'Example: node check-configs.mjs .            (from the app repo root)',
   ].join('\n'),
 };
@@ -256,6 +258,16 @@ function readProgram(root, file, report) {
   return data;
 }
 
+/**
+ * When multi-package: the app-env.d.ts of every Expo app workspace (apps/mobile/src/app-env.d.ts), the
+ * workspace form of the single app's {srcDir}/app-env.d.ts exclude. Its `declare const process` would
+ * replace @types/node's process in the root program, which includes every workspace (TS2339).
+ */
+function workspaceAppEnvFiles(root, layout) {
+  if (layout.mode !== 'monorepo') return [];
+  return layout.workspaces.filter((workspace) => isExpoApp(root, workspace.dir)).map((workspace) => `${workspace.layout.srcDir}/${basename(BASELINE.appEnv.file)}`);
+}
+
 function checkTsconfigs(root, layout, report) {
   checkBase(root, report);
   const [rootSpec, appSpec] = BASELINE.programs;
@@ -263,7 +275,12 @@ function checkTsconfigs(root, layout, report) {
   if (rootConfig) {
     checkProgramShape(rootSpec.file, rootConfig, report, { isRoot: true, worldChecked: true });
     if (layout.mode === 'single') checkWorld(rootSpec.file, rootConfig, rootSpec, layout, report);
-    else checkWorld(rootSpec.file, rootConfig, { ...rootSpec, includeContains: [], excludeContains: [] }, layout, report);
+    else {
+      // The workspace form of the app-env exclude is required where the file exists (the root program would read it).
+      const appEnv = workspaceAppEnvFiles(root, layout).filter((rel) => existsSync(join(root, rel)));
+      const excludeWhy = Object.fromEntries(appEnv.map((rel) => [rel, rootSpec.excludeWhy[BASELINE.appEnv.file]]));
+      checkWorld(rootSpec.file, rootConfig, { ...rootSpec, includeContains: [], excludeContains: appEnv, excludeWhy: { ...rootSpec.excludeWhy, ...excludeWhy } }, layout, report);
+    }
   }
   if (layout.mode === 'monorepo') {
     checkWorkspaceTsconfigs(root, layout, report);
@@ -688,7 +705,7 @@ function checkIgnoreLists(root, layout, wants, report) {
   }
   const exclude = wants('tsconfig') ? rootExclude(root) : null;
   if (exclude !== null) {
-    const canonical = new Set(BASELINE.programs[0].excludeCanonical.map((entry) => fillPath(entry, layout, 'tsconfig.json')));
+    const canonical = new Set([...BASELINE.programs[0].excludeCanonical.map((entry) => fillPath(entry, layout, 'tsconfig.json')), ...workspaceAppEnvFiles(root, layout)]);
     const text = readFileSync(join(root, 'tsconfig.json'), 'utf8');
     for (const entry of exclude.filter((value) => !canonical.has(value))) {
       const covers = scope.covers(entry, 'anchored');

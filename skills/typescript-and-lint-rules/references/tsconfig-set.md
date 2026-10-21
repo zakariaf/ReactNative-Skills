@@ -181,6 +181,13 @@ npm workspaces `apps/*` and `packages/*`, packages consumed as TypeScript source
   workspace has its own `tsconfig.json` that extends the root base (`../../tsconfig.base.json`) and
   sets only `types`, `paths`, `include` and `exclude`; an Expo app workspace lists `["jest"]`, never
   `node` (`check-configs` checks every workspace from `package.json` `workspaces`).
+- The root program still reads every workspace (`**/*.ts`), so each Expo app workspace's
+  `app-env.d.ts` leaves it in its workspace form: `"exclude": [..., "apps/mobile/src/app-env.d.ts"]`
+  next to the canonical `src/app-env.d.ts`. Without it the root program sees the app's
+  `declare const process` in place of `@types/node`'s and fails with TS2339 on `process.exitCode`.
+  `check-configs` requires the entry wherever the file exists (`tsconfig-world`) and counts it as
+  canonical, never as an ignore that skips app code (`ignore-app-code`). A Node backend workspace
+  (`functions/`, which declares `"engines": { "node": ... }`) is Node tooling and may list `node`.
 - An extensionless import does not resolve through an `exports` wildcard in `tsc`, so every relative
   and workspace import writes its extension (`./x.ts`, `@acme/ui/button.tsx`). Set
   `IS_MULTI_PACKAGE = true` in `eslint.config.mjs` and extend `PACKAGE_IMPORT_EXTENSION`'s pattern
