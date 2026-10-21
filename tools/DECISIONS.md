@@ -108,7 +108,11 @@ a heading "When multi-package" and every checker accepts directory options for i
   output stays in its own folder (`functions/lib/`, what its `"main"` names), the one workspace folder
   the root ignore lists (ESLint `globalIgnores`, `.prettierignore`, `.gitignore`) name; its tests run in
   a root Jest project of its own (`displayName` its folder, `testEnvironment: 'node'`). Checkers
-  find workspaces from `package.json` `workspaces`, never from hard-coded folders.
+  find workspaces from `package.json` `workspaces`, never from hard-coded folders. Templates stay in the
+  single-app, extensionless import style; a workspace repo writes every relative, `@/` and workspace
+  import with its extension (`IS_MULTI_PACKAGE`), so copying templates there is followed by
+  typescript-and-lint-rules' `add-import-extensions.mjs`, which rewrites them to the files they
+  resolve to and leaves platform-file imports for a person.
 
 ## 4. Repository layout
 

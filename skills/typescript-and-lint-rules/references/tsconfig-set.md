@@ -197,7 +197,12 @@ npm workspaces `apps/*` and `packages/*`, packages consumed as TypeScript source
   and workspace import writes its extension (`./x.ts`, `@acme/ui/button.tsx`). Set
   `IS_MULTI_PACKAGE = true` in `eslint.config.mjs` and extend `PACKAGE_IMPORT_EXTENSION`'s pattern
   with the workspace scope; `check-source.mjs` checks every workspace import in monorepo mode
-  (`"importExtensions": "all"`).
+  (`"importExtensions": "all"`). The skills' templates import without extensions (the single-app
+  style), so after copying templates into a workspace run `add-import-extensions.mjs . --path <folder>`:
+  it rewrites each extensionless local import to the file it resolves to (`./x` to `./x.ts`, `@/i18n`
+  to `@/i18n/index.ts`, `@acme/shared/core/result` to `@acme/shared/core/result.ts`) and refuses an
+  import that resolves to platform files (`x.ios.ts`, or a plain `x.ts` beside one): Metro picks the
+  platform file only for the extensionless form, so a person decides.
 - A package that declares a global augmentation (React Navigation's `RootParamList`, a theme module
   declaration) must be listed in the `include` of every app program that imports files depending on
   it. Otherwise the augmentation is empty there and calls fail with TS2769 ("not assignable to

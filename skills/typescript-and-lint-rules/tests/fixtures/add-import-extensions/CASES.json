@@ -1,0 +1,133 @@
+{
+  "pass-already-written": {
+    "expect": [
+      "add-import-extensions: 0 import(s) rewritten",
+      "add-import-extensions: 6 TypeScript files checked, 0 problems"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "apps/mobile/src/features/tasks/tasks-screen.tsx",
+          "find": "from '@/ui/app-text';",
+          "with": "from '@/ui/app-text.tsx';"
+        }
+      },
+      {
+        "replace": {
+          "file": "apps/mobile/src/features/tasks/tasks-screen.tsx",
+          "find": "from './use-tasks-model';",
+          "with": "from './use-tasks-model.ts';"
+        }
+      },
+      {
+        "replace": {
+          "file": "apps/mobile/src/features/tasks/use-tasks-model.ts",
+          "find": "from '@acme/shared/core/task-title';",
+          "with": "from '@acme/shared/core/task-title.ts';"
+        }
+      },
+      {
+        "replace": {
+          "file": "apps/mobile/src/features/tasks/use-tasks-model.ts",
+          "find": "from '@/i18n';",
+          "with": "from '@/i18n/index.ts';"
+        }
+      },
+      {
+        "replace": {
+          "file": "packages/shared/src/core/task-title.ts",
+          "find": "from './result';",
+          "with": "from './result.ts';"
+        }
+      }
+    ]
+  },
+  "pass-path": {
+    "args": ". --path packages/shared",
+    "expect": [
+      "rewrote packages/shared/src/core/task-title.ts:2 ./result -> ./result.ts",
+      "add-import-extensions: 1 import(s) rewritten",
+      "add-import-extensions: 2 TypeScript files checked, 0 problems"
+    ],
+    "ops": []
+  },
+  "bad-check": {
+    "args": ". --check",
+    "expect": [
+      "apps/mobile/src/features/tasks/tasks-screen.tsx:6 [import-extension] \"./use-tasks-model\" has no file extension (it resolves to \"./use-tasks-model.ts\")",
+      "packages/shared/src/core/task-title.ts:2 [import-extension] \"./result\" has no file extension (it resolves to \"./result.ts\")",
+      "RESULT: FAIL (5 problems)"
+    ],
+    "ops": []
+  },
+  "bad-platform-import": {
+    "expect": [
+      "apps/mobile/src/features/tasks/tasks-screen.tsx:7 [platform-import] \"@/services/haptics/haptics-adapter\" resolves to the platform file apps/mobile/src/services/haptics/haptics-adapter.ios.ts",
+      "apps/mobile/src/features/tasks/tasks-screen.tsx:8 [platform-import] \"./tasks-sheet\" resolves to the platform file apps/mobile/src/features/tasks/tasks-sheet.ios.tsx",
+      "rewrote apps/mobile/src/features/tasks/tasks-screen.tsx:6 ./use-tasks-model -> ./use-tasks-model.ts",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "apps/mobile/src/services/haptics/haptics-adapter.ios.ts",
+          "content": "// apps/mobile/src/services/haptics/haptics-adapter.ios.ts\n/** The iOS haptics adapter. */\nexport const HAPTICS = 'ios';\n"
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/src/services/haptics/haptics-adapter.android.ts",
+          "content": "// apps/mobile/src/services/haptics/haptics-adapter.android.ts\n/** The Android haptics adapter. */\nexport const HAPTICS = 'android';\n"
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/src/features/tasks/tasks-sheet.tsx",
+          "content": "// apps/mobile/src/features/tasks/tasks-sheet.tsx\n/** The sheet everywhere but iOS. */\nexport const SHEET = 'default';\n"
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/src/features/tasks/tasks-sheet.ios.tsx",
+          "content": "// apps/mobile/src/features/tasks/tasks-sheet.ios.tsx\n/** The iOS sheet. */\nexport const SHEET = 'ios';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "apps/mobile/src/features/tasks/tasks-screen.tsx",
+          "find": "import { useTasksModel } from './use-tasks-model';\n",
+          "with": "import { useTasksModel } from './use-tasks-model';\nimport { HAPTICS } from '@/services/haptics/haptics-adapter';\nimport { SHEET } from './tasks-sheet';\n"
+        }
+      }
+    ]
+  },
+  "bad-unresolved-import": {
+    "expect": [
+      "apps/mobile/src/features/tasks/tasks-screen.tsx:7 [unresolved-import] \"./task-row\" resolves to no file",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "apps/mobile/src/features/tasks/tasks-screen.tsx",
+          "find": "import { useTasksModel } from './use-tasks-model';\n",
+          "with": "import { useTasksModel } from './use-tasks-model';\nimport { TaskRow } from './task-row';\n"
+        }
+      }
+    ]
+  },
+  "error-path-missing": {
+    "args": ". --path apps/web",
+    "expect": [
+      "--path apps/web does not exist"
+    ],
+    "ops": []
+  },
+  "error-no-files": {
+    "args": ". --path packages/shared/package.json",
+    "expect": [
+      "no .ts or .tsx files under packages/shared/package.json"
+    ],
+    "ops": []
+  }
+}

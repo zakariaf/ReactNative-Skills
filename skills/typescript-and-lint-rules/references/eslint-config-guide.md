@@ -511,6 +511,8 @@ TypeScript under `src/`, `test/`, `scripts/` and `__mocks__/`.
   the extension on relative and `@/` imports. Extend its pattern with the workspace scope
   (`/^(\.|@\/|@acme\/)/`), because the config cannot know package names; `check-source.mjs` reads them
   from `package.json` `workspaces`.
+  Templates copied in from the skills import without extensions; `add-import-extensions.mjs . --path
+  <folder>` writes them (tsconfig-set reference, When multi-package).
 - Widen the file groups to the workspaces (`apps/*/src/**`, `packages/*/src/**`) and add the package
   direction (which package may import which) as `import/no-restricted-paths` zones;
   architecture-and-boundaries owns the direction. `check-configs.mjs` reads a workspace prefix from

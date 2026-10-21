@@ -137,7 +137,12 @@ is app layout; pre-existing exports inside it get their own `.prettierignore` li
 | `templates/dot-prettierrc.json`, `templates/dot-prettierignore` | `.prettierrc.json`, `.prettierignore` |
 | `templates/knip.json` | `knip.json`, with quality-gates' `templates/contracts/knip-ignores.json` at `contracts/knip-ignores.json` (the reasons for its ten `ignore` entries; its `knip-ignores` rule fails without them) |
 
-When multi-package, read the "When multi-package" sections of both config references first; one
+When multi-package, every relative, `@/` and workspace import writes its extension, while every
+skill's templates are written in the single-app, extensionless style: after copying templates into a
+workspace, run `node ${CLAUDE_SKILL_DIR}/scripts/add-import-extensions.mjs . --path <the folder they
+went to>` (it rewrites each import to the file it resolves to, refuses one that resolves to platform
+files, and is idempotent; `--check` only reports). Read the "When multi-package" sections of both
+config references first; one
 `.prettierignore` line per generated native folder (`apps/*/ios/`, `apps/*/android/`) is required, and a
 Node backend's build folder (`functions/lib/`, from its `"main"`) is in `globalIgnores`, `.prettierignore`
 and `.gitignore`, with its knip workspace's `entry` the one file the deploy build bundles.
@@ -220,7 +225,8 @@ and `.gitignore`, with its knip workspace's `entry` the one file the deploy buil
 | [examples/rn-skills.config.example.json](examples/rn-skills.config.example.json) | The optional repo keys both checkers read | When the app's layout differs from the default |
 | `scripts/check-configs.mjs` | Checks the tsconfig set, the ESLint config against `templates/eslint.config.mjs` (canonical blocks, file groups, shared lists, extra blocks name exact files, limits in any shape, fresh lists, re-declared options), Prettier and its ignore list, pre-existing folders in all three lists, ignore lists that reach app code, knip, pins, `overrides`, lint scripts and stray configs against the baseline | Workflow steps 2, 5 and 6 |
 | `scripts/check-source.mjs` | Checks every `.ts`/`.tsx` for silenced gates, limits, non-erasable syntax, exports, imports, the two worlds, handlers, errors and TSDoc | Workflow step 6 |
-| `scripts/selftest.mjs` | Proves both checkers pass the good fixtures and catch every planted bug | After changing a checker, the baseline or a template |
+| `scripts/add-import-extensions.mjs` | Rewrites the extensionless relative, `@/` and workspace imports of copied templates (or the whole repo) to the files they resolve to, for a workspace repo; refuses platform-file and unresolved imports; `--check` only reports | When multi-package, after copying templates |
+| `scripts/selftest.mjs` | Proves both checkers pass the good fixtures and catch every planted bug, and the import rewrite | After changing a checker, the baseline or a template |
 | `scripts/check-lib.mjs` | Shared script helper (synced; never edit here) | Never by hand |
 | `scripts/lib/source-scan.mjs` | Dependency-free lexer and import resolver (synced) | Only when changing a checker |
 | `scripts/lib/workspaces.mjs` | Workspace and Expo-app detection for the multi-package checks (synced) | Only when changing a checker |
@@ -230,7 +236,7 @@ and `.gitignore`, with its knip workspace's `entry` the one file the deploy buil
 | `scripts/lib/eslint-structure.mjs` | Reads an `eslint.config.mjs` without running it: consts, blocks, the files each block reaches (this skill's own helper) | Only when changing check-configs |
 | `assets/ts-lint-baseline.json` | The canonical compiler options, programs, required ESLint settings, limits, pins, knip rules | When a verified setting changes (stop and ask) |
 | `assets/shared.json` | The shared files this skill copies in | When adding a shared file |
-| `tests/` | Overlay fixtures: `tests/bases/configs-app` plus the templates for check-configs, `good/` for check-source | When adding a rule to a checker |
+| `tests/` | Overlay fixtures: `tests/bases/configs-app` plus the templates for check-configs, `good/` for check-source, a small workspace repo for add-import-extensions | When adding a rule to a checker |
 
 ## Related skills
 

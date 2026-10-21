@@ -1,0 +1,6 @@
+rewrote apps/mobile/src/features/tasks/tasks-screen.tsx:4 @/ui/app-text -> @/ui/app-text.tsx
+rewrote apps/mobile/src/features/tasks/tasks-screen.tsx:6 ./use-tasks-model -> ./use-tasks-model.ts
+rewrote apps/mobile/src/features/tasks/use-tasks-model.ts:2 @acme/shared/core/task-title -> @acme/shared/core/task-title.ts
+rewrote apps/mobile/src/features/tasks/use-tasks-model.ts:4 @/i18n -> @/i18n/index.ts
+rewrote packages/shared/src/core/task-title.ts:2 ./result -> ./result.ts
+add-import-extensions: 5 import(s) rewritten
