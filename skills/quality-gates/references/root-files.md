@@ -140,6 +140,14 @@ unit-and-component-tests owns `jest.config.js`; this skill guards its numbers:
     `'task-priority\\.test'` fails here before `npm ci`.
   - The guardrail compares the resolved scope with `jest.collectCoverageFrom` and `jest.projects` in
     `quality-gates.json`, and each project's `coveragePathIgnorePatterns` with the device-only list.
+  One entry is the canonical config's own but conditional: once `jest.emulator.config.js` exists
+  (firestore-rules-and-emulator-tests), `HAS_RULES_TESTS` adds `'\\.rules\\.test\\.'` to the unit
+  project's `testPathIgnorePatterns` right after the Android entry, because those security-rules tests
+  run only inside the Firebase emulators. `jest-scope` accepts it as canonical text, and the baseline
+  `gate-weakened` compares with lists it in `jest.projects.unit.testPathIgnorePatterns` exactly while
+  the file exists (`SANCTIONED_JEST_ENTRIES` in `check-gate-wiring.mjs`: entry, project, key, repo
+  fact, owner): add it to `quality-gates.json` in the commit that adds the emulator config, with its
+  trailer. Without the file the same entry fails, since nothing else runs those tests.
   Three changes pass both checks when made with a trailer:
   - **A new test project** (a `web` project with `preset: 'jest-expo/web'` and its own `testMatch`)
     added next to the canonical ones and listed under `jest.projects` in `quality-gates.json`:

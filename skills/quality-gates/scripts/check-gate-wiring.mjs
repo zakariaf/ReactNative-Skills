@@ -38,7 +38,9 @@ const SPEC = {
     '                          scripts/hooks/install-git-hooks.ts, which skips by itself outside the git top level,',
     '                          and may be absent only with rn-skills.config.json "lefthookPrepare": "parent-repo",',
     '                          never in a git root)',
-    '  gate-weakened           quality-gates.json holds a value weaker than the baseline, or lost an entry',
+    '  gate-weakened           quality-gates.json holds a value weaker than the baseline, or lost an entry (the',
+    '                          baseline adds the canonical config\'s conditional entries with their repo fact: the',
+    '                          unit project\'s \'\\\\.rules\\\\.test\\\\.\' ignore while jest.emulator.config.js exists)',
     '  verify-step             quality-gates.json "verifyExtraSteps" is not a list of distinct npm script names, names',
     '                          a core step, or names a script package.json lacks',
     '  claude-settings         .claude/settings.json lost a deny or ask rule or a hook, disables hooks, or allows a',
@@ -157,9 +159,28 @@ const APP_PROGRAM = 'src/tsconfig.json';
  * apps/<app>/src/... (the guardrail lints those paths), and the app program src/tsconfig.json leaves
  * typescript.projects (checkWorkspacePrograms matches apps/<app>/tsconfig.json against the app's keys).
  */
+/**
+ * Jest scope entries the canonical jest.config.js adds once the repo has adopted another skill, keyed by
+ * the repo fact the config itself tests: the baseline expects each one exactly then, at its place in the
+ * list (right after `after`), so quality-gates.json lists it with the fact and fails it without.
+ */
+const SANCTIONED_JEST_ENTRIES = [
+  // Security-rules tests run only inside the Firebase emulators (HAS_RULES_TESTS in jest.config.js).
+  { project: 'unit', key: 'testPathIgnorePatterns', entry: '\\.rules\\.test\\.', after: '\\.android\\.test\\.', when: 'jest.emulator.config.js', owner: 'firestore-rules-and-emulator-tests' },
+];
+
+function addSanctionedJestEntries(gates, root) {
+  for (const { project, key, entry, after, when } of SANCTIONED_JEST_ENTRIES) {
+    const list = gates.jest.projects[project]?.[key];
+    if (!Array.isArray(list) || !existsSync(join(root, when))) continue;
+    list.splice(list.indexOf(after) + 1, 0, entry);
+  }
+}
+
 function baselineGates(scripts, ctx) {
   const gates = readJson(join(TEMPLATES, 'quality-gates.json'));
   for (const name of Object.keys(gates.npmScripts)) gates.npmScripts[name] = scripts[name];
+  addSanctionedJestEntries(gates, ctx.root);
   if (ctx.layout.mode !== 'monorepo' || ctx.appWorkspaces.length === 0) return gates;
   gates.eslint.probes = Object.fromEntries(
     Object.entries(gates.eslint.probes).flatMap(([file, ruleSet]) => (file.startsWith('src/') ? ctx.appWorkspaces.map((dir) => [`${dir}/${file}`, ruleSet]) : [[file, ruleSet]])),

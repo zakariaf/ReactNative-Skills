@@ -1841,5 +1841,71 @@
         }
       }
     ]
+  },
+  "pass-rules-tests-ignored": {
+    "expect": [
+      "check-gate-wiring: 18 gate files checked, 0 problems",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "jest.emulator.config.js",
+          "content": "// jest.emulator.config.js — the 'emulator' Jest project: security-rules tests, run inside firebase emulators:exec.\n/** @type {import('jest').Config} */\nmodule.exports = {\n  rootDir: __dirname,\n  displayName: 'emulator',\n  testEnvironment: 'node',\n  testMatch: ['<rootDir>/test/rules/**/*.rules.test.ts'],\n  maxWorkers: 1,\n};\n"
+        },
+        "$comment": "firestore-rules-and-emulator-tests adopted: jest.emulator.config.js runs the *.rules.test.ts files, so the canonical unit project leaves them out (HAS_RULES_TESTS) and quality-gates.json lists the sanctioned ignore after the Android one."
+      },
+      {
+        "json": {
+          "file": "quality-gates.json",
+          "path": [
+            "jest",
+            "projects",
+            "unit",
+            "testPathIgnorePatterns",
+            7
+          ],
+          "value": "\\.rules\\.test\\."
+        }
+      }
+    ]
+  },
+  "bad-rules-ignore-without-emulator": {
+    "expect": [
+      "[gate-weakened]",
+      "jest.projects.unit.testPathIgnorePatterns is"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "quality-gates.json",
+          "path": [
+            "jest",
+            "projects",
+            "unit",
+            "testPathIgnorePatterns",
+            7
+          ],
+          "value": "\\.rules\\.test\\."
+        },
+        "$comment": "the rules-test ignore without jest.emulator.config.js: nothing runs those tests, so the entry only hides them"
+      }
+    ]
+  },
+  "bad-rules-ignore-missing": {
+    "expect": [
+      "[gate-weakened]",
+      "jest.projects.unit.testPathIgnorePatterns is",
+      "\\\\.rules\\\\.test\\\\."
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "jest.emulator.config.js",
+          "content": "// jest.emulator.config.js — the 'emulator' Jest project: security-rules tests, run inside firebase emulators:exec.\n/** @type {import('jest').Config} */\nmodule.exports = {\n  rootDir: __dirname,\n  displayName: 'emulator',\n  testEnvironment: 'node',\n  testMatch: ['<rootDir>/test/rules/**/*.rules.test.ts'],\n  maxWorkers: 1,\n};\n"
+        },
+        "$comment": "jest.emulator.config.js exists, so the resolved unit project leaves the rules tests out, but quality-gates.json still lists the ignores without it"
+      }
+    ]
   }
 }
