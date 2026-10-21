@@ -25,10 +25,36 @@ global `npm i -g firebase-tools`, which drifts per machine and is invisible to t
 |---|---|---|
 | `firebase-tools` | `15.33.0` | 15.34.0 is the npm latest on 2026-10-21 but was published 2026-10-14T23:01Z, under the 7-day release age on that date; move to it after 2026-10-21T23:01Z through the dependency policy |
 | `@firebase/rules-unit-testing` | `6.0.0` | published 2026-10-07; peer `firebase` `^13.0.0`; engines `node >=24.12.0` |
-| `firebase` | `13.0.0` | the peer above, test tooling only. 13.1.0 was published 2026-10-21 (too new). The app itself uses React Native Firebase, so the app's dependency policy allows `firebase` only with `where: dev` and the test folders as its only importers |
+| `firebase` | `13.0.0` | the peer above, test tooling only. 13.1.0 was published 2026-10-21 (too new). The app itself uses React Native Firebase, so the app's dependency policy allows `firebase` only with `where: dev` and the rules tests as its only importers (below) |
 
 A dependency-policy row per package (dependency-management's `contracts/dependency-policy.json`)
 records the version, `where: dev`, why and the verified date.
+
+An app on React Native Firebase keeps the JS SDK out of its own code. The policy says both halves at
+once: a `doNotAdd` entry scoped to the app, whose `allowIn` names the rules tests, next to the dev row
+that allows the package for them:
+
+```json
+"doNotAdd": {
+  "firebase": {
+    "reason": "the app talks to Firebase through @react-native-firebase/*; the JS SDK is a second client with its own cache",
+    "where": "app",
+    "allowIn": ["test/rules/**"]
+  }
+},
+"packages": {
+  "firebase": { "version": "13.0.0", "spec": "13.0.0", "install": "npm", "where": "dev", "why": "the peer of @firebase/rules-unit-testing; only test/rules/ imports it" },
+  "@firebase/rules-unit-testing": { "version": "6.0.0", "spec": "6.0.0", "install": "npm", "where": "dev", "why": "the rules test helpers (initializeTestEnvironment, assertSucceeds, assertFails)" }
+}
+```
+
+dependency-management's `check-deps-policy.mjs` then fails `firebase` in the app's `dependencies`
+(`do-not-add`) and accepts it in the root `devDependencies`; architecture-and-boundaries'
+`check-boundaries.mjs` reads the same entry and fails every import of `firebase` outside
+`test/rules/**` (`banned-package`), app code and other tests alike. A plain string entry
+(`"firebase": "<reason>"`) would fail the dev row's install and the rules tests' imports too. Mirror
+the ban in `eslint.config.mjs` `BANNED_PACKAGE_PATHS` and lift it in one file-exact block naming the
+rules test files.
 
 ## Node
 

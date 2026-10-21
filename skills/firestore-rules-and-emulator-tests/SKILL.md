@@ -74,7 +74,9 @@ both kinds. Verified on 2026-10-21 with firebase-tools 15.33.0, `@firebase/rules
 
    Install the pinned tooling and add the `test:rules` script exactly as
    [references/toolchain-and-ci.md](references/toolchain-and-ci.md) shows; add each package's
-   dependency-policy row (`where: dev`) through dependency-management.
+   dependency-policy row (`where: dev`) through dependency-management; when the app keeps the JS SDK out
+   of its code (React Native Firebase), its `doNotAdd` entry is scoped (`"where": "app"`, `"allowIn":
+   ["test/rules/**"]`), as the toolchain reference shows.
 3. **Test first, per block:** write the `describe('<match path>', ...)` with its `assertSucceeds` and
    `assertFails` before the block exists; deny-by-default makes the success tests fail (red). Then
    write the block (green). Read [references/emulator-tests.md](references/emulator-tests.md) for the
