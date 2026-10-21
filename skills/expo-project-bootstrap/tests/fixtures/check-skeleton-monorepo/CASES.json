@@ -344,6 +344,7 @@
         }
       },
       {
+        "$comment": "the backend's knip workspace: its entry (the file the deploy build bundles) exports every function by design, so includeEntryExports stays off and the entry names that one file",
         "json": {
           "file": "knip.json",
           "path": [
@@ -351,7 +352,13 @@
             "functions"
           ],
           "value": {
-            "includeEntryExports": true
+            "entry": [
+              "src/index.ts",
+              "src/**/*.test.ts"
+            ],
+            "project": [
+              "src/**/*.ts"
+            ]
           }
         }
       }
@@ -405,6 +412,31 @@
         "write": {
           "file": "rn-skills.config.json",
           "content": "{ \"workspaces\": { \"apps/tasks\": { \"routesDir\": \"app\" } } }\n"
+        }
+      }
+    ]
+  },
+  "bad-node-backend-knip": {
+    "expect": [
+      "knip.json:1 [knip-config] workspaces.functions.includeEntryExports is true, so knip reports every function the deploy entry exports as unused",
+      "knip.json:1 [knip-config] workspaces.functions entry adds \"src/**/*.ts\"",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "extends": "pass-node-backend",
+    "ops": [
+      {
+        "json": {
+          "file": "knip.json",
+          "path": [
+            "workspaces",
+            "functions"
+          ],
+          "value": {
+            "includeEntryExports": true,
+            "entry": [
+              "src/**/*.ts"
+            ]
+          }
         }
       }
     ]

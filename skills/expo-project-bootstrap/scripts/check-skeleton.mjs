@@ -14,7 +14,7 @@ import { dirname, join, posix, resolve } from 'node:path';
 import { ASSETS, PRINT_WIDTH, TEMPLATES, holdsTypeScript, leftoversIn, preExistingEntries, reservedIdPartProblem } from './lib/bootstrap-plan.mjs';
 import { EXACT_VERSION, NPMRC_POLICY, lineMatching, npmrcExcludeProblems, npmrcMissingPolicy, npmrcPolicyOverrides, readJsonFile, readTextFile } from './lib/repo-read.mjs';
 import { bundleIdProblem, placeholdersIn } from './lib/ship-placeholders.mjs';
-import { createReporter, fail, maskComments, parseArgs, readWorkspaces, requireDir, resolveLayout, run, walkRepo } from './check-lib.mjs';
+import { backendWorkspaces, createReporter, fail, maskComments, parseArgs, readWorkspaces, requireDir, resolveLayout, run, walkRepo } from './check-lib.mjs';
 
 const SPEC = {
   name: 'check-skeleton',
@@ -36,7 +36,9 @@ const SPEC = {
     '  then expects the workspace forms of assets/package-scripts.multi-package.json (typecheck; export:audit run',
     '  inside the Expo app workspace, <app-dir> filled in), and every workspace its own typecheck (workspace-layout).',
     '  A workspace declaring "engines.node" or a "bin" is Node tooling (a Cloud Functions backend): node types, and',
-    '  no exports map needed. Every declared workspace folder counts as app code, never as pre-existing.',
+    '  no exports map needed. knip-config: a shared package\'s knip workspace sets includeEntryExports: true; a Node',
+    '  backend\'s (outside packages/, no Expo app) does not, and its entry names exact files (src/index.ts) plus tests.',
+    '  Every declared workspace folder counts as app code, never as pre-existing.',
     'Reads rn-skills.config.json (optional): the layout keys (srcDir, routesDir, contractsDir; per workspace under',
     '  "workspaces", relative to the workspace), "dependencyPolicy", "layoutEntries" (extra top-level names that',
     '  belong to the app) and "agentInstructions": "parent-repo" (an app nested in a repository: AGENTS.md must sit',
@@ -472,7 +474,20 @@ function checkGates(ctx, add) {
     const mayIgnore = new Set([...knipWant.ignore, ...ctx.preExisting.map((entry) => (entry.isDir ? `${entry.name}/**` : entry.name))]);
     for (const glob of knipWant.ignore) if (!ignore.includes(glob)) add('knip.json', lineMatching(ctx.text('knip.json'), /"ignore"/), 'knip-config', `"ignore" lacks "${glob}": knip's Jest plugin falls back to Jest's default test globs and analyses installed skills' templates and fixtures (hundreds of "Unlisted dependencies")`, `Add "${glob}" to "ignore".`);
     for (const glob of ignore.filter((entry) => !mayIgnore.has(entry))) add('knip.json', lineMatching(ctx.text('knip.json'), new RegExp(JSON.stringify(glob).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))), 'knip-config', `"ignore" lists ${glob}; only agent folders and pre-existing top-level entries may be ignored (a wider ignore hides dead code)`, 'Remove it; fix the unused file, export or dependency instead (ignoreDependencies with a reason in contracts/knip-ignores.json for a tool knip cannot see).');
-    if (ctx.monorepo) for (const ws of ctx.layout.workspaces.filter((item) => !ctx.apps.some((app) => app.dir === item.dir))) if (knip.value.workspaces?.[ws.dir]?.includeEntryExports !== true) add('knip.json', 1, 'knip-config', `workspaces.${ws.dir}.includeEntryExports must be true (its exports map makes every file an entry, so dead files are never reported otherwise)`, 'Set it.');
+    if (ctx.monorepo) {
+      const backends = new Set(backendWorkspaces(ctx.root).map((ws) => ws.dir));
+      for (const ws of ctx.layout.workspaces.filter((item) => !ctx.apps.some((app) => app.dir === item.dir))) {
+        const own = knip.value.workspaces?.[ws.dir];
+        if (!backends.has(ws.dir)) {
+          if (own?.includeEntryExports !== true) add('knip.json', 1, 'knip-config', `workspaces.${ws.dir}.includeEntryExports must be true (its exports map makes every file an entry, so dead files are never reported otherwise)`, 'Set it.');
+          continue;
+        }
+        // A Node backend (functions/): its entry exports every deployed function and nothing imports them.
+        if (own?.includeEntryExports === true) add('knip.json', 1, 'knip-config', `workspaces.${ws.dir}.includeEntryExports is true, so knip reports every function the deploy entry exports as unused (the deploy runtime, not the repo, imports them)`, `Remove it, and name the file the deploy build bundles as the entry: "${ws.dir}": { "entry": ["src/index.ts", "src/**/*.test.ts"], "project": ["src/**/*.ts"] }.`);
+        const entries = Array.isArray(own?.entry) ? own.entry : typeof own?.entry === 'string' ? [own.entry] : [];
+        for (const glob of entries.filter((entry) => /[*?{[]/.test(entry) && !/\.test\.(?:\{[^}]*\}|[a-z]+)$/.test(entry))) add('knip.json', 1, 'knip-config', `workspaces.${ws.dir} entry adds "${glob}": every export of an entry file counts as used, so knip stops reporting dead exports in the backend`, 'List the exact file the deploy build bundles (src/index.ts) and the test glob (src/**/*.test.ts) only.');
+      }
+    }
   }
   const lefthook = ctx.text('lefthook.yml');
   if (lefthook !== null) {
