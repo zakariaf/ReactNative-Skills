@@ -136,7 +136,9 @@ is app layout; pre-existing exports inside it get their own `.prettierignore` li
 | `templates/knip.json` | `knip.json`, with quality-gates' `templates/contracts/knip-ignores.json` at `contracts/knip-ignores.json` (the reasons for its ten `ignore` entries; its `knip-ignores` rule fails without them) |
 
 When multi-package, read the "When multi-package" sections of both config references first; one
-`.prettierignore` line per generated native folder (`apps/*/ios/`, `apps/*/android/`) is required.
+`.prettierignore` line per generated native folder (`apps/*/ios/`, `apps/*/android/`) is required, and a
+Node backend's build folder (`functions/lib/`, from its `"main"`) is in `globalIgnores`, `.prettierignore`
+and `.gitignore`, with its knip workspace's `entry` the one file the deploy build bundles.
 
 ## Definition of done
 

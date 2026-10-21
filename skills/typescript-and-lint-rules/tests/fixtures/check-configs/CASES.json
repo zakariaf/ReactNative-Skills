@@ -1617,5 +1617,229 @@
         }
       }
     ]
+  },
+  "bad-monorepo-backend-build": {
+    "expect": [
+      "[eslint-required] globalIgnores lacks 'functions/lib/**', the build output of the Node backend workspace functions",
+      ".prettierignore:1 [prettier-ignore] no line ignores functions/lib/, the build output of the Node backend workspace functions",
+      ".gitignore:1 [knip-config] no line ignores functions/lib/, the build output of the Node backend workspace functions",
+      "[ignore-app-code] globalIgnores lists 'functions/src/**', which reaches into the app path functions",
+      "[ignore-app-code] the line packages/*/lib/ reaches into the app path packages",
+      "check-configs: 5 config areas checked, 5 problems"
+    ],
+    "extends": "pass-monorepo",
+    "ops": [
+      {
+        "$comment": "a Cloud Functions backend workspace: its deploy build writes functions/lib/index.js (\"main\"), build output that holds lint errors and unformatted code",
+        "json": {
+          "file": "package.json",
+          "path": [
+            "workspaces"
+          ],
+          "value": [
+            "apps/*",
+            "functions"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "functions/package.json",
+          "content": "{\n  \"name\": \"@acme/functions\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"main\": \"lib/index.js\",\n  \"engines\": {\n    \"node\": \"24\"\n  }\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "functions/tsconfig.json",
+          "content": "{\n  \"extends\": \"../tsconfig.base.json\",\n  \"compilerOptions\": {\n    \"types\": [\n      \"node\"\n    ]\n  },\n  \"include\": [\n    \"src/**/*.ts\"\n  ]\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "functions/src/index.ts",
+          "content": "export const summarizeList = (): string => 'summary';\n"
+        }
+      },
+      {
+        "write": {
+          "file": "functions/lib/index.js",
+          "content": "var summarizeList=()=>\"summary\";export{summarizeList};\n"
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "workspaces"
+          ],
+          "value": [
+            "apps/*",
+            "packages/*",
+            "functions"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "packages/shared/package.json",
+          "content": "{\n  \"name\": \"@acme/shared\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"exports\": {\n    \"./*\": \"./src/*\"\n  }\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "packages/shared/tsconfig.json",
+          "content": "{\n  \"extends\": \"../../tsconfig.base.json\",\n  \"compilerOptions\": {\n    \"types\": [\n      \"jest\"\n    ]\n  },\n  \"include\": [\n    \"src/**/*.ts\"\n  ]\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "packages/shared/src/schema.ts",
+          "content": "export const SCHEMA_VERSION = 1;\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "    '.kiro/**',\n    ...PRE_EXISTING,",
+          "with": "    '.kiro/**',\n    'functions/src/**',\n    ...PRE_EXISTING,"
+        }
+      },
+      {
+        "replace": {
+          "file": ".prettierignore",
+          "find": "\napps/*/ios/\n",
+          "with": "\napps/*/ios/\npackages/*/lib/\n"
+        }
+      },
+      {
+        "write": {
+          "file": ".gitignore",
+          "content": "node_modules/\n/build/\n"
+        }
+      }
+    ]
+  },
+  "pass-monorepo-backend-build": {
+    "expect": [
+      "check-configs: 5 config areas checked, 0 problems"
+    ],
+    "extends": "pass-monorepo",
+    "ops": [
+      {
+        "$comment": "a Cloud Functions backend workspace: its deploy build writes functions/lib/index.js (\"main\"), build output that holds lint errors and unformatted code",
+        "json": {
+          "file": "package.json",
+          "path": [
+            "workspaces"
+          ],
+          "value": [
+            "apps/*",
+            "functions"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "functions/package.json",
+          "content": "{\n  \"name\": \"@acme/functions\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"main\": \"lib/index.js\",\n  \"engines\": {\n    \"node\": \"24\"\n  }\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "functions/tsconfig.json",
+          "content": "{\n  \"extends\": \"../tsconfig.base.json\",\n  \"compilerOptions\": {\n    \"types\": [\n      \"node\"\n    ]\n  },\n  \"include\": [\n    \"src/**/*.ts\"\n  ]\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "functions/src/index.ts",
+          "content": "export const summarizeList = (): string => 'summary';\n"
+        }
+      },
+      {
+        "write": {
+          "file": "functions/lib/index.js",
+          "content": "var summarizeList=()=>\"summary\";export{summarizeList};\n"
+        }
+      },
+      {
+        "$comment": "the sanctioned ignores of a backend's build output: exactly <backend>/<folder of main>",
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "    '.kiro/**',\n    ...PRE_EXISTING,",
+          "with": "    '.kiro/**',\n    'functions/lib/**',\n    ...PRE_EXISTING,"
+        }
+      },
+      {
+        "replace": {
+          "file": ".prettierignore",
+          "find": "\napps/*/ios/\n",
+          "with": "\napps/*/ios/\nfunctions/lib/\n"
+        }
+      },
+      {
+        "write": {
+          "file": ".gitignore",
+          "content": "node_modules/\n/build/\n/functions/lib/\n"
+        }
+      },
+      {
+        "$comment": "the backend's entry is the one file the deploy build bundles: its exports (every deployed function) count as used, dead exports below it are still reported",
+        "json": {
+          "file": "knip.json",
+          "path": [
+            "workspaces"
+          ],
+          "value": {
+            "functions": {
+              "entry": [
+                "src/index.ts",
+                "src/**/*.test.ts"
+              ],
+              "project": [
+                "src/**/*.ts"
+              ]
+            },
+            "apps/mobile": {
+              "entry": [
+                "src/app/**/*.{ts,tsx}",
+                "src/**/*.test.{ts,tsx}"
+              ],
+              "project": [
+                "src/**/*.{ts,tsx}"
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "bad-monorepo-backend-knip": {
+    "expect": [
+      "knip.json:1 [knip-config] workspaces.functions sets includeEntryExports: true, so knip reports every function the entry exports for deploy as unused",
+      "knip.json:1 [knip-config] workspaces.functions entry adds \"src/**/*.ts\"; every export of an entry file counts as used",
+      "check-configs: 5 config areas checked, 2 problems"
+    ],
+    "extends": "pass-monorepo-backend-build",
+    "ops": [
+      {
+        "json": {
+          "file": "knip.json",
+          "path": [
+            "workspaces",
+            "functions"
+          ],
+          "value": {
+            "includeEntryExports": true,
+            "entry": [
+              "src/**/*.ts"
+            ],
+            "project": [
+              "src/**/*.ts"
+            ]
+          }
+        }
+      }
+    ]
   }
 }

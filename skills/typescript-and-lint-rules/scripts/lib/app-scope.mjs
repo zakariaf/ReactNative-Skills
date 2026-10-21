@@ -6,7 +6,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { globToRegExp, matchGlob, walkRepo } from '../check-lib.mjs';
+import { backendWorkspaces, globToRegExp, matchGlob, walkRepo } from '../check-lib.mjs';
 
 /** Code files ESLint lints or tsc type-checks. */
 const CODE_GLOBS = ['*.ts', '*.tsx', '*.js', '*.jsx', '*.mjs', '*.cjs'];
@@ -43,10 +43,29 @@ function generatesNative(root, dir) {
   }
 }
 
-/** The workspace folders and, among them, the Expo apps whose native projects are generated. */
+/**
+ * The workspace folders, the Expo apps among them whose native projects are generated, and the build
+ * folders of the Node backends (functions/lib: the folder package.json "main" names, written by the
+ * deploy build; check-lib's backendWorkspaces).
+ */
 export function nativeScope(root, layout) {
   const workspaceDirs = (layout.workspaces ?? []).map((workspace) => workspace.dir);
-  return { workspaceDirs, appDirs: workspaceDirs.filter((dir) => generatesNative(root, dir)) };
+  const backends = workspaceDirs.length === 0 ? [] : backendWorkspaces(root).filter((backend) => backend.buildDir !== null);
+  return {
+    workspaceDirs,
+    appDirs: workspaceDirs.filter((dir) => generatesNative(root, dir)),
+    buildDirs: backends.map((backend) => ({ dir: backend.buildDir, workspace: backend.dir })),
+  };
+}
+
+/**
+ * True when an ignore entry names exactly a Node backend's build folder (`functions/lib/`,
+ * `/functions/lib`, `functions/lib/**`): the deploy bundle, never source. `functions/` and
+ * `functions/src/` still reach app code.
+ */
+export function isWorkspaceBuildIgnore(entry, { buildDirs = [] } = {}) {
+  const pattern = normalizeIgnore(entry).replace(/\/\*\*$/, '');
+  return buildDirs.some((build) => build.dir === pattern);
 }
 
 /**
@@ -83,15 +102,16 @@ function anchoredMatch(rel, pattern) {
 /**
  * Whether an ignore entry covers app code, or null. `style` is 'anchored' (ESLint flat-config ignores and
  * tsconfig exclude: a slashless name matches only at the root) or 'gitignore' (.prettierignore: a name
- * without an inner slash matches at any depth). `native` ({ workspaceDirs, appDirs }) lets a line that names
- * exactly an Expo app workspace's generated ios/ or android/ pass (isWorkspaceNativeIgnore). Returns
+ * without an inner slash matches at any depth). `native` ({ workspaceDirs, appDirs, buildDirs }) lets a line
+ * that names exactly an Expo app workspace's generated ios/ or android/ (isWorkspaceNativeIgnore) or a Node
+ * backend's build folder (isWorkspaceBuildIgnore) pass. Returns
  * { reason, example }.
  */
 export function coversAppCode(entry, { style, tops, files, native }) {
   const raw = String(entry).trim();
   const pattern = normalizeIgnore(raw);
   if (pattern === '' || /^\*\*?$/.test(pattern)) return { reason: 'matches every file', example: files[0] ?? null };
-  if (native && isWorkspaceNativeIgnore(raw, native)) return null;
+  if (native && (isWorkspaceNativeIgnore(raw, native) || isWorkspaceBuildIgnore(raw, native))) return null;
   const first = pattern.split('/')[0];
   if (tops.has(first)) return { reason: `${pattern === first ? 'is' : 'reaches into'} the app path ${first}`, example: files.find((rel) => anchoredMatch(rel, pattern)) ?? null };
   const unanchored = style === 'gitignore' && !raw.replace(/\/+$/, '').includes('/');

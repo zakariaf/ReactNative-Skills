@@ -6,8 +6,8 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { basename, join, posix } from 'node:path';
 
-import { createReporter, fail, globToRegExp, parseArgs, parseJsonc, readTsconfigPaths, requireDir, resolveLayout, run, walk, walkRepo } from './check-lib.mjs';
-import { appFiles, appTops, coversAppCode, nativeScope } from './lib/app-scope.mjs';
+import { backendWorkspaces, createReporter, fail, globToRegExp, parseArgs, parseJsonc, readTsconfigPaths, requireDir, resolveLayout, run, walk, walkRepo } from './check-lib.mjs';
+import { appFiles, appTops, coversAppCode, isWorkspaceBuildIgnore, nativeScope } from './lib/app-scope.mjs';
 import { blockDifferences, configModel, elementsOf, isExactGlob, sameBlockFamily, scopeKey, scopeLabel } from './lib/eslint-structure.mjs';
 import { matchBracket, scanSource } from './lib/source-scan.mjs';
 import { isExpoApp } from './lib/workspaces.mjs';
@@ -47,7 +47,9 @@ const SPEC = {
     '  tsconfig-alias          the root program and the app program resolve an alias (@/*, @test/*) to different folders',
     '  app-env                 src/app-env.d.ts is missing or does not declare process for EXPO_PUBLIC_* dot access',
     '  eslint-missing          eslint.config.mjs does not exist',
-    '  eslint-required         a required setting, rule, selector or canonical message of the config is missing',
+    '  eslint-required         a required setting, rule, selector or canonical message of the config is missing; when',
+    '                          multi-package, globalIgnores lacks a Node backend\'s build folder (functions/lib/**, the',
+    '                          folder its package.json "main" names) [backend-build-ignore]',
     '  eslint-limit-changed    a size or complexity limit has a value other than the canonical one, in any shape ESLint',
     '                          accepts (a number, an options object, severity 2), or is declared bare (ESLint\'s default applies)',
     "  eslint-rule-off         a rule is switched off ('off', ['off'] or 0) more often than the canonical config does",
@@ -67,15 +69,20 @@ const SPEC = {
     '                          a nested .prettierrc*, a "prettier", "eslintConfig" or "knip" key in a package.json)',
     '  prettier-option         .prettierrc.json is missing or an option differs from the canonical value',
     '  prettier-ignore         .prettierignore is missing, lacks a required line or still holds the __PRE_EXISTING__ placeholder;',
-    '                          when multi-package, no line ignores an Expo app workspace\'s generated ios/ or android/',
+    '                          when multi-package, no line ignores an Expo app workspace\'s generated ios/ or android/,',
+    '                          or a Node backend\'s build folder (functions/lib/)',
     '  ignore-pre-existing     a top-level folder or file outside the app layout is not ignored by .prettierignore, by',
     '                          PRE_EXISTING in eslint.config.mjs, or (when it holds .ts/.tsx) by the root tsconfig.json exclude',
     '  ignore-app-code         a PRE_EXISTING or extra globalIgnores entry, a .prettierignore line or a root tsconfig.json',
     '                          exclude entry reaches app code (src/, test/, __mocks__/, scripts/, plugins/, app.config.ts,',
     '                          the workspaces, layoutEntries); a line naming exactly an Expo app workspace\'s generated',
-    '                          native folder (apps/*/ios/, apps/*/android/) is not app code',
+    '                          native folder (apps/*/ios/, apps/*/android/) or a Node backend\'s build folder',
+    '                          (functions/lib/, from its "main") is not app code',
     '  knip-config             knip.json is missing, lacks a required rule, ranks a rule below "error", filters issue types',
-    '                          (exclude, include), or drops a canonical entry or project glob',
+    '                          (exclude, include), or drops a canonical entry or project glob; when multi-package,',
+    '                          .gitignore does not ignore a Node backend\'s build folder (knip reads it, and takes "main"',
+    '                          as an entry), or a Node backend\'s knip workspace sets includeEntryExports: true (every',
+    '                          deployed function reads as unused) or a folder-wide entry (every export reads as used)',
     '  package-pin             a lint/type tool is missing from package.json or not pinned to the verified version',
     '  package-overrides       package.json overrides do not hold every @typescript-eslint/* package at the typescript-eslint pin',
     '  lint-script             an npm script that runs eslint lacks --max-warnings 0, passes an override or ignore flag',
@@ -384,6 +391,19 @@ function checkLimits(scan, spec, report) {
   }
 }
 
+const BUILD_WHY = (build) => `the build output of the Node backend workspace ${build.workspace} (its package.json "main" points into it; the deploy build writes the bundle there)`;
+
+/** When multi-package, globalIgnores names each Node backend's build folder: `eslint .` lints the bundle after a deploy build otherwise. */
+function checkBackendBuildEslint(scan, spec, report, scope) {
+  const at = scan.code.search(/globalIgnores\s*\(\s*\[/);
+  if (at === -1) return;
+  const listed = scan.strings.filter((entry) => entry.index > at).map((entry) => entry.value);
+  for (const build of scope.native.buildDirs) {
+    if (listed.includes(`${build.dir}/**`)) continue;
+    report.problem({ file: spec.file, line: scan.lineOf(at), rule: 'eslint-required', message: `globalIgnores lacks '${build.dir}/**', ${BUILD_WHY(build)} [backend-build-ignore]`, fix: `Add '${build.dir}/**' to globalIgnores next to 'build/**' (references/eslint-config-guide.md, When multi-package): a real deploy build otherwise fails npm run lint on generated code.` });
+  }
+}
+
 /** The string literals and spread identifiers of the globalIgnores([...]) list. */
 function checkGlobalIgnores(scan, spec, report, scope) {
   const at = scan.code.search(/globalIgnores\s*\(\s*\[/);
@@ -397,6 +417,7 @@ function checkGlobalIgnores(scan, spec, report, scope) {
     const spread = /^\.\.\.([A-Za-z_$][\w$]*)$/.exec(text);
     if (spread && spec.globalIgnores.spreads.includes(spread[1])) continue;
     if (literal && spec.globalIgnores.literals.includes(literal[2])) continue;
+    if (literal && literal[2].endsWith('/**') && isWorkspaceBuildIgnore(literal[2], scope.native)) continue;
     const covers = literal ? scope.covers(literal[2], 'anchored') : null;
     if (covers) {
       report.problem({ file: spec.file, line, rule: 'ignore-app-code', message: `globalIgnores lists '${literal[2]}', which ${covers.reason}, so ESLint and check-source skip app code`, fix: scope.fix });
@@ -618,6 +639,7 @@ function checkEslint(root, layout, report) {
   }
   checkLimits(scan, spec, report);
   checkGlobalIgnores(scan, spec, report, ignoreScope(root, layout));
+  checkBackendBuildEslint(scan, spec, report, ignoreScope(root, layout));
   checkStructure(readFileSync(path, 'utf8'), spec, report, root, layout);
   // Every rule switched off, in any spelling: 'rule': 'off', 'rule': ['off'], 'rule': 0, bare: 'off'.
   const offHits = new Map();
@@ -668,6 +690,7 @@ function ignoreScope(root, layout) {
     let files = null;
     scopes.set(root, {
       fix: IGNORE_APP_CODE_FIX,
+      native,
       covers: (entry, style) => {
         files ??= appFiles(root, tops);
         return coversAppCode(entry, { style, tops, files, native });
@@ -791,6 +814,17 @@ function checkPrettierIgnore(root, layout, report) {
   }
   if (lines.includes(spec.placeholder)) report.problem({ file: spec.file, line: 1, rule: 'prettier-ignore', message: `.prettierignore still holds the ${spec.placeholder} placeholder`, fix: 'Replace it with one line per pre-existing top-level entry (handbook/, notes.md), or delete it when there is none.' });
   checkWorkspaceNative(root, layout, lines, report);
+  for (const build of nativeScope(root, layout).buildDirs) {
+    if (lines.some((line) => ignoresBuildFolder(line, build.dir))) continue;
+    report.problem({ file: spec.file, line: 1, rule: 'prettier-ignore', message: `no line ignores ${build.dir}/, ${BUILD_WHY(build)}`, fix: `Add the line ${build.dir}/ next to build/ (references/eslint-config-guide.md, When multi-package): format:check otherwise fails on the minified bundle after a deploy build.` });
+  }
+}
+
+/** Whether a .prettierignore or .gitignore line (gitignore semantics) ignores the folder `dir` exactly (or a folder above it that is not app code). */
+function ignoresBuildFolder(line, dir) {
+  if (line.startsWith('!')) return false;
+  const clean = line.replace(/^\/+/, '').replace(/\/+$/, '').replace(/\/\*\*$/, '');
+  return clean === dir || clean === `**/${dir}`;
 }
 
 /** Whether a .prettierignore line (gitignore semantics) ignores the folder `<dir>/<native>/`. */
@@ -923,12 +957,49 @@ function checkKnip(root, layout, report) {
       report.problem({ file: spec.file, line: 1, rule: 'knip-config', message: `entry adds "${glob}"; every export of an entry file counts as used, so knip stops reporting dead exports there`, fix: 'List the exact file a tool loads by path (a config plugin), or tag its export /** @public */.' });
     }
   }
+  checkBackendBuildGitignore(root, layout, report);
+  if (layout.mode === 'monorepo') checkBackendKnip(root, data, spec, report);
   const rules = data.rules ?? {};
   for (const name of spec.requiredRules) {
     if (!(name in rules)) report.problem({ file: spec.file, line: 1, rule: 'knip-config', message: `rules.${name} is missing`, fix: `Add "${name}": "${spec.severity}" (templates/knip.json).` });
   }
   for (const [name, value] of Object.entries(rules)) {
     if (value !== spec.severity) report.problem({ file: spec.file, line: 1, rule: 'knip-config', message: `rules.${name} is ${show(value)}; every knip rule is "${spec.severity}"`, fix: `Set "${name}": "${spec.severity}"; delete the unused code instead of hiding it.` });
+  }
+}
+
+/** A test glob (src/**\/*.test.ts): test files export nothing, so as entries they hide no dead export. */
+const TEST_ENTRY = /\.test\.(?:\{[^}]*\}|[a-z]+)$/;
+
+/**
+ * A Node backend's entry file exports every deployed function by design and nothing imports them, so
+ * its knip workspace keeps includeEntryExports off (the entry's exports count as used) and names that
+ * file exactly: a folder-wide entry would count every export of the backend as used.
+ */
+function checkBackendKnip(root, data, spec, report) {
+  for (const backend of backendWorkspaces(root)) {
+    const config = data.workspaces?.[backend.dir];
+    if (config === null || typeof config !== 'object') continue;
+    if (config.includeEntryExports === true) report.problem({ file: spec.file, line: 1, rule: 'knip-config', message: `workspaces.${backend.dir} sets includeEntryExports: true, so knip reports every function the entry exports for deploy as unused`, fix: `Remove it for ${backend.dir} (a Node backend: the deploy runtime loads every export of its entry) and keep "entry" the exact file the build bundles; shared packages keep includeEntryExports: true.` });
+    for (const glob of (Array.isArray(config.entry) ? config.entry : typeof config.entry === 'string' ? [config.entry] : []).filter((entry) => !isExactGlob(entry) && !TEST_ENTRY.test(entry))) {
+      report.problem({ file: spec.file, line: 1, rule: 'knip-config', message: `workspaces.${backend.dir} entry adds "${glob}"; every export of an entry file counts as used, so knip stops reporting dead exports there`, fix: `List the exact file the deploy build bundles (src/index.ts) and the test glob (src/**/*.test.ts) only.` });
+    }
+  }
+}
+
+/**
+ * knip reads .gitignore and takes a workspace's package.json "main" as an entry, so a Node backend's
+ * built bundle (functions/lib/index.js) is analysed unless git ignores the folder: its inlined
+ * imports become "Unlisted dependencies" after a deploy build (verified with knip 6.38.0).
+ */
+function checkBackendBuildGitignore(root, layout, report) {
+  const builds = nativeScope(root, layout).buildDirs;
+  if (builds.length === 0) return;
+  const path = join(root, '.gitignore');
+  const lines = existsSync(path) ? readFileSync(path, 'utf8').split('\n').map((line) => line.trim()).filter((line) => line !== '' && !line.startsWith('#')) : [];
+  for (const build of builds) {
+    if (lines.some((line) => ignoresBuildFolder(line, build.dir))) continue;
+    report.problem({ file: '.gitignore', line: 1, rule: 'knip-config', message: `no line ignores ${build.dir}/, ${BUILD_WHY(build)}`, fix: `Add the line /${build.dir}/ to .gitignore: knip reads .gitignore and otherwise analyses the bundle through "main" ("Unlisted dependencies" for everything it inlined), and git would commit generated code.` });
   }
 }
 

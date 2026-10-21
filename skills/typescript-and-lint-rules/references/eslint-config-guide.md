@@ -435,6 +435,27 @@ TypeScript under `src/`, `test/`, `scripts/` and `__mocks__/`.
   own `.gitignore` from the Expo template (`/ios`, `/android`) or add `apps/*/ios` and `apps/*/android`
   to the root `.gitignore`. ESLint and tsc need nothing: generated native folders hold no `.ts` or
   `.js`, and every checker's repo scan skips each workspace's `ios/` and `android/`.
+- **A Node backend's build output** (a Cloud Functions workspace whose `package.json` `"main"` is
+  `lib/index.js`: the deploy build writes `functions/lib/`) is the one workspace folder the ignore
+  lists name. Add `'functions/lib/**'` to `globalIgnores` next to `'build/**'`, the line
+  `functions/lib/` to `.prettierignore` and `/functions/lib/` to `.gitignore`; `check-configs.mjs`
+  requires all three for every workspace outside `packages/` that is no Expo app and whose `"main"` is
+  built JavaScript outside `src/` (the folder `"main"` names; `eslint-required [backend-build-ignore]`,
+  `prettier-ignore`, `knip-config`), and lets exactly that folder pass `ignore-app-code`
+  (`functions/` and `functions/src/` still fail). Why each: after a real deploy build `eslint .`
+  lints the minified bundle (hundreds of errors) and `format:check` fails on it; knip reads
+  `.gitignore` and takes `"main"` as the workspace's entry, so an unignored bundle reports everything
+  it inlined as "Unlisted dependencies" (verified with knip 6.38.0 on 2026-10-21). The repo scans of
+  every checker (check-source and the rest) skip the folder on their own, and Jest needs nothing (its
+  tests and coverage read only `src/`). Never move the build to a root `build/` folder to dodge the
+  lists: `firebase deploy` reads the bundle at `"main"`, inside the backend's own folder.
+- **knip in a backend workspace**: its entry file (`src/index.ts`, what the esbuild command bundles)
+  exports every deployed function by design, and nothing in the repo imports them. Give the workspace
+  `"entry"` that exact file (plus its tests, `"src/**/*.test.ts"`) and leave `includeEntryExports`
+  off, so knip counts the entry's exports as used and still reports every dead export below it;
+  `includeEntryExports: true` reports each deployed function as an unused export. A folder-wide entry
+  (`"src/**/*.ts"`) would count every export of the backend as used (`knip-config`). Shared packages
+  keep `includeEntryExports: true` (their `exports` map makes every file an entry).
 - The structural comparison accepts these multi-package edits: workspace prefixes on any glob (in the
   groups and in a canonical block's own `files`), extra zones in the 5-zones block (they only add
   bans), and a different import resolver `project` list (block 1 `settings`). knip's `entry` and

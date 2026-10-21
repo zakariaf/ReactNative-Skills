@@ -2,7 +2,8 @@
 # output folders are anchored to the root, so scripts/ios/, scripts/build/, src/features/reports/ and a
 # local module's modules/<name>/ios/ native source stay committed;
 # when multi-package, each app's own .gitignore from the Expo template covers apps/<app>/ios, or add
-# apps/*/ios and apps/*/android here)
+# apps/*/ios and apps/*/android here, and a Node backend's deploy build, /functions/lib/, goes here
+# too: knip reads this file, typescript-and-lint-rules' check-configs requires the line)
 node_modules/
 .expo/
 expo-env.d.ts
