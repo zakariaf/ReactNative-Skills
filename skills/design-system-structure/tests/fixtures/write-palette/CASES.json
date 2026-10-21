@@ -117,6 +117,35 @@
       }
     ]
   },
+  "error-monorepo-several-apps": {
+    "expect": ["ERROR [bad-input] the repo has several Expo apps (apps/mobile, apps/tablet)"],
+    "ops": [
+      { "rename": { "from": "contracts", "to": "apps/mobile/contracts" } },
+      { "rename": { "from": "design", "to": "apps/mobile/design" } },
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      {
+        "write": {
+          "file": "apps/mobile/package.json",
+          "json": { "name": "@tasks/mobile", "dependencies": { "expo": "57.0.27" } }
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/app.config.ts",
+          "content": "// apps/mobile/app.config.ts\nexport default { name: 'Tasks', slug: 'tasks' };\n"
+        }
+      },
+      {
+        "write": {
+          "file": "package.json",
+          "json": { "name": "tasks", "private": true, "workspaces": ["apps/*", "packages/*"] }
+        }
+      },
+      { "write": { "file": "packages/shared/package.json", "json": { "name": "@tasks/shared", "private": true } } },
+      { "write": { "file": "apps/tablet/package.json", "json": { "name": "@tasks/tablet" } } },
+      { "write": { "file": "apps/tablet/app.json", "content": "{ \"expo\": { \"name\": \"Tasks tablet\" } }\n" } }
+    ]
+  },
   "error-no-tokens": {
     "expect": ["ERROR [bad-input] nothing to read: the token file design/tokens.json does not exist"],
     "ops": [{ "delete": "design/tokens.json" }]
@@ -217,6 +246,105 @@
       "export const PALETTE: Palette = { light: LIGHT, dark: DARK };"
     ],
     "ops": [{ "json": { "file": "design/tokens.json", "path": ["color", "dark"], "value": "{color.light}" } }]
+  },
+  "pass-monorepo-app-folder": {
+    "expect": [
+      "// apps/mobile/src/theme/palette.ts",
+      "import type { ColorTokens, Palette } from './theme-types.ts';",
+      "RESULT: PASS"
+    ],
+    "args": "{dir}/apps/mobile --dry-run",
+    "ops": [
+      { "rename": { "from": "contracts", "to": "apps/mobile/contracts" } },
+      { "rename": { "from": "design", "to": "apps/mobile/design" } },
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      {
+        "write": {
+          "file": "apps/mobile/package.json",
+          "json": { "name": "@tasks/mobile", "dependencies": { "expo": "57.0.27" } }
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/app.config.ts",
+          "content": "// apps/mobile/app.config.ts\nexport default { name: 'Tasks', slug: 'tasks' };\n"
+        }
+      },
+      {
+        "write": {
+          "file": "package.json",
+          "json": { "name": "tasks", "private": true, "workspaces": ["apps/*", "packages/*"] }
+        }
+      },
+      { "write": { "file": "packages/shared/package.json", "json": { "name": "@tasks/shared", "private": true } } }
+    ]
+  },
+  "pass-monorepo-config-node": {
+    "expect": [
+      "// apps/mobile/src/theme/palette.ts",
+      "import type { ColorTokens, Palette } from './theme-types';",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      { "rename": { "from": "contracts", "to": "apps/mobile/contracts" } },
+      { "rename": { "from": "design", "to": "apps/mobile/design" } },
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      {
+        "write": {
+          "file": "apps/mobile/package.json",
+          "json": { "name": "@tasks/mobile", "dependencies": { "expo": "57.0.27" } }
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/app.config.ts",
+          "content": "// apps/mobile/app.config.ts\nexport default { name: 'Tasks', slug: 'tasks' };\n"
+        }
+      },
+      {
+        "write": {
+          "file": "package.json",
+          "json": { "name": "tasks", "private": true, "workspaces": ["apps/*", "packages/*"] }
+        }
+      },
+      { "write": { "file": "packages/shared/package.json", "json": { "name": "@tasks/shared", "private": true } } },
+      { "write": { "file": "rn-skills.config.json", "json": { "importExtensions": "node" } } }
+    ]
+  },
+  "pass-monorepo-root": {
+    "expect": [
+      "// apps/mobile/src/theme/palette.ts",
+      "import type { ColorTokens, Palette } from './theme-types.ts';",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      { "rename": { "from": "contracts", "to": "apps/mobile/contracts" } },
+      { "rename": { "from": "design", "to": "apps/mobile/design" } },
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      {
+        "write": {
+          "file": "apps/mobile/package.json",
+          "json": { "name": "@tasks/mobile", "dependencies": { "expo": "57.0.27" } }
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/app.config.ts",
+          "content": "// apps/mobile/app.config.ts\nexport default { name: 'Tasks', slug: 'tasks' };\n"
+        }
+      },
+      {
+        "write": {
+          "file": "package.json",
+          "json": { "name": "tasks", "private": true, "workspaces": ["apps/*", "packages/*"] }
+        }
+      },
+      { "write": { "file": "packages/shared/package.json", "json": { "name": "@tasks/shared", "private": true } } }
+    ]
+  },
+  "pass-single-app-imports": {
+    "expect": ["// src/theme/palette.ts", "import type { ColorTokens, Palette } from './theme-types';", "RESULT: PASS"],
+    "ops": []
   },
   "pass-unchanged": { "expect": ["unchanged src/theme/palette.ts", "RESULT: PASS"], "args": "{dir}", "ops": [] }
 }

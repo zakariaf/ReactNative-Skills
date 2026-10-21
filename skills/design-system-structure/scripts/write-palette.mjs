@@ -9,6 +9,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, posix } from 'node:path';
 
 import { createReporter, fail, parseArgs, requireDir, resolveLayout, run } from './check-lib.mjs';
+import { enclosingWorkspaceRepo, expoAppDirs, importExtensionsMode, prefixedReporter } from './lib/expo-apps.mjs';
 import { modulePaths, readContract } from './lib/design-contract.mjs';
 import { applyExceptions, readContrastContract, schemeProblems, tableFor } from './lib/palette-rules.mjs';
 import { getPath, primitiveName, resolveTokens } from './lib/token-file.mjs';
@@ -40,6 +41,10 @@ const SPEC = {
     'The pairs: contracts/contrast.json (rn-skills.config.json "contrastContract" moves it; accessibility-as-code',
     'owns its keys), matched by the palette file and export, plus the core pairs; without it, the default pairs.',
     'Translucent #RRGGBBAA colours are painted over their ground first, as accessibility-as-code does.',
+    'In a workspace repo (package.json "workspaces") run from the root, it writes into the one Expo app workspace',
+    '(pass the app folder when there are several); line 1 names the repo path (// apps/mobile/src/theme/palette.ts)',
+    'and the import keeps its .ts extension (rn-skills.config.json "importExtensions": "node" turns that off).',
+    'The options are paths inside the app folder.',
     '',
     'Examples:',
     '  node write-palette.mjs . --dry-run',
@@ -57,13 +62,30 @@ function readTokens(root, rel) {
   }
 }
 
-/** The import specifier of theme-types from the palette file: a sibling, else the @/ alias. */
-function themeTypesImport(layout, out, themeTypes) {
-  const relative = posix.relative(posix.dirname(out), themeTypes).replace(/\.ts$/, '');
+/**
+ * The import specifier of theme-types from the palette file: a sibling, else the @/ alias. With
+ * `withExtension` (a workspace repo's lint: relative and @/ imports write their extension) it keeps .ts.
+ */
+function themeTypesImport(layout, out, themeTypes, withExtension) {
+  const ext = withExtension ? '.ts' : '';
+  const relative = posix.relative(posix.dirname(out), themeTypes).replace(/\.ts$/, ext);
   if (!relative.startsWith('.')) return `./${relative}`;
   if (!relative.startsWith('..')) return relative;
   const alias = layout.aliases.find((entry) => entry.pattern === '@/*');
-  return alias && themeTypes.startsWith(`${layout.srcDir}/`) ? `@/${themeTypes.slice(layout.srcDir.length + 1).replace(/\.ts$/, '')}` : relative;
+  return alias && themeTypes.startsWith(`${layout.srcDir}/`) ? `@/${themeTypes.slice(layout.srcDir.length + 1).replace(/\.ts$/, ext)}` : relative;
+}
+
+/**
+ * Where the palette is written: the app folder, the path of that folder from the repo root ('' for a
+ * single app, 'apps/mobile' for an Expo app workspace) and the repo root. Run from the root of a
+ * workspace repo it picks the one Expo app workspace; run on an app folder it finds the repo above.
+ */
+function appOf(root) {
+  const dirs = expoAppDirs(root);
+  if (dirs.length > 1) fail(`the repo has several Expo apps (${dirs.join(', ')}), so the palette has no single home`, `Pass the app folder: node write-palette.mjs ${dirs[0]} --dry-run`);
+  if (dirs[0] !== '.') return { appRoot: join(root, dirs[0]), prefix: dirs[0], repoRoot: root };
+  const enclosing = enclosingWorkspaceRepo(root);
+  return enclosing ? { appRoot: root, prefix: enclosing.prefix, repoRoot: enclosing.root } : { appRoot: root, prefix: '', repoRoot: root };
 }
 
 function objectLines(name, colors, raw, path) {
@@ -76,9 +98,9 @@ function objectLines(name, colors, raw, path) {
   return lines;
 }
 
-export function paletteModule({ out, importPath, tokensRel, tokenPath, exportName, sets, raw }) {
+export function paletteModule({ out, header = out, importPath, tokensRel, tokenPath, exportName, sets, raw }) {
   const blocks = [
-    `// ${out}`,
+    `// ${header}`,
     `// Written by write-palette.mjs from ${tokensRel} ("${tokenPath}"). Change the token file, then rerun.`,
     `import type { ColorTokens, Palette } from '${importPath}';`,
     '',
@@ -109,22 +131,22 @@ function schemesOf(sets) {
   return schemes;
 }
 
-function writeModule(report, root, { out, text, isForced }) {
+function writeModule(report, root, { out, shown = out, text, isForced }) {
   const abs = join(root, out);
   if (existsSync(abs) && readFileSync(abs, 'utf8') === text) {
-    report.note(`unchanged ${out}`);
+    report.note(`unchanged ${shown}`);
   } else if (existsSync(abs) && !isForced) {
     report.problem({ file: out, rule: 'palette-exists', message: 'the palette module already holds other colours', fix: 'Pass --dry-run to compare first, then --force to overwrite it.' });
   } else {
     mkdirSync(dirname(abs), { recursive: true });
     writeFileSync(abs, text);
-    report.note(`wrote ${out}`);
+    report.note(`wrote ${shown}`);
   }
 }
 
 run(async () => {
   const { options, positionals } = parseArgs(process.argv.slice(2), SPEC);
-  const root = requireDir(positionals[0] ?? '.', 'app repo root');
+  const { appRoot: root, prefix, repoRoot } = appOf(requireDir(positionals[0] ?? '.', 'app repo root'));
   const layout = resolveLayout(root);
   const { contract } = readContract(root, layout);
   const paths = modulePaths(layout, contract);
@@ -134,13 +156,14 @@ run(async () => {
   const out = options.out ?? first?.file ?? paths.palette;
   const exportName = options.export ?? first?.export ?? 'PALETTE';
   const raw = readTokens(root, tokensRel);
-  const report = createReporter({ name: 'write-palette' });
+  const results = createReporter({ name: 'write-palette' });
+  const report = prefixedReporter(results, prefix || '.');
   const { tree, problems } = resolveTokens(raw);
   for (const entry of problems) report.problem({ file: tokensRel, rule: 'token-file', message: entry.message, fix: 'Point the alias at an existing token ({group.name}).' });
   const sets = getPath(tree, tokenPath);
   if (!sets || typeof sets.light !== 'object' || typeof sets.dark !== 'object') {
     report.problem({ file: tokensRel, rule: 'token-file', message: `"${tokenPath}" holds no { light, dark } colours`, fix: 'Pass --token with the path of the semantic colours.' });
-    return report.finish({ checked: 1, unit: 'token files' });
+    return results.finish({ checked: 1, unit: 'token files' });
   }
   const table = tableFor(readContrastContract(root, layout), { file: out, exportName });
   report.note(`pairs: ${table.source ?? 'the default pairs'} plus the core pairs (${table.text.length} text, ${table.graphics.length} graphics, ${table.shapes.length} shapes)`);
@@ -152,10 +175,12 @@ run(async () => {
   if (sets.colorBlind && !STATUS_FIELDS.some((field) => ['light', 'dark'].some((scheme) => sets.colorBlind[scheme]?.[field] !== sets[scheme][field]))) {
     report.problem({ file: tokensRel, rule: 'palette-colorblind', message: `${tokenPath}.colorBlind changes no primary or status colour, so the colour-blind setting would change nothing`, fix: 'Give the variant distinguishable status colours, or drop it and carry meaning by shape and text.' });
   }
-  if (report.count === 0) {
-    const text = paletteModule({ out, importPath: themeTypesImport(layout, out, paths.themeTypes), tokensRel, tokenPath, exportName, sets, raw });
+  if (results.count === 0) {
+    const importPath = themeTypesImport(layout, out, paths.themeTypes, importExtensionsMode(repoRoot) === 'all');
+    const header = prefix === '' ? out : `${prefix}/${out}`;
+    const text = paletteModule({ out, header, importPath, tokensRel, tokenPath, exportName, sets, raw });
     if (options['dry-run']) console.log(text);
-    else writeModule(report, root, { out, text, isForced: options.force });
+    else writeModule(report, root, { out, shown: header, text, isForced: options.force });
   }
-  return report.finish({ checked: schemesOf(sets).length, unit: 'schemes' });
+  return results.finish({ checked: schemesOf(sets).length, unit: 'schemes' });
 });

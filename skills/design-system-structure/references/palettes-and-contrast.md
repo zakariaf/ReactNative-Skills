@@ -127,6 +127,11 @@ pairs on each scheme and writes nothing while a pair fails. An existing file wit
 refused (`palette-exists`) until `--force`; an identical one prints `unchanged`. The output is
 Prettier-formatted already, so regenerating never produces a diff by itself.
 
+Line 1 names the file's repo path and the import of `theme-types` follows the repo's lint: in a
+single app `// src/theme/palette.ts` and `'./theme-types'`; in a workspace repo, run from the root or
+on the app folder, `// apps/mobile/src/theme/palette.ts` and `'./theme-types.ts'`
+(tokens-and-contract.md, "When multi-package").
+
 ## Fixing a failing pair
 
 Change the colour in the token file, never the table: keep the hue and move the lightness until the

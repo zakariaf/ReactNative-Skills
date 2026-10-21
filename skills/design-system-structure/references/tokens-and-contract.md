@@ -230,7 +230,12 @@ file, `src/`, `app.config.ts` and `package.json` are read from, so contract path
 (`"tokens": "design/tokens.json"`), and every problem names the file from the repo root
 (`FAIL apps/mobile/app.config.ts:9 [color-scheme-config] ...`). The output starts with an `apps:`
 line naming the apps found. Passing the app folder (`check-design-system.mjs apps/mobile`) checks that
-app alone.
+app alone. `write-palette.mjs` writes into the one Expo app workspace (pass the app folder when the
+repo has several), names the repo path on line 1 (`// apps/mobile/src/theme/palette.ts`, the
+naming-conventions header rule) and writes its import with the extension
+(`'./theme-types.ts'`), as the canonical ESLint config requires in multi-package mode
+(typescript-and-lint-rules' check-source: `"importExtensions"` in `rn-skills.config.json`, else
+`all` in a workspace repo).
 
 When the design system lives in a package instead (`packages/ui/src/theme`, consumed by the apps as
 `@<org>/ui`), point the checkers at it with `rn-skills.config.json` (`themeDir`, `uiDir`) or the
