@@ -343,5 +343,65 @@
         }
       }
     ]
+  },
+  "pass-pure-package-port": {
+    "expect": [
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "$comment": "a pure package may declare a port and its fake (both pure TypeScript) for the apps and the backend to share; they live where they live in an app, src/services/<concern>/, and the adapters stay in the apps",
+        "write": {
+          "file": "packages/core/src/services/clock/clock-port.ts",
+          "lines": [
+            "/** The clock every package and app reads time through (pure: a type only). */",
+            "export type ClockPort = { readonly nowMs: () => number };"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "packages/core/src/services/clock/fake-clock.ts",
+          "lines": [
+            "import type { ClockPort } from './clock-port.ts';",
+            "",
+            "/** A clock the test sets by hand. */",
+            "export const createFakeClock = (startMs: number): ClockPort => ({ nowMs: () => startMs });"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "packages/core/src/services/clock/fake-clock.test.ts",
+          "lines": [
+            "import { createFakeClock } from './fake-clock.ts';",
+            "",
+            "describe('createFakeClock', () => {",
+            "  it('returns the start time', () => {",
+            "    expect(createFakeClock(5).nowMs()).toBe(5);",
+            "  });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-pure-package-port-outside-services": {
+    "expect": [
+      "[placement]",
+      "packages/core/src/time/clock-port.ts"
+    ],
+    "ops": [
+      {
+        "$comment": "one home for ports in every scope, a pure package included: the port-triple check and every reader find it there",
+        "write": {
+          "file": "packages/core/src/time/clock-port.ts",
+          "lines": [
+            "/** The clock every package and app reads time through (pure: a type only). */",
+            "export type ClockPort = { readonly nowMs: () => number };"
+          ]
+        }
+      }
+    ]
   }
 }

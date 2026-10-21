@@ -144,6 +144,19 @@ never imports `apps/mobile/src/features/lists`, and so on. Vendor SDKs stay in a
 (`packages/<name>/src/services/<concern>/*-adapter.ts`), and every SDK a package imports needs the same
 classification (`vendorSdks` or `portlessSdks`) as in an app.
 
+- **Ports have one home in every scope, a pure package included** (intended, decided 2026-10-22). A
+  pure package may declare a port its apps and the backend share (`packages/core/src/services/clock/
+  clock-port.ts`) and its fake (`fake-clock.ts`, with its test): both are pure TypeScript, so they
+  stay in `src/services/<concern>/` as in an app, and `check-layout` fails a port, adapter or fake
+  elsewhere (`placement`). The adapters live in the apps (a pure package imports no SDK), and the
+  port-triple check then finds the port where every reader looks for it. A shared domain type that is
+  not a port (a `Task` schema) is not a `*-port.ts` and lives in the package's domain folder.
+- **A package's `scripts/` folder is Node tooling** (an independent oracle, a vector writer): its
+  `exports` map serves `src/` only, so nothing bundles it. `check-boundaries` treats
+  `packages/<name>/scripts/**` as Node world: Node built-ins and `../` imports are fine there, the
+  package's `src/` importing it fails `no-tooling-import`, and `src/` itself stays bundled code
+  (`node-builtin` still fails there).
+
 ## What the checkers prove
 
 | Rule | Checker | Catches |
