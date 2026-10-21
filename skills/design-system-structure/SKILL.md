@@ -147,7 +147,9 @@ switched on in the contract or the tokens (`no-gradient`, `no-pill`, `PRESS.kind
    `npx eslint . --max-warnings 0`, `npx jest --ci`, then
    `node ${CLAUDE_SKILL_DIR}/scripts/check-design-system.mjs .` and
    `node ${CLAUDE_SKILL_DIR}/scripts/check-raw-values.mjs .`. Every `FAIL` line names the file, the
-   rule and the fix: fix the code or the token file, never the contrast pairs.
+   rule and the fix: fix the code or the token file, never the contrast pairs. In a workspace repo
+   the same commands check each Expo app workspace (`apps/mobile`) from the root
+   (tokens-and-contract.md, "When multi-package").
 8. **Report** in plain words what changed, which checks passed, which SKIP lines remain and who
    creates their targets, and any value chosen where the design was silent (the decision log). Ask
    the reviewer before changing a token the design fixed or adding a contrast exception.
@@ -241,8 +243,8 @@ switched on in the contract or the tokens (`no-gradient`, `no-pill`, `PRESS.kind
 | `scripts/write-palette.mjs` | Generator: `palette.ts` from the token file, refused while a pair fails | Workflow step 3 |
 | `scripts/selftest.mjs` | Proves the three scripts on the shipped templates and every planted bug | After changing a script or a template |
 | `scripts/check-lib.mjs` | Shared script helper, synced (do not edit here) | Never by hand |
-| `scripts/lib/` | Token file reader, contract reader, contrast maths and the contrast-contract reader, font table reader, source and import helpers, the synced TypeScript module loader | Never directly |
-| `assets/shared.json` | Declares the synced files (check-lib, the module loader, the canonical theme, AppText, the balance hook, the press feedback context and the demo token file) | When adding a shared file |
+| `scripts/lib/` | Token file reader, contract reader, contrast maths and the contrast-contract reader, font table reader, source and import helpers, the synced TypeScript module loader and Expo-app workspace finder (`expo-apps.mjs`) | Never directly |
+| `assets/shared.json` | Declares the synced files (check-lib, the module loader, the Expo-app workspace finder, the canonical theme, AppText, the balance hook, the press feedback context and the demo token file) | When adding a shared file |
 | `assets/default-contrast.json` | The default pairs: a verbatim copy of accessibility-as-code's `contracts/contrast.json` template, read when the app has no contrast contract | Never by hand (copy the template again when it changes) |
 | `tests/fixtures/` | Overlay cases per script: good, planted bad, SKIP, NOT APPLICABLE and note cases | When adding a rule |
 | `tests/bases/` | The base app (the bundled-font variant: stub fonts with real metrics, their `fonts.ts` and contract; app config, root layout) and the raw-values base with silent planted findings in installed skills | When a case needs a new base file |

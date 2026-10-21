@@ -9,6 +9,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join, posix } from 'node:path';
 
 import { createReporter, fail, lineOf, notYetCreated, parseArgs, requireDir, resolveLayout, run, sha256, walkRepo } from './check-lib.mjs';
+import { forEachExpoApp } from './lib/expo-apps.mjs';
 import { enableAppImports, errorText, lineOfExport } from './lib/app-modules.mjs';
 import { aliasesOf, closingIndex, constExpression, constInitializer, diffObject, functionRange, importsOf, inRanges, jsxAttribute, lineOfPattern, masked, normalDir, openingTagEnd, readSource, sameValue, show, specifierNames, splitTopLevel, typeRange, valueExpression, within } from './lib/app-source.mjs';
 import { SYSTEM_FONT, bundledFonts, lightOnlyReason, modulePaths, otherStylingPackage, readContract, weightByOf } from './lib/design-contract.mjs';
@@ -88,6 +89,8 @@ const SPEC = {
     '  text-locale-provided        a multi-script app mounts no TextLocaleProvider (SKIP until src/i18n exists)',
     '',
     'Folders come from the canonical layout: src/ (rn-skills.config.json "srcDir"; "." for an app without src/),',
+    'In a workspace repo (package.json "workspaces") whose root is no app, each Expo app workspace (apps/mobile: an',
+    'app config, else an expo dependency) is checked as an app with its own contracts/, and files show from the root.',
     'routes in src/app or app/ at the root; the contract "files" key moves single modules.',
     'NOT APPLICABLE when package.json has another styling system (nativewind, tamagui, restyle, unistyles,',
     'styled-components) and the theme folder does not exist.',
@@ -1148,14 +1151,12 @@ function checkProviders(ctx, fonts) {
   }
 }
 
-run(async () => {
-  const { options, positionals } = parseArgs(process.argv.slice(2), SPEC);
-  const root = requireDir(positionals[0] ?? '.', 'app repo root');
-  const report = createReporter({ name: 'check-design-system', json: options.json });
+/** One Expo app: its own folder is the root every path of its contract and layout is read from. */
+async function checkApp(root, options, report) {
   const themeDir = resolveLayout(root).themeDir;
   if (!existsSync(join(root, themeDir))) {
     const other = otherStylingPackage(root);
-    if (other) return report.notApplicable(`${other} is in package.json and ${themeDir} does not exist: the app styles through ${other}`);
+    if (other) return { notApplicable: `${other} is in package.json and ${themeDir} does not exist: the app styles through ${other}` };
     fail(`nothing to check: ${themeDir} does not exist`, 'Copy the templates (templates/src/theme, templates/src/ui, templates/contracts, templates/design) into the app, or pass the repo root as the argument.');
   }
   const ctx = createContext(root, options, report);
@@ -1171,5 +1172,14 @@ run(async () => {
   checkFonts(ctx, fonts);
   checkColorSchemeConfig(ctx);
   checkProviders(ctx, fonts);
-  return report.finish({ checked: ctx.checked, unit: 'modules and facts' });
+  return { checked: ctx.checked };
+}
+
+run(async () => {
+  const { options, positionals } = parseArgs(process.argv.slice(2), SPEC);
+  const root = requireDir(positionals[0] ?? '.', 'app repo root');
+  const report = createReporter({ name: 'check-design-system', json: options.json });
+  const result = await forEachExpoApp(root, report, (appRoot, appReport) => checkApp(appRoot, options, appReport));
+  if (result.notApplicable !== null) return report.notApplicable(result.notApplicable);
+  return report.finish({ checked: result.checked, unit: 'modules and facts' });
 });

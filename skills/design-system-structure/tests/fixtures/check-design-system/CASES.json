@@ -531,6 +531,32 @@
       }
     ]
   },
+  "bad-monorepo-color-scheme": {
+    "expect": ["apps/mobile/app.config.ts:9 [color-scheme-config] userInterfaceStyle is \"light\", not \"automatic\""],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "  userInterfaceStyle: 'automatic',\n",
+          "with": "  userInterfaceStyle: 'light',\n"
+        }
+      },
+      { "rename": { "from": "app.config.ts", "to": "apps/mobile/app.config.ts" } },
+      { "rename": { "from": "assets", "to": "apps/mobile/assets" } },
+      { "rename": { "from": "contracts", "to": "apps/mobile/contracts" } },
+      { "rename": { "from": "design", "to": "apps/mobile/design" } },
+      { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      { "rename": { "from": "tsconfig.json", "to": "apps/mobile/tsconfig.json" } },
+      {
+        "write": {
+          "file": "package.json",
+          "json": { "name": "tasks", "private": true, "workspaces": ["apps/*", "packages/*"] }
+        }
+      },
+      { "write": { "file": "packages/shared/package.json", "json": { "name": "@tasks/shared", "private": true } } }
+    ]
+  },
   "bad-motion-mismatch": {
     "expect": ["[theme-mismatch] MOTION_MS.pressIn is 90, the token file says 70", "src/theme/motion.ts:"],
     "ops": [{ "replace": { "file": "src/theme/motion.ts", "find": "  pressIn: 70,\n", "with": "  pressIn: 90,\n" } }]
@@ -1207,6 +1233,26 @@
     "expect": ["ERROR [bad-input] contracts/design-system.json: \"lightOnly\" needs a \"reason\""],
     "ops": [{ "json": { "file": "contracts/design-system.json", "path": ["lightOnly"], "value": { "reason": " " } } }]
   },
+  "error-monorepo-no-theme": {
+    "expect": ["ERROR [bad-input] apps/mobile: nothing to check: src/theme does not exist"],
+    "ops": [
+      { "delete": "src/theme" },
+      { "rename": { "from": "app.config.ts", "to": "apps/mobile/app.config.ts" } },
+      { "rename": { "from": "assets", "to": "apps/mobile/assets" } },
+      { "rename": { "from": "contracts", "to": "apps/mobile/contracts" } },
+      { "rename": { "from": "design", "to": "apps/mobile/design" } },
+      { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      { "rename": { "from": "tsconfig.json", "to": "apps/mobile/tsconfig.json" } },
+      {
+        "write": {
+          "file": "package.json",
+          "json": { "name": "tasks", "private": true, "workspaces": ["apps/*", "packages/*"] }
+        }
+      },
+      { "write": { "file": "packages/shared/package.json", "json": { "name": "@tasks/shared", "private": true } } }
+    ]
+  },
   "error-no-theme": {
     "expect": ["ERROR [bad-input] nothing to check: src/theme does not exist"],
     "ops": [{ "delete": "src/theme" }]
@@ -1435,6 +1481,28 @@
           "with": "<AppThemeProvider preference=\"light\">"
         }
       }
+    ]
+  },
+  "pass-monorepo": {
+    "expect": [
+      "apps: apps/mobile (the Expo app workspaces of package.json \"workspaces\"), each checked as an app",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      { "rename": { "from": "app.config.ts", "to": "apps/mobile/app.config.ts" } },
+      { "rename": { "from": "assets", "to": "apps/mobile/assets" } },
+      { "rename": { "from": "contracts", "to": "apps/mobile/contracts" } },
+      { "rename": { "from": "design", "to": "apps/mobile/design" } },
+      { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      { "rename": { "from": "tsconfig.json", "to": "apps/mobile/tsconfig.json" } },
+      {
+        "write": {
+          "file": "package.json",
+          "json": { "name": "tasks", "private": true, "workspaces": ["apps/*", "packages/*"] }
+        }
+      },
+      { "write": { "file": "packages/shared/package.json", "json": { "name": "@tasks/shared", "private": true } } }
     ]
   },
   "pass-navigation-theme-component-file": {

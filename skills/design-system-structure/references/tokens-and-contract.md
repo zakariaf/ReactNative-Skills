@@ -222,9 +222,18 @@ mockup, and a value changes only with its entry.
 
 ## When multi-package
 
-In an npm-workspaces monorepo (`apps/*`, `packages/*`) the design system usually lives in one
-package (`packages/ui/src/theme`) consumed by the apps as `@<org>/ui`. Point the checkers at it with
-`rn-skills.config.json` (`themeDir`, `uiDir`) or the contract's `files`, keep one token file and one
-contract per design system, and run the checkers once per app that bundles fonts (fonts and
-`app.config.ts` belong to the app). Package source imports then carry their extension, as the
-canonical ESLint config requires in multi-package mode.
+Run every script from the repo root, as in a single app. In a workspace repo (`package.json`
+`"workspaces"`) whose root is no app, each **Expo app workspace** (a workspace with an
+`app.config.*` or `app.json`; failing that, one that depends on `expo`) is checked as an app of its
+own: `apps/mobile/` is the root its `contracts/design-system.json`, `contracts/contrast.json`, token
+file, `src/`, `app.config.ts` and `package.json` are read from, so contract paths stay app-relative
+(`"tokens": "design/tokens.json"`), and every problem names the file from the repo root
+(`FAIL apps/mobile/app.config.ts:9 [color-scheme-config] ...`). The output starts with an `apps:`
+line naming the apps found. Passing the app folder (`check-design-system.mjs apps/mobile`) checks that
+app alone.
+
+When the design system lives in a package instead (`packages/ui/src/theme`, consumed by the apps as
+`@<org>/ui`), point the checkers at it with `rn-skills.config.json` (`themeDir`, `uiDir`) or the
+contract's `files`, keep one token file and one contract per design system, and run the checkers
+once per app that bundles fonts (fonts and `app.config.ts` belong to the app). Package source
+imports carry their extension, as the canonical ESLint config requires in multi-package mode.
