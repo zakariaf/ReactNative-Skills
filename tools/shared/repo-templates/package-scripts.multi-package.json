@@ -1,0 +1,13 @@
+{
+  "$comment": "When multi-package (npm workspaces): the canonical scripts that take another form. \"scripts\" replace the root scripts of the same name in package-scripts.json (every other root script stays as it is). \"workspaceScripts\" go into every workspace's own package.json, because the root runs them with --workspaces. \"appScripts\" go into every Expo app workspace's package.json: the root export:audit runs the app's own one, so expo export runs inside the app (Metro finds the app's entry there; from the root it looks for the single-app entry and fails) and writes the export to dist-audit at the repo root, where audit:licenses and the bundle audit read it. \"../../\" is the way up from apps/<app>. check-gate-wiring.mjs (quality-gates) and check-skeleton.mjs (expo-project-bootstrap) read this file when package.json has workspaces.",
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json && npm run -s typecheck --workspaces",
+    "export:audit": "npm run -s export:audit --workspaces --if-present"
+  },
+  "workspaceScripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "appScripts": {
+    "export:audit": "APP_VARIANT=production EXPO_PUBLIC_APP_VARIANT=production expo export --platform ios --platform android --source-maps --output-dir ../../dist-audit"
+  }
+}

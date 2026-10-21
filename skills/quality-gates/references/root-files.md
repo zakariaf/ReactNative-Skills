@@ -189,11 +189,12 @@ copy that lost the agent-folder exclusion.
 
 - this skill's files exist (`gate-file-missing`); another skill's gate file that does not exist yet
   is a `SKIP` naming it, and the rules reading it wait;
-- every canonical script is present byte for byte (`npm-script`; the workspace `typecheck` form when
-  multi-package), and every `node <file>` target of a script, a lefthook job or an extra step exists,
+- every canonical script is present byte for byte (`npm-script`; the workspace `typecheck` and
+  `export:audit` forms when multi-package), and every `node <file>` target of a script, a lefthook job or an extra step exists,
   or is another skill's not-yet-created file (`script-target`);
-- `quality-gates.json` is no weaker than the template (`gate-weakened`) and its extra steps are valid
-  (`verify-step`);
+- `quality-gates.json` is no weaker than the template (`gate-weakened`; when multi-package the
+  template's probes and app program carry each Expo app workspace's prefix, and every workspace
+  `tsconfig.json` has a `typescript.projects` entry) and its extra steps are valid (`verify-step`);
 - `.claude/settings.json` keeps every deny and ask rule, both hooks with their commands byte for
   byte, no bypass allow rule and no `disableAllHooks` (`claude-settings`);
 - `lefthook.yml` keeps every job, run line, `glob:` line and secret glob, switches nothing off and

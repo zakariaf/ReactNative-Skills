@@ -1,6 +1,8 @@
 [
   { "from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs" },
+  { "from": "scripts/lib/workspaces.mjs", "to": "scripts/lib/workspaces.mjs" },
   { "from": "repo-templates/package-scripts.json", "to": "templates/package-scripts.json" },
+  { "from": "repo-templates/package-scripts.multi-package.json", "to": "assets/package-scripts.multi-package.json" },
   { "from": "repo-templates/lefthook.yml", "to": "templates/lefthook.yml" },
   { "from": "repo-templates/quality-gates.json", "to": "templates/quality-gates.json" },
   { "from": "repo-templates/dot-claude/settings.json", "to": "assets/claude-settings.json" },

@@ -104,14 +104,17 @@ is missing, weakened or bypassed.
    root. Fix every `FAIL` line (each names the file, the rule and the fix) and rerun until both print
    `RESULT: PASS`. Before a push, `npm run verify` must be green.
 
-**When multi-package** (npm workspaces): `typecheck` takes the workspace form in
-`assets/package-scripts.multi-package.json` (each workspace keeps its own `typecheck` script),
-`quality-gates.json` lists each program under `typescript.projects` (a glob such as
-`apps/*/tsconfig.json` covers new ones), knip gets one `workspaces` entry per package, and the one
+**When multi-package** (npm workspaces): `typecheck` and `export:audit` take the workspace forms in
+`assets/package-scripts.multi-package.json` (each workspace keeps its own `typecheck` script, each
+Expo app its own `export:audit`, which runs `expo export` inside the app into the root `dist-audit/`),
+`quality-gates.json` lists every workspace program under `typescript.projects` (a glob such as
+`apps/*/tsconfig.json` covers new ones; the app program keeps `["jest"]`), the ESLint probes name the
+app workspace (`apps/<app>/src/core/gate-probe.ts`), knip gets one `workspaces` entry per package, and the one
 root `jest.config.js` writes its test roots, coverage glob and logic keys in workspace form
 (`<rootDir>/apps/*/src/**/`, `./packages/core/src/`), restated in `quality-gates.json` `jest` in the
 same gate change. The gate files stay at the repo root; `check-gate-wiring.mjs` reads the workspaces
-from `package.json` and compares the Jest scope with the canonical one, workspace prefixes stripped.
+from `package.json`, puts each Expo app workspace's prefix on the baseline probes and app program, and
+compares the Jest scope with the canonical one, workspace prefixes stripped.
 
 ## Definition of done
 
@@ -185,12 +188,13 @@ from `package.json` and compares the Jest scope with the canonical one, workspac
 | `templates/dot-npmrc` | dependency-management's `.npmrc` policy (synced; copy as `.npmrc`) | Only when its owner has not written it |
 | `assets/claude-settings.json` | The deny rules (iOS and Android keys, hook bypasses), the ask rules (gate files), the PostToolUse and Stop hooks (canonical, owned here, synced; merge into `.claude/settings.json`) | Workflow step 2 |
 | `assets/jest-config-baseline.js` | unit-and-component-tests' canonical `jest.config.js` (synced, never copied into the app): the scope values `jest-scope` compares with | Read only to see the canonical scope |
-| `assets/package-scripts.multi-package.json` | The scripts that change when multi-package | When package.json has workspaces |
+| `assets/package-scripts.multi-package.json` | The root scripts that change when multi-package (`typecheck`, `export:audit`), the script every workspace keeps and the one every Expo app keeps (synced; do not edit here) | When package.json has workspaces |
 | `assets/gate-question.md` | The one-message note to the developer when a gate looks wrong | Workflow step 5 |
 | `assets/shared.json` | Declares the files synced from the library (edit the canonical copies, never these) | When adding a shared file |
 | `scripts/check-gate-wiring.mjs` | Checks gate files, scripts and their targets, hooks (commands byte for byte), settings and the local overrides, `.npmrc`, linter options, thresholds and logic folder keys, the Jest coverage and test scope, verify extra steps, knip reasons, that `quality-gates.json` is no weaker than the baseline, and that no gate reaches into agent folders while knip ignores them (14 rules) | Workflow steps 3 and 8 |
 | `scripts/check-bypasses.mjs` | Finds suppressions, ignore comments, hook bypasses, auto-updated snapshots, relaxed ESLint flags and stale release-age exceptions anywhere in the repo (11 rules) | Workflow step 8 and the definition of done |
 | `scripts/lib/not-weaker.mjs` | The direction-aware comparison the wiring check uses | Read only to change a rule |
+| `scripts/lib/workspaces.mjs` | Shared workspace helper (synced; do not edit here): tells an Expo app workspace from a package | Never by hand |
 | `scripts/lib/workspace-scope.mjs` | The workspace form of the Jest scope (prefixes from `package.json` `workspaces`, the single-app form, logic-key counterparts, reach probes) | Read only to change the multi-package rules |
 | `scripts/selftest.mjs` | Proves both checkers on good fixtures and every planted bug | After changing a checker, a template or a fixture |
 | `scripts/check-lib.mjs` | Shared script helper, synced from the library (do not edit here) | Never by hand |

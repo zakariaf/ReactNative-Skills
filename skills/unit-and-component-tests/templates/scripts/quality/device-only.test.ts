@@ -69,3 +69,45 @@ describe('deviceOnlyFiles', () => {
     expect(matcher.test(`${root}/src/features/board/draw-boardXts`)).toBe(false);
   });
 });
+
+describe('deviceOnlyFiles when multi-package', () => {
+  const root = mkdtempSync(path.join(tmpdir(), 'device-only-workspaces-'));
+  const write = (file: string, text: string): void => {
+    mkdirSync(path.dirname(path.join(root, file)), { recursive: true });
+    writeFileSync(path.join(root, file), text);
+  };
+
+  beforeAll(() => {
+    write(
+      'package.json',
+      JSON.stringify({
+        workspaces: ['apps/*', 'packages/*', 'functions', '!packages/legacy'],
+      }),
+    );
+    write('apps/mobile/src/services/audio/audio-adapter.ts', MARKED);
+    write('packages/shared/src/clock/system-clock.ts', MARKED);
+    write('functions/src/deploy-entry.ts', MARKED);
+    write('apps/mobile/src/core/plain.ts', 'export const plain = 1;\n');
+    // Outside every workspace's src/: config plugins, a folder no glob declares, a negated workspace.
+    write('apps/mobile/plugins/with-flag.ts', MARKED);
+    write('tools/src/report.ts', MARKED);
+    write('packages/legacy/src/old.ts', MARKED);
+  });
+
+  afterAll(() => {
+    rmSync(root, { recursive: true, force: true });
+  });
+
+  it('lists the marked files under the src/ of every declared workspace', () => {
+    expect(deviceOnlyFiles(root)).toStrictEqual([
+      'apps/mobile/src/services/audio/audio-adapter.ts',
+      'functions/src/deploy-entry.ts',
+      'packages/shared/src/clock/system-clock.ts',
+    ]);
+  });
+
+  it('reads the workspaces of the { "packages": [...] } form too', () => {
+    write('package.json', JSON.stringify({ workspaces: { packages: ['functions'] } }));
+    expect(deviceOnlyFiles(root)).toStrictEqual(['functions/src/deploy-entry.ts']);
+  });
+});

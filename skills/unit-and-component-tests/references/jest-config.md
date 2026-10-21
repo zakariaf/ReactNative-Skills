@@ -386,7 +386,9 @@ One Jest config, run from the repo root, still covers every workspace:
   '<rootDir>/apps/*/plugins/**/', '<rootDir>/test/**/']` (each app keeps its config plugins beside its
   app config; without `scripts/` the device-only helper's own test never runs;
   `jest-orphan-tests` fails it), `collectCoverageFrom: ['<rootDir>/{apps,packages}/*/src/**/*.{ts,tsx}',
-  ...]`, and the device-only helper's `SOURCES` list each workspace's `src/` (`apps/*/src/**/*.ts`, ...).
+  ...]`, and the device-only helper reads the root `package.json` `workspaces` itself, so the marked
+  files of every workspace's `src/` (`apps/*`, `packages/*`, a `functions` backend) leave coverage with
+  the canonical helper unchanged.
 - **Skia in a workspace only.** The template's `HAS_SKIA` reads the root `package.json`; when only an
   app workspace lists Skia, read that workspace's manifest instead (the checker looks at every
   workspace).

@@ -10,8 +10,9 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { AGENT_SKILL_FOLDERS, createReporter, fail, lineOf, maskComments, notYetCreated, parseArgs, PROJECT_CONFIG_FILE, requireDir, resolveLayout, run, toPosix, walk } from './check-lib.mjs';
+import { AGENT_SKILL_FOLDERS, createReporter, fail, globToRegExp, lineOf, maskComments, notYetCreated, parseArgs, PROJECT_CONFIG_FILE, requireDir, resolveLayout, run, toPosix, walk } from './check-lib.mjs';
 import { findWeaker } from './lib/not-weaker.mjs';
+import { isExpoApp } from './lib/workspaces.mjs';
 import { isLogicCounterpart, probeFor, reaches, singleAppForm, singleAppList, workspacePrefixes, workspacesWithSource } from './lib/workspace-scope.mjs';
 
 const SPEC = {
@@ -67,8 +68,11 @@ const SPEC = {
     'The repo root is the optional positional argument (default "."). Expected SKIP lines while other skills',
     'have not run yet, for example: SKIP scripts/git/check-commit-message.ts [script-target] not yet created',
     '(git-commits-and-reporting creates it).',
-    'When multi-package (package.json "workspaces"), the typecheck script is the workspace form in',
-    'assets/package-scripts.multi-package.json, and the Jest scope and logic keys may take their workspace form',
+    'When multi-package (package.json "workspaces"), the typecheck and export:audit scripts are the workspace',
+    'forms in assets/package-scripts.multi-package.json; the baseline ESLint probes and the app program take each',
+    'Expo app workspace\'s prefix (apps/<app>/src/core/gate-probe.ts; apps/<app>/tsconfig.json, matched by a',
+    'typescript.projects key or glob), every workspace tsconfig.json is listed under typescript.projects, and the',
+    'Jest scope and logic keys may take their workspace form',
     '(<rootDir>/apps/*/src/**/, ./packages/core/src/). rn-skills.config.json keys read: "contractsDir" (where',
     'knip-ignores.json lives) and "lefthookPrepare".',
   ].join('\n'),
@@ -132,11 +136,47 @@ function baselineScripts(layout) {
   return { ...scripts, ...readJson(join(SKILL, 'assets', 'package-scripts.multi-package.json')).scripts };
 }
 
-/** The baseline quality-gates.json, its npmScripts taking the workspace forms when multi-package. */
-function baselineGates(scripts) {
+/** The single app's program in the canonical typescript.projects; multi-package, each Expo app workspace's own. */
+const APP_PROGRAM = 'src/tsconfig.json';
+
+/**
+ * The baseline quality-gates.json. Multi-package, its npmScripts take the workspace forms, and the paths
+ * that name the single app's src/ take each Expo app workspace's prefix: the ESLint probes become
+ * apps/<app>/src/... (the guardrail lints those paths), and the app program src/tsconfig.json leaves
+ * typescript.projects (checkWorkspacePrograms matches apps/<app>/tsconfig.json against the app's keys).
+ */
+function baselineGates(scripts, ctx) {
   const gates = readJson(join(TEMPLATES, 'quality-gates.json'));
   for (const name of Object.keys(gates.npmScripts)) gates.npmScripts[name] = scripts[name];
+  if (ctx.layout.mode !== 'monorepo' || ctx.appWorkspaces.length === 0) return gates;
+  gates.eslint.probes = Object.fromEntries(
+    Object.entries(gates.eslint.probes).flatMap(([file, ruleSet]) => (file.startsWith('src/') ? ctx.appWorkspaces.map((dir) => [`${dir}/${file}`, ruleSet]) : [[file, ruleSet]])),
+  );
+  gates.appProgram = gates.typescript.projects[APP_PROGRAM];
+  delete gates.typescript.projects[APP_PROGRAM];
   return gates;
+}
+
+/**
+ * Multi-package: every workspace program is listed under typescript.projects (a literal path or a glob
+ * such as apps/*\/tsconfig.json), so the guardrail compares its compiler options; an Expo app workspace
+ * always is, with no value weaker than the single app's program (types ["jest"], never node).
+ */
+function checkWorkspacePrograms(actual, baseline, ctx, report) {
+  if (baseline.appProgram === undefined) return;
+  const projects = actual.typescript?.projects ?? {};
+  for (const dir of ctx.layout.workspaces.map((workspace) => workspace.dir)) {
+    const isApp = ctx.appWorkspaces.includes(dir);
+    const program = `${dir}/tsconfig.json`;
+    if (!isApp && !existsSync(join(ctx.root, program))) continue;
+    const key = Object.keys(projects).find((pattern) => pattern === program || globToRegExp(pattern).test(program));
+    if (key === undefined) {
+      report.problem({ file: 'quality-gates.json', line: 1, rule: 'gate-weakened', message: `typescript.projects has no entry for ${program}, so the guardrail never compares that program's compiler options${isApp ? ` (baseline ${JSON.stringify(baseline.appProgram)}, the app program)` : ''}`, fix: `Add "${dir.includes('/') ? `${dirname(dir)}/*` : dir}/tsconfig.json" (or the literal path) with the program's types, in the same gate change as the tsconfig.` });
+      continue;
+    }
+    if (!isApp) continue;
+    for (const { path, message } of findWeaker(baseline.appProgram, projects[key], ['typescript', 'projects', key])) report.problem({ file: 'quality-gates.json', line: 1, rule: 'gate-weakened', message: `${path} ${message}`, fix: GATE_FIX });
+  }
 }
 
 function tryJson(root, rel, rule, report) {
@@ -285,12 +325,14 @@ function checkWorkspaceReach(actual, baseline, ctx, report) {
 
 function checkQualityGates(actual, baseline, ctx, report) {
   const { base, app } = forComparison(actual, baseline, ctx);
+  delete base.appProgram;
   for (const { path, message } of findWeaker(base, app)) {
     const form = ctx.prefixes.length > 0 && path.startsWith('jest.') ? ' (compared in its single-app form: workspace prefixes stripped)' : '';
     report.problem({ file: 'quality-gates.json', line: 1, rule: 'gate-weakened', message: `${path} ${message}${form}`, fix: GATE_FIX });
   }
   checkThresholdKeys(actual, baseline, ctx, report);
   if (ctx.layout.mode === 'monorepo') checkWorkspaceReach(actual, baseline, ctx, report);
+  checkWorkspacePrograms(actual, baseline, ctx, report);
 }
 
 function hookCommands(settings, event) {
@@ -606,7 +648,6 @@ run(async () => {
   const report = createReporter({ name: 'check-gate-wiring', json: options.json });
   const ownTools = ownToolFiles();
   const scripts = baselineScripts(layout);
-  const baseline = baselineGates(scripts);
   const present = new Set();
   let checked = 0;
   for (const rel of [...OWN_CONFIGS, ...ownTools]) {
@@ -622,7 +663,9 @@ run(async () => {
   }
   const pkg = tryJson(root, 'package.json', 'npm-script', report) ?? {};
   const prefixes = workspacePrefixes(layout, pkg);
-  const ctx = { root, layout, pkg, prefixes, sourceWorkspaces: workspacesWithSource(root, layout) };
+  const appWorkspaces = layout.workspaces.map((workspace) => workspace.dir).filter((dir) => isExpoApp(root, dir));
+  const ctx = { root, layout, pkg, prefixes, appWorkspaces, sourceWorkspaces: workspacesWithSource(root, layout) };
+  const baseline = baselineGates(scripts, ctx);
   checkScripts(root, layout, pkg, scripts, report);
   const gates = present.has('quality-gates.json') ? tryJson(root, 'quality-gates.json', 'gate-weakened', report) : null;
   const extraTargets = gates ? checkExtraSteps(pkg, gates, report) : [];
