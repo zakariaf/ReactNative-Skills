@@ -77,13 +77,18 @@ describe('deviceOnlyFiles when multi-package', () => {
     writeFileSync(path.join(root, file), text);
   };
 
-  beforeAll(() => {
+  // Each test starts from the full workspace list: one test rewrites package.json, and
+  // test:coverage runs the tests in random order (jest --randomize).
+  beforeEach(() => {
     write(
       'package.json',
       JSON.stringify({
         workspaces: ['apps/*', 'packages/*', 'functions', '!packages/legacy'],
       }),
     );
+  });
+
+  beforeAll(() => {
     write('apps/mobile/src/services/audio/audio-adapter.ts', MARKED);
     write('packages/shared/src/clock/system-clock.ts', MARKED);
     write('functions/src/deploy-entry.ts', MARKED);
