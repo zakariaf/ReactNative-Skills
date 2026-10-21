@@ -114,7 +114,7 @@ comparison belongs to app-variants-and-environment, whose variant names are fixe
 | `importTimeExempt` | globs | files allowed to work at import time (polyfill installers) | layout `import-time-work` |
 | `gameFacing` | globs | more files every game may import: the seam game-session-host defines | boundaries `game-facing`, `game-to-game` |
 | `assetExtensions` | extensions without the dot | more asset extensions, the ones the app added to `metro.config.js` `resolver.assetExts` (`glb`, `obj`, `bin`, `csv`); keep both lists equal | boundaries `test-only-gate` |
-| `packages` | `[{ name, pure?, world?, exports? }]` | when multi-package: every folder under `packages/` | both (multi-package.md) |
+| `packages` | `[{ name, dir?, pure?, world?, exports? }]` | when multi-package: every folder under `packages/`, and a Node backend outside it by its `dir` (`functions`, `world: "node"`) | both (multi-package.md) |
 
 Keep the vendor and ban lists equal to `VENDOR_SDK_PATHS` and `BANNED_PACKAGE_PATHS` in the ESLint
 config: the checker covers resolved paths and subpaths, ESLint gives the editor squiggle.

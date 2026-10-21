@@ -55,9 +55,13 @@ const SPEC = {
     '                    "^@/(.*)$" first (or without the folder mapping), or, with no "@/" mapping of its own,',
     '                    jest-expo derives the map from tsconfig.json paths, which list "@/*" first',
     '  one-react         root overrides pin react or react-native to another version than the app uses',
-    '  workspaces        (multi-package) workspaces is not ["apps/*", "packages/*"], or a package is not recorded',
-    '  manifest          (multi-package) a package lacks "type": "module" or its exports map or has "main"; an app',
-    '                    lacks "main" or has "type": "module" next to a CommonJS metro.config.js',
+    '  workspaces        (multi-package) package.json workspaces is not ["apps/*", "packages/*"] plus the folder of',
+    '                    each Node backend the contract records (packages[].dir outside packages/, such as',
+    '                    "functions"), there is no contract, or a package is not recorded (a workspace outside',
+    '                    packages/ that is no Expo app is a Node backend: { "name", "dir", "world": "node" })',
+    '  manifest          (multi-package) a package lacks "type": "module" or its exports map or has "main"; a Node',
+    '                    backend lacks "type": "module" (its "main" is the deploy bundle, no exports map needed); an',
+    '                    app lacks "main" or has "type": "module" next to a CommonJS metro.config.js',
     '  native-deps       (multi-package) a package peer dependency is missing from an app, or apps pin different versions',
     '',
     'NOT APPLICABLE when no app depends on expo (the entry and route rules assume an Expo app).',
@@ -634,26 +638,50 @@ function checkOneReact(root, manifest, apps, report, { required }) {
   }
 }
 
+/** The workspace globs of the root package.json (a list, or { "packages": [...] }). */
+function workspaceGlobs(manifest) {
+  const value = Array.isArray(manifest.workspaces) ? manifest.workspaces : manifest.workspaces?.packages;
+  return Array.isArray(value) ? value : [];
+}
+
+/**
+ * The root workspaces: apps/* and packages/*, plus the folder of every Node backend the contract records
+ * outside packages/ ("functions"). Read from package.json, never assumed; an entry the contract does not
+ * explain is a problem once the contract exists.
+ */
 function checkWorkspaces(arch, manifest, report) {
-  const want = ['apps/*', 'packages/*'];
-  if (!same(manifest.workspaces, want)) {
-    report.problem({ file: 'package.json', line: 1, rule: 'workspaces', message: `workspaces is ${JSON.stringify(manifest.workspaces)}`, fix: `Set "workspaces": ${JSON.stringify(want)}: apps under apps/, shared packages under packages/.` });
+  const declared = workspaceGlobs(manifest);
+  const backends = (arch.contract.data?.packages ?? []).map((entry) => entry.dir).filter((dir) => typeof dir === 'string' && !dir.startsWith('packages/'));
+  const want = ['apps/*', 'packages/*', ...backends.filter((dir) => !dir.startsWith('apps/'))];
+  const missing = want.filter((glob) => !declared.includes(glob));
+  const extra = arch.contract.data === null ? [] : declared.filter((glob) => !want.includes(glob));
+  if (missing.length > 0 || extra.length > 0) {
+    report.problem({ file: 'package.json', line: 1, rule: 'workspaces', message: `workspaces is ${JSON.stringify(manifest.workspaces)}`, fix: `Set "workspaces": ${JSON.stringify(want)}: apps under apps/, shared packages under packages/, and each Node backend the contract records (packages[].dir) by its folder.` });
   }
   if (arch.contract.data === null) {
-    report.problem({ file: arch.contract.rel, rule: 'workspaces', message: 'a multi-package repo has no architecture contract', fix: 'Copy the skill\'s templates/contracts/architecture.json and record every package under packages/ in "packages" (pure, world).' });
+    report.problem({ file: arch.contract.rel, rule: 'workspaces', message: 'a multi-package repo has no architecture contract', fix: 'Copy the skill\'s templates/contracts/architecture.json and record every package under packages/ in "packages" (pure, world), and a Node backend outside packages/ with its "dir" and "world": "node".' });
     return;
   }
   for (const scope of arch.packageScopes) {
-    if (!scope.declared) report.problem({ file: `${scope.dir}/`, rule: 'workspaces', message: `unexpected package "${scope.name}"`, fix: `Record it in ${arch.contract.rel} "packages" (a new package is an architecture decision: stop and ask), or move the code into an existing package.` });
+    if (scope.declared) continue;
+    const record = scope.isBackend ? `{ "name": "${scope.name}", "dir": "${scope.dir}", "world": "node" } (a workspace outside packages/ that is no Expo app is a Node backend)` : `{ "name": "${scope.name}" } (pure, world)`;
+    report.problem({ file: `${scope.dir}/`, rule: 'workspaces', message: `unexpected package "${scope.name}"`, fix: `Record it in ${arch.contract.rel} "packages" as ${record} (a new package is an architecture decision: stop and ask), or move the code into an existing package.` });
   }
 }
 
 function checkManifests(root, arch, report) {
   for (const scope of arch.packageScopes) {
+    // A backend the contract does not record yet: the workspaces rule reports it, its world decides the rest.
+    if (scope.isBackend && !scope.declared) continue;
     const manifest = scope.manifest ?? {};
     const file = `${scope.dir}/package.json`;
-    const want = scope.declared?.exports ?? { './*': './src/*' };
     if (manifest.type !== 'module') report.problem({ file, line: 1, rule: 'manifest', message: 'no "type": "module"', fix: 'Add "type": "module" so Node type-strips the package without MODULE_TYPELESS_PACKAGE_JSON.' });
+    // A Node backend is imported by nothing: its "main" is the deploy bundle (lib/index.js), and it needs no exports map.
+    if (scope.isBackend) {
+      if (scope.declared.exports !== undefined && !same(manifest.exports, scope.declared.exports)) report.problem({ file, line: 1, rule: 'manifest', message: `exports is ${JSON.stringify(manifest.exports)}`, fix: `Set "exports": ${JSON.stringify(scope.declared.exports)}, the map the contract records.` });
+      continue;
+    }
+    const want = scope.declared?.exports ?? { './*': './src/*' };
     if (!same(manifest.exports, want)) report.problem({ file, line: 1, rule: 'manifest', message: `exports is ${JSON.stringify(manifest.exports)}`, fix: `Set "exports": ${JSON.stringify(want)}; packages are consumed as TypeScript source, no build step, no barrel.` });
     if (manifest.main !== undefined) report.problem({ file, line: 1, rule: 'manifest', message: `"main": "${manifest.main}" (a barrel entry)`, fix: 'Remove "main"; importers name the file (@org/<package>/<path>).' });
   }
@@ -666,7 +694,8 @@ function checkManifests(root, arch, report) {
 }
 
 function checkNativeDeps(arch, report) {
-  const peers = new Set(arch.packageScopes.flatMap((scope) => Object.keys(scope.manifest?.peerDependencies ?? {})));
+  // A Node backend's peers are no app's native modules.
+  const peers = new Set(arch.packageScopes.filter((scope) => !scope.isBackend).flatMap((scope) => Object.keys(scope.manifest?.peerDependencies ?? {})));
   const versions = new Map();
   const workspaceNames = new Set([...arch.packageScopes, ...arch.appScopes].map((scope) => scope.manifest?.name).filter(Boolean));
   for (const app of arch.appScopes) {

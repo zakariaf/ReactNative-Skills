@@ -8,6 +8,7 @@ workspaces. Moving to a monorepo is an architecture decision: stop and ask first
 ## Contents
 
 - The shape
+- A Node backend workspace
 - Recording the packages
 - Manifests
 - Packages are consumed as TypeScript source
@@ -20,10 +21,11 @@ workspaces. Moving to a monorepo is an architecture decision: stop and ask first
 ```
 <repo>/
   package.json            "workspaces": ["apps/*", "packages/*"], "overrides": { react, react-native }
-  contracts/architecture.json   every package under packages/, with its world
+  contracts/architecture.json   every package under packages/, with its world (and a backend's dir)
   apps/<app>/             one Expo app each, with the single-app layout inside (src/app, src/features, ...)
     package.json  app.config.ts  tsconfig.json ("@/*": ["./src/*"])  metro.config.js
   packages/<name>/        shared TypeScript source: package.json, src/
+  functions/              optional: a Node backend (Cloud Functions), listed in "workspaces" by its folder
 ```
 
 Each app keeps every single-app rule inside its own folder (its `src/` zones, its routes, its composition
@@ -31,13 +33,40 @@ root). Package names use one scope, `@<org>/<name>`. Checkers find workspaces fr
 `workspaces`, never from hard-coded folders, and give each workspace its own layout and tsconfig aliases
 (`rn-skills.config.json` `workspaces` can move a workspace's folders).
 
+## A Node backend workspace
+
+A backend that deploys on its own, such as Cloud Functions in `functions/` (cloud-functions-backend, When
+multi-package), is one more workspace: `"workspaces": ["apps/*", "packages/*", "functions"]`. It is no
+app and no shared package: it runs in Node, nothing in an app or a package imports it, and its own folder
+layout (`src/index.ts`, `src/lib/`, `src/config/`) is the backend's, not the app's `src/` zones. Record it
+in the contract with its folder and its world:
+
+```json
+{ "name": "functions", "dir": "functions", "world": "node" }
+```
+
+- `check-layout` then asks of it only what a Node package needs: `"type": "module"` (Node type-strips
+  its `.ts` files, and the deploy bundle is ESM), no `@/*` alias, no `main` of the app's kind. Its
+  `"main"` is the deploy bundle (`lib/index.js`) and it needs no `exports` map; a map the contract
+  records (`exports`) must match.
+- `check-boundaries` treats it as Node world: an app or package file that imports it fails
+  `no-tooling-import`, so server code never reaches the bundle. The schemas both sides share live in a
+  pure package under `packages/` that the app and the backend import.
+- A workspace outside `packages/` that is no Expo app (no `app.config.ts`, no `expo` dependency) is read
+  as a Node backend even before it is recorded: without a contract only the missing contract is
+  reported; with one, the unrecorded backend is a `workspaces` problem naming the entry to add.
+- A `dir` outside `packages/` always needs `"world": "node"`; the contract fails to load otherwise
+  (exit 2).
+
 ## Recording the packages
 
-`contracts/architecture.json` lists every folder under `packages/` (`examples/architecture-multi-package.json`):
+`contracts/architecture.json` lists every folder under `packages/` and every Node backend outside it
+(`examples/architecture-multi-package.json`):
 
 | Field | Meaning |
 |---|---|
-| `name` | the folder name under `packages/` |
+| `name` | the folder name under `packages/` (for a backend, the last part of its `dir`) |
+| `dir` | the workspace folder when it is not `packages/<name>`: a Node backend such as `functions` |
 | `pure: true` | pure TypeScript: no framework packages; imports only itself and other pure packages (`core-pure`) |
 | `world: "node"` | tooling: runs in Node; no app or package code imports it (`no-tooling-import`) |
 | `exports` | the exact exports map when it is not `{ "./*": "./src/*" }` (a package that also exports `./plugins/*`) |
@@ -49,8 +78,9 @@ of a refactor.
 
 | Workspace | Load-bearing fields |
 |---|---|
-| root | `"private": true`, `"workspaces": ["apps/*", "packages/*"]`, `"overrides"` pinning `react` and `react-native` to the apps' versions, `engines` |
+| root | `"private": true`, `"workspaces": ["apps/*", "packages/*"]` (plus each recorded backend's folder), `"overrides"` pinning `react` and `react-native` to the apps' versions, `engines` |
 | `packages/<name>` | `"type": "module"`, `"exports": { "./*": "./src/*" }`, no `"main"` (no barrel: importers name the file), native modules as `"*"` `peerDependencies` |
+| a Node backend (`functions/`) | `"type": "module"`, `"engines": { "node": ... }`, `"main"` the deploy bundle (`lib/index.js`), no `exports` needed (nothing imports it) |
 | `apps/<app>` | `"main": "expo-router/entry"` (or the thin `index.ts`), no `"type": "module"` while `metro.config.js` is CommonJS, every native module of every package as a direct dependency |
 
 Under `"type": "module"` Node treats `metro.config.js` as ESM and its `require()` fails; renaming the file
@@ -105,8 +135,8 @@ classification (`vendorSdks` or `portlessSdks`) as in an app.
 
 | Rule | Checker | Catches |
 |---|---|---|
-| `workspaces` | check-layout | `workspaces` other than `["apps/*", "packages/*"]`, no contract, a package not recorded |
-| `manifest` | check-layout | a package without `"type": "module"` or its exports map, with `"main"`; an app without `"main"` or with `"type": "module"` next to `metro.config.js` |
+| `workspaces` | check-layout | `workspaces` (read from `package.json`) other than `["apps/*", "packages/*"]` plus the recorded backends' folders, no contract, a package or backend not recorded |
+| `manifest` | check-layout | a package without `"type": "module"` or its exports map, with `"main"`; a backend without `"type": "module"`; an app without `"main"` or with `"type": "module"` next to `metro.config.js` |
 | `one-react` | check-layout | `overrides` missing or not equal to the apps' `react` / `react-native` |
 | `native-deps` | check-layout | a package peer missing from an app; apps pinning different versions |
 | `app-to-app`, `package-direction` | check-boundaries | cross-app and package-to-app imports, resolved through workspace names |

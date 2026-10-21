@@ -15,7 +15,8 @@
 // API routes, the root +middleware file and contract serverFiles: server code, never in the native
 // bundle), node (app.config.ts, plugins/, scripts/ and contract nodeWorldFiles), test-helpers (test/),
 // mocks (__mocks__/), native-module (local Expo modules in modules/<name>/). A workspace under
-// packages/ is zone 'package' (pure or Node world when the contract says so).
+// packages/ is zone 'package' (pure or Node world when the contract says so), and so is a workspace
+// elsewhere that is no Expo app: a Node backend (functions/, contract packages[].dir, world "node").
 
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { basename, dirname, join, posix } from 'node:path';
@@ -116,6 +117,10 @@ function checkContractShape(data, file) {
   }
   for (const [index, entry] of (data.packages ?? []).entries()) {
     if (typeof entry.name !== 'string' || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(entry.name)) throw contractProblem(file, `packages[${index}].name must be the kebab-case folder name under packages/`);
+    if (entry.dir !== undefined) {
+      if (typeof entry.dir !== 'string' || !/^[a-z0-9._-]+(\/[a-z0-9._-]+)*$/.test(entry.dir) || entry.dir.split('/').includes('..') || posix.basename(entry.dir) !== entry.name) throw contractProblem(file, `packages[${index}].dir must be the workspace folder, repo-relative, ending in its name ("${entry.name}", or "packages/${entry.name}")`);
+      if (!entry.dir.startsWith('packages/') && entry.world !== 'node') throw contractProblem(file, `packages[${index}].dir "${entry.dir}" is outside packages/: such a workspace is a Node backend (Cloud Functions in functions/), so it needs "world": "node"`);
+    }
     if (entry.pure !== undefined && typeof entry.pure !== 'boolean') throw contractProblem(file, `packages[${index}].pure must be true or false`);
     if (entry.world !== undefined && !['node', 'app'].includes(entry.world)) throw contractProblem(file, `packages[${index}].world must be "node" or "app"`);
     if (entry.exports !== undefined && (entry.exports === null || typeof entry.exports !== 'object' || Array.isArray(entry.exports))) throw contractProblem(file, `packages[${index}].exports must be an object`);
@@ -195,6 +200,12 @@ function readDevOnlyRequires(layout) {
     throw new UsageError('rn-skills.config.json: "devOnlyRequires" must be a list of require() specifier globs', 'Write "devOnlyRequires": ["./dev-tools/*"] (app-variants-and-environment documents the key).');
   }
   return list;
+}
+
+/** An Expo app workspace: an app config in the folder, or expo in its dependencies. */
+function isExpoWorkspace(root, dir, manifest) {
+  if (['app.config.ts', 'app.config.js', 'app.config.mjs', 'app.config.cjs', 'app.json'].some((name) => existsSync(join(root, dir, name)))) return true;
+  return Boolean(manifest?.dependencies?.expo ?? manifest?.devDependencies?.expo);
 }
 
 function readManifest(root, dir) {
@@ -277,9 +288,12 @@ export function loadArchitecture(root, options = {}) {
     appScopes.push(appFrom('', layout, readManifest(root, '')));
   } else {
     for (const ws of workspaces) {
-      if (ws.dir.startsWith('packages/')) {
-        const name = ws.dir.split('/')[1];
-        const declared = settings.packages.find((entry) => entry.name === name) ?? null;
+      // A recorded package (packages/<name>, or its contract "dir"), any workspace under packages/, and a
+      // workspace elsewhere that is no Expo app (a Node backend such as functions/) are package scopes.
+      const declared = settings.packages.find((entry) => (entry.dir ?? `packages/${entry.name}`) === ws.dir) ?? null;
+      const isBackend = !ws.dir.startsWith('packages/');
+      if (!isBackend || declared !== null || !isExpoWorkspace(root, ws.dir, ws.manifest)) {
+        const name = isBackend ? basename(ws.dir) : ws.dir.split('/')[1];
         const pkgLayout = { ...ws.layout, srcDir: `${ws.dir}/src`, servicesDir: `${ws.dir}/src/services`, dataDir: `${ws.dir}/src/data` };
         packageScopes.push({
           kind: 'package',
@@ -288,8 +302,10 @@ export function loadArchitecture(root, options = {}) {
           packageName: ws.name,
           manifest: ws.manifest,
           declared,
+          // A backend (outside packages/) runs in Node; one not recorded yet is reported by check-layout's workspaces rule.
+          isBackend,
           isPure: declared?.pure === true,
-          isNode: declared?.world === 'node',
+          isNode: declared?.world === 'node' || (isBackend && declared === null),
           layout: ws.layout,
           adapterGlobs: DEFAULTS.adapterFiles.map((glob) => fillPlaceholders(glob, pkgLayout)),
           compositionGlobs: [],

@@ -103,7 +103,9 @@ a heading "When multi-package" and every checker accepts directory options for i
 - Named exports everywhere except where a tool requires a default export (Expo Router route files,
   `app.config.ts`, config plugins).
 - When multi-package: npm workspaces `apps/*` + `packages/*`, package scope `@<org>/<pkg>`, TS-source
-  packages. Checkers find workspaces from `package.json` `workspaces`, never from hard-coded folders.
+  packages; a Node backend that deploys on its own (Cloud Functions) is one more workspace at the root
+  (`functions`), recorded in `contracts/architecture.json` with its `dir` and `world: "node"`. Checkers
+  find workspaces from `package.json` `workspaces`, never from hard-coded folders.
 
 ## 4. Repository layout
 

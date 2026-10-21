@@ -61,12 +61,14 @@ The app's server code runs as 2nd-gen Cloud Functions for Firebase in TypeScript
 
 ## When multi-package
 
-In an npm workspaces repo (`apps/*`, `packages/*`), the request and response schemas live once in a shared package (`packages/shared`, imported as `@<org>/shared`) that both the app and `functions/` import as TypeScript source.
+In an npm workspaces repo (`apps/*`, `packages/*`), the request and response schemas live once in a shared package (`packages/shared`, imported as `@<org>/shared`) that both the app and `functions/` import as TypeScript source. The layout is the one architecture-and-boundaries and expo-project-bootstrap check (their "When multi-package"):
 
-- `functions/` is its own workspace; its `package.json` lists `@<org>/shared` in `devDependencies` (`"*"` or the workspace version), because the bundle inlines it.
+- `functions/` sits at the repo root and is its own workspace, listed by its folder: `"workspaces": ["apps/*", "packages/*", "functions"]`. `contracts/architecture.json` records it as a Node backend, `{ "name": "functions", "dir": "functions", "world": "node" }`, so no app or package may import it and it is never read as an app (no `@/*` alias, no app `src/` zones asked of it).
+- Its `package.json` is the template's with the workspace's name in the one scope (`"name": "@<org>/functions"`, `"private": true`): `"type": "module"`, `"main": "lib/index.js"`, `"engines": { "node": ... }`, no `exports` map (nothing imports it), and the root-run scripts every workspace keeps (`"typecheck": "tsc --noEmit -p tsconfig.json"`); it lists `@<org>/shared` in `devDependencies` (`"*"` or the workspace version), because the bundle inlines it.
+- Its `tsconfig.json` becomes a workspace program: it extends the root `tsconfig.base.json` and sets only `types` (`["node"]`, plus `"jest"` when the root Jest config runs its tests), because the root checks allow a workspace program nothing else; `quality-gates.json` `typescript.projects` lists it (`functions/tsconfig.json`). Checked with an empty entry file in a workspace app on 2026-10-21; the full templates were not type-checked against the root base (re-check: `npm run -s typecheck` after copying them).
 - The esbuild command bundles everything except `firebase-functions` and `firebase-admin` (`--external:` for each, never `--packages=external`), so `lib/index.js` contains the shared schemas and `firebase deploy` never has to resolve a workspace link: the Cloud Build step runs `npm install` on `functions/package.json` alone, where a workspace dependency does not exist.
 - `functions/package.json` `dependencies` hold only the externals; check it by grepping the bundle's imports (`grep -o 'from "[^"]*"' lib/index.js | sort -u`).
-- `firebase.json` `functions[].source` stays `functions` (or `apps/functions`); the checker reads it, and `rn-skills.config.json` `"functionsDir"` overrides it.
+- `firebase.json` `functions[].source` stays `functions`; the checker reads it, and `rn-skills.config.json` `"functionsDir"` overrides it.
 - The shared package must not import React Native, Expo or anything with platform code, so it type-checks and bundles for Node.
 
 ## Files in this skill

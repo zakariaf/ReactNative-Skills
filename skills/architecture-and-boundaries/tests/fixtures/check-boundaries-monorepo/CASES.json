@@ -1,4 +1,19 @@
 {
+  "bad-node-backend-import": {
+    "expect": [
+      "apps/mobile/src/features/tasks/tasks-screen.tsx:1 [no-tooling-import] imports functions/src/tasks/summarize-list.ts"
+    ],
+    "extends": "pass-node-backend",
+    "ops": [
+      {
+        "replace": {
+          "file": "apps/mobile/src/features/tasks/tasks-screen.tsx",
+          "find": "import { formatPrice } from '@acme/core/money/format-price';\n",
+          "with": "import { summarizeList } from '@acme/functions/src/tasks/summarize-list.ts';\nimport { formatPrice } from '@acme/core/money/format-price';\n"
+        }
+      }
+    ]
+  },
   "bad-workspace-direction": {
     "expect": [
       "apps/tablet/src/features/lists/lists-screen.tsx:1 [app-to-app] app apps/tablet imports app apps/mobile (apps/mobile/src/features/tasks/task-title.ts)",
@@ -14,13 +29,17 @@
       {
         "write": {
           "file": "apps/mobile/src/features/tasks/task-title.ts",
-          "lines": ["export const taskTitle = (title: string): string => title.trim();"]
+          "lines": [
+            "export const taskTitle = (title: string): string => title.trim();"
+          ]
         }
       },
       {
         "write": {
           "file": "apps/mobile/src/stores/tasks-store.ts",
-          "lines": ["export const tasksStore = { tasks: [] };"]
+          "lines": [
+            "export const tasksStore = { tasks: [] };"
+          ]
         }
       },
       {
@@ -37,7 +56,11 @@
       {
         "write": {
           "file": "packages/ui/src/haptic-button.tsx",
-          "lines": ["import { impactAsync } from 'expo-haptics';", "", "export const pressFeedback = impactAsync;"]
+          "lines": [
+            "import { impactAsync } from 'expo-haptics';",
+            "",
+            "export const pressFeedback = impactAsync;"
+          ]
         }
       },
       {
@@ -66,6 +89,67 @@
           "file": "apps/mobile/src/app/index.tsx",
           "find": "import { TasksScreen } from '@/features/tasks/tasks-screen';\n",
           "with": "import { tasksStore } from '@/stores/tasks-store';\nimport { TasksScreen } from '@/features/tasks/tasks-screen';\n"
+        }
+      }
+    ]
+  },
+  "pass-node-backend": {
+    "expect": [
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "$comment": "a Cloud Functions backend as its own workspace (cloud-functions-backend, When multi-package): Node world, deployed from its bundle, imported by nothing",
+        "json": {
+          "file": "package.json",
+          "path": [
+            "workspaces"
+          ],
+          "value": [
+            "apps/*",
+            "packages/*",
+            "functions"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "contracts/architecture.json",
+          "content": "{\n  \"packages\": [\n    {\n      \"name\": \"core\",\n      \"pure\": true\n    },\n    {\n      \"name\": \"ui\"\n    },\n    {\n      \"name\": \"tooling\",\n      \"world\": \"node\"\n    },\n    {\n      \"name\": \"functions\",\n      \"dir\": \"functions\",\n      \"world\": \"node\"\n    }\n  ]\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "functions/package.json",
+          "content": "{\n  \"name\": \"@acme/functions\",\n  \"version\": \"1.0.0\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"main\": \"lib/index.js\",\n  \"engines\": {\n    \"node\": \"24\"\n  }\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "functions/tsconfig.json",
+          "lines": [
+            "{",
+            "  \"extends\": \"../tsconfig.base.json\",",
+            "  \"compilerOptions\": { \"types\": [\"node\"] },",
+            "  \"include\": [\"src/**/*\"]",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "functions/src/index.ts",
+          "lines": [
+            "export { summarizeList } from './tasks/summarize-list.ts';"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "functions/src/tasks/summarize-list.ts",
+          "lines": [
+            "export const summarizeList = (titles: readonly string[]): string => titles.join(', ');"
+          ]
         }
       }
     ]
