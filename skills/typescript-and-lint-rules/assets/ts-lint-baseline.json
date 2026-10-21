@@ -277,8 +277,13 @@
       },
       {
         "id": "restricted-imports-helper",
-        "pattern": "paths:\\s*\\[\\.\\.\\.without\\(BANNED_PACKAGE_PATHS,\\s*\\.\\.\\.allow\\),\\s*\\.\\.\\.paths\\]",
+        "pattern": "const kept = without\\(BANNED_PACKAGE_PATHS,\\s*\\.\\.\\.allow\\);[\\s\\S]{0,300}?paths:\\s*\\[\\s*\\.\\.\\.kept\\.map\\(",
         "what": "restrictedImports() prepending BANNED_PACKAGE_PATHS to every no-restricted-imports list"
+      },
+      {
+        "id": "restricted-imports-subpaths",
+        "pattern": "\\.\\.\\.withSubpaths\\.map\\(subpathPattern\\)",
+        "what": "restrictedImports() banning the subpaths of every bannedWithSubpaths() entry it keeps (pkg/*)"
       },
       {
         "id": "vendor-sdk-list",

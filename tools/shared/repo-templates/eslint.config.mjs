@@ -151,6 +151,9 @@ const VENDOR_SDK_PATHS = [
 ];
 const TASK_MANAGER_IMPORT = VENDOR_SDK_PATHS.find((entry) => entry.name === 'expo-task-manager');
 const banned = (name, message) => ({ name, message });
+// A package banned with every subpath (`firebase` and `firebase/firestore`): restrictedImports()
+// adds its `<name>/*` pattern next to the path, and an `allow` that lifts the entry lifts both.
+const bannedWithSubpaths = (name, message) => ({ name, message, subpaths: true });
 // The app asks for App Tracking Transparency before any ad or analytics request that could use the
 // IDFA, and only the consent adapter does (every other file keeps this ban).
 const ATT_IMPORT = banned(
@@ -225,15 +228,31 @@ const PURE_ALIAS = {
 
 // Every block that narrows no-restricted-imports starts from RUNTIME_PATHS minus its exemptions.
 const without = (paths, ...removed) => paths.filter((entry) => !removed.includes(entry));
-// `allow` lifts a banned package for one file-exact block (the ATT adapter); nothing else does.
-// `allowParent` lifts the parent-import ban for Node code, which cannot use the @/ alias.
-const restrictedImports = ({ paths = [], patterns = [], allow = [], allowParent = false }) => [
-  'error',
-  {
-    paths: [...without(BANNED_PACKAGE_PATHS, ...allow), ...paths],
-    patterns: [...(allowParent ? [] : [PARENT_IMPORT]), ...patterns],
-  },
-];
+// A banned entry as ESLint reads it (no `subpaths` key), and the pattern that bans its subpaths.
+const packagePath = ({ name, message }) => ({ name, message });
+const subpathPattern = ({ name, message }) => ({ group: [`${name}/*`], message });
+// `allow` lifts a banned package (with its subpaths) for one block: a file-exact block (the ATT
+// adapter), or the block for the importers a scoped doNotAdd entry names in its allowIn
+// (contracts/dependency-policy.json); nothing else does. `allowParent` lifts the parent-import ban
+// for Node code, which cannot use the @/ alias.
+const restrictedImports = ({ paths = [], patterns = [], allow = [], allowParent = false }) => {
+  const kept = without(BANNED_PACKAGE_PATHS, ...allow);
+  const withSubpaths = kept.filter((entry) => entry.subpaths === true);
+  return [
+    'error',
+    {
+      paths: [
+        ...kept.map((entry) => (entry.subpaths === true ? packagePath(entry) : entry)),
+        ...paths,
+      ],
+      patterns: [
+        ...(allowParent ? [] : [PARENT_IMPORT]),
+        ...withSubpaths.map(subpathPattern),
+        ...patterns,
+      ],
+    },
+  ];
+};
 const REACT_INTL_IMPORT = {
   name: 'react-intl',
   message: 'Use t() / <T> from src/i18n, never react-intl directly.',
