@@ -75,7 +75,9 @@ both kinds. Verified on 2026-10-21 with firebase-tools 15.33.0, `@firebase/rules
    | `templates/jest.emulator.config.js` | repo root |
 
    Install the pinned tooling and add the `test:rules` script exactly as
-   [references/toolchain-and-ci.md](references/toolchain-and-ci.md) shows; add each package's
+   [references/toolchain-and-ci.md](references/toolchain-and-ci.md) shows (on Node 26 firebase-tools
+   needs the root `superstatic` override it gives, or `engine-strict` stops the install with
+   `EBADENGINE`); add each package's
    dependency-policy row (`where: dev`) through dependency-management; when the app keeps the JS SDK out
    of its code (React Native Firebase), its `doNotAdd` entry is scoped (`"where": "app"`, `"allowIn":
    ["test/rules/**"]`), as the toolchain reference shows.

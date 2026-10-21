@@ -62,6 +62,44 @@ rules test files.
 Node 22 fails. The house `.nvmrc` pins Node 26, which satisfies it; a CI job that runs the rules tests
 takes Node from `.nvmrc` like every other job.
 
+<!-- stack-pin-ignore-start: superstatic's engines field and npm's error quote other Node majors -->
+**firebase-tools on Node 26 needs a root override of `superstatic`.** firebase-tools 15.33.0 (and
+15.34.0) depends on `superstatic` `^10.0.0`, whose only release, 10.0.0, declares `node: "20 || 22 ||
+24"`. Under the house `engine-strict=true` an install on Node 26 therefore stops before anything is
+written:
+
+```
+npm error code EBADENGINE
+npm error notsup Not compatible with your version of node/npm: superstatic@10.0.0
+npm error notsup Required: {"node":"20 || 22 || 24"}
+```
+<!-- stack-pin-ignore-end -->
+
+superstatic 11.0.0 (published 2026-07-08, MIT, no install scripts of its own) declares `"22 || 24 ||
+26"`; its diff from 10.0.0 drops `lodash`, `glob-slasher` and `join-path`, and only the Hosting
+emulator and `firebase serve` load it, never the Firestore, Storage, Auth or Functions emulators. Pin
+it with a root override, in the same commit as firebase-tools:
+
+```json
+"overrides": { "superstatic": "11.0.0" }
+```
+
+and record it as a companion of the firebase-tools row, so dependency-management's
+`check-deps-policy.mjs` accepts the override (`stale-override` fails any other) and moves it with the
+row:
+
+```json
+"firebase-tools": { "version": "15.33.0", "spec": "15.33.0", "install": "npm", "where": "dev", "why": "the Firebase CLI and emulators for the rules tests", "companions": [
+  { "package": "superstatic", "version": "11.0.0", "via": "overrides", "why": "firebase-tools asks for ^10.0.0, whose only release 10.0.0 declares node 20 || 22 || 24 and fails engine-strict on Node 26" }
+] }
+```
+
+Never answer `EBADENGINE` with `--force`, `--engine-strict=false` or an older Node for the install:
+each switches the guard off for every package. Both superstatic versions bring the optional `re2`
+(a native install script), which `allowScripts` keeps denied: superstatic falls back to JavaScript
+regular expressions without it. Drop the override once a firebase-tools release past the release age
+depends on superstatic 11 (re-verify below).
+
 ## The JDK: 21 or newer, beside the Android build's 17
 
 firebase-tools 15 refuses to start the emulators on a JDK older than 21: <!-- stack-pin-ignore: the Firebase emulators' JDK, not the Android build's -->
@@ -143,7 +181,10 @@ Keep `firebase.json`, the rules files and the tests at the repository root: they
 project, not one app. The `test:rules` script may live in the root `package.json` or in a workspace
 (`functions/`, `packages/backend`); check-rules-tests reads the root and every workspace's
 `package.json` from `package.json` `workspaces`. Paths in `contracts/firebase-rules.json` stay
-repo-relative.
+repo-relative. The `superstatic` override sits in the **root** `package.json` wherever
+firebase-tools is installed: npm workspaces share one lockfile and read `overrides` only from the
+root, so moving firebase-tools into `functions/` (even one pinned to an older Node) neither avoids
+`EBADENGINE` nor lets a workspace override fix it.
 
 ## Dated facts
 
@@ -151,6 +192,7 @@ repo-relative.
 |---|---|---|
 | firebase-tools latest 15.34.0 (published 2026-10-14T23:01Z), 15.33.0 published 2026-10-08T04:09Z | 2026-10-21 | `npm view firebase-tools version time --json` |
 | @firebase/rules-unit-testing latest 6.0.0 (published 2026-10-07T19:23Z), peer `firebase ^13.0.0`, engines `node >=24.12.0` | 2026-10-21 | `npm view @firebase/rules-unit-testing version time peerDependencies engines --json` |
+| firebase-tools 15.33.0 and 15.34.0 depend on `superstatic` `^10.0.0`; superstatic 10.0.0 (2025-09-11) declares engines `node: "20 \|\| 22 \|\| 24"`, 11.0.0 (2026-07-08) `"22 \|\| 24 \|\| 26"`, 11.1.0 published 2026-10-14; with `engine-strict` on Node 26.12.0 and npm 11.20.0 the install stops with `EBADENGINE` on superstatic@10.0.0, and with `"overrides": { "superstatic": "11.0.0" }` it resolves | 2026-10-22, `npm view` and `npm install --engine-strict --package-lock-only firebase-tools@15.33.0` in an empty folder, with and without the override | `npm view firebase-tools@<pin> dependencies.superstatic` and `npm view superstatic@<version> engines time --json`, then the same install in an empty folder |
 | firebase latest 13.1.0 (published 2026-10-21T15:03Z), 13.0.0 published 2026-10-07T19:36Z | 2026-10-21 | `npm view firebase version time --json` |
 | The emulators need JDK 21 or newer: CLI v15.0.0 (2025-12-10) "Removed support for running emulators with Java versions prior to 21"; refused on JDK 17 in a real run | 2026-10-21, Firebase CLI release notes and a run with firebase-tools 15.33.0 | https://firebase.google.com/support/release-notes/cli and `npx firebase emulators:exec --only firestore --project demo-x "true"` on the JDK in question <!-- stack-pin-ignore: the Firebase emulators' JDK --> |
 | Emulator cache folder `~/.cache/firebase/emulators`, overridden by `FIREBASE_EMULATORS_PATH` | 2026-10-21, firebase-tools 15.33.0 `lib/emulator/downloadableEmulators.js` `CACHE_DIR` | `grep -n CACHE_DIR node_modules/firebase-tools/lib/emulator/downloadableEmulators.js` |
