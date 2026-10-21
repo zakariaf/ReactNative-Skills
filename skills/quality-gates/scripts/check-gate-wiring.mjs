@@ -7,10 +7,10 @@
 // Run: node ${CLAUDE_SKILL_DIR}/scripts/check-gate-wiring.mjs [repo-root]
 
 import { existsSync, readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { basename, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { AGENT_SKILL_FOLDERS, createReporter, fail, globToRegExp, lineOf, maskComments, notYetCreated, parseArgs, PROJECT_CONFIG_FILE, requireDir, resolveLayout, run, toPosix, walk } from './check-lib.mjs';
+import { AGENT_SKILL_FOLDERS, backendWorkspaces, createReporter, fail, globToRegExp, lineOf, maskComments, notYetCreated, parseArgs, PROJECT_CONFIG_FILE, requireDir, resolveLayout, run, toPosix, walk } from './check-lib.mjs';
 import { findWeaker } from './lib/not-weaker.mjs';
 import { isExpoApp } from './lib/workspaces.mjs';
 import { isLogicCounterpart, probeFor, reaches, singleAppForm, singleAppList, workspacePrefixes, workspacesWithSource } from './lib/workspace-scope.mjs';
@@ -56,8 +56,9 @@ const SPEC = {
     '                          coveragePathIgnorePatterns, testPathIgnorePatterns, modulePathIgnorePatterns, testMatch,',
     '                          testRegex or roots value (or a constant it spreads) differs from the canonical config',
     '                          in assets/jest-config-baseline.js (multi-package: its workspace form, and every workspace',
-    '                          with src/ stays reached); a project quality-gates.json jest.projects adds is left to the',
-    '                          guardrail, and every canonical project keeps its displayName',
+    '                          with src/ stays reached, a Node backend such as functions/ by the canonical projects or',
+    '                          by a listed project named after its folder); a project quality-gates.json jest.projects',
+    '                          adds is left to the guardrail, and every canonical project keeps its displayName',
     '  gate-scope              a gate reaches into installed agent skills: gated-paths.ts lost the agent-folder',
     '                          exclusion, an Edit(**/...) ask rule prompts for skill files, or an agent folder holding',
     '                          code (.claude/skills/, .agents/skills/, ...) is not in knip.json "ignore"',
@@ -320,16 +321,21 @@ function checkThresholdKeys(actual, baseline, ctx, report) {
   }
 }
 
+/** The glob a fix names for a workspace: apps/mobile -> apps/*; a folder at the root (functions) stays itself. */
+const workspaceGlob = (dir) => (dir.includes('/') ? dir.replace(/[^/]+$/, '*') : dir);
+
 /** Multi-package: coverage and every canonical project's tests still reach each workspace's src/. */
 function checkWorkspaceReach(actual, baseline, ctx, report) {
   const problem = (message, fix) => report.problem({ file: 'quality-gates.json', line: 1, rule: 'gate-weakened', message, fix });
   for (const dir of ctx.sourceWorkspaces) {
     const probe = probeFor(dir, baseline.jest.collectCoverageFrom.find((glob) => !glob.startsWith('!')));
-    if (probe && !reaches(actual.jest?.collectCoverageFrom, probe)) problem(`jest.collectCoverageFrom does not reach ${dir}/src (no glob matches ${probe})`, `Add the workspace form of the source glob ("${dir.replace(/[^/]+$/, '*')}/src/**/*.{ts,tsx}") in jest.config.js and here together; every workspace's code is covered.`);
+    if (probe && !reaches(actual.jest?.collectCoverageFrom, probe)) problem(`jest.collectCoverageFrom does not reach ${dir}/src (no glob matches ${probe})`, `Add the workspace form of the source glob ("${workspaceGlob(dir)}/src/**/*.{ts,tsx}") in jest.config.js and here together; every workspace's code is covered.`);
+    // A Node backend whose own project runs its tests (displayName = its folder) is that project's, not the canonical projects'.
+    if (ctx.backendProjects.has(dir) && reaches(actual.jest?.projects?.[ctx.backendProjects.get(dir)]?.testMatch, `${dir}/src/a/x.test.ts`)) continue;
     for (const [name, project] of Object.entries(baseline.jest.projects)) {
       const glob = (project.testMatch ?? []).find((item) => probeFor(dir, item) !== null);
       const testProbe = glob && probeFor(dir, glob);
-      if (testProbe && !reaches(actual.jest?.projects?.[name]?.testMatch, testProbe)) problem(`jest.projects.${name}.testMatch does not reach ${dir}/src (no glob matches ${testProbe})`, `Add the workspace form of the test root ("<rootDir>/${dir.replace(/[^/]+$/, '*')}/src/**/") to TEST_ROOTS in jest.config.js and here together.`);
+      if (testProbe && !reaches(actual.jest?.projects?.[name]?.testMatch, testProbe)) problem(`jest.projects.${name}.testMatch does not reach ${dir}/src (no glob matches ${testProbe})`, `Add the workspace form of the test root ("<rootDir>/${workspaceGlob(dir)}/src/**/") to TEST_ROOTS in jest.config.js and here together${ctx.backendProjects.has(dir) ? `, or run the Node backend's tests in a project of its own (displayName '${ctx.backendProjects.get(dir)}', testMatch <rootDir>/${dir}/src/**/*.test.ts) listed under jest.projects` : ''}.`);
     }
   }
 }
@@ -538,7 +544,7 @@ function projectSpans(source, names) {
   for (const match of code.matchAll(/displayName\s*:\s*['"]([\w-]+)['"]/g)) {
     if (!names.includes(match[1])) continue;
     const inner = pairs.filter(([start, end]) => start < match.index && match.index < end).sort((a, b) => (b[0] - a[0]))[0];
-    if (inner) spans.push(inner);
+    if (inner) spans.push(Object.assign([...inner], { name: match[1] }));
   }
   return spans;
 }
@@ -576,8 +582,15 @@ function checkJestScope(root, gates, ctx, report) {
   const spans = projectSpans(source, extraProjects(gates));
   const reached = { coverage: new Set(), tests: new Set() };
   const seen = new Set();
+  const backendOf = new Map([...ctx.backendProjects].map(([dir, name]) => [name, dir]));
   for (const { key, value, index, from, family } of jestScopeValues(source)) {
-    if (spans.some(([start, end]) => start < from && from < end)) continue;
+    const span = spans.find(([start, end]) => start < from && from < end);
+    if (span) {
+      // A listed Node backend project reaches its own workspace's tests (the guardrail compares the rest).
+      const dir = backendOf.get(span.name);
+      if (dir !== undefined && TEST_FAMILY.has(family) && value.includes(`${dir}/src/`)) reached.tests.add(dir);
+      continue;
+    }
     const bucket = COVERAGE_FAMILY.has(family) ? reached.coverage : TEST_FAMILY.has(family) ? reached.tests : null;
     // Only a src/ root reaches a workspace's code: "<rootDir>/apps/*/plugins/**/" alone leaves apps/*/src untested.
     const form = singleAppForm(value, ctx.prefixes, (prefix, after) => {
@@ -588,8 +601,8 @@ function checkJestScope(root, gates, ctx, report) {
     report.problem({ file: 'jest.config.js', line: lineOf(source, index), rule: 'jest-scope', message: `${key} is ${value.length > 160 ? `${value.slice(0, 160)}...` : value}, which the canonical config does not have${ctx.prefixes.length > 0 ? ' (nor its workspace form)' : ''}: it changes which files coverage or the tests reach`, fix: 'Restore the value from unit-and-component-tests\' canonical jest.config.js (multi-package: the same value with a workspace prefix where src/ stood). A file leaves coverage only through its "// device-only: covered by <check>" marker; a failing or untested file is fixed or tested, never ignored; a new test project is added to quality-gates.json jest.projects in the same gate change.' });
   }
   for (const dir of ctx.sourceWorkspaces) {
-    if (!reached.coverage.has(dir)) report.problem({ file: 'jest.config.js', line: 1, rule: 'jest-scope', message: `collectCoverageFrom does not reach the workspace ${dir} (it holds src/), so its code has no coverage floor`, fix: `Write the source glob in its workspace form ("<rootDir>/${dir.replace(/[^/]+$/, '*')}/src/**/*.{ts,tsx}") so every workspace is covered.` });
-    if (!reached.tests.has(dir)) report.problem({ file: 'jest.config.js', line: 1, rule: 'jest-scope', message: `no test root reaches the workspace ${dir} (it holds src/), so its tests never run`, fix: `Add "<rootDir>/${dir.replace(/[^/]+$/, '*')}/src/**/" to TEST_ROOTS in place of "<rootDir>/src/**/".` });
+    if (!reached.coverage.has(dir)) report.problem({ file: 'jest.config.js', line: 1, rule: 'jest-scope', message: `collectCoverageFrom does not reach the workspace ${dir} (it holds src/), so its code has no coverage floor`, fix: `Write the source glob in its workspace form ("<rootDir>/${workspaceGlob(dir)}/src/**/*.{ts,tsx}") so every workspace is covered.` });
+    if (!reached.tests.has(dir)) report.problem({ file: 'jest.config.js', line: 1, rule: 'jest-scope', message: `no test root reaches the workspace ${dir} (it holds src/), so its tests never run`, fix: `Add "<rootDir>/${workspaceGlob(dir)}/src/**/" to TEST_ROOTS in place of "<rootDir>/src/**/"${ctx.backendProjects.has(dir) ? `, or give the Node backend a project of its own (displayName '${ctx.backendProjects.get(dir)}', testEnvironment 'node', testMatch ['<rootDir>/${dir}/src/**/*.test.ts']) listed in quality-gates.json jest.projects` : ''}.` });
   }
 }
 
@@ -674,7 +687,9 @@ run(async () => {
   const pkg = tryJson(root, 'package.json', 'npm-script', report) ?? {};
   const prefixes = workspacePrefixes(layout, pkg);
   const appWorkspaces = layout.workspaces.map((workspace) => workspace.dir).filter((dir) => isExpoApp(root, dir));
-  const ctx = { root, layout, pkg, prefixes, appWorkspaces, sourceWorkspaces: workspacesWithSource(root, layout) };
+  // Node backends (functions/) by folder, with the project name a Node-environment project of their own takes.
+  const backendProjects = new Map(layout.mode === 'monorepo' ? backendWorkspaces(root).map((backend) => [backend.dir, basename(backend.dir)]) : []);
+  const ctx = { root, layout, pkg, prefixes, appWorkspaces, backendProjects, sourceWorkspaces: workspacesWithSource(root, layout) };
   const scripts = baselineScripts(ctx);
   const baseline = baselineGates(scripts, ctx);
   checkScripts(root, layout, pkg, scripts, report);

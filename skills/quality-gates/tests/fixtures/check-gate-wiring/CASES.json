@@ -1721,5 +1721,125 @@
         }
       }
     ]
+  },
+  "pass-multi-package-backend-project": {
+    "expect": [
+      "check-gate-wiring: 18 gate files checked, 0 problems",
+      "RESULT: PASS"
+    ],
+    "extends": "pass-multi-package",
+    "ops": [
+      {
+        "$comment": "the Cloud Functions workspace holds src/ and its tests run in a Node project of their own (unit-and-component-tests, When multi-package), listed in quality-gates.json jest.projects in the same gate change; unit leaves functions/ out",
+        "write": {
+          "file": "functions/src/index.ts",
+          "content": "export const summarizeList = (): string => 'summary';\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "const goldenProject = {\n",
+          "with": "const functionsProject = {\n  ...SHARED,\n  displayName: 'functions',\n  preset: undefined,\n  testEnvironment: 'node',\n  setupFiles: [],\n  testMatch: ['<rootDir>/functions/src/**/*.test.ts'],\n};\n\nconst goldenProject = {\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "projects: [unitProject, androidProject, goldenProject],",
+          "with": "projects: [unitProject, androidProject, goldenProject, functionsProject],"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "    '<rootDir>/{apps,packages}/*/src/**/*.{ts,tsx}',\n",
+          "with": "    '<rootDir>/{apps,packages}/*/src/**/*.{ts,tsx}',\n    '<rootDir>/functions/src/**/*.{ts,tsx}',\n"
+        }
+      },
+      {
+        "json": {
+          "file": "quality-gates.json",
+          "path": [
+            "jest",
+            "collectCoverageFrom"
+          ],
+          "value": [
+            "{apps,packages}/*/src/**/*.{ts,tsx}",
+            "functions/src/**/*.{ts,tsx}",
+            "!**/*.{test,golden.test,sim.test}.{ts,tsx}",
+            "!**/*.d.ts",
+            "!**/fixtures/**",
+            "!**/testing/**"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "quality-gates.json",
+          "path": [
+            "jest",
+            "projects",
+            "functions"
+          ],
+          "value": {
+            "roots": [
+              "<rootDir>"
+            ],
+            "testMatch": [
+              "<rootDir>/functions/src/**/*.test.ts"
+            ],
+            "testPathIgnorePatterns": [
+              "/node_modules/",
+              "<rootDir>/(ios|android|build|dist|web-build)/",
+              "<rootDir>/(apps|packages)/[^/]+/(ios|android|build|dist|web-build)/",
+              "<rootDir>/(coverage|reports|skills|\\.stryker-tmp|\\.skill-tooling)/",
+              "<rootDir>/\\.(agents|claude|codex|cursor|windsurf|roo|cline|continue|kiro)/"
+            ],
+            "modulePathIgnorePatterns": [
+              "<rootDir>/(ios|android|build|dist|web-build)/",
+              "<rootDir>/(apps|packages)/[^/]+/(ios|android|build|dist|web-build)/",
+              "<rootDir>/(coverage|reports|skills|\\.stryker-tmp|\\.skill-tooling)/",
+              "<rootDir>/\\.(agents|claude|codex|cursor|windsurf|roo|cline|continue|kiro)/"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "bad-multi-package-backend-untested": {
+    "expect": [
+      "[jest-scope] no test root reaches the workspace functions",
+      "[gate-weakened] jest.projects.unit.testMatch does not reach functions/src"
+    ],
+    "extends": "pass-multi-package-backend-project",
+    "ops": [
+      {
+        "$comment": "the backend project is gone: functions/ holds src/ but neither unit nor a project of its own runs its tests",
+        "replace": {
+          "file": "jest.config.js",
+          "find": "projects: [unitProject, androidProject, goldenProject, functionsProject],",
+          "with": "projects: [unitProject, androidProject, goldenProject],"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "  testMatch: ['<rootDir>/functions/src/**/*.test.ts'],\n",
+          "with": "  testMatch: [],\n"
+        }
+      },
+      {
+        "json": {
+          "file": "quality-gates.json",
+          "path": [
+            "jest",
+            "projects",
+            "functions"
+          ],
+          "delete": true
+        }
+      }
+    ]
   }
 }

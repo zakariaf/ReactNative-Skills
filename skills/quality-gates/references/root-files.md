@@ -158,7 +158,12 @@ unit-and-component-tests owns `jest.config.js`; this skill guards its numbers:
     `(apps|packages)/[^/]+`), strips them, drops repeats and compares the rest with the canonical
     value, in `jest.config.js` and in `quality-gates.json` alike. Keep the canonical order with the
     workspace entries where `src/` stood. It also fails a workspace holding `src/` that no coverage
-    glob or test root reaches. Per-workspace Jest configs (`projects: ['<rootDir>/apps/*']`) are
+    glob or test root reaches. A Node backend workspace (`functions/`: outside `packages/`, no Expo
+    app) is reached by a project of its own instead of the canonical ones: `displayName: 'functions'`
+    (its folder), `testEnvironment: 'node'`, `testMatch: ['<rootDir>/functions/src/**/*.test.ts']`
+    (unit-and-component-tests, When multi-package), listed under `jest.projects.functions` like any
+    new project, with `TEST_ROOTS` leaving the backend out and `collectCoverageFrom` adding
+    `<rootDir>/functions/src/**/*.{ts,tsx}`. Per-workspace Jest configs (`projects: ['<rootDir>/apps/*']`) are
     outside the static check: it reports them as differing, and the guardrail compares them.
   Any other agreed change of scope (a new ignore pattern, a new generated folder, a test root in the
   single-app layout) is a change to unit-and-component-tests' canonical config, made there and

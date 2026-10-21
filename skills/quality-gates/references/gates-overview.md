@@ -202,8 +202,11 @@ a probe or program it lacks). The `ask` rules gain the workspace tsconfigs
 `quality-gates.json` `claudeSettings` in the same gate change, so loosening a workspace program still
 prompts, and `gatedPaths` gains `apps/*/tsconfig*.json` and `packages/*/tsconfig*.json`, so the commit
 needs a `Gate-Change:` trailer too (`isGatedFile` keeps wildcard patterns out of the agent folders), knip gets one `workspaces` entry per package (with
-`includeEntryExports` for packages whose `exports` map makes every file an entry). Jest stays one root
-`jest.config.js` whose scope takes the workspace form: `TEST_ROOTS` lists `<rootDir>/apps/*/src/**/`
+`includeEntryExports` for packages whose `exports` map makes every file an entry; a Node backend such as
+`functions/` names its deploy entry file and leaves it off, so the deployed functions it exports count as
+used; its build output `functions/lib/` is git-, Prettier- and ESLint-ignored, typescript-and-lint-rules).
+Jest stays one root `jest.config.js` whose scope takes the workspace form (a Node backend's tests in a
+`functions` project with `testEnvironment: 'node'`, listed under `jest.projects`): `TEST_ROOTS` lists `<rootDir>/apps/*/src/**/`
 and `<rootDir>/packages/*/src/**/` where it had `<rootDir>/src/**/` (and `<rootDir>/apps/*/plugins/**/`
 where it had `<rootDir>/plugins/**/`; only a `src/` root counts as reaching a workspace), the coverage glob is
 `<rootDir>/{apps,packages}/*/src/**/*.{ts,tsx}`, and the logic keys name each package's logic folder
