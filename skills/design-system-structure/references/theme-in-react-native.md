@@ -12,6 +12,7 @@ against Expo SDK 57 (expo-router 57.0.24, expo-system-ui 57.0.4, the `default@sd
 - File map
 - Mounting: the root layout and the navigation theme
 - Dark mode on iOS and Android, and the root view
+- Light-only apps
 - makeStyles recipes
 - Static shadows, rings and focus
 - The press surface
@@ -151,6 +152,34 @@ so a dark theme never flashes a white root; the call is cosmetic, so a failure l
 colour and goes to the `onError` prop (an effect event, so a new callback never repaints). The navigation theme paints the screen container itself (`background` above). The bar icons
 follow the scheme through `expo-status-bar` (`style="auto"` reads the mirrored Appearance); a screen
 that paints a different colour at its top sets the status bar style itself.
+
+## Light-only apps
+
+Following the phone is the default. An app whose design has no dark set (yet) declares it once, in
+`contracts/design-system.json`, with the reason:
+
+```json
+"lightOnly": { "reason": "the launch design has no dark set; revisit when one is designed" }
+```
+
+Then the app says so to both platforms and to its own provider, and `color-scheme-config` checks
+each instead of `'automatic'` (a blank or missing reason is bad input, exit 2):
+
+1. `userInterfaceStyle: 'light'` in the app config, written out, with no `ios` or `android` override
+   saying otherwise (Expo's default happens to be light, but an unset key reads as a forgotten one).
+   iOS then reports light to `useColorScheme()` and Android keeps its system UI light.
+2. `expo-system-ui` stays installed: Android applies `userInterfaceStyle` through it, and
+   `AppThemeProvider` still paints the root view with it.
+3. Every `AppThemeProvider` mount passes `preference="light"`, so neither a saved `dark` choice nor
+   the phone reaches the theme; hide the theme setting while the app is light-only
+   (settings-and-preferences).
+
+The palette keeps both sets, because `Palette` and the contrast contract name both: alias the dark
+set to light in the token file (`"dark": "{color.light}"`) so a stray dark read still draws the
+proven light colours, and `write-palette.mjs` and accessibility-as-code's `check-contrast.mjs` judge
+it like any other set. design-review-workflow reads the same `userInterfaceStyle` and sweeps light
+only (`plan-themes`). Removing `lightOnly` and setting `'automatic'` is the whole switch back, once a
+hand-tuned dark set exists.
 
 ## makeStyles recipes
 

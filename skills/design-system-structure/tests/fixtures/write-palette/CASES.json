@@ -210,5 +210,13 @@
       }
     ]
   },
+  "pass-light-only-alias": {
+    "expect": [
+      "const DARK: ColorTokens = {",
+      "  background: '#F5F6F8',",
+      "export const PALETTE: Palette = { light: LIGHT, dark: DARK };"
+    ],
+    "ops": [{ "json": { "file": "design/tokens.json", "path": ["color", "dark"], "value": "{color.light}" } }]
+  },
   "pass-unchanged": { "expect": ["unchanged src/theme/palette.ts", "RESULT: PASS"], "args": "{dir}", "ops": [] }
 }

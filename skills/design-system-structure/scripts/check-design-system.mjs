@@ -11,7 +11,7 @@ import { join, posix } from 'node:path';
 import { createReporter, fail, lineOf, notYetCreated, parseArgs, requireDir, resolveLayout, run, sha256, walkRepo } from './check-lib.mjs';
 import { enableAppImports, errorText, lineOfExport } from './lib/app-modules.mjs';
 import { aliasesOf, closingIndex, constExpression, constInitializer, diffObject, functionRange, importsOf, inRanges, jsxAttribute, lineOfPattern, masked, normalDir, openingTagEnd, readSource, sameValue, show, specifierNames, splitTopLevel, typeRange, valueExpression, within } from './lib/app-source.mjs';
-import { SYSTEM_FONT, bundledFonts, modulePaths, otherStylingPackage, readContract, weightByOf } from './lib/design-contract.mjs';
+import { SYSTEM_FONT, bundledFonts, lightOnlyReason, modulePaths, otherStylingPackage, readContract, weightByOf } from './lib/design-contract.mjs';
 import { FontTableError, readFontFile } from './lib/font-tables.mjs';
 import { CORE_FIELDS, applyExceptions, readContrastContract, schemeProblems, tableFor } from './lib/palette-rules.mjs';
 import { getPath, resolveTokens } from './lib/token-file.mjs';
@@ -67,6 +67,8 @@ const SPEC = {
     '                              to Expo\'s light default, or expo-system-ui (Android) is not installed. A same-file const',
     '                              is followed (userInterfaceStyle: UI_STYLE); app.json is the base an app.config.* that',
     '                              spreads ...config overrides',
+    '                              Light-only (contract "lightOnly": { "reason" }): every userInterfaceStyle is "light" and',
+    '                              written out, and every AppThemeProvider mount passes preference="light"',
     '  theme-provider-behaviour    the provider does not mirror the preference to Appearance.setColorScheme or paint the',
     '                              root view with SystemUI.setBackgroundColorAsync',
     '  theme-provider-mounted      no runtime file renders the app\'s provider imported from <themeDir>/theme-provider',
@@ -770,8 +772,35 @@ function checkColorSchemeConfig(ctx) {
     return;
   }
   ctx.checked += 1;
-  const fix = "Set userInterfaceStyle: 'automatic' in the app config, and drop or align the ios / android overrides.";
   const styles = effectiveStyles(ctx, config);
+  if (lightOnlyReason(ctx.contract) !== null) checkLightOnlyConfig(ctx, config, styles);
+  else checkFollowsPhone(ctx, config, styles);
+  if (!Object.hasOwn({ ...ctx.manifest.dependencies }, 'expo-system-ui')) {
+    ctx.report.problem({ file: 'package.json', rule: 'color-scheme-config', message: 'expo-system-ui is not a dependency, so Android ignores userInterfaceStyle in a development or release build', fix: 'Run: npx expo install expo-system-ui' });
+  }
+}
+
+/**
+ * A light-only app (contract "lightOnly" with its reason) says so to both platforms: every
+ * userInterfaceStyle is 'light', written out (Expo's default happens to be light, but an unset key
+ * reads as a forgotten one), so neither the phone's dark mode nor a dark system UI reaches it.
+ */
+function checkLightOnlyConfig(ctx, config, styles) {
+  const declared = `${ctx.contractRel} declares the app light-only ("lightOnly": ${lightOnlyReason(ctx.contract)})`;
+  const fix = `Set userInterfaceStyle: 'light' in the app config and drop the ios / android overrides; or, once the app has a dark set, remove "lightOnly" from ${ctx.contractRel} and set 'automatic'.`;
+  ctx.report.note(`color-scheme-config: light-only (${ctx.contractRel} "lightOnly": ${lightOnlyReason(ctx.contract)})`);
+  for (const entry of styles.filter((item) => item.value !== 'light')) {
+    const where = entry.platform === 'top' ? 'userInterfaceStyle' : `${entry.platform}.userInterfaceStyle`;
+    ctx.report.problem({ file: entry.file, line: lineOf(entry.text, entry.index), rule: 'color-scheme-config', message: `${where} is ${JSON.stringify(entry.value)}, but ${declared}, so the system UI ${entry.platform === 'top' ? '' : `on ${entry.platform === 'ios' ? 'iOS' : 'Android'} `}turns dark under a light-only theme`, fix });
+  }
+  if (styles.length === 0) {
+    ctx.report.problem({ file: config, rule: 'color-scheme-config', message: `userInterfaceStyle is not set, but ${declared}: Expo's default happens to be light, yet an unset key reads as a forgotten one`, fix });
+  }
+}
+
+/** The default: light and dark follow the phone on both platforms. */
+function checkFollowsPhone(ctx, config, styles) {
+  const fix = "Set userInterfaceStyle: 'automatic' in the app config, and drop or align the ios / android overrides.";
   const wrong = styles.filter((entry) => entry.value !== 'automatic');
   for (const entry of wrong) {
     const where = entry.platform === 'top' ? 'userInterfaceStyle' : `${entry.platform}.userInterfaceStyle`;
@@ -782,9 +811,6 @@ function checkColorSchemeConfig(ctx) {
     const missing = ['ios', 'android'].filter((platform) => !covers(platform));
     const text = config.endsWith('.json') ? ctx.source(config) : masked(ctx.source(config));
     ctx.report.problem({ file: config, line: lineOfPattern(text, /userInterfaceStyle/), rule: 'color-scheme-config', message: `userInterfaceStyle is not "automatic" for ${missing.join(' and ')} (Expo's default is light), so the dark palette never follows the phone there`, fix });
-  }
-  if (!Object.hasOwn({ ...ctx.manifest.dependencies }, 'expo-system-ui')) {
-    ctx.report.problem({ file: 'package.json', rule: 'color-scheme-config', message: 'expo-system-ui is not a dependency, so Android ignores userInterfaceStyle in a development or release build', fix: 'Run: npx expo install expo-system-ui' });
   }
 }
 
@@ -1057,6 +1083,27 @@ function checkSecondTheme(ctx, sources) {
   }
 }
 
+/**
+ * In a light-only app every AppThemeProvider mount passes preference "light": a saved 'dark' or
+ * 'system' choice would otherwise paint the dark set (or the phone's scheme) the design never made.
+ */
+function checkLightOnlyPreference(ctx, sources, providerFile) {
+  for (const { rel, text } of sources) {
+    const locals = importsOf(text)
+      .filter((entry) => specifierNames(rel, entry.spec, providerFile, aliasesOf(ctx.layout)))
+      .flatMap((entry) => entry.names.filter((name) => name.imported === 'AppThemeProvider').map((name) => name.local));
+    for (const local of locals) {
+      for (const match of text.matchAll(new RegExp(`<${escapeRegExp(local)}(?=[\\s/>])`, 'g'))) {
+        const end = openingTagEnd(text, match.index);
+        const expr = jsxAttribute(text.slice(match.index, end < 0 ? text.length : end), 'preference');
+        const value = expr === null ? null : expr.replace(/^(["'`])(.*)\1$/, '$2');
+        if (value === 'light') continue;
+        ctx.report.problem({ file: rel, line: lineOf(text, match.index), rule: 'color-scheme-config', message: `AppThemeProvider gets preference ${expr === null ? '(none)' : JSON.stringify(value)}, but ${ctx.contractRel} declares the app light-only ("lightOnly": ${lightOnlyReason(ctx.contract)}), so a saved choice or the phone paints the dark set`, fix: 'Pass preference="light" to every AppThemeProvider mount, and hide the theme setting (settings-and-preferences) while the app is light-only.' });
+      }
+    }
+  }
+}
+
 function checkProviders(ctx, fonts) {
   checkProviderBehaviour(ctx);
   const sources = runtimeSources(ctx).map((rel) => ({ rel, text: masked(ctx.source(rel)) }));
@@ -1067,6 +1114,7 @@ function checkProviders(ctx, fonts) {
     if (!target.exists) ctx.report.skip({ file: target.file, rule: 'theme-provider-mounted', message: notYetCreated(ctx.root, { file: target.file, owner: 'expo-project-bootstrap' }) });
     else ctx.report.problem({ file: target.file, rule: 'theme-provider-mounted', message: `no runtime file renders AppThemeProvider from ${providerFile}, so the app never follows the dark-mode setting or the phone (expo-router's ThemeProvider is the navigation theme, not this one)`, fix: 'Mount <AppThemeProvider preference={...}> once around the root Stack (or the React Navigation root), with the navigation theme inside it taking its colours from the app theme (examples/root-layout.tsx).' });
   }
+  if (lightOnlyReason(ctx.contract) !== null) checkLightOnlyPreference(ctx, sources, providerFile);
   const withTheme = runtimeSources(ctx, { withTheme: true }).map((rel) => ({ rel, text: masked(ctx.source(rel)) }));
   checkNavigationTheme(ctx, withTheme, target);
   checkSecondTheme(ctx, sources);

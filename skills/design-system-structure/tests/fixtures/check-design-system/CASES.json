@@ -373,6 +373,70 @@
       }
     ]
   },
+  "bad-light-only-automatic": {
+    "expect": [
+      "app.config.ts:9 [color-scheme-config] userInterfaceStyle is \"automatic\", but contracts/design-system.json declares the app light-only"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/design-system.json",
+          "path": ["lightOnly"],
+          "value": { "reason": "the launch design has no dark set yet" }
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "<AppThemeProvider preference=\"system\">",
+          "with": "<AppThemeProvider preference=\"light\">"
+        }
+      }
+    ]
+  },
+  "bad-light-only-preference": {
+    "expect": [
+      "src/app/_layout.tsx:13 [color-scheme-config] AppThemeProvider gets preference \"system\", but contracts/design-system.json declares the app light-only"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/design-system.json",
+          "path": ["lightOnly"],
+          "value": { "reason": "the launch design has no dark set yet" }
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "  userInterfaceStyle: 'automatic',\n",
+          "with": "  userInterfaceStyle: 'light',\n"
+        }
+      }
+    ]
+  },
+  "bad-light-only-unset": {
+    "expect": [
+      "app.config.ts [color-scheme-config] userInterfaceStyle is not set, but contracts/design-system.json declares the app light-only"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/design-system.json",
+          "path": ["lightOnly"],
+          "value": { "reason": "the launch design has no dark set yet" }
+        }
+      },
+      { "replace": { "file": "app.config.ts", "find": "  userInterfaceStyle: 'automatic',\n", "with": "" } },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "<AppThemeProvider preference=\"system\">",
+          "with": "<AppThemeProvider preference=\"light\">"
+        }
+      }
+    ]
+  },
   "bad-line-height-fraction": {
     "expect": [
       "[line-height-grid] the line height is not snapped to the device pixel grid",
@@ -1099,6 +1163,10 @@
     "expect": ["ERROR [bad-input] contracts/design-system.json: \"fonts\" is missing: declare \"system\""],
     "ops": [{ "json": { "file": "contracts/design-system.json", "path": ["fonts"], "delete": true } }]
   },
+  "error-light-only-reason": {
+    "expect": ["ERROR [bad-input] contracts/design-system.json: \"lightOnly\" needs a \"reason\""],
+    "ops": [{ "json": { "file": "contracts/design-system.json", "path": ["lightOnly"], "value": { "reason": " " } } }]
+  },
   "error-no-theme": {
     "expect": ["ERROR [bad-input] nothing to check: src/theme does not exist"],
     "ops": [{ "delete": "src/theme" }]
@@ -1285,6 +1353,34 @@
           "file": "src/theme/fonts.ts",
           "find": "  ur: 'arabic',\n};",
           "with": "  ur: 'arabic',\n  ja: 'japanese',\n};"
+        }
+      }
+    ]
+  },
+  "pass-light-only": {
+    "expect": [
+      "color-scheme-config: light-only (contracts/design-system.json \"lightOnly\": the launch design has no dark set yet)"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/design-system.json",
+          "path": ["lightOnly"],
+          "value": { "reason": "the launch design has no dark set yet" }
+        }
+      },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "  userInterfaceStyle: 'automatic',\n",
+          "with": "  userInterfaceStyle: 'light',\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/app/_layout.tsx",
+          "find": "<AppThemeProvider preference=\"system\">",
+          "with": "<AppThemeProvider preference=\"light\">"
         }
       }
     ]
