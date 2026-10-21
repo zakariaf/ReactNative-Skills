@@ -389,6 +389,34 @@ One Jest config, run from the repo root, still covers every workspace:
   ...]`, and the device-only helper reads the root `package.json` `workspaces` itself, so the marked
   files of every workspace's `src/` (`apps/*`, `packages/*`, a `functions` backend) leave coverage with
   the canonical helper unchanged.
+- **A Node backend's tests run in a Node project.** A Cloud Functions workspace (`functions/`: outside
+  `packages/`, no Expo app) gets a project named after its folder, and `TEST_ROOTS` leaves its `src/`
+  out, so its tests run once, in Node:
+
+  ```js
+  // Cloud Functions run in Node: no React Native preset, environment or jest.setup.ts.
+  const functionsProject = {
+    ...SHARED,
+    displayName: 'functions',
+    preset: undefined,
+    testEnvironment: 'node',
+    setupFiles: [],
+    testMatch: ['<rootDir>/functions/src/**/*.test.ts'],
+  };
+  // projects: [unitProject, androidProject, goldenProject, functionsProject]
+  ```
+
+  Babel still transforms the TypeScript through the root `babel.config.js`, and `SHARED` keeps the
+  ignores, the mappers, the mock resets and the device-only coverage. Inside `unit` the same test
+  sees React Native's globals and setup: in a copy of the reference app on 2026-10-21 a functions test that
+  asserted `typeof window === 'undefined'` failed under `unit` (6.3 s, `window` is an object) and
+  passed in the Node project (0.4 s). `collectCoverageFrom` adds `'<rootDir>/functions/src/**/*.{ts,tsx}'`
+  so the backend keeps its coverage floor. `check-test-setup.mjs` accepts the project only when
+  multi-package and named after a backend folder (`jest-backend-project`: `testEnvironment: 'node'`,
+  no preset, no `jest.setup.ts`, only `functions/src` tests; `jest-orphan-tests` fails a test both
+  projects run); a single app keeps exactly unit, android and golden. quality-gates lists the
+  project in `quality-gates.json` `jest.projects` in the same gate change. The build output
+  (`functions/lib/`) needs no Jest ignore: tests and coverage read only `src/`.
 - **Skia in a workspace only.** The template's `HAS_SKIA` reads the root `package.json`; when only an
   app workspace lists Skia, read that workspace's manifest instead (the checker looks at every
   workspace).
