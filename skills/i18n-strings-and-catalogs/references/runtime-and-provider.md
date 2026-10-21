@@ -543,6 +543,12 @@ Everything else in this skill is the same.
 - Run the checkers with `--app-dir apps/mobile` when the app is a workspace (checkers reference,
   "When multi-package"); `scripts/i18n/`, `index.ts` and the `i18n:verify` script live in the app's
   folder.
+- **One root Jest config.** The multi-package form of unit-and-component-tests runs every workspace
+  from one root `jest.config.js`, so its `INTL_POLYFILLS` is the repo path
+  (`apps/mobile/src/i18n/intl-polyfills.ts`). With `--app-dir` and no Jest config in the app folder,
+  `check-i18n-code.mjs` reads the root one (`jest-polyfills`), and the single app's
+  `src/i18n/intl-polyfills.ts` there is a problem: that file does not exist at the root, so Jest would
+  run on Node's ICU.
 - **One place for contracts.** `contracts/` (i18n.json, copy-source.json) sits at the repo root for
   the checkers and the tooling alike. The tooling runs from the app folder (npm runs workspace
   scripts there) and finds the root with `repoRootOf` (`i18n-contract.ts`): the nearest folder above

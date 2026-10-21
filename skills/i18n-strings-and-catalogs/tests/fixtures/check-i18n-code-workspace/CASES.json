@@ -1,10 +1,28 @@
 {
   "bad-app-entry": {
-    "expect": ["[polyfill-first]", "apps/mobile/package.json:5", "the app entry is \"expo-router/entry\""],
-    "ops": [{ "json": { "file": "apps/mobile/package.json", "path": ["main"], "value": "expo-router/entry" } }]
+    "expect": [
+      "[polyfill-first]",
+      "apps/mobile/package.json:5",
+      "the app entry is \"expo-router/entry\""
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "apps/mobile/package.json",
+          "path": [
+            "main"
+          ],
+          "value": "expo-router/entry"
+        }
+      }
+    ]
   },
   "bad-app-jest": {
-    "expect": ["[jest-polyfills]", "apps/mobile/jest.config.js:10", "does not load intl-polyfills.ts"],
+    "expect": [
+      "[jest-polyfills]",
+      "apps/mobile/jest.config.js:10",
+      "does not load intl-polyfills.ts"
+    ],
     "ops": [
       {
         "replace": {
@@ -16,7 +34,11 @@
     ]
   },
   "bad-app-locales": {
-    "expect": ["[system-text-locales]", "apps/mobile/app.config.ts:1", "sets no \"locales\""],
+    "expect": [
+      "[system-text-locales]",
+      "apps/mobile/app.config.ts:1",
+      "sets no \"locales\""
+    ],
     "ops": [
       {
         "replace": {
@@ -28,7 +50,11 @@
     ]
   },
   "bad-app-text": {
-    "expect": ["[jsx-literal-text]", "apps/mobile/src/features/tasks/tasks-screen.tsx:19", "My tasks"],
+    "expect": [
+      "[jsx-literal-text]",
+      "apps/mobile/src/features/tasks/tasks-screen.tsx:19",
+      "My tasks"
+    ],
     "ops": [
       {
         "replace": {
@@ -39,8 +65,49 @@
       }
     ]
   },
+  "bad-root-jest-path": {
+    "expect": [
+      "FAIL jest.config.js:5 [jest-polyfills] setupFiles loads",
+      "the i18n folder is apps/mobile/src/i18n"
+    ],
+    "extends": "pass-root-jest",
+    "ops": [
+      {
+        "$comment": "the single app's path kept in the root config: no such file, so Jest runs on Node's ICU",
+        "replace": {
+          "file": "jest.config.js",
+          "find": "const INTL_POLYFILLS = 'apps/mobile/src/i18n/intl-polyfills.ts';",
+          "with": "const INTL_POLYFILLS = 'src/i18n/intl-polyfills.ts';"
+        }
+      }
+    ]
+  },
   "error-no-app-dir": {
-    "expect": ["ERROR [bad-input] nothing to check: no .ts/.tsx files under src", "--app-dir apps/mobile"],
+    "expect": [
+      "ERROR [bad-input] nothing to check: no .ts/.tsx files under src",
+      "--app-dir apps/mobile"
+    ],
     "args": "{dir}"
+  },
+  "pass-root-jest": {
+    "expect": [
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "$comment": "the multi-package form: one root jest.config.js for every workspace loads the app's polyfills by their repo path",
+        "rename": {
+          "from": "apps/mobile/jest.config.js",
+          "to": "jest.config.js"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "const INTL_POLYFILLS = 'src/i18n/intl-polyfills.ts';",
+          "with": "const INTL_POLYFILLS = 'apps/mobile/src/i18n/intl-polyfills.ts';"
+        }
+      }
+    ]
   }
 }
