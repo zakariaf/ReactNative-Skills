@@ -104,7 +104,10 @@ a heading "When multi-package" and every checker accepts directory options for i
   `app.config.ts`, config plugins).
 - When multi-package: npm workspaces `apps/*` + `packages/*`, package scope `@<org>/<pkg>`, TS-source
   packages; a Node backend that deploys on its own (Cloud Functions) is one more workspace at the root
-  (`functions`), recorded in `contracts/architecture.json` with its `dir` and `world: "node"`. Checkers
+  (`functions`), recorded in `contracts/architecture.json` with its `dir` and `world: "node"`. Its build
+  output stays in its own folder (`functions/lib/`, what its `"main"` names), the one workspace folder
+  the root ignore lists (ESLint `globalIgnores`, `.prettierignore`, `.gitignore`) name; its tests run in
+  a root Jest project of its own (`displayName` its folder, `testEnvironment: 'node'`). Checkers
   find workspaces from `package.json` `workspaces`, never from hard-coded folders.
 
 ## 4. Repository layout
