@@ -83,9 +83,11 @@ elsewhere. The case it exists for: an app on React Native Firebase keeps the Fir
   and tests alike; without `allowIn` no file may import it.
 - `plan-dependency.mjs` plans the package only for a row outside the entry's places.
 - A plain string (`"axios": "<reason>"`) keeps meaning "never a direct dependency, never imported".
-- Mirror an import ban in `eslint.config.mjs` `BANNED_PACKAGE_PATHS` as usual, and lift it in one
-  file-exact block for the allowed files (`restrictedImports({ allow: [<the entry>] })`, naming the
-  rules test files exactly; typescript-and-lint-rules).
+- Mirror an import ban in `eslint.config.mjs` `BANNED_PACKAGE_PATHS` as usual (`bannedWithSubpaths()`
+  when its subpaths are imported too, `firebase/firestore`), and lift it in one block whose `files` are
+  the `allowIn` globs (`files: ['test/rules/**']`, `restrictedImports({ allow: [<the entry>] })`);
+  typescript-and-lint-rules' `check-configs.mjs` accepts that glob only for a scoped entry's
+  `allowIn`, so a new rules test file needs no config change.
 
 `check-deps-policy.mjs` reports every shape problem as `policy-contract` with the key that is wrong,
 including **unknown keys** at the top level, in a row, a companion, a `heldBack` or `banned` entry,

@@ -15,7 +15,7 @@ or when a new folder, adapter or exemption is needed.
 - How check-configs reads the config
 - The file-exact exemptions
 - Blocks other skills own
-- Adding an exception, step by step
+- Adding an exception, step by step (and lifting a ban for a scoped doNotAdd entry's importers)
 - Prettier
 - knip
 - Troubleshooting
@@ -194,7 +194,15 @@ item it exempts:
 - `without(RUNTIME_PATHS, PRESSABLE_IMPORT)` to lift one import ban,
 - `restrictedImports({ paths, patterns })` always prepends `BANNED_PACKAGE_PATHS` and `PARENT_IMPORT`;
   its `allow` list lifts one banned package, and only the file-exact consent-adapter block uses it
-  (`check-configs.mjs` fails a second one: `eslint-weakened [allow-list]`).
+  (`check-configs.mjs` fails a second one: `eslint-weakened [allow-list]`), except the sanctioned lift
+  of a scoped `doNotAdd` entry ("Lifting a ban for the importers a scoped doNotAdd entry names" below).
+- A package that is banned with its subpaths (`firebase` and `firebase/firestore`, `firebase/app`, ...)
+  is a `bannedWithSubpaths(name, message)` entry of `BANNED_PACKAGE_PATHS`: `restrictedImports()` bans
+  the name as a path and `<name>/*` as a pattern, and an `allow` that names the entry lifts both. A
+  plain `banned()` entry bans the exact name only (verified with ESLint 9.39.5 on 2026-10-22: with
+  `bannedWithSubpaths('firebase', ...)` an app file importing `firebase` and `firebase/firestore`
+  fails twice, a `test/rules/` file under the lift block passes; re-verify with `npx eslint
+  --print-config <file>` and a planted import).
 
 A block that writes a fresh short list (`'no-restricted-imports': ['error', { paths: [x] }]`) silently
 drops every other ban for those files. That is the most likely way to weaken the config by accident.
@@ -229,7 +237,7 @@ verbatim, like the `RESTRICTED_PROPERTIES` messages: an edit in place fails `esl
 | Part | Rule | Allowed to differ |
 |---|---|---|
 | each canonical block (its `files`, `ignores`, `rules`, `extends` and options) | present, unchanged, in the template's order (`[canonical-block]`): a later block replaces an earlier one's options, so order is part of the config | nothing; when multi-package, see that section |
-| every other block | names exact files: each `files` entry has a literal file name as its last segment (`src/services/perf/frame-sampler-adapter.ts`, `src/**/test-only.ts`); a block without `files`, a folder glob, a name pattern (`src/**/use-*.ts`) or a `files` value that is not a string list fails (`[exemption-scope]`) | anything inside it, within the other rules (`[fresh-list]`, `[option-redeclared]`, `eslint-rule-off`) |
+| every other block | names exact files: each `files` entry has a literal file name as its last segment (`src/services/perf/frame-sampler-adapter.ts`, `src/**/test-only.ts`); a block without `files`, a folder glob, a name pattern (`src/**/use-*.ts`) or a `files` value that is not a string list fails (`[exemption-scope]`); the one exception is the sanctioned lift of a scoped `doNotAdd` entry, which may name its `allowIn` glob (`[scoped-lift]`, "Adding an exception") | anything inside it, within the other rules (`[fresh-list]`, `[option-redeclared]`, `eslint-rule-off`) |
 | the file groups | `[file-group]` (above) | widening groups gain globs; exemption groups gain exact file names |
 | every other top-level `const` (shared lists, selectors, helpers) | verbatim (`[canonical-const]`) | `PRE_EXISTING`, `IS_MULTI_PACKAGE` and `PACKAGE_IMPORT_EXTENSION` are the app's to fill; `VENDOR_SDK_PATHS` and `BANNED_PACKAGE_PATHS` gain entries but never lose one; new consts are allowed |
 | the items of `defineConfig([...])` that are not blocks | only `globalIgnores(...)`, `expoConfig` and `prettierConfig` (`[config-item]`) | nothing |
@@ -323,6 +331,49 @@ tool or library contract truly needs one:
    Jest thresholds, the scripts and the hooks with `quality-gates.json`. Never edit
    `quality-gates.json` to make it pass; quality-gates owns it.
 7. Commit with a `Gate-Change: <why>` trailer (the config is a gated file).
+
+### Lifting a ban for the importers a scoped doNotAdd entry names
+
+The one exception that may name a glob instead of exact files. When the dependency policy keeps a
+package out of the app but lets some files import it (a scoped `doNotAdd` entry with `allowIn`,
+dependency-management; the Firebase JS SDK for the security-rules tests is the usual case), mirror it
+in three parts and change nothing else:
+
+```js
+// The Firebase JS SDK: the app talks to Firebase through @react-native-firebase/*; only the rules
+// tests import it (contracts/dependency-policy.json doNotAdd "firebase", allowIn test/rules/**).
+const FIREBASE_JS_SDK = bannedWithSubpaths(
+  'firebase',
+  'Use @react-native-firebase/* in the app; the Firebase JS SDK is test tooling for test/rules/ only.',
+);
+const BANNED_PACKAGE_PATHS = [
+  FIREBASE_JS_SDK,
+  // ... the canonical entries
+];
+
+// block 5c or later: the importers the doNotAdd entry's allowIn names, nothing else lifted
+{
+  files: ['test/rules/**'],
+  rules: { 'no-restricted-imports': restrictedImports({ allow: [FIREBASE_JS_SDK] }) },
+},
+```
+
+`check-configs.mjs` accepts such a block, as many as there are scoped entries, without an exact file
+name and without counting its `allow` list, when all of this holds; otherwise it reports each gap as
+`eslint-weakened [scoped-lift]` next to the usual `[exemption-scope]` and `[allow-list]`:
+
+- every name in `allow` is a `banned()` or `bannedWithSubpaths()` const whose package has a `doNotAdd`
+  entry in `contracts/dependency-policy.json` with `allowIn`;
+- every `files` entry lies within one of those `allowIn` globs (`test/rules/**`, or exact files under
+  it); `test/**` fails;
+- the block sets `no-restricted-imports` and nothing else, and its value is the value the canonical
+  config gives those files plus the `allow` list: `restrictedImports({ allow: [...] })` for `test/`
+  (block 4's `restrictedImports({})`), `restrictedImports({ paths: RUNTIME_PATHS, patterns:
+  [NODE_BUILTINS], allow: [...] })` for a file under `src/`. Any other lift drops more than the one
+  package.
+
+A new rules test file then needs no config change. architecture-and-boundaries' `check-boundaries.mjs`
+reads the same `allowIn`, so both gates agree on who may import the package.
 
 Editing `eslint.config.mjs`, `.prettierrc.json` or a `tsconfig*.json` may show the developer a
 permission prompt (they are `ask` paths in `.claude/settings.json`). That is expected: say in one plain

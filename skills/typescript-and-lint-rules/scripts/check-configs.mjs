@@ -8,6 +8,7 @@ import { basename, join, posix } from 'node:path';
 
 import { backendWorkspaces, createReporter, fail, globToRegExp, parseArgs, parseJsonc, readTsconfigPaths, requireDir, resolveLayout, run, walk, walkRepo } from './check-lib.mjs';
 import { appFiles, appTops, coversAppCode, isWorkspaceBuildIgnore, nativeScope } from './lib/app-scope.mjs';
+import { reviewLift, scopedEntries } from './lib/eslint-lifts.mjs';
 import { blockDifferences, configModel, elementsOf, isExactGlob, sameBlockFamily, scopeKey, scopeLabel } from './lib/eslint-structure.mjs';
 import { matchBracket, scanSource } from './lib/source-scan.mjs';
 import { isExpoApp } from './lib/workspaces.mjs';
@@ -62,7 +63,11 @@ const SPEC = {
     '                          also disableTypeChecked, noInlineConfig: false, a second linterOptions block, an extra allow list,',
     '                          a fresh no-restricted-* list or a restrictedImports() call without RUNTIME_PATHS [fresh-list], a',
     '                          rule whose options carry a guarantee (or a limit rule) declared again [option-redeclared], an extra',
-    '                          globalIgnores entry [global-ignores] or ignores key [block-ignores]',
+    '                          globalIgnores entry [global-ignores] or ignores key [block-ignores]; a block that lifts a banned',
+    '                          package (allow: [...]) beyond the consent adapter and is not the sanctioned lift of a scoped',
+    '                          doNotAdd entry: files within its allowIn, only no-restricted-imports, the canonical value of',
+    '                          those files plus the allow list [scoped-lift] (such a block may name a glob and needs no',
+    '                          exact files)',
     '  eslint-warn             a rule uses the "warn" severity or 1 (there is no warning tier)',
     '  eslint-forbidden-import the config imports a forbidden plugin (eslint-plugin-prettier)',
     '  config-stray            a second ESLint, Prettier or knip config exists (.eslintrc*, prettier.config.js, a workspace config,',
@@ -89,6 +94,8 @@ const SPEC = {
     '                          (--rule, --config, --ignore-pattern, ...), lints a narrower target than ., or swallows eslint\'s',
     '                          exit code (|| true, ; echo, a pipe)',
     '',
+    'Reads contracts/dependency-policy.json (optional; dependency-management) for the scoped doNotAdd entries whose',
+    '"allowIn" importers may have a lift block.',
     'Reads from rn-skills.config.json (optional): the layout keys (srcDir, ...) and "layoutEntries", a list of extra',
     'top-level folders or files that belong to the app (so ignore-pre-existing does not ask to ignore them, and',
     'ignore-app-code keeps every ignore list out of them).',
@@ -461,6 +468,7 @@ function canonicalEslint() {
   return canonicalModel;
 }
 
+const SCOPED_LIFT_FIX = 'A block may lift a banned package only for the importers its scoped doNotAdd entry names (contracts/dependency-policy.json "allowIn", for example test/rules/**): files within those globs, \'no-restricted-imports\': restrictedImports({ allow: [<the banned entry>] }) and nothing else (references/eslint-config-guide.md, "Adding an exception"). Any other lift is a stop-and-ask decision with a Gate-Change trailer.';
 const STRUCTURE_FIX = 'Restore it from templates/eslint.config.mjs. An exception is a new block that names exact files (references/eslint-config-guide.md, "Adding an exception"); any other change is a stop-and-ask decision with a Gate-Change trailer.';
 /** The canonical file groups: the const arrays the canonical blocks name in files or ignores. */
 const groupsOf = (model) => [...new Set(model.items.filter((item) => item.kind === 'block').flatMap((block) => [...(block.files?.units ?? []), ...(block.ignores?.units ?? [])]).map((entry) => entry.group).filter((group) => group !== null))];
@@ -540,7 +548,7 @@ function wideUnits(block, canonicalExact) {
  * later block replaces a rule's options for its files, so a new folder-wide block (or a changed scope)
  * can drop any ban, however it is spelled.
  */
-function checkBlocks(canonical, app, spec, report, multiPackage) {
+function checkBlocks(canonical, app, spec, report, { multiPackage, scoped }) {
   const groupExact = new Map(groupsOf(canonical).map((group) => [group, canonical.constGlobs(group).globs.every(isExactGlob)]));
   const keyOf = (item) => (item.kind === 'block' ? `block:${scopeKey(item)}` : `other:${item.head}`);
   const equal = (want, got) => (want.kind === 'block' ? blockDifferences(want, got, { multiPackage }).length === 0 : want.head === 'globalIgnores' || want.text === got.text);
@@ -573,8 +581,17 @@ function checkBlocks(canonical, app, spec, report, multiPackage) {
     }
     report.problem({ file: spec.file, line: firstLine, rule: 'eslint-weakened', message: `${label} is missing or its files/ignores changed [canonical-block]`, fix: STRUCTURE_FIX });
   }
+  const sanctioned = [];
   app.items.forEach((item, index) => {
     if (used.has(index)) return;
+    const lift = item.kind === 'block' ? reviewLift(item, { app, canonical, scoped }) : null;
+    if (lift !== null && lift.reasons.length === 0) {
+      sanctioned.push({ start: item.start, end: item.end });
+      return;
+    }
+    for (const reason of lift?.reasons ?? []) {
+      report.problem({ file: spec.file, line: item.filesLine ?? item.line, rule: 'eslint-weakened', message: `the block for ${scopeLabel(item)} ${reason} [scoped-lift]`, fix: SCOPED_LIFT_FIX });
+    }
     if (item.kind !== 'block') {
       report.problem({ file: spec.file, line: item.line, rule: 'eslint-weakened', message: `defineConfig lists ${item.head}, which is not a canonical config item; a shared config can switch any rule off for every file [config-item]`, fix: 'Remove it. Only the canonical items, the canonical blocks and blocks that name exact files belong in defineConfig([...]).' });
       return;
@@ -588,6 +605,7 @@ function checkBlocks(canonical, app, spec, report, multiPackage) {
       report.problem({ file: spec.file, line: item.filesLine ?? item.line, rule: 'eslint-weakened', message: `a block beyond the canonical ones reaches ${where}; it replaces those files' rule options [exemption-scope]`, fix: 'Name the exact file the tool or library contract needs (src/services/<concern>/<library>-<concern>-adapter.ts, src/i18n/direction.ts). A folder-wide block is a stop-and-ask decision with a Gate-Change trailer.' });
     }
   });
+  return sanctioned;
 }
 
 /** Mutations of a shared list (RESTRICTED_PROPERTIES.length = 0, SYNTAX.x.selector = ..., push, splice, delete). */
@@ -615,13 +633,18 @@ function checkStatements(app, spec, report) {
 
 /** The structural comparison with templates/eslint.config.mjs (the canonical blocks, groups and lists). */
 function checkStructure(text, spec, report, root, layout) {
-  const app = configModel(text, { prefixes: workspacePrefixes(root, layout) });
+  const prefixes = workspacePrefixes(root, layout);
+  const app = configModel(text, { prefixes });
   const canonical = canonicalEslint();
   checkFileGroups(canonical, app, spec, report);
   checkConsts(canonical, app, spec, report);
-  checkBlocks(canonical, app, spec, report, layout.mode === 'monorepo');
+  const sanctioned = checkBlocks(canonical, app, spec, report, { multiPackage: layout.mode === 'monorepo', scoped: scopedEntries(root, layout.contractsDir, prefixes) });
   checkStatements(app, spec, report);
+  return sanctioned;
 }
+
+/** The counted patterns a sanctioned lift block may hold beyond the canonical count. */
+const LIFT_COUNTED = new Set(['allow-list', 'fresh-list']);
 
 function checkEslint(root, layout, report) {
   const spec = BASELINE.eslint;
@@ -640,7 +663,9 @@ function checkEslint(root, layout, report) {
   checkLimits(scan, spec, report);
   checkGlobalIgnores(scan, spec, report, ignoreScope(root, layout));
   checkBackendBuildEslint(scan, spec, report, ignoreScope(root, layout));
-  checkStructure(readFileSync(path, 'utf8'), spec, report, root, layout);
+  // A sanctioned lift block (a scoped doNotAdd entry's allowIn) is not counted as an extra allow list.
+  const sanctioned = checkStructure(readFileSync(path, 'utf8'), spec, report, root, layout);
+  const inSanctioned = (index) => sanctioned.some((range) => range.start <= index && index < range.end);
   // Every rule switched off, in any spelling: 'rule': 'off', 'rule': ['off'], 'rule': 0, bare: 'off'.
   const offHits = new Map();
   const offPattern = /(?:(['"])([^'"\n]+)\1\s*:\s*(?:\[\s*)?(?:'off'|"off"|0)|(?<![\w$'".-])([A-Za-z_$][\w$]*)\s*:\s*(?:\[\s*)?(?:'off'|"off"))(?![\w.])/g;
@@ -655,7 +680,7 @@ function checkEslint(root, layout, report) {
     }
   }
   for (const item of spec.maxOccurrences) {
-    const hits = [...code.matchAll(new RegExp(item.pattern, 'g'))];
+    const hits = [...code.matchAll(new RegExp(item.pattern, 'g'))].filter((hit) => !(LIFT_COUNTED.has(item.id) && inSanctioned(hit.index)));
     if (hits.length > item.max) {
       report.problem({ file: spec.file, line: scan.lineOf(hits[item.max].index), rule: 'eslint-weakened', message: `${item.what} appears ${hits.length} times; the canonical config has ${item.max} [${item.id}]`, fix: item.fix ?? 'Remove it; exceptions name single files and rebuild the rule from the shared lists.' });
     }

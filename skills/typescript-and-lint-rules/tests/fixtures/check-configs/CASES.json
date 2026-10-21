@@ -1841,5 +1841,142 @@
         }
       }
     ]
+  },
+  "pass-eslint-scoped-lift": {
+    "expect": [
+      "check-configs: 5 config areas checked, 0 problems"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "const BANNED_PACKAGE_PATHS = [\n",
+          "with": "// The Firebase JS SDK: the app talks to Firebase through @react-native-firebase/*; only the rules\n// tests import the JS SDK (contracts/dependency-policy.json doNotAdd \"firebase\", allowIn test/rules/**).\nconst FIREBASE_JS_SDK = bannedWithSubpaths(\n  'firebase',\n  'Use @react-native-firebase/* in the app; the Firebase JS SDK is test tooling for test/rules/ only.',\n);\nconst BANNED_PACKAGE_PATHS = [\n  FIREBASE_JS_SDK,\n"
+        }
+      },
+      {
+        "write": {
+          "file": "contracts/dependency-policy.json",
+          "content": "{\n  \"doNotAdd\": {\n    \"axios\": \"use the ApiClient (fetch)\",\n    \"firebase\": {\n      \"reason\": \"the app talks to Firebase through @react-native-firebase/*\",\n      \"where\": \"app\",\n      \"allowIn\": [\n        \"test/rules/**\"\n      ]\n    }\n  }\n}\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  // 8. Plain JS config files: no type information.\n",
+          "with": "  // The rules tests alone import the Firebase JS SDK (the scoped doNotAdd entry's allowIn).\n  {\n    files: ['test/rules/**'],\n    rules: { 'no-restricted-imports': restrictedImports({ allow: [FIREBASE_JS_SDK] }) },\n  },\n  // 8. Plain JS config files: no type information.\n"
+        }
+      }
+    ]
+  },
+  "pass-eslint-scoped-lift-exact": {
+    "expect": [
+      "check-configs: 5 config areas checked, 0 problems"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "const BANNED_PACKAGE_PATHS = [\n",
+          "with": "// The Firebase JS SDK: the app talks to Firebase through @react-native-firebase/*; only the rules\n// tests import the JS SDK (contracts/dependency-policy.json doNotAdd \"firebase\", allowIn test/rules/**).\nconst FIREBASE_JS_SDK = bannedWithSubpaths(\n  'firebase',\n  'Use @react-native-firebase/* in the app; the Firebase JS SDK is test tooling for test/rules/ only.',\n);\nconst BANNED_PACKAGE_PATHS = [\n  FIREBASE_JS_SDK,\n"
+        }
+      },
+      {
+        "write": {
+          "file": "contracts/dependency-policy.json",
+          "content": "{\n  \"doNotAdd\": {\n    \"axios\": \"use the ApiClient (fetch)\",\n    \"firebase\": {\n      \"reason\": \"the app talks to Firebase through @react-native-firebase/*\",\n      \"where\": \"app\",\n      \"allowIn\": [\n        \"test/rules/**\"\n      ]\n    }\n  }\n}\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  // 8. Plain JS config files: no type information.\n",
+          "with": "  // The rules tests alone import the Firebase JS SDK (the scoped doNotAdd entry's allowIn).\n  {\n    files: ['test/rules/rules-test-env.ts', 'test/rules/firestore.rules.test.ts'],\n    rules: { 'no-restricted-imports': restrictedImports({ allow: [FIREBASE_JS_SDK] }) },\n  },\n  // 8. Plain JS config files: no type information.\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  // 9. Prettier last",
+          "with": "  // A second sanctioned lift: the same importers through their exact names.\n  {\n    files: ['test/rules/storage.rules.test.ts'],\n    rules: { 'no-restricted-imports': restrictedImports({ allow: [FIREBASE_JS_SDK] }) },\n  },\n  // 9. Prettier last"
+        }
+      }
+    ]
+  },
+  "bad-eslint-scoped-lift": {
+    "expect": [
+      "[eslint-weakened] a block beyond the canonical ones reaches every file under 'test/**'; it replaces those files' rule options [exemption-scope]",
+      "lifts firebase for test/**, which its doNotAdd entry's allowIn (test/rules/**) does not cover",
+      "[eslint-weakened] a block beyond the canonical ones reaches every file under 'test/rules/**'; it replaces those files' rule options [exemption-scope]",
+      "lifts ATT_IMPORT, which no scoped doNotAdd entry with allowIn names",
+      "[eslint-weakened] a block beyond the canonical ones reaches every file under 'src/features/**'; it replaces those files' rule options [exemption-scope]",
+      "does not keep the canonical no-restricted-imports of those files beside its allow list (restrictedImports({paths:RUNTIME_PATHS,patterns:[NODE_BUILTINS]}))",
+      "[allow-list]"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "const BANNED_PACKAGE_PATHS = [\n",
+          "with": "// The Firebase JS SDK: the app talks to Firebase through @react-native-firebase/*; only the rules\n// tests import the JS SDK (contracts/dependency-policy.json doNotAdd \"firebase\", allowIn test/rules/**).\nconst FIREBASE_JS_SDK = bannedWithSubpaths(\n  'firebase',\n  'Use @react-native-firebase/* in the app; the Firebase JS SDK is test tooling for test/rules/ only.',\n);\nconst BANNED_PACKAGE_PATHS = [\n  FIREBASE_JS_SDK,\n"
+        }
+      },
+      {
+        "write": {
+          "file": "contracts/dependency-policy.json",
+          "content": "{\n  \"doNotAdd\": {\n    \"axios\": \"use the ApiClient (fetch)\",\n    \"firebase\": {\n      \"reason\": \"the app talks to Firebase through @react-native-firebase/*\",\n      \"where\": \"app\",\n      \"allowIn\": [\n        \"test/rules/**\"\n      ]\n    }\n  }\n}\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  // 8. Plain JS config files: no type information.\n",
+          "with": "  // Planted: wider than the allowIn.\n  {\n    files: ['test/**'],\n    rules: { 'no-restricted-imports': restrictedImports({ allow: [FIREBASE_JS_SDK] }) },\n  },\n  // 8. Plain JS config files: no type information.\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  // 8. Plain JS config files: no type information.\n",
+          "with": "  // Planted: lifts a package no scoped entry allows.\n  {\n    files: ['test/rules/**'],\n    rules: { 'no-restricted-imports': restrictedImports({ allow: [FIREBASE_JS_SDK, ATT_IMPORT] }) },\n  },\n  // 8. Plain JS config files: no type information.\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  // 8. Plain JS config files: no type information.\n",
+          "with": "  // Planted: drops the runtime bans of app code.\n  {\n    files: ['src/features/**'],\n    rules: { 'no-restricted-imports': restrictedImports({ allow: [FIREBASE_JS_SDK] }) },\n  },\n  // 8. Plain JS config files: no type information.\n"
+        }
+      }
+    ]
+  },
+  "bad-eslint-scoped-lift-unscoped": {
+    "expect": [
+      "[eslint-weakened] a block beyond the canonical ones reaches every file under 'test/rules/**'; it replaces those files' rule options [exemption-scope]",
+      "lifts firebase, whose doNotAdd entry names no allowIn",
+      "[allow-list]"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "const BANNED_PACKAGE_PATHS = [\n",
+          "with": "// The Firebase JS SDK: the app talks to Firebase through @react-native-firebase/*; only the rules\n// tests import the JS SDK (contracts/dependency-policy.json doNotAdd \"firebase\", allowIn test/rules/**).\nconst FIREBASE_JS_SDK = bannedWithSubpaths(\n  'firebase',\n  'Use @react-native-firebase/* in the app; the Firebase JS SDK is test tooling for test/rules/ only.',\n);\nconst BANNED_PACKAGE_PATHS = [\n  FIREBASE_JS_SDK,\n"
+        }
+      },
+      {
+        "write": {
+          "file": "contracts/dependency-policy.json",
+          "content": "{\n  \"doNotAdd\": {\n    \"axios\": \"use the ApiClient (fetch)\",\n    \"firebase\": {\n      \"reason\": \"the app talks to Firebase through @react-native-firebase/*\",\n      \"where\": \"app\"\n    }\n  }\n}\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "  // 8. Plain JS config files: no type information.\n",
+          "with": "  // The rules tests alone import the Firebase JS SDK (the scoped doNotAdd entry's allowIn).\n  {\n    files: ['test/rules/**'],\n    rules: { 'no-restricted-imports': restrictedImports({ allow: [FIREBASE_JS_SDK] }) },\n  },\n  // 8. Plain JS config files: no type information.\n"
+        }
+      }
+    ]
   }
 }
