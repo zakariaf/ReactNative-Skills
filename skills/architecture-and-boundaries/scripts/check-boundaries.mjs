@@ -310,7 +310,9 @@ const UNCLASSIFIED_FIX =
   'Decide first (stop and ask the developer): a side effect (device API, storage, network, notifications, system ' +
   'sheets, analytics) goes into vendorSdks in contracts/architecture.json with its port, and only its adapter ' +
   'imports it; a UI building block or a read-only fact goes into portlessSdks with the reason. Mirror a vendor ' +
-  'SDK in eslint.config.mjs VENDOR_SDK_PATHS.';
+  'SDK in eslint.config.mjs VENDOR_SDK_PATHS. A server SDK (firebase-admin, firebase-functions: listed in ' +
+  'sdkPackagePatterns so bundled code cannot import it) is never classified: that code belongs in the Node backend ' +
+  'workspace (functions/), which imports it freely.';
 
 /** Where a ban is recorded, for the fix: the install policy, the contract, or the defaults. */
 function bannedFix(arch, name) {

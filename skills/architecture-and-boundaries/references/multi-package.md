@@ -57,6 +57,19 @@ in the contract with its folder and its world:
   reported; with one, the unrecorded backend is a `workspaces` problem naming the entry to add.
 - A `dir` outside `packages/` always needs `"world": "node"`; the contract fails to load otherwise
   (exit 2).
+- **Server SDKs** (`firebase-admin`, `firebase-functions`: packages only the backend's `package.json`
+  declares) are never imported by an app or a shared package, and the contract has no per-world SDK
+  list to say so: `vendorSdks` and `portlessSdks` classify what bundled code imports, and
+  `check-boundaries` asks Node-world code for no classification, so the backend imports its SDKs
+  freely. Add their names to the contract's `sdkPackagePatterns` (`"sdkPackagePatterns":
+  ["firebase-admin", "firebase-functions"]`): an import from app or package runtime code is then
+  `unclassified-sdk`, whose fix says to move server code into the backend. Never put them in
+  `vendorSdks` or `portlessSdks` (that would sanction the import from bundled code), nor in
+  `bannedPackages` or the policy's `doNotAdd` (both ban every importer, the backend included). In
+  ESLint the same rule is an `import/no-restricted-paths` zone from `./node_modules/firebase-admin`
+  and `./node_modules/firebase-functions` to the app and package folders (typescript-and-lint-rules'
+  5-zones block takes extra zones). A per-world SDK classification is not implemented: the pattern
+  plus the zone is the supported form (decided 2026-10-21).
 
 ## Recording the packages
 

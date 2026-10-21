@@ -107,7 +107,8 @@ zero-dependency checkers prove it on every change, on resolved imports, for iOS 
     checkers pass. (`app-entry`, `app-files`)
 12. **When multi-package, apps never import each other and packages never import an app.** Workspaces
     `apps/*` + `packages/*` (plus a Node backend such as `functions` by its folder, recorded with its `dir`
-    and `world: "node"`), each package recorded in the contract (`pure`, `world`), packages consumed as
+    and `world: "node"`; its server SDKs such as `firebase-admin` go into `sdkPackagePatterns`, so bundled
+    code cannot import them), each package recorded in the contract (`pure`, `world`), packages consumed as
     TypeScript source, one React, every native module in every app at one version. Why: one change in a
     package reaches every app, and autolinking (iOS and Android) sees only an app's own dependencies.
     (`workspaces`, `manifest`, `one-react`, `native-deps`, `app-to-app`, `package-direction`)
