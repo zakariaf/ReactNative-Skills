@@ -98,8 +98,9 @@ both kinds. Verified on 2026-10-21 with firebase-tools 15.33.0, `@firebase/rules
    (unit-and-component-tests), whose unit project leaves `*.rules.test.ts` out by itself once
    `jest.emulator.config.js` exists, with `'\\.rules\\.test\\.'` added after the android entry of
    `quality-gates.json` `jest.projects.unit.testPathIgnorePatterns` in the same gate change (never a
-   hand-edited ignore list: emulator-tests reference); `assertSucceeds` and `assertFails` in
-   `jest/expect-expect`'s `assertFunctionNames` (typescript-and-lint-rules); the JDK 21 step and the <!-- stack-pin-ignore: the Firebase emulators' JDK -->
+   hand-edited ignore list: emulator-tests reference); `assertSucceeds` and `assertFails` appended
+   to the tests block's `jest/expect-expect` `assertFunctionNames` and the `test/rules/**` lift of the
+   JS SDK ban (typescript-and-lint-rules; toolchain reference); the JDK 21 step and the <!-- stack-pin-ignore: the Firebase emulators' JDK -->
    jar cache in the CI verify job (ci-pipeline-and-gates).
 7. **Run the checker:** `node ${CLAUDE_SKILL_DIR}/scripts/check-rules-tests.mjs .` (repo root,
    positional). Fix every `FAIL` line ([references/checks.md](references/checks.md) explains each

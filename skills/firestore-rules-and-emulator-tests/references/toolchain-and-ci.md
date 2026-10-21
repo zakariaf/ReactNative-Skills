@@ -53,8 +53,20 @@ dependency-management's `check-deps-policy.mjs` then fails `firebase` in the app
 `check-boundaries.mjs` reads the same entry and fails every import of `firebase` outside
 `test/rules/**` (`banned-package`), app code and other tests alike. A plain string entry
 (`"firebase": "<reason>"`) would fail the dev row's install and the rules tests' imports too. Mirror
-the ban in `eslint.config.mjs` `BANNED_PACKAGE_PATHS` and lift it in one file-exact block naming the
-rules test files.
+the ban in `eslint.config.mjs`: `const FIREBASE_JS_SDK = bannedWithSubpaths('firebase', '<message>')`
+in `BANNED_PACKAGE_PATHS` (it bans `firebase` and `firebase/*`, so `firebase/firestore` too), lifted
+in one block for the folder the entry's `allowIn` names:
+
+```js
+{
+  files: ['test/rules/**'],
+  rules: { 'no-restricted-imports': restrictedImports({ allow: [FIREBASE_JS_SDK] }) },
+},
+```
+
+typescript-and-lint-rules' `check-configs.mjs` accepts that glob only because the scoped `doNotAdd`
+entry's `allowIn` names it (`[scoped-lift]` otherwise), so a new rules test file needs no change to
+the gated config.
 
 ## Node
 

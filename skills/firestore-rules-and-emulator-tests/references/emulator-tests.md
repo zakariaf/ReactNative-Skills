@@ -127,8 +127,12 @@ broken create rule fails every update test with a confusing message.
 - Call them directly in the describe's tests, not through a wrapper helper: the checker counts the
   calls inside each describe.
 - The house ESLint rule `jest/expect-expect` counts only the names in its `assertFunctionNames`; the
-  canonical config (typescript-and-lint-rules) needs `'assertSucceeds'` and `'assertFails'` there,
-  or every rules test fails lint as "Test has no assertions". Never wrap them in a dummy `expect`.
+  canonical config (typescript-and-lint-rules) needs `'assertSucceeds'` and `'assertFails'` appended
+  there, in the tests block itself (`['expect', 'fc.assert', 'assertSucceeds', 'assertFails']`, the one
+  sanctioned addition `check-configs` accepts; never in the lift block, where it fails
+  `[scoped-lift]`), or every rules test fails lint as "Test has no assertions". Never wrap them in a
+  dummy `expect`. tdd-workflow's `check-tests.mjs` counts them as assertions when the file imports
+  them from `@firebase/rules-unit-testing`.
 
 ## What every block's describe proves
 
