@@ -62,6 +62,7 @@ One row per skill: the "Use when" and "Not for" clauses of its description. This
 | `forms-and-input` | use when adding a form, text field or validation, or the keyboard hides a field | sign-in (auth-and-secure-storage) |
 | `adaptive-layout` | use when making screens responsive or for tablets, iPad, foldables, rotation, split screen, orientation lock | tab bars (navigation-and-routing) |
 | `motion-and-animation` | use when animating a transition, sheet, loop, drag, spring or celebration, or one ignores Reduce Motion or blocks taps | canvases (skia-canvas-rendering) |
+| `lottie-and-rive` | use when adding a .json or .riv file | Reanimated motion (motion-and-animation) |
 | `audio-and-haptics-feedback` | use when adding or tuning sounds, SFX, music or haptics, or sound ignores the silent switch, stops the user's music or a pulse fails on Android | settings (settings-and-preferences) |
 | `icons-app-icon-and-splash` | use when adding an icon, logo, app icon or splash, or an image or emoji appears | photos (media-images-and-files) |
 | `skia-canvas-rendering` | use when drawing a chart, grid or board, or canvas animation freezes | touch (canvas-gestures-and-hit-testing) |
@@ -84,6 +85,9 @@ One row per skill: the "Use when" and "Not for" clauses of its description. This
 |---|---|---|
 | `state-management-zustand` | use when adding a store, action or selector, deciding where state lives, leaving Redux or persist+AsyncStorage, or on Maximum update depth | server data (networking-and-server-state) |
 | `networking-and-server-state` | use when calling an API, adding a query or mutation, or data is stale | local data (persistence-and-migrations) |
+| `firebase-rnfb` | use when setting up RNFB, adding Firestore, Storage or Functions calls, or writes hang offline | sign-in tokens (auth-and-secure-storage) |
+| `firestore-rules-and-emulator-tests` | use when adding a collection or upload path, or on permission denied | app reads or writes (firebase-rnfb) |
+| `cloud-functions-backend` | use when adding a callable, trigger, server secret or paid API call | security rules (firestore-rules-and-emulator-tests) |
 | `auth-and-secure-storage` | use when adding login, tokens, 401 retries, logout or account deletion | API calls (networking-and-server-state) |
 | `persistence-and-migrations` | use when adding a table, column or saved data, leaving AsyncStorage, or data is lost after an update | stores (state-management-zustand) |
 | `run-migration` (runbook) | use when shipping a migration | writing steps (persistence-and-migrations) |
@@ -120,7 +124,8 @@ One row per skill: the "Use when" and "Not for" clauses of its description. This
 | Skill | Use when | Not for |
 |---|---|---|
 | `admob-ads-and-consent` | use when touching ads, consent, ATT, ad IDs or rewarded perks | purchases (in-app-purchases) |
-| `in-app-purchases` | use when touching IAP, buy, restore, paywall or Premium state | ads (admob-ads-and-consent) |
+| `in-app-purchases` | use when touching IAP, buy, restore, paywall or Premium state | ads (admob-ads-and-consent) or RevenueCat subscriptions (subscriptions-revenuecat) |
+| `subscriptions-revenuecat` | use when adding react-native-purchases, a renewing plan or its webhook | an expo-iap unlock (in-app-purchases) |
 | `privacy-and-store-declarations` | use when an SDK lands, a release nears or an audit fails | installs (dependency-management) |
 | `crash-reporting-and-observability` | use when adding Sentry or a DSN, or stacks are minified | analytics (analytics-and-consent) |
 | `analytics-and-consent` | use when adding analytics, events, screen views or a usage-data toggle | crashes (crash-reporting-and-observability) |

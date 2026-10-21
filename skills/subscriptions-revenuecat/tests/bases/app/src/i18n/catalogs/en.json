@@ -1,0 +1,8 @@
+{
+  "paywall.title": "Tasks Premium",
+  "paywall.plan.monthly": "Monthly, {priceText}",
+  "paywall.plan.annual": "Yearly, {priceText}",
+  "paywall.plan.per-month": "About {priceText} a month",
+  "paywall.restore-button": "Restore purchases",
+  "paywall.renewal-notice": "Renews automatically. Cancel any time in your store settings."
+}

@@ -207,6 +207,12 @@
         "manual": false
       },
       {
+        "name": "lottie-and-rive",
+        "category": "ui",
+        "plugin": "core",
+        "manual": false
+      },
+      {
         "name": "audio-and-haptics-feedback",
         "category": "ui",
         "plugin": "core",
@@ -274,6 +280,24 @@
       },
       {
         "name": "networking-and-server-state",
+        "category": "data",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "firebase-rnfb",
+        "category": "data",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "firestore-rules-and-emulator-tests",
+        "category": "data",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "cloud-functions-backend",
         "category": "data",
         "plugin": "core",
         "manual": false
@@ -406,6 +430,12 @@
       },
       {
         "name": "in-app-purchases",
+        "category": "money-privacy",
+        "plugin": "core",
+        "manual": false
+      },
+      {
+        "name": "subscriptions-revenuecat",
         "category": "money-privacy",
         "plugin": "core",
         "manual": false
@@ -629,7 +659,12 @@
         "ota-updates",
         "new-game-scaffold",
         "game-balance-and-bots",
-        "expo-prebuild-and-config-plugins"
+        "expo-prebuild-and-config-plugins",
+        "firebase-rnfb",
+        "firestore-rules-and-emulator-tests",
+        "cloud-functions-backend",
+        "subscriptions-revenuecat",
+        "lottie-and-rive"
       ],
       "require": [
         "tdd-workflow"
@@ -793,6 +828,29 @@
       "quick": true
     },
     {
+      "task": "Add a Lottie or Rive animation",
+      "skills": [
+        "lottie-and-rive",
+        "motion-and-animation",
+        "accessibility-as-code",
+        "performance-budgets",
+        "dependency-management",
+        "tdd-workflow"
+      ],
+      "note": "Bundled files only, within the size budget, with a still frame for Reduce Motion.",
+      "quick": true
+    },
+    {
+      "task": "An animation file is too big, loops forever or ignores Reduce Motion",
+      "skills": [
+        "lottie-and-rive",
+        "motion-and-animation",
+        "accessibility-as-code",
+        "performance-budgets",
+        "tdd-workflow"
+      ]
+    },
+    {
       "task": "Add or tune sounds, music or haptics",
       "skills": [
         "audio-and-haptics-feedback",
@@ -944,6 +1002,86 @@
         "tdd-workflow"
       ],
       "note": "Account deletion in the app is a store requirement on both platforms when the app has sign-up."
+    },
+    {
+      "task": "Add a Firestore read, write or listener",
+      "skills": [
+        "firebase-rnfb",
+        "firestore-rules-and-emulator-tests",
+        "architecture-and-boundaries",
+        "error-handling-typed-results",
+        "persistence-and-migrations",
+        "async-safety",
+        "tdd-workflow"
+      ],
+      "note": "Writes never wait for the server while offline; every listener unsubscribes; a new collection or field ships with its rule and an emulator test.",
+      "quick": true
+    },
+    {
+      "task": "Set up React Native Firebase",
+      "skills": [
+        "firebase-rnfb",
+        "expo-prebuild-and-config-plugins",
+        "app-variants-and-environment",
+        "dependency-management",
+        "privacy-and-store-declarations",
+        "tdd-workflow"
+      ],
+      "note": "One Firebase project per variant; the emulators in development and tests."
+    },
+    {
+      "task": "Add a Firestore collection or change its security rules",
+      "skills": [
+        "firestore-rules-and-emulator-tests",
+        "firebase-rnfb",
+        "quality-gates",
+        "ci-pipeline-and-gates",
+        "tdd-workflow"
+      ],
+      "note": "Deny by default; each allow is proven by an emulator test that fails without it."
+    },
+    {
+      "task": "Fix a permission-denied error from Firestore or Storage",
+      "skills": [
+        "firestore-rules-and-emulator-tests",
+        "firebase-rnfb",
+        "auth-and-secure-storage",
+        "troubleshooting-playbook",
+        "tdd-workflow"
+      ],
+      "note": "Reproduce it as a failing rules test on the emulator before changing a rule."
+    },
+    {
+      "task": "Add or change a Cloud Function, callable or trigger",
+      "skills": [
+        "cloud-functions-backend",
+        "firebase-rnfb",
+        "firestore-rules-and-emulator-tests",
+        "error-handling-typed-results",
+        "dependency-management",
+        "tdd-workflow"
+      ],
+      "quick": true
+    },
+    {
+      "task": "Add a server secret or paid API key",
+      "skills": [
+        "cloud-functions-backend",
+        "app-variants-and-environment",
+        "privacy-and-store-declarations",
+        "tdd-workflow"
+      ],
+      "note": "EXPO_PUBLIC_ values ship inside the app; a paid key lives only in a secret bound to the function that uses it."
+    },
+    {
+      "task": "Add a per-user quota, a budget alert or a kill switch",
+      "skills": [
+        "cloud-functions-backend",
+        "firestore-rules-and-emulator-tests",
+        "firebase-rnfb",
+        "tdd-workflow"
+      ],
+      "note": "Paid work runs only behind the kill switch and a server-side quota; quota and switch docs are server-only."
     },
     {
       "task": "Add a table, a column or saved data, or leave AsyncStorage",
@@ -1143,6 +1281,35 @@
         "accessibility-as-code"
       ],
       "note": "StoreKit testing on iOS and license testers on Play before any release."
+    },
+    {
+      "task": "Sell a subscription with RevenueCat",
+      "skills": [
+        "subscriptions-revenuecat",
+        "cloud-functions-backend",
+        "firestore-rules-and-emulator-tests",
+        "firebase-rnfb",
+        "screen-contracts",
+        "ui-states-and-feedback",
+        "i18n-strings-and-catalogs",
+        "rtl-and-direction",
+        "accessibility-as-code",
+        "design-visual-parity",
+        "privacy-and-store-declarations",
+        "tdd-workflow"
+      ],
+      "note": "A one-time Premium unlock with no server stays with in-app-purchases."
+    },
+    {
+      "task": "Add or change the subscription webhook or a server entitlement check",
+      "skills": [
+        "subscriptions-revenuecat",
+        "cloud-functions-backend",
+        "firestore-rules-and-emulator-tests",
+        "firebase-rnfb",
+        "tdd-workflow"
+      ],
+      "note": "The webhook is idempotent, and only the server writes the entitlement record."
     },
     {
       "task": "Add crash reporting, a DSN, source maps or symbols",

@@ -13,7 +13,7 @@ import { createReporter, notYetCreated, parseArgs, readWorkspaces, requireDir, r
 import { checkDocument } from './lib/document-rules.mjs';
 import { replayMigrations } from './lib/migration-replay.mjs';
 import { knownTables, loadSources } from './lib/persistence-source.mjs';
-import { checkDocumentWriters, checkRepoFiles, KEY_VALUE_STORES, keyValueStoreOf, LOCAL_STORAGE_INSTALL, SECOND_ENGINES } from './lib/repo-rules.mjs';
+import { checkDocumentWriters, checkRepoFiles, KEY_VALUE_STORES, keyValueStoreOf, LOCAL_STORAGE_INSTALL, SECOND_ENGINES, SYNCED_STORE_PACKAGES } from './lib/repo-rules.mjs';
 import { checkBackgroundCheckpoint, checkBaselineWired, checkBoundParams, checkFixtures, checkMigrations, checkOpenAtImport, checkOpenPath, checkPeeks, checkRepositories, checkRequiredFiles, checkResets, checkSchemas, checkSqlOutsideRepositories, isStepFile, paths } from './lib/tables-rules.mjs';
 
 const SPEC = {
@@ -38,8 +38,11 @@ const SPEC = {
     '                          outside the data folder, a driver.run/get/all/exec/transaction call, or `.driver` on',
     '                          useAppData(), an opener or an AppData/AppDatabase value (or cast to SqlDriver), in a',
     '                          file that imports the data layer; `.driver` on the app\'s own nouns is left alone',
-    '  second-persistence      AsyncStorage, another database engine, zustand persist, or a second key-value store',
-    '                          (a file listed in the contract\'s legacyImports may import an older engine once)',
+    '  second-persistence      AsyncStorage, another database engine, zustand persist, a second key-value store, or a',
+    '                          synced store (Firestore, Realtime Database, PowerSync, ...) the contract does not declare',
+    '                          as syncedStore (a file listed in the contract\'s legacyImports may import an older engine once)',
+    '  synced-store-outside-adapter  the syncedStore profile: its package imported outside syncedStore.adapterDir',
+    '                          (tests, root mocks and scripts excepted)',
     '  single-validator        zod, yup, superstruct, io-ts, joi, ajv, arktype or typebox imported (valibot is the one)',
     '  sql-outside-data        SQL text outside the data folder: uppercase keywords, any case on one of the app\'s',
     '                          tables, or any statement handed to .run/.get/.all/.exec (contract sqlAllowed lists',
@@ -79,12 +82,16 @@ const SPEC = {
     '  validate-on-read (what .get/.all on the driver returns, whatever its SQL argument, reaches a parse that takes it:',
     '  the call, a variable, loop binding or array-callback parameter derived from it, or a same-file helper parameter',
     '  that does), exec-in-repository (driver.exec in a repository file),',
-    '  sql-outside-method (a statement outside every repository method and the helpers they call), schema-strict,',
+    '  sql-outside-method (a statement outside every repository method and the helpers they call), schema-strict (not in the syncedStore adapterDir),',
     '  protected-reset (also SQL built from a value).',
+    'Mode synced (app data in the declared synced store, no SQLite database; device-only data in the key-value store):',
+    '  only the repo-wide rules, synced-store-outside-adapter and contract (an expo-sqlite database import or a',
+    '  <dataDir>/sql-driver.ts under mode synced) run.',
     'Rules (mode document or both): missing-file, schema-strict, schema-version, migration-chain, migration-pure,',
     '  fixture-*, validate-before-write, protected-reset, quarantine-not-delete, write-outside-service.',
     '',
-    'NOT APPLICABLE when package.json lists no local persistence package (expo-sqlite, AsyncStorage, MMKV, ...), and',
+    'NOT APPLICABLE when package.json lists no local persistence package (expo-sqlite, AsyncStorage, MMKV, a synced',
+    'store such as @react-native-firebase/firestore, ...), and',
     'when the app keeps no database: no contract, no data folder, and expo-sqlite not imported or only as',
     'expo-sqlite/kv-store or expo-sqlite/localStorage/install (the repo-wide rules still run first:',
     'sqlite-outside-data, second-persistence, single-validator, sql-outside-data).',
@@ -96,7 +103,9 @@ const SPEC = {
   ].join('\n'),
 };
 
-const MODES = ['tables', 'document', 'both'];
+const MODES = ['tables', 'document', 'both', 'synced'];
+const NPM_NAME = /^(@[a-z0-9][a-z0-9._~-]*\/)?[a-z0-9][a-z0-9._~-]*(\/[a-z0-9._~-]+)*$/;
+const isUnder = (rel, dir) => rel === dir || rel.startsWith(`${dir}/`);
 
 function readJson(path, what) {
   try {
@@ -121,6 +130,33 @@ function chooseLayout(root, dataDir) {
   return withData.length === 1 ? { ...layout, ...withData[0].layout, workspaces: layout.workspaces } : layout;
 }
 
+/**
+ * The synced-store profile: `{ package, adapterDir }`. The adapter folder sits strictly inside the data or
+ * services folder, so the profile can never open the whole app to the SDK. Returns it normalised (no
+ * trailing slash) or undefined.
+ */
+function readSyncedStore(ctx, contract, bad) {
+  const store = contract.syncedStore;
+  if (store === undefined) {
+    if (contract.mode === 'synced') bad('syncedStore', 'mode synced needs syncedStore: { "package": "<sdk>", "adapterDir": "<dataDir>/<store>/" }');
+    return undefined;
+  }
+  if (store === null || typeof store !== 'object' || Array.isArray(store)) {
+    bad('syncedStore', 'must be an object with package and adapterDir');
+    return undefined;
+  }
+  const extra = Object.keys(store).filter((key) => key !== 'package' && key !== 'adapterDir');
+  if (extra.length > 0) bad('syncedStore', `unknown key ${extra.join(', ')} (only package and adapterDir)`);
+  if (typeof store.package !== 'string' || !NPM_NAME.test(store.package)) bad('syncedStore.package', 'must be the SDK\'s import path, for example @react-native-firebase/firestore');
+  const adapterDir = typeof store.adapterDir === 'string' ? store.adapterDir.replace(/\/+$/, '') : '';
+  const homes = [ctx.dataDir, ctx.layout.servicesDir];
+  if (adapterDir === '' || adapterDir.includes('..') || adapterDir.startsWith('/') || !homes.some((home) => adapterDir !== home && isUnder(adapterDir, home))) {
+    bad('syncedStore.adapterDir', `must be one folder for the adapters inside ${homes.map((home) => `${home}/`).join(' or ')} (for example ${ctx.dataDir}/<store>/), never the whole source tree`);
+    return undefined;
+  }
+  return typeof store.package === 'string' && NPM_NAME.test(store.package) ? { package: store.package, adapterDir } : undefined;
+}
+
 function readContract(ctx, file) {
   if (!existsSync(join(ctx.root, file))) {
     ctx.add({ file, rule: 'contract', message: 'the persistence contract is missing', fix: 'Copy templates/contracts/persistence.json (and its schema) and fill in the app\'s facts: mode, protected tables, reset modules.' });
@@ -134,12 +170,30 @@ function readContract(ctx, file) {
   }
   const bad = (key, message) => ctx.add({ file, rule: 'contract', message: `${key}: ${message}`, fix: 'Follow persistence.schema.json (shipped next to the template).' });
   if (!MODES.includes(contract.mode)) bad('mode', `must be one of ${MODES.join(', ')}`);
-  if (typeof contract.databaseFile !== 'string' || !/^[A-Za-z0-9._-]+\.db$/.test(contract.databaseFile)) bad('databaseFile', 'must be a file name ending in .db');
+  const synced = contract.mode === 'synced';
+  if ((!synced || contract.databaseFile !== undefined) && (typeof contract.databaseFile !== 'string' || !/^[A-Za-z0-9._-]+\.db$/.test(contract.databaseFile))) bad('databaseFile', 'must be a file name ending in .db');
   for (const key of ['protectedTables', 'resetModules', 'sqlAllowed', 'legacyImports']) {
     if (contract[key] !== undefined && !(Array.isArray(contract[key]) && contract[key].every((item) => typeof item === 'string'))) bad(key, 'must be a list of strings');
   }
   if (contract.keyValueStore !== undefined && !KEY_VALUE_STORES.includes(contract.keyValueStore)) bad('keyValueStore', `must be one of ${KEY_VALUE_STORES.join(', ')}`);
-  return { ...contract, mode: MODES.includes(contract.mode) ? contract.mode : 'tables' };
+  const syncedStore = readSyncedStore(ctx, contract, bad);
+  return { ...contract, syncedStore, mode: MODES.includes(contract.mode) ? contract.mode : 'tables' };
+}
+
+/**
+ * Mode synced keeps no SQLite database: app data lives in the synced store, device-only data in the
+ * key-value store. A database import or the SqlDriver port means the app needs mode tables instead.
+ */
+function checkSyncedMode(ctx, contractFile) {
+  const fix = 'Set "mode": "tables" (with syncedStore kept) to hold device-only tables in SQLite, or keep device-only data in the key-value store behind a port.';
+  const isDatabase = (spec) => /^(expo-sqlite(\/.*)?)$/.test(spec) && spec !== 'expo-sqlite/kv-store' && spec !== LOCAL_STORAGE_INSTALL;
+  for (const src of ctx.sources.values()) {
+    if (isUnder(src.rel, ctx.layout.testDir) || isUnder(src.rel, ctx.layout.scriptsDir)) continue;
+    for (const entry of src.imports.filter((item) => isDatabase(item.spec))) {
+      ctx.add({ file: src.rel, line: entry.line, rule: 'contract', message: `imports ${entry.spec}, but ${contractFile} says mode synced (no SQLite database)`, fix });
+    }
+  }
+  if (ctx.exists(`${ctx.dataDir}/sql-driver.ts`)) ctx.add({ file: `${ctx.dataDir}/sql-driver.ts`, line: 1, rule: 'contract', message: `a SqlDriver port exists, but ${contractFile} says mode synced (no SQLite database)`, fix });
 }
 
 /** The one key-value store a repo without a contract uses (the only one it imports), else kv-store. */
@@ -161,7 +215,7 @@ run(async () => {
   if (!existsSync(join(root, 'package.json'))) throw new UsageError(`nothing to check: no package.json in ${root}`, 'Run from the app repo root (or pass it as the first argument).');
   const report = createReporter({ name: 'check-persistence', json: options.json });
   const deps = dependencies(root);
-  const packages = ['expo-sqlite', ...SECOND_ENGINES.keys(), 'react-native-mmkv'];
+  const packages = ['expo-sqlite', ...SECOND_ENGINES.keys(), 'react-native-mmkv', ...SYNCED_STORE_PACKAGES];
   if (!packages.some((name) => deps.has(name))) return report.notApplicable('package.json lists no local persistence package (expo-sqlite, AsyncStorage, MMKV, ...)');
   const layout = chooseLayout(root, options['data-dir']);
   const files = walkRepo(root, { include: ['*.ts', '*.tsx'], ignore: ['**/*.d.ts'] });
@@ -187,6 +241,10 @@ run(async () => {
   }
   ctx.contract = readContract(ctx, contractFile);
   checkRepoFiles(ctx);
+  if (ctx.contract.mode === 'synced') {
+    checkSyncedMode(ctx, contractFile);
+    return report.finish({ checked: files.length, unit: 'source files' });
+  }
   checkRequiredFiles(ctx);
   checkOpenPath(ctx);
   const latest = checkMigrations(ctx);

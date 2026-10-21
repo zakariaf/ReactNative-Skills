@@ -22,6 +22,13 @@ scripts prove the code, the schema history and the file on a named iOS simulator
    `expo-sqlite/localStorage/install` puts over the same store, installed by the first import of the
    `local-storage-<concern>-adapter.ts` that reads it), behind a port; secrets to
    `expo-secure-store`. Why: one file, one version number, one backup story.
+   **Opt-in synced-store profile:** when app data lives in a cloud database whose SDK keeps its own
+   offline cache (a Tasks app syncing tasks and lists through React Native Firebase Firestore), the
+   contract declares it as `syncedStore` (`package`, `adapterDir`) and that one SDK is imported only in
+   that adapter folder, behind a port; `"mode": "synced"` when there is no SQLite database at all,
+   `tables` when device-only tables stay in SQLite. Every other rule here still holds: no AsyncStorage,
+   no second key-value store, no second synced store. Why: the synced store's cache is then the one
+   copy of app data, and a feature that imports its SDK skips the port, its fake and its tests.
 2. **Open synchronously, version first, then `journal_mode = WAL`, `synchronous = FULL` and
    `foreign_keys = ON` on every open; every table is STRICT.** Why: a committed transaction survives a
    kill or power cut, SQLite ships with foreign keys off, and the journal-mode pragma writes the file.
@@ -94,7 +101,9 @@ scripts prove the code, the schema history and the file on a named iOS simulator
    call it from the model hook or store (`useAppData().tasks`; `useAppData().database` is only the
    status: outcome, `isPersistent`, `checkpoint`); never SQL or the driver in a feature, and never a
    statement in another data file (a sibling `task-rows.ts` escapes every repository rule). A new column
-   or table is a new version.
+   or table is a new version. App data in a synced store (Firestore and the like): read "The synced-store
+   profile (opt-in)" in the same reference, declare `syncedStore` in the contract, and keep the SDK in
+   its adapter folder.
 5. The schema changes: read [references/migrations-and-fixtures.md](references/migrations-and-fixtures.md)
    and follow "Adding version N+1" in order, imitating `examples/migration-v2/` (step, test on the old
    fixture, new frozen fixture made with `inspect-database.mjs --dump`, checksum, FIXTURES entry). For a
@@ -113,6 +122,7 @@ scripts prove the code, the schema history and the file on a named iOS simulator
 
 ## Definition of done
 
+- [ ] Under the synced-store profile: its package is imported only in `syncedStore.adapterDir` (tests and root mocks excepted), no other synced store is imported, and `mode` is `synced` only when no SQLite database exists.
 - [ ] SQLite and `SqlDriver` imports and SQL text appear only in `src/data/`, `test/`, `scripts/`, the SQLite error log adapter and `sqlAllowed`; statements run only in repository files and the open path's own files; no feature reaches `.driver`; no AsyncStorage (outside a listed `legacyImports` importer), zustand `persist` or second engine; kv-store, the `localStorage` install and `localStorage` reads only in a `src/services/<concern>/*-adapter.ts`.
 - [ ] `app-database.ts` reads `user_version` and the file's tables before `APP_DB_PRAGMAS`, never opens a version-0 file with tables as fresh (adopting only the `BASELINE` schema or a declared variant), snapshots to `<file>.v<from>.bak` before migrating, prunes old snapshots, and never throws; every table is STRICT.
 - [ ] Every version 1..N has its `vNNNN` step registered in order, its `db-vN.sql` fixture, its checksum and its `FIXTURES` entry (adopting: each legacy schema its `db-v0-<variant>.sql` in `LEGACY_FIXTURES`); a step that drops or renames a table says `rebuildsTables: true`; no shipped step, fixture or checksum was edited.
@@ -175,7 +185,7 @@ scripts prove the code, the schema history and the file on a named iOS simulator
 | `templates/src/core/` | `result.ts` and its test (error-handling-typed-results' Result module) and `dates/date-key.ts` with its test (the clock port's date type), synced (do not edit here) | Workflow step 2 |
 | `templates/src/services/` | The clock port and system clock adapter, the error log port, memory adapter and fake, with tests (architecture-and-boundaries' files, synced; do not edit here), and this skill's SQLite error log adapter | Workflow step 2 |
 | `templates/test/sqlite/` | node:sqlite driver, temp folder, runner test and driver contract test (synced), file listing, schema helper, and the SQL tests (the fixtures test replays every fixture with foreign keys on and counts every table's rows) | Workflow steps 2 and 8 |
-| `templates/contracts/` | `persistence.json` (the app's facts) and its JSON schema | Workflow step 2 |
+| `templates/contracts/` | `persistence.json` (the app's facts) and its JSON schema (modes, the opt-in `syncedStore` profile) | Workflow steps 2 and 4 |
 | `examples/migration-v2/` | A complete v1 to v2 table change: step, list, frozen `db-v2.sql`, checksums, fixtures test, the step's test | Workflow step 5 |
 | `examples/document-v2/` | A complete document v1 to v2 change: sections, schema, defaults and their pinned test, step and its fast-check test, list, fixtures, checksums | Workflow step 6 |
 | `examples/root-layout.tsx` | The startup wiring in an Expo Router root layout, using only this skill's templates (the self-test runs the checker on it) | Workflow step 2 |
@@ -186,7 +196,7 @@ scripts prove the code, the schema history and the file on a named iOS simulator
 | `scripts/check-lib.mjs` | Shared script helper, synced from the library (do not edit here) | Never by hand |
 | `scripts/selftest.mjs` | Pins the checksum vectors and proves both checkers pass good input and catch every planted bug | After changing a checker or a template |
 | `assets/shared.json` | Declares the shared files this skill copies in | When adding a shared file |
-| `tests/` | Overlay fixtures (planted bugs) for check-persistence in tables and both modes (rebuilds, helpers, adoption variants included) and for inspect-database, with their bases | When adding a checker rule |
+| `tests/` | Overlay fixtures (planted bugs) for check-persistence in tables, both and synced modes (rebuilds, helpers, adoption variants, the synced-store profile included) and for inspect-database, with their bases | When adding a checker rule |
 
 ## Related skills
 
@@ -197,6 +207,7 @@ scripts prove the code, the schema history and the file on a named iOS simulator
 - `app-startup-and-bootstrap` - the full startup order around opening the database.
 - `architecture-and-boundaries` - ports, the composition root, the clock and error log services.
 - `networking-and-server-state` - server state, the persisted query cache and the offline outbox's sync.
+- `firebase-rnfb` - React Native Firebase adapters, offline writes and listeners under the synced-store profile.
 - `auth-and-secure-storage` - tokens and secrets in expo-secure-store.
 - `settings-and-preferences` - what is a preference and where it is saved.
 - `in-app-purchases` - the entitlement and its dated revocation.

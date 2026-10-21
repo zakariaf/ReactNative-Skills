@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "contracts/subscriptions.json",
+  "description": "The app's subscription facts, read by the subscriptions-revenuecat skill's check-revenuecat.mjs. The ids are written once and must match the RevenueCat dashboard and both store consoles.",
+  "type": "object",
+  "required": [
+    "entitlementId",
+    "offeringId",
+    "packageIds",
+    "productIds",
+    "familyShareable",
+    "serverDirs",
+    "webhookFiles"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "entitlementId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The RevenueCat entitlement that unlocks Premium (for example premium)."
+    },
+    "offeringId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The offering the paywall shows (RevenueCat's current offering)."
+    },
+    "packageIds": {
+      "type": "object",
+      "additionalProperties": { "type": "string", "minLength": 1 },
+      "description": "Package ids by period, for example { monthly: $rc_monthly, annual: $rc_annual }."
+    },
+    "productIds": {
+      "type": "object",
+      "additionalProperties": { "type": "string", "minLength": 1 },
+      "description": "Store product ids by period; never reused once created."
+    },
+    "familyShareable": {
+      "type": "boolean",
+      "description": "Family Sharing; once on in App Store Connect it can never be turned off. Default false."
+    },
+    "adapterFile": {
+      "type": "string",
+      "description": "The one file that imports react-native-purchases (default src/services/subscription/revenuecat-subscription-adapter.ts under the layout's servicesDir)."
+    },
+    "sdkImportersAllowed": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Extra repo paths allowed to import react-native-purchases-ui (a RevenueCat paywall view), each a deliberate decision."
+    },
+    "serverDirs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "description": "Folders that hold server code (server/src, or functions/src with Firebase); scanned for client entitlements used as server decisions."
+    },
+    "webhookFiles": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "description": "The webhook handler file(s): checked for the Authorization check and the event-id claim."
+    }
+  }
+}

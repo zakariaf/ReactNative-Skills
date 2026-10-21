@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Animations",
+  "description": "The app's Lottie and Rive files for the lottie-and-rive checker (check-animations): where they live, the budgets every file stays inside, and one record per file with its runtime, job, budget, reduced-motion alternative, licence and source.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["animations"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "assetsDir": {
+      "description": "Repo-relative folder of bundled assets, scanned for Lottie .json files (default assets). .riv and .lottie files are found anywhere in the repo.",
+      "type": "string",
+      "pattern": "^(?!/)(?!.*\\.\\.)[^\\s]+$"
+    },
+    "wrapperFiles": {
+      "description": "Globs of the only files that may import lottie-react-native or @rive-app/react-native (default: the ui folder's animation/**). One of them calls useReduceMotion().",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1
+    },
+    "budgets": {
+      "description": "The app's ceilings. Each may be stricter than the library's (maxBytes 500000, heavyFromBytes 150000, maxFps 60, maxPlays 3, maxSeconds 10), never looser.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "maxBytes": {
+          "description": "Largest file any record may budget, in bytes.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "heavyFromBytes": {
+          "description": "A file this large or larger is heavy: its record says \"heavy\": true and it plays alone.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxFps": {
+          "description": "Highest frame rate a file may be authored at (Lottie fr) or render at (Rive frameRate).",
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxPlays": {
+          "description": "Most plays a bounded Lottie loop may take in one run.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxSeconds": {
+          "description": "Longest a Lottie run may last: its length times its plays.",
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "animations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/animation" }
+    }
+  },
+  "$defs": {
+    "animation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "file",
+        "runtime",
+        "job",
+        "maxBytes",
+        "fps",
+        "heavy",
+        "decorative",
+        "reducedMotion",
+        "licence",
+        "source"
+      ],
+      "properties": {
+        "id": {
+          "description": "kebab-case name, for example list-completed.",
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+        },
+        "file": {
+          "description": "Repo-relative path of the bundled file, for example assets/animations/list-completed.json. Never a URL.",
+          "type": "string",
+          "pattern": "^(?!/)(?![a-z]+:)(?!.*\\.\\.)[^\\s]+\\.(json|lottie|riv)$"
+        },
+        "runtime": {
+          "description": "lottie (lottie-react-native) or rive (@rive-app/react-native).",
+          "enum": ["lottie", "rive"]
+        },
+        "job": {
+          "description": "lottie: one-shot or loop; rive: state-machine.",
+          "enum": ["one-shot", "loop", "state-machine"]
+        },
+        "maxBytes": {
+          "description": "This file's size budget in bytes, at most budgets.maxBytes.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "fps": {
+          "description": "Lottie: the file's own frame rate (fr). Rive: the frameRate the app renders it at.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "plays": {
+          "description": "Lottie only: plays per run, 1 for a one-shot, at most budgets.maxPlays for a loop.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "stateMachine": {
+          "description": "Rive only: the state machine the app plays.",
+          "type": "string",
+          "minLength": 1
+        },
+        "settles": {
+          "description": "Rive only: true once the designer confirmed every state rests (no endless timeline in an idle state).",
+          "const": true
+        },
+        "heavy": {
+          "description": "Full-screen, large or costly: plays alone (AnimationStageProvider).",
+          "type": "boolean"
+        },
+        "decorative": {
+          "description": "True when the art carries no information: hidden from VoiceOver and TalkBack.",
+          "type": "boolean"
+        },
+        "reducedMotion": {
+          "description": "What Reduce Motion (and a test build held still) shows. frame: Lottie at progress (0 to 1), Rive paused on its first frame. hidden: nothing, for decorative art only.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["show"],
+          "properties": {
+            "show": { "enum": ["frame", "hidden"] },
+            "progress": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        },
+        "licence": {
+          "description": "The licence the file is used under, for example the Lottie Simple License, CC0-1.0, or 'commissioned, all rights to the app'.",
+          "type": "string",
+          "minLength": 2
+        },
+        "source": {
+          "description": "Where it came from: the page it was downloaded from, the vendor, or 'made by the team'.",
+          "type": "string",
+          "minLength": 2
+        },
+        "author": {
+          "description": "The designer or studio, when the licence asks for credit.",
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

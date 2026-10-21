@@ -23,6 +23,7 @@ in this skill. Verified on 2026-10-03 with expo-sqlite ~57.0.3, expo-file-system
 - Resets and protected tables
 - Small preferences and secrets
 - Server-owned data (networked apps)
+- The synced-store profile (opt-in)
 - The error log table
 - Where the file lives, and device backups
 - Adopting in an existing app
@@ -398,6 +399,63 @@ In an app with a server, server state is TanStack Query over the `ApiClient` por
 - The split, agreed with networking-and-server-state: it owns the persister, the sync service and
   retries; this skill owns the tables, the outbox, its repository methods and the migrations.
 
+## The synced-store profile (opt-in)
+
+Some apps keep their data in a cloud database whose SDK holds its own offline cache on the device:
+writes land in that cache at once, survive an app kill, and sync when the network returns. React
+Native Firebase Firestore is the common case (its native iOS and Android SDKs persist the cache and
+the queue of pending writes). For such an app the SDK's cache is the one copy of app data, and a
+second local engine next to it would be the bug this skill exists to prevent. The profile says so
+in the contract, and the checker stays strict around it.
+
+**Example (a Tasks app that syncs tasks and lists across a user's devices):**
+
+```json
+{
+  "$schema": "./persistence.schema.json",
+  "mode": "synced",
+  "keyValueStore": "expo-sqlite/kv-store",
+  "syncedStore": { "package": "@react-native-firebase/firestore", "adapterDir": "src/data/firestore/" }
+}
+```
+
+- **`syncedStore.package`** is the SDK's import path (its subpaths count). **`adapterDir`** is the one
+  folder whose files may import it: inside the data folder or the services folder, never the whole
+  source tree (the checker refuses `src/` as `contract`). Each file there implements a port
+  (`src/data/tasks/task-store-port.ts`: `saveTask(task)`, `watchList(listId, onTasks)` returning its
+  unsubscribe), and the composition root creates the adapter; features and stores see only the port
+  and its fake. Tests, root mocks (`__mocks__/@react-native-firebase/firestore.ts`) and scripts may
+  import the package to test it.
+- **Modes.** `"mode": "synced"`: no SQLite database at all; device-only data (a draft, an upload
+  queue, the in-progress screen state) lives in the key-value store behind a port, and the checker
+  runs only the repo-wide rules, the profile and `contract` (an `expo-sqlite` database import or a
+  `src/data/sql-driver.ts` under `synced` is a `contract` problem: switch to `tables`). `"mode":
+  "tables"` (or `both`) with `syncedStore`: the synced store holds app data and SQLite tables hold
+  device-only data that grows or needs queries (an upload queue with retry counts); every table rule
+  of this skill applies to those tables.
+- **Document codecs in `adapterDir` keep `v.object`.** Every installed app version reads and writes
+  the same documents, so a codec that rejected unknown keys would fail on a field a newer version
+  added; `v.object` drops it on read, and writes that merge (never replace) keep it on the server.
+  `schema-strict` therefore skips `adapterDir`; table schemas elsewhere in the data folder stay strict.
+- **What still fails under the profile:** the package outside `adapterDir`
+  (`synced-store-outside-adapter`); AsyncStorage, MMKV (or any key-value store the contract does not
+  name), zustand `persist`, another engine, and any other synced store, the SDK's Realtime Database
+  beside its Firestore included (`second-persistence`); `expo-sqlite/kv-store` outside a preferences
+  adapter (`sqlite-outside-data`).
+- **Without the profile** a known synced store (`@react-native-firebase/firestore`,
+  `@react-native-firebase/database`, `firebase/firestore`, `firebase/database`,
+  `@powersync/react-native`) is a second engine (`second-persistence`), so adopting one is a
+  deliberate contract change that a reviewer sees, ideally with a decision record next to it.
+- **What the profile does not cover:** the synced store's own rules (one batched write per user
+  action, no client transaction offline, never awaiting a commit in UI code, listeners unsubscribed,
+  emulators only in development) belong to the SDK's own skill; for React Native Firebase that is
+  firebase-rnfb, and its server-side security rules belong to firestore-rules-and-emulator-tests.
+- **Why not the Firebase JS SDK for this:** on React Native the web SDK has no persistent cache
+  (its IndexedDB persistence needs a browser), so writes queued offline are lost when the app is
+  killed; the profile accepts any package, but only an SDK with a native persistent cache fits the
+  "source of truth offline" role. Checked against the Firebase and React Native Firebase docs on
+  2026-10-21 (re-verify: read the "Offline" pages of both docs).
+
 ## The error log table
 
 `error_log` is created by migration 1. `src/services/error-log/sqlite-error-log-adapter.ts`
@@ -494,10 +552,11 @@ and rely on the fixtures test.
 
 | Rule | Means |
 |---|---|
-| `contract` | `contracts/persistence.json` is missing or a key is malformed |
+| `contract` | `contracts/persistence.json` is missing or a key is malformed (mode `synced` without `syncedStore`, an `adapterDir` outside the data and services folders, an SQLite database under mode `synced`) |
 | `missing-file` | a required data-layer file, a reset module, a repository, or a repository's node:sqlite test is missing |
 | `sqlite-outside-data` | `expo-sqlite`, `node:sqlite` or the `SqlDriver` port (`src/data/sql-driver.ts`) imported outside the data folder, tests and scripts (the SQLite error log adapter and `sqlAllowed` may hold the port); `expo-sqlite/kv-store`, `expo-sqlite/localStorage/install` or a `localStorage.` read in `src/` outside a preferences adapter (`services/<concern>/*-adapter.ts`); outside the data folder, in a file that imports the data layer, a `driver.run/get/all/exec/transaction` call or `.driver` on `useAppData()`, an opener or an `AppData`/`AppDatabase` value (or cast to `SqlDriver`) |
-| `second-persistence` | AsyncStorage, another engine or binding, zustand `persist`, or a key-value store the contract does not name (a file in `legacyImports` may import an older engine) |
+| `second-persistence` | AsyncStorage, another engine or binding, zustand `persist`, a key-value store the contract does not name, or a synced store the contract does not declare as `syncedStore` (a file in `legacyImports` may import an older engine) |
+| `synced-store-outside-adapter` | the `syncedStore` profile's package imported outside `syncedStore.adapterDir` (tests, root mocks and scripts excepted) |
 | `single-validator` | zod, yup, superstruct, io-ts, joi, ajv, arktype or typebox imported |
 | `sql-outside-data` | SQL text outside the data folder: uppercase keywords, any case when it names one of the app's tables, or any statement handed to a driver call (the SQLite error log adapter and contract `sqlAllowed` excepted) |
 | `sql-bound-params` | SQL built from a value in the data folder (a template literal with `${...}`, or an SQL literal concatenated with a non-literal anywhere in the file); the `PRAGMA user_version` stamp excepted |
@@ -512,7 +571,7 @@ and rely on the fixtures test.
 | `exec-in-repository` | `driver.exec` in a repository file |
 | `sql-outside-method` | a statement in a repository file outside every method and every helper a method calls |
 | `validate-on-read` | what a read returns (`.get`/`.all` on the driver, whatever its SQL argument, or rows a same-file helper hands back) never reaches a schema check: no parse takes the call, a variable or loop binding derived from it, or a helper parameter that reaches one; also a read a helper makes and neither checks nor returns |
-| `schema-strict` | `v.object`, `v.looseObject` or `v.any` in a data schema |
+| `schema-strict` | `v.object`, `v.looseObject` or `v.any` in a data schema (the `syncedStore` adapter folder excepted) |
 | `protected-reset` | a reset touches a protected table, or builds its SQL from a value |
 | `peek-writes` | a `peek-*.ts` writes, runs DDL or migrates |
 | `no-background-checkpoint` | no background checkpoint, or the hook is never called |

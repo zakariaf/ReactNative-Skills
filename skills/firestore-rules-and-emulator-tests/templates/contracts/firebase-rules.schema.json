@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Firebase security-rules contract",
+  "description": "contracts/firebase-rules.json: where the app's Firestore and Storage rules and their emulator tests live, for firestore-rules-and-emulator-tests' check-rules-tests.mjs.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "$comment": { "type": "string" },
+    "firestoreRules": {
+      "description": "Repo-relative path of the Firestore rules file (firebase.json firestore.rules), or null when the app has no Firestore.",
+      "type": ["string", "null"],
+      "pattern": "^(?!/)(?!.*\\.\\./).+\\.rules$"
+    },
+    "storageRules": {
+      "description": "Repo-relative path of the Cloud Storage rules file (firebase.json storage.rules), or null when the app has no Storage.",
+      "type": ["string", "null"],
+      "pattern": "^(?!/)(?!.*\\.\\./).+\\.rules$"
+    },
+    "testsDir": {
+      "description": "Repo-relative folder of the rules tests (*.rules.test.ts), run by jest.emulator.config.js inside firebase emulators:exec.",
+      "type": "string",
+      "pattern": "^(?!/)(?!.*\\.\\.)[^\\s]+$"
+    }
+  },
+  "required": ["firestoreRules", "storageRules", "testsDir"]
+}

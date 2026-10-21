@@ -1,0 +1,456 @@
+{
+  "bad-missing-app-check": {
+    "expect": [
+      "[missing-app-check]",
+      "functions/src/lib/define-callable.ts:83",
+      "does not set enforceAppCheck: true"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "functions/src/lib/define-callable.ts",
+          "find": "      enforceAppCheck: true,",
+          "with": "      enforceAppCheck: false,"
+        }
+      }
+    ]
+  },
+  "bad-missing-app-check-no-options": {
+    "expect": [
+      "[missing-app-check]",
+      "functions/src/tasks/ping.ts:5"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "functions/src/tasks/ping.ts",
+          "lines": [
+            "// functions/src/tasks/ping.ts",
+            "import { HttpsError, onCall } from 'firebase-functions/v2/https';",
+            "",
+            "// No options object: App Check is not enforced.",
+            "export const ping = onCall(async (request) => {",
+            "  if (!request.auth) throw new HttpsError('unauthenticated', 'unauthenticated');",
+            "  return 'pong';",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-missing-app-check-consume": {
+    "expect": [
+      "[missing-app-check]",
+      "functions/src/tasks/summarize-list.ts:27",
+      "without consumeAppCheckToken: true"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "functions/src/tasks/summarize-list.ts",
+          "find": "    consumeAppCheckToken: true,\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-missing-app-check-root-namespace": {
+    "expect": [
+      "[missing-app-check]",
+      "functions/src/tasks/archive-list.ts:5",
+      "does not set enforceAppCheck: true"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "functions/src/tasks/archive-list.ts",
+          "lines": [
+            "// functions/src/tasks/archive-list.ts",
+            "import * as functions from 'firebase-functions';",
+            "",
+            "// The root entry point is 2nd gen in firebase-functions 7, so this is a 2nd-gen callable without App Check.",
+            "export const archiveList = functions.https.onCall({ enforceAppCheck: false }, async (request) => {",
+            "  if (!request.auth) throw new functions.https.HttpsError('unauthenticated', 'unauthenticated');",
+            "  return { archived: true };",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-missing-app-check-cjs": {
+    "expect": [
+      "[missing-app-check]",
+      "functions/src/tasks/count-tasks.js:5",
+      "without an options object"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "functions/src/tasks/count-tasks.js",
+          "lines": [
+            "// functions/src/tasks/count-tasks.js",
+            "const { onCall: call, HttpsError } = require('firebase-functions/https');",
+            "",
+            "// A CommonJS callable with no options object.",
+            "exports.countTasks = call((request) => {",
+            "  if (request.auth === undefined) throw new HttpsError('unauthenticated', 'unauthenticated');",
+            "  return { count: 0 };",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-missing-auth-check": {
+    "expect": [
+      "[missing-auth-check]",
+      "functions/src/tasks/count-lists.ts:6"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "functions/src/tasks/count-lists.ts",
+          "lines": [
+            "// functions/src/tasks/count-lists.ts",
+            "import { onCall } from 'firebase-functions/v2/https';",
+            "import * as v from 'valibot';",
+            "",
+            "const CountListsInput = v.object({ ownerId: v.string() });",
+            "export const countLists = onCall({ enforceAppCheck: true }, async (request) => {",
+            "  const input = v.parse(CountListsInput, request.data);",
+            "  return { ownerId: input.ownerId, count: 0 };",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-unvalidated-input": {
+    "expect": [
+      "[unvalidated-input]",
+      "functions/src/tasks/rename-list.ts:6"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "functions/src/tasks/rename-list.ts",
+          "lines": [
+            "// functions/src/tasks/rename-list.ts",
+            "import { HttpsError, onCall } from 'firebase-functions/v2/https';",
+            "",
+            "export const renameList = onCall({ enforceAppCheck: true }, async (request) => {",
+            "  if (!request.auth) throw new HttpsError('unauthenticated', 'unauthenticated');",
+            "  const title = String(request.data.title);",
+            "  return { title };",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-unvalidated-input-wrapper": {
+    "expect": [
+      "[unvalidated-input]",
+      "functions/src/tasks/summarize-list.ts:27",
+      "has no input schema"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "functions/src/tasks/summarize-list.ts",
+          "find": "    input: SummarizeListInput,\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-env-secret": {
+    "expect": [
+      "[env-secret]",
+      "functions/src/tasks/summarize-list.ts:45",
+      "process.env.SUMMARY_API_KEY"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "functions/src/tasks/summarize-list.ts",
+          "find": "SUMMARY_API_KEY.value()",
+          "with": "process.env.SUMMARY_API_KEY ?? ''"
+        }
+      }
+    ]
+  },
+  "bad-env-secret-unbound": {
+    "expect": [
+      "[env-secret]",
+      "functions/src/tasks/summarize-list.ts:44",
+      "SUMMARY_API_KEY.value()"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "functions/src/tasks/summarize-list.ts",
+          "find": "    secrets: [SUMMARY_API_KEY],\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-literal-key": {
+    "expect": [
+      "[literal-key]",
+      "functions/src/tasks/summary-provider.ts:18"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "functions/src/tasks/summary-provider.ts",
+          "find": "authorization: `Bearer ${apiKey}`",
+          "with": "authorization: 'Bearer XX-ant-api03-Zq7DefusedPlantedKeyValue0000000000000000'"
+        }
+      },
+      {
+        "replace": {
+          "file": "functions/src/tasks/summary-provider.ts",
+          "find": "XX-ant-",
+          "with": "sk-ant-"
+        }
+      }
+    ]
+  },
+  "bad-literal-key-env-file": {
+    "expect": [
+      "[literal-key]",
+      "functions/.env:2"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "functions/.env",
+          "lines": [
+            "TASKS_REGION_LABEL=europe",
+            "SUMMARY_API_KEY=XX-ant-api03-Zq7DefusedPlantedKeyValue0000000000000000"
+          ]
+        }
+      },
+      {
+        "replace": {
+          "file": "functions/.env",
+          "find": "XX-ant-",
+          "with": "sk-ant-"
+        }
+      }
+    ]
+  },
+  "bad-unbounded-instances": {
+    "expect": [
+      "[unbounded-instances]",
+      "functions/src/lib/define-callable.ts:83",
+      "maxInstances"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "functions/src/config/global-options.ts",
+          "find": "  maxInstances: 10,\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-unbounded-instances-trigger": {
+    "expect": [
+      "[unbounded-instances]",
+      "functions/src/ops/nightly-cleanup.ts:4",
+      "region"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "functions/src/config/global-options.ts",
+          "find": "  region: FUNCTION_REGION,\n",
+          "with": ""
+        }
+      },
+      {
+        "write": {
+          "file": "functions/src/ops/nightly-cleanup.ts",
+          "lines": [
+            "// functions/src/ops/nightly-cleanup.ts",
+            "import { onSchedule } from 'firebase-functions/v2/scheduler';",
+            "",
+            "export const nightlyCleanup = onSchedule({ schedule: 'every day 03:00', maxInstances: 1 }, async () => {",
+            "  await Promise.resolve();",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-v1-api": {
+    "expect": [
+      "[v1-api]",
+      "functions/src/ops/legacy-reminders.ts:2"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "functions/src/ops/legacy-reminders.ts",
+          "lines": [
+            "// functions/src/ops/legacy-reminders.ts",
+            "import * as functions from 'firebase-functions/v1';",
+            "",
+            "export const sendReminders = functions.pubsub.schedule('every 24 hours').onRun(() => null);"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-v1-api-config": {
+    "expect": [
+      "[v1-api]",
+      "functions/src/ops/legacy-config.ts:4",
+      "functions.config()"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "functions/src/ops/legacy-config.ts",
+          "lines": [
+            "// functions/src/ops/legacy-config.ts",
+            "import * as functions from 'firebase-functions';",
+            "",
+            "export const providerUrl = (): string => String(functions.config().summary?.url);"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-v1-api-root-old-major": {
+    "expect": [
+      "[v1-api]",
+      "functions/src/ops/legacy-https.ts:2",
+      "before 6"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "functions/package.json",
+          "path": [
+            "dependencies",
+            "firebase-functions"
+          ],
+          "value": "5.1.1"
+        }
+      },
+      {
+        "write": {
+          "file": "functions/src/ops/legacy-https.ts",
+          "lines": [
+            "// functions/src/ops/legacy-https.ts",
+            "import { logger } from 'firebase-functions';",
+            "",
+            "export const logPing = (): void => logger.info('ping');"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-firebase-json-source": {
+    "expect": [
+      "note: functions folder backend (firebase.json functions source)",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "rename": {
+          "from": "functions",
+          "to": "backend"
+        }
+      },
+      {
+        "write": {
+          "file": "firebase.json",
+          "json": {
+            "functions": [
+              {
+                "source": "backend",
+                "codebase": "default"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "pass-installed-skills-silent": {
+    "expect": [
+      "note: functions folder . (rn-skills.config.json functionsDir)",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "rn-skills.config.json",
+          "json": {
+            "functionsDir": "."
+          }
+        }
+      },
+      {
+        "delete": [
+          "functions/src/vendor/kit/leak.ts",
+          "functions/src/vendor/kit/SKILL.md"
+        ]
+      }
+    ]
+  },
+  "pass-budget-handler": {
+    "expect": [
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "functions/src/ops/on-budget-alert.ts",
+          "lines": [
+            "// functions/src/ops/on-budget-alert.ts",
+            "import { onMessagePublished } from 'firebase-functions/v2/pubsub';",
+            "import * as logger from 'firebase-functions/logger';",
+            "import * as v from 'valibot';",
+            "",
+            "const BudgetNotification = v.object({ costAmount: v.number(), budgetAmount: v.number(), alertThresholdExceeded: v.optional(v.number()) });",
+            "",
+            "export const onBudgetAlert = onMessagePublished({ topic: 'budget-alerts', retry: false }, async (event) => {",
+            "  const parsed = v.safeParse(BudgetNotification, event.data.message.json);",
+            "  if (!parsed.success) return;",
+            "  logger.info('budget', { ratio: parsed.output.costAmount / parsed.output.budgetAmount });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "error-missing-functions-dir": {
+    "expect": [
+      "ERROR [bad-input]",
+      "backend"
+    ],
+    "args": ". --functions-dir backend"
+  },
+  "pass-root-logger-import": {
+    "expect": [
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "functions/src/lib/define-callable.ts",
+          "find": "import * as logger from 'firebase-functions/logger';",
+          "with": "import { logger } from 'firebase-functions';"
+        }
+      }
+    ]
+  }
+}

@@ -1,6 +1,6 @@
 ---
 name: in-app-purchases
-description: Sells a Premium unlock with expo-iap behind a PurchasePort - saved entitlement, paywall states, restore, refunds, store testing. Use when touching IAP, buy, restore, paywall or Premium state. Not for ads (admob-ads-and-consent).
+description: Sells a Premium unlock with expo-iap behind a PurchasePort - saved entitlement, paywall states, restore, refunds, store testing. Use when touching IAP, buy, restore, paywall or Premium state. Not for ads (admob-ads-and-consent) or RevenueCat subscriptions (subscriptions-revenuecat).
 ---
 
 # In-app purchases

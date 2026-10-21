@@ -1,0 +1,12 @@
+{
+  "$schema": "./subscriptions.schema.json",
+  "entitlementId": "__ENTITLEMENT_ID__",
+  "offeringId": "default",
+  "packageIds": { "monthly": "$rc_monthly", "annual": "$rc_annual" },
+  "productIds": { "monthly": "__MONTHLY_PRODUCT_ID__", "annual": "__ANNUAL_PRODUCT_ID__" },
+  "familyShareable": false,
+  "adapterFile": "src/services/subscription/revenuecat-subscription-adapter.ts",
+  "sdkImportersAllowed": [],
+  "serverDirs": ["server/src"],
+  "webhookFiles": ["server/src/subscriptions/revenuecat-webhook-handler.ts"]
+}

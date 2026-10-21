@@ -1,0 +1,7 @@
+{
+  "$schema": "./firebase-rules.schema.json",
+  "$comment": "The app's security-rules facts, read by firestore-rules-and-emulator-tests' check-rules-tests.mjs. Paths are repo-relative and equal the rules paths in firebase.json. A service the app does not use is null. testsDir holds the *.rules.test.ts files that run against the emulators.",
+  "firestoreRules": "firestore.rules",
+  "storageRules": "storage.rules",
+  "testsDir": "test/rules"
+}

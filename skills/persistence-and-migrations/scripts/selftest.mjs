@@ -5,6 +5,8 @@
 //   every rule, the migration replay on node:sqlite included; each bad-* case plants one bug.
 // - check-persistence-document: the same plus tests/bases/both (mode "both": a v0002 step that creates
 //   the document slots and its frozen db-v2.sql), so the save-document appendix rules run too.
+// - check-persistence-synced: tests/bases/synced, a Tasks app under the syncedStore profile (mode synced:
+//   tasks in React Native Firebase Firestore behind an adapter folder, device-only drafts in kv-store).
 // - inspect-database: the frozen db-v2.sql dump as app.sql; each bad-* case damages it one way.
 //   bad-page-damage writes a 4-page binary database (page_size 512, user_version 1, WAL) whose page 2
 //   b-tree header was overwritten with 0xff bytes: page 1 reads, integrity_check throws SQLITE_CORRUPT.
@@ -40,5 +42,6 @@ const INSPECT_ARGS = ['--expect-version', '2', '--max-version', '2', '--document
 await runSelftest(import.meta.url, [
   { script: 'check-persistence.mjs', fixtures: '../tests/fixtures/check-persistence', args: (dir) => [dir] },
   { script: 'check-persistence.mjs', fixtures: '../tests/fixtures/check-persistence-document', args: (dir) => [dir] },
+  { script: 'check-persistence.mjs', fixtures: '../tests/fixtures/check-persistence-synced', args: (dir) => [dir] },
   { script: 'inspect-database.mjs', fixtures: '../tests/fixtures/inspect-database', args: (dir) => [join(dir, 'app.sql'), ...INSPECT_ARGS] },
 ]);

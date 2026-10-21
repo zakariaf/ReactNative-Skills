@@ -1,0 +1,49 @@
+{
+  "base": [
+    "@tests/bases/app",
+    {
+      "templates": true,
+      "firstLinePath": true,
+      "fill": {
+        "__ENTITLEMENT_ID__": "premium",
+        "__MONTHLY_PRODUCT_ID__": "com.example.tasks.premium.monthly",
+        "__ANNUAL_PRODUCT_ID__": "com.example.tasks.premium.annual"
+      }
+    }
+  ],
+  "ops": [
+    {
+      "$comment": "Installed and vendored skills hold planted bugs on purpose: walkRepo must keep every one of them out.",
+      "write": {
+        "file": ".agents/skills/demo/src/planted-subscription.ts",
+        "lines": [
+          "import Purchases from 'react-native-purchases';",
+          "import { initConnection } from 'expo-iap';",
+          "export const planted = [Purchases, initConnection, 'Only $4.99 a month'];"
+        ]
+      }
+    },
+    {
+      "write": {
+        "file": "skills/demo/package.json",
+        "json": { "name": "demo", "dependencies": { "expo-iap": "5.8.0", "react-native-purchases": "10.13.0" } }
+      }
+    },
+    {
+      "write": {
+        "file": "skills/demo/server/src/quota.ts",
+        "lines": ["export const gate = (request: { data: { isPremium: boolean } }) => request.data.isPremium;"]
+      }
+    },
+    { "write": { "file": "vendor/kit/SKILL.md", "lines": ["---", "name: kit", "description: Vendored skill.", "---"] } },
+    {
+      "write": {
+        "file": "vendor/kit/src/planted-subscription.ts",
+        "lines": [
+          "import RevenueCatUI from 'react-native-purchases-ui';",
+          "export const planted = [RevenueCatUI, '1,99 €'];"
+        ]
+      }
+    }
+  ]
+}

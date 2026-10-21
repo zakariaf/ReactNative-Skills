@@ -1,0 +1,46 @@
+{
+  "$schema": "./animations.schema.json",
+  "$comment": "Example: contracts/animations.json of a Tasks app with one Lottie celebration and one Rive mascot.",
+  "assetsDir": "assets",
+  "wrapperFiles": ["src/ui/animation/**"],
+  "budgets": {
+    "maxBytes": 150000,
+    "heavyFromBytes": 60000,
+    "maxFps": 60,
+    "maxPlays": 3,
+    "maxSeconds": 6
+  },
+  "animations": [
+    {
+      "id": "list-completed",
+      "file": "assets/animations/list-completed.json",
+      "runtime": "lottie",
+      "job": "one-shot",
+      "maxBytes": 40000,
+      "fps": 30,
+      "plays": 1,
+      "heavy": true,
+      "decorative": true,
+      "reducedMotion": { "show": "frame", "progress": 1 },
+      "licence": "Lottie Simple License (FL 9.13.21)",
+      "source": "https://lottiefiles.com/free-animation/list-completed-example",
+      "author": "Example Studio"
+    },
+    {
+      "id": "empty-tasks-mascot",
+      "file": "assets/animations/empty-tasks-mascot.riv",
+      "runtime": "rive",
+      "job": "state-machine",
+      "stateMachine": "Idle",
+      "settles": true,
+      "maxBytes": 30000,
+      "fps": 30,
+      "heavy": false,
+      "decorative": false,
+      "reducedMotion": { "show": "frame" },
+      "licence": "Commissioned for the app, all rights assigned",
+      "source": "Made by the team in the Rive editor",
+      "author": "The app's designer"
+    }
+  ]
+}

@@ -1002,7 +1002,7 @@
       "src/services/clipboard/expo-clipboard-adapter.ts:2 [unclassified-sdk] imports expo-clipboard",
       "src/features/tasks/use-checkout.ts:3 [unclassified-sdk] imports @stripe/stripe-react-native",
       "src/features/tasks/use-checkout.ts:4 [unclassified-sdk] imports @notifee/react-native",
-      "src/features/tasks/use-checkout.ts:5 [unclassified-sdk] imports lottie-react-native",
+      "src/features/tasks/use-checkout.ts:5 [unclassified-sdk] imports acme-charts-react-native",
       "src/features/tasks/use-checkout.ts:6 [unclassified-sdk] imports @acme/haptic-kit",
       "RESULT: FAIL (8 problems)"
     ],
@@ -1028,13 +1028,13 @@
           "lines": [
             "// A test imports what its subject imports, and test libraries: no decision is forced here.",
             "import { renderHook } from '@testing-library/react-native';",
-            "import LottieView from 'lottie-react-native';",
+            "import ChartView from 'acme-charts-react-native';",
             "",
             "import { checkout } from './use-checkout';",
             "",
             "describe('checkout', () => {",
             "  it('lists the SDKs', () => {",
-            "    expect([renderHook, LottieView, checkout]).toHaveLength(3);",
+            "    expect([renderHook, ChartView, checkout]).toHaveLength(3);",
             "  });",
             "});"
           ]
@@ -1048,11 +1048,11 @@
             "// whose name hides it but whose node_modules folder ships native code (expo-module.config.json).",
             "import { useStripe } from '@stripe/stripe-react-native';",
             "import notifee from '@notifee/react-native';",
-            "import LottieView from 'lottie-react-native';",
+            "import ChartView from 'acme-charts-react-native';",
             "import { pulse } from '@acme/haptic-kit';",
             "import { toDay } from '@acme/date-kit';",
             "",
-            "export const checkout = { useStripe, notifee, LottieView, pulse, toDay };"
+            "export const checkout = { useStripe, notifee, ChartView, pulse, toDay };"
           ]
         }
       },

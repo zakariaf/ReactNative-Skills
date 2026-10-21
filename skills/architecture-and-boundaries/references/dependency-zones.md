@@ -267,7 +267,8 @@ build's own version, build number and id), `expo-asset` (resolves and preloads b
 `expo-localization` (the root layout reads the device locales once and language resolution takes them as
 values, so tests pass locales in), `react-native-safe-area-context`, `react-native-screens`,
 `react-native-reanimated`, `react-native-gesture-handler`, `react-native-worklets`,
-`@shopify/react-native-skia`, `@shopify/flash-list`, `react-native-keyboard-controller`. The reasons are
+`@shopify/react-native-skia`, `@shopify/flash-list`, `lottie-react-native` and `@rive-app/react-native`
+(they play bundled animation files; lottie-and-rive owns them), `react-native-keyboard-controller`. The reasons are
 in `assets/architecture-defaults.json`.
 
 Add a side-effect SDK to `vendorSdks` in the contract and to `VENDOR_SDK_PATHS` in the ESLint config; the

@@ -1,0 +1,254 @@
+{
+  "bad-sdk-outside-adapter": {
+    "expect": ["[sdk-outside-adapter] imports react-native-purchases", "src/features/paywall/use-paywall-model.ts:2"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/paywall/use-paywall-model.ts",
+          "lines": [
+            "// src/features/paywall/use-paywall-model.ts",
+            "import Purchases from 'react-native-purchases';",
+            "",
+            "export const buyAnnual = async (): Promise<void> => {",
+            "  const offerings = await Purchases.getOfferings();",
+            "  const annual = offerings.current?.annual;",
+            "  if (annual) await Purchases.purchasePackage(annual);",
+            "};"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-sdk-ui-outside-adapter": {
+    "expect": ["[sdk-outside-adapter] imports react-native-purchases-ui", "src/features/paywall/revenuecat-paywall.tsx:2"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/paywall/revenuecat-paywall.tsx",
+          "lines": [
+            "// src/features/paywall/revenuecat-paywall.tsx",
+            "import RevenueCatUI from 'react-native-purchases-ui';",
+            "",
+            "export function RevenueCatPaywall(): React.JSX.Element {",
+            "  return <RevenueCatUI.Paywall />;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-ui-importer-allowed": {
+    "expect": ["RESULT: PASS"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/paywall/revenuecat-paywall.tsx",
+          "lines": [
+            "// src/features/paywall/revenuecat-paywall.tsx",
+            "import RevenueCatUI from 'react-native-purchases-ui';",
+            "",
+            "export function RevenueCatPaywall(): React.JSX.Element {",
+            "  return <RevenueCatUI.Paywall />;",
+            "}"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/subscriptions.json",
+          "path": ["sdkImportersAllowed"],
+          "value": ["src/features/paywall/revenuecat-paywall.tsx"]
+        }
+      }
+    ]
+  },
+  "bad-client-entitlement-request-flag": {
+    "expect": ["[client-entitlement-for-quota] request.data.isPremium", "server/src/quota/check-quota.ts:8"],
+    "ops": [
+      {
+        "replace": {
+          "file": "server/src/quota/check-quota.ts",
+          "find": "resolvePlan(await readEntitlement(userId), Date.now())",
+          "with": "request.data.isPremium === true ? 'premium' : resolvePlan(await readEntitlement(userId), Date.now())"
+        }
+      },
+      {
+        "replace": {
+          "file": "server/src/quota/check-quota.ts",
+          "find": "{ readonly count: number }",
+          "with": "{ readonly count: number; readonly isPremium?: boolean }"
+        }
+      }
+    ]
+  },
+  "bad-client-entitlement-destructured": {
+    "expect": ["[client-entitlement-for-quota]", "server/src/quota/list-allowance.ts:3"],
+    "ops": [
+      {
+        "write": {
+          "file": "server/src/quota/list-allowance.ts",
+          "lines": [
+            "// server/src/quota/list-allowance.ts",
+            "export function allowance(request: { readonly body: { readonly plan: string } }): number {",
+            "  const { plan } = request.body;",
+            "  return plan === 'premium' ? 100 : 3;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-client-entitlement-customer-info": {
+    "expect": ["[client-entitlement-for-quota] customerInfo", "server/src/quota/premium-gate.ts:3"],
+    "ops": [
+      {
+        "write": {
+          "file": "server/src/quota/premium-gate.ts",
+          "lines": [
+            "// server/src/quota/premium-gate.ts",
+            "export function isPremium(body: { readonly customerInfo: { readonly entitlements: { readonly active: Record<string, unknown> } } }): boolean {",
+            "  return body.customerInfo.entitlements.active['premium'] !== undefined;",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-hardcoded-price-catalog": {
+    "expect": ["[hardcoded-price] \"paywall.plan.monthly\"", "src/i18n/catalogs/en.json:3"],
+    "ops": [
+      { "json": { "file": "src/i18n/catalogs/en.json", "path": ["paywall.plan.monthly"], "value": "Monthly, $4.99" } }
+    ]
+  },
+  "bad-hardcoded-price-code": {
+    "expect": ["[hardcoded-price] a typed price", "src/features/paywall/annual-note.ts:2"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/paywall/annual-note.ts",
+          "lines": ["// src/features/paywall/annual-note.ts", "export const ANNUAL_NOTE = 'Only 2,99 € a month';"]
+        }
+      }
+    ]
+  },
+  "bad-hardcoded-price-rebuilt": {
+    "expect": ["[hardcoded-price] a price rebuilt from a number", "src/features/paywall/per-month.ts:3"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/paywall/per-month.ts",
+          "lines": [
+            "// src/features/paywall/per-month.ts",
+            "export function perMonth(product: { readonly price: number }): string {",
+            "  return (product.price / 12).toFixed(2);",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-webhook-plain-compare": {
+    "expect": ["[webhook-unauthenticated] no constant-time comparison", "server/src/subscriptions/revenuecat-webhook-handler.ts"],
+    "ops": [
+      {
+        "replace": {
+          "file": "server/src/subscriptions/revenuecat-webhook-handler.ts",
+          "find": "return timingSafeEqual(digest(received), digest(expected));",
+          "with": "return digest(received).equals(digest(expected));"
+        }
+      }
+    ]
+  },
+  "bad-webhook-no-401": {
+    "expect": ["[webhook-unauthenticated] never answers 401", "server/src/subscriptions/revenuecat-webhook-handler.ts"],
+    "ops": [
+      {
+        "replace": {
+          "file": "server/src/subscriptions/revenuecat-webhook-handler.ts",
+          "find": "  if (!isAuthorized(request.authorization, deps.expectedAuthorization)) {\n    deps.log({ outcome: 'unauthorized' });\n    return { status: 401, body: 'unauthorized' };\n  }\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-webhook-not-idempotent": {
+    "expect": ["[webhook-not-idempotent]", "server/src/subscriptions/revenuecat-webhook-handler.ts:94"],
+    "ops": [
+      {
+        "replace": {
+          "file": "server/src/subscriptions/revenuecat-webhook-handler.ts",
+          "find": "deps.ledger.claim(event.id)",
+          "with": "deps.ledger.claim(`${event.type}:${event.appUserId ?? ''}`)"
+        }
+      }
+    ]
+  },
+  "bad-webhook-missing": {
+    "expect": [
+      "server/src/subscriptions/revenuecat-webhook-handler.ts [webhook-unauthenticated] the webhook handler listed in contracts/subscriptions.json does not exist",
+      "server/src/subscriptions/revenuecat-webhook-handler.ts [webhook-not-idempotent] the webhook handler listed in contracts/subscriptions.json does not exist"
+    ],
+    "ops": [{ "delete": ["server/src/subscriptions/revenuecat-webhook-handler.ts"] }]
+  },
+  "pass-server-not-yet-created": {
+    "expect": [
+      "SKIP backend/src/subscriptions/revenuecat-webhook-handler.ts [webhook-unauthenticated] not yet created (cloud-functions-backend creates it)",
+      "SKIP backend/src/subscriptions/revenuecat-webhook-handler.ts [webhook-not-idempotent] not yet created (cloud-functions-backend creates it)",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      { "json": { "file": "contracts/subscriptions.json", "path": ["serverDirs"], "value": ["backend/src"] } },
+      {
+        "json": {
+          "file": "contracts/subscriptions.json",
+          "path": ["webhookFiles"],
+          "value": ["backend/src/subscriptions/revenuecat-webhook-handler.ts"]
+        }
+      }
+    ]
+  },
+  "bad-mixed-purchase-sdks-package": {
+    "expect": ["[mixed-purchase-sdks] expo-iap", "package.json"],
+    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo-iap"], "value": "5.8.0" } }]
+  },
+  "bad-mixed-purchase-sdks-import": {
+    "expect": ["[mixed-purchase-sdks] imports react-native-iap", "src/services/purchase/iap-restore.ts:2"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/purchase/iap-restore.ts",
+          "lines": [
+            "// src/services/purchase/iap-restore.ts",
+            "import { getAvailablePurchases } from 'react-native-iap';",
+            "",
+            "export const readPurchases = () => getAvailablePurchases();"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-mixed-purchase-sdks-plugin": {
+    "expect": ["[mixed-purchase-sdks] expo-iap", "app.config.ts:9"],
+    "ops": [
+      { "replace": { "file": "app.config.ts", "find": "plugins: ['expo-router'],", "with": "plugins: ['expo-router', 'expo-iap']," } }
+    ]
+  },
+  "pass-not-applicable": {
+    "expect": ["NOT APPLICABLE: react-native-purchases is not in package.json and no code imports it", "RESULT: PASS"],
+    "base": "@tests/bases/bare",
+    "ops": []
+  },
+  "error-missing-root": {
+    "expect": ["ERROR [bad-input] nothing to check: repo root no-such-folder does not exist or is not a folder"],
+    "args": "no-such-folder",
+    "ops": []
+  },
+  "error-missing-contract": {
+    "expect": ["ERROR [bad-input] contracts/subscriptions.json is missing"],
+    "ops": [{ "delete": ["contracts/subscriptions.json"] }]
+  },
+  "error-contract-incomplete": {
+    "expect": ["ERROR [bad-input] contracts/subscriptions.json lacks \"webhookFiles\""],
+    "ops": [{ "json": { "file": "contracts/subscriptions.json", "path": ["webhookFiles"], "delete": true } }]
+  }
+}

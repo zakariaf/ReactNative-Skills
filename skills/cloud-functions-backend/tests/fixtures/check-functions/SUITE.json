@@ -1,0 +1,33 @@
+{
+  "base": [
+    {
+      "templates": true,
+      "firstLinePath": true,
+      "fill": {
+        "__FUNCTIONS_REGION__": "europe-west1",
+        "__SUMMARY_API_URL__": "https://summary.example.com/v1/summaries"
+      }
+    },
+    "@tests/bases/decoys"
+  ],
+  "ops": [
+    {
+      "write": {
+        "file": ".agents/skills/decoy/SKILL.md",
+        "content": "---\nname: decoy\ndescription: Planted findings that every scan must skip.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/decoy/SKILL.md",
+        "content": "---\nname: decoy\ndescription: Planted findings that every scan must skip.\n---\n"
+      }
+    },
+    {
+      "write": {
+        "file": "functions/src/vendor/kit/SKILL.md",
+        "content": "---\nname: decoy\ndescription: Planted findings that every scan must skip.\n---\n"
+      }
+    }
+  ]
+}

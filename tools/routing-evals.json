@@ -4339,6 +4339,99 @@
       "near": "unit-and-component-tests"
     },
     {
+      "prompt": "add a Firestore write that still works offline with React Native Firebase",
+      "expect": "firebase-rnfb"
+    },
+    {
+      "prompt": "set up React Native Firebase in the Expo app with the config plugins and dynamic frameworks",
+      "expect": "firebase-rnfb"
+    },
+    {
+      "prompt": "upload a photo to Firebase Storage from the app and save its path on the task",
+      "expect": "firebase-rnfb"
+    },
+    {
+      "prompt": "Firestore listener keeps firing after leaving the screen",
+      "expect": "firebase-rnfb"
+    },
+    {
+      "prompt": "saving to Firestore hangs offline",
+      "expect": "firebase-rnfb"
+    },
+    {
+      "prompt": "store the refresh token in secure storage after sign in",
+      "expect": "auth-and-secure-storage",
+      "near": "firebase-rnfb"
+    },
+    {
+      "prompt": "Write Firestore security rules and test them against the emulator",
+      "expect": "firestore-rules-and-emulator-tests"
+    },
+    {
+      "prompt": "Add a Storage rule that limits uploads to the owner and image content types",
+      "expect": "firestore-rules-and-emulator-tests"
+    },
+    {
+      "prompt": "lock down the entitlements collection so only the server can write it and prove it with a test",
+      "expect": "firestore-rules-and-emulator-tests"
+    },
+    {
+      "prompt": "Add a Firestore write with offline persistence using React Native Firebase",
+      "expect": "firebase-rnfb",
+      "near": "firestore-rules-and-emulator-tests"
+    },
+    {
+      "prompt": "add a callable Cloud Function that summarizes a task list with a paid AI API and limits each user to 20 calls a day",
+      "expect": "cloud-functions-backend"
+    },
+    {
+      "prompt": "my onCall function needs App Check and should reject users who are not signed in",
+      "expect": "cloud-functions-backend"
+    },
+    {
+      "prompt": "stop all paid Cloud Function calls when the Google Cloud billing budget alert fires",
+      "expect": "cloud-functions-backend"
+    },
+    {
+      "prompt": "write the Firestore security rules so users can only read their own quota docs",
+      "expect": "firestore-rules-and-emulator-tests",
+      "near": "cloud-functions-backend"
+    },
+    {
+      "prompt": "subscribe with RevenueCat",
+      "expect": "subscriptions-revenuecat"
+    },
+    {
+      "prompt": "add a monthly and annual Premium subscription with react-native-purchases and an offering",
+      "expect": "subscriptions-revenuecat"
+    },
+    {
+      "prompt": "write the RevenueCat webhook that updates the user's entitlement on renewal, refund and billing issue",
+      "expect": "subscriptions-revenuecat"
+    },
+    {
+      "prompt": "add a Premium unlock with expo-iap",
+      "expect": "in-app-purchases",
+      "near": "subscriptions-revenuecat"
+    },
+    {
+      "prompt": "Add a Lottie celebration when the user completes a list",
+      "expect": "lottie-and-rive"
+    },
+    {
+      "prompt": "Play a Rive animation on the empty state of the tasks screen",
+      "expect": "lottie-and-rive"
+    },
+    {
+      "prompt": "Our Lottie file is 900 KB and stutters, set a size budget",
+      "expect": "lottie-and-rive"
+    },
+    {
+      "prompt": "the list-cleared confetti burst made with Reanimated ignores Reduce Motion",
+      "expect": "motion-and-animation",
+      "near": "lottie-and-rive"
+    },
+    {
       "prompt": "Write a haiku about autumn leaves",
       "expect": null
     },

@@ -1,0 +1,13 @@
+{
+  "name": "tasks-app",
+  "private": true,
+  "main": "expo-router/entry",
+  "dependencies": {
+    "@react-native-firebase/app": "26.4.0",
+    "@react-native-firebase/firestore": "26.4.0",
+    "expo": "~57.0.26",
+    "expo-router": "~57.0.24",
+    "expo-sqlite": "~57.0.3",
+    "valibot": "1.5.0"
+  }
+}

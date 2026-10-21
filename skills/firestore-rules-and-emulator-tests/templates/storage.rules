@@ -1,0 +1,30 @@
+// storage.rules
+// Deny by default. An upload is allowed only into the signed-in user's own folder, only as an image
+// type the app accepts, and only under the size cap. Tests: test/rules/storage.rules.test.ts.
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // 5 MiB: the app resizes before upload, so a larger file is a bug or someone else's client.
+    function isAcceptedImage() {
+      return request.resource.contentType.matches('image/(jpeg|png|webp)')
+        && request.resource.size < 5 * 1024 * 1024;
+    }
+
+    // A photo attached to a task, at users/<uid>/attachments/<file name>.
+    match /users/{uid}/attachments/{fileName} {
+      allow read: if isOwner(uid);
+      allow create, update: if isOwner(uid) && isAcceptedImage();
+      allow delete: if isOwner(uid);
+    }
+  }
+}

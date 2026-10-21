@@ -1,0 +1,724 @@
+{
+  "bad-budget-above-ceiling": {
+    "expect": [
+      "[unbudgeted-file]",
+      "contracts/animations.json:11"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/animations.json",
+          "path": [
+            "budgets",
+            "maxFps"
+          ],
+          "value": 120
+        }
+      }
+    ]
+  },
+  "bad-frame-rate": {
+    "expect": [
+      "[unbudgeted-file]",
+      "assets/animations/list-completed.json:3",
+      "authored at 120 fps"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "assets/animations/list-completed.json",
+          "find": "\"fr\": 30,",
+          "with": "\"fr\": 120,"
+        }
+      }
+    ]
+  },
+  "bad-heavy-undeclared": {
+    "expect": [
+      "[unbudgeted-file]",
+      "contracts/animations.json:43",
+      "not declared heavy"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/animations.json",
+          "path": [
+            "budgets",
+            "heavyFromBytes"
+          ],
+          "value": 50
+        }
+      }
+    ]
+  },
+  "bad-hidden-informative": {
+    "expect": [
+      "[no-reduce-motion-fallback]",
+      "contracts/animations.json:45"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/animations.json",
+          "path": [
+            "animations",
+            1,
+            "reducedMotion"
+          ],
+          "value": {
+            "show": "hidden"
+          }
+        }
+      }
+    ]
+  },
+  "bad-legacy-rive-package": {
+    "expect": [
+      "[unapproved-runtime]",
+      "package.json:11",
+      "depends on rive-react-native"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "rive-react-native"
+          ],
+          "value": "9.8.6"
+        }
+      }
+    ]
+  },
+  "bad-missing-licence": {
+    "expect": [
+      "[missing-licence-record]",
+      "contracts/animations.json:17",
+      "has no licence"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/animations.json",
+          "path": [
+            "animations",
+            0,
+            "licence"
+          ],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "bad-moment-runtime-mismatch": {
+    "expect": [
+      "[unapproved-runtime]",
+      "src/features/tasks/components/empty-tasks-mascot.tsx:16",
+      "<RiveMoment> plays assets/animations/list-completed.json"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/empty-tasks-mascot.tsx",
+          "find": "empty-tasks-mascot.riv')",
+          "with": "list-completed.json')"
+        }
+      }
+    ]
+  },
+  "bad-over-byte-budget": {
+    "expect": [
+      "[unbudgeted-file]",
+      "assets/animations/list-completed.json:1",
+      "is 826 bytes, over its budget of 100"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/animations.json",
+          "path": [
+            "animations",
+            0,
+            "maxBytes"
+          ],
+          "value": 100
+        }
+      }
+    ]
+  },
+  "bad-placeholder-source": {
+    "expect": [
+      "[missing-licence-record]",
+      "contracts/animations.json:49",
+      "has no source"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/animations.json",
+          "path": [
+            "animations",
+            1,
+            "source"
+          ],
+          "value": "TODO"
+        }
+      }
+    ]
+  },
+  "bad-plays-mismatch": {
+    "expect": [
+      "[unbudgeted-file]",
+      "src/features/tasks/components/list-completed-burst.tsx:17"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/list-completed-burst.tsx",
+          "find": "plays={1}",
+          "with": "plays={3}"
+        }
+      }
+    ]
+  },
+  "bad-record-without-reduced": {
+    "expect": [
+      "[no-reduce-motion-fallback]",
+      "contracts/animations.json:17"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/animations.json",
+          "path": [
+            "animations",
+            0,
+            "reducedMotion"
+          ],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "bad-remote-record": {
+    "expect": [
+      "[remote-animation-source]",
+      "contracts/animations.json:18"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/animations.json",
+          "path": [
+            "animations",
+            0,
+            "file"
+          ],
+          "value": "https://cdn.example.com/list-completed.json"
+        }
+      }
+    ]
+  },
+  "bad-remote-rive-factory": {
+    "expect": [
+      "[remote-animation-source]",
+      "src/ui/animation/rive-player.tsx:31",
+      "fromURL()"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/animation/rive-player.tsx",
+          "find": "const { riveFile, error } = useRiveFile(source);",
+          "with": "const { riveFile, error } = useRiveFile(source);\n  void RiveFileFactory.fromURL(String(source), undefined);"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/ui/animation/rive-player.tsx",
+          "find": "import { Fit, RiveView, useRive, useRiveFile } from '@rive-app/react-native';",
+          "with": "import { Fit, RiveFileFactory, RiveView, useRive, useRiveFile } from '@rive-app/react-native';"
+        }
+      }
+    ]
+  },
+  "bad-remote-uri-source": {
+    "expect": [
+      "[remote-animation-source]",
+      "src/features/tasks/components/list-completed-burst.tsx:16",
+      "{ uri } source"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/list-completed-burst.tsx",
+          "find": "source={require('@/assets/animations/list-completed.json')}",
+          "with": "source={{ uri: 'https://cdn.example.com/list-completed.json' }}"
+        }
+      }
+    ]
+  },
+  "bad-remote-url-constant": {
+    "expect": [
+      "[remote-animation-source]",
+      "src/features/tasks/mascot-url.ts:2"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/mascot-url.ts",
+          "lines": [
+            "// src/features/tasks/mascot-url.ts",
+            "export const MASCOT_URL = 'https://cdn.example.com/animations/empty-tasks-mascot.riv';"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-rive-frame-rate": {
+    "expect": [
+      "[unbudgeted-file]",
+      "src/features/tasks/components/empty-tasks-mascot.tsx:18"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/empty-tasks-mascot.tsx",
+          "find": "frameRate={30}",
+          "with": "frameRate={120}"
+        }
+      }
+    ]
+  },
+  "bad-rive-not-settling": {
+    "expect": [
+      "[unbudgeted-file]",
+      "contracts/animations.json:35",
+      "not confirmed to settle"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/animations.json",
+          "path": [
+            "animations",
+            1,
+            "settles"
+          ],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "bad-rive-without-nitro": {
+    "expect": [
+      "[unapproved-runtime]",
+      "package.json:5",
+      "without react-native-nitro-modules"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "react-native-nitro-modules"
+          ],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "bad-run-too-long": {
+    "expect": [
+      "[unbudgeted-file]",
+      "contracts/animations.json:23",
+      "runs 1.5 s"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/animations.json",
+          "path": [
+            "budgets",
+            "maxSeconds"
+          ],
+          "value": 1
+        }
+      }
+    ]
+  },
+  "bad-runtime-extension": {
+    "expect": [
+      "[unapproved-runtime]",
+      "contracts/animations.json:37"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/animations.json",
+          "path": [
+            "animations",
+            1,
+            "runtime"
+          ],
+          "value": "lottie"
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/animations.json",
+          "path": [
+            "animations",
+            1,
+            "plays"
+          ],
+          "value": 1
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/animations.json",
+          "path": [
+            "animations",
+            1,
+            "settles"
+          ],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "bad-runtime-outside-wrapper": {
+    "expect": [
+      "[no-reduce-motion-fallback]",
+      "src/features/tasks/components/confetti-burst.tsx:2",
+      "outside the animation wrappers"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/confetti-burst.tsx",
+          "lines": [
+            "// src/features/tasks/components/confetti-burst.tsx",
+            "import LottieView from 'lottie-react-native';",
+            "",
+            "export const ConfettiView = LottieView;"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-still-mismatch": {
+    "expect": [
+      "[no-reduce-motion-fallback]",
+      "src/features/tasks/components/list-completed-burst.tsx:18",
+      "still=0.5"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/list-completed-burst.tsx",
+          "find": "still={1}",
+          "with": "still={0.5}"
+        }
+      }
+    ]
+  },
+  "bad-unapproved-import": {
+    "expect": [
+      "[unapproved-runtime]",
+      "src/features/tasks/components/sparkle.tsx:2"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/sparkle.tsx",
+          "lines": [
+            "// src/features/tasks/components/sparkle.tsx",
+            "import { DotLottie } from '@lottiefiles/dotlottie-react-native';",
+            "",
+            "export const Sparkle = DotLottie;"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-unbounded-loop": {
+    "expect": [
+      "[unbudgeted-file]",
+      "contracts/animations.json:23",
+      "plays 10 times"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/animations.json",
+          "path": [
+            "animations",
+            0,
+            "job"
+          ],
+          "value": "loop"
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/animations.json",
+          "path": [
+            "animations",
+            0,
+            "plays"
+          ],
+          "value": 10
+        }
+      }
+    ]
+  },
+  "bad-unrecorded-file": {
+    "expect": [
+      "[unbudgeted-file]",
+      "assets/animations/confetti.json:1"
+    ],
+    "ops": [
+      {
+        "copy": {
+          "from": "assets/animations/list-completed.json",
+          "to": "assets/animations/confetti.json"
+        }
+      }
+    ]
+  },
+  "bad-unrecorded-require": {
+    "expect": [
+      "[unbudgeted-file]",
+      "src/features/tasks/components/empty-tasks-mascot.tsx:16",
+      "waving-mascot.riv, which has no record"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/empty-tasks-mascot.tsx",
+          "find": "empty-tasks-mascot.riv')",
+          "with": "waving-mascot.riv')"
+        }
+      }
+    ]
+  },
+  "bad-unrecorded-riv": {
+    "expect": [
+      "[unbudgeted-file]",
+      "src/features/tasks/assets/sparkle.riv:1"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/assets/sparkle.riv",
+          "content": "RIVE fixture\n"
+        }
+      }
+    ]
+  },
+  "bad-weight-mismatch": {
+    "expect": [
+      "[unbudgeted-file]",
+      "src/features/tasks/components/list-completed-burst.tsx:19",
+      "weight=\"light\""
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/components/list-completed-burst.tsx",
+          "find": "weight=\"heavy\"",
+          "with": "weight=\"light\""
+        }
+      }
+    ]
+  },
+  "bad-wrapper-without-reduce-motion": {
+    "expect": [
+      "[no-reduce-motion-fallback]",
+      "src/ui/animation/lottie-player.tsx:8",
+      "no wrapper file calls useReduceMotion()"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/ui/animation/animation-moment.tsx",
+          "find": "const isReduceMotion = useReduceMotion();",
+          "with": "const isReduceMotion = false;"
+        }
+      },
+      {
+        "replace": {
+          "file": "src/ui/animation/animation-moment.tsx",
+          "find": "import { useReduceMotion } from '@/ui/a11y/use-reduce-motion';\n",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-wrong-job": {
+    "expect": [
+      "[unapproved-runtime]",
+      "contracts/animations.json:38",
+      "gives rive the job \"one-shot\""
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/animations.json",
+          "path": [
+            "animations",
+            1,
+            "job"
+          ],
+          "value": "one-shot"
+        }
+      }
+    ]
+  },
+  "error-broken-contract": {
+    "expect": [
+      "ERROR [bad-input]",
+      "contracts/animations.json"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/animations.json",
+          "content": "{ \"animations\": [ \n"
+        }
+      }
+    ]
+  },
+  "error-missing-root": {
+    "expect": [
+      "ERROR [bad-input]",
+      "no-such-folder"
+    ],
+    "args": "no-such-folder",
+    "ops": []
+  },
+  "error-no-contract": {
+    "expect": [
+      "ERROR [bad-input]",
+      "contracts/animations.json"
+    ],
+    "ops": [
+      {
+        "delete": [
+          "contracts/animations.json"
+        ]
+      }
+    ]
+  },
+  "error-no-package-json": {
+    "expect": [
+      "ERROR [bad-input]",
+      "package.json"
+    ],
+    "ops": [
+      {
+        "delete": [
+          "package.json"
+        ]
+      }
+    ]
+  },
+  "pass-lottie-only": {
+    "expect": [
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "@rive-app/react-native"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "react-native-nitro-modules"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "delete": [
+          "src/ui/animation/rive-moment.tsx",
+          "src/ui/animation/rive-player.tsx",
+          "src/ui/animation/rive-moment.test.tsx",
+          "__mocks__/@rive-app/react-native.tsx",
+          "src/features/tasks/components/empty-tasks-mascot.tsx",
+          "assets/animations/empty-tasks-mascot.riv"
+        ]
+      },
+      {
+        "json": {
+          "file": "contracts/animations.json",
+          "path": [
+            "animations",
+            1
+          ],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "pass-not-applicable": {
+    "expect": [
+      "NOT APPLICABLE: no Lottie or Rive runtime in package.json"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "@rive-app/react-native"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "lottie-react-native"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "react-native-nitro-modules"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "delete": [
+          "src/ui/animation",
+          "__mocks__",
+          "src/features/tasks/components",
+          "assets/animations",
+          "contracts"
+        ]
+      }
+    ]
+  }
+}
