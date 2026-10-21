@@ -131,7 +131,7 @@
         "replace": {
           "file": "contracts/contrast.json",
           "find": "  \"exceptions\": []\n",
-          "with": "  \"exceptions\": [],\n"
+          "with": "  \"exceptions\" []\n"
         }
       }
     ]
@@ -495,6 +495,21 @@
     "ops": [
       { "rename": { "from": "contracts/contrast.json", "to": "qa/contrast.json" } },
       { "write": { "file": "rn-skills.config.json", "json": { "contrastContract": "qa/contrast.json" } } }
+    ]
+  },
+  "pass-contract-comments": {
+    "expect": [
+      "check-contrast: 4 palettes, canvas surfaces, colour lists and gate files checked, 0 problems",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "contracts/contrast.json",
+          "find": "  \"exceptions\": []\n",
+          "with": "  // No pair fails yet; an exception names its reason and approver (references/contrast-and-colour.md).\n  \"exceptions\": [],\n"
+        }
+      }
     ]
   },
   "pass-contract-option-repo-relative": {
