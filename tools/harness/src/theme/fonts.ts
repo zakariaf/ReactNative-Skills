@@ -28,6 +28,25 @@ export const SCRIPT_FONTS: Readonly<Record<ScriptKey, ScriptFamilies | null>> = 
   arabic: null,
 };
 
+/**
+ * An optional display typeface per script, for a design that names one beside its text face (a
+ * Latin display family for headings, numbers and the brand name). Display and brand text draw with
+ * it; a script without an entry draws its display text with its SCRIPT_FONTS family. It is bundled
+ * and pinned exactly like SCRIPT_FONTS: one file per weight, file name = PostScript name, each file
+ * in the contract and the expo-font entry, metrics in TALL_SCRIPT_METRICS for a tall script. The
+ * default names none; a Latin display face reads latin: { regular: 'Fraunces-Bold', medium:
+ * 'Fraunces-Bold', semibold: 'Fraunces-Bold', bold: 'Fraunces-Bold' } (display text is bold).
+ */
+export const DISPLAY_FONTS: Readonly<Partial<Record<ScriptKey, ScriptFamilies>>> = {};
+
+/** What scriptFontFor picks from: the family per script and weight, and the display faces. */
+export type FontTables = {
+  readonly scripts: Readonly<Record<ScriptKey, ScriptFamilies | null>>;
+  readonly display: Readonly<Partial<Record<ScriptKey, ScriptFamilies>>>;
+};
+
+const FONT_TABLES: FontTables = { scripts: SCRIPT_FONTS, display: DISPLAY_FONTS };
+
 /** fontWeight for the system font (never for a bundled family). */
 export type FontWeightValue = '400' | '500' | '600' | '700';
 export const FONT_WEIGHT_VALUES: Readonly<Record<FontWeightToken, FontWeightValue>> = {
@@ -78,17 +97,21 @@ export function scriptOf(language: string): ScriptKey {
 
 /**
  * The font for a text: it follows the language of the TEXT, not the UI (an autonym in a language
- * list uses its own script). Display text is bold; brand text stays in the Latin family everywhere.
+ * list uses its own script). Display text is bold, in the script's display face when DISPLAY_FONTS
+ * names one; brand text stays in the Latin family (or the Latin display face) everywhere. `fonts`
+ * is the tables, or a SCRIPT_FONTS-shaped table alone (no display faces), as tests pass it.
  */
 export function scriptFontFor(
   language: string,
   style: { readonly weight: FontWeightToken; readonly face: TypeFace },
-  fonts: Readonly<Record<ScriptKey, ScriptFamilies | null>> = SCRIPT_FONTS,
+  fonts: FontTables | FontTables['scripts'] = FONT_TABLES,
 ): ScriptFont {
+  const tables: FontTables = 'scripts' in fonts ? fonts : { scripts: fonts, display: {} };
   const script = style.face === 'brand' ? 'latin' : scriptOf(language);
   const resolved = style.face === 'text' ? style.weight : 'bold';
+  const display = style.face === 'text' ? undefined : tables.display[script]?.[resolved];
   return {
-    fontFamily: fonts[script]?.[resolved] ?? null,
+    fontFamily: display ?? tables.scripts[script]?.[resolved] ?? null,
     fontWeight: FONT_WEIGHT_VALUES[resolved],
     isTallScript: TALL_SCRIPTS.has(script),
   };

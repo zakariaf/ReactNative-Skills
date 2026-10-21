@@ -181,11 +181,28 @@ npm workspaces `apps/*` and `packages/*`, packages consumed as TypeScript source
   workspace has its own `tsconfig.json` that extends the root base (`../../tsconfig.base.json`) and
   sets only `types`, `paths`, `include` and `exclude`; an Expo app workspace lists `["jest"]`, never
   `node` (`check-configs` checks every workspace from `package.json` `workspaces`).
+- The root program still reads every workspace (`**/*.ts`), so each Expo app workspace's
+  `app-env.d.ts` leaves it in its workspace form: `"exclude": [..., "apps/mobile/src/app-env.d.ts"]`
+  next to the canonical `src/app-env.d.ts`. Without it the root program sees the app's
+  `declare const process` in place of `@types/node`'s and fails with TS2339 on `process.exitCode`.
+  `check-configs` requires the entry wherever the file exists (`tsconfig-world`) and counts it as
+  canonical, never as an ignore that skips app code (`ignore-app-code`). A Node backend workspace
+  (`functions/`, which declares `"engines": { "node": ... }`) is Node tooling and may list `node`.
+  `check-source.mjs` treats it as Node-run code too, like `scripts/`: its `node:crypto` import is
+  fine, while app code that imports one of its files fails `node-world-import`. It reads the backend
+  from `package.json` `workspaces` (outside `packages/`, no Expo app) and from
+  `contracts/architecture.json` (architecture-and-boundaries), where a workspace with `"world":
+  "node"` (a server-only package) joins the Node world and `"world": "app"` keeps one in the app.
 - An extensionless import does not resolve through an `exports` wildcard in `tsc`, so every relative
   and workspace import writes its extension (`./x.ts`, `@acme/ui/button.tsx`). Set
   `IS_MULTI_PACKAGE = true` in `eslint.config.mjs` and extend `PACKAGE_IMPORT_EXTENSION`'s pattern
   with the workspace scope; `check-source.mjs` checks every workspace import in monorepo mode
-  (`"importExtensions": "all"`).
+  (`"importExtensions": "all"`). The skills' templates import without extensions (the single-app
+  style), so after copying templates into a workspace run `add-import-extensions.mjs . --path <folder>`:
+  it rewrites each extensionless local import to the file it resolves to (`./x` to `./x.ts`, `@/i18n`
+  to `@/i18n/index.ts`, `@acme/shared/core/result` to `@acme/shared/core/result.ts`) and refuses an
+  import that resolves to platform files (`x.ios.ts`, or a plain `x.ts` beside one): Metro picks the
+  platform file only for the extensionless form, so a person decides.
 - A package that declares a global augmentation (React Navigation's `RootParamList`, a theme module
   declaration) must be listed in the `include` of every app program that imports files depending on
   it. Otherwise the augmentation is empty there and calls fail with TS2769 ("not assignable to

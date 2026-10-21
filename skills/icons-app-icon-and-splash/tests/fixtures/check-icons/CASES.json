@@ -144,6 +144,31 @@
       }
     ]
   },
+  "bad-monorepo-emoji": {
+    "expect": ["FAIL apps/mobile/src/i18n/catalogs/en.json:3 [no-emoji]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/i18n/catalogs/en.json",
+          "content": "{\n  \"tasks.title\": \"Tasks\",\n  \"tasks.empty\": \"All done 🎉\",\n  \"tasks.streak\": \"On a roll 🔥\"\n}\n"
+        }
+      },
+      { "rename": { "from": "app.config.ts", "to": "apps/mobile/app.config.ts" } },
+      { "rename": { "from": "contracts", "to": "apps/mobile/contracts" } },
+      { "rename": { "from": "design", "to": "apps/mobile/design" } },
+      { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+      { "rename": { "from": "scripts", "to": "apps/mobile/scripts" } },
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      { "rename": { "from": "tsconfig.json", "to": "apps/mobile/tsconfig.json" } },
+      {
+        "write": {
+          "file": "package.json",
+          "json": { "name": "tasks", "private": true, "workspaces": ["apps/*", "packages/*"] }
+        }
+      },
+      { "write": { "file": "packages/shared/package.json", "json": { "name": "@tasks/shared", "private": true } } }
+    ]
+  },
   "bad-path-edit": {
     "expect": ["[icon-path-stale] \"plus\" covers", "differently from its layers"],
     "ops": [
@@ -198,6 +223,25 @@
           "regex": true
         }
       }
+    ]
+  },
+  "error-monorepo-no-source": {
+    "expect": ["ERROR [bad-input] apps/mobile: nothing to check: app source folder"],
+    "ops": [
+      { "delete": "src" },
+      { "rename": { "from": "app.config.ts", "to": "apps/mobile/app.config.ts" } },
+      { "rename": { "from": "contracts", "to": "apps/mobile/contracts" } },
+      { "rename": { "from": "design", "to": "apps/mobile/design" } },
+      { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+      { "rename": { "from": "scripts", "to": "apps/mobile/scripts" } },
+      { "rename": { "from": "tsconfig.json", "to": "apps/mobile/tsconfig.json" } },
+      {
+        "write": {
+          "file": "package.json",
+          "json": { "name": "tasks", "private": true, "workspaces": ["apps/*", "packages/*"] }
+        }
+      },
+      { "write": { "file": "packages/shared/package.json", "json": { "name": "@tasks/shared", "private": true } } }
     ]
   },
   "error-no-source": {
@@ -286,6 +330,29 @@
         }
       },
       { "write": { "file": "src/vendor/kit-skill/emoji.ts", "lines": ["export const STAR = '⭐';"] } }
+    ]
+  },
+  "pass-monorepo": {
+    "expect": [
+      "apps: apps/mobile (the Expo app workspaces of package.json \"workspaces\"), each checked as an app",
+      "check-icons: 11 source files and icon sets checked, 0 problems",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      { "rename": { "from": "app.config.ts", "to": "apps/mobile/app.config.ts" } },
+      { "rename": { "from": "contracts", "to": "apps/mobile/contracts" } },
+      { "rename": { "from": "design", "to": "apps/mobile/design" } },
+      { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+      { "rename": { "from": "scripts", "to": "apps/mobile/scripts" } },
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      { "rename": { "from": "tsconfig.json", "to": "apps/mobile/tsconfig.json" } },
+      {
+        "write": {
+          "file": "package.json",
+          "json": { "name": "tasks", "private": true, "workspaces": ["apps/*", "packages/*"] }
+        }
+      },
+      { "write": { "file": "packages/shared/package.json", "json": { "name": "@tasks/shared", "private": true } } }
     ]
   },
   "pass-no-icon-set": {

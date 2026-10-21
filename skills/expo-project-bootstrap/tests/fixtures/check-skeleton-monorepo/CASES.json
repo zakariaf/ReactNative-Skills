@@ -1,13 +1,31 @@
 {
   "bad-app-lockstep": {
-    "expect": ["[app-lockstep] react-native-reanimated differs between apps: apps/admin=4.5.0, apps/tasks=4.5.1"],
+    "expect": [
+      "[app-lockstep] react-native-reanimated differs between apps: apps/admin=4.5.0, apps/tasks=4.5.1"
+    ],
     "ops": [
-      { "copy": { "from": "apps/tasks", "to": "apps/admin" } },
-      { "json": { "file": "apps/admin/package.json", "path": ["name"], "value": "@acme/admin" } },
+      {
+        "copy": {
+          "from": "apps/tasks",
+          "to": "apps/admin"
+        }
+      },
       {
         "json": {
           "file": "apps/admin/package.json",
-          "path": ["dependencies", "react-native-reanimated"],
+          "path": [
+            "name"
+          ],
+          "value": "@acme/admin"
+        }
+      },
+      {
+        "json": {
+          "file": "apps/admin/package.json",
+          "path": [
+            "dependencies",
+            "react-native-reanimated"
+          ],
           "value": "4.5.0"
         }
       }
@@ -17,21 +35,139 @@
     "expect": [
       "FAIL package.json:1 [root-overrides] overrides.react-native-reanimated is missing; packages/ui peers on it with \"*\""
     ],
-    "ops": [{ "json": { "file": "package.json", "path": ["overrides", "react-native-reanimated"], "delete": true } }]
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "overrides",
+            "react-native-reanimated"
+          ],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "bad-node-backend-exports": {
+    "expect": [
+      "FAIL functions/package.json:1 [package-manifest] exports must map \"./*\" to \"./src/*\""
+    ],
+    "extends": "pass-node-backend",
+    "ops": [
+      {
+        "$comment": "Node tooling may leave the exports map out, but one it declares still maps the TypeScript source",
+        "json": {
+          "file": "functions/package.json",
+          "path": [
+            "exports"
+          ],
+          "value": {
+            ".": "./lib/index.js"
+          }
+        }
+      }
+    ]
   },
   "bad-package-manifest": {
-    "expect": ["FAIL packages/ui/package.json:1 [package-manifest] exports must map \"./*\" to \"./src/*\""],
-    "ops": [{ "json": { "file": "packages/ui/package.json", "path": ["exports"], "delete": true } }]
+    "expect": [
+      "FAIL packages/ui/package.json:1 [package-manifest] exports must map \"./*\" to \"./src/*\""
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "packages/ui/package.json",
+          "path": [
+            "exports"
+          ],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "bad-root-export-audit-folder": {
+    "expect": [
+      "[root-scripts] script \"export:audit\" differs from the canonical command Fix: Set it to: cd apps/tasks && APP_VARIANT=production",
+      "--output-dir ../../dist-audit"
+    ],
+    "ops": [
+      {
+        "$comment": "the export writes inside the app, where neither audit looks",
+        "json": {
+          "file": "package.json",
+          "path": [
+            "scripts",
+            "export:audit"
+          ],
+          "value": "cd apps/tasks && APP_VARIANT=production EXPO_PUBLIC_APP_VARIANT=production expo export --platform ios --platform android --source-maps --output-dir dist-audit"
+        }
+      },
+      {
+        "json": {
+          "file": "quality-gates.json",
+          "path": [
+            "npmScripts",
+            "export:audit"
+          ],
+          "value": "cd apps/tasks && APP_VARIANT=production EXPO_PUBLIC_APP_VARIANT=production expo export --platform ios --platform android --source-maps --output-dir dist-audit"
+        }
+      }
+    ]
   },
   "bad-root-runtime": {
-    "expect": ["FAIL package.json:1 [root-runtime] expo-haptics is an app runtime package listed at the root"],
+    "expect": [
+      "FAIL package.json:1 [root-runtime] expo-haptics is an app runtime package listed at the root"
+    ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["dependencies"], "value": { "expo-haptics": "~57.0.3" } } },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies"
+          ],
+          "value": {
+            "expo-haptics": "~57.0.3"
+          }
+        }
+      },
       {
         "json": {
           "file": "package-lock.json",
-          "path": ["packages", "", "dependencies"],
-          "value": { "expo-haptics": "~57.0.3" }
+          "path": [
+            "packages",
+            "",
+            "dependencies"
+          ],
+          "value": {
+            "expo-haptics": "~57.0.3"
+          }
+        }
+      }
+    ]
+  },
+  "bad-root-scripts-single-app": {
+    "expect": [
+      "[root-scripts] script \"typecheck\" differs from the canonical command Fix: Set it to: tsc --noEmit -p tsconfig.json && npm run -s typecheck --workspaces"
+    ],
+    "ops": [
+      {
+        "$comment": "the single app's typecheck kept after the move: src/tsconfig.json no longer exists",
+        "json": {
+          "file": "package.json",
+          "path": [
+            "scripts",
+            "typecheck"
+          ],
+          "value": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p src/tsconfig.json"
+        }
+      },
+      {
+        "json": {
+          "file": "quality-gates.json",
+          "path": [
+            "npmScripts",
+            "typecheck"
+          ],
+          "value": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p src/tsconfig.json"
         }
       }
     ]
@@ -41,12 +177,30 @@
       "FAIL packages/legacy/package.json:1 [workspace-layout] packages/legacy has a package.json but no \"workspaces\" glob matches it"
     ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["apps/*", "packages/ui"] } },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "workspaces"
+          ],
+          "value": [
+            "apps/*",
+            "packages/ui"
+          ]
+        }
+      },
       {
         "json": {
           "file": "package-lock.json",
-          "path": ["packages", "", "workspaces"],
-          "value": ["apps/*", "packages/ui"]
+          "path": [
+            "packages",
+            "",
+            "workspaces"
+          ],
+          "value": [
+            "apps/*",
+            "packages/ui"
+          ]
         }
       },
       {
@@ -58,11 +212,20 @@
     ]
   },
   "bad-workspace-no-types": {
-    "expect": ["FAIL packages/ui/tsconfig.json:1 [tsconfig-program] sets no compilerOptions.types"],
+    "expect": [
+      "FAIL packages/ui/tsconfig.json:1 [tsconfig-program] sets no compilerOptions.types"
+    ],
     "ops": [
       {
         "$comment": "No types list: TypeScript then loads every installed @types package, @types/node included.",
-        "json": { "file": "packages/ui/tsconfig.json", "path": ["compilerOptions", "types"], "delete": true }
+        "json": {
+          "file": "packages/ui/tsconfig.json",
+          "path": [
+            "compilerOptions",
+            "types"
+          ],
+          "delete": true
+        }
       }
     ]
   },
@@ -74,34 +237,206 @@
     "ops": [
       {
         "$comment": "A shared package's program loosens the base and adds Node globals to code the app imports.",
-        "json": { "file": "packages/ui/tsconfig.json", "path": ["compilerOptions", "types"], "value": ["jest", "node"] }
+        "json": {
+          "file": "packages/ui/tsconfig.json",
+          "path": [
+            "compilerOptions",
+            "types"
+          ],
+          "value": [
+            "jest",
+            "node"
+          ]
+        }
       },
-      { "json": { "file": "packages/ui/tsconfig.json", "path": ["compilerOptions", "strict"], "value": false } }
+      {
+        "json": {
+          "file": "packages/ui/tsconfig.json",
+          "path": [
+            "compilerOptions",
+            "strict"
+          ],
+          "value": false
+        }
+      }
+    ]
+  },
+  "bad-workspace-typecheck-missing": {
+    "expect": [
+      "FAIL packages/ui/package.json:1 [workspace-layout] script \"typecheck\" is missing (the root runs it in every workspace"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "packages/ui/package.json",
+          "path": [
+            "scripts",
+            "typecheck"
+          ],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "pass-node-backend": {
+    "expect": [
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "$comment": "a Cloud Functions backend as its own workspace (cloud-functions-backend): Node tooling with its deploy bundle as main and no exports map, since nothing imports it",
+        "json": {
+          "file": "package.json",
+          "path": [
+            "workspaces"
+          ],
+          "value": [
+            "apps/*",
+            "packages/*",
+            "functions"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": [
+            "packages",
+            "",
+            "workspaces"
+          ],
+          "value": [
+            "apps/*",
+            "packages/*",
+            "functions"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": [
+            "packages",
+            "functions"
+          ],
+          "value": {
+            "name": "@acme/functions",
+            "version": "1.0.0"
+          }
+        }
+      },
+      {
+        "write": {
+          "file": "functions/package.json",
+          "content": "{\n  \"name\": \"@acme/functions\",\n  \"version\": \"1.0.0\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"main\": \"lib/index.js\",\n  \"engines\": {\n    \"node\": \"24\"\n  },\n  \"scripts\": {\n    \"typecheck\": \"tsc --noEmit -p tsconfig.json\"\n  }\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "functions/tsconfig.json",
+          "content": "{\n  \"extends\": \"../tsconfig.base.json\",\n  \"compilerOptions\": {\n    \"types\": [\"node\"]\n  },\n  \"include\": [\"src/**/*\"]\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "functions/src/index.ts",
+          "content": "export {};\n"
+        }
+      },
+      {
+        "$comment": "the backend's knip workspace: its entry (the file the deploy build bundles) exports every function by design, so includeEntryExports stays off and the entry names that one file",
+        "json": {
+          "file": "knip.json",
+          "path": [
+            "workspaces",
+            "functions"
+          ],
+          "value": {
+            "entry": [
+              "src/index.ts",
+              "src/**/*.test.ts"
+            ],
+            "project": [
+              "src/**/*.ts"
+            ]
+          }
+        }
+      }
     ]
   },
   "pass-node-tooling-package": {
-    "expect": ["RESULT: PASS"],
+    "expect": [
+      "RESULT: PASS"
+    ],
     "ops": [
       {
         "$comment": "A package that declares engines.node is Node tooling: types node is allowed there.",
-        "json": { "file": "packages/ui/package.json", "path": ["engines"], "value": { "node": ">=22.18" } }
+        "json": {
+          "file": "packages/ui/package.json",
+          "path": [
+            "engines"
+          ],
+          "value": {
+            "node": ">=22.18"
+          }
+        }
       },
       {
-        "json": { "file": "packages/ui/tsconfig.json", "path": ["compilerOptions", "types"], "value": ["jest", "node"] }
+        "json": {
+          "file": "packages/ui/tsconfig.json",
+          "path": [
+            "compilerOptions",
+            "types"
+          ],
+          "value": [
+            "jest",
+            "node"
+          ]
+        }
       }
     ]
   },
   "pass-workspace-routes-dir": {
-    "expect": ["RESULT: PASS"],
+    "expect": [
+      "RESULT: PASS"
+    ],
     "ops": [
       {
         "$comment": "The app's routes live in apps/tasks/app (rn-skills.config.json workspaces): the per-app checks follow the workspace layout.",
-        "rename": { "from": "apps/tasks/src/app", "to": "apps/tasks/app" }
+        "rename": {
+          "from": "apps/tasks/src/app",
+          "to": "apps/tasks/app"
+        }
       },
       {
         "write": {
           "file": "rn-skills.config.json",
           "content": "{ \"workspaces\": { \"apps/tasks\": { \"routesDir\": \"app\" } } }\n"
+        }
+      }
+    ]
+  },
+  "bad-node-backend-knip": {
+    "expect": [
+      "knip.json:1 [knip-config] workspaces.functions.includeEntryExports is true, so knip reports every function the deploy entry exports as unused",
+      "knip.json:1 [knip-config] workspaces.functions entry adds \"src/**/*.ts\"",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "extends": "pass-node-backend",
+    "ops": [
+      {
+        "json": {
+          "file": "knip.json",
+          "path": [
+            "workspaces",
+            "functions"
+          ],
+          "value": {
+            "includeEntryExports": true,
+            "entry": [
+              "src/**/*.ts"
+            ]
+          }
         }
       }
     ]

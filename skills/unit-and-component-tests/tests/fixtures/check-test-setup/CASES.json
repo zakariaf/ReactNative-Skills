@@ -1,7 +1,7 @@
 {
   "bad-android-preset": {
     "expect": [
-      "jest.config.js:118 [jest-android-project] android preset is \"jest-expo/ios\", not \"jest-expo/android\""
+      "jest.config.js:146 [jest-android-project] android preset is \"jest-expo/ios\", not \"jest-expo/android\""
     ],
     "ops": [
       {
@@ -47,15 +47,32 @@
       "scripts/quality/device-only.ts [coverage-device-only]",
       "jest.config.js requires this helper but it does not exist"
     ],
-    "ops": [{ "delete": ["scripts/quality/device-only.ts", "scripts/quality/device-only.test.ts"] }]
+    "ops": [
+      {
+        "delete": [
+          "scripts/quality/device-only.ts",
+          "scripts/quality/device-only.test.ts"
+        ]
+      }
+    ]
   },
   "bad-coverage-keys-gone": {
-    "expect": ["jest.config.js:147 [coverage-threshold-keys] the logic threshold key ./src/data/ is gone"],
-    "ops": [{ "replace": { "file": "jest.config.js", "find": "  './src/data/': 'src/data/**/*.ts',\n", "with": "" } }]
+    "expect": [
+      "jest.config.js:176 [coverage-threshold-keys] the logic threshold key ./src/data/ is gone"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "  './src/data/': 'src/data/**/*.ts',\n",
+          "with": ""
+        }
+      }
+    ]
   },
   "bad-coverage-report": {
     "expect": [
-      "jest.config.js:178 [coverage-report] coverage is not written to <rootDir>/reports/coverage with the json-summary reporter"
+      "jest.config.js:207 [coverage-report] coverage is not written to <rootDir>/reports/coverage with the json-summary reporter"
     ],
     "ops": [
       {
@@ -68,7 +85,9 @@
     ]
   },
   "bad-coverage-scope-extra": {
-    "expect": ["jest.config.js:177 [coverage-scope] collectCoverageFrom leaves out !<rootDir>/src/features/**"],
+    "expect": [
+      "jest.config.js:206 [coverage-scope] collectCoverageFrom leaves out !<rootDir>/src/features/**"
+    ],
     "ops": [
       {
         "replace": {
@@ -80,7 +99,9 @@
     ]
   },
   "bad-device-only-counted": {
-    "expect": ["src/app/_layout.tsx:1 [coverage-device-only] is marked device-only but jest.config.js still counts it"],
+    "expect": [
+      "src/app/_layout.tsx:1 [coverage-device-only] is marked device-only but jest.config.js still counts it"
+    ],
     "ops": [
       {
         "replace": {
@@ -92,7 +113,9 @@
     ]
   },
   "bad-golden-env": {
-    "expect": ["jest.config.js:140 [jest-golden-project] golden testEnvironment is undefined"],
+    "expect": [
+      "jest.config.js:169 [jest-golden-project] golden testEnvironment is undefined"
+    ],
     "ops": [
       {
         "replace": {
@@ -105,7 +128,7 @@
   },
   "bad-golden-loads-unit-setup": {
     "expect": [
-      "jest.config.js:133 [jest-golden-project] golden loads <rootDir>/jest.setup.ts, whose inert Skia mock replaces CanvasKit"
+      "jest.config.js:162 [jest-golden-project] golden loads <rootDir>/jest.setup.ts, whose inert Skia mock replaces CanvasKit"
     ],
     "ops": [
       {
@@ -119,12 +142,32 @@
   },
   "bad-golden-no-setup-without-skia": {
     "expect": [
-      "jest.config.js:138 [jest-golden-project] golden does not load <rootDir>/jest.setup.ts (without Skia, goldens run with the unit set-up)"
+      "jest.config.js:167 [jest-golden-project] golden does not load <rootDir>/jest.setup.ts (without Skia, goldens run with the unit set-up)"
     ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["dependencies", "@shopify/react-native-skia"], "delete": true } },
-      { "delete": "test/skia-mock.test.tsx" },
-      { "json": { "file": "package.json", "path": ["scripts", "test:golden"], "delete": true } },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "@shopify/react-native-skia"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "delete": "test/skia-mock.test.tsx"
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "scripts",
+            "test:golden"
+          ],
+          "delete": true
+        }
+      },
       {
         "replace": {
           "file": "jest.config.js",
@@ -136,12 +179,32 @@
   },
   "bad-golden-without-skia": {
     "expect": [
-      "jest.config.js:141 [jest-golden-project] golden uses Skia's CanvasKit environment, but the app does not depend on @shopify/react-native-skia"
+      "jest.config.js:170 [jest-golden-project] golden uses Skia's CanvasKit environment, but the app does not depend on @shopify/react-native-skia"
     ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["dependencies", "@shopify/react-native-skia"], "delete": true } },
-      { "json": { "file": "package.json", "path": ["scripts", "test:golden"], "delete": true } },
-      { "delete": "test/skia-mock.test.tsx" },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "@shopify/react-native-skia"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "scripts",
+            "test:golden"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "delete": "test/skia-mock.test.tsx"
+      },
       {
         "replace": {
           "file": "jest.config.js",
@@ -152,7 +215,9 @@
     ]
   },
   "bad-jest-config-load": {
-    "expect": ["jest.config.js:1 [jest-config-load] throws when loaded: Cannot find module './jest.shared-preset.js'"],
+    "expect": [
+      "jest.config.js:1 [jest-config-load] throws when loaded: Cannot find module './jest.shared-preset.js'"
+    ],
     "ops": [
       {
         "replace": {
@@ -164,12 +229,27 @@
     ]
   },
   "bad-jest-config-missing": {
-    "expect": ["jest.config.js [jest-config-missing] no jest.config.js at the repo root"],
-    "ops": [{ "delete": "jest.config.js" }]
+    "expect": [
+      "jest.config.js [jest-config-missing] no jest.config.js at the repo root"
+    ],
+    "ops": [
+      {
+        "delete": "jest.config.js"
+      }
+    ]
   },
   "bad-jest-config-second-file": {
-    "expect": ["jest.config.ts:1 [jest-config-duplicate] sits next to jest.config.js"],
-    "ops": [{ "write": { "file": "jest.config.ts", "content": "export default { preset: 'jest-expo' };\n" } }]
+    "expect": [
+      "jest.config.ts:1 [jest-config-duplicate] sits next to jest.config.js"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "jest.config.ts",
+          "content": "export default { preset: 'jest-expo' };\n"
+        }
+      }
+    ]
   },
   "bad-jest-expo-sdk": {
     "expect": [
@@ -177,9 +257,25 @@
       "package.json:29 [test-dep-version] @react-native/jest-preset 0.85.2 differs from react-native 0.86.3"
     ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["devDependencies", "jest-expo"], "value": "56.0.4" } },
       {
-        "json": { "file": "package.json", "path": ["devDependencies", "@react-native/jest-preset"], "value": "0.85.2" }
+        "json": {
+          "file": "package.json",
+          "path": [
+            "devDependencies",
+            "jest-expo"
+          ],
+          "value": "56.0.4"
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "devDependencies",
+            "@react-native/jest-preset"
+          ],
+          "value": "0.85.2"
+        }
       }
     ]
   },
@@ -187,19 +283,46 @@
     "expect": [
       "package.json:41 [jest-config-duplicate] has a \"jest\" key next to jest.config.js, so every Jest run stops with \"Multiple configurations found\""
     ],
-    "ops": [{ "json": { "file": "package.json", "path": ["jest"], "value": { "preset": "jest-expo" } } }]
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "jest"
+          ],
+          "value": {
+            "preset": "jest-expo"
+          }
+        }
+      }
+    ]
   },
   "bad-missing-sdk-mock": {
     "expect": [
       "__mocks__/expo-iap.ts [root-mock-missing] package.json depends on expo-iap but the root mock is missing",
       "__mocks__/expo-tracking-transparency.ts [root-mock-missing] package.json depends on expo-tracking-transparency"
     ],
-    "ops": [{ "delete": ["__mocks__/expo-iap.ts", "__mocks__/expo-tracking-transparency.ts"] }]
+    "ops": [
+      {
+        "delete": [
+          "__mocks__/expo-iap.ts",
+          "__mocks__/expo-tracking-transparency.ts"
+        ]
+      }
+    ]
   },
   "bad-mock-reset": {
-    "expect": ["jest.config.js:81 [jest-mock-reset] project \"unit\" does not set clearMocks and restoreMocks to true"],
+    "expect": [
+      "jest.config.js:103 [jest-mock-reset] project \"unit\" does not set clearMocks and restoreMocks to true"
+    ],
     "ops": [
-      { "replace": { "file": "jest.config.js", "find": "  restoreMocks: true,\n", "with": "  restoreMocks: false,\n" } }
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "  restoreMocks: true,\n",
+          "with": "  restoreMocks: false,\n"
+        }
+      }
     ]
   },
   "bad-nested-sdk-mock": {
@@ -217,14 +340,24 @@
   },
   "bad-no-alias-mapper": {
     "expect": [
-      "jest.config.js:76 [jest-alias-mapper] project \"unit\" does not map @/* to its source under <rootDir>",
-      "jest.config.js:76 [jest-alias-mapper] project \"android\" does not map @/*",
-      "jest.config.js:76 [jest-alias-mapper] project \"golden\" does not map @/*"
+      "jest.config.js:98 [jest-alias-mapper] project \"unit\" does not map @/* to its source under <rootDir>",
+      "jest.config.js:98 [jest-alias-mapper] project \"android\" does not map @/*",
+      "jest.config.js:98 [jest-alias-mapper] project \"golden\" does not map @/*"
     ],
-    "ops": [{ "replace": { "file": "jest.config.js", "find": "  '^@/(.*)$': '<rootDir>/src/$1',\n", "with": "" } }]
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "  '^@/(.*)$': '<rootDir>/src/$1',\n",
+          "with": ""
+        }
+      }
+    ]
   },
   "bad-no-android-project": {
-    "expect": ["jest.config.js:170 [jest-projects] projects are [unit, golden]: the android project is missing"],
+    "expect": [
+      "jest.config.js:199 [jest-projects] projects are [unit, golden]: the android project is missing"
+    ],
     "ops": [
       {
         "replace": {
@@ -236,20 +369,53 @@
     ]
   },
   "bad-no-react-native-override": {
-    "expect": ["package.json:27 [one-react] overrides lack \"react-native\""],
-    "base": ["@tests/bases/app", { "templates": true, "firstLinePath": true }, "@tests/bases/monorepo"],
+    "expect": [
+      "package.json:27 [one-react] overrides lack \"react-native\""
+    ],
+    "base": [
+      "@tests/bases/app",
+      {
+        "templates": true,
+        "firstLinePath": true
+      },
+      "@tests/bases/monorepo"
+    ],
     "ops": [
-      { "rename": { "from": "src", "to": "apps/mobile/src" } },
-      { "json": { "file": "package.json", "path": ["overrides", "react-native"], "delete": true } }
+      {
+        "rename": {
+          "from": "src",
+          "to": "apps/mobile/src"
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "overrides",
+            "react-native"
+          ],
+          "delete": true
+        }
+      }
     ]
   },
   "bad-no-tz": {
-    "expect": ["jest.config.js:1 [jest-tz] does not set process.env.TZ = 'UTC'"],
-    "ops": [{ "replace": { "file": "jest.config.js", "find": "process.env.TZ = 'UTC';\n", "with": "" } }]
+    "expect": [
+      "jest.config.js:1 [jest-tz] does not set process.env.TZ = 'UTC'"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "process.env.TZ = 'UTC';\n",
+          "with": ""
+        }
+      }
+    ]
   },
   "bad-one-project": {
     "expect": [
-      "jest.config.js:170 [jest-projects] projects are [unit, android]: the app depends on @shopify/react-native-skia but the golden project is missing"
+      "jest.config.js:199 [jest-projects] projects are [unit, android]: the app depends on @shopify/react-native-skia but the golden project is missing"
     ],
     "ops": [
       {
@@ -264,12 +430,23 @@
   "bad-orphan-data-golden": {
     "expect": [
       "src/core/task-filter.golden.test.ts:1 [jest-orphan-tests] neither a Jest project (unit, android) nor jest.sim.config.js runs this test, so it never runs",
-      "jest.config.js:170 [jest-projects] projects are [unit, android]: src/core/task-filter.golden.test.ts is a golden test but the golden project is missing",
+      "jest.config.js:199 [jest-projects] projects are [unit, android]: src/core/task-filter.golden.test.ts is a golden test but the golden project is missing",
       "package.json:6 [test-script] script \"test:golden\" is missing"
     ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["dependencies", "@shopify/react-native-skia"], "delete": true } },
-      { "delete": "test/skia-mock.test.tsx" },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "@shopify/react-native-skia"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "delete": "test/skia-mock.test.tsx"
+      },
       {
         "replace": {
           "file": "jest.config.js",
@@ -277,7 +454,16 @@
           "with": "projects: [unitProject, androidProject, ...(HAS_SKIA ? [goldenProject] : [])],"
         }
       },
-      { "json": { "file": "package.json", "path": ["scripts", "test:golden"], "delete": true } },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "scripts",
+            "test:golden"
+          ],
+          "delete": true
+        }
+      },
       {
         "write": {
           "file": "src/core/task-filter.golden.test.ts",
@@ -365,19 +551,54 @@
     ]
   },
   "bad-range-pin": {
-    "expect": ["package.json:37 [test-dep-range] jest is \"^29.7.0\", not an exact version"],
-    "ops": [{ "json": { "file": "package.json", "path": ["devDependencies", "jest"], "value": "^29.7.0" } }]
+    "expect": [
+      "package.json:37 [test-dep-range] jest is \"^29.7.0\", not an exact version"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "devDependencies",
+            "jest"
+          ],
+          "value": "^29.7.0"
+        }
+      }
+    ]
   },
   "bad-react-range": {
-    "expect": ["package.json:20 [one-react] react is \"^19.2.3\", not an exact version"],
-    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "react"], "value": "^19.2.3" } }]
+    "expect": [
+      "package.json:20 [one-react] react is \"^19.2.3\", not an exact version"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "react"
+          ],
+          "value": "^19.2.3"
+        }
+      }
+    ]
   },
   "bad-react-test-renderer": {
     "expect": [
       "package.json:40 [test-dep-deprecated] declares react-test-renderer, which React 19 deprecates and RNTL 14 does not use"
     ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["devDependencies", "react-test-renderer"], "value": "19.2.3" } }
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "devDependencies",
+            "react-test-renderer"
+          ],
+          "value": "19.2.3"
+        }
+      }
     ]
   },
   "bad-render-helper-missing": {
@@ -385,7 +606,13 @@
       "test/render-with-providers.tsx [render-helper-missing] 1 component test file(s) exist (src/features/tasks/tasks-screen.test.tsx)"
     ],
     "ops": [
-      { "delete": ["test/render-with-providers.tsx", "test/render-with-providers.test.tsx", "test/skia-mock.test.tsx"] }
+      {
+        "delete": [
+          "test/render-with-providers.tsx",
+          "test/render-with-providers.test.tsx",
+          "test/skia-mock.test.tsx"
+        ]
+      }
     ]
   },
   "bad-rntl-without-renderer": {
@@ -393,15 +620,39 @@
       "package.json:28 [test-dep-missing] devDependencies lack test-renderer",
       "It comes with @testing-library/react-native 14.0.1"
     ],
-    "ops": [{ "json": { "file": "package.json", "path": ["devDependencies", "test-renderer"], "delete": true } }]
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "devDependencies",
+            "test-renderer"
+          ],
+          "delete": true
+        }
+      }
+    ]
   },
   "bad-script-updates-snapshots": {
-    "expect": ["package.json:7 [test-script] script \"test\" is \"jest --ci -u\""],
-    "ops": [{ "json": { "file": "package.json", "path": ["scripts", "test"], "value": "jest --ci -u" } }]
+    "expect": [
+      "package.json:7 [test-script] script \"test\" is \"jest --ci -u\""
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "scripts",
+            "test"
+          ],
+          "value": "jest --ci -u"
+        }
+      }
+    ]
   },
   "bad-setup-file-missing": {
     "expect": [
-      "jest.config.js:110 [jest-setup-file-missing] project \"unit\" loads test/setup-extra.ts, which does not exist"
+      "jest.config.js:138 [jest-setup-file-missing] project \"unit\" loads test/setup-extra.ts, which does not exist"
     ],
     "ops": [
       {
@@ -415,19 +666,33 @@
     ]
   },
   "bad-setup-missing": {
-    "expect": ["jest.setup.ts [jest-setup-missing] no jest.setup.ts at the repo root"],
-    "ops": [{ "delete": "jest.setup.ts" }]
-  },
-  "bad-setup-no-reanimated": {
-    "expect": ["jest.setup.ts:1 [jest-setup-content] lacks require('react-native-reanimated').setUpTests()"],
+    "expect": [
+      "jest.setup.ts [jest-setup-missing] no jest.setup.ts at the repo root"
+    ],
     "ops": [
       {
-        "replace": { "file": "jest.setup.ts", "find": "require('react-native-reanimated').setUpTests();\n", "with": "" }
+        "delete": "jest.setup.ts"
+      }
+    ]
+  },
+  "bad-setup-no-reanimated": {
+    "expect": [
+      "jest.setup.ts:1 [jest-setup-content] lacks require('react-native-reanimated').setUpTests()"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.setup.ts",
+          "find": "require('react-native-reanimated').setUpTests();\n",
+          "with": ""
+        }
       }
     ]
   },
   "bad-setup-no-skia-mock": {
-    "expect": ["jest.setup.ts:1 [skia-unit-mock] does not mock @shopify/react-native-skia"],
+    "expect": [
+      "jest.setup.ts:1 [skia-unit-mock] does not mock @shopify/react-native-skia"
+    ],
     "ops": [
       {
         "write": {
@@ -444,7 +709,9 @@
     ]
   },
   "bad-setup-retries": {
-    "expect": ["jest.setup.ts:13 [jest-retries] calls jest.retryTimes"],
+    "expect": [
+      "jest.setup.ts:13 [jest-retries] calls jest.retryTimes"
+    ],
     "ops": [
       {
         "replace": {
@@ -456,14 +723,24 @@
     ]
   },
   "bad-sim-environment": {
-    "expect": ["jest.sim.config.js:1 [sim-config] testEnvironment is undefined, not \"node\""],
-    "ops": [{ "replace": { "file": "jest.sim.config.js", "find": "  testEnvironment: 'node',\n", "with": "" } }]
+    "expect": [
+      "jest.sim.config.js:1 [sim-config] testEnvironment is undefined, not \"node\""
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.sim.config.js",
+          "find": "  testEnvironment: 'node',\n",
+          "with": ""
+        }
+      }
+    ]
   },
   "bad-skills-not-ignored": {
     "expect": [
-      "jest.config.js:77 [jest-ignored-paths] project \"unit\" does not ignore skills, .agents, .claude in modulePathIgnorePatterns",
-      "jest.config.js:77 [jest-ignored-paths] project \"android\" does not ignore skills, .agents, .claude",
-      "jest.config.js:77 [jest-ignored-paths] project \"golden\" does not ignore skills, .agents, .claude",
+      "jest.config.js:99 [jest-ignored-paths] project \"unit\" does not ignore skills, .agents, .claude in modulePathIgnorePatterns",
+      "jest.config.js:99 [jest-ignored-paths] project \"android\" does not ignore skills, .agents, .claude",
+      "jest.config.js:99 [jest-ignored-paths] project \"golden\" does not ignore skills, .agents, .claude",
       "jest.sim.config.js:18 [jest-ignored-paths] the sim config does not ignore skills, .agents, .claude"
     ],
     "ops": [
@@ -500,8 +777,21 @@
     ]
   },
   "bad-stryker-break": {
-    "expect": ["stryker.config.json:46 [stryker-config] thresholds.break is 60 (must be at least 75)"],
-    "ops": [{ "json": { "file": "stryker.config.json", "path": ["thresholds", "break"], "value": 60 } }]
+    "expect": [
+      "stryker.config.json:46 [stryker-config] thresholds.break is 60 (must be at least 75)"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "stryker.config.json",
+          "path": [
+            "thresholds",
+            "break"
+          ],
+          "value": 60
+        }
+      }
+    ]
   },
   "bad-stryker-scans-skills": {
     "expect": [
@@ -511,8 +801,18 @@
       {
         "json": {
           "file": "stryker.config.json",
-          "path": ["ignorePatterns"],
-          "value": ["ios", "android", "build", "dist", "reports", "coverage", ".skill-tooling"]
+          "path": [
+            "ignorePatterns"
+          ],
+          "value": [
+            "ios",
+            "android",
+            "build",
+            "dist",
+            "reports",
+            "coverage",
+            ".skill-tooling"
+          ]
         }
       }
     ]
@@ -528,7 +828,15 @@
         "$comment": "An app on create-expo-app's default tsconfig has no tsconfig.base.json (typescript-and-lint-rules creates it).",
         "delete": "tsconfig.base.json"
       },
-      { "json": { "file": "tsconfig.json", "path": ["extends"], "value": "expo/tsconfig.base" } }
+      {
+        "json": {
+          "file": "tsconfig.json",
+          "path": [
+            "extends"
+          ],
+          "value": "expo/tsconfig.base"
+        }
+      }
     ]
   },
   "bad-stryker-tsconfig-node-types": {
@@ -536,7 +844,19 @@
       "tsconfig.stryker.json:4 [stryker-tsconfig] compilerOptions.types is [\"jest\",\"node\"], not [\"jest\"]"
     ],
     "ops": [
-      { "json": { "file": "tsconfig.stryker.json", "path": ["compilerOptions", "types"], "value": ["jest", "node"] } }
+      {
+        "json": {
+          "file": "tsconfig.stryker.json",
+          "path": [
+            "compilerOptions",
+            "types"
+          ],
+          "value": [
+            "jest",
+            "node"
+          ]
+        }
+      }
     ]
   },
   "bad-test-in-routes": {
@@ -575,10 +895,31 @@
       "apps/mobile/src/features/<feature>/<feature>-navigation.test.tsx",
       "check-test-setup: 1 repo checked, 1 problems"
     ],
-    "base": ["@tests/bases/app", { "templates": true, "firstLinePath": true }, "@tests/bases/monorepo"],
+    "base": [
+      "@tests/bases/app",
+      {
+        "templates": true,
+        "firstLinePath": true
+      },
+      "@tests/bases/monorepo"
+    ],
     "ops": [
-      { "rename": { "from": "src", "to": "apps/mobile/src" } },
-      { "json": { "file": "apps/mobile/package.json", "path": ["dependencies", "expo-router"], "value": "~57.0.24" } },
+      {
+        "rename": {
+          "from": "src",
+          "to": "apps/mobile/src"
+        }
+      },
+      {
+        "json": {
+          "file": "apps/mobile/package.json",
+          "path": [
+            "dependencies",
+            "expo-router"
+          ],
+          "value": "~57.0.24"
+        }
+      },
       {
         "$comment": "The app workspace uses Expo Router, so Jest transpiles its navigation packages too.",
         "replace": {
@@ -603,13 +944,26 @@
     ]
   },
   "bad-test-renderer-line": {
-    "expect": ["package.json:39 [test-renderer-line] test-renderer 1.3.0 does not match React 19.2.3"],
-    "ops": [{ "json": { "file": "package.json", "path": ["devDependencies", "test-renderer"], "value": "1.3.0" } }]
+    "expect": [
+      "package.json:39 [test-renderer-line] test-renderer 1.3.0 does not match React 19.2.3"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "devDependencies",
+            "test-renderer"
+          ],
+          "value": "1.3.0"
+        }
+      }
+    ]
   },
   "bad-threshold-lowered": {
     "expect": [
-      "jest.config.js:160 [coverage-threshold] global coverage threshold is weaker than 90/90/90/85 (lines 80 < 90)",
-      "jest.config.js:146 [coverage-threshold] logic threshold ./src/core/ is weaker than 95/95/95/90 (branches 80 < 90)"
+      "jest.config.js:189 [coverage-threshold] global coverage threshold is weaker than 90/90/90/85 (lines 80 < 90)",
+      "jest.config.js:175 [coverage-threshold] logic threshold ./src/core/ is weaker than 95/95/95/90 (branches 80 < 90)"
     ],
     "ops": [
       {
@@ -629,12 +983,22 @@
     ]
   },
   "bad-transform-missing-router": {
-    "expect": ["jest.config.js:40 [jest-transform] project \"unit\" does not transpile standard-navigation"],
-    "ops": [{ "replace": { "file": "jest.config.js", "find": "  'standard-navigation',\n", "with": "" } }]
+    "expect": [
+      "jest.config.js:62 [jest-transform] project \"unit\" does not transpile standard-navigation"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "  'standard-navigation',\n",
+          "with": ""
+        }
+      }
+    ]
   },
   "bad-unit-testmatch": {
     "expect": [
-      "jest.config.js:101 [jest-unit-project] unit testMatch does not cover test",
+      "jest.config.js:128 [jest-unit-project] unit testMatch does not cover test",
       "test/render-with-providers.test.tsx:1 [jest-orphan-tests]"
     ],
     "ops": [
@@ -651,9 +1015,21 @@
     "expect": [
       "jest.config.js:28 [jest-alias-mapper] project \"unit\" does not map @acme/core/* to its source under <rootDir>"
     ],
-    "base": ["@tests/bases/app", { "templates": true, "firstLinePath": true }, "@tests/bases/monorepo"],
+    "base": [
+      "@tests/bases/app",
+      {
+        "templates": true,
+        "firstLinePath": true
+      },
+      "@tests/bases/monorepo"
+    ],
     "ops": [
-      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      {
+        "rename": {
+          "from": "src",
+          "to": "apps/mobile/src"
+        }
+      },
       {
         "replace": {
           "file": "jest.config.js",
@@ -664,19 +1040,28 @@
     ]
   },
   "error-bad-contract": {
-    "expect": ["ERROR [bad-input] contracts/test-setup.json has an unknown key \"renderHelpers\""],
+    "expect": [
+      "ERROR [bad-input] contracts/test-setup.json has an unknown key \"renderHelpers\""
+    ],
     "ops": [
       {
         "json": {
           "file": "contracts/test-setup.json",
-          "path": ["renderHelpers"],
-          "value": { "file": "test/render.tsx" }
+          "path": [
+            "renderHelpers"
+          ],
+          "value": {
+            "file": "test/render.tsx"
+          }
         }
       }
     ]
   },
   "pass-babel-instrumented-override": {
-    "expect": ["check-test-setup: 1 repo checked, 0 problems", "RESULT: PASS"],
+    "expect": [
+      "check-test-setup: 1 repo checked, 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
       {
         "$comment": "The instrumented-only override from references/jest-config.md (the fix for the Reanimated 'useAnimatedStyle was used without a dependency array' failure in Stryker's initial run) passes babel-config.",
@@ -688,7 +1073,10 @@
     ]
   },
   "pass-config-plugin-test": {
-    "expect": ["check-test-setup: 1 repo checked, 0 problems", "RESULT: PASS"],
+    "expect": [
+      "check-test-setup: 1 repo checked, 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
       {
         "$comment": "A local Expo config plugin with its colocated test: the canonical TEST_ROOTS reach plugins/, so the test is no orphan.",
@@ -706,10 +1094,24 @@
     ]
   },
   "pass-data-golden-no-skia": {
-    "expect": ["check-test-setup: 1 repo checked, 0 problems", "RESULT: PASS"],
+    "expect": [
+      "check-test-setup: 1 repo checked, 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["dependencies", "@shopify/react-native-skia"], "delete": true } },
-      { "delete": "test/skia-mock.test.tsx" },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "@shopify/react-native-skia"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "delete": "test/skia-mock.test.tsx"
+      },
       {
         "write": {
           "file": "src/core/task-filter.golden.test.ts",
@@ -719,7 +1121,10 @@
     ]
   },
   "pass-ios-only": {
-    "expect": ["check-test-setup: 1 repo checked, 0 problems", "RESULT: PASS"],
+    "expect": [
+      "check-test-setup: 1 repo checked, 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
       {
         "write": {
@@ -737,14 +1142,40 @@
     ]
   },
   "pass-monorepo": {
-    "expect": ["check-test-setup: 1 repo checked, 0 problems", "RESULT: PASS"],
-    "base": ["@tests/bases/app", { "templates": true, "firstLinePath": true }, "@tests/bases/monorepo"],
-    "ops": [{ "rename": { "from": "src", "to": "apps/mobile/src" } }]
+    "expect": [
+      "check-test-setup: 1 repo checked, 0 problems",
+      "RESULT: PASS"
+    ],
+    "base": [
+      "@tests/bases/app",
+      {
+        "templates": true,
+        "firstLinePath": true
+      },
+      "@tests/bases/monorepo"
+    ],
+    "ops": [
+      {
+        "rename": {
+          "from": "src",
+          "to": "apps/mobile/src"
+        }
+      }
+    ]
   },
   "pass-no-providers-marked": {
-    "expect": ["check-test-setup: 1 repo checked, 0 problems", "RESULT: PASS"],
+    "expect": [
+      "check-test-setup: 1 repo checked, 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
-      { "delete": ["test/render-with-providers.tsx", "test/render-with-providers.test.tsx", "test/skia-mock.test.tsx"] },
+      {
+        "delete": [
+          "test/render-with-providers.tsx",
+          "test/render-with-providers.test.tsx",
+          "test/skia-mock.test.tsx"
+        ]
+      },
       {
         "$comment": "The one component test renders a props-only view with plain render() and says why; without the helper nothing else needs it.",
         "write": {
@@ -755,19 +1186,59 @@
     ]
   },
   "pass-no-skia": {
-    "expect": ["check-test-setup: 1 repo checked, 0 problems", "RESULT: PASS"],
+    "expect": [
+      "check-test-setup: 1 repo checked, 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["dependencies", "@shopify/react-native-skia"], "delete": true } },
-      { "json": { "file": "package.json", "path": ["scripts", "test:golden"], "delete": true } },
-      { "delete": "test/skia-mock.test.tsx" }
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "@shopify/react-native-skia"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "scripts",
+            "test:golden"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "delete": "test/skia-mock.test.tsx"
+      }
     ]
   },
   "pass-not-expo": {
-    "expect": ["NOT APPLICABLE: expo is not a dependency in package.json or any workspace", "RESULT: PASS"],
-    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo"], "delete": true } }]
+    "expect": [
+      "NOT APPLICABLE: expo is not a dependency in package.json or any workspace",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "expo"
+          ],
+          "delete": true
+        }
+      }
+    ]
   },
   "pass-other-runner-globs": {
-    "expect": ["check-test-setup: 1 repo checked, 0 problems", "RESULT: PASS"],
+    "expect": [
+      "check-test-setup: 1 repo checked, 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
       {
         "$comment": "A web test runner the checker cannot see (its config builds testDir with path.join): the contract names its folder.",
@@ -782,15 +1253,35 @@
           "content": "import { expect, test } from '@playwright/test';\n\ntest('shows the task list', async ({ page }) => {\n  await page.goto('/');\n  await expect(page.getByRole('heading', { name: 'Tasks' })).toBeVisible();\n});\n"
         }
       },
-      { "json": { "file": "contracts/test-setup.json", "path": ["otherRunnerGlobs"], "value": ["tools/web-tests/**"] } }
+      {
+        "json": {
+          "file": "contracts/test-setup.json",
+          "path": [
+            "otherRunnerGlobs"
+          ],
+          "value": [
+            "tools/web-tests/**"
+          ]
+        }
+      }
     ]
   },
   "pass-routes-folder-without-router": {
-    "expect": ["check-test-setup: 1 repo checked, 0 problems", "RESULT: PASS"],
+    "expect": [
+      "check-test-setup: 1 repo checked, 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
       {
         "$comment": "Without expo-router, src/app/ is not a routes folder: nothing bundles its files as routes.",
-        "json": { "file": "package.json", "path": ["dependencies", "expo-router"], "delete": true }
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "expo-router"
+          ],
+          "delete": true
+        }
       },
       {
         "write": {
@@ -798,7 +1289,402 @@
           "content": "import { APP_NAME } from './app-shell';\n\ndescribe('APP_NAME', () => {\n  it('names the app', () => {\n    expect(APP_NAME).toBe('Tasks');\n  });\n});\n"
         }
       },
-      { "write": { "file": "src/app/app-shell.ts", "content": "export const APP_NAME = 'Tasks';\n" } }
+      {
+        "write": {
+          "file": "src/app/app-shell.ts",
+          "content": "export const APP_NAME = 'Tasks';\n"
+        }
+      }
+    ]
+  },
+  "pass-monorepo-backend-project": {
+    "expect": [
+      "check-test-setup: 1 repo checked, 0 problems",
+      "RESULT: PASS"
+    ],
+    "base": [
+      "@tests/bases/app",
+      {
+        "templates": true,
+        "firstLinePath": true
+      },
+      "@tests/bases/monorepo"
+    ],
+    "ops": [
+      {
+        "rename": {
+          "from": "src",
+          "to": "apps/mobile/src"
+        }
+      },
+      {
+        "$comment": "a Cloud Functions backend workspace (outside packages/, no Expo app): its tests run in Node, in a project of their own",
+        "json": {
+          "file": "package.json",
+          "path": [
+            "workspaces"
+          ],
+          "value": [
+            "apps/*",
+            "packages/*",
+            "functions"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "functions/package.json",
+          "content": "{\n  \"name\": \"@acme/functions\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"main\": \"lib/index.js\",\n  \"engines\": {\n    \"node\": \"24\"\n  }\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "functions/src/hash-id.ts",
+          "content": "// functions/src/hash-id.ts\nimport { createHash } from 'node:crypto';\n\nexport function hashId(value: string): string {\n  return createHash('sha256').update(value).digest('hex').slice(0, 8);\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "functions/src/hash-id.test.ts",
+          "content": "// functions/src/hash-id.test.ts\nimport { hashId } from './hash-id.ts';\n\ndescribe('hashId', () => {\n  it('is eight hex characters', () => {\n    expect(hashId('a')).toHaveLength(8);\n  });\n});\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "  '^@acme/mobile/(.*)$': '<rootDir>/apps/mobile/src/$1',\n",
+          "with": "  '^@acme/mobile/(.*)$': '<rootDir>/apps/mobile/src/$1',\n  '^@acme/functions/(.*)$': '<rootDir>/functions/src/$1',\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "const LOGIC = {",
+          "with": "// A Node backend's tests (Cloud Functions in functions/) run in Node, without the React Native preset.\nconst functionsProject = {\n  ...SHARED,\n  displayName: 'functions',\n  preset: undefined,\n  testEnvironment: 'node',\n  setupFiles: [],\n  testMatch: ['<rootDir>/functions/src/**/*.test.ts'],\n};\nconst LOGIC = {"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "  projects: [unitProject, androidProject],",
+          "with": "  projects: [unitProject, androidProject, functionsProject],"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "    '<rootDir>/{apps,packages}/*/src/**/*.{ts,tsx}',\n",
+          "with": "    '<rootDir>/{apps,packages}/*/src/**/*.{ts,tsx}',\n    '<rootDir>/functions/src/**/*.{ts,tsx}',\n"
+        }
+      }
+    ]
+  },
+  "bad-monorepo-backend-project": {
+    "expect": [
+      "[jest-backend-project] functions preset is \"jest-expo/ios\"",
+      "[jest-backend-project] functions testEnvironment is undefined, not \"node\"",
+      "[jest-backend-project] functions loads <rootDir>/jest.setup.ts",
+      "[jest-backend-project] functions testMatch reaches tests outside functions/ (apps/mobile/src)",
+      "RESULT: FAIL (4 problems)"
+    ],
+    "base": [
+      "@tests/bases/app",
+      {
+        "templates": true,
+        "firstLinePath": true
+      },
+      "@tests/bases/monorepo"
+    ],
+    "ops": [
+      {
+        "rename": {
+          "from": "src",
+          "to": "apps/mobile/src"
+        }
+      },
+      {
+        "$comment": "a Cloud Functions backend workspace (outside packages/, no Expo app): its tests run in Node, in a project of their own",
+        "json": {
+          "file": "package.json",
+          "path": [
+            "workspaces"
+          ],
+          "value": [
+            "apps/*",
+            "packages/*",
+            "functions"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "functions/package.json",
+          "content": "{\n  \"name\": \"@acme/functions\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"main\": \"lib/index.js\",\n  \"engines\": {\n    \"node\": \"24\"\n  }\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "functions/src/hash-id.ts",
+          "content": "// functions/src/hash-id.ts\nimport { createHash } from 'node:crypto';\n\nexport function hashId(value: string): string {\n  return createHash('sha256').update(value).digest('hex').slice(0, 8);\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "functions/src/hash-id.test.ts",
+          "content": "// functions/src/hash-id.test.ts\nimport { hashId } from './hash-id.ts';\n\ndescribe('hashId', () => {\n  it('is eight hex characters', () => {\n    expect(hashId('a')).toHaveLength(8);\n  });\n});\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "  '^@acme/mobile/(.*)$': '<rootDir>/apps/mobile/src/$1',\n",
+          "with": "  '^@acme/mobile/(.*)$': '<rootDir>/apps/mobile/src/$1',\n  '^@acme/functions/(.*)$': '<rootDir>/functions/src/$1',\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "const LOGIC = {",
+          "with": "const functionsProject = {\n  ...SHARED,\n  displayName: 'functions',\n  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],\n  testMatch: ['<rootDir>/functions/src/**/*.test.ts', '<rootDir>/apps/mobile/src/**/*.node.test.ts'],\n};\nconst LOGIC = {"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "  projects: [unitProject, androidProject],",
+          "with": "  projects: [unitProject, androidProject, functionsProject],"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "    '<rootDir>/{apps,packages}/*/src/**/*.{ts,tsx}',\n",
+          "with": "    '<rootDir>/{apps,packages}/*/src/**/*.{ts,tsx}',\n    '<rootDir>/functions/src/**/*.{ts,tsx}',\n"
+        }
+      }
+    ]
+  },
+  "bad-monorepo-backend-twice": {
+    "expect": [
+      "functions/src/hash-id.test.ts:1 [jest-orphan-tests] runs in 2 places (unit, functions)",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "base": [
+      "@tests/bases/app",
+      {
+        "templates": true,
+        "firstLinePath": true
+      },
+      "@tests/bases/monorepo"
+    ],
+    "ops": [
+      {
+        "rename": {
+          "from": "src",
+          "to": "apps/mobile/src"
+        }
+      },
+      {
+        "$comment": "a Cloud Functions backend workspace (outside packages/, no Expo app): its tests run in Node, in a project of their own",
+        "json": {
+          "file": "package.json",
+          "path": [
+            "workspaces"
+          ],
+          "value": [
+            "apps/*",
+            "packages/*",
+            "functions"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "functions/package.json",
+          "content": "{\n  \"name\": \"@acme/functions\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"main\": \"lib/index.js\",\n  \"engines\": {\n    \"node\": \"24\"\n  }\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "functions/src/hash-id.ts",
+          "content": "// functions/src/hash-id.ts\nimport { createHash } from 'node:crypto';\n\nexport function hashId(value: string): string {\n  return createHash('sha256').update(value).digest('hex').slice(0, 8);\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "functions/src/hash-id.test.ts",
+          "content": "// functions/src/hash-id.test.ts\nimport { hashId } from './hash-id.ts';\n\ndescribe('hashId', () => {\n  it('is eight hex characters', () => {\n    expect(hashId('a')).toHaveLength(8);\n  });\n});\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "  '^@acme/mobile/(.*)$': '<rootDir>/apps/mobile/src/$1',\n",
+          "with": "  '^@acme/mobile/(.*)$': '<rootDir>/apps/mobile/src/$1',\n  '^@acme/functions/(.*)$': '<rootDir>/functions/src/$1',\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "const LOGIC = {",
+          "with": "// A Node backend's tests (Cloud Functions in functions/) run in Node, without the React Native preset.\nconst functionsProject = {\n  ...SHARED,\n  displayName: 'functions',\n  preset: undefined,\n  testEnvironment: 'node',\n  setupFiles: [],\n  testMatch: ['<rootDir>/functions/src/**/*.test.ts'],\n};\nconst LOGIC = {"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "  projects: [unitProject, androidProject],",
+          "with": "  projects: [unitProject, androidProject, functionsProject],"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "    '<rootDir>/{apps,packages}/*/src/**/*.{ts,tsx}',\n",
+          "with": "    '<rootDir>/{apps,packages}/*/src/**/*.{ts,tsx}',\n    '<rootDir>/functions/src/**/*.{ts,tsx}',\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "const TEST_ROOTS = ['<rootDir>/{apps,packages}/*/src/**/',",
+          "with": "const TEST_ROOTS = ['<rootDir>/{apps,packages}/*/src/**/', '<rootDir>/functions/src/**/',"
+        }
+      }
+    ]
+  },
+  "bad-functions-project-single-app": {
+    "expect": [
+      "[jest-projects] project \"functions\" is not one of unit, android, golden",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "const goldenProject = {",
+          "with": "const functionsProject = {\n  ...SHARED,\n  displayName: 'functions',\n  preset: undefined,\n  testEnvironment: 'node',\n  testMatch: ['<rootDir>/functions/src/**/*.test.ts'],\n};\n\nconst goldenProject = {"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "  projects: [unitProject, androidProject, goldenProject],",
+          "with": "  projects: [unitProject, androidProject, goldenProject, functionsProject],"
+        }
+      }
+    ]
+  },
+  "pass-skia-in-app-workspace": {
+    "expect": [
+      "check-test-setup: 1 repo checked, 0 problems",
+      "RESULT: PASS"
+    ],
+    "base": [
+      "@tests/bases/app",
+      "@tests/bases/monorepo",
+      {
+        "templates": true,
+        "firstLinePath": true
+      }
+    ],
+    "ops": [
+      {
+        "$comment": "The canonical jest.config.js in its workspace form, in a repo whose Expo app workspace (apps/mobile) depends on Skia while the root package.json does not: HAS_SKIA reads the workspaces' manifests too, so the golden project still runs in CanvasKit.",
+        "rename": {
+          "from": "src",
+          "to": "apps/mobile/src"
+        }
+      },
+      {
+        "json": {
+          "file": "apps/mobile/package.json",
+          "path": [
+            "dependencies",
+            "@shopify/react-native-skia"
+          ],
+          "value": "2.6.2"
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "scripts",
+            "test:golden"
+          ],
+          "value": "jest --ci --selectProjects golden"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "  '<rootDir>/src/**/',\n",
+          "with": "  '<rootDir>/{apps,packages}/*/src/**/',\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "  '^@/(.*)$': '<rootDir>/src/$1',\n",
+          "with": "  '^@acme/core/(.*)$': '<rootDir>/packages/core/src/$1',\n  '^@acme/mobile/(.*)$': '<rootDir>/apps/mobile/src/$1',\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "    '<rootDir>/src/**/*.{ts,tsx}',\n",
+          "with": "    '<rootDir>/{apps,packages}/*/src/**/*.{ts,tsx}',\n"
+        }
+      }
+    ]
+  },
+  "pass-rules-tests-own-config": {
+    "expect": [
+      "check-test-setup: 1 repo checked, 0 problems",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "$comment": "firestore-rules-and-emulator-tests adopted: jest.emulator.config.js runs test/rules/*.rules.test.ts inside the Firebase emulators, and the canonical unit project leaves those files out (HAS_RULES_TESTS); they are that config's tests, not orphans.",
+        "write": {
+          "file": "jest.emulator.config.js",
+          "content": "// jest.emulator.config.js — the 'emulator' Jest project: security-rules tests (*.rules.test.ts in\n// test/rules/), run only inside `firebase emulators:exec` (npm run test:rules).\n/** @type {import('jest').Config} */\nmodule.exports = {\n  rootDir: __dirname,\n  displayName: 'emulator',\n  testEnvironment: 'node',\n  testMatch: ['<rootDir>/test/rules/**/*.rules.test.ts'],\n  maxWorkers: 1,\n};\n"
+        }
+      },
+      {
+        "write": {
+          "file": "test/rules/firestore.rules.test.ts",
+          "content": "import { assertFails } from '@firebase/rules-unit-testing';\n\ndescribe('/users/{uid}/tasks/{taskId}', () => {\n  it('denies a signed-out read', async () => {\n    await assertFails(Promise.reject(new Error('denied')));\n  });\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-rules-tests-in-unit": {
+    "expect": [
+      "test/rules/firestore.rules.test.ts:1 [jest-orphan-tests] runs in 2 places (unit, jest.emulator.config.js)"
+    ],
+    "ops": [
+      {
+        "$comment": "A unit project that no longer leaves the rules tests out runs them twice, once without the emulators.",
+        "write": {
+          "file": "jest.emulator.config.js",
+          "content": "// jest.emulator.config.js — the 'emulator' Jest project: security-rules tests (*.rules.test.ts in\n// test/rules/), run only inside `firebase emulators:exec` (npm run test:rules).\n/** @type {import('jest').Config} */\nmodule.exports = {\n  rootDir: __dirname,\n  displayName: 'emulator',\n  testEnvironment: 'node',\n  testMatch: ['<rootDir>/test/rules/**/*.rules.test.ts'],\n  maxWorkers: 1,\n};\n"
+        }
+      },
+      {
+        "write": {
+          "file": "test/rules/firestore.rules.test.ts",
+          "content": "import { assertFails } from '@firebase/rules-unit-testing';\n\ndescribe('/users/{uid}/tasks/{taskId}', () => {\n  it('denies a signed-out read', async () => {\n    await assertFails(Promise.reject(new Error('denied')));\n  });\n});\n"
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.config.js",
+          "find": "    ...(HAS_RULES_TESTS ? ['\\\\.rules\\\\.test\\\\.'] : []),\n",
+          "with": ""
+        }
+      }
     ]
   }
 }

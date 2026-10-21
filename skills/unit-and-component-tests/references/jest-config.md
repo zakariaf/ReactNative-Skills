@@ -208,8 +208,8 @@ mutated files), but it fails the first Stryker run that reaches an animated comp
 - **Every test file runs in exactly one place.** `check-test-setup.mjs` finds, anywhere in the repo,
   every file that Jest's defaults, jest-expo's presets or Expo's guide would treat as a test
   (`*.test|spec.[jt]s(x)`, a test under `__tests__/`, `*-test.[jt]s(x)`) and matches each against
-  every project's `testMatch` and `testPathIgnorePatterns` and against `jest.sim.config.js`
-  (`jest-orphan-tests`): a file no project runs (a `*.golden.test.tsx`, a `.sim.test.tsx`, a
+  every project's `testMatch` and `testPathIgnorePatterns` and against `jest.sim.config.js` and
+  `jest.emulator.config.js` (`jest-orphan-tests`): a file no project runs (a `*.golden.test.tsx`, a `.sim.test.tsx`, a
   `.spec.ts`, a `__tests__/<name>-test.tsx`, a `lib/x.test.ts` outside `src/`, `scripts/` and
   `test/`) is silently skipped, and a file two projects run is run twice. `npx jest --listTests`
   shows what really runs. Left out of the search: installed skills, the Maestro folder, and a folder
@@ -246,6 +246,17 @@ mutated files), but it fails the first Stryker run that reaches an animated comp
   that skill's `plugin-test` rule fails the same gap). A new root changes the project scope that
   quality-gates guards: its `quality-gates.json` `jest.projects.*.testMatch` changes in the same
   gate change, or every app's guardrail fails.
+- **`HAS_RULES_TESTS`**: once `jest.emulator.config.js` exists (firestore-rules-and-emulator-tests
+  copies it), the unit project leaves out `*.rules.test.ts` (`'\\.rules\\.test\\.'`, right after the
+  Android entry). Those security-rules tests in `test/rules/` need running Firebase emulators, so they
+  run only through that config inside `firebase emulators:exec` (`npm run test:rules`), the way
+  simulations run only through `jest.sim.config.js`; under `unit` every one would fail with no
+  emulator to reach, and with the ignore but no emulator config they would run nowhere. The entry is
+  the canonical config's, keyed by the same file, so quality-gates' `jest-scope` accepts it and its
+  `gate-weakened` expects `quality-gates.json` `jest.projects.unit.testPathIgnorePatterns` to list it
+  exactly while the file exists. `check-test-setup.mjs` counts the emulator config as the place its
+  tests run (`jest-orphan-tests`: a rules test the unit project also runs is run twice). Never add
+  the pattern by hand or for any other suite.
 - **`IS_MUTATION_RUN`**: inside Stryker workers the unit project leaves out the one test that checks
   the Worklets plugin's output (`scripts/quality/worklet-transform.test.ts`). The files Stryker
   instrumented compile without that plugin (see "babel.config.js"), so the test fails whenever its
@@ -386,10 +397,41 @@ One Jest config, run from the repo root, still covers every workspace:
   '<rootDir>/apps/*/plugins/**/', '<rootDir>/test/**/']` (each app keeps its config plugins beside its
   app config; without `scripts/` the device-only helper's own test never runs;
   `jest-orphan-tests` fails it), `collectCoverageFrom: ['<rootDir>/{apps,packages}/*/src/**/*.{ts,tsx}',
-  ...]`, and the device-only helper's `SOURCES` list each workspace's `src/` (`apps/*/src/**/*.ts`, ...).
-- **Skia in a workspace only.** The template's `HAS_SKIA` reads the root `package.json`; when only an
-  app workspace lists Skia, read that workspace's manifest instead (the checker looks at every
-  workspace).
+  ...]`, and the device-only helper reads the root `package.json` `workspaces` itself, so the marked
+  files of every workspace's `src/` (`apps/*`, `packages/*`, a `functions` backend) leave coverage with
+  the canonical helper unchanged.
+- **A Node backend's tests run in a Node project.** A Cloud Functions workspace (`functions/`: outside
+  `packages/`, no Expo app) gets a project named after its folder, and `TEST_ROOTS` leaves its `src/`
+  out, so its tests run once, in Node:
+
+  ```js
+  // Cloud Functions run in Node: no React Native preset, environment or jest.setup.ts.
+  const functionsProject = {
+    ...SHARED,
+    displayName: 'functions',
+    preset: undefined,
+    testEnvironment: 'node',
+    setupFiles: [],
+    testMatch: ['<rootDir>/functions/src/**/*.test.ts'],
+  };
+  // projects: [unitProject, androidProject, goldenProject, functionsProject]
+  ```
+
+  Babel still transforms the TypeScript through the root `babel.config.js`, and `SHARED` keeps the
+  ignores, the mappers, the mock resets and the device-only coverage. Inside `unit` the same test
+  sees React Native's globals and setup: in a copy of the reference app on 2026-10-21 a functions test that
+  asserted `typeof window === 'undefined'` failed under `unit` (6.3 s, `window` is an object) and
+  passed in the Node project (0.4 s). `collectCoverageFrom` adds `'<rootDir>/functions/src/**/*.{ts,tsx}'`
+  so the backend keeps its coverage floor. `check-test-setup.mjs` accepts the project only when
+  multi-package and named after a backend folder (`jest-backend-project`: `testEnvironment: 'node'`,
+  no preset, no `jest.setup.ts`, only `functions/src` tests; `jest-orphan-tests` fails a test both
+  projects run); a single app keeps exactly unit, android and golden. quality-gates lists the
+  project in `quality-gates.json` `jest.projects` in the same gate change. The build output
+  (`functions/lib/`) needs no Jest ignore: tests and coverage read only `src/`.
+- **Skia in a workspace only.** The template's `HAS_SKIA` reads the root `package.json` and every
+  workspace's (`MANIFESTS`, from the root `"workspaces"` globs), so Skia listed only in
+  `apps/mobile/package.json` still runs the golden project in CanvasKit, as the checker expects (it
+  reads every workspace too; `pass-skia-in-app-workspace`). Nothing to edit in the config.
 - **Stryker** `disableTypeChecks: "{apps,packages}/*/src/**/*.{ts,tsx}"` (coverage-and-mutation.md).
 - **Ignore lists** add each app's generated folders (`<rootDir>/apps/[^/]+/(ios|android|build|dist)/`).
 - **The contract** names the logic keys and mutate globs of each workspace

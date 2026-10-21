@@ -43,6 +43,7 @@ import {
   readPng,
   readProjectConfig,
   readTsconfigPaths,
+  backendWorkspaces,
   readWorkspaces,
   removeTempDir,
   renderPng,
@@ -224,6 +225,19 @@ test('REPO_SCAN_IGNORES and walkRepo: agent skill folders, generated output, wor
   for (const rel of kept) assert.ok(!isRepoScanIgnored(rel, dir), `${rel} should be scanned`);
   assert.ok(isRepoScanIgnored('./skills/a/b.ts'));
   assert.ok(!isRepoScanIgnored('apps/mobile/ios/Podfile'), 'without the root, workspace folders are unknown');
+  // A Node backend workspace (functions/, no Expo app, outside packages/): the folder its "main" names
+  // (lib/index.js, the deploy bundle) is build output; a package whose main is TypeScript source is not.
+  const backend = join(dir, 'backend');
+  write(join(backend, 'package.json'), JSON.stringify({ name: 'tasks', workspaces: ['apps/*', 'packages/*', 'functions'] }));
+  write(join(backend, 'apps', 'mobile', 'package.json'), JSON.stringify({ name: '@acme/mobile', main: 'lib/entry.js', dependencies: { expo: '~57.0.27' } }));
+  write(join(backend, 'packages', 'shared', 'package.json'), JSON.stringify({ name: '@acme/shared', main: 'lib/index.js' }));
+  write(join(backend, 'functions', 'package.json'), JSON.stringify({ name: '@acme/functions', type: 'module', main: './lib/index.js' }));
+  for (const rel of ['functions/src/index.ts', 'functions/lib/index.js', 'packages/shared/lib/index.ts', 'apps/mobile/lib/entry.ts']) write(join(backend, rel));
+  assert.deepEqual(backendWorkspaces(backend).map((entry) => `${entry.dir}:${entry.buildDir}`), ['functions:functions/lib']);
+  assert.ok(repoScanIgnores(backend).includes('functions/lib/**'));
+  assert.deepEqual(walkRepo(backend, { include: ['*.ts', '*.js'] }), ['apps/mobile/lib/entry.ts', 'functions/src/index.ts', 'packages/shared/lib/index.ts']);
+  write(join(backend, 'functions', 'package.json'), JSON.stringify({ name: '@acme/functions', main: 'src/index.ts' }));
+  assert.deepEqual(backendWorkspaces(backend).map((entry) => `${entry.dir}:${entry.buildDir}`), ['functions:null']);
   // A single-app repo: the same patterns from the root; a planted bug under skills/ stays unseen.
   const single = join(dir, 'single');
   for (const rel of ['src/a.ts', 'ios/b.ts', 'skills/s/c.ts', '.agents/skills/s/d.ts']) write(join(single, rel));

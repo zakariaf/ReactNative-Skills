@@ -1,6 +1,6 @@
 {
   "$schema": "./architecture.schema.json",
-  "$comment": "contracts/architecture.json of a repo with two apps (apps/phone, apps/tablet) and four packages. core is pure, ui holds shared components and their adapters, tooling and config-plugins run in Node.",
+  "$comment": "contracts/architecture.json of a repo with two apps (apps/phone, apps/tablet), four packages and a Cloud Functions backend. core is pure, ui holds shared components and their adapters, tooling and config-plugins run in Node, and functions/ (package.json workspaces: [\"apps/*\", \"packages/*\", \"functions\"]) is a Node backend that nothing imports.",
   "vendorSdks": {
     "expo-notifications": "LocalNotificationsPort and PushPort"
   },
@@ -13,6 +13,7 @@
       "name": "config-plugins",
       "world": "node",
       "exports": { "./*": "./src/*", "./plugins/*": "./plugins/*" }
-    }
+    },
+    { "name": "functions", "dir": "functions", "world": "node" }
   ]
 }

@@ -53,7 +53,25 @@ export function weightByOf(contract) {
   return bundledFonts(contract)?.weightBy ?? 'family';
 }
 
-const TOP_KEYS = new Set(['$schema', 'tokens', 'exports', 'palettes', 'invariantFields', 'files', 'text', 'fonts', 'rawValues']);
+const TOP_KEYS = new Set(['$schema', 'tokens', 'exports', 'palettes', 'invariantFields', 'files', 'text', 'fonts', 'rawValues', 'lightOnly']);
+
+/**
+ * The reason of a light-only declaration ("lightOnly": { "reason": "..." }), or null when the app
+ * follows the phone in light and dark (the default). Light-only is a design decision, so it is
+ * written down once, with its reason, where every checker reads it.
+ */
+export function lightOnlyReason(contract) {
+  const reason = contract?.lightOnly?.reason;
+  return typeof reason === 'string' && reason.trim() !== '' ? reason.trim() : null;
+}
+
+function lightOnlyErrors(lightOnly) {
+  if (lightOnly === undefined) return [];
+  if (lightOnly === null || typeof lightOnly !== 'object' || Array.isArray(lightOnly)) return ['"lightOnly" must be { "reason": "<why the app has no dark appearance>" }'];
+  const errors = Object.keys(lightOnly).filter((key) => key !== 'reason').map((key) => `unknown key "lightOnly.${key}"`);
+  if (lightOnlyReason({ lightOnly }) === null) errors.push('"lightOnly" needs a "reason": why the app has no dark appearance (a design decision someone can revisit)');
+  return errors;
+}
 
 /** Styling systems whose apps keep tokens elsewhere: with one of them and no theme folder, the checks do not apply. */
 export const OTHER_STYLING_PACKAGES = ['nativewind', 'tamagui', '@tamagui/core', '@shopify/restyle', 'react-native-unistyles', 'styled-components', '@gluestack-ui/themed'];
@@ -102,6 +120,7 @@ function shapeErrors(contract) {
     need(isRepoPath(entry?.file) && typeof entry?.export === 'string' && typeof entry?.token === 'string', `palettes[${i}] needs "file", "export" and "token"`);
   }
   errors.push(...fontsErrors(contract.fonts));
+  errors.push(...lightOnlyErrors(contract.lightOnly));
   const policy = contract.rawValues?.policy;
   if (policy !== undefined) need(policy.maxRadius === undefined || policy.maxRadius === null || typeof policy.maxRadius === 'number', '"rawValues.policy.maxRadius" must be a number or null');
   return errors;

@@ -191,7 +191,7 @@
     "ops": [{ "replace": { "file": "lefthook.yml", "find": "run: npm run verify", "with": "run: npm run lint" } }]
   },
   "bad-long-pre-existing-line": {
-    "expect": ["FAIL eslint.config.mjs:498 [format-width] the PRE_EXISTING line is"],
+    "expect": ["FAIL eslint.config.mjs:517 [format-width] the PRE_EXISTING line is"],
     "ops": [
       { "write": { "file": "design-exports-from-the-agency/readme.md", "content": "# exports\n" } },
       { "write": { "file": "handbook-for-the-whole-team/readme.md", "content": "# handbook\n" } },

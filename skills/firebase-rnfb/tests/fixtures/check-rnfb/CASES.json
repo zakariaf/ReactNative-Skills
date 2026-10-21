@@ -1,0 +1,377 @@
+{
+  "bad-namespaced-default-import": {
+    "expect": [
+      "[namespaced-api]",
+      "src/data/firestore/firestore-note-adapter.ts:2",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/firestore/firestore-note-adapter.ts",
+          "content": "// src/data/firestore/firestore-note-adapter.ts\nimport firestore from '@react-native-firebase/firestore';\n\n/** Planted: the namespaced API (removed in v26). */\nexport function notesOf(uid: string): unknown {\n  return firestore().collection('users').doc(uid).collection('notes');\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-namespaced-firebase-object": {
+    "expect": [
+      "[namespaced-api]",
+      "src/services/app-check/rnfb-legacy-adapter.ts:2",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/app-check/rnfb-legacy-adapter.ts",
+          "content": "// src/services/app-check/rnfb-legacy-adapter.ts\nimport { firebase } from '@react-native-firebase/app-check';\n\n/** Planted: firebase.appCheck() is the namespaced API. */\nexport const appCheck = firebase.appCheck();\n"
+        }
+      }
+    ]
+  },
+  "bad-client-transaction": {
+    "expect": [
+      "[client-transaction]",
+      "src/data/firestore/firestore-list-adapter.ts:2",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/firestore/firestore-list-adapter.ts",
+          "content": "// src/data/firestore/firestore-list-adapter.ts\nimport { doc, getFirestore, runTransaction } from '@react-native-firebase/firestore';\n\n/** Planted: a client transaction needs the server and fails offline. */\nexport async function renameList(uid: string, listId: string, name: string): Promise<void> {\n  const db = getFirestore();\n  await runTransaction(db, async (transaction) => {\n    const ref = doc(db, 'users', uid, 'lists', listId);\n    const snapshot = await transaction.get(ref);\n    if (snapshot.exists()) transaction.update(ref, { name });\n  });\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-awaited-port-commit": {
+    "expect": [
+      "[awaited-commit-in-ui]",
+      "src/features/lists/use-rename-list.ts:7",
+      "renameList",
+      "src/data/firestore/firestore-list-adapter.ts:11",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/firestore/firestore-list-adapter.ts",
+          "content": "// src/data/firestore/firestore-list-adapter.ts\nimport { doc, serverTimestamp, writeBatch } from '@react-native-firebase/firestore';\n\nimport type { Firestore } from '@react-native-firebase/firestore';\n\nexport function createFirestoreListAdapter(db: Firestore, uid: string) {\n  return {\n    renameList: (listId: string, name: string): Promise<void> => {\n      const batch = writeBatch(db);\n      batch.set(doc(db, 'users', uid, 'lists', listId), { name, updatedAt: serverTimestamp() }, { merge: true });\n      return batch.commit();\n    },\n  };\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/lists/use-rename-list.ts",
+          "content": "// src/features/lists/use-rename-list.ts\nimport type { ListStore } from '@/data/lists/list-store-port';\n\n/** Planted: offline this await never settles, so the screen waits forever. */\nexport function useRenameList(store: ListStore): (listId: string, name: string) => Promise<void> {\n  return async (listId, name) => {\n    await store.renameList(listId, name);\n  };\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-awaited-commit-in-screen": {
+    "expect": [
+      "[awaited-commit-in-ui]",
+      "src/features/lists/lists-screen.tsx:8",
+      "[sdk-outside-adapter]",
+      "src/features/lists/lists-screen.tsx:2",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/lists/lists-screen.tsx",
+          "content": "// src/features/lists/lists-screen.tsx\nimport { doc, getFirestore, writeBatch } from '@react-native-firebase/firestore';\n\n/** Planted: a screen that writes and waits for the server. */\nexport async function archiveList(uid: string, listId: string): Promise<void> {\n  const batch = writeBatch(getFirestore());\n  batch.set(doc(getFirestore(), 'users', uid, 'lists', listId), { isArchived: true }, { merge: true });\n  await batch.commit();\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-sdk-in-feature": {
+    "expect": [
+      "[sdk-outside-adapter]",
+      "src/features/tasks/use-task-count.ts:2",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-count.ts",
+          "content": "// src/features/tasks/use-task-count.ts\nimport { collection, getCountFromServer, getFirestore } from '@react-native-firebase/firestore';\n\n/** Planted: a feature reads Firestore without the port. */\nexport async function taskCount(uid: string): Promise<number> {\n  const snapshot = await getCountFromServer(collection(getFirestore(), 'users', uid, 'tasks'));\n  return snapshot.data().count;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-sdk-types-in-port": {
+    "expect": [
+      "[sdk-outside-adapter]",
+      "src/data/tasks/task-store-port.ts:7",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/tasks/task-store-port.ts",
+          "find": "import type { Result } from '@/core/result';\n",
+          "with": "import type { Result } from '@/core/result';\nimport type { Timestamp } from '@react-native-firebase/firestore';\n\nexport type TaskTimestamp = Timestamp;\n"
+        }
+      }
+    ]
+  },
+  "bad-sdk-in-non-adapter-file": {
+    "expect": [
+      "[sdk-outside-adapter]",
+      "src/data/firestore/task-paths.ts:2",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/firestore/task-paths.ts",
+          "content": "// src/data/firestore/task-paths.ts\nimport { collection, getFirestore } from '@react-native-firebase/firestore';\n\n/** Planted: a helper in the adapter folder that is not an adapter. */\nexport const tasksOf = (uid: string): unknown => collection(getFirestore(), 'users', uid, 'tasks');\n"
+        }
+      }
+    ]
+  },
+  "bad-emulator-literal-host": {
+    "expect": [
+      "[emulator-in-production]",
+      "src/data/firestore/firestore-client-adapter.ts:",
+      "literal host",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/data/firestore/firestore-client-adapter.ts",
+          "find": "connectFirestoreEmulator(db, emulators.host, emulators.ports.firestore);",
+          "with": "connectFirestoreEmulator(db, 'localhost', 8080);"
+        }
+      }
+    ]
+  },
+  "bad-emulator-without-config": {
+    "expect": [
+      "[emulator-in-production]",
+      "src/services/auth/rnfb-auth-adapter.ts:5",
+      "does not take its host from src/config/firebase-emulators.ts",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/auth/rnfb-auth-adapter.ts",
+          "content": "// src/services/auth/rnfb-auth-adapter.ts\nimport { connectAuthEmulator, getAuth } from '@react-native-firebase/auth';\n\nexport function connectAuth(host: string): void {\n  if (__DEV__) connectAuthEmulator(getAuth(), `http://${host}:9099`);\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-emulator-config-dev-flag": {
+    "expect": [
+      "[emulator-in-production]",
+      "src/config/firebase-emulators.ts:",
+      "guarded by __DEV__",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/config/firebase-emulators.ts",
+          "find": "if (input.variant !== 'development') {",
+          "with": "if (!__DEV__) {"
+        }
+      }
+    ]
+  },
+  "bad-config-file-committed": {
+    "expect": [
+      "[config-file-committed]",
+      "GoogleService-Info.plist",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".gitignore",
+          "find": "GoogleService-Info.plist\n",
+          "with": ""
+        }
+      },
+      {
+        "write": {
+          "file": "GoogleService-Info.plist",
+          "content": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<plist version=\"1.0\"><dict><key>PROJECT_ID</key><string>tasks-dev</string></dict></plist>\n"
+        }
+      }
+    ]
+  },
+  "bad-config-file-path-in-app-config": {
+    "expect": [
+      "[config-file-committed]",
+      "app.config.ts:8",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "googleServicesFile: process.env['GOOGLE_SERVICES_JSON']",
+          "with": "googleServicesFile: './google-services.json'"
+        }
+      }
+    ]
+  },
+  "pass-config-file-ignored": {
+    "expect": [
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "google-services.json",
+          "content": "{ \"project_info\": { \"project_id\": \"tasks-dev\" } }\n"
+        }
+      }
+    ]
+  },
+  "bad-listener-dropped-in-adapter": {
+    "expect": [
+      "[listener-leak]",
+      "src/services/auth/rnfb-session-adapter.ts:6",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/auth/rnfb-session-adapter.ts",
+          "content": "// src/services/auth/rnfb-session-adapter.ts\nimport { getAuth, onAuthStateChanged } from '@react-native-firebase/auth';\n\n/** Planted: the unsubscribe is dropped, so every call adds one more listener. */\nexport function watchSession(onUser: (uid: string | null) => void): void {\n  onAuthStateChanged(getAuth(), (user) => onUser(user?.uid ?? null));\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-listener-leak-in-effect": {
+    "expect": [
+      "[listener-leak]",
+      "src/features/tasks/use-list-tasks.ts:9",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "src/features/tasks/use-list-tasks.ts",
+          "find": "  useEffect(() => store.watchList(listId, { onTasks: setTasks, onError: () => undefined }), [store, listId]);",
+          "with": "  useEffect(() => {\n    store.watchList(listId, { onTasks: setTasks, onError: () => undefined });\n  }, [store, listId]);"
+        }
+      }
+    ]
+  },
+  "pass-installed-skills-ignored": {
+    "expect": [
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/planted/SKILL.md",
+          "content": "---\nname: planted\ndescription: Plants findings that must stay silent.\n---\n"
+        }
+      },
+      {
+        "write": {
+          "file": ".agents/skills/planted/templates/src/features/x/use-x.ts",
+          "content": "import firestore, { runTransaction } from '@react-native-firebase/firestore';\nexport async function x(): Promise<void> {\n  await firestore().collection('a').doc('b').set({});\n  await runTransaction(firestore(), async () => undefined);\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": ".agents/skills/planted/GoogleService-Info.plist",
+          "content": "<plist/>\n"
+        }
+      },
+      {
+        "write": {
+          "file": "skills/other/SKILL.md",
+          "content": "---\nname: other\ndescription: Another installed skill.\n---\n"
+        }
+      },
+      {
+        "write": {
+          "file": "skills/other/src/features/y/use-y.ts",
+          "content": "import { connectFirestoreEmulator, getFirestore, onSnapshot } from '@react-native-firebase/firestore';\nconnectFirestoreEmulator(getFirestore(), 'localhost', 8080);\nonSnapshot(null as never, () => undefined);\n"
+        }
+      },
+      {
+        "write": {
+          "file": "vendor/kit/SKILL.md",
+          "content": "---\nname: kit\ndescription: A vendored skill folder.\n---\n"
+        }
+      },
+      {
+        "write": {
+          "file": "vendor/kit/google-services.json",
+          "content": "{}\n"
+        }
+      }
+    ]
+  },
+  "pass-tests-and-mocks-may-import": {
+    "expect": [
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "test/firestore/seed-tasks.ts",
+          "content": "// test/firestore/seed-tasks.ts\nimport { doc, getFirestore, setDoc } from '@react-native-firebase/firestore';\n\nexport async function seedTask(uid: string): Promise<void> {\n  await setDoc(doc(getFirestore(), 'users', uid, 'tasks', 't1'), { title: 'Buy milk' });\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-not-applicable": {
+    "expect": [
+      "NOT APPLICABLE: package.json lists no @react-native-firebase package"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "@react-native-firebase/app"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "@react-native-firebase/app-check"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "@react-native-firebase/firestore"
+          ],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "error-no-package-json": {
+    "expect": [
+      "ERROR [bad-input]",
+      "no package.json"
+    ],
+    "ops": [
+      {
+        "delete": [
+          "package.json"
+        ]
+      }
+    ]
+  }
+}

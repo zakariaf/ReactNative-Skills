@@ -267,7 +267,8 @@ build's own version, build number and id), `expo-asset` (resolves and preloads b
 `expo-localization` (the root layout reads the device locales once and language resolution takes them as
 values, so tests pass locales in), `react-native-safe-area-context`, `react-native-screens`,
 `react-native-reanimated`, `react-native-gesture-handler`, `react-native-worklets`,
-`@shopify/react-native-skia`, `@shopify/flash-list`, `react-native-keyboard-controller`. The reasons are
+`@shopify/react-native-skia`, `@shopify/flash-list`, `lottie-react-native` and `@rive-app/react-native`
+(they play bundled animation files; lottie-and-rive owns them), `react-native-keyboard-controller`. The reasons are
 in `assets/architecture-defaults.json`.
 
 Add a side-effect SDK to `vendorSdks` in the contract and to `VENDOR_SDK_PATHS` in the ESLint config; the
@@ -293,7 +294,13 @@ The install policy bans too: when `contracts/dependency-policy.json` (dependency
 package in its `doNotAdd` map is a `banned-package` here, with the policy's reason, so the developer keeps
 install bans in one list. `bannedPackages` in the architecture contract holds the architecture bans (a port
 replaced the package) and wins over `doNotAdd` for the same name (`null` drops one). A malformed policy file
-prints a `note:` and is left to dependency-management's checker.
+prints a `note:` and is left to dependency-management's checker. A scoped entry, `{ "reason", "where",
+"allowIn" }`, keeps the package out of some `package.json` places only (dependency-management's
+policy contract) and names the files that may still import it: every other importer, app code and tests
+alike, is a `banned-package` whose message names the allowed globs. The case it exists for is the
+Firebase JS SDK in an app on React Native Firebase: `"firebase": { "reason": "...", "where": "app",
+"allowIn": ["test/rules/**"] }` lets firestore-rules-and-emulator-tests' rules tests import `firebase`
+while `src/` (and any other test) cannot.
 
 A bare import named like a Node module (`buffer`, `events`, `url`, `util`) is that npm package when the
 app's `package.json` declares it (a polyfill), and a Node built-in otherwise (`node-builtin`): Metro

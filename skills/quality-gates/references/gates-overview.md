@@ -174,17 +174,39 @@ that differs.
 ## When multi-package
 
 With npm workspaces (`apps/*`, `packages/*`), the gate files and hooks stay at the repo root and run
-from there. `typecheck` becomes `tsc --noEmit -p tsconfig.json && npm run -s typecheck --workspaces`
-(`assets/package-scripts.multi-package.json`), and every workspace has its own `typecheck` script
-(`tsc --noEmit -p tsconfig.json`); without `--if-present`, a workspace that lacks it fails loudly.
-`quality-gates.json` lists each program under `typescript.projects` (a glob such as
-`apps/*/tsconfig.json` covers new ones), the `ask` rules gain the workspace tsconfigs
+from there. `assets/package-scripts.multi-package.json` holds every script that changes:
+
+- `typecheck` becomes `tsc --noEmit -p tsconfig.json && npm run -s typecheck --workspaces`, and every
+  workspace has its own `typecheck` script (`tsc --noEmit -p tsconfig.json`); without `--if-present`, a
+  workspace that lacks it fails loudly.
+- `export:audit` becomes `cd <app-dir> && <the single app's expo export command>` with
+  `--output-dir <to-root>/dist-audit`, where `<app-dir>` is the Expo app workspace (`apps/mobile`) and
+  `<to-root>` the way back up to the repo root (two folders for `apps/mobile`); the checks fill both
+  from the workspaces. The root form of the single app fails after the move: Metro, started at the
+  root, falls back to `expo/AppEntry`, which imports an `App` file the root does not have, and stops
+  with "Unable to resolve module". Run inside the app it finds `expo-router/entry`, and the export still
+  lands at the repo root, where
+  `audit:licenses` (its `dist-audit/**` source maps) and the bundle audit read it (verified on Expo
+  SDK 57 in an npm-workspaces app with one app workspace on 2026-10-21; re-verify:
+  `npm run -s export:audit && npm run -s audit:licenses` from the root). The form exports one app;
+  with several apps the checks accept it for any one of them, and auditing each is not covered yet.
+
+`quality-gates.json` lists every workspace program under `typescript.projects` (a glob such as
+`apps/*/tsconfig.json` covers new ones; each Expo app's program keeps the single app's `["jest"]`), the
+ESLint probes take the app workspace's prefix (`apps/<app>/src/core/gate-probe.ts`, ... in place of
+`src/core/gate-probe.ts`: the guardrail runs `eslint --print-config` on those paths, so the single-app
+ones resolve no app config), and `npmScripts` restates the workspace forms; `check-gate-wiring.mjs`
+builds the same workspace form of its baseline from `package.json` `workspaces` (`gate-weakened` names
+a probe or program it lacks). The `ask` rules gain the workspace tsconfigs
 (`Edit(/apps/*/tsconfig*.json)`, `Edit(/packages/*/tsconfig*.json)`) in `.claude/settings.json` and
 `quality-gates.json` `claudeSettings` in the same gate change, so loosening a workspace program still
 prompts, and `gatedPaths` gains `apps/*/tsconfig*.json` and `packages/*/tsconfig*.json`, so the commit
 needs a `Gate-Change:` trailer too (`isGatedFile` keeps wildcard patterns out of the agent folders), knip gets one `workspaces` entry per package (with
-`includeEntryExports` for packages whose `exports` map makes every file an entry). Jest stays one root
-`jest.config.js` whose scope takes the workspace form: `TEST_ROOTS` lists `<rootDir>/apps/*/src/**/`
+`includeEntryExports` for packages whose `exports` map makes every file an entry; a Node backend such as
+`functions/` names its deploy entry file and leaves it off, so the deployed functions it exports count as
+used; its build output `functions/lib/` is git-, Prettier- and ESLint-ignored, typescript-and-lint-rules).
+Jest stays one root `jest.config.js` whose scope takes the workspace form (a Node backend's tests in a
+`functions` project with `testEnvironment: 'node'`, listed under `jest.projects`): `TEST_ROOTS` lists `<rootDir>/apps/*/src/**/`
 and `<rootDir>/packages/*/src/**/` where it had `<rootDir>/src/**/` (and `<rootDir>/apps/*/plugins/**/`
 where it had `<rootDir>/plugins/**/`; only a `src/` root counts as reaching a workspace), the coverage glob is
 `<rootDir>/{apps,packages}/*/src/**/*.{ts,tsx}`, and the logic keys name each package's logic folder

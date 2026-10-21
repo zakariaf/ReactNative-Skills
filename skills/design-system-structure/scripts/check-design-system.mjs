@@ -9,9 +9,10 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join, posix } from 'node:path';
 
 import { createReporter, fail, lineOf, notYetCreated, parseArgs, requireDir, resolveLayout, run, sha256, walkRepo } from './check-lib.mjs';
+import { forEachExpoApp } from './lib/expo-apps.mjs';
 import { enableAppImports, errorText, lineOfExport } from './lib/app-modules.mjs';
 import { aliasesOf, closingIndex, constExpression, constInitializer, diffObject, functionRange, importsOf, inRanges, jsxAttribute, lineOfPattern, masked, normalDir, openingTagEnd, readSource, sameValue, show, specifierNames, splitTopLevel, typeRange, valueExpression, within } from './lib/app-source.mjs';
-import { SYSTEM_FONT, bundledFonts, modulePaths, otherStylingPackage, readContract, weightByOf } from './lib/design-contract.mjs';
+import { SYSTEM_FONT, bundledFonts, lightOnlyReason, modulePaths, otherStylingPackage, readContract, weightByOf } from './lib/design-contract.mjs';
 import { FontTableError, readFontFile } from './lib/font-tables.mjs';
 import { CORE_FIELDS, applyExceptions, readContrastContract, schemeProblems, tableFor } from './lib/palette-rules.mjs';
 import { getPath, resolveTokens } from './lib/token-file.mjs';
@@ -56,7 +57,8 @@ const SPEC = {
     '  font-family                 a family in fonts.ts has no bundled file of that name, or its PostScript name differs',
     '                              (fonts.weightBy "fontWeight": the family is a fontFamily of the expo-font entry); fonts.ts',
     '                              names a family while the contract says "fonts": "system"; or the contract bundles files',
-    '                              while fonts.ts draws every script with the system font',
+    '                              while fonts.ts draws every script with the system font; DISPLAY_FONTS (an optional display',
+    '                              face per script) is held to the same rules and keyed by a SCRIPT_FONTS script',
     '  font-files                  (bundled fonts) a contract font is missing, differs from its sha256, or its family has',
     '                              no licence file',
     '  font-plugin                 (bundled fonts) the expo-font config plugin entry is missing or misses a contract font',
@@ -67,6 +69,8 @@ const SPEC = {
     '                              to Expo\'s light default, or expo-system-ui (Android) is not installed. A same-file const',
     '                              is followed (userInterfaceStyle: UI_STYLE); app.json is the base an app.config.* that',
     '                              spreads ...config overrides',
+    '                              Light-only (contract "lightOnly": { "reason" }): every userInterfaceStyle is "light" and',
+    '                              written out, and every AppThemeProvider mount passes preference="light"',
     '  theme-provider-behaviour    the provider does not mirror the preference to Appearance.setColorScheme or paint the',
     '                              root view with SystemUI.setBackgroundColorAsync',
     '  theme-provider-mounted      no runtime file renders the app\'s provider imported from <themeDir>/theme-provider',
@@ -85,6 +89,8 @@ const SPEC = {
     '  text-locale-provided        a multi-script app mounts no TextLocaleProvider (SKIP until src/i18n exists)',
     '',
     'Folders come from the canonical layout: src/ (rn-skills.config.json "srcDir"; "." for an app without src/),',
+    'In a workspace repo (package.json "workspaces") whose root is no app, each Expo app workspace (apps/mobile: an',
+    'app config, else an expo dependency) is checked as an app with its own contracts/, and files show from the root.',
     'routes in src/app or app/ at the root; the contract "files" key moves single modules.',
     'NOT APPLICABLE when package.json has another styling system (nativewind, tamagui, restyle, unistyles,',
     'styled-components) and the theme folder does not exist.',
@@ -471,10 +477,19 @@ function checkGuardShape(ctx) {
   }
 }
 
+/** The optional display typeface per script (fonts.ts DISPLAY_FONTS; none in an app that has no such export). */
+const displayFontsOf = (fonts) => (fonts?.DISPLAY_FONTS !== null && typeof fonts?.DISPLAY_FONTS === 'object' ? fonts.DISPLAY_FONTS : {});
+
+/** Every bundled family a script draws with: [{ family, table }] from SCRIPT_FONTS and DISPLAY_FONTS. */
+function familiesOfScript(fonts, script) {
+  const tables = [['SCRIPT_FONTS', fonts.SCRIPT_FONTS?.[script]], ['DISPLAY_FONTS', displayFontsOf(fonts)[script]]];
+  return tables.flatMap(([table, byWeight]) => (byWeight !== null && typeof byWeight === 'object' ? Object.values(byWeight).map((family) => ({ family, table })) : []));
+}
+
 /** { tall: every tall script, bundled: those with bundled families (the guard needs their metrics) }. */
 function tallScriptsOf(fonts) {
   const tall = fonts.TALL_SCRIPTS instanceof Set ? [...fonts.TALL_SCRIPTS] : Array.isArray(fonts.TALL_SCRIPTS) ? fonts.TALL_SCRIPTS : [];
-  return { tall, bundled: tall.filter((script) => fonts.SCRIPT_FONTS?.[script] !== null && fonts.SCRIPT_FONTS?.[script] !== undefined) };
+  return { tall, bundled: tall.filter((script) => familiesOfScript(fonts, script).length > 0) };
 }
 
 function checkTallMetrics(ctx, fonts) {
@@ -485,8 +500,8 @@ function checkTallMetrics(ctx, fonts) {
   const onSystemFont = tall.filter((script) => !bundled.includes(script));
   if (onSystemFont.length > 0) ctx.report.note(`tall-script-overflow-guard: ${onSystemFont.join(', ')} use${onSystemFont.length === 1 ? 's' : ''} the system font, which has no font file to read metrics from, so no guard is computed for it; its tall line heights are still checked`);
   for (const script of bundled) {
-    for (const family of Object.values(fonts.SCRIPT_FONTS[script])) {
-      if (!metrics[family]) ctx.report.problem({ file, line: lineOfPattern(source, /TALL_SCRIPT_METRICS/), rule: 'tall-script-overflow-guard', message: `the tall script ${script} uses ${family}, which has no TALL_SCRIPT_METRICS entry`, fix: 'Add its hhea unitsPerEm, ascender and descender (check-design-system reads them from the font file).' });
+    for (const { family, table } of familiesOfScript(fonts, script)) {
+      if (!metrics[family]) ctx.report.problem({ file, line: lineOfPattern(source, /TALL_SCRIPT_METRICS/), rule: 'tall-script-overflow-guard', message: `the tall script ${script} uses ${family}${table === 'DISPLAY_FONTS' ? ' (DISPLAY_FONTS)' : ''}, which has no TALL_SCRIPT_METRICS entry`, fix: 'Add its hhea unitsPerEm, ascender and descender (check-design-system reads them from the font file).' });
     }
   }
   for (const [family, want] of Object.entries(metrics)) {
@@ -648,7 +663,7 @@ function checkFontPlugin(ctx, fontsSpec) {
  */
 function checkFontsDrawn(ctx, fonts, fontsSpec) {
   ctx.checked += 1;
-  const drawn = Object.values(fonts.SCRIPT_FONTS ?? {}).some((byWeight) => byWeight !== null && typeof byWeight === 'object' && Object.keys(byWeight).length > 0);
+  const drawn = [...Object.values(fonts.SCRIPT_FONTS ?? {}), ...Object.values(displayFontsOf(fonts))].some((byWeight) => byWeight !== null && typeof byWeight === 'object' && Object.keys(byWeight).length > 0);
   if (drawn) return;
   const source = ctx.source(ctx.paths.fonts) ?? '';
   ctx.report.problem({ file: ctx.paths.fonts, line: lineOfExport(source, 'SCRIPT_FONTS'), rule: 'font-family', message: `the contract bundles ${fontsSpec.files.map((entry) => entry.file).join(', ')}, but every script of SCRIPT_FONTS is null, so no text draws with them and the build embeds fonts nobody sees`, fix: `Name a family per weight in SCRIPT_FONTS (file name = PostScript name), or keep the system font: write "fonts": "${SYSTEM_FONT}" in ${ctx.contractRel} and remove the files and the expo-font entry (references/text-and-fonts.md, "System font").` });
@@ -713,7 +728,8 @@ function checkScriptCoverage(ctx, fonts) {
 
 function checkFonts(ctx, fonts) {
   if (!ctx.contract) return;
-  const families = fonts ? [...new Set([...Object.values(fonts.SCRIPT_FONTS ?? {}).flatMap((byWeight) => Object.values(byWeight ?? {})), ...Object.keys(fonts.TALL_SCRIPT_METRICS ?? {})])] : [];
+  const families = fonts ? [...new Set([...[...Object.values(fonts.SCRIPT_FONTS ?? {}), ...Object.values(displayFontsOf(fonts))].flatMap((byWeight) => Object.values(byWeight ?? {})), ...Object.keys(fonts.TALL_SCRIPT_METRICS ?? {})])] : [];
+  if (fonts) checkDisplayScripts(ctx, fonts);
   const fontsSpec = bundledFonts(ctx.contract);
   if (fontsSpec === null) {
     ctx.report.note(`font rules: the contract says "fonts": "${SYSTEM_FONT}", so no file, pin, licence or expo-font entry is checked`);
@@ -725,6 +741,16 @@ function checkFonts(ctx, fonts) {
   if (fonts) checkScriptCoverage(ctx, fonts);
   checkFontFamilies(ctx, fontsSpec, families);
   checkFontPlugin(ctx, fontsSpec);
+}
+
+/** A DISPLAY_FONTS entry is a display face of a script the app has: its key is a SCRIPT_FONTS script. */
+function checkDisplayScripts(ctx, fonts) {
+  const source = ctx.source(ctx.paths.fonts) ?? '';
+  for (const script of Object.keys(displayFontsOf(fonts))) {
+    ctx.checked += 1;
+    if (Object.hasOwn(fonts.SCRIPT_FONTS ?? {}, script)) continue;
+    ctx.report.problem({ file: ctx.paths.fonts, line: lineOfPattern(source, new RegExp(`\\b${escapeRegExp(script)}\\s*:`)), rule: 'font-family', message: `DISPLAY_FONTS names the script '${script}', which SCRIPT_FONTS does not have, so no text ever picks that display face`, fix: 'Key DISPLAY_FONTS by a ScriptKey of SCRIPT_FONTS (latin for a Latin display face), or remove the entry.' });
+  }
 }
 
 /** The key of the object literal around `index` (ios in `ios: { userInterfaceStyle }`), or null at the top. */
@@ -770,8 +796,35 @@ function checkColorSchemeConfig(ctx) {
     return;
   }
   ctx.checked += 1;
-  const fix = "Set userInterfaceStyle: 'automatic' in the app config, and drop or align the ios / android overrides.";
   const styles = effectiveStyles(ctx, config);
+  if (lightOnlyReason(ctx.contract) !== null) checkLightOnlyConfig(ctx, config, styles);
+  else checkFollowsPhone(ctx, config, styles);
+  if (!Object.hasOwn({ ...ctx.manifest.dependencies }, 'expo-system-ui')) {
+    ctx.report.problem({ file: 'package.json', rule: 'color-scheme-config', message: 'expo-system-ui is not a dependency, so Android ignores userInterfaceStyle in a development or release build', fix: 'Run: npx expo install expo-system-ui' });
+  }
+}
+
+/**
+ * A light-only app (contract "lightOnly" with its reason) says so to both platforms: every
+ * userInterfaceStyle is 'light', written out (Expo's default happens to be light, but an unset key
+ * reads as a forgotten one), so neither the phone's dark mode nor a dark system UI reaches it.
+ */
+function checkLightOnlyConfig(ctx, config, styles) {
+  const declared = `${ctx.contractRel} declares the app light-only ("lightOnly": ${lightOnlyReason(ctx.contract)})`;
+  const fix = `Set userInterfaceStyle: 'light' in the app config and drop the ios / android overrides; or, once the app has a dark set, remove "lightOnly" from ${ctx.contractRel} and set 'automatic'.`;
+  ctx.report.note(`color-scheme-config: light-only (${ctx.contractRel} "lightOnly": ${lightOnlyReason(ctx.contract)})`);
+  for (const entry of styles.filter((item) => item.value !== 'light')) {
+    const where = entry.platform === 'top' ? 'userInterfaceStyle' : `${entry.platform}.userInterfaceStyle`;
+    ctx.report.problem({ file: entry.file, line: lineOf(entry.text, entry.index), rule: 'color-scheme-config', message: `${where} is ${JSON.stringify(entry.value)}, but ${declared}, so the system UI ${entry.platform === 'top' ? '' : `on ${entry.platform === 'ios' ? 'iOS' : 'Android'} `}turns dark under a light-only theme`, fix });
+  }
+  if (styles.length === 0) {
+    ctx.report.problem({ file: config, rule: 'color-scheme-config', message: `userInterfaceStyle is not set, but ${declared}: Expo's default happens to be light, yet an unset key reads as a forgotten one`, fix });
+  }
+}
+
+/** The default: light and dark follow the phone on both platforms. */
+function checkFollowsPhone(ctx, config, styles) {
+  const fix = "Set userInterfaceStyle: 'automatic' in the app config, and drop or align the ios / android overrides.";
   const wrong = styles.filter((entry) => entry.value !== 'automatic');
   for (const entry of wrong) {
     const where = entry.platform === 'top' ? 'userInterfaceStyle' : `${entry.platform}.userInterfaceStyle`;
@@ -782,9 +835,6 @@ function checkColorSchemeConfig(ctx) {
     const missing = ['ios', 'android'].filter((platform) => !covers(platform));
     const text = config.endsWith('.json') ? ctx.source(config) : masked(ctx.source(config));
     ctx.report.problem({ file: config, line: lineOfPattern(text, /userInterfaceStyle/), rule: 'color-scheme-config', message: `userInterfaceStyle is not "automatic" for ${missing.join(' and ')} (Expo's default is light), so the dark palette never follows the phone there`, fix });
-  }
-  if (!Object.hasOwn({ ...ctx.manifest.dependencies }, 'expo-system-ui')) {
-    ctx.report.problem({ file: 'package.json', rule: 'color-scheme-config', message: 'expo-system-ui is not a dependency, so Android ignores userInterfaceStyle in a development or release build', fix: 'Run: npx expo install expo-system-ui' });
   }
 }
 
@@ -1057,6 +1107,27 @@ function checkSecondTheme(ctx, sources) {
   }
 }
 
+/**
+ * In a light-only app every AppThemeProvider mount passes preference "light": a saved 'dark' or
+ * 'system' choice would otherwise paint the dark set (or the phone's scheme) the design never made.
+ */
+function checkLightOnlyPreference(ctx, sources, providerFile) {
+  for (const { rel, text } of sources) {
+    const locals = importsOf(text)
+      .filter((entry) => specifierNames(rel, entry.spec, providerFile, aliasesOf(ctx.layout)))
+      .flatMap((entry) => entry.names.filter((name) => name.imported === 'AppThemeProvider').map((name) => name.local));
+    for (const local of locals) {
+      for (const match of text.matchAll(new RegExp(`<${escapeRegExp(local)}(?=[\\s/>])`, 'g'))) {
+        const end = openingTagEnd(text, match.index);
+        const expr = jsxAttribute(text.slice(match.index, end < 0 ? text.length : end), 'preference');
+        const value = expr === null ? null : expr.replace(/^(["'`])(.*)\1$/, '$2');
+        if (value === 'light') continue;
+        ctx.report.problem({ file: rel, line: lineOf(text, match.index), rule: 'color-scheme-config', message: `AppThemeProvider gets preference ${expr === null ? '(none)' : JSON.stringify(value)}, but ${ctx.contractRel} declares the app light-only ("lightOnly": ${lightOnlyReason(ctx.contract)}), so a saved choice or the phone paints the dark set`, fix: 'Pass preference="light" to every AppThemeProvider mount, and hide the theme setting (settings-and-preferences) while the app is light-only.' });
+      }
+    }
+  }
+}
+
 function checkProviders(ctx, fonts) {
   checkProviderBehaviour(ctx);
   const sources = runtimeSources(ctx).map((rel) => ({ rel, text: masked(ctx.source(rel)) }));
@@ -1067,6 +1138,7 @@ function checkProviders(ctx, fonts) {
     if (!target.exists) ctx.report.skip({ file: target.file, rule: 'theme-provider-mounted', message: notYetCreated(ctx.root, { file: target.file, owner: 'expo-project-bootstrap' }) });
     else ctx.report.problem({ file: target.file, rule: 'theme-provider-mounted', message: `no runtime file renders AppThemeProvider from ${providerFile}, so the app never follows the dark-mode setting or the phone (expo-router's ThemeProvider is the navigation theme, not this one)`, fix: 'Mount <AppThemeProvider preference={...}> once around the root Stack (or the React Navigation root), with the navigation theme inside it taking its colours from the app theme (examples/root-layout.tsx).' });
   }
+  if (lightOnlyReason(ctx.contract) !== null) checkLightOnlyPreference(ctx, sources, providerFile);
   const withTheme = runtimeSources(ctx, { withTheme: true }).map((rel) => ({ rel, text: masked(ctx.source(rel)) }));
   checkNavigationTheme(ctx, withTheme, target);
   checkSecondTheme(ctx, sources);
@@ -1079,14 +1151,12 @@ function checkProviders(ctx, fonts) {
   }
 }
 
-run(async () => {
-  const { options, positionals } = parseArgs(process.argv.slice(2), SPEC);
-  const root = requireDir(positionals[0] ?? '.', 'app repo root');
-  const report = createReporter({ name: 'check-design-system', json: options.json });
+/** One Expo app: its own folder is the root every path of its contract and layout is read from. */
+async function checkApp(root, options, report) {
   const themeDir = resolveLayout(root).themeDir;
   if (!existsSync(join(root, themeDir))) {
     const other = otherStylingPackage(root);
-    if (other) return report.notApplicable(`${other} is in package.json and ${themeDir} does not exist: the app styles through ${other}`);
+    if (other) return { notApplicable: `${other} is in package.json and ${themeDir} does not exist: the app styles through ${other}` };
     fail(`nothing to check: ${themeDir} does not exist`, 'Copy the templates (templates/src/theme, templates/src/ui, templates/contracts, templates/design) into the app, or pass the repo root as the argument.');
   }
   const ctx = createContext(root, options, report);
@@ -1102,5 +1172,14 @@ run(async () => {
   checkFonts(ctx, fonts);
   checkColorSchemeConfig(ctx);
   checkProviders(ctx, fonts);
-  return report.finish({ checked: ctx.checked, unit: 'modules and facts' });
+  return { checked: ctx.checked };
+}
+
+run(async () => {
+  const { options, positionals } = parseArgs(process.argv.slice(2), SPEC);
+  const root = requireDir(positionals[0] ?? '.', 'app repo root');
+  const report = createReporter({ name: 'check-design-system', json: options.json });
+  const result = await forEachExpoApp(root, report, (appRoot, appReport) => checkApp(appRoot, options, appReport));
+  if (result.notApplicable !== null) return report.notApplicable(result.notApplicable);
+  return report.finish({ checked: result.checked, unit: 'modules and facts' });
 });

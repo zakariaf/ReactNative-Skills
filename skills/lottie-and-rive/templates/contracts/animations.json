@@ -1,0 +1,14 @@
+{
+  "$schema": "./animations.schema.json",
+  "$comment": "Every Lottie and Rive file the app ships: bundled, budgeted, with its reduced-motion alternative and its licence. Owned by the lottie-and-rive skill; check-animations reads it.",
+  "assetsDir": "assets",
+  "wrapperFiles": ["src/ui/animation/**"],
+  "budgets": {
+    "maxBytes": 150000,
+    "heavyFromBytes": 60000,
+    "maxFps": 60,
+    "maxPlays": 3,
+    "maxSeconds": 6
+  },
+  "animations": []
+}

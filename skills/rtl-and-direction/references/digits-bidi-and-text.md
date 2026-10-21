@@ -132,6 +132,12 @@ AppText's `direction`, falling back to the layout when the text has no strong le
 <AppText direction={firstStrongDirection(task.title) ?? layoutDirection}>{task.title}</AppText>
 ```
 
+Only letters are strong. Digits are weak in every script, the Arabic-Indic digits (U+0660–0669) and
+the Persian ones (U+06F0–06F9) too, even though they sit inside the Arabic block, and so are Arabic
+punctuation (`،`, `٪`, `٫`) and the harakat. So `"۳ tasks"` reads left to right and `"۱۲:۳۰"` has no
+direction of its own; a check by Unicode block alone would call both right-to-left. The template tests
+it with a property: any run of digits and separators before a word leaves the word's direction.
+
 A `TextInput` for free text holds the same mix: keep its alignment logical through the input
 component (never a `textAlign` literal) and test typing both scripts in both layouts; forms-and-input
 owns the input components.

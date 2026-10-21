@@ -1,0 +1,72 @@
+// firestore.rules
+// Deny by default: a path no match block names is closed, so a new collection is closed until its
+// block and its tests land together. Every allow below has a test that proves it and a test that
+// proves its denial (test/rules/firestore.rules.test.ts, one describe per match path).
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // A required, bounded string field of the incoming document.
+    function isTitle(value) {
+      return value is string && value.size() >= 1 && value.size() <= 200;
+    }
+
+    // A list the user owns. Client-writable: the keys are an allow-list and every field is typed.
+    match /users/{uid}/lists/{listId} {
+      allow read: if isOwner(uid);
+      allow create: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(['title', 'createdAt', 'updatedAt'])
+        && request.resource.data.keys().hasAll(['title', 'createdAt'])
+        && isTitle(request.resource.data.title)
+        && request.resource.data.createdAt == request.time;
+      allow update: if isOwner(uid)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'updatedAt'])
+        && isTitle(request.resource.data.title)
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isOwner(uid);
+    }
+
+    // A task the user owns. createdAt is set once, by the server clock of the write.
+    match /users/{uid}/tasks/{taskId} {
+      allow read: if isOwner(uid);
+      allow create: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(['title', 'listId', 'done', 'createdAt', 'updatedAt'])
+        && request.resource.data.keys().hasAll(['title', 'done', 'createdAt'])
+        && isTitle(request.resource.data.title)
+        && request.resource.data.done is bool
+        && (!('listId' in request.resource.data) || request.resource.data.listId is string)
+        && request.resource.data.createdAt == request.time;
+      allow update: if isOwner(uid)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'listId', 'done', 'updatedAt'])
+        && isTitle(request.resource.data.title)
+        && request.resource.data.done is bool
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isOwner(uid);
+    }
+
+    // An append-only activity log: create only. No update or delete rule exists, so both are denied.
+    match /users/{uid}/activity/{eventId} {
+      allow read: if isOwner(uid);
+      allow create: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(['kind', 'taskId', 'at'])
+        && request.resource.data.kind in ['task-created', 'task-completed', 'task-deleted']
+        && request.resource.data.taskId is string
+        && request.resource.data.at == request.time;
+    }
+
+    // Server-only: the Premium entitlement. Only the Admin SDK (Cloud Functions, a webhook) writes
+    // it, and the Admin SDK bypasses these rules; no client write is allowed, so none is written here.
+    match /entitlements/{uid} {
+      allow get: if isOwner(uid);
+    }
+  }
+}

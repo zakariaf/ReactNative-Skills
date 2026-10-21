@@ -59,13 +59,26 @@
       },
       {
         "png": {
-          "files": ["assets/images/empty-list.png", "assets/images/logo.png"],
+          "files": [
+            "assets/images/empty-list.png",
+            "assets/images/logo.png"
+          ],
           "width": 8,
           "height": 8,
           "fill": "#ffffff"
         }
       },
-      { "json": { "file": "tsconfig.json", "path": ["compilerOptions", "paths", "@/assets/*"], "delete": true } }
+      {
+        "json": {
+          "file": "tsconfig.json",
+          "path": [
+            "compilerOptions",
+            "paths",
+            "@/assets/*"
+          ],
+          "delete": true
+        }
+      }
     ]
   },
   "bad-cycle-and-paths": {
@@ -396,8 +409,14 @@
       {
         "json": {
           "file": "tsconfig.json",
-          "path": ["compilerOptions", "paths", "@/modules/*"],
-          "value": ["./modules/*"]
+          "path": [
+            "compilerOptions",
+            "paths",
+            "@/modules/*"
+          ],
+          "value": [
+            "./modules/*"
+          ]
         }
       }
     ]
@@ -525,8 +544,12 @@
       {
         "json": {
           "file": "contracts/architecture.json",
-          "path": ["nodeWorldFiles"],
-          "value": ["src/config/build-config.ts"]
+          "path": [
+            "nodeWorldFiles"
+          ],
+          "value": [
+            "src/config/build-config.ts"
+          ]
         }
       }
     ]
@@ -595,7 +618,9 @@
       {
         "write": {
           "file": "src/services/haptics/haptics-port.ts",
-          "lines": ["export type HapticsPort = { readonly tap: () => void };"]
+          "lines": [
+            "export type HapticsPort = { readonly tap: () => void };"
+          ]
         }
       },
       {
@@ -639,7 +664,16 @@
           ]
         }
       },
-      { "json": { "file": "package.json", "path": ["dependencies", "moment"], "value": "2.30.1" } }
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "moment"
+          ],
+          "value": "2.30.1"
+        }
+      }
     ]
   },
   "bad-pure": {
@@ -668,7 +702,9 @@
       {
         "write": {
           "file": "src/games/lights-out/board/draw-board.ts",
-          "lines": ["export const drawBoard = (): string => 'board';"]
+          "lines": [
+            "export const drawBoard = (): string => 'board';"
+          ]
         }
       },
       {
@@ -730,13 +766,17 @@
       {
         "write": {
           "file": "src/games/lights-out/rules/toggle.ts",
-          "lines": ["export const toggle = (isOn: boolean): boolean => !isOn;"]
+          "lines": [
+            "export const toggle = (isOn: boolean): boolean => !isOn;"
+          ]
         }
       },
       {
         "write": {
           "file": "src/games/lights-out/testing/lights-out-bot.ts",
-          "lines": ["export const lightsOutBot = 'bot';"]
+          "lines": [
+            "export const lightsOutBot = 'bot';"
+          ]
         }
       },
       {
@@ -990,7 +1030,15 @@
         }
       },
       {
-        "json": { "file": "contracts/architecture.json", "path": ["testOnlyFolders"], "value": ["src/features/debug/"] }
+        "json": {
+          "file": "contracts/architecture.json",
+          "path": [
+            "testOnlyFolders"
+          ],
+          "value": [
+            "src/features/debug/"
+          ]
+        }
       }
     ]
   },
@@ -1002,12 +1050,14 @@
       "src/services/clipboard/expo-clipboard-adapter.ts:2 [unclassified-sdk] imports expo-clipboard",
       "src/features/tasks/use-checkout.ts:3 [unclassified-sdk] imports @stripe/stripe-react-native",
       "src/features/tasks/use-checkout.ts:4 [unclassified-sdk] imports @notifee/react-native",
-      "src/features/tasks/use-checkout.ts:5 [unclassified-sdk] imports lottie-react-native",
+      "src/features/tasks/use-checkout.ts:5 [unclassified-sdk] imports acme-charts-react-native",
       "src/features/tasks/use-checkout.ts:6 [unclassified-sdk] imports @acme/haptic-kit",
       "RESULT: FAIL (8 problems)"
     ],
     "ops": [
-      { "delete": "contracts/architecture.json" },
+      {
+        "delete": "contracts/architecture.json"
+      },
       {
         "write": {
           "file": "src/features/tasks/use-attach-photo.ts",
@@ -1028,13 +1078,13 @@
           "lines": [
             "// A test imports what its subject imports, and test libraries: no decision is forced here.",
             "import { renderHook } from '@testing-library/react-native';",
-            "import LottieView from 'lottie-react-native';",
+            "import ChartView from 'acme-charts-react-native';",
             "",
             "import { checkout } from './use-checkout';",
             "",
             "describe('checkout', () => {",
             "  it('lists the SDKs', () => {",
-            "    expect([renderHook, LottieView, checkout]).toHaveLength(3);",
+            "    expect([renderHook, ChartView, checkout]).toHaveLength(3);",
             "  });",
             "});"
           ]
@@ -1048,11 +1098,11 @@
             "// whose name hides it but whose node_modules folder ships native code (expo-module.config.json).",
             "import { useStripe } from '@stripe/stripe-react-native';",
             "import notifee from '@notifee/react-native';",
-            "import LottieView from 'lottie-react-native';",
+            "import ChartView from 'acme-charts-react-native';",
             "import { pulse } from '@acme/haptic-kit';",
             "import { toDay } from '@acme/date-kit';",
             "",
-            "export const checkout = { useStripe, notifee, LottieView, pulse, toDay };"
+            "export const checkout = { useStripe, notifee, ChartView, pulse, toDay };"
           ]
         }
       },
@@ -1152,28 +1202,55 @@
     ]
   },
   "error-contract-unknown-key": {
-    "expect": ["ERROR [bad-input] contracts/architecture.json: unknown key \"zones\""],
-    "ops": [{ "json": { "file": "contracts/architecture.json", "path": ["zones"], "value": [] } }]
-  },
-  "error-exception-without-reason": {
-    "expect": ["ERROR [bad-input] contracts/architecture.json: allowedImports[0].reason must be a non-empty string"],
+    "expect": [
+      "ERROR [bad-input] contracts/architecture.json: unknown key \"zones\""
+    ],
     "ops": [
       {
         "json": {
           "file": "contracts/architecture.json",
-          "path": ["allowedImports"],
-          "value": [{ "from": "src/features/a/**", "to": "src/features/b/**" }]
+          "path": [
+            "zones"
+          ],
+          "value": []
+        }
+      }
+    ]
+  },
+  "error-exception-without-reason": {
+    "expect": [
+      "ERROR [bad-input] contracts/architecture.json: allowedImports[0].reason must be a non-empty string"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/architecture.json",
+          "path": [
+            "allowedImports"
+          ],
+          "value": [
+            {
+              "from": "src/features/a/**",
+              "to": "src/features/b/**"
+            }
+          ]
         }
       }
     ]
   },
   "error-no-files": {
-    "expect": ["ERROR [bad-input] nothing to check: 0 TypeScript and JavaScript files found"],
+    "expect": [
+      "ERROR [bad-input] nothing to check: 0 TypeScript and JavaScript files found"
+    ],
     "args": "{dir}/contracts",
     "ops": []
   },
   "pass-allowed-import": {
-    "expect": ["check-boundaries: ", ", 0 problems", "RESULT: PASS"],
+    "expect": [
+      "check-boundaries: ",
+      ", 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
       {
         "replace": {
@@ -1185,7 +1262,9 @@
       {
         "json": {
           "file": "contracts/architecture.json",
-          "path": ["allowedImports"],
+          "path": [
+            "allowedImports"
+          ],
           "value": [
             {
               "from": "src/features/task-detail/**",
@@ -1198,7 +1277,10 @@
     ]
   },
   "pass-api-route": {
-    "expect": [", 0 problems", "RESULT: PASS"],
+    "expect": [
+      ", 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
       {
         "write": {
@@ -1255,12 +1337,35 @@
           ]
         }
       },
-      { "json": { "file": "contracts/architecture.json", "path": ["srcFolders"], "value": ["server"] } },
-      { "json": { "file": "contracts/architecture.json", "path": ["serverFiles"], "value": ["src/server/**"] } }
+      {
+        "json": {
+          "file": "contracts/architecture.json",
+          "path": [
+            "srcFolders"
+          ],
+          "value": [
+            "server"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/architecture.json",
+          "path": [
+            "serverFiles"
+          ],
+          "value": [
+            "src/server/**"
+          ]
+        }
+      }
     ]
   },
   "pass-asset-extension": {
-    "expect": [", 0 problems", "RESULT: PASS"],
+    "expect": [
+      ", 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
       {
         "write": {
@@ -1271,12 +1376,30 @@
           ]
         }
       },
-      { "json": { "file": "contracts/architecture.json", "path": ["assetExtensions"], "value": ["glb"] } },
-      { "write": { "file": "assets/models/board.glb", "content": "glTF\n" } }
+      {
+        "json": {
+          "file": "contracts/architecture.json",
+          "path": [
+            "assetExtensions"
+          ],
+          "value": [
+            "glb"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "assets/models/board.glb",
+          "content": "glTF\n"
+        }
+      }
     ]
   },
   "pass-asset-require": {
-    "expect": [", 0 problems", "RESULT: PASS"],
+    "expect": [
+      ", 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
       {
         "write": {
@@ -1312,18 +1435,35 @@
       },
       {
         "png": {
-          "files": ["assets/images/empty-list.png", "assets/images/logo@2x.png", "assets/images/logo@3x.png"],
+          "files": [
+            "assets/images/empty-list.png",
+            "assets/images/logo@2x.png",
+            "assets/images/logo@3x.png"
+          ],
           "width": 8,
           "height": 8,
           "fill": "#ffffff"
         }
       },
-      { "write": { "file": "assets/fonts/inter-regular.ttf", "content": "font\n" } },
-      { "write": { "file": "assets/sounds/chime.mp3", "content": "sound\n" } }
+      {
+        "write": {
+          "file": "assets/fonts/inter-regular.ttf",
+          "content": "font\n"
+        }
+      },
+      {
+        "write": {
+          "file": "assets/sounds/chime.mp3",
+          "content": "sound\n"
+        }
+      }
     ]
   },
   "pass-data-adapter": {
-    "expect": [", 0 problems", "RESULT: PASS"],
+    "expect": [
+      ", 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
       {
         "write": {
@@ -1366,7 +1506,10 @@
     ]
   },
   "pass-data-opener": {
-    "expect": [", 0 problems", "RESULT: PASS"],
+    "expect": [
+      ", 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
       {
         "write": {
@@ -1404,12 +1547,21 @@
     ]
   },
   "pass-dev-only-require": {
-    "expect": [", 0 problems", "RESULT: PASS"],
+    "expect": [
+      ", 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
       {
         "write": {
           "file": "rn-skills.config.json",
-          "lines": ["{", "  \"devOnlyRequires\": [", "    \"./dev-tools/*\"", "  ]", "}"]
+          "lines": [
+            "{",
+            "  \"devOnlyRequires\": [",
+            "    \"./dev-tools/*\"",
+            "  ]",
+            "}"
+          ]
         }
       },
       {
@@ -1456,7 +1608,10 @@
     ]
   },
   "pass-fake-in-test-only": {
-    "expect": [", 0 problems", "RESULT: PASS"],
+    "expect": [
+      ", 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
       {
         "replace": {
@@ -1466,12 +1621,23 @@
         }
       },
       {
-        "json": { "file": "contracts/architecture.json", "path": ["testOnlyFolders"], "value": ["src/features/debug/"] }
+        "json": {
+          "file": "contracts/architecture.json",
+          "path": [
+            "testOnlyFolders"
+          ],
+          "value": [
+            "src/features/debug/"
+          ]
+        }
       }
     ]
   },
   "pass-game-seam": {
-    "expect": [", 0 problems", "RESULT: PASS"],
+    "expect": [
+      ", 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
       {
         "write": {
@@ -1534,14 +1700,29 @@
       {
         "write": {
           "file": "src/games/lights-out/rules/toggle.ts",
-          "lines": ["export const toggle = (isOn: boolean): boolean => !isOn;"]
+          "lines": [
+            "export const toggle = (isOn: boolean): boolean => !isOn;"
+          ]
         }
       },
-      { "json": { "file": "contracts/architecture.json", "path": ["gameFacing"], "value": ["src/games/game-host/**"] } }
+      {
+        "json": {
+          "file": "contracts/architecture.json",
+          "path": [
+            "gameFacing"
+          ],
+          "value": [
+            "src/games/game-host/**"
+          ]
+        }
+      }
     ]
   },
   "pass-gate-not-equal": {
-    "expect": [", 0 problems", "RESULT: PASS"],
+    "expect": [
+      ", 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
       {
         "replace": {
@@ -1553,7 +1734,10 @@
     ]
   },
   "pass-gate-polarity-elsewhere": {
-    "expect": [", 0 problems", "RESULT: PASS"],
+    "expect": [
+      ", 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
       {
         "$comment": "An inverted gate ships test-only code to the store. app-variants-and-environment's inclusion-gate owns the literal comparison and its polarity (DECISIONS: one rule, one owner), so check-boundaries checks only that the gate has a condition.",
@@ -1566,7 +1750,10 @@
     ]
   },
   "pass-inclusion-flag": {
-    "expect": [", 0 problems", "RESULT: PASS"],
+    "expect": [
+      ", 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
       {
         "write": {
@@ -1581,13 +1768,19 @@
       {
         "write": {
           "file": "src/ui/storybook-root.tsx",
-          "lines": ["// The Storybook UI root (a stub here).", "export const STORYBOOK_TITLE = 'Storybook';"]
+          "lines": [
+            "// The Storybook UI root (a stub here).",
+            "export const STORYBOOK_TITLE = 'Storybook';"
+          ]
         }
       }
     ]
   },
   "pass-local-module": {
-    "expect": [", 0 problems", "RESULT: PASS"],
+    "expect": [
+      ", 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
       {
         "write": {
@@ -1698,18 +1891,34 @@
       {
         "json": {
           "file": "tsconfig.json",
-          "path": ["compilerOptions", "paths", "@/modules/*"],
-          "value": ["./modules/*"]
+          "path": [
+            "compilerOptions",
+            "paths",
+            "@/modules/*"
+          ],
+          "value": [
+            "./modules/*"
+          ]
         }
       }
     ]
   },
   "pass-no-contract": {
-    "expect": ["note: no contracts/architecture.json; the default zones, vendor SDKs and bans apply", "RESULT: PASS"],
-    "ops": [{ "delete": "contracts/architecture.json" }]
+    "expect": [
+      "note: no contracts/architecture.json; the default zones, vendor SDKs and bans apply",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "delete": "contracts/architecture.json"
+      }
+    ]
   },
   "pass-platform-adapter": {
-    "expect": [", 0 problems", "RESULT: PASS"],
+    "expect": [
+      ", 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
       {
         "write": {
@@ -1773,7 +1982,9 @@
       {
         "write": {
           "file": "src/services/haptics/haptics-port.ts",
-          "lines": ["export type HapticsPort = { readonly tap: () => void };"]
+          "lines": [
+            "export type HapticsPort = { readonly tap: () => void };"
+          ]
         }
       },
       {
@@ -1786,7 +1997,10 @@
     ]
   },
   "pass-platform-type-import": {
-    "expect": [", 0 problems", "RESULT: PASS"],
+    "expect": [
+      ", 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
       {
         "write": {
@@ -1849,7 +2063,9 @@
       {
         "write": {
           "file": "src/services/haptics/haptics-port.ts",
-          "lines": ["export type HapticsPort = { readonly tap: () => void };"]
+          "lines": [
+            "export type HapticsPort = { readonly tap: () => void };"
+          ]
         }
       },
       {
@@ -1862,7 +2078,10 @@
     ]
   },
   "pass-polyfill-builtin": {
-    "expect": [", 0 problems", "RESULT: PASS"],
+    "expect": [
+      ", 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
       {
         "write": {
@@ -1875,11 +2094,23 @@
           ]
         }
       },
-      { "json": { "file": "package.json", "path": ["dependencies", "buffer"], "value": "6.0.3" } }
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "buffer"
+          ],
+          "value": "6.0.3"
+        }
+      }
     ]
   },
   "pass-portless-sdk": {
-    "expect": [", 0 problems", "RESULT: PASS"],
+    "expect": [
+      ", 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
       {
         "write": {
@@ -1902,16 +2133,25 @@
       {
         "json": {
           "file": "contracts/architecture.json",
-          "path": ["portlessSdks"],
-          "value": { "react-native-svg": "draws vector icons; no side effect" }
+          "path": [
+            "portlessSdks"
+          ],
+          "value": {
+            "react-native-svg": "draws vector icons; no side effect"
+          }
         }
       }
     ]
   },
   "pass-react-navigation": {
-    "expect": [", 0 problems", "RESULT: PASS"],
+    "expect": [
+      ", 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
-      { "delete": "src/app" },
+      {
+        "delete": "src/app"
+      },
       {
         "write": {
           "file": "index.ts",
@@ -1948,21 +2188,63 @@
           ]
         }
       },
-      { "json": { "file": "package.json", "path": ["dependencies", "expo-router"], "delete": true } },
-      { "json": { "file": "package.json", "path": ["dependencies", "@react-navigation/native"], "value": "7.1.28" } },
-      { "json": { "file": "package.json", "path": ["main"], "value": "index.ts" } },
-      { "json": { "file": "contracts/architecture.json", "path": ["srcFolders"], "value": ["navigation"] } },
       {
         "json": {
-          "file": "contracts/architecture.json",
-          "path": ["compositionRoot"],
-          "value": ["src/navigation/app.tsx"]
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "expo-router"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "@react-navigation/native"
+          ],
+          "value": "7.1.28"
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "main"
+          ],
+          "value": "index.ts"
         }
       },
       {
         "json": {
           "file": "contracts/architecture.json",
-          "path": ["allowedImports"],
+          "path": [
+            "srcFolders"
+          ],
+          "value": [
+            "navigation"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/architecture.json",
+          "path": [
+            "compositionRoot"
+          ],
+          "value": [
+            "src/navigation/app.tsx"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/architecture.json",
+          "path": [
+            "allowedImports"
+          ],
           "value": [
             {
               "from": "src/navigation/**",
@@ -1975,14 +2257,20 @@
       {
         "json": {
           "file": "contracts/architecture.json",
-          "path": ["portlessSdks", "@react-navigation/native"],
+          "path": [
+            "portlessSdks",
+            "@react-navigation/native"
+          ],
           "value": "navigation: the navigator and its hooks"
         }
       }
     ]
   },
   "pass-route-hooks": {
-    "expect": [", 0 problems", "RESULT: PASS"],
+    "expect": [
+      ", 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
       {
         "write": {
@@ -2007,7 +2295,10 @@
     ]
   },
   "pass-route-test-in-feature": {
-    "expect": [", 0 problems", "RESULT: PASS"],
+    "expect": [
+      ", 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
       {
         "write": {
@@ -2058,7 +2349,10 @@
     ]
   },
   "pass-test-only-folder-route": {
-    "expect": [", 0 problems", "RESULT: PASS"],
+    "expect": [
+      ", 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
       {
         "write": {
@@ -2089,12 +2383,23 @@
         }
       },
       {
-        "json": { "file": "contracts/architecture.json", "path": ["testOnlyFolders"], "value": ["src/features/debug/"] }
+        "json": {
+          "file": "contracts/architecture.json",
+          "path": [
+            "testOnlyFolders"
+          ],
+          "value": [
+            "src/features/debug/"
+          ]
+        }
       }
     ]
   },
   "pass-thin-routes": {
-    "expect": [", 0 problems", "RESULT: PASS"],
+    "expect": [
+      ", 0 problems",
+      "RESULT: PASS"
+    ],
     "ops": [
       {
         "write": {
@@ -2111,7 +2416,98 @@
       {
         "write": {
           "file": "src/app/lists/index.tsx",
-          "lines": ["export { TasksScreen as default } from '@/features/tasks/tasks-screen';"]
+          "lines": [
+            "export { TasksScreen as default } from '@/features/tasks/tasks-screen';"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-policy-banned-scoped": {
+    "expect": [
+      "src/features/tasks/task-sync.ts:1 [banned-package] imports firebase: the app talks to Firebase through @react-native-firebase/*",
+      "test/tasks/task-fixtures.test.ts:1 [banned-package] imports firebase",
+      "only test/rules/** may import it",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "$comment": "the JS SDK is kept out of the app (doNotAdd scoped to where: app) and imported only by the rules tests (allowIn), which firestore-rules-and-emulator-tests puts under test/rules/",
+        "write": {
+          "file": "contracts/dependency-policy.json",
+          "lines": [
+            "{",
+            "  \"doNotAdd\": {",
+            "    \"firebase\": {",
+            "      \"reason\": \"the app talks to Firebase through @react-native-firebase/*; the JS SDK is a second client with its own cache\",",
+            "      \"where\": \"app\",",
+            "      \"allowIn\": [\"test/rules/**\"]",
+            "    }",
+            "  }",
+            "}"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "devDependencies",
+            "firebase"
+          ],
+          "value": "13.0.0"
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "devDependencies",
+            "@firebase/rules-unit-testing"
+          ],
+          "value": "6.0.0"
+        }
+      },
+      {
+        "write": {
+          "file": "test/rules/firestore.rules.test.ts",
+          "lines": [
+            "import { assertFails, initializeTestEnvironment } from '@firebase/rules-unit-testing';",
+            "import { doc, getDoc } from 'firebase/firestore';",
+            "",
+            "describe('tasks/{taskId}', () => {",
+            "  it('denies a stranger', async () => {",
+            "    const env = await initializeTestEnvironment({ projectId: 'demo-tasks' });",
+            "    await assertFails(getDoc(doc(env.unauthenticatedContext().firestore(), 'tasks/t1')));",
+            "  });",
+            "});"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/features/tasks/task-sync.ts",
+          "lines": [
+            "import { getFirestore } from 'firebase/firestore';",
+            "",
+            "export function taskStore(): unknown {",
+            "  return getFirestore();",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "test/tasks/task-fixtures.test.ts",
+          "lines": [
+            "import { Timestamp } from 'firebase/firestore';",
+            "",
+            "describe('fixtures', () => {",
+            "  it('builds a timestamp', () => {",
+            "    expect(Timestamp.fromMillis(0).seconds).toBe(0);",
+            "  });",
+            "});"
+          ]
         }
       }
     ]

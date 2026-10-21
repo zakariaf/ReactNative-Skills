@@ -1,0 +1,9 @@
+{
+  "$comment": "Installed and vendored skills plant findings on purpose; the checker must stay silent about them. The vendored kit sits inside the tests folder and is marked as a skill by a SKILL.md written at assembly time.",
+  "ops": [
+    { "write": { "file": "test/rules/vendor/rules-kit/SKILL.md", "lines": ["---", "name: rules-kit", "description: Checks a vendored kit. Use when testing. Not for apps (none).", "---"] } },
+    { "write": { "file": "test/rules/vendor/rules-kit/planted.rules.test.ts", "lines": ["// A vendored skill's fixture: a real project id the scan must never read.", "export const config = { projectId: 'tasks-prod' };"] } },
+    { "write": { "file": ".agents/skills/rules-kit/test/rules/planted.rules.test.ts", "lines": ["export const config = { projectId: 'tasks-prod' };"] } },
+    { "write": { "file": "skills/rules-kit/firestore.rules", "lines": ["rules_version = '2';", "service cloud.firestore { match /databases/{database}/documents { match /{document=**} { allow read, write: if true; } } }"] } }
+  ]
+}

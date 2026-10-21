@@ -9,6 +9,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join, posix } from 'node:path';
 
 import { createReporter, lineOf, maskComments, matchGlob, parseArgs, requireDir, resolveAlias, resolveLayout, run, toPosix, walkRepo } from './check-lib.mjs';
+import { forEachExpoApp } from './lib/expo-apps.mjs';
 import { readArtContract } from './lib/art-contract.mjs';
 import { enableAppImports, errorText } from './lib/app-modules.mjs';
 import { compareIconCoverage } from './lib/icon-coverage.mjs';
@@ -52,7 +53,8 @@ const SPEC = {
     'Which icons point along the reading direction is rtl-and-direction\'s rule (directional-icons).',
     'contracts/app-art.json keys read: icons.allowImages (globs of permitted raster images, e.g. photos),',
     'icons.allowPackages (icon packages the app chose on purpose). Layout keys: srcDir, uiDir, contractsDir.',
-    'When multi-package, run it once per app folder. Folders holding a SKILL.md are never scanned.',
+    'In a workspace repo (package.json "workspaces") whose root is no app, each Expo app workspace (apps/mobile) is',
+    'checked as an app from the repo root (or pass the app folder). Folders holding a SKILL.md are never scanned.',
   ].join('\n'),
 };
 
@@ -303,18 +305,24 @@ function checkSources(report, root, { layout, contract }) {
   return files.length;
 }
 
-run(async () => {
-  const { options, positionals } = parseArgs(process.argv.slice(2), SPEC);
-  const root = requireDir(positionals[0] ?? '.', 'app root');
+/** One Expo app: its own folder is the root its source, contract and icon set are read from. */
+async function checkApp(root, options, report) {
   const layout = resolveLayout(root);
   const srcDir = layout.srcDir;
   requireDir(join(root, srcDir), 'app source folder');
   const contract = readArtContract(root, layout.contractsDir, options.contract);
   const setFile = toPosix(options['icon-set'] ?? posix.join(layout.uiDir, 'icons', 'icon-paths.ts'));
   const layersFile = toPosix(options.layers ?? 'design/icon-layers.json');
-  const report = createReporter({ name: 'check-icons', json: options.json });
   const sets = await checkIconSet(report, root, { setFile, layersFile });
   const files = checkSources(report, root, { layout, contract });
-  return report.finish({ checked: files + sets, unit: 'source files and icon sets' });
-});
+  return { checked: files + sets };
+}
 
+run(async () => {
+  const { options, positionals } = parseArgs(process.argv.slice(2), SPEC);
+  const root = requireDir(positionals[0] ?? '.', 'app root');
+  const report = createReporter({ name: 'check-icons', json: options.json });
+  const result = await forEachExpoApp(root, report, (appRoot, appReport) => checkApp(appRoot, options, appReport));
+  if (result.notApplicable !== null) return report.notApplicable(result.notApplicable);
+  return report.finish({ checked: result.checked, unit: 'source files and icon sets' });
+});

@@ -1,0 +1,3 @@
+The assembled base (tests/bases/app + every template of this skill at the path its first line names,
+placeholders filled) passes every rule, while SUITE.json plants each bug under .agents/skills/,
+skills/ and a vendored folder holding a SKILL.md, where the scan must stay silent.

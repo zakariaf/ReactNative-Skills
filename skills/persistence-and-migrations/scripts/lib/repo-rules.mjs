@@ -13,6 +13,20 @@ export const SECOND_ENGINES = new Map([
   ['@op-engineering/op-sqlite', 'a second SQLite binding opens the file behind the SqlDriver port'],
   ['react-native-quick-sqlite', 'a second SQLite binding opens the file behind the SqlDriver port'],
 ]);
+/**
+ * Synced stores: cloud databases whose SDK keeps its own offline cache on the device. Each is a second
+ * engine for app data unless contracts/persistence.json declares it as the app's one synced store
+ * (`syncedStore: { package, adapterDir }`), and then it is imported only inside that adapter folder.
+ */
+export const SYNCED_STORES = new Map([
+  ['@react-native-firebase/firestore', 'React Native Firebase Firestore keeps its own native offline cache'],
+  ['@react-native-firebase/database', 'React Native Firebase Realtime Database keeps its own native offline cache'],
+  ['firebase/firestore', 'the Firebase JS SDK Firestore keeps its own cache (memory-only on React Native)'],
+  ['firebase/database', 'the Firebase JS SDK Realtime Database keeps its own cache'],
+  ['@powersync/react-native', 'PowerSync keeps its own synced SQLite database'],
+]);
+/** The package names (package.json keys) of the synced stores, for the NOT APPLICABLE test. */
+export const SYNCED_STORE_PACKAGES = ['@react-native-firebase/firestore', '@react-native-firebase/database', '@powersync/react-native'];
 export const KEY_VALUE_STORES = ['expo-sqlite/kv-store', 'react-native-mmkv'];
 /**
  * `import 'expo-sqlite/localStorage/install'` puts kv-store's default instance on the global
@@ -60,7 +74,42 @@ function checkSqliteImport(ctx, src, entry) {
   ctx.add({ file: rel, line: entry.line, rule: 'sqlite-outside-data', message: `imports ${entry.spec} outside ${ctx.dataDir}/`, fix: `Only ${ctx.dataDir}/ (the drivers, repositories and migrations) talks to SQLite; everything else calls a repository or the document service.` });
 }
 
+/** true when `spec` is `pkg` or one of its subpaths (`firebase/firestore/lite` for `firebase/firestore`). */
+const isPackageSpec = (spec, pkg) => spec === pkg || spec.startsWith(`${pkg}/`);
+
+/** The synced store a spec names: the declared one first, then the known list. */
+function syncedStoreOf(ctx, spec) {
+  const declared = ctx.contract.syncedStore?.package;
+  if (typeof declared === 'string' && isPackageSpec(spec, declared)) return { pkg: declared, declared: true };
+  const known = [...SYNCED_STORES.keys()].find((pkg) => isPackageSpec(spec, pkg));
+  return known === undefined ? null : { pkg: known, declared: false };
+}
+
+/**
+ * The synced-store profile (contracts/persistence.json syncedStore): the declared SDK only inside its
+ * adapter folder (tests, root mocks and scripts may hold it to test it); any other synced store is a
+ * second engine.
+ */
+function checkSyncedStoreImport(ctx, src, entry) {
+  const store = syncedStoreOf(ctx, entry.spec);
+  if (store === null) return false;
+  if (store.declared) {
+    const adapterDir = ctx.contract.syncedStore.adapterDir;
+    if (isTestSide(ctx, src.rel) || under(src.rel, adapterDir)) return true;
+    ctx.add({ file: src.rel, line: entry.line, rule: 'synced-store-outside-adapter', message: `imports ${entry.spec} outside the synced store's adapter folder ${adapterDir}/`, fix: `Only ${adapterDir}/ talks to ${store.pkg} (behind a port the composition root creates); features, stores and hooks call the port.` });
+    return true;
+  }
+  if ((ctx.contract.legacyImports ?? []).includes(src.rel)) return true;
+  const declared = ctx.contract.syncedStore?.package;
+  const message = declared === undefined
+    ? `imports ${entry.spec}: ${SYNCED_STORES.get(store.pkg)}, a second engine unless contracts/persistence.json declares it as syncedStore`
+    : `imports ${entry.spec}, but contracts/persistence.json names ${declared} as the one synced store`;
+  ctx.add({ file: src.rel, line: entry.line, rule: 'second-persistence', message, fix: declared === undefined ? 'Keep app data in the app database, or declare the synced store on purpose: "syncedStore": { "package": "<sdk>", "adapterDir": "<dataDir>/<store>/" } in contracts/persistence.json, and import it only there.' : 'One synced store for app data: use the one the contract names.' });
+  return true;
+}
+
 function checkEngineImport(ctx, src, entry) {
+  if (checkSyncedStoreImport(ctx, src, entry)) return;
   const reason = SECOND_ENGINES.get(entry.spec);
   const keyValue = ctx.contract.keyValueStore ?? ctx.keyValueStore ?? 'expo-sqlite/kv-store';
   // contracts/persistence.json legacyImports: the one-time importer of an older store, for the releases it lives.

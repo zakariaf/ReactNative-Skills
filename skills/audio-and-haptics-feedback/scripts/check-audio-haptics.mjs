@@ -9,6 +9,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { createReporter, fail, lineOf, maskComments, parseArgs, parseJsonc, readWorkspaces, requireDir, resolveLayout, run, walkRepo } from './check-lib.mjs';
+import { forEachExpoApp } from './lib/expo-apps.mjs';
 import { LiteralError, findConstInitializer, parseObjectEntries } from './lib/ts-literal.mjs';
 
 const SPEC = {
@@ -17,7 +18,7 @@ const SPEC = {
   usage: '[repo-root] [options]',
   options: {
     contract: { type: 'string', value: 'file', help: 'The audio feedback contract (default: rn-skills.config.json "audioFeedbackContract", else contracts/audio-feedback.json; missing = the defaults)' },
-    'src-dir': { type: 'string', value: 'dir', help: 'The source folder (default: from resolveLayout, src); when multi-package, the app workspace\'s src' },
+    'src-dir': { type: 'string', value: 'dir', help: 'The source folder inside the app (default: from resolveLayout, src); a workspace repo checks each Expo app workspace from the root' },
     json: { type: 'boolean', help: 'Also print the problems as one JSON line' },
   },
   positionals: { min: 0, max: 1 },
@@ -252,9 +253,9 @@ function manifestsOf(root) {
   return list.filter((entry) => existsSync(join(root, entry.rel)));
 }
 
-function checkPackages(root, contract, parts, report) {
+function checkPackages(root, contract, parts, report, manifests = manifestsOf(root)) {
   const expected = contract.audioApiVersion;
-  for (const { rel, mustList } of manifestsOf(root)) {
+  for (const { rel, mustList } of manifests) {
     const text = readRel(root, rel);
     let pkg;
     try {
@@ -514,7 +515,7 @@ function checkMicString(rel, raw, report) {
   });
 }
 
-function checkAssets(root, layout, contract, parts, report) {
+function checkAssets(root, layout, contract, parts, report, repo = { root, report }) {
   const listed = new Set([...contract.bundledSounds, ...contract.otherAudio].map((entry) => entry.file));
   for (const rel of walkRepo(root, { ignore: ['reports/**', `${layout.testDir}/**`, 'coverage/**'] })) {
     if (AUDIO_FILE.test(rel) && !listed.has(rel)) report.problem({ file: rel, line: 0, rule: 'file-audio', message: 'ships a recorded audio file the contract does not list', fix: `List it in ${contract.rel} with its licence and source: otherAudio (purpose "notification" or "media") for a notification sound or a feature's media, bundledSounds for a feedback sound the adapter decodes. For feedback, a synthesized SoundRecipe needs no file at all.` });
@@ -526,8 +527,9 @@ function checkAssets(root, layout, contract, parts, report) {
     if (!existsSync(join(root, entry.file))) report.problem({ file: contract.rel, line: 0, rule: 'file-audio', message: `listed audio file ${entry.file} does not exist`, fix: 'Add the file or remove the entry.' });
   }
   if (!parts.audio) return;
-  const ignore = readRel(root, '.gitignore');
-  if (ignore === null || !/^\/?reports(\/(\*\*\/?|sfx\/?)?)?\s*$/m.test(ignore)) report.problem({ file: '.gitignore', line: 0, rule: 'preview-ignored', message: 'the root .gitignore does not ignore reports/ (the WAV previews)', fix: 'Add the line reports/ to the root .gitignore.' });
+  // In a workspace repo the repo root's .gitignore counts too: git applies it to the app folder.
+  const ignores = [readRel(root, '.gitignore'), repo.root === root ? null : readRel(repo.root, '.gitignore')];
+  if (!ignores.some((ignore) => ignore !== null && /^\/?reports(\/(\*\*\/?|sfx\/?)?)?\s*$/m.test(ignore))) repo.report.problem({ file: '.gitignore', line: 0, rule: 'preview-ignored', message: 'the root .gitignore does not ignore reports/ (the WAV previews)', fix: 'Add the line reports/ to the root .gitignore.' });
 }
 
 function checkCallSites(ctx, report) {
@@ -708,12 +710,13 @@ function partsOf(root, layout, P, files) {
   };
 }
 
-run(async () => {
-  const { options, positionals } = parseArgs(process.argv.slice(2), SPEC);
-  const root = requireDir(positionals[0] ?? '.', 'repo root');
+/** One Expo app: its own folder is the root its source, contract, config and manifest are read from. */
+function checkApp(root, options, report, repo) {
   if (!existsSync(join(root, 'package.json'))) fail(`nothing to check: ${root} has no package.json, so it is not an app repo root`, 'Run from the app repo root, or pass it as the first argument.');
-  const layout = resolveLayout(root, { srcDir: options['src-dir'] });
-  const report = createReporter({ name: SPEC.name, json: options.json });
+  // --src-dir is inside the app folder; the repo-root spelling of a workspace (apps/mobile/src) still works.
+  const given = options['src-dir'];
+  const srcDir = given !== undefined && repo.dir !== '.' && given.startsWith(`${repo.dir}/`) ? given.slice(repo.dir.length + 1) : given;
+  const layout = resolveLayout(root, { srcDir });
   const P = pathsOf(layout);
   const contract = loadContract(root, layout, options.contract);
   const files = walkRepo(root, { include: ['*.ts', '*.tsx', '*.js', '*.jsx'] })
@@ -723,7 +726,7 @@ run(async () => {
       return { rel, raw, source: maskComments(raw), isTest: TEST_FILE.test(rel) };
     });
   const parts = partsOf(root, layout, P, files);
-  if (!parts.audio && !parts.haptics) return report.notApplicable(`no source file imports react-native-audio-api, expo-haptics or Vibration, and ${P.audio} and ${P.haptics} do not exist`);
+  if (!parts.audio && !parts.haptics) return { notApplicable: `no source file imports react-native-audio-api, expo-haptics or Vibration, and ${P.audio} and ${P.haptics} do not exist` };
   if (!parts.audio) report.note(`audio rules not applicable: no source file imports react-native-audio-api, no audio plugin, no ${P.audio}`);
   if (!parts.haptics) report.note(`haptics rules not applicable: no source file imports expo-haptics or Vibration, no ${P.haptics}`);
   const ctx = { root, layout, P, contract, files, parts };
@@ -734,8 +737,38 @@ run(async () => {
   checkPolicies(root, P, parts, report);
   if (parts.haptics) checkHaptics(root, P, report);
   checkConfig(root, layout, P, parts, report);
-  checkAssets(root, layout, contract, parts, report);
+  checkAssets(root, layout, contract, parts, report, repo);
   checkCallSites(ctx, report);
   checkUiFeedback(ctx, report);
-  return report.finish({ checked: files.length, unit: 'source files' });
+  repo.apps.push({ contract, parts });
+  return { checked: files.length };
+}
+
+/**
+ * In a workspace repo run from its root, the workspaces that are no app (a shared feedback package)
+ * still keep the native module's pin: their manifests are checked once, from the root.
+ */
+function checkPackageManifests(root, appDirs, repo, report) {
+  const app = repo.apps.find((entry) => entry.parts.audio) ?? repo.apps[0];
+  if (app === undefined || appDirs.includes('.')) return;
+  const manifests = readWorkspaces(root)
+    .filter((workspace) => !appDirs.includes(workspace.dir))
+    .map((workspace) => ({ rel: `${workspace.dir}/package.json`, mustList: false }));
+  checkPackages(root, app.contract, app.parts, report, manifests);
+}
+
+run(async () => {
+  const { options, positionals } = parseArgs(process.argv.slice(2), SPEC);
+  const root = requireDir(positionals[0] ?? '.', 'repo root');
+  if (!existsSync(join(root, 'package.json'))) fail(`nothing to check: ${root} has no package.json, so it is not an app repo root`, 'Run from the app repo root, or pass it as the first argument.');
+  const report = createReporter({ name: SPEC.name, json: options.json });
+  const repo = { root, report, apps: [] };
+  const appDirs = [];
+  const result = await forEachExpoApp(root, report, (appRoot, appReport, dir) => {
+    appDirs.push(dir);
+    return checkApp(appRoot, options, appReport, { ...repo, dir });
+  });
+  checkPackageManifests(root, appDirs, repo, report);
+  if (result.notApplicable !== null) return report.notApplicable(result.notApplicable);
+  return report.finish({ checked: result.checked, unit: 'source files' });
 });

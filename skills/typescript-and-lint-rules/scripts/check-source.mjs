@@ -8,7 +8,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { createReporter, fail, matchGlob, parseArgs, requireDir, resolveLayout, run, walkRepo } from './check-lib.mjs';
+import { backendWorkspaces, createReporter, fail, matchGlob, parseArgs, parseJsonc, requireDir, resolveLayout, run, walkRepo } from './check-lib.mjs';
 import { appFiles, appTops, coversAppCode, nativeScope, normalizeIgnore } from './lib/app-scope.mjs';
 import { codeLineCount, functionsOf, importsOf, paramListsOf, resolveImport, scanSource } from './lib/source-scan.mjs';
 
@@ -51,6 +51,10 @@ const SPEC = {
     '                                                                                       [NODE_IMPORT_EXTENSION, PACKAGE_IMPORT_EXTENSION]',
     '  node-world-import       app code (src/) imports a Node built-in, app.config.ts, plugins/ or scripts/,',
     '                          even with import type                                        [two programs, NODE_BUILTINS]',
+    '                          When multi-package, a Node-world workspace is Node-run code, not app code: a Node',
+    '                          backend (outside packages/, no Expo app: functions/) and every workspace',
+    '                          contracts/architecture.json declares with "world": "node" (world "app" keeps one in the',
+    '                          app world); app code that imports one of their files still fails',
     '  sync-handler            an async handleX function, an async inline on* handler, or handleSubmit(...)',
     '                          passed straight to an on* prop                               [asyncHandler]',
     '  handler-body            an inline on* arrow or a handleX arrow with an expression body, outside tests',
@@ -116,14 +120,38 @@ function preExistingIgnores(root, layout, report) {
   return honoured;
 }
 
+/**
+ * The workspaces of the Node world: a Node backend (a workspace outside packages/ that is no Expo app,
+ * such as functions/) and every workspace contracts/architecture.json declares with world "node"; a
+ * contract entry with world "app" keeps its workspace in the app world.
+ */
+function nodeWorkspaceDirs(root, layout) {
+  const dirs = new Set(backendWorkspaces(root).map((workspace) => workspace.dir));
+  const file = join(root, layout.contractsDir, 'architecture.json');
+  if (!existsSync(file)) return dirs;
+  let contract = null;
+  try {
+    contract = parseJsonc(readFileSync(file, 'utf8'));
+  } catch {
+    return dirs; // A broken contract is architecture-and-boundaries' problem; the detected backends stay.
+  }
+  for (const entry of Array.isArray(contract?.workspaces) ? contract.workspaces : []) {
+    if (typeof entry?.name !== 'string') continue;
+    const dir = typeof entry.dir === 'string' ? entry.dir : `packages/${entry.name}`;
+    if (entry.world === 'node') dirs.add(dir);
+    else if (entry.world === 'app') dirs.delete(dir);
+  }
+  return dirs;
+}
+
 /** Which repo paths play which part, from the layout (and each workspace when multi-package). */
-function zonesOf(layout) {
-  const apps = [{ dir: '', layout }, ...layout.workspaces.map((workspace) => ({ dir: `${workspace.dir}/`, layout: workspace.layout }))];
+function zonesOf(layout, nodeDirs = new Set()) {
+  const apps = [{ dir: '', layout }, ...layout.workspaces.filter((workspace) => !nodeDirs.has(workspace.dir)).map((workspace) => ({ dir: `${workspace.dir}/`, layout: workspace.layout }))];
   const configGlobs = layout.config.tsdocGlobs;
   return {
     app: apps.map((app) => `${app.layout.srcDir}/**`),
     routes: apps.map((app) => `${app.layout.routesDir}/**`),
-    node: apps.flatMap((app) => [`${app.dir}app.config.ts`, `${app.dir}plugins/**`, `${app.layout.scriptsDir}/**`]),
+    node: [...apps.flatMap((app) => [`${app.dir}app.config.ts`, `${app.dir}plugins/**`, `${app.layout.scriptsDir}/**`]), ...[...nodeDirs].map((dir) => `${dir}/**`)],
     tests: ['**/*.test.ts', '**/*.test.tsx', ...apps.flatMap((app) => [`${app.layout.testDir}/**`, `${app.layout.mocksDir}/**`, `${app.dir}jest.setup.ts`])],
     defaultExport: apps.flatMap((app) => [`${app.layout.routesDir}/**`, `${app.dir}app.config.ts`, `${app.dir}plugins/**`, `${app.layout.mocksDir}/**`, `${app.dir}jest.setup.ts`]),
     tsdoc: Array.isArray(configGlobs) ? configGlobs.map(String) : apps.flatMap((app) => [`${app.layout.coreDir}/**/*.ts`, `${app.layout.servicesDir}/*/*-port.ts`]),
@@ -297,7 +325,7 @@ run(async () => {
   const configured = options['import-extensions'] ?? layout.config.importExtensions;
   const extensionsMode = configured ?? (layout.mode === 'monorepo' ? 'all' : 'node');
   if (!['node', 'all'].includes(extensionsMode)) fail(`import extensions "${extensionsMode}" is not node or all`, 'Pass --import-extensions node (single app) or all (TypeScript-source workspace packages).');
-  const zones = zonesOf(layout);
+  const zones = zonesOf(layout, layout.mode === 'monorepo' ? nodeWorkspaceDirs(root, layout) : new Set());
   const report = createReporter({ name: 'check-source', json: options.json });
   const files = walkRepo(root, { include: ['*.ts', '*.tsx'], ignore: [...EXTRA_IGNORES, ...preExistingIgnores(root, layout, report)] });
   const context = { root, layout, extensionsMode, zones };

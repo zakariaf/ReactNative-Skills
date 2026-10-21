@@ -195,11 +195,26 @@ a template file it plans as neither is new demo content: add it to `LEFTOVERS` i
 For several apps that share code: npm workspaces `"workspaces": ["apps/*", "packages/*"]`, each app
 an Expo app in `apps/<app>` (its own `package.json`, `app.config.ts`, `metro.config.js`,
 `tsconfig.json`, `src/`, `assets/`), shared code in `packages/<name>` consumed as TypeScript source.
+A Node backend that deploys on its own (Cloud Functions in `functions/`, cloud-functions-backend) is
+one more workspace, listed by its folder (`"workspaces": ["apps/*", "packages/*", "functions"]`) and
+recorded in `contracts/architecture.json` as a Node-world package (architecture-and-boundaries, When
+multi-package).
 
 How to get there: bootstrap the single app first (every gate green), then move `app.config.ts`,
 `metro.config.js`, `src/` and `assets/` into `apps/<app>/`, give the app its own `package.json` with
 the runtime dependencies, and leave the root configs, `scripts/`, `contracts/` and the dev tools at
-the root. `scaffold-app.mjs` writes only the single-app form; run it inside `apps/<app>` for a second
+the root. **Rewrite the path header of every moved file in the same commit**: line 1 names the repo
+path (naming-conventions' `path-header`), so `// src/features/home/home-screen.tsx` becomes
+`// apps/<app>/src/features/home/home-screen.tsx`; `check-file-names.mjs` fails every stale one after
+the move, and a header that names the old path sends the next agent to a file that is not there. One
+command rewrites exactly the headers that name a moved file's old path (a `#!` line stays first):
+
+```sh
+node -e 'const fs=require("node:fs");const app=process.argv[1];for(const f of fs.globSync(app+"/**/*.{ts,tsx,js,mjs,cjs}")){if(f.includes("/node_modules/"))continue;const t=fs.readFileSync(f,"utf8");const old=f.slice(app.length+1);const n=t.replace(/^((?:#![^\n]*\n)?)\/\/ ([^\s:]+)/,(m,bang,path)=>path===old?bang+"// "+f:m);if(n!==t)fs.writeFileSync(f,n)}' apps/<app>
+```
+
+Then run `node <naming-conventions>/scripts/check-file-names.mjs .` (it reads `package.json`
+`workspaces`), and let Prettier and the tests run as usual. `scaffold-app.mjs` writes only the single-app form; run it inside `apps/<app>` for a second
 app's files and merge by hand. The rules that hold there, each checked by `check-skeleton.mjs` when
 `package.json` has `workspaces`:
 
@@ -230,6 +245,31 @@ app's files and merge by hand. The rules that hold there, each checked by `check
   specifier.
 - **Workspace links are `"*"`** (`app-manifest`), apps have no `"type"` (their `metro.config.js` is
   CommonJS), and `knip.json` sets `includeEntryExports: true` per shared package (its `exports` map
-  makes every file an entry, so a dead file is never reported otherwise; `knip-config`).
+  makes every file an entry, so a dead file is never reported otherwise; `knip-config`). A Node
+  backend's workspace is the exception: its entry exports every deployed function by design and
+  nothing in the repo imports them, so it leaves `includeEntryExports` off and names the file the
+  deploy build bundles, `"functions": { "entry": ["src/index.ts", "src/**/*.test.ts"], "project":
+  ["src/**/*.ts"] }` (with `includeEntryExports: true` knip reports each deployed function as an
+  unused export, verified with knip 6.38.0 on 2026-10-21; a folder-wide entry would hide every dead
+  export of the backend, `knip-config`).
 - Each app's generated native folders join `.gitignore` and `.prettierignore` (`apps/*/ios`,
   `apps/*/android`).
+- **Two root scripts take their workspace form** (`root-scripts`, from
+  `assets/package-scripts.multi-package.json`, quality-gates' list): `typecheck` runs the root program
+  and then `npm run -s typecheck --workspaces`, and `export:audit` is `cd <app-dir> && ` followed by the
+  single app's `expo export` command with `--output-dir <to-root>/dist-audit` (`<app-dir>` the Expo app
+  workspace, `apps/tasks`; `<to-root>` the way back up, two folders), so the export lands in the root
+  `dist-audit/` where `audit:licenses` reads its source maps. Every workspace keeps `"typecheck": "tsc
+  --noEmit -p tsconfig.json"` (`workspace-layout`, `app-manifest` for an app; without `--if-present` a
+  workspace that lacks it fails the root run). The single-app `export:audit` fails after the move: Metro, started at the
+  root, falls back to `expo/AppEntry` and cannot resolve its `App` import (verified on Expo SDK 57 on
+  2026-10-21; re-verify: `npm run -s export:audit && npm run -s audit:licenses`). `quality-gates.json`
+  `npmScripts` restates both in the same gate change.
+- **A Node backend workspace** is Node tooling: its `package.json` declares `"engines": { "node": ...
+  }`, so its program may list `node` types (`tsconfig-program`), and it may have no `exports` map, its
+  deploy bundle being `"main"` (`package-manifest`; nothing imports it). It is still private and in the
+  one scope (`@<org>/functions`). Every declared workspace folder is app code, so `functions/` needs no
+  `"layoutEntries"` entry and joins no ignore list, except its build output: the folder `"main"`
+  names (`functions/lib/`, which the deploy build writes) goes into ESLint's `globalIgnores`,
+  `.prettierignore` and `.gitignore` (typescript-and-lint-rules, When multi-package), and the build
+  stays there, never in a root `build/` folder (cloud-functions-backend, When multi-package).

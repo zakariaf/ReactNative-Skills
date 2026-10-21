@@ -145,6 +145,20 @@ export function declaredLayoutEntries(root) {
   }
 }
 
+/**
+ * The top-level folder of every npm workspace the root package.json declares ("apps" for "apps/*",
+ * "functions" for "functions"): a declared workspace is app code, never a pre-existing folder.
+ */
+export function workspaceTopFolders(root) {
+  try {
+    const declared = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).workspaces;
+    const globs = Array.isArray(declared) ? declared : Array.isArray(declared?.packages) ? declared.packages : [];
+    return [...new Set(globs.filter((glob) => typeof glob === 'string' && !glob.startsWith('!')).map((glob) => glob.replace(/^\.\//, '').split('/')[0]).filter((name) => name !== '' && !name.includes('*')))];
+  } catch {
+    return [];
+  }
+}
+
 /** True for a top-level name of the app layout (a name, or a *.d.ts file at the root). */
 export function isLayoutEntry(name, extra = []) {
   return LAYOUT_ENTRIES.includes(name) || extra.includes(name) || /\.d\.ts$/.test(name);
@@ -153,7 +167,7 @@ export function isLayoutEntry(name, extra = []) {
 /** Top-level entries that are not part of the app (hidden entries and fixture control files skipped). */
 export function preExistingEntries(root) {
   if (!existsSync(root)) return [];
-  const extra = declaredLayoutEntries(root);
+  const extra = [...declaredLayoutEntries(root), ...workspaceTopFolders(root)];
   return readdirSync(root, { withFileTypes: true })
     .filter((entry) => !entry.name.startsWith('.') && !isLayoutEntry(entry.name, extra) && !STRAY_CONFIGS.some((item) => item.path === entry.name) && entry.name !== 'EXPECT.txt' && entry.name !== 'ARGS.txt')
     .map((entry) => ({ name: entry.name, isDir: entry.isDirectory() }))

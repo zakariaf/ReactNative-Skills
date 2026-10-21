@@ -123,6 +123,7 @@ bad input (exit 2); a missing one is a `contract-missing` problem.
 | `text.tabularStyles` | roles or styles that must carry `isTabular: true` | `["number"]` |
 | `text.minTallLineHeight` | `{ styleName: minimum tall ratio }`, device-proven minimums | `{}` |
 | `fonts` | the font decision, always declared: `"system"` for the platform's font, or `{ dir, files: [{ file, family, sha256 }], licences: { family: file }, weightBy? }` (at least one file) for bundled fonts. A missing key, `null` or an empty `files` list is bad input, because none of them says which of the two the app chose | `"system"` in the template: nothing bundled, the file, pin, licence, plugin and `no-font-weight` rules off; an object turns every one of them on |
+| `lightOnly` | `{ "reason": "..." }`: the app has no dark appearance, and why (a design decision with its reason, revisited when a dark set exists). `color-scheme-config` then requires `userInterfaceStyle: 'light'` and `preference="light"` on every `AppThemeProvider` mount instead of `'automatic'`; a missing or blank reason is bad input (theme-in-react-native.md, "Light-only apps") | absent: light and dark follow the phone |
 | `fonts.weightBy` | `"family"` (a file and family per weight, never `fontWeight`) or `"fontWeight"` (Expo's object syntax, text-and-fonts.md) | `"family"` |
 | `rawValues.scan` | folders check-raw-values scans | `src` and the routes folder (`src/app`, or `app/` at the root) minus `src/core`, `src/data`, `src/api`, `src/stores`, `src/services`, `src/i18n`, `src/config` |
 | `rawValues.allowColors` | globs where colour literals may appear | `["<themeDir>/**"]` |
@@ -221,9 +222,23 @@ mockup, and a value changes only with its entry.
 
 ## When multi-package
 
-In an npm-workspaces monorepo (`apps/*`, `packages/*`) the design system usually lives in one
-package (`packages/ui/src/theme`) consumed by the apps as `@<org>/ui`. Point the checkers at it with
-`rn-skills.config.json` (`themeDir`, `uiDir`) or the contract's `files`, keep one token file and one
-contract per design system, and run the checkers once per app that bundles fonts (fonts and
-`app.config.ts` belong to the app). Package source imports then carry their extension, as the
-canonical ESLint config requires in multi-package mode.
+Run every script from the repo root, as in a single app. In a workspace repo (`package.json`
+`"workspaces"`) whose root is no app, each **Expo app workspace** (a workspace with an
+`app.config.*` or `app.json`; failing that, one that depends on `expo`) is checked as an app of its
+own: `apps/mobile/` is the root its `contracts/design-system.json`, `contracts/contrast.json`, token
+file, `src/`, `app.config.ts` and `package.json` are read from, so contract paths stay app-relative
+(`"tokens": "design/tokens.json"`), and every problem names the file from the repo root
+(`FAIL apps/mobile/app.config.ts:9 [color-scheme-config] ...`). The output starts with an `apps:`
+line naming the apps found. Passing the app folder (`check-design-system.mjs apps/mobile`) checks that
+app alone. `write-palette.mjs` writes into the one Expo app workspace (pass the app folder when the
+repo has several), names the repo path on line 1 (`// apps/mobile/src/theme/palette.ts`, the
+naming-conventions header rule) and writes its import with the extension
+(`'./theme-types.ts'`), as the canonical ESLint config requires in multi-package mode
+(typescript-and-lint-rules' check-source: `"importExtensions"` in `rn-skills.config.json`, else
+`all` in a workspace repo).
+
+When the design system lives in a package instead (`packages/ui/src/theme`, consumed by the apps as
+`@<org>/ui`), point the checkers at it with `rn-skills.config.json` (`themeDir`, `uiDir`) or the
+contract's `files`, keep one token file and one contract per design system, and run the checkers
+once per app that bundles fonts (fonts and `app.config.ts` belong to the app). Package source
+imports carry their extension, as the canonical ESLint config requires in multi-package mode.

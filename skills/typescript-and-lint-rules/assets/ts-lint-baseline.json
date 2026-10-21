@@ -277,8 +277,13 @@
       },
       {
         "id": "restricted-imports-helper",
-        "pattern": "paths:\\s*\\[\\.\\.\\.without\\(BANNED_PACKAGE_PATHS,\\s*\\.\\.\\.allow\\),\\s*\\.\\.\\.paths\\]",
+        "pattern": "const kept = without\\(BANNED_PACKAGE_PATHS,\\s*\\.\\.\\.allow\\);[\\s\\S]{0,300}?paths:\\s*\\[\\s*\\.\\.\\.kept\\.map\\(",
         "what": "restrictedImports() prepending BANNED_PACKAGE_PATHS to every no-restricted-imports list"
+      },
+      {
+        "id": "restricted-imports-subpaths",
+        "pattern": "\\.\\.\\.withSubpaths\\.map\\(subpathPattern\\)",
+        "what": "restrictedImports() banning the subpaths of every bannedWithSubpaths() entry it keeps (pkg/*)"
       },
       {
         "id": "vendor-sdk-list",
@@ -312,8 +317,8 @@
       },
       {
         "id": "banned-axios",
-        "pattern": "BANNED_PACKAGE_PATHS = \\[(?:(?!\\n\\];)[\\s\\S])*?banned\\(\\s*'axios',",
-        "what": "the axios ban in BANNED_PACKAGE_PATHS (network goes through the ApiClient)"
+        "pattern": "BANNED_PACKAGE_PATHS = \\[(?:(?!\\n\\];)[\\s\\S])*?banned(?:WithSubpaths)?\\(\\s*'axios',",
+        "what": "the axios ban in BANNED_PACKAGE_PATHS, with its subpaths (network goes through the ApiClient)"
       },
       {
         "id": "banned-async-storage",
@@ -1036,7 +1041,7 @@
       ]
     },
     "structure": {
-      "$comment": "check-configs compares eslint.config.mjs with the skill's own templates/eslint.config.mjs: every canonical block (files, ignores, rules, extends, options) present, unchanged and in order; every other block names exact files; every file group keeps its canonical globs; every other top-level const is verbatim. wideningGroups may gain any glob (their blocks add bans); the other file groups gain only exact file names. knobs are the consts an app fills (PRE_EXISTING, the multi-package switch and its import pattern). supersets may gain entries but never lose one (a new vendor SDK, a new banned package).",
+      "$comment": "check-configs compares eslint.config.mjs with the skill's own templates/eslint.config.mjs: every canonical block (files, ignores, rules, extends, options) present, unchanged and in order; every other block names exact files; every file group keeps its canonical globs; every other top-level const is verbatim. wideningGroups may gain any glob (their blocks add bans); the other file groups gain only exact file names. knobs are the consts an app fills (PRE_EXISTING, the multi-package switch and its import pattern). supersets may gain entries but never lose one (a new vendor SDK, a new banned package). ruleAlternatives are the other values a canonical rule may take, verbatim (normalized: no whitespace, no trailing commas), each with its reason.",
       "wideningGroups": [
         "ALL_TS",
         "RUNTIME",
@@ -1051,7 +1056,15 @@
       "supersets": [
         "VENDOR_SDK_PATHS",
         "BANNED_PACKAGE_PATHS"
-      ]
+      ],
+      "ruleAlternatives": {
+        "jest/expect-expect": [
+          {
+            "value": "['error',{assertFunctionNames:['expect','fc.assert','assertSucceeds','assertFails']}]",
+            "why": "the security-rules tests (firestore-rules-and-emulator-tests) assert with @firebase/rules-unit-testing's assertSucceeds and assertFails; only those two names count, a test that calls neither nor expect still fails"
+          }
+        ]
+      }
     }
   },
   "prettier": {

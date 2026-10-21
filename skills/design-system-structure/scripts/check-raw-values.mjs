@@ -10,6 +10,7 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { createReporter, fail, lineOf, matchGlob, parseArgs, requireDir, resolveLayout, run, walkRepo } from './check-lib.mjs';
+import { forEachExpoApp } from './lib/expo-apps.mjs';
 import { aliasesOf, closingIndex, constInitializer, importsOf, inRanges, masked, normalDir, rawLiteralsIn, readSource, specifierNames, splitTopLevel, styleSheetRanges, valueExpression, within } from './lib/app-source.mjs';
 import { SYSTEM_FONT, bundledFonts, modulePaths, otherStylingPackage, readContract, weightByOf } from './lib/design-contract.mjs';
 
@@ -60,6 +61,8 @@ const SPEC = {
     '  no-pill                  (policy maxRadius) a radius above the maximum, 50% or size / 2',
     '',
     'NOT APPLICABLE when package.json has another styling system and the theme folder does not exist.',
+    'In a workspace repo (package.json "workspaces") whose root is no app, each Expo app workspace (apps/mobile) is',
+    'scanned as an app with its own contract, and files show from the repo root.',
     'Example: node check-raw-values.mjs .',
   ].join('\n'),
 };
@@ -424,14 +427,12 @@ function checkFile(report, file, source, settings) {
   checkPolicy(report, file, text, settings);
 }
 
-run(async () => {
-  const { options, positionals } = parseArgs(process.argv.slice(2), SPEC);
-  const root = requireDir(positionals[0] ?? '.', 'app repo root');
+/** One Expo app: its own folder is the root its contract and layout are read from. */
+function checkApp(root, options, report) {
   const layout = resolveLayout(root);
-  const report = createReporter({ name: 'check-raw-values', json: options.json });
   if (!existsSync(join(root, layout.themeDir))) {
     const other = otherStylingPackage(root);
-    if (other) return report.notApplicable(`${other} is in package.json and ${layout.themeDir} does not exist: the app styles through ${other}`);
+    if (other) return { notApplicable: `${other} is in package.json and ${layout.themeDir} does not exist: the app styles through ${other}` };
   }
   const { contract } = readContract(root, layout, options.contract);
   const settings = settingsOf(layout, contract);
@@ -443,5 +444,14 @@ run(async () => {
   if (templateTheme.length > 0) report.note(`${templateTheme.join(' and ')}: the create-expo-app template's own theme. Migrate its values into the token file and delete it before fixing its colour literals one by one (references/tokens-and-contract.md, "Adopting the create-expo-app theme"); check-design-system fails on it (second-theme-system)`);
   const files = scanFiles(root, settings);
   for (const file of files) checkFile(report, file, readSource(join(root, file)) ?? '', settings);
-  return report.finish({ checked: files.length, unit: 'files' });
+  return { checked: files.length };
+}
+
+run(async () => {
+  const { options, positionals } = parseArgs(process.argv.slice(2), SPEC);
+  const root = requireDir(positionals[0] ?? '.', 'app repo root');
+  const report = createReporter({ name: 'check-raw-values', json: options.json });
+  const result = await forEachExpoApp(root, report, (appRoot, appReport) => checkApp(appRoot, options, appReport));
+  if (result.notApplicable !== null) return report.notApplicable(result.notApplicable);
+  return report.finish({ checked: result.checked, unit: 'files' });
 });

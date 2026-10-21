@@ -1,0 +1,225 @@
+{
+  "bad-synced-sdk-in-feature": {
+    "expect": [
+      "[synced-store-outside-adapter]",
+      "src/features/tasks/use-task-count.ts:2",
+      "imports @react-native-firebase/firestore outside the synced store's adapter folder src/data/firestore/",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-task-count.ts",
+          "content": "// src/features/tasks/use-task-count.ts\nimport { collection, getCountFromServer, getFirestore } from '@react-native-firebase/firestore';\n\n/** Planted: a feature reads Firestore directly instead of through the task store port. */\nexport async function taskCount(uid: string): Promise<number> {\n  const snapshot = await getCountFromServer(collection(getFirestore(), 'users', uid, 'tasks'));\n  return snapshot.data().count;\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-synced-sdk-in-services": {
+    "expect": [
+      "[synced-store-outside-adapter]",
+      "src/services/sync/firestore-sync-adapter.ts:2",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/sync/firestore-sync-adapter.ts",
+          "content": "// src/services/sync/firestore-sync-adapter.ts\nimport { getFirestore, waitForPendingWrites } from '@react-native-firebase/firestore';\n\n/** Planted: an adapter outside the declared adapter folder. */\nexport async function flushTasks(): Promise<void> {\n  await waitForPendingWrites(getFirestore());\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-synced-async-storage": {
+    "expect": [
+      "[second-persistence]",
+      "src/services/session/async-session-adapter.ts:2",
+      "@react-native-async-storage/async-storage",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/session/async-session-adapter.ts",
+          "content": "// src/services/session/async-session-adapter.ts\nimport AsyncStorage from '@react-native-async-storage/async-storage';\n\n/** Planted: device-only data in AsyncStorage next to the synced store and kv-store. */\nexport async function saveSession(json: string): Promise<void> {\n  await AsyncStorage.setItem('session', json);\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-synced-mmkv": {
+    "expect": [
+      "[second-persistence]",
+      "src/services/session/mmkv-session-adapter.ts:2",
+      "but contracts/persistence.json names expo-sqlite/kv-store",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/services/session/mmkv-session-adapter.ts",
+          "content": "// src/services/session/mmkv-session-adapter.ts\nimport { createMMKV } from 'react-native-mmkv';\n\n/** Planted: a second key-value store. */\nexport const session = createMMKV();\n"
+        }
+      }
+    ]
+  },
+  "bad-synced-kv-outside-adapter": {
+    "expect": [
+      "[sqlite-outside-data]",
+      "src/features/tasks/use-draft.ts:2",
+      "imports expo-sqlite/kv-store outside a preferences adapter",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-draft.ts",
+          "content": "// src/features/tasks/use-draft.ts\nimport Storage from 'expo-sqlite/kv-store';\n\n/** Planted: a feature reads the key-value store without its port. */\nexport function readDraft(): string | null {\n  return Storage.getItemSync('task-draft');\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-synced-second-store": {
+    "expect": [
+      "[second-persistence]",
+      "src/data/firestore/presence-adapter.ts:2",
+      "but contracts/persistence.json names @react-native-firebase/firestore as the one synced store",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/firestore/presence-adapter.ts",
+          "content": "// src/data/firestore/presence-adapter.ts\nimport { getDatabase, ref, set } from '@react-native-firebase/database';\n\n/** Planted: a second synced store (Realtime Database) beside Firestore. */\nexport async function markOnline(uid: string): Promise<void> {\n  await set(ref(getDatabase(), `presence/${uid}`), true);\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-synced-profile-missing": {
+    "expect": [
+      "[contract]",
+      "contracts/persistence.json",
+      "mode synced needs syncedStore"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/persistence.json",
+          "path": [
+            "syncedStore"
+          ],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "bad-synced-adapter-dir-too-wide": {
+    "expect": [
+      "[contract]",
+      "syncedStore.adapterDir: must be one folder for the adapters inside src/data/ or src/services/"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/persistence.json",
+          "path": [
+            "syncedStore",
+            "adapterDir"
+          ],
+          "value": "src/"
+        }
+      }
+    ]
+  },
+  "bad-synced-sqlite-database": {
+    "expect": [
+      "[contract]",
+      "src/data/firestore/local-cache.ts:2",
+      "imports expo-sqlite, but contracts/persistence.json says mode synced"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/firestore/local-cache.ts",
+          "content": "// src/data/firestore/local-cache.ts\nimport { openDatabaseSync } from 'expo-sqlite';\n\n/** Planted: an SQLite database under mode synced (no migrations, no fixtures checked). */\nexport const cache = openDatabaseSync('cache.db');\n"
+        }
+      }
+    ]
+  },
+  "pass-synced-tests-and-mocks": {
+    "expect": [
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/firestore/firestore-task-adapter.test.ts",
+          "content": "// src/data/firestore/firestore-task-adapter.test.ts\nimport { writeBatch } from '@react-native-firebase/firestore';\n\nimport { createFirestoreTaskAdapter } from './firestore-task-adapter';\n\ntest('a save is one batch', () => {\n  createFirestoreTaskAdapter('u1').saveTask({ id: 't1', listId: 'l1', title: 'Buy milk', done: false });\n  expect(writeBatch).toHaveBeenCalledTimes(1);\n});\n"
+        }
+      },
+      {
+        "write": {
+          "file": "test/firestore/seed-tasks.ts",
+          "content": "// test/firestore/seed-tasks.ts\nimport { doc, getFirestore, setDoc } from '@react-native-firebase/firestore';\n\nexport async function seedTask(uid: string): Promise<void> {\n  await setDoc(doc(getFirestore(), 'users', uid, 'tasks', 't1'), { title: 'Buy milk' });\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-synced-installed-skills-ignored": {
+    "expect": [
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": ".agents/skills/planted/SKILL.md",
+          "content": "---\nname: planted\ndescription: Plants findings that must stay silent.\n---\n"
+        }
+      },
+      {
+        "write": {
+          "file": ".agents/skills/planted/templates/src/features/tasks/use-tasks.ts",
+          "content": "import { getFirestore } from '@react-native-firebase/firestore';\nimport AsyncStorage from '@react-native-async-storage/async-storage';\nexport { AsyncStorage, getFirestore };\n"
+        }
+      },
+      {
+        "write": {
+          "file": "skills/other/SKILL.md",
+          "content": "---\nname: other\ndescription: Another installed skill.\n---\n"
+        }
+      },
+      {
+        "write": {
+          "file": "skills/other/src/features/x/sync.ts",
+          "content": "import { getDatabase } from '@react-native-firebase/database';\nexport { getDatabase };\n"
+        }
+      }
+    ]
+  },
+  "pass-synced-not-applicable": {
+    "expect": [
+      "NOT APPLICABLE: package.json lists no local persistence package"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "expo-sqlite"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "@react-native-firebase/firestore"
+          ],
+          "delete": true
+        }
+      }
+    ]
+  }
+}

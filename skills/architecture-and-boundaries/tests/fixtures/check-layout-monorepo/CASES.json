@@ -21,7 +21,9 @@
       {
         "write": {
           "file": "apps/mobile/src/helpers/clamp-count.ts",
-          "lines": ["export const clampCount = (count: number): number => Math.max(0, count);"]
+          "lines": [
+            "export const clampCount = (count: number): number => Math.max(0, count);"
+          ]
         }
       }
     ]
@@ -33,14 +35,115 @@
       "package.json:1 [native-deps] expo has different versions across apps"
     ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["overrides", "react-native"], "delete": true } },
-      { "json": { "file": "apps/tablet/package.json", "path": ["dependencies", "expo-haptics"], "delete": true } },
-      { "json": { "file": "apps/tablet/package.json", "path": ["dependencies", "expo"], "value": "~57.0.20" } }
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "overrides",
+            "react-native"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "apps/tablet/package.json",
+          "path": [
+            "dependencies",
+            "expo-haptics"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "apps/tablet/package.json",
+          "path": [
+            "dependencies",
+            "expo"
+          ],
+          "value": "~57.0.20"
+        }
+      }
     ]
   },
   "bad-no-contract": {
-    "expect": ["contracts/architecture.json [workspaces] a multi-package repo has no architecture contract"],
-    "ops": [{ "delete": "contracts/architecture.json" }]
+    "expect": [
+      "contracts/architecture.json [workspaces] a multi-package repo has no architecture contract"
+    ],
+    "ops": [
+      {
+        "delete": "contracts/architecture.json"
+      }
+    ]
+  },
+  "bad-node-backend-manifest": {
+    "expect": [
+      "functions/package.json:1 [manifest] no \"type\": \"module\""
+    ],
+    "extends": "pass-node-backend",
+    "ops": [
+      {
+        "json": {
+          "file": "functions/package.json",
+          "path": [
+            "type"
+          ],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "bad-node-backend-no-contract": {
+    "expect": [
+      "contracts/architecture.json [workspaces] a multi-package repo has no architecture contract",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "extends": "pass-node-backend",
+    "ops": [
+      {
+        "$comment": "without the contract the backend is still no app: no main, src/ layout or @/ alias asked of it",
+        "delete": "contracts/architecture.json"
+      }
+    ]
+  },
+  "bad-node-backend-not-a-workspace": {
+    "expect": [
+      "package.json:1 [workspaces] workspaces is [\"apps/*\",\"packages/*\"]",
+      "Set \"workspaces\": [\"apps/*\",\"packages/*\",\"functions\"]"
+    ],
+    "extends": "pass-node-backend",
+    "ops": [
+      {
+        "$comment": "the contract records the backend but npm never links it",
+        "json": {
+          "file": "package.json",
+          "path": [
+            "workspaces"
+          ],
+          "value": [
+            "apps/*",
+            "packages/*"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-node-backend-unrecorded": {
+    "expect": [
+      "package.json:1 [workspaces] workspaces is [\"apps/*\",\"packages/*\",\"functions\"]",
+      "functions/ [workspaces] unexpected package \"functions\"",
+      "\"dir\": \"functions\", \"world\": \"node\""
+    ],
+    "extends": "pass-node-backend",
+    "ops": [
+      {
+        "write": {
+          "file": "contracts/architecture.json",
+          "content": "{\n  \"packages\": [\n    {\n      \"name\": \"core\",\n      \"pure\": true\n    },\n    {\n      \"name\": \"ui\"\n    },\n    {\n      \"name\": \"tooling\",\n      \"world\": \"node\"\n    }\n  ]\n}\n"
+        }
+      }
+    ]
   },
   "bad-workspaces": {
     "expect": [
@@ -72,15 +175,233 @@
       {
         "write": {
           "file": "packages/utils/src/clamp.ts",
-          "lines": ["export const clamp = (value: number): number => Math.max(0, value);"]
+          "lines": [
+            "export const clamp = (value: number): number => Math.max(0, value);"
+          ]
         }
       },
-      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["apps/*", "packages/*", "libs/*"] } },
-      { "json": { "file": "packages/core/package.json", "path": ["type"], "delete": true } },
-      { "json": { "file": "packages/core/package.json", "path": ["exports"], "delete": true } },
-      { "json": { "file": "packages/core/package.json", "path": ["main"], "value": "src/index.ts" } },
-      { "json": { "file": "apps/tablet/package.json", "path": ["main"], "delete": true } },
-      { "json": { "file": "apps/tablet/package.json", "path": ["type"], "value": "module" } }
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "workspaces"
+          ],
+          "value": [
+            "apps/*",
+            "packages/*",
+            "libs/*"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "packages/core/package.json",
+          "path": [
+            "type"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "packages/core/package.json",
+          "path": [
+            "exports"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "packages/core/package.json",
+          "path": [
+            "main"
+          ],
+          "value": "src/index.ts"
+        }
+      },
+      {
+        "json": {
+          "file": "apps/tablet/package.json",
+          "path": [
+            "main"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "apps/tablet/package.json",
+          "path": [
+            "type"
+          ],
+          "value": "module"
+        }
+      }
+    ]
+  },
+  "error-contract-backend-world": {
+    "expect": [
+      "ERROR",
+      "packages[3]",
+      "outside packages/",
+      "\"world\": \"node\""
+    ],
+    "extends": "pass-node-backend",
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/architecture.json",
+          "path": [
+            "packages",
+            3,
+            "world"
+          ],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "pass-node-backend": {
+    "expect": [
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "$comment": "a Cloud Functions backend as its own workspace (cloud-functions-backend, When multi-package): Node world, deployed from its bundle, imported by nothing",
+        "json": {
+          "file": "package.json",
+          "path": [
+            "workspaces"
+          ],
+          "value": [
+            "apps/*",
+            "packages/*",
+            "functions"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "contracts/architecture.json",
+          "content": "{\n  \"packages\": [\n    {\n      \"name\": \"core\",\n      \"pure\": true\n    },\n    {\n      \"name\": \"ui\"\n    },\n    {\n      \"name\": \"tooling\",\n      \"world\": \"node\"\n    },\n    {\n      \"name\": \"functions\",\n      \"dir\": \"functions\",\n      \"world\": \"node\"\n    }\n  ]\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "functions/package.json",
+          "content": "{\n  \"name\": \"@acme/functions\",\n  \"version\": \"1.0.0\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"main\": \"lib/index.js\",\n  \"engines\": {\n    \"node\": \"24\"\n  }\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "functions/tsconfig.json",
+          "lines": [
+            "{",
+            "  \"extends\": \"../tsconfig.base.json\",",
+            "  \"compilerOptions\": { \"types\": [\"node\"] },",
+            "  \"include\": [\"src/**/*\"]",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "functions/src/index.ts",
+          "lines": [
+            "export { summarizeList } from './tasks/summarize-list.ts';"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "functions/src/tasks/summarize-list.ts",
+          "lines": [
+            "export const summarizeList = (titles: readonly string[]): string => titles.join(', ');"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-package-scripts-are-tooling": {
+    "expect": [
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "$comment": "a package's scripts/ folder is Node tooling beside the package (check-boundaries treats it as Node world)",
+        "write": {
+          "file": "packages/core/scripts/vectors/write-price-vectors.ts",
+          "lines": [
+            "// packages/core/scripts/vectors/write-price-vectors.ts",
+            "import { writeFileSync } from 'node:fs';",
+            "",
+            "import { formatPrice } from '../../src/money/format-price.ts';",
+            "",
+            "writeFileSync('price.vectors.json', JSON.stringify([formatPrice(100)]));"
+          ]
+        }
+      }
+    ]
+  },
+  "pass-pure-package-port": {
+    "expect": [
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "$comment": "a pure package may declare a port and its fake (both pure TypeScript) for the apps and the backend to share; they live where they live in an app, src/services/<concern>/, and the adapters stay in the apps",
+        "write": {
+          "file": "packages/core/src/services/clock/clock-port.ts",
+          "lines": [
+            "/** The clock every package and app reads time through (pure: a type only). */",
+            "export type ClockPort = { readonly nowMs: () => number };"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "packages/core/src/services/clock/fake-clock.ts",
+          "lines": [
+            "import type { ClockPort } from './clock-port.ts';",
+            "",
+            "/** A clock the test sets by hand. */",
+            "export const createFakeClock = (startMs: number): ClockPort => ({ nowMs: () => startMs });"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "packages/core/src/services/clock/fake-clock.test.ts",
+          "lines": [
+            "import { createFakeClock } from './fake-clock.ts';",
+            "",
+            "describe('createFakeClock', () => {",
+            "  it('returns the start time', () => {",
+            "    expect(createFakeClock(5).nowMs()).toBe(5);",
+            "  });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-pure-package-port-outside-services": {
+    "expect": [
+      "[placement]",
+      "packages/core/src/time/clock-port.ts"
+    ],
+    "ops": [
+      {
+        "$comment": "one home for ports in every scope, a pure package included: the port-triple check and every reader find it there",
+        "write": {
+          "file": "packages/core/src/time/clock-port.ts",
+          "lines": [
+            "/** The clock every package and app reads time through (pure: a type only). */",
+            "export type ClockPort = { readonly nowMs: () => number };"
+          ]
+        }
+      }
     ]
   }
 }

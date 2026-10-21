@@ -2,6 +2,7 @@
   {"from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs"},
   {"from": "scripts/lib/ship-placeholders.mjs", "to": "scripts/lib/ship-placeholders.mjs"},
   {"from": "repo-templates/package.json", "to": "assets/skeleton-package.json"},
+  {"from": "repo-templates/package-scripts.multi-package.json", "to": "assets/package-scripts.multi-package.json"},
   {"from": "repo-templates/dot-claude/settings.json", "to": "assets/claude-settings.json"},
   {"from": "repo-templates/babel.config.js", "to": "templates/babel.config.js"},
   {"from": "repo-templates/eslint.config.mjs", "to": "templates/eslint.config.mjs"},

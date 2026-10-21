@@ -135,6 +135,7 @@ fuller router.
 - `forms-and-input`: use when adding a form, text field or validation, or the keyboard hides a field.
 - `adaptive-layout`: use when making screens responsive or for tablets, iPad, foldables, rotation, split screen, orientation lock.
 - `motion-and-animation`: use when animating a transition, sheet, loop, drag, spring or celebration, or one ignores Reduce Motion or blocks taps.
+- `lottie-and-rive`: use when adding a .json or .riv file.
 - `audio-and-haptics-feedback`: use when adding or tuning sounds, SFX, music or haptics, or sound ignores the silent switch, stops the user's music or a pulse fails on Android.
 - `icons-app-icon-and-splash`: use when adding an icon, logo, app icon or splash, or an image or emoji appears.
 - `skia-canvas-rendering`: use when drawing a chart, grid or board, or canvas animation freezes.
@@ -153,6 +154,9 @@ fuller router.
 
 - `state-management-zustand`: use when adding a store, action or selector, deciding where state lives, leaving Redux or persist+AsyncStorage, or on Maximum update depth.
 - `networking-and-server-state`: use when calling an API, adding a query or mutation, or data is stale.
+- `firebase-rnfb`: use when setting up RNFB, adding Firestore, Storage or Functions calls, or writes hang offline.
+- `firestore-rules-and-emulator-tests`: use when adding a collection or upload path, or on permission denied.
+- `cloud-functions-backend`: use when adding a callable, trigger, server secret or paid API call.
 - `auth-and-secure-storage`: use when adding login, tokens, 401 retries, logout or account deletion.
 - `persistence-and-migrations`: use when adding a table, column or saved data, leaving AsyncStorage, or data is lost after an update.
 - `run-migration` (runbook: only when asked by name): use when shipping a migration.
@@ -184,6 +188,7 @@ fuller router.
 
 - `admob-ads-and-consent`: use when touching ads, consent, ATT, ad IDs or rewarded perks.
 - `in-app-purchases`: use when touching IAP, buy, restore, paywall or Premium state.
+- `subscriptions-revenuecat`: use when adding react-native-purchases, a renewing plan or its webhook.
 - `privacy-and-store-declarations`: use when an SDK lands, a release nears or an audit fails.
 - `crash-reporting-and-observability`: use when adding Sentry or a DSN, or stacks are minified.
 - `analytics-and-consent`: use when adding analytics, events, screen views or a usage-data toggle.

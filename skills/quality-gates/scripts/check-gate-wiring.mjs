@@ -7,11 +7,12 @@
 // Run: node ${CLAUDE_SKILL_DIR}/scripts/check-gate-wiring.mjs [repo-root]
 
 import { existsSync, readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { basename, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { AGENT_SKILL_FOLDERS, createReporter, fail, lineOf, maskComments, notYetCreated, parseArgs, PROJECT_CONFIG_FILE, requireDir, resolveLayout, run, toPosix, walk } from './check-lib.mjs';
+import { AGENT_SKILL_FOLDERS, backendWorkspaces, createReporter, fail, globToRegExp, lineOf, maskComments, notYetCreated, parseArgs, PROJECT_CONFIG_FILE, requireDir, resolveLayout, run, toPosix, walk } from './check-lib.mjs';
 import { findWeaker } from './lib/not-weaker.mjs';
+import { isExpoApp } from './lib/workspaces.mjs';
 import { isLogicCounterpart, probeFor, reaches, singleAppForm, singleAppList, workspacePrefixes, workspacesWithSource } from './lib/workspace-scope.mjs';
 
 const SPEC = {
@@ -37,7 +38,9 @@ const SPEC = {
     '                          scripts/hooks/install-git-hooks.ts, which skips by itself outside the git top level,',
     '                          and may be absent only with rn-skills.config.json "lefthookPrepare": "parent-repo",',
     '                          never in a git root)',
-    '  gate-weakened           quality-gates.json holds a value weaker than the baseline, or lost an entry',
+    '  gate-weakened           quality-gates.json holds a value weaker than the baseline, or lost an entry (the',
+    '                          baseline adds the canonical config\'s conditional entries with their repo fact: the',
+    '                          unit project\'s \'\\\\.rules\\\\.test\\\\.\' ignore while jest.emulator.config.js exists)',
     '  verify-step             quality-gates.json "verifyExtraSteps" is not a list of distinct npm script names, names',
     '                          a core step, or names a script package.json lacks',
     '  claude-settings         .claude/settings.json lost a deny or ask rule or a hook, disables hooks, or allows a',
@@ -55,8 +58,9 @@ const SPEC = {
     '                          coveragePathIgnorePatterns, testPathIgnorePatterns, modulePathIgnorePatterns, testMatch,',
     '                          testRegex or roots value (or a constant it spreads) differs from the canonical config',
     '                          in assets/jest-config-baseline.js (multi-package: its workspace form, and every workspace',
-    '                          with src/ stays reached); a project quality-gates.json jest.projects adds is left to the',
-    '                          guardrail, and every canonical project keeps its displayName',
+    '                          with src/ stays reached, a Node backend such as functions/ by the canonical projects or',
+    '                          by a listed project named after its folder); a project quality-gates.json jest.projects',
+    '                          adds is left to the guardrail, and every canonical project keeps its displayName',
     '  gate-scope              a gate reaches into installed agent skills: gated-paths.ts lost the agent-folder',
     '                          exclusion, an Edit(**/...) ask rule prompts for skill files, or an agent folder holding',
     '                          code (.claude/skills/, .agents/skills/, ...) is not in knip.json "ignore"',
@@ -67,8 +71,11 @@ const SPEC = {
     'The repo root is the optional positional argument (default "."). Expected SKIP lines while other skills',
     'have not run yet, for example: SKIP scripts/git/check-commit-message.ts [script-target] not yet created',
     '(git-commits-and-reporting creates it).',
-    'When multi-package (package.json "workspaces"), the typecheck script is the workspace form in',
-    'assets/package-scripts.multi-package.json, and the Jest scope and logic keys may take their workspace form',
+    'When multi-package (package.json "workspaces"), the typecheck and export:audit scripts are the workspace',
+    'forms in assets/package-scripts.multi-package.json; the baseline ESLint probes and the app program take each',
+    'Expo app workspace\'s prefix (apps/<app>/src/core/gate-probe.ts; apps/<app>/tsconfig.json, matched by a',
+    'typescript.projects key or glob), every workspace tsconfig.json is listed under typescript.projects, and the',
+    'Jest scope and logic keys may take their workspace form',
     '(<rootDir>/apps/*/src/**/, ./packages/core/src/). rn-skills.config.json keys read: "contractsDir" (where',
     'knip-ignores.json lives) and "lefthookPrepare".',
   ].join('\n'),
@@ -125,18 +132,84 @@ function coreSteps() {
   return [...list.matchAll(/'([^']+)'/g)].map((match) => match[1]);
 }
 
-/** The baseline scripts: the canonical map, with the workspace forms when multi-package. */
-function baselineScripts(layout) {
-  const scripts = readJson(join(TEMPLATES, 'package-scripts.json'));
-  if (layout.mode !== 'monorepo') return scripts;
-  return { ...scripts, ...readJson(join(SKILL, 'assets', 'package-scripts.multi-package.json')).scripts };
+/**
+ * A workspace-form command for one Expo app workspace: <app-dir> is its folder, <to-root> the way back up.
+ * With several apps the one the repo's own script names is the baseline (else the first).
+ */
+function fillAppDir(command, appWorkspaces, actual) {
+  if (!command.includes('<app-dir>') || appWorkspaces.length === 0) return command;
+  const forms = appWorkspaces.map((dir) => command.replaceAll('<app-dir>', dir).replaceAll('<to-root>', dir.split('/').map(() => '..').join('/')));
+  return forms.find((form) => form === actual) ?? forms[0];
 }
 
-/** The baseline quality-gates.json, its npmScripts taking the workspace forms when multi-package. */
-function baselineGates(scripts) {
+/** The baseline scripts: the canonical map, with the workspace forms when multi-package. */
+function baselineScripts(ctx) {
+  const scripts = readJson(join(TEMPLATES, 'package-scripts.json'));
+  if (ctx.layout.mode !== 'monorepo') return scripts;
+  const multi = readJson(join(SKILL, 'assets', 'package-scripts.multi-package.json')).scripts;
+  return { ...scripts, ...Object.fromEntries(Object.entries(multi).map(([name, command]) => [name, fillAppDir(command, ctx.appWorkspaces, ctx.pkg.scripts?.[name])])) };
+}
+
+/** The single app's program in the canonical typescript.projects; multi-package, each Expo app workspace's own. */
+const APP_PROGRAM = 'src/tsconfig.json';
+
+/**
+ * The baseline quality-gates.json. Multi-package, its npmScripts take the workspace forms, and the paths
+ * that name the single app's src/ take each Expo app workspace's prefix: the ESLint probes become
+ * apps/<app>/src/... (the guardrail lints those paths), and the app program src/tsconfig.json leaves
+ * typescript.projects (checkWorkspacePrograms matches apps/<app>/tsconfig.json against the app's keys).
+ */
+/**
+ * Jest scope entries the canonical jest.config.js adds once the repo has adopted another skill, keyed by
+ * the repo fact the config itself tests: the baseline expects each one exactly then, at its place in the
+ * list (right after `after`), so quality-gates.json lists it with the fact and fails it without.
+ */
+const SANCTIONED_JEST_ENTRIES = [
+  // Security-rules tests run only inside the Firebase emulators (HAS_RULES_TESTS in jest.config.js).
+  { project: 'unit', key: 'testPathIgnorePatterns', entry: '\\.rules\\.test\\.', after: '\\.android\\.test\\.', when: 'jest.emulator.config.js', owner: 'firestore-rules-and-emulator-tests' },
+];
+
+function addSanctionedJestEntries(gates, root) {
+  for (const { project, key, entry, after, when } of SANCTIONED_JEST_ENTRIES) {
+    const list = gates.jest.projects[project]?.[key];
+    if (!Array.isArray(list) || !existsSync(join(root, when))) continue;
+    list.splice(list.indexOf(after) + 1, 0, entry);
+  }
+}
+
+function baselineGates(scripts, ctx) {
   const gates = readJson(join(TEMPLATES, 'quality-gates.json'));
   for (const name of Object.keys(gates.npmScripts)) gates.npmScripts[name] = scripts[name];
+  addSanctionedJestEntries(gates, ctx.root);
+  if (ctx.layout.mode !== 'monorepo' || ctx.appWorkspaces.length === 0) return gates;
+  gates.eslint.probes = Object.fromEntries(
+    Object.entries(gates.eslint.probes).flatMap(([file, ruleSet]) => (file.startsWith('src/') ? ctx.appWorkspaces.map((dir) => [`${dir}/${file}`, ruleSet]) : [[file, ruleSet]])),
+  );
+  gates.appProgram = gates.typescript.projects[APP_PROGRAM];
+  delete gates.typescript.projects[APP_PROGRAM];
   return gates;
+}
+
+/**
+ * Multi-package: every workspace program is listed under typescript.projects (a literal path or a glob
+ * such as apps/*\/tsconfig.json), so the guardrail compares its compiler options; an Expo app workspace
+ * always is, with no value weaker than the single app's program (types ["jest"], never node).
+ */
+function checkWorkspacePrograms(actual, baseline, ctx, report) {
+  if (baseline.appProgram === undefined) return;
+  const projects = actual.typescript?.projects ?? {};
+  for (const dir of ctx.layout.workspaces.map((workspace) => workspace.dir)) {
+    const isApp = ctx.appWorkspaces.includes(dir);
+    const program = `${dir}/tsconfig.json`;
+    if (!isApp && !existsSync(join(ctx.root, program))) continue;
+    const key = Object.keys(projects).find((pattern) => pattern === program || globToRegExp(pattern).test(program));
+    if (key === undefined) {
+      report.problem({ file: 'quality-gates.json', line: 1, rule: 'gate-weakened', message: `typescript.projects has no entry for ${program}, so the guardrail never compares that program's compiler options${isApp ? ` (baseline ${JSON.stringify(baseline.appProgram)}, the app program)` : ''}`, fix: `Add "${dir.includes('/') ? `${dirname(dir)}/*` : dir}/tsconfig.json" (or the literal path) with the program's types, in the same gate change as the tsconfig.` });
+      continue;
+    }
+    if (!isApp) continue;
+    for (const { path, message } of findWeaker(baseline.appProgram, projects[key], ['typescript', 'projects', key])) report.problem({ file: 'quality-gates.json', line: 1, rule: 'gate-weakened', message: `${path} ${message}`, fix: GATE_FIX });
+  }
 }
 
 function tryJson(root, rel, rule, report) {
@@ -269,28 +342,35 @@ function checkThresholdKeys(actual, baseline, ctx, report) {
   }
 }
 
+/** The glob a fix names for a workspace: apps/mobile -> apps/*; a folder at the root (functions) stays itself. */
+const workspaceGlob = (dir) => (dir.includes('/') ? dir.replace(/[^/]+$/, '*') : dir);
+
 /** Multi-package: coverage and every canonical project's tests still reach each workspace's src/. */
 function checkWorkspaceReach(actual, baseline, ctx, report) {
   const problem = (message, fix) => report.problem({ file: 'quality-gates.json', line: 1, rule: 'gate-weakened', message, fix });
   for (const dir of ctx.sourceWorkspaces) {
     const probe = probeFor(dir, baseline.jest.collectCoverageFrom.find((glob) => !glob.startsWith('!')));
-    if (probe && !reaches(actual.jest?.collectCoverageFrom, probe)) problem(`jest.collectCoverageFrom does not reach ${dir}/src (no glob matches ${probe})`, `Add the workspace form of the source glob ("${dir.replace(/[^/]+$/, '*')}/src/**/*.{ts,tsx}") in jest.config.js and here together; every workspace's code is covered.`);
+    if (probe && !reaches(actual.jest?.collectCoverageFrom, probe)) problem(`jest.collectCoverageFrom does not reach ${dir}/src (no glob matches ${probe})`, `Add the workspace form of the source glob ("${workspaceGlob(dir)}/src/**/*.{ts,tsx}") in jest.config.js and here together; every workspace's code is covered.`);
+    // A Node backend whose own project runs its tests (displayName = its folder) is that project's, not the canonical projects'.
+    if (ctx.backendProjects.has(dir) && reaches(actual.jest?.projects?.[ctx.backendProjects.get(dir)]?.testMatch, `${dir}/src/a/x.test.ts`)) continue;
     for (const [name, project] of Object.entries(baseline.jest.projects)) {
       const glob = (project.testMatch ?? []).find((item) => probeFor(dir, item) !== null);
       const testProbe = glob && probeFor(dir, glob);
-      if (testProbe && !reaches(actual.jest?.projects?.[name]?.testMatch, testProbe)) problem(`jest.projects.${name}.testMatch does not reach ${dir}/src (no glob matches ${testProbe})`, `Add the workspace form of the test root ("<rootDir>/${dir.replace(/[^/]+$/, '*')}/src/**/") to TEST_ROOTS in jest.config.js and here together.`);
+      if (testProbe && !reaches(actual.jest?.projects?.[name]?.testMatch, testProbe)) problem(`jest.projects.${name}.testMatch does not reach ${dir}/src (no glob matches ${testProbe})`, `Add the workspace form of the test root ("<rootDir>/${workspaceGlob(dir)}/src/**/") to TEST_ROOTS in jest.config.js and here together${ctx.backendProjects.has(dir) ? `, or run the Node backend's tests in a project of its own (displayName '${ctx.backendProjects.get(dir)}', testMatch <rootDir>/${dir}/src/**/*.test.ts) listed under jest.projects` : ''}.`);
     }
   }
 }
 
 function checkQualityGates(actual, baseline, ctx, report) {
   const { base, app } = forComparison(actual, baseline, ctx);
+  delete base.appProgram;
   for (const { path, message } of findWeaker(base, app)) {
     const form = ctx.prefixes.length > 0 && path.startsWith('jest.') ? ' (compared in its single-app form: workspace prefixes stripped)' : '';
     report.problem({ file: 'quality-gates.json', line: 1, rule: 'gate-weakened', message: `${path} ${message}${form}`, fix: GATE_FIX });
   }
   checkThresholdKeys(actual, baseline, ctx, report);
   if (ctx.layout.mode === 'monorepo') checkWorkspaceReach(actual, baseline, ctx, report);
+  checkWorkspacePrograms(actual, baseline, ctx, report);
 }
 
 function hookCommands(settings, event) {
@@ -485,7 +565,7 @@ function projectSpans(source, names) {
   for (const match of code.matchAll(/displayName\s*:\s*['"]([\w-]+)['"]/g)) {
     if (!names.includes(match[1])) continue;
     const inner = pairs.filter(([start, end]) => start < match.index && match.index < end).sort((a, b) => (b[0] - a[0]))[0];
-    if (inner) spans.push(inner);
+    if (inner) spans.push(Object.assign([...inner], { name: match[1] }));
   }
   return spans;
 }
@@ -523,8 +603,15 @@ function checkJestScope(root, gates, ctx, report) {
   const spans = projectSpans(source, extraProjects(gates));
   const reached = { coverage: new Set(), tests: new Set() };
   const seen = new Set();
+  const backendOf = new Map([...ctx.backendProjects].map(([dir, name]) => [name, dir]));
   for (const { key, value, index, from, family } of jestScopeValues(source)) {
-    if (spans.some(([start, end]) => start < from && from < end)) continue;
+    const span = spans.find(([start, end]) => start < from && from < end);
+    if (span) {
+      // A listed Node backend project reaches its own workspace's tests (the guardrail compares the rest).
+      const dir = backendOf.get(span.name);
+      if (dir !== undefined && TEST_FAMILY.has(family) && value.includes(`${dir}/src/`)) reached.tests.add(dir);
+      continue;
+    }
     const bucket = COVERAGE_FAMILY.has(family) ? reached.coverage : TEST_FAMILY.has(family) ? reached.tests : null;
     // Only a src/ root reaches a workspace's code: "<rootDir>/apps/*/plugins/**/" alone leaves apps/*/src untested.
     const form = singleAppForm(value, ctx.prefixes, (prefix, after) => {
@@ -535,8 +622,8 @@ function checkJestScope(root, gates, ctx, report) {
     report.problem({ file: 'jest.config.js', line: lineOf(source, index), rule: 'jest-scope', message: `${key} is ${value.length > 160 ? `${value.slice(0, 160)}...` : value}, which the canonical config does not have${ctx.prefixes.length > 0 ? ' (nor its workspace form)' : ''}: it changes which files coverage or the tests reach`, fix: 'Restore the value from unit-and-component-tests\' canonical jest.config.js (multi-package: the same value with a workspace prefix where src/ stood). A file leaves coverage only through its "// device-only: covered by <check>" marker; a failing or untested file is fixed or tested, never ignored; a new test project is added to quality-gates.json jest.projects in the same gate change.' });
   }
   for (const dir of ctx.sourceWorkspaces) {
-    if (!reached.coverage.has(dir)) report.problem({ file: 'jest.config.js', line: 1, rule: 'jest-scope', message: `collectCoverageFrom does not reach the workspace ${dir} (it holds src/), so its code has no coverage floor`, fix: `Write the source glob in its workspace form ("<rootDir>/${dir.replace(/[^/]+$/, '*')}/src/**/*.{ts,tsx}") so every workspace is covered.` });
-    if (!reached.tests.has(dir)) report.problem({ file: 'jest.config.js', line: 1, rule: 'jest-scope', message: `no test root reaches the workspace ${dir} (it holds src/), so its tests never run`, fix: `Add "<rootDir>/${dir.replace(/[^/]+$/, '*')}/src/**/" to TEST_ROOTS in place of "<rootDir>/src/**/".` });
+    if (!reached.coverage.has(dir)) report.problem({ file: 'jest.config.js', line: 1, rule: 'jest-scope', message: `collectCoverageFrom does not reach the workspace ${dir} (it holds src/), so its code has no coverage floor`, fix: `Write the source glob in its workspace form ("<rootDir>/${workspaceGlob(dir)}/src/**/*.{ts,tsx}") so every workspace is covered.` });
+    if (!reached.tests.has(dir)) report.problem({ file: 'jest.config.js', line: 1, rule: 'jest-scope', message: `no test root reaches the workspace ${dir} (it holds src/), so its tests never run`, fix: `Add "<rootDir>/${workspaceGlob(dir)}/src/**/" to TEST_ROOTS in place of "<rootDir>/src/**/"${ctx.backendProjects.has(dir) ? `, or give the Node backend a project of its own (displayName '${ctx.backendProjects.get(dir)}', testEnvironment 'node', testMatch ['<rootDir>/${dir}/src/**/*.test.ts']) listed in quality-gates.json jest.projects` : ''}.` });
   }
 }
 
@@ -605,8 +692,6 @@ run(async () => {
   const layout = resolveLayout(root);
   const report = createReporter({ name: 'check-gate-wiring', json: options.json });
   const ownTools = ownToolFiles();
-  const scripts = baselineScripts(layout);
-  const baseline = baselineGates(scripts);
   const present = new Set();
   let checked = 0;
   for (const rel of [...OWN_CONFIGS, ...ownTools]) {
@@ -622,7 +707,12 @@ run(async () => {
   }
   const pkg = tryJson(root, 'package.json', 'npm-script', report) ?? {};
   const prefixes = workspacePrefixes(layout, pkg);
-  const ctx = { root, layout, pkg, prefixes, sourceWorkspaces: workspacesWithSource(root, layout) };
+  const appWorkspaces = layout.workspaces.map((workspace) => workspace.dir).filter((dir) => isExpoApp(root, dir));
+  // Node backends (functions/) by folder, with the project name a Node-environment project of their own takes.
+  const backendProjects = new Map(layout.mode === 'monorepo' ? backendWorkspaces(root).map((backend) => [backend.dir, basename(backend.dir)]) : []);
+  const ctx = { root, layout, pkg, prefixes, appWorkspaces, backendProjects, sourceWorkspaces: workspacesWithSource(root, layout) };
+  const scripts = baselineScripts(ctx);
+  const baseline = baselineGates(scripts, ctx);
   checkScripts(root, layout, pkg, scripts, report);
   const gates = present.has('quality-gates.json') ? tryJson(root, 'quality-gates.json', 'gate-weakened', report) : null;
   const extraTargets = gates ? checkExtraSteps(pkg, gates, report) : [];

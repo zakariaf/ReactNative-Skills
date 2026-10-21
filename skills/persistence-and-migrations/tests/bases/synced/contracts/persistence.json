@@ -1,0 +1,9 @@
+{
+  "$schema": "./persistence.schema.json",
+  "mode": "synced",
+  "keyValueStore": "expo-sqlite/kv-store",
+  "syncedStore": {
+    "package": "@react-native-firebase/firestore",
+    "adapterDir": "src/data/firestore/"
+  }
+}

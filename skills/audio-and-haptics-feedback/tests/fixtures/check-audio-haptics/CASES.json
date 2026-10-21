@@ -464,6 +464,83 @@
       }
     ]
   },
+  "bad-monorepo-haptics-import": {
+    "expect": ["FAIL apps/mobile/src/games/arena-chase/shake.ts:2 [vendor-import]"],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/arena-chase/shake.ts",
+          "lines": [
+            "// src/games/arena-chase/shake.ts",
+            "import { impactAsync } from 'expo-haptics';",
+            "",
+            "export const shake = (): Promise<void> => impactAsync();"
+          ]
+        }
+      },
+      { "rename": { "from": "__mocks__", "to": "apps/mobile/__mocks__" } },
+      { "rename": { "from": "app.config.ts", "to": "apps/mobile/app.config.ts" } },
+      { "rename": { "from": "contracts", "to": "apps/mobile/contracts" } },
+      { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      { "rename": { "from": "tsconfig.json", "to": "apps/mobile/tsconfig.json" } },
+      {
+        "write": {
+          "file": "package.json",
+          "json": { "name": "tasks", "private": true, "workspaces": ["apps/*", "packages/*"] }
+        }
+      }
+    ]
+  },
+  "bad-monorepo-peer-range": {
+    "expect": ["FAIL packages/feedback/package.json:5 [audio-pin]", "not an exact pin"],
+    "ops": [
+      { "rename": { "from": "__mocks__", "to": "apps/mobile/__mocks__" } },
+      { "rename": { "from": "app.config.ts", "to": "apps/mobile/app.config.ts" } },
+      { "rename": { "from": "contracts", "to": "apps/mobile/contracts" } },
+      { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      { "rename": { "from": "tsconfig.json", "to": "apps/mobile/tsconfig.json" } },
+      {
+        "write": {
+          "file": "package.json",
+          "json": { "name": "tasks", "private": true, "workspaces": ["apps/*", "packages/*"] }
+        }
+      },
+      {
+        "write": {
+          "file": "packages/feedback/package.json",
+          "lines": [
+            "{",
+            "  \"name\": \"@acme/feedback\",",
+            "  \"private\": true,",
+            "  \"peerDependencies\": {",
+            "    \"react-native-audio-api\": \"^0.13.6\"",
+            "  }",
+            "}"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-monorepo-preview-not-ignored": {
+    "expect": ["FAIL .gitignore [preview-ignored]"],
+    "ops": [
+      { "rename": { "from": "__mocks__", "to": "apps/mobile/__mocks__" } },
+      { "rename": { "from": "app.config.ts", "to": "apps/mobile/app.config.ts" } },
+      { "rename": { "from": "contracts", "to": "apps/mobile/contracts" } },
+      { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      { "rename": { "from": "tsconfig.json", "to": "apps/mobile/tsconfig.json" } },
+      {
+        "write": {
+          "file": "package.json",
+          "json": { "name": "tasks", "private": true, "workspaces": ["apps/*", "packages/*"] }
+        }
+      },
+      { "write": { "file": ".gitignore", "content": "node_modules/\n" } }
+    ]
+  },
   "bad-music-on": {
     "expect": ["FAIL src/services/audio/audio-port.ts:1 [music-default]", "keep music off"],
     "ops": [
@@ -1151,6 +1228,27 @@
           "file": "src/config/audio-plugin.ts",
           "find": "    disableStaticExternalLibs: true,\n",
           "with": "    disableStaticExternalLibs: true,\n    // ITMS-90683: the first upload asked for it; the app never records.\n    iosMicrophonePermission: 'Allow $(PRODUCT_NAME) to play sound effects',\n"
+        }
+      }
+    ]
+  },
+  "pass-monorepo": {
+    "expect": [
+      "apps: apps/mobile (the Expo app workspaces of package.json \"workspaces\"), each checked as an app",
+      "check-audio-haptics: 53 source files checked, 0 problems",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      { "rename": { "from": "__mocks__", "to": "apps/mobile/__mocks__" } },
+      { "rename": { "from": "app.config.ts", "to": "apps/mobile/app.config.ts" } },
+      { "rename": { "from": "contracts", "to": "apps/mobile/contracts" } },
+      { "rename": { "from": "package.json", "to": "apps/mobile/package.json" } },
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      { "rename": { "from": "tsconfig.json", "to": "apps/mobile/tsconfig.json" } },
+      {
+        "write": {
+          "file": "package.json",
+          "json": { "name": "tasks", "private": true, "workspaces": ["apps/*", "packages/*"] }
         }
       }
     ]

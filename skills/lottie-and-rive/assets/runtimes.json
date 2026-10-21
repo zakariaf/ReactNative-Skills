@@ -1,0 +1,37 @@
+{
+  "$comment": "check-animations reads this table. Verified on 2026-10-21 (re-verify: npm view lottie-react-native @rive-app/react-native rive-react-native react-native-nitro-modules version time peerDependencies --json; grep lottie node_modules/expo/bundledNativeModules.json). Library facts, not the app's: the app's own facts live in contracts/animations.json.",
+  "approved": {
+    "lottie-react-native": {
+      "runtime": "lottie",
+      "jobs": ["one-shot", "loop"],
+      "extensions": [".json", ".lottie"],
+      "why": "designer-exported one-shot or briefly looping illustrations (After Effects via Bodymovin, LottieFiles)",
+      "install": "npx expo install lottie-react-native (Expo SDK 57 resolves ~7.3.8)",
+      "requires": []
+    },
+    "@rive-app/react-native": {
+      "runtime": "rive",
+      "jobs": ["state-machine"],
+      "extensions": [".riv"],
+      "why": "interactive state machines driven by the app (data binding) or by touch",
+      "install": "npm install --save-exact @rive-app/react-native@0.5.5 react-native-nitro-modules@0.36.5 (not in Expo's module map; nitro >=0.35.10 <0.37 is its peer range)",
+      "requires": ["react-native-nitro-modules"]
+    }
+  },
+  "unapproved": {
+    "rive-react-native": "the legacy Rive runtime, replaced by @rive-app/react-native (Rive's docs, read 2026-10-21)",
+    "@lottiefiles/dotlottie-react-native": "a second Lottie runtime; lottie-react-native plays .json and .lottie files",
+    "lottie-ios": "the iOS-only native library; lottie-react-native already links it",
+    "lottie-web": "a browser renderer, not a React Native runtime",
+    "lottie-react": "a React DOM component, not a React Native runtime",
+    "react-lottie": "a React DOM component, not a React Native runtime",
+    "@lottiefiles/react-lottie-player": "a React DOM component, not a React Native runtime",
+    "@rive-app/react-canvas": "the React DOM Rive runtime, not React Native",
+    "@rive-app/react-canvas-lite": "the React DOM Rive runtime, not React Native",
+    "@rive-app/react-webgl2": "the React DOM Rive runtime, not React Native"
+  },
+  "budgets": {
+    "defaults": { "maxBytes": 150000, "heavyFromBytes": 60000, "maxFps": 60, "maxPlays": 3, "maxSeconds": 6 },
+    "ceilings": { "maxBytes": 500000, "heavyFromBytes": 150000, "maxFps": 60, "maxPlays": 3, "maxSeconds": 10 }
+  }
+}

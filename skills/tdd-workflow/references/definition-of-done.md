@@ -66,7 +66,11 @@ component tests per screen, one or two end-to-end flows and its screenshots.
   90%, branches 85%; logic keys (`./src/core/`, `./src/data/`, and the app's other logic folders)
   95/95/95/90. A threshold key becomes active once its folder has source files.
 - Add tests for uncovered behaviour; never assertion-free tests (check-tests' `test-without-assertion`,
-  `jest/expect-expect` and Stryker catch those), never `istanbul ignore`, never a lower number.
+  `jest/expect-expect` and Stryker catch those), never `istanbul ignore`, never a lower number. An
+  assertion is `expect(`, `fc.assert(` or `expect.assertions(`; a security-rules test asserts with
+  `assertSucceeds(` and `assertFails(` imported from `@firebase/rules-unit-testing` (each rejects when
+  the emulator's verdict differs), and those count too. A helper of the same name from elsewhere does
+  not, and the ESLint side is `jest/expect-expect`'s `assertFunctionNames` (typescript-and-lint-rules).
 - Mutation (Stryker): run when a logic module is finished, nightly and before a release; the break
   threshold is 75%. Kill surviving mutants with boundary examples, never by relaxing thresholds.
 

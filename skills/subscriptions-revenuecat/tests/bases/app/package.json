@@ -1,0 +1,13 @@
+{
+  "name": "tasks",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.ts",
+  "dependencies": {
+    "expo": "~57.0.27",
+    "react": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-purchases": "10.13.0",
+    "react-native-purchases-ui": "10.13.0"
+  }
+}

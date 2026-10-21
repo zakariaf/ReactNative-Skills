@@ -42,7 +42,9 @@ shadow or second theme hides in the app's code.
    (the routes layout, or `App.tsx` with React Navigation) renders the provider imported from
    `src/theme/theme-provider` (`color-scheme-config`, `theme-provider-behaviour`,
    `theme-provider-mounted`). Miss one and iOS reports light forever, Android ignores the setting,
-   or headers and screen backgrounds stay light in dark mode.
+   or headers and screen backgrounds stay light in dark mode. A light-only app says so in the
+   contract with its reason (`"lightOnly": { "reason" }`); then `userInterfaceStyle` is `'light'` and
+   every provider mount gets `preference="light"` instead, and the dark set aliases light.
 5. **A makeStyles factory builds with StyleSheet.create and returns it.** Styles are cached per
    theme object (`make-styles-factory`). That keeps tsc's excess-property check and the style lint
    rules; a plain object loses both.
@@ -128,7 +130,8 @@ switched on in the contract or the tokens (`no-gradient`, `no-pill`, `PRESS.kind
    nothing more. Bundle a font only when the design names one: copy the TTFs (each named after its
    PostScript name) and their licences into `assets/fonts/`, replace the contract's `"system"` with
    the files and each `shasum -a 256`, add the `expo-font` plugin entry (`npx expo install expo-font`),
-   name a family per weight in `src/theme/fonts.ts`, and copy each tall script's hhea values into
+   name a family per weight in `src/theme/fonts.ts` (a separate display face, when the design names
+   one, in `DISPLAY_FONTS`), and copy each tall script's hhea values into
    `TALL_SCRIPT_METRICS` (the checker prints them; the reference gives Noto Sans as a worked example).
 5. **Wire dark mode and the providers.** Set `userInterfaceStyle: 'automatic'`, run
    `npx expo install expo-system-ui`, and mount `AppThemeProvider` (with `onError` from the error
@@ -144,7 +147,9 @@ switched on in the contract or the tokens (`no-gradient`, `no-pill`, `PRESS.kind
    `npx eslint . --max-warnings 0`, `npx jest --ci`, then
    `node ${CLAUDE_SKILL_DIR}/scripts/check-design-system.mjs .` and
    `node ${CLAUDE_SKILL_DIR}/scripts/check-raw-values.mjs .`. Every `FAIL` line names the file, the
-   rule and the fix: fix the code or the token file, never the contrast pairs.
+   rule and the fix: fix the code or the token file, never the contrast pairs. In a workspace repo
+   the same commands check each Expo app workspace (`apps/mobile`) from the root
+   (tokens-and-contract.md, "When multi-package").
 8. **Report** in plain words what changed, which checks passed, which SKIP lines remain and who
    creates their targets, and any value chosen where the design was silent (the decision log). Ask
    the reviewer before changing a token the design fixed or adding a contrast exception.
@@ -161,7 +166,7 @@ switched on in the contract or the tokens (`no-gradient`, `no-pill`, `PRESS.kind
 - [ ] Bundled fonts: each file is in `assets/fonts/` with its licence and recorded sha256, named after
       its PostScript name, listed in the `expo-font` entry, and named per weight in `fonts.ts`. System
       font (the default): the contract says `"fonts": "system"` and every script of `SCRIPT_FONTS` is `null`.
-- [ ] `userInterfaceStyle` is `'automatic'`, `expo-system-ui` is installed, and the root layout mounts
+- [ ] `userInterfaceStyle` is `'automatic'` (light-only: `'light'`, with `lightOnly` and its reason in the contract), `expo-system-ui` is installed, and the root layout mounts
       `AppThemeProvider` with `NavigationThemeProvider` inside it (and `TextLocaleProvider` in a
       multi-script app); no second theme (`constants/theme.ts`, another `useTheme`) is left.
 - [ ] `npm run typecheck`, `npx eslint . --max-warnings 0` and `npx jest --ci` pass.
@@ -221,9 +226,9 @@ switched on in the contract or the tokens (`no-gradient`, `no-pill`, `PRESS.kind
 |---|---|---|
 | [references/tokens-and-contract.md](references/tokens-and-contract.md) | Two tiers, the token file format (plain and DTCG), the colour roles, module mapping, every contract key, flavours, the decision log, multi-package | Workflow step 2, and before changing a token |
 | [references/layout-and-shape-tokens.md](references/layout-and-shape-tokens.md) | Spacing scale and named layout steps, the screen frame under Android 15/16 edge-to-edge and safe-area insets, the centred column on wide windows, radii, strokes (dashed state cues, icon strokes), elevation levels, touch targets, component measurements | Workflow step 2, and when laying out a screen |
-| [references/theme-in-react-native.md](references/theme-in-react-native.md) | File map, mounting with the navigation theme (Expo Router, React Navigation appendix), the root view, dark mode on both platforms, makeStyles, shadows, the press surface looks, RTL, what is verified | Workflow steps 2 and 5 |
+| [references/theme-in-react-native.md](references/theme-in-react-native.md) | File map, mounting with the navigation theme (Expo Router, React Navigation appendix), the root view, dark mode on both platforms, light-only apps, makeStyles, shadows, the press surface looks, RTL, what is verified | Workflow steps 2 and 5 |
 | [references/palettes-and-contrast.md](references/palettes-and-contrast.md) | Pairs, the contrast contract, core and default pairs, shapes, translucent colours, exceptions, write-palette, fixing a pair, dark sets, colour-blind variants, palette rule ids | Workflow step 3, any contrast question |
-| [references/text-and-fonts.md](references/text-and-fonts.md) | AppText and its direction on both platforms, roles, the pixel grid and the font scale, glyph nudges, tall scripts and the guard, balanced text, tabular figures, bundled fonts and the demo fonts' source, the system font, the object-syntax alternative, font scaling | Workflow step 4, any text work |
+| [references/text-and-fonts.md](references/text-and-fonts.md) | AppText and its direction on both platforms, roles, the pixel grid and the font scale, glyph nudges, tall scripts and the guard, balanced text, tabular figures, bundled fonts and the demo fonts' source, a separate display face, the system font, the object-syntax alternative, font scaling | Workflow step 4, any text work |
 | [references/motion-tokens.md](references/motion-tokens.md) | Motion tokens, complete springs, what no-raw-duration and no-raw-spring see, the reduce-motion table, reduce motion in code | Any animation |
 | `templates/src/theme/` | Theme types, token modules (with `PRESS`), fonts (system font by default), palette and its core-pair test, contrast, theme set, context, `AppThemeProvider`, `NavigationThemeProvider`, makeStyles, text locale and its hook, text style hook, shadow helpers (each with its test); synced from the canonical copy | Workflow steps 2 and 5 (copy) |
 | `templates/src/ui/` | AppText (+ iOS, Android and balance tests), the balance hook (+ test), the press feedback context (+ test; all synced), PressableSurface (+ iOS and Android tests) | Workflow step 2 (copy) |
@@ -238,8 +243,8 @@ switched on in the contract or the tokens (`no-gradient`, `no-pill`, `PRESS.kind
 | `scripts/write-palette.mjs` | Generator: `palette.ts` from the token file, refused while a pair fails | Workflow step 3 |
 | `scripts/selftest.mjs` | Proves the three scripts on the shipped templates and every planted bug | After changing a script or a template |
 | `scripts/check-lib.mjs` | Shared script helper, synced (do not edit here) | Never by hand |
-| `scripts/lib/` | Token file reader, contract reader, contrast maths and the contrast-contract reader, font table reader, source and import helpers, the synced TypeScript module loader | Never directly |
-| `assets/shared.json` | Declares the synced files (check-lib, the module loader, the canonical theme, AppText, the balance hook, the press feedback context and the demo token file) | When adding a shared file |
+| `scripts/lib/` | Token file reader, contract reader, contrast maths and the contrast-contract reader, font table reader, source and import helpers, the synced TypeScript module loader and Expo-app workspace finder (`expo-apps.mjs`) | Never directly |
+| `assets/shared.json` | Declares the synced files (check-lib, the module loader, the Expo-app workspace finder, the canonical theme, AppText, the balance hook, the press feedback context and the demo token file) | When adding a shared file |
 | `assets/default-contrast.json` | The default pairs: a verbatim copy of accessibility-as-code's `contracts/contrast.json` template, read when the app has no contrast contract | Never by hand (copy the template again when it changes) |
 | `tests/fixtures/` | Overlay cases per script: good, planted bad, SKIP, NOT APPLICABLE and note cases | When adding a rule |
 | `tests/bases/` | The base app (the bundled-font variant: stub fonts with real metrics, their `fonts.ts` and contract; app config, root layout) and the raw-values base with silent planted findings in installed skills | When a case needs a new base file |

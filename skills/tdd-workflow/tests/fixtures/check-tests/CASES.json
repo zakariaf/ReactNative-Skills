@@ -335,5 +335,38 @@
         }
       }
     ]
+  },
+  "pass-rules-assertions": {
+    "expect": [
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "test/rules/tasks.rules.test.ts",
+          "content": "// test/rules/tasks.rules.test.ts\nimport { assertFails, assertSucceeds, type RulesTestEnvironment } from '@firebase/rules-unit-testing';\nimport { doc, getDoc } from 'firebase/firestore';\n\ndeclare const testEnv: RulesTestEnvironment;\n\ndescribe('/users/{uid}/tasks/{taskId}', () => {\n  it('lets the owner read a task', async () => {\n    const db = testEnv.authenticatedContext('user-a').firestore();\n    await assertSucceeds(getDoc(doc(db, 'users/user-a/tasks/t1')));\n  });\n\n  it('denies another user', async () => {\n    const db = testEnv.authenticatedContext('user-b').firestore();\n    await assertFails(getDoc(doc(db, 'users/user-a/tasks/t1')));\n  });\n});\n"
+        }
+      }
+    ]
+  },
+  "bad-rules-assertion-lookalike": {
+    "expect": [
+      "[test-without-assertion]",
+      "test/rules/tasks.rules.test.ts:1"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "test/rules/tasks.rules.test.ts",
+          "content": "// test/rules/tasks.rules.test.ts\nimport { getDoc } from 'firebase/firestore';\n\nimport { assertSucceeds, ownerDb } from './rules-helpers';\n\ndescribe('/users/{uid}/tasks/{taskId}', () => {\n  it('lets the owner read a task', async () => {\n    await assertSucceeds(getDoc(ownerDb('users/user-a/tasks/t1')));\n  });\n});\n"
+        }
+      },
+      {
+        "write": {
+          "file": "test/rules/rules-helpers.ts",
+          "content": "// test/rules/rules-helpers.ts\nexport const assertSucceeds = async <T>(promise: Promise<T>): Promise<T> => promise;\nexport const ownerDb = (path: string): string => path;\n"
+        }
+      }
+    ]
   }
 }

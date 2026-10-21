@@ -417,8 +417,11 @@ The library is pre-1.0, so every version change is a small project:
 
 Native modules autolink per app, so every Expo app workspace lists both packages (react-native-audio-api
 exact, expo-haptics with the SDK range); a shared package that holds the feedback layer declares them as
-`peerDependencies` `"*"` (the checker accepts `*` only there). Run the checker with
-`--src-dir apps/<app>/src` (or the workspace keys of `rn-skills.config.json`).
+`peerDependencies` `"*"` (the checker accepts `*` only there). Run the checker from the repo root:
+each Expo app workspace (an `app.config.*` or `app.json`, else an `expo` dependency) is checked as an
+app with its own `src/`, contract, app config and `package.json`, every problem names the file from the
+root (`apps/mobile/src/...`), the other workspaces' manifests keep the pin rule, and the root
+`.gitignore` counts for the previews. Passing the app folder checks that app alone.
 
 ## Known issues
 

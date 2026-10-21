@@ -315,6 +315,17 @@ window.SKILLS = [
     "path": "skills/motion-and-animation"
   },
   {
+    "name": "lottie-and-rive",
+    "description": "Adds Lottie and Rive animation moments - bundled files, size and frame-rate budgets, Reduce Motion still frame, screen-reader hiding, bounded loops, licences. Use when adding a .json or .riv file. Not for Reanimated motion (motion-and-animation).",
+    "category": "ui",
+    "categoryLabel": "UI, design & interaction",
+    "plugin": "react-native",
+    "manual": false,
+    "rich": true,
+    "checker": true,
+    "path": "skills/lottie-and-rive"
+  },
+  {
     "name": "audio-and-haptics-feedback",
     "description": "Builds SFX and haptics behind ports. Use when adding or tuning sounds, SFX, music or haptics, or sound ignores the silent switch, stops the user's music or a pulse fails on Android. Not for settings (settings-and-preferences).",
     "category": "ui",
@@ -445,6 +456,39 @@ window.SKILLS = [
     "rich": true,
     "checker": true,
     "path": "skills/networking-and-server-state"
+  },
+  {
+    "name": "firebase-rnfb",
+    "description": "Builds React Native Firebase adapters - modular API, offline writes, listeners, uploads, App Check. Use when setting up RNFB, adding Firestore, Storage or Functions calls, or writes hang offline. Not for sign-in tokens (auth-and-secure-storage).",
+    "category": "data",
+    "categoryLabel": "State & data",
+    "plugin": "react-native",
+    "manual": false,
+    "rich": true,
+    "checker": true,
+    "path": "skills/firebase-rnfb"
+  },
+  {
+    "name": "firestore-rules-and-emulator-tests",
+    "description": "Secures the database and Storage with deny-by-default rules - owner checks, field allow-lists, server-only docs, a test per rule. Use when adding a collection or upload path, or on permission denied. Not for app reads or writes (firebase-rnfb).",
+    "category": "data",
+    "categoryLabel": "State & data",
+    "plugin": "react-native",
+    "manual": false,
+    "rich": true,
+    "checker": true,
+    "path": "skills/firestore-rules-and-emulator-tests"
+  },
+  {
+    "name": "cloud-functions-backend",
+    "description": "Builds 2nd-gen Cloud Functions - App Check callables, auth, bound secrets, limits, quotas, a budget kill switch. Use when adding a callable, trigger, server secret or paid API call. Not for security rules (firestore-rules-and-emulator-tests).",
+    "category": "data",
+    "categoryLabel": "State & data",
+    "plugin": "react-native",
+    "manual": false,
+    "rich": true,
+    "checker": true,
+    "path": "skills/cloud-functions-backend"
   },
   {
     "name": "auth-and-secure-storage",
@@ -679,7 +723,7 @@ window.SKILLS = [
   },
   {
     "name": "in-app-purchases",
-    "description": "Sells a Premium unlock with expo-iap behind a PurchasePort - saved entitlement, paywall states, restore, refunds, store testing. Use when touching IAP, buy, restore, paywall or Premium state. Not for ads (admob-ads-and-consent).",
+    "description": "Sells a Premium unlock with expo-iap behind a PurchasePort - saved entitlement, paywall states, restore, refunds, store testing. Use when touching IAP, buy, restore, paywall or Premium state. Not for ads (admob-ads-and-consent) or RevenueCat subscriptions (subscriptions-revenuecat).",
     "category": "money-privacy",
     "categoryLabel": "Monetization, privacy & observability",
     "plugin": "react-native",
@@ -687,6 +731,17 @@ window.SKILLS = [
     "rich": true,
     "checker": true,
     "path": "skills/in-app-purchases"
+  },
+  {
+    "name": "subscriptions-revenuecat",
+    "description": "Sells RevenueCat subscriptions behind a port - offerings, store prices, restore, a server entitlement set by an idempotent webhook. Use when adding react-native-purchases, a renewing plan or its webhook. Not for an expo-iap unlock (in-app-purchases).",
+    "category": "money-privacy",
+    "categoryLabel": "Monetization, privacy & observability",
+    "plugin": "react-native",
+    "manual": false,
+    "rich": true,
+    "checker": true,
+    "path": "skills/subscriptions-revenuecat"
   },
   {
     "name": "privacy-and-store-declarations",

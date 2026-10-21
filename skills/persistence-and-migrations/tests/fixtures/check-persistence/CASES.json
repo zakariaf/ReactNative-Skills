@@ -1619,5 +1619,96 @@
         }
       }
     ]
+  },
+  "bad-synced-store-undeclared": {
+    "expect": [
+      "[second-persistence]",
+      "src/data/firestore/firestore-task-adapter.ts:2",
+      "a second engine unless contracts/persistence.json declares it as syncedStore",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "@react-native-firebase/firestore"
+          ],
+          "value": "26.4.0"
+        }
+      },
+      {
+        "write": {
+          "file": "src/data/firestore/firestore-task-adapter.ts",
+          "content": "// src/data/firestore/firestore-task-adapter.ts\nimport { collection, doc, getFirestore, writeBatch } from '@react-native-firebase/firestore';\n\n/** Planted: a synced store with its own offline cache, not declared in the contract. */\nexport function saveTaskTitle(uid: string, id: string, title: string): void {\n  const db = getFirestore();\n  const batch = writeBatch(db);\n  batch.set(doc(collection(db, 'users', uid, 'tasks'), id), { title }, { merge: true });\n  void batch.commit();\n}\n"
+        }
+      }
+    ]
+  },
+  "pass-synced-store-with-tables": {
+    "expect": [
+      "RESULT: PASS"
+    ],
+    "extends": "bad-synced-store-undeclared",
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/persistence.json",
+          "path": [
+            "syncedStore"
+          ],
+          "value": {
+            "package": "@react-native-firebase/firestore",
+            "adapterDir": "src/data/firestore/"
+          }
+        }
+      }
+    ]
+  },
+  "bad-synced-store-in-feature-with-tables": {
+    "expect": [
+      "[synced-store-outside-adapter]",
+      "src/features/tasks/use-remote-titles.ts:2",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "extends": "pass-synced-store-with-tables",
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/use-remote-titles.ts",
+          "content": "// src/features/tasks/use-remote-titles.ts\nimport { getFirestore } from '@react-native-firebase/firestore';\n\nexport const firestore = getFirestore();\n"
+        }
+      }
+    ]
+  },
+  "pass-synced-store-codec-not-strict": {
+    "expect": [
+      "RESULT: PASS"
+    ],
+    "extends": "pass-synced-store-with-tables",
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/firestore/task-doc-schema.ts",
+          "content": "// src/data/firestore/task-doc-schema.ts\nimport * as v from 'valibot';\n\n/** Read by every app version: v.object drops fields a newer version added instead of failing. */\nexport const TASK_DOC = v.object({ title: v.string(), isDone: v.boolean() });\n"
+        }
+      }
+    ]
+  },
+  "bad-schema-loose-outside-synced-dir": {
+    "expect": [
+      "[schema-strict]",
+      "src/data/tasks/task-note-schema.ts:5"
+    ],
+    "extends": "pass-synced-store-with-tables",
+    "ops": [
+      {
+        "write": {
+          "file": "src/data/tasks/task-note-schema.ts",
+          "content": "// src/data/tasks/task-note-schema.ts\nimport * as v from 'valibot';\n\n/** Planted: a table row schema outside the synced folder stays strict. */\nexport const TASK_NOTE_ROW = v.object({ id: v.string(), body: v.string() });\n"
+        }
+      }
+    ]
   }
 }

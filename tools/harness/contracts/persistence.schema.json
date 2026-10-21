@@ -4,12 +4,19 @@
   "description": "The app's persistence facts, read by the persistence-and-migrations checker (check-persistence.mjs).",
   "type": "object",
   "additionalProperties": false,
-  "required": ["mode", "databaseFile", "protectedTables", "resetModules"],
+  "required": ["mode"],
+  "allOf": [
+    {
+      "if": { "properties": { "mode": { "const": "synced" } } },
+      "then": { "required": ["syncedStore"] },
+      "else": { "required": ["databaseFile", "protectedTables", "resetModules"] }
+    }
+  ],
   "properties": {
     "$schema": { "type": "string" },
     "mode": {
-      "description": "tables: SQLite tables and repositories (the default). document: one validated JSON document in current/backup slots. both: tables plus a document for small app state.",
-      "enum": ["tables", "document", "both"]
+      "description": "tables: SQLite tables and repositories (the default). document: one validated JSON document in current/backup slots. both: tables plus a document for small app state. synced: no SQLite database; app data lives in the synced store named by syncedStore and device-only data in the key-value store (with syncedStore and device-only tables in SQLite, use tables).",
+      "enum": ["tables", "document", "both", "synced"]
     },
     "databaseFile": {
       "description": "The database file name in expo-sqlite's default directory.",
@@ -47,6 +54,24 @@
     "keyValueStore": {
       "description": "The one key-value library for small preferences.",
       "enum": ["expo-sqlite/kv-store", "react-native-mmkv"]
+    },
+    "syncedStore": {
+      "description": "Opt-in profile: a cloud database whose SDK keeps its own offline cache on the device (for example React Native Firebase Firestore) holds the app data. The checker then accepts that one package only inside adapterDir and still fails AsyncStorage, a second key-value store, any other synced store, and a key-value import outside its adapter.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["package", "adapterDir"],
+      "properties": {
+        "package": {
+          "description": "The SDK's import path, for example @react-native-firebase/firestore; its subpaths count too.",
+          "type": "string",
+          "pattern": "^(@[a-z0-9][a-z0-9._~-]*/)?[a-z0-9][a-z0-9._~-]*(/[a-z0-9._~-]+)*$"
+        },
+        "adapterDir": {
+          "description": "The one folder whose files may import the package: a folder inside the data folder or the services folder, for example src/data/firestore/.",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_@.-]+(/[A-Za-z0-9_@.-]+)+/?$"
+        }
+      }
     },
     "fixturesTest": {
       "description": "The test that lists every frozen database fixture (default test/sqlite/migration-fixtures.test.ts).",

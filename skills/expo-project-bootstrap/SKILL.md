@@ -160,7 +160,7 @@ unfilled template tokens (`placeholder`). Each rule's reason is in `references/r
 | [references/first-install-and-verify.md](references/first-install-and-verify.md) | Install and approvals, the gate runs, the variant configs, other skills' checkers on a fresh skeleton, the first commit, pending gates, traps, the verified run | Workflow steps 6 to 9 |
 | [examples/bootstrap-report.md](examples/bootstrap-report.md) | A complete report after a bootstrap | Workflow step 10 |
 | `scripts/scaffold-app.mjs` | Generator: dry-run plan, `--write`, `--replace <file>`, `--compare`; rules `conflict`, `leftover`, `differs` | Workflow steps 3 to 5 |
-| `scripts/check-skeleton.mjs` | Checker for the whole skeleton (the rule ids above; when multi-package also `workspace-layout`, `package-manifest`, `app-lockstep`, `root-runtime`) | Workflow step 8, and after any change to a root config |
+| `scripts/check-skeleton.mjs` | Checker for the whole skeleton (the rule ids above; when multi-package also `workspace-layout`, `package-manifest`, `app-lockstep`, `root-runtime`, and the workspace forms of the scripts) | Workflow step 8, and after any change to a root config |
 | `scripts/lib/bootstrap-plan.mjs` | Template mapping, rendering, merges, pre-existing entries, leftovers, placeholder art | Read only to change the generator |
 | `scripts/lib/repo-read.mjs` | JSONC, `.npmrc` policy and dated-exclude readers | Read only to change the checker |
 | `scripts/lib/ship-placeholders.mjs` | The placeholder values the ship gates refuse (synced; do not edit here) | Read to see why `com.example` is only a NOTE here |
@@ -168,6 +168,7 @@ unfilled template tokens (`placeholder`). Each rule's reason is in `references/r
 | `scripts/selftest.mjs` | Proves both scripts: generator cases, and the checker on a skeleton generated at test time (single app, multi-package, nested) with a planted bug per rule | After changing a script or a template |
 | `templates/` | Every file of the skeleton: the canonical root configs, `contracts/`, `scripts/` (gates, hooks, git, deps, audit, clock, metro), `src/` (env types, app-variant, starter layout, route and screen), `app.config.ts`, `metro.config.js`, `AGENTS.md`, `CLAUDE.md`, `dot-nvmrc` (a `dot-` file name becomes `.`; synced copies are listed in `assets/shared.json`) | The generator writes them; read one when resolving a conflict |
 | `assets/skeleton-package.json` | The canonical skeleton manifest (scripts, dev tools, overrides, approvals; synced) | The generator renders `package.json` from it |
+| `assets/package-scripts.multi-package.json` | The scripts that take another form when multi-package: root `typecheck` and `export:audit` (run inside the Expo app, `<app-dir>`), every workspace's `typecheck` (quality-gates' list, synced) | When package.json has workspaces |
 | `assets/claude-settings.json` | The canonical `.claude/settings.json` (synced) | The generator writes or merges it |
 | `assets/app-dependencies.json` | The skeleton's runtime packages and the dev tools it leaves out until first use | When the skeleton's dependency set changes |
 | `assets/template-placeholders.json` | Placeholder values for the template harness | Maintainers only |

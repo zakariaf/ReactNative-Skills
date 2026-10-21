@@ -155,7 +155,14 @@
       "TypeScript-source workspace packages do not resolve without it",
       "src/core/goals/score-day.test.ts:2 [import-extension] \"./score-day\" has no file extension"
     ],
-    "ops": [{ "write": { "file": "rn-skills.config.json", "content": "{ \"importExtensions\": \"all\" }\n" } }]
+    "ops": [
+      {
+        "write": {
+          "file": "rn-skills.config.json",
+          "content": "{ \"importExtensions\": \"all\" }\n"
+        }
+      }
+    ]
   },
   "bad-imports": {
     "expect": [
@@ -836,13 +843,150 @@
     ]
   },
   "error-bad-extensions": {
-    "expect": ["ERROR [bad-input] import extensions \"some\" is not node or all"],
+    "expect": [
+      "ERROR [bad-input] import extensions \"some\" is not node or all"
+    ],
     "args": "{dir} --import-extensions some",
     "ops": []
   },
   "error-no-root": {
-    "expect": ["ERROR [bad-input] nothing to check:", "missing-folder"],
+    "expect": [
+      "ERROR [bad-input] nothing to check:",
+      "missing-folder"
+    ],
     "args": "{dir}/missing-folder",
     "ops": []
+  },
+  "pass-node-backend": {
+    "expect": [
+      "check-source: 26 TypeScript files checked, 0 problems"
+    ],
+    "args": ". --import-extensions node",
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "workspaces"
+          ],
+          "value": [
+            "functions",
+            "packages/*"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "functions/package.json",
+          "content": "{\n  \"name\": \"@acme/functions\",\n  \"private\": true,\n  \"main\": \"lib/index.js\",\n  \"engines\": {\n    \"node\": \"24\"\n  }\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "functions/src/task-digest.ts",
+          "lines": [
+            "// functions/src/task-digest.ts",
+            "import { createHash } from 'node:crypto';",
+            "",
+            "/** The hex SHA-256 of a task title, the id of its digest document. */",
+            "export function taskDigest(title: string): string {",
+            "  return createHash('sha256').update(title).digest('hex');",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "packages/server-kit/package.json",
+          "content": "{\n  \"name\": \"@acme/server-kit\",\n  \"private\": true,\n  \"exports\": {\n    \"./*\": \"./src/*\"\n  }\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "packages/server-kit/src/read-config.ts",
+          "lines": [
+            "// packages/server-kit/src/read-config.ts",
+            "import { readFileSync } from 'node:fs';",
+            "",
+            "/** The text of a config file next to the server code. */",
+            "export function readConfig(path: string): string {",
+            "  return readFileSync(path, 'utf8');",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "contracts/architecture.json",
+          "content": "{\n  \"workspaces\": [\n    {\n      \"name\": \"functions\",\n      \"dir\": \"functions\",\n      \"world\": \"node\"\n    },\n    {\n      \"name\": \"server-kit\",\n      \"dir\": \"packages/server-kit\",\n      \"world\": \"node\"\n    }\n  ]\n}\n"
+        }
+      }
+    ]
+  },
+  "bad-node-backend-package": {
+    "expect": [
+      "packages/shared/src/read-config.ts:2 [node-world-import] app code imports the Node built-in \"node:fs\""
+    ],
+    "args": ". --import-extensions node",
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "workspaces"
+          ],
+          "value": [
+            "functions",
+            "packages/*"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "functions/package.json",
+          "content": "{\n  \"name\": \"@acme/functions\",\n  \"private\": true,\n  \"main\": \"lib/index.js\",\n  \"engines\": {\n    \"node\": \"24\"\n  }\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "functions/src/task-digest.ts",
+          "lines": [
+            "// functions/src/task-digest.ts",
+            "import { createHash } from 'node:crypto';",
+            "",
+            "/** The hex SHA-256 of a task title, the id of its digest document. */",
+            "export function taskDigest(title: string): string {",
+            "  return createHash('sha256').update(title).digest('hex');",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "packages/shared/package.json",
+          "content": "{\n  \"name\": \"@acme/shared\",\n  \"private\": true,\n  \"exports\": {\n    \"./*\": \"./src/*\"\n  }\n}\n"
+        }
+      },
+      {
+        "write": {
+          "file": "packages/shared/src/read-config.ts",
+          "lines": [
+            "// packages/shared/src/read-config.ts",
+            "import { readFileSync } from 'node:fs';",
+            "",
+            "/** The text of a config file. */",
+            "export function readConfig(path: string): string {",
+            "  return readFileSync(path, 'utf8');",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "contracts/architecture.json",
+          "content": "{\n  \"workspaces\": [\n    {\n      \"name\": \"functions\",\n      \"dir\": \"functions\",\n      \"world\": \"node\"\n    },\n    {\n      \"name\": \"shared\",\n      \"dir\": \"packages/shared\",\n      \"world\": \"app\"\n    }\n  ]\n}\n"
+        }
+      }
+    ]
   }
 }

@@ -137,6 +137,8 @@
     "react-native-worklets": "worklets for animation and gestures",
     "@shopify/react-native-skia": "draws on a canvas",
     "@shopify/flash-list": "renders long lists",
+    "lottie-react-native": "plays bundled Lottie animation files (lottie-and-rive)",
+    "@rive-app/react-native": "plays bundled Rive animation files (lottie-and-rive)",
     "react-native-keyboard-controller": "keyboard-aware layout"
   },
   "adapterFiles": [

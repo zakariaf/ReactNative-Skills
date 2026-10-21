@@ -1,5 +1,6 @@
 [
   { "from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs" },
+  { "from": "scripts/lib/expo-apps.mjs", "to": "scripts/lib/expo-apps.mjs" },
   { "from": "scripts/lib/app-modules.mjs", "to": "scripts/lib/app-modules.mjs" },
   { "from": "repo-templates/src/theme/", "to": "templates/src/theme/" },
   { "from": "repo-templates/design/tokens.json", "to": "templates/design/tokens.json" },

@@ -4,10 +4,32 @@
 //           'golden' (*.golden.test.ts only: data goldens, and pixel goldens in Skia's CanvasKit env
 //           once the app depends on Skia).
 // Simulations (*.sim.test.ts) are NOT here: they run via jest.sim.config.js (`npm run test:sim`).
+// Security-rules tests (*.rules.test.ts) are NOT here either once jest.emulator.config.js exists:
+// they run inside the Firebase emulators (`npm run test:rules`).
 const fs = require('node:fs');
 const path = require('node:path');
 
-const { dependencies = {}, devDependencies = {} } = require('./package.json');
+// The repo's manifests: the root package.json and, in a workspace repo (package.json "workspaces"),
+// every workspace's, because a native library such as Skia is a dependency of the Expo app workspace
+// there (apps/mobile/package.json), not of the root.
+const ROOT_MANIFEST = require('./package.json');
+const WORKSPACE_GLOBS = [ROOT_MANIFEST.workspaces?.packages ?? ROOT_MANIFEST.workspaces ?? []]
+  .flat()
+  .filter((glob) => typeof glob === 'string' && !glob.startsWith('!'));
+const MANIFESTS = [
+  ROOT_MANIFEST,
+  ...fs
+    .globSync(
+      WORKSPACE_GLOBS.map((glob) => `${glob.replace(/\/+$/, '')}/package.json`),
+      { cwd: __dirname },
+    )
+    .map((file) => JSON.parse(fs.readFileSync(path.join(__dirname, file), 'utf8'))),
+];
+const dependsOn = (name) =>
+  MANIFESTS.some(
+    ({ dependencies = {}, devDependencies = {} }) =>
+      name in dependencies || name in devDependencies,
+  );
 
 // Coverage leaves out exactly the files whose first 6 lines say
 // "// device-only: covered by <the e2e flow or simulator check that exercises it>" (native
@@ -96,6 +118,11 @@ const TEST_ROOTS = [
 // test of the plugin's output fails once its directive file is mutated; mutation runs leave it out.
 const IS_MUTATION_RUN = process.env.STRYKER_MUTATOR_WORKER !== undefined;
 
+// Security-rules tests (*.rules.test.ts in test/rules/) run only inside the Firebase emulators,
+// through jest.emulator.config.js (firestore-rules-and-emulator-tests); once that config exists the
+// unit project leaves them out, and nothing else does.
+const HAS_RULES_TESTS = fs.existsSync(path.join(__dirname, 'jest.emulator.config.js'));
+
 const unitProject = {
   ...SHARED,
   displayName: 'unit',
@@ -105,6 +132,7 @@ const unitProject = {
     '\\.golden\\.test\\.',
     '\\.sim\\.test\\.',
     '\\.android\\.test\\.',
+    ...(HAS_RULES_TESTS ? ['\\.rules\\.test\\.'] : []),
     ...(IS_MUTATION_RUN ? ['/quality/worklet-transform\\.test\\.'] : []),
   ],
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
@@ -125,8 +153,9 @@ const androidProject = {
 // set-up. Once the app depends on Skia, the project runs in Skia's CanvasKit environment instead, so
 // pixel goldens draw real pixels (data goldens run there unchanged) and the inert Skia mock of
 // jest.setup.ts stays out. Without the package, a project naming that environment fails every Jest
-// run ("Test environment ... cannot be found"), so the environment follows package.json.
-const HAS_SKIA = '@shopify/react-native-skia' in { ...dependencies, ...devDependencies };
+// run ("Test environment ... cannot be found"), so the environment follows the manifests (the
+// root's and, in a workspace repo, the app workspace's).
+const HAS_SKIA = dependsOn('@shopify/react-native-skia');
 
 const CANVASKIT = {
   testEnvironment: '@shopify/react-native-skia/jestEnv.js',

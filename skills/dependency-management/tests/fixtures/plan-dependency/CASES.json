@@ -32,9 +32,25 @@
         }
       },
       {
-        "json": { "file": "package.json", "path": ["devDependencies", "@testing-library/react-native"], "delete": true }
+        "json": {
+          "file": "package.json",
+          "path": [
+            "devDependencies",
+            "@testing-library/react-native"
+          ],
+          "delete": true
+        }
       },
-      { "json": { "file": "package.json", "path": ["devDependencies", "test-renderer"], "delete": true } }
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "devDependencies",
+            "test-renderer"
+          ],
+          "delete": true
+        }
+      }
     ]
   },
   "bad-companion-typescript-eslint": {
@@ -92,17 +108,23 @@
     ]
   },
   "bad-do-not-add": {
-    "expect": ["[do-not-add] babel-preset-expo: comes with expo; a direct copy drifts from the SDK's own"],
+    "expect": [
+      "[do-not-add] babel-preset-expo: comes with expo; a direct copy drifts from the SDK's own"
+    ],
     "args": "babel-preset-expo .",
     "ops": []
   },
   "bad-held-back": {
-    "expect": ["[held-back] eslint@10.0.0 crosses a held-back major"],
+    "expect": [
+      "[held-back] eslint@10.0.0 crosses a held-back major"
+    ],
     "args": "eslint@10.0.0 .",
     "ops": []
   },
   "bad-licence": {
-    "expect": ["[licence] valibot is licensed GPL-3.0-only, which the policy does not allow for shipped code"],
+    "expect": [
+      "[licence] valibot is licensed GPL-3.0-only, which the policy does not allow for shipped code"
+    ],
     "args": "valibot . --npm-view valibot-view.json --now 2026-10-03T00:00:00Z",
     "ops": [
       {
@@ -144,7 +166,10 @@
     ]
   },
   "bad-not-in-table": {
-    "expect": ["[not-in-table] left-pad is not in the dependency policy", "Stop and ask the developer"],
+    "expect": [
+      "[not-in-table] left-pad is not in the dependency policy",
+      "Stop and ask the developer"
+    ],
     "args": "left-pad .",
     "ops": []
   },
@@ -207,7 +232,9 @@
     ]
   },
   "bad-too-young-outliving-block": {
-    "expect": ["[too-young] react-native-google-mobile-ads@17.2.0 is 2 days old"],
+    "expect": [
+      "[too-young] react-native-google-mobile-ads@17.2.0 is 2 days old"
+    ],
     "args": "react-native-google-mobile-ads . --npm-view gma-view.json --now 2026-09-28T00:00:00Z",
     "ops": [
       {
@@ -266,26 +293,44 @@
           ]
         }
       },
-      { "replace": { "file": ".npmrc", "find": "min-release-age=7\n", "with": "min-release-age=14\n" } }
+      {
+        "replace": {
+          "file": ".npmrc",
+          "find": "min-release-age=7\n",
+          "with": "min-release-age=14\n"
+        }
+      }
     ]
   },
   "bad-version-differs": {
-    "expect": ["[version-differs] the dependency policy pins zustand 5.0.15, not 5.0.14"],
+    "expect": [
+      "[version-differs] the dependency policy pins zustand 5.0.15, not 5.0.14"
+    ],
     "args": "zustand@5.0.14 .",
     "ops": []
   },
   "bad-version-differs-online": {
-    "expect": ["[version-differs] the dependency policy pins zustand 5.0.15, not 5.99.0"],
+    "expect": [
+      "[version-differs] the dependency policy pins zustand 5.0.15, not 5.99.0"
+    ],
     "args": "zustand@5.99.0 . --online --today 2026-10-03",
     "ops": []
   },
   "error-no-policy": {
-    "expect": ["ERROR [bad-input] no dependency policy at contracts/dependency-policy.json"],
+    "expect": [
+      "ERROR [bad-input] no dependency policy at contracts/dependency-policy.json"
+    ],
     "args": "expo-haptics .",
-    "ops": [{ "delete": "contracts/dependency-policy.json" }]
+    "ops": [
+      {
+        "delete": "contracts/dependency-policy.json"
+      }
+    ]
   },
   "error-peer-of-single": {
-    "expect": ["ERROR [bad-input] --peer-of packages/ui needs npm workspaces, and this repo has none"],
+    "expect": [
+      "ERROR [bad-input] --peer-of packages/ui needs npm workspaces, and this repo has none"
+    ],
     "args": "expo-haptics . --peer-of packages/ui",
     "ops": []
   },
@@ -370,13 +415,24 @@
         }
       },
       {
-        "json": { "file": "package.json", "path": ["allowScripts"], "value": { "lefthook": false } },
+        "json": {
+          "file": "package.json",
+          "path": [
+            "allowScripts"
+          ],
+          "value": {
+            "lefthook": false
+          }
+        },
         "$comment": "A name-only false denies the script of every lefthook version: a reviewed decision, so no review step."
       }
     ]
   },
   "pass-deprecated-accepted": {
-    "expect": ["deprecated This version is no longer supported.", "accepted ESLint 9 is end of life"],
+    "expect": [
+      "deprecated This version is no longer supported.",
+      "accepted ESLint 9 is end of life"
+    ],
     "args": "eslint . --npm-view eslint-view.json --now 2026-10-03T00:00:00Z",
     "ops": [
       {
@@ -398,7 +454,9 @@
     ]
   },
   "pass-exclude-covered": {
-    "expect": ["covered  by the dated exclude react-native-google-mobile-ads (block expires 2026-10-02)"],
+    "expect": [
+      "covered  by the dated exclude react-native-google-mobile-ads (block expires 2026-10-02)"
+    ],
     "args": "react-native-google-mobile-ads . --npm-view gma-view.json --now 2026-09-28T00:00:00Z",
     "ops": [
       {
@@ -436,11 +494,56 @@
     ],
     "args": "expo-router .",
     "ops": [
-      { "json": { "file": "package.json", "path": ["dependencies", "expo-router"], "delete": true } },
-      { "json": { "file": "package.json", "path": ["dependencies", "expo-linking"], "delete": true } },
-      { "json": { "file": "package.json", "path": ["dependencies", "expo-constants"], "delete": true } },
-      { "json": { "file": "package.json", "path": ["dependencies", "react-native-screens"], "delete": true } },
-      { "json": { "file": "package.json", "path": ["dependencies", "react-native-safe-area-context"], "delete": true } }
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "expo-router"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "expo-linking"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "expo-constants"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "react-native-screens"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "react-native-safe-area-context"
+          ],
+          "delete": true
+        }
+      }
     ]
   },
   "pass-expo-managed-plan": {
@@ -454,7 +557,18 @@
       "native change: rebuild the binaries"
     ],
     "args": "expo-haptics .",
-    "ops": [{ "json": { "file": "package.json", "path": ["dependencies", "expo-haptics"], "delete": true } }]
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "expo-haptics"
+          ],
+          "delete": true
+        }
+      }
+    ]
   },
   "pass-expo-table-spec": {
     "expect": [
@@ -475,7 +589,10 @@
     "ops": []
   },
   "pass-remove": {
-    "expect": ["step 1   npm uninstall zustand", "delete its row from the dependency policy"],
+    "expect": [
+      "step 1   npm uninstall zustand",
+      "delete its row from the dependency policy"
+    ],
     "args": "zustand . --remove",
     "ops": []
   },
@@ -564,8 +681,82 @@
         }
       },
       {
-        "json": { "file": "package.json", "path": ["allowScripts"], "value": { "lefthook": true } },
+        "json": {
+          "file": "package.json",
+          "path": [
+            "allowScripts"
+          ],
+          "value": {
+            "lefthook": true
+          }
+        },
         "$comment": "A name-only true lets npm run the script of any lefthook version: the plan does not count it as a review."
+      }
+    ]
+  },
+  "pass-do-not-add-scoped-dev-row": {
+    "expect": [
+      "npm install -D firebase@13.0.0",
+      "plan-dependency: 1 requests checked, 0 problems"
+    ],
+    "args": "firebase .",
+    "ops": [
+      {
+        "$comment": "a doNotAdd entry scoped to the app: the dev row is planned as usual",
+        "json": {
+          "file": "contracts/dependency-policy.json",
+          "path": [
+            "packages",
+            "firebase"
+          ],
+          "value": {
+            "version": "13.0.0",
+            "spec": "13.0.0",
+            "install": "npm",
+            "where": "dev",
+            "why": "the peer of @firebase/rules-unit-testing: only the rules tests under test/rules/ import it (firestore-rules-and-emulator-tests)"
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/dependency-policy.json",
+          "path": [
+            "doNotAdd",
+            "firebase"
+          ],
+          "value": {
+            "reason": "the app talks to Firebase through @react-native-firebase/*; the JS SDK is a second client",
+            "where": "app",
+            "allowIn": [
+              "test/rules/**"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "bad-do-not-add-scoped-no-row": {
+    "expect": [
+      "[do-not-add] firebase (kept out of dependencies): the app talks to Firebase through @react-native-firebase/*"
+    ],
+    "args": "firebase .",
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/dependency-policy.json",
+          "path": [
+            "doNotAdd",
+            "firebase"
+          ],
+          "value": {
+            "reason": "the app talks to Firebase through @react-native-firebase/*; the JS SDK is a second client",
+            "where": "app",
+            "allowIn": [
+              "test/rules/**"
+            ]
+          }
+        }
       }
     ]
   }

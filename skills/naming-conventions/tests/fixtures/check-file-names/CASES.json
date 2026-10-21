@@ -29,11 +29,20 @@
           "with": "android: { package: 'com.example.new',"
         }
       },
-      { "replace": { "file": "app.config.ts", "find": "slug: 'tasks',", "with": "slug: 'TasksApp'," } }
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "slug: 'tasks',",
+          "with": "slug: 'TasksApp',"
+        }
+      }
     ]
   },
   "bad-app-id-config-both": {
-    "expect": ["app.config.ts:4 [app-id] app id 'com.Example.tasks' does not match", "RESULT: FAIL (1 problems)"],
+    "expect": [
+      "app.config.ts:4 [app-id] app id 'com.Example.tasks' does not match",
+      "RESULT: FAIL (1 problems)"
+    ],
     "ops": [
       {
         "write": {
@@ -88,7 +97,10 @@
     ]
   },
   "bad-app-id-followed": {
-    "expect": ["app.config.ts:8 [app-id] app id 'tasks' does not match", "RESULT: FAIL (1 problems)"],
+    "expect": [
+      "app.config.ts:8 [app-id] app id 'tasks' does not match",
+      "RESULT: FAIL (1 problems)"
+    ],
     "ops": [
       {
         "write": {
@@ -176,7 +188,10 @@
     ]
   },
   "bad-app-id-object-property": {
-    "expect": ["app.config.ts:8 [app-id] app id 'com.Acme.Tasks' does not match", "RESULT: FAIL (1 problems)"],
+    "expect": [
+      "app.config.ts:8 [app-id] app id 'com.Acme.Tasks' does not match",
+      "RESULT: FAIL (1 problems)"
+    ],
     "ops": [
       {
         "write": {
@@ -240,8 +255,16 @@
       {
         "json": {
           "file": "contracts/naming.json",
-          "path": ["publishedAppIds"],
-          "value": [{ "id": "com.Acme.Tasks", "platform": "ios", "why": "live on the App Store since 2023" }]
+          "path": [
+            "publishedAppIds"
+          ],
+          "value": [
+            {
+              "id": "com.Acme.Tasks",
+              "platform": "ios",
+              "why": "live on the App Store since 2023"
+            }
+          ]
         }
       }
     ]
@@ -309,11 +332,23 @@
       "RESULT: FAIL (1 problems)"
     ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["apps/*"] } },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "workspaces"
+          ],
+          "value": [
+            "apps/*"
+          ]
+        }
+      },
       {
         "write": {
           "file": "apps/planner/package.json",
-          "lines": ["{ \"name\": \"@acme/planner\", \"private\": true }"]
+          "lines": [
+            "{ \"name\": \"@acme/planner\", \"private\": true }"
+          ]
         }
       },
       {
@@ -331,7 +366,15 @@
           ]
         }
       },
-      { "json": { "file": "contracts/naming.json", "path": ["slugMatchesAppFolder"], "value": true } }
+      {
+        "json": {
+          "file": "contracts/naming.json",
+          "path": [
+            "slugMatchesAppFolder"
+          ],
+          "value": true
+        }
+      }
     ]
   },
   "bad-barrel-index": {
@@ -342,12 +385,21 @@
     ],
     "ops": [
       {
-        "write": { "file": "src/ui/index.ts", "lines": ["// src/ui/index.ts", "export { AppText } from './app-text';"] }
+        "write": {
+          "file": "src/ui/index.ts",
+          "lines": [
+            "// src/ui/index.ts",
+            "export { AppText } from './app-text';"
+          ]
+        }
       },
       {
         "write": {
           "file": "src/features/tasks/index.ts",
-          "lines": ["// src/features/tasks/index.ts", "export { TasksScreen } from './tasks-screen';"]
+          "lines": [
+            "// src/features/tasks/index.ts",
+            "export { TasksScreen } from './tasks-screen';"
+          ]
         }
       }
     ]
@@ -360,8 +412,26 @@
       "RESULT: FAIL (3 problems)"
     ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["scripts", "typecheck"], "delete": true } },
-      { "json": { "file": "package.json", "path": ["scripts", "check:fast"], "value": "eslint . --max-warnings 0" } },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "scripts",
+            "typecheck"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "scripts",
+            "check:fast"
+          ],
+          "value": "eslint . --max-warnings 0"
+        }
+      },
       {
         "replace": {
           "file": "src/data/sql-driver.ts",
@@ -385,8 +455,22 @@
       "RESULT: FAIL (2 problems)"
     ],
     "ops": [
-      { "write": { "file": "src/i18n/catalogs/english.json", "lines": ["{}"] } },
-      { "write": { "file": "src/i18n/catalogs/fr.json", "lines": ["{}"] } }
+      {
+        "write": {
+          "file": "src/i18n/catalogs/english.json",
+          "lines": [
+            "{}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/i18n/catalogs/fr.json",
+          "lines": [
+            "{}"
+          ]
+        }
+      }
     ]
   },
   "bad-catalog-file-default": {
@@ -397,10 +481,33 @@
       "RESULT: FAIL (3 problems)"
     ],
     "ops": [
-      { "delete": "contracts/naming.json" },
-      { "write": { "file": "src/i18n/catalogs/pt_BR.json", "lines": ["{}"] } },
-      { "write": { "file": "src/i18n/catalogs/pt-br.json", "lines": ["{}"] } },
-      { "write": { "file": "src/i18n/catalogs/zh-hans.json", "lines": ["{}"] } }
+      {
+        "delete": "contracts/naming.json"
+      },
+      {
+        "write": {
+          "file": "src/i18n/catalogs/pt_BR.json",
+          "lines": [
+            "{}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/i18n/catalogs/pt-br.json",
+          "lines": [
+            "{}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/i18n/catalogs/zh-hans.json",
+          "lines": [
+            "{}"
+          ]
+        }
+      }
     ]
   },
   "bad-export-name": {
@@ -487,7 +594,10 @@
       {
         "write": {
           "file": "src/services/haptics/haptics-port.ts",
-          "lines": ["// src/services/haptics/haptics-port.ts", "export type Haptics = { readonly tap: () => void };"]
+          "lines": [
+            "// src/services/haptics/haptics-port.ts",
+            "export type Haptics = { readonly tap: () => void };"
+          ]
         }
       },
       {
@@ -532,19 +642,28 @@
       {
         "write": {
           "file": "src/services/clock/clock.mock.ts",
-          "lines": ["// src/services/clock/clock.mock.ts", "export const CLOCK_START = 0;"]
+          "lines": [
+            "// src/services/clock/clock.mock.ts",
+            "export const CLOCK_START = 0;"
+          ]
         }
       },
       {
         "write": {
           "file": "src/services/clock/mock-clock.ts",
-          "lines": ["// src/services/clock/mock-clock.ts", "export const CLOCK_STEP = 1;"]
+          "lines": [
+            "// src/services/clock/mock-clock.ts",
+            "export const CLOCK_STEP = 1;"
+          ]
         }
       },
       {
         "write": {
           "file": "__mocks__/expo-notifications-mock.ts",
-          "lines": ["// __mocks__/expo-notifications-mock.ts", "export const scheduleNotificationAsync = jest.fn();"]
+          "lines": [
+            "// __mocks__/expo-notifications-mock.ts",
+            "export const scheduleNotificationAsync = jest.fn();"
+          ]
         }
       },
       {
@@ -572,13 +691,21 @@
       {
         "write": {
           "file": "src/ui/TaskBadge.tsx",
-          "lines": ["// src/ui/TaskBadge.tsx", "export function TaskBadge(): null {", "  return null;", "}"]
+          "lines": [
+            "// src/ui/TaskBadge.tsx",
+            "export function TaskBadge(): null {",
+            "  return null;",
+            "}"
+          ]
         }
       },
       {
         "write": {
           "file": "src/features/tasks/apply_filter.ts",
-          "lines": ["// src/features/tasks/apply_filter.ts", "export function applyFilter(): void {}"]
+          "lines": [
+            "// src/features/tasks/apply_filter.ts",
+            "export function applyFilter(): void {}"
+          ]
         }
       }
     ]
@@ -590,8 +717,22 @@
       "RESULT: FAIL (2 problems)"
     ],
     "ops": [
-      { "write": { "file": "src/data/fixtures/v1.json", "lines": ["{}"] } },
-      { "write": { "file": "src/data/fixtures/tasks-db.json", "lines": ["{}"] } }
+      {
+        "write": {
+          "file": "src/data/fixtures/v1.json",
+          "lines": [
+            "{}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/data/fixtures/tasks-db.json",
+          "lines": [
+            "{}"
+          ]
+        }
+      }
     ]
   },
   "bad-flow-file": {
@@ -603,10 +744,46 @@
       "RESULT: FAIL (4 problems)"
     ],
     "ops": [
-      { "write": { "file": ".maestro/flows/smoke/add-task.yaml", "lines": ["appId: ${APP_ID}", "---", "- launchApp"] } },
-      { "write": { "file": ".maestro/flows/03-loose.yaml", "lines": ["appId: ${APP_ID}", "---", "- launchApp"] } },
-      { "write": { "file": ".maestro/subflows/01_Seed.yaml", "lines": ["appId: ${APP_ID}", "---", "- launchApp"] } },
-      { "write": { "file": ".maestro/stray.yaml", "lines": ["appId: ${APP_ID}", "---", "- launchApp"] } }
+      {
+        "write": {
+          "file": ".maestro/flows/smoke/add-task.yaml",
+          "lines": [
+            "appId: ${APP_ID}",
+            "---",
+            "- launchApp"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": ".maestro/flows/03-loose.yaml",
+          "lines": [
+            "appId: ${APP_ID}",
+            "---",
+            "- launchApp"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": ".maestro/subflows/01_Seed.yaml",
+          "lines": [
+            "appId: ${APP_ID}",
+            "---",
+            "- launchApp"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": ".maestro/stray.yaml",
+          "lines": [
+            "appId: ${APP_ID}",
+            "---",
+            "- launchApp"
+          ]
+        }
+      }
     ]
   },
   "bad-flow-file-area-folder": {
@@ -632,7 +809,11 @@
     ]
   },
   "bad-folder-kebab": {
-    "expect": ["src/features/TaskDetails/ [folder-kebab]", "scripts/Build/ [folder-kebab]", "RESULT: FAIL (2 problems)"],
+    "expect": [
+      "src/features/TaskDetails/ [folder-kebab]",
+      "scripts/Build/ [folder-kebab]",
+      "RESULT: FAIL (2 problems)"
+    ],
     "ops": [
       {
         "write": {
@@ -648,7 +829,10 @@
       {
         "write": {
           "file": "scripts/Build/build-android-emulator.ts",
-          "lines": ["// scripts/Build/build-android-emulator.ts", "export function buildAndroidEmulator(): void {}"]
+          "lines": [
+            "// scripts/Build/build-android-emulator.ts",
+            "export function buildAndroidEmulator(): void {}"
+          ]
         }
       }
     ]
@@ -674,13 +858,19 @@
       {
         "write": {
           "file": "src/core/common.ts",
-          "lines": ["// src/core/common.ts", "export const SECONDS_PER_DAY = 86400;"]
+          "lines": [
+            "// src/core/common.ts",
+            "export const SECONDS_PER_DAY = 86400;"
+          ]
         }
       }
     ]
   },
   "bad-grab-bag-folder": {
-    "expect": ["src/helpers/ [grab-bag-folder]", "RESULT: FAIL (1 problems)"],
+    "expect": [
+      "src/helpers/ [grab-bag-folder]",
+      "RESULT: FAIL (1 problems)"
+    ],
     "ops": [
       {
         "write": {
@@ -696,8 +886,20 @@
     ]
   },
   "bad-level-file": {
-    "expect": ["src/games/lights-out/levels/level-one.json [level-file]", "RESULT: FAIL (1 problems)"],
-    "ops": [{ "write": { "file": "src/games/lights-out/levels/level-one.json", "lines": ["{ \"levels\": [] }"] } }]
+    "expect": [
+      "src/games/lights-out/levels/level-one.json [level-file]",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/games/lights-out/levels/level-one.json",
+          "lines": [
+            "{ \"levels\": [] }"
+          ]
+        }
+      }
+    ]
   },
   "bad-npm-script-name": {
     "expect": [
@@ -706,11 +908,23 @@
       "RESULT: FAIL (2 problems)"
     ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["scripts", "checkFast"], "value": "eslint ." } },
       {
         "json": {
           "file": "package.json",
-          "path": ["scripts", "test:Golden"],
+          "path": [
+            "scripts",
+            "checkFast"
+          ],
+          "value": "eslint ."
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "scripts",
+            "test:Golden"
+          ],
           "value": "jest --ci --selectProjects golden"
         }
       }
@@ -752,16 +966,40 @@
       "RESULT: FAIL (2 problems)"
     ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["packages/*"] } },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "workspaces"
+          ],
+          "value": [
+            "packages/*"
+          ]
+        }
+      },
       {
         "write": {
           "file": "packages/billing/package.json",
-          "lines": ["{ \"name\": \"@demo/billing-kit\", \"private\": true }"]
+          "lines": [
+            "{ \"name\": \"@demo/billing-kit\", \"private\": true }"
+          ]
         }
       },
-      { "write": { "file": "packages/ui/package.json", "lines": ["{ \"name\": \"@acme/ui\", \"private\": true }"] } },
       {
-        "write": { "file": "packages/sync/package.json", "lines": ["{ \"name\": \"@other/sync\", \"private\": true }"] }
+        "write": {
+          "file": "packages/ui/package.json",
+          "lines": [
+            "{ \"name\": \"@acme/ui\", \"private\": true }"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "packages/sync/package.json",
+          "lines": [
+            "{ \"name\": \"@other/sync\", \"private\": true }"
+          ]
+        }
       }
     ]
   },
@@ -780,8 +1018,20 @@
           "with": "// src/core/date-key.ts\n"
         }
       },
-      { "replace": { "file": "src/core/dates/add-days.ts", "find": "// src/core/dates/add-days.ts\n", "with": "" } },
-      { "replace": { "file": "jest.setup.ts", "find": "// jest.setup.ts: runs", "with": "// Runs" } }
+      {
+        "replace": {
+          "file": "src/core/dates/add-days.ts",
+          "find": "// src/core/dates/add-days.ts\n",
+          "with": ""
+        }
+      },
+      {
+        "replace": {
+          "file": "jest.setup.ts",
+          "find": "// jest.setup.ts: runs",
+          "with": "// Runs"
+        }
+      }
     ]
   },
   "bad-path-header-js": {
@@ -818,7 +1068,11 @@
       {
         "write": {
           "file": "scripts/release/bump-build-number.mjs",
-          "lines": ["#!/usr/bin/env node", "// Bumps the build number before an EAS build.", "console.log('bumped');"]
+          "lines": [
+            "#!/usr/bin/env node",
+            "// Bumps the build number before an EAS build.",
+            "console.log('bumped');"
+          ]
         }
       },
       {
@@ -834,7 +1088,10 @@
     ]
   },
   "bad-plugin-file": {
-    "expect": ["plugins/android-queries-plugin.ts [plugin-file]", "RESULT: FAIL (1 problems)"],
+    "expect": [
+      "plugins/android-queries-plugin.ts [plugin-file]",
+      "RESULT: FAIL (1 problems)"
+    ],
     "ops": [
       {
         "write": {
@@ -880,7 +1137,9 @@
       {
         "json": {
           "file": "contracts/naming.json",
-          "path": ["storeProductIds"],
+          "path": [
+            "storeProductIds"
+          ],
           "value": [
             "com.example.tasks.premium",
             "com.other.app.pro",
@@ -911,7 +1170,9 @@
       {
         "json": {
           "file": "contracts/naming.json",
-          "path": ["storeProductIds"],
+          "path": [
+            "storeProductIds"
+          ],
           "value": [
             "com.acmecorporation.taskplanner.pro",
             "taskplanner.premium_yearly",
@@ -959,8 +1220,21 @@
       "RESULT: FAIL (1 problems)"
     ],
     "ops": [
-      { "rename": { "from": "src/app", "to": "app" } },
-      { "json": { "file": "contracts/naming.json", "path": ["pathHeader"], "value": false } },
+      {
+        "rename": {
+          "from": "src/app",
+          "to": "app"
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/naming.json",
+          "path": [
+            "pathHeader"
+          ],
+          "value": false
+        }
+      },
       {
         "replace": {
           "file": "app/+not-found.tsx",
@@ -981,7 +1255,12 @@
       {
         "write": {
           "file": "src/app/TaskList.tsx",
-          "lines": ["// src/app/TaskList.tsx", "export default function TaskListRoute(): null {", "  return null;", "}"]
+          "lines": [
+            "// src/app/TaskList.tsx",
+            "export default function TaskListRoute(): null {",
+            "  return null;",
+            "}"
+          ]
         }
       },
       {
@@ -1014,12 +1293,29 @@
       "RESULT: FAIL (1 problems)"
     ],
     "ops": [
-      { "rename": { "from": "src/app", "to": "app" } },
-      { "json": { "file": "contracts/naming.json", "path": ["pathHeader"], "value": false } },
+      {
+        "rename": {
+          "from": "src/app",
+          "to": "app"
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/naming.json",
+          "path": [
+            "pathHeader"
+          ],
+          "value": false
+        }
+      },
       {
         "write": {
           "file": "app/tasks/TaskList.tsx",
-          "lines": ["export default function TaskListRoute(): null {", "  return null;", "}"]
+          "lines": [
+            "export default function TaskListRoute(): null {",
+            "  return null;",
+            "}"
+          ]
         }
       }
     ]
@@ -1035,19 +1331,28 @@
       {
         "write": {
           "file": "src/features/tasks/task-list.spec.ts",
-          "lines": ["// src/features/tasks/task-list.spec.ts", "export {};"]
+          "lines": [
+            "// src/features/tasks/task-list.spec.ts",
+            "export {};"
+          ]
         }
       },
       {
         "write": {
           "file": "src/features/tasks/__tests__/sort-tasks.test.ts",
-          "lines": ["// src/features/tasks/__tests__/sort-tasks.test.ts", "export {};"]
+          "lines": [
+            "// src/features/tasks/__tests__/sort-tasks.test.ts",
+            "export {};"
+          ]
         }
       },
       {
         "write": {
           "file": "src/features/tasks/task-list.unit.test.ts",
-          "lines": ["// src/features/tasks/task-list.unit.test.ts", "export {};"]
+          "lines": [
+            "// src/features/tasks/task-list.unit.test.ts",
+            "export {};"
+          ]
         }
       },
       {
@@ -1060,13 +1365,33 @@
         }
       },
       {
-        "write": { "file": "src/ui/list-row.ios.test.tsx", "lines": ["// src/ui/list-row.ios.test.tsx", "export {};"] }
+        "write": {
+          "file": "src/ui/list-row.ios.test.tsx",
+          "lines": [
+            "// src/ui/list-row.ios.test.tsx",
+            "export {};"
+          ]
+        }
       }
     ]
   },
   "error-bad-contract": {
-    "expect": ["ERROR [bad-input] contracts/naming.json has the unknown key \"languages\""],
-    "ops": [{ "json": { "file": "contracts/naming.json", "path": ["languages"], "value": ["en"] } }]
+    "expect": [
+      "ERROR [bad-input] contracts/naming.json has the unknown key \"languages\""
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/naming.json",
+          "path": [
+            "languages"
+          ],
+          "value": [
+            "en"
+          ]
+        }
+      }
+    ]
   },
   "error-extra-e2e-folder": {
     "expect": [
@@ -1076,49 +1401,95 @@
       {
         "json": {
           "file": "contracts/naming.json",
-          "path": ["extraE2eFolders"],
-          "value": [{ "folder": "flows/manual", "why": "manual checks" }]
+          "path": [
+            "extraE2eFolders"
+          ],
+          "value": [
+            {
+              "folder": "flows/manual",
+              "why": "manual checks"
+            }
+          ]
         }
       }
     ]
   },
   "error-missing-contract": {
-    "expect": ["ERROR [bad-input] rn-skills.config.json \"namingContract\" names qa/naming.json, which does not exist"],
-    "ops": [{ "write": { "file": "rn-skills.config.json", "lines": ["{ \"namingContract\": \"qa/naming.json\" }"] } }]
+    "expect": [
+      "ERROR [bad-input] rn-skills.config.json \"namingContract\" names qa/naming.json, which does not exist"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "rn-skills.config.json",
+          "lines": [
+            "{ \"namingContract\": \"qa/naming.json\" }"
+          ]
+        }
+      }
+    ]
   },
-  "error-missing-root": { "expect": ["ERROR [bad-input] nothing to check"], "args": "{dir}/does-not-exist", "ops": [] },
+  "error-missing-root": {
+    "expect": [
+      "ERROR [bad-input] nothing to check"
+    ],
+    "args": "{dir}/does-not-exist",
+    "ops": []
+  },
   "error-published-entry": {
-    "expect": ["ERROR [bad-input] contracts/naming.json \"publishedAppIds\"[0] needs \"why\" (a non-empty string)"],
+    "expect": [
+      "ERROR [bad-input] contracts/naming.json \"publishedAppIds\"[0] needs \"why\" (a non-empty string)"
+    ],
     "ops": [
       {
         "json": {
           "file": "contracts/naming.json",
-          "path": ["publishedAppIds"],
-          "value": [{ "id": "com.Acme.Tasks", "platform": "ios" }]
+          "path": [
+            "publishedAppIds"
+          ],
+          "value": [
+            {
+              "id": "com.Acme.Tasks",
+              "platform": "ios"
+            }
+          ]
         }
       }
     ]
   },
   "pass-allowed-index": {
-    "expect": ["check-file-names:", "0 problems"],
+    "expect": [
+      "check-file-names:",
+      "0 problems"
+    ],
     "ops": [
       {
         "write": {
           "file": "src/vendor-entry/index.ts",
-          "lines": ["// src/vendor-entry/index.ts", "export const ENTRY_NAME = \"tasks\";"]
+          "lines": [
+            "// src/vendor-entry/index.ts",
+            "export const ENTRY_NAME = \"tasks\";"
+          ]
         }
       },
       {
         "json": {
           "file": "contracts/naming.json",
-          "path": ["allowedIndexFiles"],
-          "value": ["src/vendor-entry/index.ts"]
+          "path": [
+            "allowedIndexFiles"
+          ],
+          "value": [
+            "src/vendor-entry/index.ts"
+          ]
         }
       }
     ]
   },
   "pass-app-id-variant-shapes": {
-    "expect": ["check-file-names:", "0 problems"],
+    "expect": [
+      "check-file-names:",
+      "0 problems"
+    ],
     "ops": [
       {
         "write": {
@@ -1156,17 +1527,53 @@
     ]
   },
   "pass-catalog-locale-tags": {
-    "expect": ["check-file-names:", "0 problems"],
+    "expect": [
+      "check-file-names:",
+      "0 problems"
+    ],
     "ops": [
-      { "delete": "contracts/naming.json" },
-      { "write": { "file": "src/i18n/catalogs/pt-BR.json", "lines": ["{}"] } },
-      { "write": { "file": "src/i18n/catalogs/zh-Hans.json", "lines": ["{}"] } },
-      { "write": { "file": "src/i18n/catalogs/es-419.json", "lines": ["{}"] } },
-      { "write": { "file": "src/i18n/catalogs/fil.json", "lines": ["{}"] } }
+      {
+        "delete": "contracts/naming.json"
+      },
+      {
+        "write": {
+          "file": "src/i18n/catalogs/pt-BR.json",
+          "lines": [
+            "{}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/i18n/catalogs/zh-Hans.json",
+          "lines": [
+            "{}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/i18n/catalogs/es-419.json",
+          "lines": [
+            "{}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "src/i18n/catalogs/fil.json",
+          "lines": [
+            "{}"
+          ]
+        }
+      }
     ]
   },
   "pass-context-module": {
-    "expect": ["check-file-names:", "0 problems"],
+    "expect": [
+      "check-file-names:",
+      "0 problems"
+    ],
     "ops": [
       {
         "write": {
@@ -1219,7 +1626,10 @@
     ]
   },
   "pass-directive-line-2": {
-    "expect": ["check-file-names:", "0 problems"],
+    "expect": [
+      "check-file-names:",
+      "0 problems"
+    ],
     "ops": [
       {
         "write": {
@@ -1254,32 +1664,55 @@
     ]
   },
   "pass-extra-e2e-folder": {
-    "expect": ["check-file-names:", "0 problems"],
+    "expect": [
+      "check-file-names:",
+      "0 problems"
+    ],
     "ops": [
       {
         "write": {
           "file": ".maestro/screenshots/matrix.yaml",
-          "lines": ["# .maestro/screenshots/matrix.yaml", "appId: ${APP_ID}", "---", "- launchApp"]
+          "lines": [
+            "# .maestro/screenshots/matrix.yaml",
+            "appId: ${APP_ID}",
+            "---",
+            "- launchApp"
+          ]
         }
       },
       {
         "write": {
           "file": ".maestro/storekit/01-buy.yaml",
-          "lines": ["# .maestro/storekit/01-buy.yaml", "appId: ${APP_ID}", "---", "- launchApp"]
+          "lines": [
+            "# .maestro/storekit/01-buy.yaml",
+            "appId: ${APP_ID}",
+            "---",
+            "- launchApp"
+          ]
         }
       },
       {
         "write": {
           "file": ".maestro/subflows/auth/sign-in.yaml",
-          "lines": ["# .maestro/subflows/auth/sign-in.yaml", "appId: ${APP_ID}", "---", "- launchApp"]
+          "lines": [
+            "# .maestro/subflows/auth/sign-in.yaml",
+            "appId: ${APP_ID}",
+            "---",
+            "- launchApp"
+          ]
         }
       },
       {
         "json": {
           "file": "contracts/naming.json",
-          "path": ["extraE2eFolders"],
+          "path": [
+            "extraE2eFolders"
+          ],
           "value": [
-            { "folder": "screenshots", "why": "run only by npm run screenshots:ios, never by CI" },
+            {
+              "folder": "screenshots",
+              "why": "run only by npm run screenshots:ios, never by CI"
+            },
             {
               "folder": "storekit",
               "why": "StoreKit tests run by their own script against a local StoreKit configuration"
@@ -1290,13 +1723,29 @@
     ]
   },
   "pass-multi-package": {
-    "expect": ["check-file-names:", "0 problems"],
+    "expect": [
+      "check-file-names:",
+      "0 problems"
+    ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["workspaces"], "value": ["apps/*", "packages/*"] } },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "workspaces"
+          ],
+          "value": [
+            "apps/*",
+            "packages/*"
+          ]
+        }
+      },
       {
         "write": {
           "file": "packages/billing/package.json",
-          "lines": ["{ \"name\": \"@acme/billing\", \"private\": true }"]
+          "lines": [
+            "{ \"name\": \"@acme/billing\", \"private\": true }"
+          ]
         }
       },
       {
@@ -1310,9 +1759,21 @@
           ]
         }
       },
-      { "write": { "file": "packages/ui/package.json", "lines": ["{ \"name\": \"@acme/ui\", \"private\": true }"] } },
       {
-        "write": { "file": "apps/mobile/package.json", "lines": ["{ \"name\": \"@acme/mobile\", \"private\": true }"] }
+        "write": {
+          "file": "packages/ui/package.json",
+          "lines": [
+            "{ \"name\": \"@acme/ui\", \"private\": true }"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/package.json",
+          "lines": [
+            "{ \"name\": \"@acme/mobile\", \"private\": true }"
+          ]
+        }
       },
       {
         "write": {
@@ -1333,13 +1794,23 @@
       {
         "write": {
           "file": "apps/mobile/.maestro/flows/smoke/01-open-tasks.yaml",
-          "lines": ["appId: ${APP_ID}", "---", "- launchApp", "- runFlow: ../../subflows/grant-notifications.yaml"]
+          "lines": [
+            "appId: ${APP_ID}",
+            "---",
+            "- launchApp",
+            "- runFlow: ../../subflows/grant-notifications.yaml"
+          ]
         }
       },
       {
         "write": {
           "file": "apps/mobile/.maestro/subflows/grant-notifications.yaml",
-          "lines": ["appId: ${APP_ID}", "---", "- assertVisible:", "    id: 'tasks.list'"]
+          "lines": [
+            "appId: ${APP_ID}",
+            "---",
+            "- assertVisible:",
+            "    id: 'tasks.list'"
+          ]
         }
       },
       {
@@ -1356,14 +1827,34 @@
     ]
   },
   "pass-path-header-off": {
-    "expect": ["check-file-names:", "0 problems"],
+    "expect": [
+      "check-file-names:",
+      "0 problems"
+    ],
     "ops": [
-      { "replace": { "file": "src/core/dates/add-days.ts", "find": "// src/core/dates/add-days.ts\n", "with": "" } },
-      { "json": { "file": "contracts/naming.json", "path": ["pathHeader"], "value": false } }
+      {
+        "replace": {
+          "file": "src/core/dates/add-days.ts",
+          "find": "// src/core/dates/add-days.ts\n",
+          "with": ""
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/naming.json",
+          "path": [
+            "pathHeader"
+          ],
+          "value": false
+        }
+      }
     ]
   },
   "pass-published-app-id": {
-    "expect": ["check-file-names:", "0 problems"],
+    "expect": [
+      "check-file-names:",
+      "0 problems"
+    ],
     "ops": [
       {
         "replace": {
@@ -1386,42 +1877,80 @@
           "with": "android: { package: 'com.acme.tasks_app',"
         }
       },
-      { "replace": { "file": "app.config.ts", "find": "slug: 'tasks',", "with": "slug: 'TasksApp'," } },
+      {
+        "replace": {
+          "file": "app.config.ts",
+          "find": "slug: 'tasks',",
+          "with": "slug: 'TasksApp',"
+        }
+      },
       {
         "json": {
           "file": "contracts/naming.json",
-          "path": ["publishedAppIds"],
+          "path": [
+            "publishedAppIds"
+          ],
           "value": [
-            { "id": "com.Acme.Tasks", "platform": "ios", "why": "live on the App Store since 2023" },
-            { "id": "com.acme.tasks_app", "platform": "android", "why": "live on Google Play since 2023" }
+            {
+              "id": "com.Acme.Tasks",
+              "platform": "ios",
+              "why": "live on the App Store since 2023"
+            },
+            {
+              "id": "com.acme.tasks_app",
+              "platform": "android",
+              "why": "live on Google Play since 2023"
+            }
           ]
         }
       },
       {
         "json": {
           "file": "contracts/naming.json",
-          "path": ["publishedSlugs"],
-          "value": [{ "slug": "TasksApp", "why": "the EAS project since 2023" }]
+          "path": [
+            "publishedSlugs"
+          ],
+          "value": [
+            {
+              "slug": "TasksApp",
+              "why": "the EAS project since 2023"
+            }
+          ]
         }
       },
       {
         "json": {
           "file": "contracts/naming.json",
-          "path": ["storeProductIds"],
-          "value": ["com.example.tasks.premium", "Premium-Monthly"]
+          "path": [
+            "storeProductIds"
+          ],
+          "value": [
+            "com.example.tasks.premium",
+            "Premium-Monthly"
+          ]
         }
       },
       {
         "json": {
           "file": "contracts/naming.json",
-          "path": ["publishedProductIds"],
-          "value": [{ "id": "Premium-Monthly", "why": "App Store only, sold since 2023" }]
+          "path": [
+            "publishedProductIds"
+          ],
+          "value": [
+            {
+              "id": "Premium-Monthly",
+              "why": "App Store only, sold since 2023"
+            }
+          ]
         }
       }
     ]
   },
   "pass-vendor-app-id-consts": {
-    "expect": ["check-file-names:", "0 problems"],
+    "expect": [
+      "check-file-names:",
+      "0 problems"
+    ],
     "ops": [
       {
         "replace": {
@@ -1435,6 +1964,56 @@
           "file": "app.config.ts",
           "find": "    extra: { appVariant: variant },\n",
           "with": "    plugins: [\n      ['react-native-google-mobile-ads', { iosAppId: ADMOB_IOS_APP_ID, androidAppId: ADMOB_ANDROID_APP_ID }],\n      ['react-native-fbsdk-next', { appID: FACEBOOK_APP_ID, displayName: 'Tasks', scheme: `fb${FACEBOOK_APP_ID}` }],\n    ],\n    extra: { appVariant: variant, firebase: { appId: FIREBASE_IOS_APP_ID }, support: { appId: 'a1b2c3d4' } },\n"
+        }
+      }
+    ]
+  },
+  "bad-path-header-workspace": {
+    "expect": [
+      "apps/tasks/src/features/tasks/use-tasks-model.ts:1 [path-header] line 1 is not \"// apps/tasks/src/features/tasks/use-tasks-model.ts\"",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "$comment": "the single app moved into apps/tasks: a moved file whose header still names its old path fails; the rewritten header passes",
+        "json": {
+          "file": "package.json",
+          "path": [
+            "workspaces"
+          ],
+          "value": [
+            "apps/*"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "apps/tasks/package.json",
+          "lines": [
+            "{ \"name\": \"@acme/tasks\", \"private\": true }"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "apps/tasks/src/features/tasks/use-tasks-model.ts",
+          "lines": [
+            "// src/features/tasks/use-tasks-model.ts",
+            "export function useTasksModel(): number {",
+            "  return 1;",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "apps/tasks/src/features/tasks/tasks-screen.tsx",
+          "lines": [
+            "// apps/tasks/src/features/tasks/tasks-screen.tsx: rewritten with the move",
+            "export function TasksScreen(): null {",
+            "  return null;",
+            "}"
+          ]
         }
       }
     ]

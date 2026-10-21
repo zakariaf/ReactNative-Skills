@@ -220,6 +220,13 @@
       "oneLine": "Motion with Reanimated 4: a declared moment catalog, motion tokens, interruptible animations, reduce motion everywhere, bounded celebration."
     },
     {
+      "name": "lottie-and-rive",
+      "category": "ui",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Lottie and Rive moments: bundled files with size and frame-rate budgets, a Reduce Motion still frame, screen-reader hiding, bounded loops and licence records."
+    },
+    {
       "name": "audio-and-haptics-feedback",
       "category": "ui",
       "plugin": "core",
@@ -302,6 +309,27 @@
       "plugin": "core",
       "manual": false,
       "oneLine": "Server state with TanStack Query over a typed ApiClient port: validated responses, query keys, retries, cancellation, optimistic updates, online/focus managers, offline."
+    },
+    {
+      "name": "firebase-rnfb",
+      "category": "data",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "React Native Firebase behind ports: the modular API, offline-first Firestore writes, listeners that unsubscribe, Storage uploads, emulators, App Check and config plugins."
+    },
+    {
+      "name": "firestore-rules-and-emulator-tests",
+      "category": "data",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Firestore and Storage security rules closed by default (owner checks, field allow-lists, server-only docs), each proven by a test on the emulator."
+    },
+    {
+      "name": "cloud-functions-backend",
+      "category": "data",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "2nd-gen Cloud Functions in TypeScript: one callable wrapper (App Check, auth, parsed input, typed failures), bound secrets, limits, quotas and a billing kill switch."
     },
     {
       "name": "auth-and-secure-storage",
@@ -456,6 +484,13 @@
       "plugin": "core",
       "manual": false,
       "oneLine": "In-app purchases with expo-iap behind a port: a Premium entitlement, every purchase state, restore, refunds and revocation, StoreKit and Play testing."
+    },
+    {
+      "name": "subscriptions-revenuecat",
+      "category": "money-privacy",
+      "plugin": "core",
+      "manual": false,
+      "oneLine": "Subscriptions with RevenueCat behind a port: offerings and store prices, restore, a server entitlement kept by an idempotent webhook, sandbox testing."
     },
     {
       "name": "privacy-and-store-declarations",

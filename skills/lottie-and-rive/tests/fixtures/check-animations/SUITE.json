@@ -1,0 +1,103 @@
+{
+  "$comment": "The templates (AnimationMoment, the players, the mocks, the empty contract) laid under a small Tasks app; the ops add the .riv files (no committed binaries), the app's two records and a vendored skill whose planted findings must stay silent.",
+  "base": [
+    {
+      "templates": true,
+      "firstLinePath": true
+    },
+    "@tests/bases/app"
+  ],
+  "ops": [
+    {
+      "write": {
+        "file": "assets/animations/empty-tasks-mascot.riv",
+        "content": "RIVE fixture: check-animations reads the size and the record of a .riv file, never its content.\n"
+      }
+    },
+    {
+      "write": {
+        "file": ".agents/skills/kit/assets/stray.riv",
+        "content": "RIVE fixture: check-animations reads the size and the record of a .riv file, never its content.\n"
+      }
+    },
+    {
+      "write": {
+        "file": "skills/brand/assets/stray.riv",
+        "content": "RIVE fixture: check-animations reads the size and the record of a .riv file, never its content.\n"
+      }
+    },
+    {
+      "write": {
+        "file": "vendor/anim-kit/SKILL.md",
+        "lines": [
+          "---",
+          "name: anim-kit",
+          "description: Checks a vendored kit. Use when testing. Not for apps (none).",
+          "---"
+        ]
+      }
+    },
+    {
+      "write": {
+        "file": "vendor/anim-kit/src/remote.tsx",
+        "lines": [
+          "// A vendored skill's fixture: the scan prunes the folder that holds its SKILL.md.",
+          "import Rive from 'rive-react-native';",
+          "",
+          "export const planted = [Rive, 'https://cdn.example.com/vendor/mascot.riv'];"
+        ]
+      }
+    },
+    {
+      "write": {
+        "file": "vendor/anim-kit/assets/stray.riv",
+        "content": "RIVE fixture: check-animations reads the size and the record of a .riv file, never its content.\n"
+      }
+    },
+    {
+      "json": {
+        "file": "contracts/animations.json",
+        "path": [
+          "animations"
+        ],
+        "value": [
+          {
+            "id": "list-completed",
+            "file": "assets/animations/list-completed.json",
+            "runtime": "lottie",
+            "job": "one-shot",
+            "maxBytes": 4000,
+            "fps": 30,
+            "plays": 1,
+            "heavy": true,
+            "decorative": true,
+            "reducedMotion": {
+              "show": "frame",
+              "progress": 1
+            },
+            "licence": "Lottie Simple License (FL 9.13.21)",
+            "source": "https://lottiefiles.com/free-animation/list-completed-example",
+            "author": "Example Studio"
+          },
+          {
+            "id": "empty-tasks-mascot",
+            "file": "assets/animations/empty-tasks-mascot.riv",
+            "runtime": "rive",
+            "job": "state-machine",
+            "stateMachine": "Idle",
+            "settles": true,
+            "maxBytes": 2000,
+            "fps": 30,
+            "heavy": false,
+            "decorative": false,
+            "reducedMotion": {
+              "show": "frame"
+            },
+            "licence": "Commissioned for the app, all rights assigned",
+            "source": "Made by the team in the Rive editor"
+          }
+        ]
+      }
+    }
+  ]
+}

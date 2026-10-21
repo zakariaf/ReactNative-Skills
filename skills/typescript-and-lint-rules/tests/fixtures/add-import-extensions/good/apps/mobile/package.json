@@ -1,0 +1,7 @@
+{
+  "name": "@acme/mobile",
+  "private": true,
+  "dependencies": {
+    "expo": "~57.0.27"
+  }
+}

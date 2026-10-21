@@ -204,6 +204,41 @@
       }
     ]
   },
+  "bad-monorepo-radius": {
+    "expect": [
+      "apps/mobile/src/features/tasks/components/tag-chip.tsx:10 [no-raw-radius] raw radius 4 and 12 in a conditional"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "src/features/tasks/components/tag-chip.tsx",
+          "content": "// src/features/tasks/components/tag-chip.tsx\nimport { StyleSheet } from 'react-native';\n\nimport { RADII } from '@/theme/tokens';\n\nconst isNarrow = (): boolean => false;\nconst AVATAR = 32;\n\nexport const styles = StyleSheet.create({\n  chip: { borderRadius: isNarrow() ? 4 : 12 },\n  card: { borderTopStartRadius: isNarrow() ? RADII.sm : RADII.md },\n  avatar: { width: AVATAR, height: AVATAR, borderRadius: AVATAR / 2 },\n});\n"
+        }
+      },
+      { "rename": { "from": "contracts", "to": "apps/mobile/contracts" } },
+      { "rename": { "from": "design", "to": "apps/mobile/design" } },
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      {
+        "write": {
+          "file": "apps/mobile/package.json",
+          "json": { "name": "@tasks/mobile", "dependencies": { "expo": "57.0.27" } }
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/app.config.ts",
+          "content": "// apps/mobile/app.config.ts\nexport default { name: 'Tasks', slug: 'tasks' };\n"
+        }
+      },
+      {
+        "write": {
+          "file": "package.json",
+          "json": { "name": "tasks", "private": true, "workspaces": ["apps/*", "packages/*"] }
+        }
+      },
+      { "write": { "file": "packages/shared/package.json", "json": { "name": "@tasks/shared", "private": true } } }
+    ]
+  },
   "bad-named-color-prop": {
     "expect": [
       "src/features/tasks/components/task-form.tsx:7 [no-color-literal] named colour 'white'",
@@ -436,6 +471,33 @@
           "content": "// src/app/+html.tsx: the static web root paints both schemes' ground at export time.\nimport { PALETTE } from '@/theme/palette';\n\nexport const GROUND_CSS = `body { background: ${PALETTE.light.background}; } @media (prefers-color-scheme: dark) { body { background: ${PALETTE.dark.background}; } }`;\n"
         }
       }
+    ]
+  },
+  "pass-monorepo": {
+    "expect": ["apps: apps/mobile", "check-raw-values: 22 files checked, 0 problems", "RESULT: PASS"],
+    "ops": [
+      { "rename": { "from": "contracts", "to": "apps/mobile/contracts" } },
+      { "rename": { "from": "design", "to": "apps/mobile/design" } },
+      { "rename": { "from": "src", "to": "apps/mobile/src" } },
+      {
+        "write": {
+          "file": "apps/mobile/package.json",
+          "json": { "name": "@tasks/mobile", "dependencies": { "expo": "57.0.27" } }
+        }
+      },
+      {
+        "write": {
+          "file": "apps/mobile/app.config.ts",
+          "content": "// apps/mobile/app.config.ts\nexport default { name: 'Tasks', slug: 'tasks' };\n"
+        }
+      },
+      {
+        "write": {
+          "file": "package.json",
+          "json": { "name": "tasks", "private": true, "workspaces": ["apps/*", "packages/*"] }
+        }
+      },
+      { "write": { "file": "packages/shared/package.json", "json": { "name": "@tasks/shared", "private": true } } }
     ]
   },
   "pass-semantic-props": {

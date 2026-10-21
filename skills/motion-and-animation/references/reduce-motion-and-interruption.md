@@ -68,7 +68,7 @@ JSX depth limit often pushes `MotionConfig` into the component the layout render
 | React Native's `LayoutAnimation` | **no** | banned (`reanimated-only`) |
 | Skia canvas timelines | **no** (not Reanimated animations) | the reduced timeline (skia-canvas-rendering) |
 | A JavaScript timer that starts an animation | **no**: the timer still waits | banned (`no-timer-sequencing`) |
-| Lottie, animated images (expo-image `autoplay` of a WebP/GIF), looping video | **no**: none of them reads Reanimated's config | `autoPlay`/`autoplay={!isReducedMotion}` (or show the poster or last frame); a celebration's Lottie plays from `useCelebration`'s `play()` and counts as `pieces: 1` within `CELEBRATION_LIMITS`. Not checked by check-motion: a review item |
+| Lottie, animated images (expo-image `autoplay` of a WebP/GIF), looping video | **no**: none of them reads Reanimated's config | `autoPlay`/`autoplay={!isReducedMotion}` (or show the poster or last frame); a celebration's Lottie plays from `useCelebration`'s `play()` and counts as `pieces: 1` within `CELEBRATION_LIMITS`. Not checked by check-motion: `lottie-and-rive` owns Lottie and Rive files and its `check-animations.mjs` checks their Reduce Motion frame, loops and size |
 
 ## Each kind in code
 

@@ -127,6 +127,11 @@ pairs on each scheme and writes nothing while a pair fails. An existing file wit
 refused (`palette-exists`) until `--force`; an identical one prints `unchanged`. The output is
 Prettier-formatted already, so regenerating never produces a diff by itself.
 
+Line 1 names the file's repo path and the import of `theme-types` follows the repo's lint: in a
+single app `// src/theme/palette.ts` and `'./theme-types'`; in a workspace repo, run from the root or
+on the app folder, `// apps/mobile/src/theme/palette.ts` and `'./theme-types.ts'`
+(tokens-and-contract.md, "When multi-package").
+
 ## Fixing a failing pair
 
 Change the colour in the token file, never the table: keep the hue and move the lightness until the
@@ -140,6 +145,8 @@ Dark is never an automatic inversion of light. Grounds become deep, surfaces one
 `sunken` between them; text turns light; fills usually brighten and the text on them turns dark;
 semantic colours lighten to keep 4.5:1 on dark surfaces; shadows go near-black and stop being
 boundaries. Each set passes the table on its own, which is why the generator checks both.
+A light-only app (contract `lightOnly`, theme-in-react-native.md) aliases its dark set to light
+(`"dark": "{color.light}"`) instead of tuning one, and the pairs judge it as they judge light.
 
 ## Colour-blind variants
 

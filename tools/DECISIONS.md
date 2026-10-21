@@ -103,7 +103,16 @@ a heading "When multi-package" and every checker accepts directory options for i
 - Named exports everywhere except where a tool requires a default export (Expo Router route files,
   `app.config.ts`, config plugins).
 - When multi-package: npm workspaces `apps/*` + `packages/*`, package scope `@<org>/<pkg>`, TS-source
-  packages. Checkers find workspaces from `package.json` `workspaces`, never from hard-coded folders.
+  packages; a Node backend that deploys on its own (Cloud Functions) is one more workspace at the root
+  (`functions`), recorded in `contracts/architecture.json` with its `dir` and `world: "node"`. Its build
+  output stays in its own folder (`functions/lib/`, what its `"main"` names), the one workspace folder
+  the root ignore lists (ESLint `globalIgnores`, `.prettierignore`, `.gitignore`) name; its tests run in
+  a root Jest project of its own (`displayName` its folder, `testEnvironment: 'node'`). Checkers
+  find workspaces from `package.json` `workspaces`, never from hard-coded folders. Templates stay in the
+  single-app, extensionless import style; a workspace repo writes every relative, `@/` and workspace
+  import with its extension (`IS_MULTI_PACKAGE`), so copying templates there is followed by
+  typescript-and-lint-rules' `add-import-extensions.mjs`, which rewrites them to the files they
+  resolve to and leaves platform-file imports for a person.
 
 ## 4. Repository layout
 
@@ -243,17 +252,17 @@ edit a synced copy. Owners (only the owner skill's maintainer changes the canoni
 
 | Canonical file(s) (under `tools/shared/`) | Owner skill | Also synced into |
 |---|---|---|
-| `scripts/check-lib.mjs`, `scripts/lib/*` helpers | (library) | every skill with scripts |
+| `scripts/check-lib.mjs`, `scripts/lib/*` helpers | (library) | every skill with scripts (the 2026-10-21 Firebase, RevenueCat and animation skills: `check-lib.mjs` into firebase-rnfb, firestore-rules-and-emulator-tests, cloud-functions-backend, subscriptions-revenuecat and lottie-and-rive; `lib/source-scan.mjs` into all of them but firestore-rules-and-emulator-tests; `lib/object-literal.mjs` into cloud-functions-backend) |
 | root configs: `eslint.config.mjs`, the tsconfig set (`tsconfig.base.json`, `tsconfig.json`, `src/tsconfig.json`; `tsconfig.stryker.json` is unit-and-component-tests'), `src/app-env.d.ts`, prettier (`dot-prettierrc.json`, `dot-prettierignore`), `knip.json`, `dot-gitignore` | typescript-and-lint-rules | bootstrap (all of them), quality-gates |
 | jest configs, `jest.setup.ts`, `stryker.config.json`, `tsconfig.stryker.json`, `scripts/package.json` (`{"type":"module"}` for the Node-run tooling), `__mocks__/` policy, `scripts/quality/device-only.ts`, `test/render-*-with-providers.tsx`, `test/test-app.tsx` (services, `language` and `direction` options) | unit-and-component-tests | bootstrap (the jest configs, `jest.setup.ts`, `stryker.config.json`, `tsconfig.stryker.json`, `scripts/package.json`, `device-only.ts`) |
-| `lefthook.yml`, `quality-gates.json`, `package-scripts.json` (and the `scripts` block of `repo-templates/package.json`, which must equal it), `dot-claude/settings.json`, `scripts/quality/{check-quality-gates,gate-diff,gated-paths,verify-plan,run-verify}.ts` (+tests), `scripts/hooks/{after-edit,install-git-hooks,hook-install-plan}.ts` (+test), `contracts/knip-ignores.json` (+ `contracts/knip-ignores.schema.json`) | quality-gates | bootstrap; git-commits-and-reporting (`quality-gates.json`) |
+| `lefthook.yml`, `quality-gates.json`, `package-scripts.json` (and the `scripts` block of `repo-templates/package.json`, which must equal it), `package-scripts.multi-package.json` (the workspace forms of `typecheck` and `export:audit`), `dot-claude/settings.json`, `scripts/quality/{check-quality-gates,gate-diff,gated-paths,verify-plan,run-verify}.ts` (+tests), `scripts/hooks/{after-edit,install-git-hooks,hook-install-plan}.ts` (+test), `contracts/knip-ignores.json` (+ `contracts/knip-ignores.schema.json`) | quality-gates | bootstrap; git-commits-and-reporting (`quality-gates.json`) |
 | `babel.config.js`, the `app.config.ts` skeleton (its template; the harness adopts app-variants-and-environment's fuller `app.config.ts`), `AGENTS.md`, `CLAUDE.md`, `.nvmrc` (its templates) | expo-project-bootstrap | unit tests (`babel.config.js`) |
 | `metro.config.js`, `scripts/metro/public-env-cache-version.ts` (+test), `scripts/metro/compose-metro-config.ts` (+test; the Metro slot, see the root slots row) (canonical under `repo-templates/`; `metro.config.js` is in verify-templates' `CANONICAL_FILES`) | app-variants-and-environment | expo-project-bootstrap; crash-reporting-and-observability (`metro.config.js` in its test base) |
 | path-header rule (line 1 names the repo path) | naming-conventions | typescript-and-lint-rules cites it |
 | complexity and size limits table, TSDoc rules | typescript-and-lint-rules | everyone cites it |
 | `src/services/clock/*`, `src/services/error-log/*`, composition root (`src/services/services-context.tsx`, `create-device-services.ts`, `create-test-services.ts`; ports `clock`, `directionGuard`, `errorLog`) | architecture-and-boundaries | persistence, dates, error handling, unit tests, startup; networking, IAP, OTA, push (the clock and error-log ports and fakes) |
 | `src/services/direction-guard/*`, `test/direction-guard/*`, `src/i18n/direction-context.tsx` (+test) | rtl-and-direction | architecture-and-boundaries (the guard), unit tests (the port and `direction-context.tsx`) |
-| `src/core/result.ts` (+test) | error-handling-typed-results | architecture, persistence, networking, data-export-and-restore, run-migration, value-objects, unit tests, debug hooks, ads, IAP, analytics-and-consent, push-notifications, ota-updates, deep-links-and-universal-links, game-session-host; lint cites it |
+| `src/core/result.ts` (+test) | error-handling-typed-results | architecture, persistence, networking, data-export-and-restore, run-migration, value-objects, unit tests, debug hooks, ads, IAP, subscriptions-revenuecat, analytics-and-consent, push-notifications, ota-updates, deep-links-and-universal-links, game-session-host; lint cites it |
 | `src/config/app-variant.ts` (+test), `src/env.d.ts` | app-variants-and-environment | bootstrap, build, release, ads, OTA, CI skills |
 | `src/theme/*`, `src/ui/app-text.tsx`, `src/ui/use-balanced-wrap.ts`, `src/ui/press-feedback-context.tsx`, `design/tokens.json` (neutral demo tokens) | design-system-structure | ui-component-library, settings, accessibility, rtl, icons, screen-contracts, audio, unit tests (`text-locale.tsx`) |
 | `src/ui/a11y/{system-a11y-store,use-reduce-motion,motion-config,use-announce}.ts(x)`; contrast pairs (`contracts/contrast.json`) | accessibility-as-code | settings, motion, design-system (reads the pairs); react-components-and-hooks cross-references only |

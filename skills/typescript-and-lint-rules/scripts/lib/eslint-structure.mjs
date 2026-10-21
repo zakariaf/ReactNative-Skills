@@ -232,10 +232,10 @@ export function scopeLabel(block) {
 
 /**
  * How an app block differs from the canonical block with the same scope ([] when it does not). The
- * import resolver settings may list more tsconfigs when multi-package, and the zones rule may hold more
- * zones (they only add bans).
+ * import resolver settings may list more tsconfigs when multi-package, the zones rule may hold more
+ * zones (they only add bans), and a rule may take one of its sanctioned `alternatives` values verbatim.
  */
-export function blockDifferences(canonical, app, { multiPackage = false } = {}) {
+export function blockDifferences(canonical, app, { multiPackage = false, alternatives = {} } = {}) {
   const differences = [];
   const keys = new Set([...canonical.keys.keys(), ...app.keys.keys()]);
   for (const key of keys) {
@@ -249,7 +249,7 @@ export function blockDifferences(canonical, app, { multiPackage = false } = {}) 
     if (got === undefined) differences.push(`lacks the rule '${rule}'`);
     else if (typeof want === 'object' && typeof got === 'object') {
       if (got.value !== want.value || want.zones.some((zone) => !got.zones.includes(zone))) differences.push(`changes the rule '${rule}'`);
-    } else if (JSON.stringify(got) !== JSON.stringify(want)) differences.push(`changes the rule '${rule}'`);
+    } else if (JSON.stringify(got) !== JSON.stringify(want) && !(alternatives[rule] ?? []).some((entry) => entry.value === got)) differences.push(`changes the rule '${rule}'`);
   }
   for (const rule of app.rules.keys()) if (!canonical.rules.has(rule)) differences.push(`adds the rule '${rule}'`);
   for (const key of app.dupes) differences.push(`declares '${key}' twice (the last one wins)`);

@@ -227,6 +227,7 @@ sounds and haptics play (audio-and-haptics-feedback); canvas timelines (skia-can
 - `rtl-and-direction` - which way a horizontal moment moves in right-to-left languages.
 - `ui-component-library` - the press surface's users and the hold button built on a functional moment.
 - `performance-budgets` - frame-time budgets measured on devices.
+- `lottie-and-rive` - designer-made Lottie and Rive files: size budgets, the Reduce Motion still frame, bounded loops.
 - `debug-menu-and-test-hooks` - launching test builds with motion held still.
 - `unit-and-component-tests` - the Jest set-up and render helpers the motion tests use.
 - Expo's `expo-animation` skill - a broader Reanimated and gesture API reference.

@@ -65,7 +65,9 @@ palette drift.
 ## The contract: contracts/contrast.json
 
 Schema: `templates/contracts/contrast.schema.json`. Unknown keys are refused, because a misspelt
-`"grapics"` would silently turn every graphics pair off:
+`"grapics"` would silently turn every graphics pair off. The file is read as JSON with comments
+(`//`, `/* */`, trailing commas), as design-system-structure's checkers read it and its
+`design-system.json`, so a note beside a pair never makes one checker refuse what the other accepts:
 
 ```json
 {

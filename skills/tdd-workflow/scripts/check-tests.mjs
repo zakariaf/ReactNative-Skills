@@ -41,7 +41,8 @@ const SPEC = {
     '                           workspace\'s src/); such tests live under the root test/ folder',
     '  test-file-name           *.spec.ts(x) or a __tests__ folder (no Jest project runs them)',
     '  test-in-routes           a test file inside the Expo Router routes folder (src/app/): Expo bundles it as a route',
-    '  test-without-assertion   a test file with no expect( or fc.assert(',
+    '  test-without-assertion   a test file with no expect(, fc.assert( or (rules tests) assertSucceeds(/assertFails(',
+    '                           imported from @firebase/rules-unit-testing',
     '  untested-module          a logic module (.ts, runtime exports: an exported function, class or function-valued',
     '                           const, or a local one listed in export { }) that no test imports and that has no',
     '                           sibling test (an exported object of functions is left to the coverage gate)',
@@ -149,11 +150,26 @@ function checkTestFile(context, rel, source, shown) {
       if (spec.startsWith('node:') || NODE_BUILTINS.includes(spec)) report.problem({ file: shown, line: at(match.index), rule: 'node-api-in-app-test', message: `imports "${spec}" in an app test (the app program has Jest types only)`, fix: `Move the test and its Node helper under the root ${layout.testDir}/ folder (${layout.testDir}/integration/<area>/), importing the unit through @/.` });
     }
   }
-  if (!/\bexpect\s*\(|\bfc\.assert\s*\(|\bexpect\.assertions\s*\(/.test(code)) report.problem({ file: shown, line: 1, rule: 'test-without-assertion', message: 'the test file never calls expect( or fc.assert(', fix: 'Assert the behaviour; a test without an assertion passes whatever the code does.' });
+  if (!hasAssertion(code)) report.problem({ file: shown, line: 1, rule: 'test-without-assertion', message: 'the test file never calls expect(, fc.assert( or (security-rules tests) assertSucceeds(/assertFails( imported from @firebase/rules-unit-testing', fix: 'Assert the behaviour; a test without an assertion passes whatever the code does.' });
   for (const match of code.matchAll(/(?:\bfrom\s+|\bimport\s*\(\s*|\brequire\s*\(\s*|\bjest\.(?:mock|requireActual)\s*\(\s*)(['"])([^'"]+)\1/g)) {
     const target = resolveImport(rel, match[2], { root, aliases: layout.aliases });
     if (target.kind === 'local' && target.path) importedByTests.add(target.path);
   }
+}
+
+// @firebase/rules-unit-testing's assertSucceeds and assertFails reject when the emulator's verdict
+// differs, so a security-rules test asserts through them; only when imported from that package, so a
+// look-alike helper of the same name does not count.
+const RULES_ASSERTIONS = /\bimport\s*\{([^}]*)\}\s*from\s*['"]@firebase\/rules-unit-testing['"]/;
+
+/** True when the (comment-masked) test file asserts: expect(, fc.assert(, expect.assertions( or a rules assertion. */
+function hasAssertion(code) {
+  if (/\bexpect\s*\(|\bfc\.assert\s*\(|\bexpect\.assertions\s*\(/.test(code)) return true;
+  const specifiers = RULES_ASSERTIONS.exec(code)?.[1].split(',') ?? [];
+  return specifiers.some((specifier) => {
+    const [imported, local = imported] = specifier.trim().split(/\s+as\s+/);
+    return ['assertSucceeds', 'assertFails'].includes(imported) && new RegExp(`\\b${local}\\s*\\(`).test(code);
+  });
 }
 
 /**

@@ -1,6 +1,10 @@
 {
-  "$comment": "When multi-package (npm workspaces): the canonical scripts that take another form. Every other script of templates/package-scripts.json stays as it is. Each workspace keeps its own \"typecheck\" script (tsc --noEmit -p tsconfig.json). check-gate-wiring.mjs reads this file when package.json has workspaces.",
+  "$comment": "When multi-package (npm workspaces): the canonical scripts that take another form. \"scripts\" replace the root scripts of the same name in package-scripts.json (every other root script stays as it is); \"workspaceScripts\" go into every workspace's own package.json, because the root runs them with --workspaces. export:audit runs expo export inside the Expo app workspace: from the root, Metro falls back to expo/AppEntry and cannot resolve its App import. <app-dir> is that workspace's folder (apps/mobile) and <to-root> the way back up (../..), so the export lands in dist-audit/ at the repo root, where audit:licenses and the bundle audit read it. check-gate-wiring.mjs (quality-gates) and check-skeleton.mjs (expo-project-bootstrap) fill both from the Expo app workspaces when package.json has workspaces.",
   "scripts": {
-    "typecheck": "tsc --noEmit -p tsconfig.json && npm run -s typecheck --workspaces"
+    "typecheck": "tsc --noEmit -p tsconfig.json && npm run -s typecheck --workspaces",
+    "export:audit": "cd <app-dir> && APP_VARIANT=production EXPO_PUBLIC_APP_VARIANT=production expo export --platform ios --platform android --source-maps --output-dir <to-root>/dist-audit"
+  },
+  "workspaceScripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
   }
 }

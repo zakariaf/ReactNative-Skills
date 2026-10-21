@@ -150,7 +150,7 @@
       }
     },
     "packages": {
-      "description": "When multi-package: every folder under packages/, with its world.",
+      "description": "When multi-package: every folder under packages/, with its world, and every Node backend workspace outside packages/ (Cloud Functions in functions/) with its dir and world \"node\".",
       "type": "array",
       "items": {
         "type": "object",
@@ -160,6 +160,11 @@
           "name": {
             "type": "string",
             "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+          },
+          "dir": {
+            "type": "string",
+            "pattern": "^[a-z0-9._-]+(/[a-z0-9._-]+)*$",
+            "description": "The workspace folder, repo-relative and ending in name (default packages/<name>). Outside packages/ (\"functions\") it is a Node backend: deployed on its own, imported by nothing, so world must be \"node\"; its folder is listed in package.json workspaces."
           },
           "pure": {
             "type": "boolean",

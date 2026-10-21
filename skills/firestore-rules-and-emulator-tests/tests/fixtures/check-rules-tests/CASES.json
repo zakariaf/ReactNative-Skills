@@ -1,0 +1,491 @@
+{
+  "bad-open-rule-if-true": {
+    "expect": [
+      "firestore.rules:69 [open-rule]",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "firestore.rules",
+          "find": "allow get: if isOwner(uid);",
+          "with": "allow get: if true;"
+        }
+      }
+    ]
+  },
+  "bad-open-rule-test-mode": {
+    "expect": [
+      "storage.rules:25 [open-rule]",
+      "time-limited",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "storage.rules",
+          "find": "      allow read: if isOwner(uid);",
+          "with": "      allow read: if request.time < timestamp.date(2026, 11, 20);"
+        }
+      }
+    ]
+  },
+  "bad-open-rule-no-condition": {
+    "expect": [
+      "storage.rules:27 [open-rule]",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "storage.rules",
+          "find": "      allow delete: if isOwner(uid);",
+          "with": "      allow delete;"
+        }
+      }
+    ]
+  },
+  "bad-untested-match": {
+    "expect": [
+      "firestore.rules:68 [untested-match]",
+      "users/{uid}/reminders/{reminderId}",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "firestore.rules",
+          "find": "    match /entitlements/{uid} {",
+          "with": "    match /users/{uid}/reminders/{reminderId} {\n      allow read: if isOwner(uid);\n    }\n\n    match /entitlements/{uid} {"
+        }
+      }
+    ]
+  },
+  "bad-untested-match-no-succeeds": {
+    "expect": [
+      "firestore.rules:68 [untested-match]",
+      "no assertSucceeds",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "test/rules/firestore.rules.test.ts",
+          "find": "await assertSucceeds(getDoc(doc(dbAs(OWNER), path)));",
+          "occurrence": 3,
+          "with": "await assertFails(getDoc(doc(dbAs(null), path)));"
+        }
+      }
+    ]
+  },
+  "bad-untested-match-skipped-describe": {
+    "expect": [
+      "firestore.rules:68 [untested-match]",
+      "entitlements/{uid}",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "test/rules/firestore.rules.test.ts",
+          "find": "describe('entitlements/{uid}', () => {",
+          "with": "describe.skip('entitlements/{uid}', () => {"
+        }
+      }
+    ]
+  },
+  "bad-untested-match-storage": {
+    "expect": [
+      "storage.rules:24 [untested-match]",
+      "users/{uid}/attachments/{fileName}",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "delete": [
+          "test/rules/storage.rules.test.ts"
+        ]
+      }
+    ]
+  },
+  "bad-missing-deny-test": {
+    "expect": [
+      "firestore.rules:68 [missing-deny-test]",
+      "users/{uid}/reminders/{reminderId}",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "firestore.rules",
+          "find": "    match /entitlements/{uid} {",
+          "with": "    match /users/{uid}/reminders/{reminderId} {\n      allow read: if isOwner(uid);\n    }\n\n    match /entitlements/{uid} {"
+        }
+      },
+      {
+        "write": {
+          "file": "test/rules/reminders.rules.test.ts",
+          "lines": [
+            "// test/rules/reminders.rules.test.ts",
+            "import { assertSucceeds, type RulesTestEnvironment } from '@firebase/rules-unit-testing';",
+            "import { doc, getDoc } from 'firebase/firestore';",
+            "",
+            "import { createRulesTestEnvironment } from './rules-test-env';",
+            "",
+            "let testEnv: RulesTestEnvironment;",
+            "",
+            "beforeAll(async () => {",
+            "  testEnv = await createRulesTestEnvironment('firestore');",
+            "});",
+            "",
+            "describe('users/{uid}/reminders/{reminderId}', () => {",
+            "  it('lets the owner read a reminder', async () => {",
+            "    await assertSucceeds(getDoc(doc(testEnv.authenticatedContext('user-a').firestore(), 'users/user-a/reminders/r1')));",
+            "  });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-real-project-id-script": {
+    "expect": [
+      "package.json:7 [real-project-id]",
+      "tasks-prod",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "package.json",
+          "find": "--project demo-tasks",
+          "with": "--project tasks-prod"
+        }
+      }
+    ]
+  },
+  "bad-real-project-id-no-flag": {
+    "expect": [
+      "package.json:7 [real-project-id]",
+      "no --project",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "package.json",
+          "find": " --project demo-tasks",
+          "with": ""
+        }
+      }
+    ]
+  },
+  "bad-real-project-id-test": {
+    "expect": [
+      "test/rules/rules-test-env.ts:12 [real-project-id]",
+      "tasks-prod",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "test/rules/rules-test-env.ts",
+          "find": "= 'demo-tasks';",
+          "with": "= 'tasks-prod';"
+        }
+      }
+    ]
+  },
+  "bad-wildcard-write": {
+    "expect": [
+      "firestore.rules:69 [wildcard-write]",
+      "users/{uid}/{document=**}",
+      "RESULT: FAIL (1 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "firestore.rules",
+          "find": "    match /entitlements/{uid} {",
+          "with": "    match /users/{uid}/{document=**} {\n      allow write: if isOwner(uid);\n    }\n\n    match /entitlements/{uid} {"
+        }
+      },
+      {
+        "write": {
+          "file": "test/rules/everything.rules.test.ts",
+          "lines": [
+            "// test/rules/everything.rules.test.ts",
+            "import { assertFails, assertSucceeds, type RulesTestEnvironment } from '@firebase/rules-unit-testing';",
+            "import { doc, setDoc } from 'firebase/firestore';",
+            "",
+            "import { createRulesTestEnvironment } from './rules-test-env';",
+            "",
+            "let testEnv: RulesTestEnvironment;",
+            "",
+            "beforeAll(async () => {",
+            "  testEnv = await createRulesTestEnvironment('firestore');",
+            "});",
+            "",
+            "describe('users/{uid}/{document=**}', () => {",
+            "  it('lets the owner write anything in the folder', async () => {",
+            "    await assertSucceeds(setDoc(doc(testEnv.authenticatedContext('user-a').firestore(), 'users/user-a/x/1'), { a: 1 }));",
+            "    await assertFails(setDoc(doc(testEnv.authenticatedContext('user-b').firestore(), 'users/user-a/x/1'), { a: 1 }));",
+            "  });",
+            "});"
+          ]
+        }
+      }
+    ]
+  },
+  "bad-wildcard-write-storage": {
+    "expect": [
+      "storage.rules:26 [wildcard-write]",
+      "storage.rules:27 [wildcard-write]",
+      "users/{uid}/{allPaths=**}",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "storage.rules",
+          "find": "    match /users/{uid}/attachments/{fileName} {",
+          "with": "    match /users/{uid}/{allPaths=**} {"
+        }
+      },
+      {
+        "replace": {
+          "file": "test/rules/storage.rules.test.ts",
+          "find": "describe('users/{uid}/attachments/{fileName}', () => {",
+          "with": "describe('users/{uid}/{allPaths=**}', () => {"
+        }
+      }
+    ]
+  },
+  "pass-comments-ignored": {
+    "expect": [
+      "check-rules-tests: 5 match blocks checked, 0 problems",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "firestore.rules",
+          "find": "    match /entitlements/{uid} {",
+          "with": "    // Never: allow read, write: if true;\n    /* match /open/{doc} { allow write: if request.time < timestamp.date(2026, 11, 20); } */\n    match /entitlements/{uid} {"
+        }
+      }
+    ]
+  },
+  "pass-no-storage": {
+    "expect": [
+      "check-rules-tests: 4 match blocks checked, 0 problems",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "contracts/firebase-rules.json",
+          "find": "\"storageRules\": \"storage.rules\"",
+          "with": "\"storageRules\": null"
+        }
+      },
+      {
+        "delete": [
+          "storage.rules",
+          "test/rules/storage.rules.test.ts"
+        ]
+      }
+    ]
+  },
+  "pass-moved-contract": {
+    "expect": [
+      "check-rules-tests: 5 match blocks checked, 0 problems",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "rn-skills.config.json",
+          "json": {
+            "contractsDir": "qa/contracts"
+          }
+        }
+      },
+      {
+        "rename": {
+          "from": "contracts/firebase-rules.json",
+          "to": "qa/contracts/firebase-rules.json"
+        }
+      }
+    ]
+  },
+  "pass-not-applicable": {
+    "expect": [
+      "NOT APPLICABLE: no firebase.json, no contracts/firebase-rules.json and firebase-tools is not in package.json",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "delete": [
+          "firebase.json",
+          "contracts/firebase-rules.json"
+        ]
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "devDependencies",
+            "firebase-tools"
+          ],
+          "delete": true
+        }
+      }
+    ]
+  },
+  "error-missing-root": {
+    "expect": [
+      "ERROR [bad-input] nothing to check: repo root no-such-folder does not exist or is not a folder"
+    ],
+    "args": "no-such-folder"
+  },
+  "error-missing-contract": {
+    "expect": [
+      "ERROR [bad-input] contracts/firebase-rules.json is missing",
+      "templates/contracts/firebase-rules.json"
+    ],
+    "ops": [
+      {
+        "delete": [
+          "contracts/firebase-rules.json"
+        ]
+      }
+    ]
+  },
+  "error-contract-names-missing-file": {
+    "expect": [
+      "ERROR [bad-input] contracts/firebase-rules.json firestoreRules names firebase/firestore.rules, which does not exist"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/firebase-rules.json",
+          "path": [
+            "firestoreRules"
+          ],
+          "value": "firebase/firestore.rules"
+        }
+      }
+    ]
+  },
+  "error-contract-shape": {
+    "expect": [
+      "ERROR [bad-input] contracts/firebase-rules.json testsDir must be a repo-relative folder"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/firebase-rules.json",
+          "path": [
+            "testsDir"
+          ],
+          "value": 42
+        }
+      }
+    ]
+  },
+  "pass-deny-all": {
+    "expect": [
+      "NOTE firestore.rules grants no access (deny-all)",
+      "NOTE storage.rules grants no access (deny-all)",
+      "check-rules-tests: 2 deny-all rules files checked, 0 problems",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "firestore.rules",
+          "lines": [
+            "// firestore.rules",
+            "// Deny by default: no match block names a collection yet, so every request is denied.",
+            "rules_version = '2';",
+            "",
+            "service cloud.firestore {",
+            "  match /databases/{database}/documents {",
+            "    function isSignedIn() {",
+            "      return request.auth != null;",
+            "    }",
+            "  }",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "storage.rules",
+          "lines": [
+            "// storage.rules",
+            "rules_version = '2';",
+            "",
+            "service firebase.storage {",
+            "  match /b/{bucket}/o {",
+            "    function isSignedIn() {",
+            "      return request.auth != null;",
+            "    }",
+            "  }",
+            "}"
+          ]
+        }
+      },
+      {
+        "delete": [
+          "test/rules/firestore.rules.test.ts",
+          "test/rules/storage.rules.test.ts"
+        ]
+      }
+    ]
+  },
+  "bad-empty-match": {
+    "expect": [
+      "[empty-match]",
+      "firestore.rules:4",
+      "must contain at least one declaration"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "firestore.rules",
+          "lines": [
+            "rules_version = '2';",
+            "",
+            "service cloud.firestore {",
+            "  match /databases/{database}/documents {",
+            "  }",
+            "}"
+          ]
+        }
+      },
+      {
+        "delete": [
+          "test/rules/firestore.rules.test.ts"
+        ]
+      }
+    ]
+  },
+  "bad-empty-match-nested": {
+    "expect": [
+      "[empty-match]",
+      "storage.rules:24",
+      "match /users/{uid}/attachments/{fileName}"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "storage.rules",
+          "find": "      allow read: if isOwner(uid);\n      allow create, update: if isOwner(uid) && isAcceptedImage();\n      allow delete: if isOwner(uid);\n",
+          "with": "      // allow read: if isOwner(uid);\n"
+        }
+      }
+    ]
+  }
+}

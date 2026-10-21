@@ -74,7 +74,8 @@ const SPEC = {
     '                       pt.js); an imported @formatjs package missing from node_modules fails; only a repo',
     '                       with no node_modules at all accepts the tag or a truncation',
     '  polyfill-first       the app entry (package.json "main", not expo-router/entry) imports the polyfills first',
-    '  jest-polyfills       every setupFiles of the Jest config loads intl-polyfills.ts, and a literal path to it',
+    '  jest-polyfills       every setupFiles of the Jest config (the app\'s; with --app-dir and none there, the one',
+    '                       root jest.config.js of the workspaces) loads intl-polyfills.ts, and a literal path to it',
     '                       names the i18n folder the checkers read (a moved folder)',
     '  verify-script        package.json has an "i18n:verify" script that runs scripts/i18n/verify-catalogs.ts (exists)',
     '  tooling-dir          scripts/i18n/app-languages.ts I18N_DIR is the i18n folder the checkers read',
@@ -784,13 +785,17 @@ function setupPath(value, layout) {
 
 function checkJest(ctx) {
   const { root, layout, report } = ctx;
-  const configs = JEST_CONFIGS.map((name) => appFile(layout, name)).filter((name) => existsSync(join(root, name)));
+  const appConfigs = JEST_CONFIGS.map((name) => appFile(layout, name)).filter((name) => existsSync(join(root, name)));
+  // When multi-package, one root jest.config.js runs every workspace (unit-and-component-tests): with no
+  // config in the app folder, the root one must load the app's polyfills by their repo path.
+  const rootConfigs = layout.appDir && appConfigs.length === 0 ? JEST_CONFIGS.filter((name) => existsSync(join(root, name))) : [];
+  const configs = appConfigs.length > 0 ? appConfigs : rootConfigs;
   if (configs.length === 0) {
     const file = appFile(layout, 'jest.config.js');
     report.skip({ file, rule: 'jest-polyfills', message: notYetCreated(root, { file, owner: 'unit-and-component-tests' }) });
     return;
   }
-  const fromApp = layout.appDir ? layout.i18nDir.slice(layout.appDir.length + 1) : layout.i18nDir;
+  const fromApp = layout.appDir && rootConfigs.length === 0 ? layout.i18nDir.slice(layout.appDir.length + 1) : layout.i18nDir;
   const want = `${fromApp}/intl-polyfills`;
   const fix = `List '<rootDir>/${fromApp}/intl-polyfills.ts' in setupFiles of every Jest project, so Jest formats exactly like the phone.`;
   for (const name of configs) {

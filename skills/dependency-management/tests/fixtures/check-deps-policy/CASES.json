@@ -4,7 +4,19 @@
       "[install-scripts] allowScripts key \"lefthook@^2.1.0\" is a form this check cannot evaluate",
       "npm never matches a range or a tag"
     ],
-    "ops": [{ "json": { "file": "package.json", "path": ["allowScripts"], "value": { "lefthook@^2.1.0": true } } }]
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "allowScripts"
+          ],
+          "value": {
+            "lefthook@^2.1.0": true
+          }
+        }
+      }
+    ]
   },
   "bad-allow-scripts-string-value": {
     "expect": [
@@ -13,7 +25,15 @@
     ],
     "ops": [
       {
-        "json": { "file": "package.json", "path": ["allowScripts"], "value": { "lefthook@2.1.14": "true" } },
+        "json": {
+          "file": "package.json",
+          "path": [
+            "allowScripts"
+          ],
+          "value": {
+            "lefthook@2.1.14": "true"
+          }
+        },
         "$comment": "npm counts only the booleans true and false; a string leaves the package unreviewed."
       }
     ]
@@ -27,7 +47,10 @@
       {
         "json": {
           "file": "contracts/dependency-policy.json",
-          "path": ["banned", 7],
+          "path": [
+            "banned",
+            7
+          ],
           "value": {
             "pattern": "^@react-native-community/netinfo$",
             "scope": "anywhere",
@@ -39,27 +62,56 @@
       {
         "json": {
           "file": "package-lock.json",
-          "path": ["packages", "node_modules/some-lib/node_modules/@react-native-community/netinfo"],
-          "value": { "version": "12.0.1", "license": "MIT" }
+          "path": [
+            "packages",
+            "node_modules/some-lib/node_modules/@react-native-community/netinfo"
+          ],
+          "value": {
+            "version": "12.0.1",
+            "license": "MIT"
+          }
         }
       }
     ]
   },
   "bad-banned-transitive": {
-    "expect": ["[banned] node-ipc is in the lockfile (node_modules/some-tool/node_modules/node-ipc)", "protestware"],
+    "expect": [
+      "[banned] node-ipc is in the lockfile (node_modules/some-tool/node_modules/node-ipc)",
+      "protestware"
+    ],
     "ops": [
       {
         "json": {
           "file": "package-lock.json",
-          "path": ["packages", "node_modules/some-tool/node_modules/node-ipc"],
-          "value": { "version": "12.0.0", "license": "MIT" }
+          "path": [
+            "packages",
+            "node_modules/some-tool/node_modules/node-ipc"
+          ],
+          "value": {
+            "version": "12.0.0",
+            "license": "MIT"
+          }
         }
       }
     ]
   },
   "bad-caret-pin": {
-    "expect": ["[pin-exact] typescript is \"^6.0.3\", not an exact version", "npm install typescript@6.0.3 -D"],
-    "ops": [{ "json": { "file": "package.json", "path": ["devDependencies", "typescript"], "value": "^6.0.3" } }]
+    "expect": [
+      "[pin-exact] typescript is \"^6.0.3\", not an exact version",
+      "npm install typescript@6.0.3 -D"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "devDependencies",
+            "typescript"
+          ],
+          "value": "^6.0.3"
+        }
+      }
+    ]
   },
   "bad-deprecated": {
     "expect": [
@@ -70,56 +122,118 @@
       {
         "json": {
           "file": "package-lock.json",
-          "path": ["packages", "node_modules/zustand", "deprecated"],
+          "path": [
+            "packages",
+            "node_modules/zustand",
+            "deprecated"
+          ],
           "value": "Planted: this release is deprecated, upgrade to the next one"
         }
       }
     ]
   },
   "bad-direct-http-client": {
-    "expect": ["[banned] request is banned: deprecated and unmaintained", "Instead: the built-in fetch"],
+    "expect": [
+      "[banned] request is banned: deprecated and unmaintained",
+      "Instead: the built-in fetch"
+    ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["dependencies", "request"], "value": "2.88.2" } },
       {
-        "json": { "file": "package-lock.json", "path": ["packages", "", "dependencies", "request"], "value": "2.88.2" }
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "request"
+          ],
+          "value": "2.88.2"
+        }
       },
       {
         "json": {
           "file": "package-lock.json",
-          "path": ["packages", "node_modules/request"],
-          "value": { "version": "2.88.2", "license": "Apache-2.0" }
+          "path": [
+            "packages",
+            "",
+            "dependencies",
+            "request"
+          ],
+          "value": "2.88.2"
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": [
+            "packages",
+            "node_modules/request"
+          ],
+          "value": {
+            "version": "2.88.2",
+            "license": "Apache-2.0"
+          }
         }
       }
     ]
   },
   "bad-do-not-add": {
-    "expect": ["[do-not-add] babel-preset-expo: comes with expo"],
+    "expect": [
+      "[do-not-add] babel-preset-expo: comes with expo"
+    ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["devDependencies", "babel-preset-expo"], "value": "57.0.13" } },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "devDependencies",
+            "babel-preset-expo"
+          ],
+          "value": "57.0.13"
+        }
+      },
       {
         "json": {
           "file": "package-lock.json",
-          "path": ["packages", "", "devDependencies", "babel-preset-expo"],
+          "path": [
+            "packages",
+            "",
+            "devDependencies",
+            "babel-preset-expo"
+          ],
           "value": "57.0.13"
         }
       }
     ]
   },
   "bad-duplicate-native": {
-    "expect": ["[one-version] expo-haptics is installed as 57.0.3, 57.0.9", "the policy pins 57.0.3"],
+    "expect": [
+      "[one-version] expo-haptics is installed as 57.0.3, 57.0.9",
+      "the policy pins 57.0.3"
+    ],
     "ops": [
       {
         "json": {
           "file": "package-lock.json",
-          "path": ["packages", "node_modules/expo-haptics"],
-          "value": { "version": "57.0.9", "license": "MIT" }
+          "path": [
+            "packages",
+            "node_modules/expo-haptics"
+          ],
+          "value": {
+            "version": "57.0.9",
+            "license": "MIT"
+          }
         }
       },
       {
         "json": {
           "file": "package-lock.json",
-          "path": ["packages", "node_modules/some-lib/node_modules/expo-haptics"],
-          "value": { "version": "57.0.3", "license": "MIT" }
+          "path": [
+            "packages",
+            "node_modules/some-lib/node_modules/expo-haptics"
+          ],
+          "value": {
+            "version": "57.0.3",
+            "license": "MIT"
+          }
         }
       }
     ]
@@ -130,19 +244,43 @@
       "Remove it: npm uninstall eas-cli."
     ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["devDependencies", "eas-cli"], "value": "24.10.0" } },
       {
         "json": {
-          "file": "package-lock.json",
-          "path": ["packages", "", "devDependencies", "eas-cli"],
+          "file": "package.json",
+          "path": [
+            "devDependencies",
+            "eas-cli"
+          ],
           "value": "24.10.0"
         }
       },
       {
         "json": {
           "file": "package-lock.json",
-          "path": ["packages", "node_modules/eas-cli"],
-          "value": { "version": "24.10.0", "dev": true, "license": "MIT", "bin": { "eas": "bin/run" } }
+          "path": [
+            "packages",
+            "",
+            "devDependencies",
+            "eas-cli"
+          ],
+          "value": "24.10.0"
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": [
+            "packages",
+            "node_modules/eas-cli"
+          ],
+          "value": {
+            "version": "24.10.0",
+            "dev": true,
+            "license": "MIT",
+            "bin": {
+              "eas": "bin/run"
+            }
+          }
         }
       }
     ]
@@ -260,18 +398,49 @@
       "[engines] has no \"engines.node\"",
       "Set \"engines\": { \"npm\": \">=11.17.0\" } in the root package.json"
     ],
-    "ops": [{ "json": { "file": "package.json", "path": ["engines"], "delete": true } }]
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "engines"
+          ],
+          "delete": true
+        }
+      }
+    ]
   },
   "bad-engines-npm-range": {
-    "expect": ["package.json:8 [engines] \"engines.npm\" is \">=10\", which admits npm below 11.17.0"],
-    "ops": [{ "json": { "file": "package.json", "path": ["engines", "npm"], "value": ">=10" } }]
+    "expect": [
+      "package.json:8 [engines] \"engines.npm\" is \">=10\", which admits npm below 11.17.0"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "engines",
+            "npm"
+          ],
+          "value": ">=10"
+        }
+      }
+    ]
   },
   "bad-exclude-block-outlives": {
     "expect": [
       ".npmrc:26 [npmrc-exclude] exclude block expires 2099-12-31, after 2026-10-10 (today + the 7-day release age): a block can never outlive its release by more than the release age; it was extended or invented",
       "Set expires= to the publish date of the youngest release it covers + 7 days"
     ],
-    "ops": [{ "replace": { "file": ".npmrc", "find": "expires=2026-10-10", "with": "expires=2099-12-31" } }]
+    "ops": [
+      {
+        "replace": {
+          "file": ".npmrc",
+          "find": "expires=2026-10-10",
+          "with": "expires=2099-12-31"
+        }
+      }
+    ]
   },
   "bad-exclude-catch-all": {
     "expect": [
@@ -303,7 +472,9 @@
     ]
   },
   "bad-exclude-spelling": {
-    "expect": [".npmrc:9 [npmrc-exclude] exclude knip is not inside a dated exclude block"],
+    "expect": [
+      ".npmrc:9 [npmrc-exclude] exclude knip is not inside a dated exclude block"
+    ],
     "ops": [
       {
         "replace": {
@@ -319,7 +490,15 @@
       ".npmrc:27 [npmrc-exclude] exclude expo sits in a block that expired on 2026-09-20",
       "Delete the whole block (never extend it)"
     ],
-    "ops": [{ "replace": { "file": ".npmrc", "find": "expires=2026-10-10", "with": "expires=2026-09-20" } }]
+    "ops": [
+      {
+        "replace": {
+          "file": ".npmrc",
+          "find": "expires=2026-10-10",
+          "with": "expires=2026-09-20"
+        }
+      }
+    ]
   },
   "bad-expo-caret": {
     "expect": [
@@ -327,11 +506,25 @@
       "Run npx expo install expo-constants@~57.0.21"
     ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["dependencies", "expo-constants"], "value": "^57.0.21" } },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "expo-constants"
+          ],
+          "value": "^57.0.21"
+        }
+      },
       {
         "json": {
           "file": "package-lock.json",
-          "path": ["packages", "", "dependencies", "expo-constants"],
+          "path": [
+            "packages",
+            "",
+            "dependencies",
+            "expo-constants"
+          ],
           "value": "^57.0.21"
         }
       }
@@ -346,11 +539,25 @@
       "[table-version] expo-haptics is \"~57.0.4\" but the policy pins \"~57.0.3\""
     ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["dependencies", "expo-haptics"], "value": "~57.0.4" } },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "expo-haptics"
+          ],
+          "value": "~57.0.4"
+        }
+      },
       {
         "json": {
           "file": "package-lock.json",
-          "path": ["packages", "", "dependencies", "expo-haptics"],
+          "path": [
+            "packages",
+            "",
+            "dependencies",
+            "expo-haptics"
+          ],
           "value": "~57.0.4"
         }
       }
@@ -362,11 +569,25 @@
       "npx expo install expo-haptics@~57.0.3"
     ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["dependencies", "expo-haptics"], "value": "57.0.3" } },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "expo-haptics"
+          ],
+          "value": "57.0.3"
+        }
+      },
       {
         "json": {
           "file": "package-lock.json",
-          "path": ["packages", "", "dependencies", "expo-haptics"],
+          "path": [
+            "packages",
+            "",
+            "dependencies",
+            "expo-haptics"
+          ],
           "value": "57.0.3"
         }
       }
@@ -378,11 +599,25 @@
       "eslint-config-expo ships an eslint-plugin-react that supports ESLint 10"
     ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["devDependencies", "eslint"], "value": "10.0.0" } },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "devDependencies",
+            "eslint"
+          ],
+          "value": "10.0.0"
+        }
+      },
       {
         "json": {
           "file": "package-lock.json",
-          "path": ["packages", "", "devDependencies", "eslint"],
+          "path": [
+            "packages",
+            "",
+            "devDependencies",
+            "eslint"
+          ],
           "value": "10.0.0"
         }
       }
@@ -394,30 +629,58 @@
       "TS7016"
     ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["devDependencies", "jest-image-snapshot"], "value": "6.5.2" } },
       {
         "json": {
-          "file": "package-lock.json",
-          "path": ["packages", "", "devDependencies", "jest-image-snapshot"],
+          "file": "package.json",
+          "path": [
+            "devDependencies",
+            "jest-image-snapshot"
+          ],
           "value": "6.5.2"
         }
       },
       {
         "json": {
           "file": "package-lock.json",
-          "path": ["packages", "node_modules/jest-image-snapshot"],
-          "value": { "version": "6.5.2", "dev": true, "license": "Apache-2.0" }
+          "path": [
+            "packages",
+            "",
+            "devDependencies",
+            "jest-image-snapshot"
+          ],
+          "value": "6.5.2"
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": [
+            "packages",
+            "node_modules/jest-image-snapshot"
+          ],
+          "value": {
+            "version": "6.5.2",
+            "dev": true,
+            "license": "Apache-2.0"
+          }
         }
       }
     ]
   },
   "bad-license-exception": {
-    "expect": ["[license-exceptions] licenses.exceptions.caniuse-lite needs an exact \"license\" and a real \"reason\""],
+    "expect": [
+      "[license-exceptions] licenses.exceptions.caniuse-lite needs an exact \"license\" and a real \"reason\""
+    ],
     "ops": [
       {
         "json": {
           "file": "contracts/dependency-policy.json",
-          "path": ["licenses", "exceptions", "caniuse-lite", "reason"],
+          "path": [
+            "licenses",
+            "exceptions",
+            "caniuse-lite",
+            "reason"
+          ],
           "value": ""
         }
       }
@@ -427,7 +690,18 @@
     "expect": [
       "[companion] overrides.@typescript-eslint/utils is missing; typescript-eslint 8.70.1 needs it pinned at 8.70.1"
     ],
-    "ops": [{ "json": { "file": "package.json", "path": ["overrides", "@typescript-eslint/utils"], "delete": true } }]
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "overrides",
+            "@typescript-eslint/utils"
+          ],
+          "delete": true
+        }
+      }
+    ]
   },
   "bad-nested-typescript-eslint": {
     "expect": [
@@ -438,29 +712,69 @@
       {
         "json": {
           "file": "package-lock.json",
-          "path": ["packages", "node_modules/@typescript-eslint/eslint-plugin"],
-          "value": { "version": "8.71.0", "dev": true, "license": "MIT" }
+          "path": [
+            "packages",
+            "node_modules/@typescript-eslint/eslint-plugin"
+          ],
+          "value": {
+            "version": "8.71.0",
+            "dev": true,
+            "license": "MIT"
+          }
         }
       },
       {
         "json": {
           "file": "package-lock.json",
-          "path": ["packages", "node_modules/typescript-eslint/node_modules/@typescript-eslint/eslint-plugin"],
-          "value": { "version": "8.70.1", "dev": true, "license": "MIT" }
+          "path": [
+            "packages",
+            "node_modules/typescript-eslint/node_modules/@typescript-eslint/eslint-plugin"
+          ],
+          "value": {
+            "version": "8.70.1",
+            "dev": true,
+            "license": "MIT"
+          }
         }
       }
     ]
   },
   "bad-no-lockfile": {
-    "expect": ["package-lock.json [lockfile-missing] is missing"],
-    "ops": [{ "delete": "package-lock.json" }]
+    "expect": [
+      "package-lock.json [lockfile-missing] is missing"
+    ],
+    "ops": [
+      {
+        "delete": "package-lock.json"
+      }
+    ]
   },
   "bad-not-in-table": {
-    "expect": ["[not-in-table] left-pad is not in the dependency policy"],
+    "expect": [
+      "[not-in-table] left-pad is not in the dependency policy"
+    ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["dependencies", "left-pad"], "value": "1.3.0" } },
       {
-        "json": { "file": "package-lock.json", "path": ["packages", "", "dependencies", "left-pad"], "value": "1.3.0" }
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "left-pad"
+          ],
+          "value": "1.3.0"
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": [
+            "packages",
+            "",
+            "dependencies",
+            "left-pad"
+          ],
+          "value": "1.3.0"
+        }
       }
     ]
   },
@@ -499,12 +813,18 @@
     ],
     "ops": [
       {
-        "replace": { "file": ".npmrc", "find": "min-release-age=7\n", "with": "min-release-age=7\nbefore=2099-12-31\n" }
+        "replace": {
+          "file": ".npmrc",
+          "find": "min-release-age=7\n",
+          "with": "min-release-age=7\nbefore=2099-12-31\n"
+        }
       }
     ]
   },
   "bad-npmrc-force-bare": {
-    "expect": [".npmrc:9 [npmrc-policy] sets force: npm then overrides conflicts and protections"],
+    "expect": [
+      ".npmrc:9 [npmrc-policy] sets force: npm then overrides conflicts and protections"
+    ],
     "ops": [
       {
         "op": "replace",
@@ -538,7 +858,11 @@
     ],
     "ops": [
       {
-        "replace": { "file": ".npmrc", "find": "legacy-peer-deps=false\n", "with": "legacy-peer-deps=true\n" },
+        "replace": {
+          "file": ".npmrc",
+          "find": "legacy-peer-deps=false\n",
+          "with": "legacy-peer-deps=true\n"
+        },
         "$comment": "The usual answer to ERESOLVE, flipped in the line the template writes out."
       }
     ]
@@ -550,7 +874,11 @@
     ],
     "ops": [
       {
-        "replace": { "file": ".npmrc", "find": "package-lock=true\n", "with": "package-lock=false\n" },
+        "replace": {
+          "file": ".npmrc",
+          "find": "package-lock=true\n",
+          "with": "package-lock=false\n"
+        },
         "$comment": "Libraries often ship this line; npm install then ignores and stops writing package-lock.json."
       }
     ]
@@ -584,7 +912,10 @@
       {
         "json": {
           "file": "package.json",
-          "path": ["scripts", "upload:sourcemaps"],
+          "path": [
+            "scripts",
+            "upload:sourcemaps"
+          ],
           "value": "npx -p sentry-expo sentry-expo-upload-sourcemaps dist"
         }
       }
@@ -598,7 +929,10 @@
       {
         "json": {
           "file": "package.json",
-          "path": ["scripts", "build:ios"],
+          "path": [
+            "scripts",
+            "build:ios"
+          ],
           "value": "npm run -s check:unused && npx eas build --platform ios"
         }
       }
@@ -636,11 +970,23 @@
       "offline-only: product analytics"
     ],
     "ops": [
-      { "json": { "file": "contracts/dependency-policy.json", "path": ["profiles"], "value": ["offline-only"] } },
       {
         "json": {
           "file": "contracts/dependency-policy.json",
-          "path": ["banned"],
+          "path": [
+            "profiles"
+          ],
+          "value": [
+            "offline-only"
+          ]
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/dependency-policy.json",
+          "path": [
+            "banned"
+          ],
           "value": [
             {
               "pattern": "^flatmap-stream$",
@@ -774,29 +1120,65 @@
       {
         "json": {
           "file": "package-lock.json",
-          "path": ["packages", "node_modules/some-sdk/node_modules/posthog-react-native"],
-          "value": { "version": "4.9.0", "license": "MIT" }
+          "path": [
+            "packages",
+            "node_modules/some-sdk/node_modules/posthog-react-native"
+          ],
+          "value": {
+            "version": "4.9.0",
+            "license": "MIT"
+          }
         }
       }
     ]
   },
   "bad-overrides": {
-    "expect": ["[overrides] overrides.react is 19.3.0 but the app uses 19.2.3"],
-    "ops": [{ "json": { "file": "package.json", "path": ["overrides", "react"], "value": "19.3.0" } }]
+    "expect": [
+      "[overrides] overrides.react is 19.3.0 but the app uses 19.2.3"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "overrides",
+            "react"
+          ],
+          "value": "19.3.0"
+        }
+      }
+    ]
   },
   "bad-policy-line": {
-    "expect": ["[npmrc-policy] lacks the line save-exact=true"],
-    "ops": [{ "replace": { "file": ".npmrc", "find": "save-exact=true\n", "with": "" } }]
+    "expect": [
+      "[npmrc-policy] lacks the line save-exact=true"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".npmrc",
+          "find": "save-exact=true\n",
+          "with": ""
+        }
+      }
+    ]
   },
   "bad-policy-missing": {
     "expect": [
       "contracts/dependency-policy.json [policy-contract] is missing",
       "Copy templates/contracts/dependency-policy.json"
     ],
-    "ops": [{ "delete": "contracts/dependency-policy.json" }]
+    "ops": [
+      {
+        "delete": "contracts/dependency-policy.json"
+      }
+    ]
   },
   "bad-policy-override": {
-    "expect": ["[npmrc-policy] sets min-release-age=1", "npm keeps the last value of a key"],
+    "expect": [
+      "[npmrc-policy] sets min-release-age=1",
+      "npm keeps the last value of a key"
+    ],
     "ops": [
       {
         "replace": {
@@ -812,12 +1194,36 @@
       "[policy-contract] \"banned\" lacks ^expo-updates$ (profile offline-only)",
       "the app's own gate (scripts/deps/check-deps.ts) reads only this file"
     ],
-    "ops": [{ "json": { "file": "contracts/dependency-policy.json", "path": ["profiles"], "value": ["offline-only"] } }]
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/dependency-policy.json",
+          "path": [
+            "profiles"
+          ],
+          "value": [
+            "offline-only"
+          ]
+        }
+      }
+    ]
   },
   "bad-policy-row": {
-    "expect": ["[policy-contract] packages.zustand.why is missing"],
+    "expect": [
+      "[policy-contract] packages.zustand.why is missing"
+    ],
     "ops": [
-      { "json": { "file": "contracts/dependency-policy.json", "path": ["packages", "zustand", "why"], "delete": true } }
+      {
+        "json": {
+          "file": "contracts/dependency-policy.json",
+          "path": [
+            "packages",
+            "zustand",
+            "why"
+          ],
+          "delete": true
+        }
+      }
     ]
   },
   "bad-policy-unknown-key": {
@@ -827,7 +1233,13 @@
       "RESULT: FAIL (2 problems)"
     ],
     "ops": [
-      { "replace": { "file": "contracts/dependency-policy.json", "find": "\"heldBack\":", "with": "\"heldback\":" } },
+      {
+        "replace": {
+          "file": "contracts/dependency-policy.json",
+          "find": "\"heldBack\":",
+          "with": "\"heldback\":"
+        }
+      },
       {
         "replace": {
           "file": "contracts/dependency-policy.json",
@@ -842,39 +1254,137 @@
       ".npmrc:4 [npmrc-policy] sets min-release-age=3, outside the policy (min-release-age=7 or higher)",
       "Make it min-release-age=7 or higher"
     ],
-    "ops": [{ "replace": { "file": ".npmrc", "find": "min-release-age=7\n", "with": "min-release-age=3\n" } }]
+    "ops": [
+      {
+        "replace": {
+          "file": ".npmrc",
+          "find": "min-release-age=7\n",
+          "with": "min-release-age=3\n"
+        }
+      }
+    ]
   },
   "bad-stale-approval": {
-    "expect": ["[stale-approval] allowScripts approves lefthook@2.1.13 but 2.1.14 is installed"],
-    "ops": [{ "json": { "file": "package.json", "path": ["allowScripts"], "value": { "lefthook@2.1.13": true } } }]
+    "expect": [
+      "[stale-approval] allowScripts approves lefthook@2.1.13 but 2.1.14 is installed"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "allowScripts"
+          ],
+          "value": {
+            "lefthook@2.1.13": true
+          }
+        }
+      }
+    ]
   },
   "bad-stale-lockfile": {
-    "expect": ["package-lock.json:1 [lockfile-sync] dependencies of the root differ from its package.json"],
-    "ops": [{ "json": { "file": "package.json", "path": ["devDependencies", "prettier"], "value": "3.9.9" } }]
+    "expect": [
+      "package-lock.json:1 [lockfile-sync] dependencies of the root differ from its package.json"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "devDependencies",
+            "prettier"
+          ],
+          "value": "3.9.9"
+        }
+      }
+    ]
   },
   "bad-stale-override": {
-    "expect": ["[stale-override] overrides.lodash is neither react, react-native"],
-    "ops": [{ "json": { "file": "package.json", "path": ["overrides", "lodash"], "value": "4.17.21" } }]
+    "expect": [
+      "[stale-override] overrides.lodash is neither react, react-native"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "overrides",
+            "lodash"
+          ],
+          "value": "4.17.21"
+        }
+      }
+    ]
   },
   "bad-strict-allow-scripts-missing": {
     "expect": [
       ".npmrc:1 [npmrc-policy] lacks the line strict-allow-scripts=true: without it npm 11.17 runs an install script nobody reviewed"
     ],
-    "ops": [{ "replace": { "file": ".npmrc", "find": "\nstrict-allow-scripts=true\n", "with": "\n" } }]
+    "ops": [
+      {
+        "replace": {
+          "file": ".npmrc",
+          "find": "\nstrict-allow-scripts=true\n",
+          "with": "\n"
+        }
+      }
+    ]
   },
   "bad-table-sdk": {
-    "expect": ["[table-sdk] the app is on Expo SDK 58 but the dependency policy is for SDK 57"],
+    "expect": [
+      "[table-sdk] the app is on Expo SDK 58 but the dependency policy is for SDK 57"
+    ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["dependencies", "expo"], "value": "~58.0.2" } },
-      { "json": { "file": "package-lock.json", "path": ["packages", "", "dependencies", "expo"], "value": "~58.0.2" } }
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "expo"
+          ],
+          "value": "~58.0.2"
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": [
+            "packages",
+            "",
+            "dependencies",
+            "expo"
+          ],
+          "value": "~58.0.2"
+        }
+      }
     ]
   },
   "bad-table-version": {
-    "expect": ["[table-version] zustand is \"5.0.14\" but the policy pins \"5.0.15\""],
+    "expect": [
+      "[table-version] zustand is \"5.0.14\" but the policy pins \"5.0.15\""
+    ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["dependencies", "zustand"], "value": "5.0.14" } },
       {
-        "json": { "file": "package-lock.json", "path": ["packages", "", "dependencies", "zustand"], "value": "5.0.14" }
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "zustand"
+          ],
+          "value": "5.0.14"
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": [
+            "packages",
+            "",
+            "dependencies",
+            "zustand"
+          ],
+          "value": "5.0.14"
+        }
       }
     ]
   },
@@ -883,61 +1393,110 @@
       "[companion] @testing-library/react-native 14.0.1 is installed but its companion test-renderer 1.2.0 is not"
     ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["devDependencies", "test-renderer"], "delete": true } },
       {
         "json": {
-          "file": "package-lock.json",
-          "path": ["packages", "", "devDependencies", "test-renderer"],
+          "file": "package.json",
+          "path": [
+            "devDependencies",
+            "test-renderer"
+          ],
           "delete": true
         }
       },
       {
         "json": {
           "file": "package-lock.json",
-          "path": ["packages", "node_modules/test-renderer"],
-          "value": { "version": "1.3.0", "dev": true, "license": "MIT" }
+          "path": [
+            "packages",
+            "",
+            "devDependencies",
+            "test-renderer"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": [
+            "packages",
+            "node_modules/test-renderer"
+          ],
+          "value": {
+            "version": "1.3.0",
+            "dev": true,
+            "license": "MIT"
+          }
         }
       }
     ]
   },
   "bad-test-renderer-nested": {
-    "expect": ["[one-version] test-renderer is installed as 1.2.0, 1.3.0"],
+    "expect": [
+      "[one-version] test-renderer is installed as 1.2.0, 1.3.0"
+    ],
     "ops": [
       {
         "json": {
           "file": "package-lock.json",
-          "path": ["packages", "node_modules/@testing-library/react-native/node_modules/test-renderer"],
-          "value": { "version": "1.3.0", "dev": true, "license": "MIT" }
+          "path": [
+            "packages",
+            "node_modules/@testing-library/react-native/node_modules/test-renderer"
+          ],
+          "value": {
+            "version": "1.3.0",
+            "dev": true,
+            "license": "MIT"
+          }
         }
       }
     ]
   },
   "bad-two-reacts": {
-    "expect": ["[one-react] react is installed as 19.2.3, 19.3.0"],
+    "expect": [
+      "[one-react] react is installed as 19.2.3, 19.3.0"
+    ],
     "ops": [
       {
         "json": {
           "file": "package-lock.json",
-          "path": ["packages", "node_modules/test-renderer/node_modules/react"],
-          "value": { "version": "19.3.0", "license": "MIT" }
+          "path": [
+            "packages",
+            "node_modules/test-renderer/node_modules/react"
+          ],
+          "value": {
+            "version": "19.3.0",
+            "license": "MIT"
+          }
         }
       }
     ]
   },
   "bad-unapproved-script": {
-    "expect": ["[install-scripts] unrs-resolver@1.12.2 has an install script that allowScripts does not cover"],
+    "expect": [
+      "[install-scripts] unrs-resolver@1.12.2 has an install script that allowScripts does not cover"
+    ],
     "ops": [
       {
         "json": {
           "file": "package-lock.json",
-          "path": ["packages", "node_modules/unrs-resolver"],
-          "value": { "version": "1.12.2", "dev": true, "hasInstallScript": true }
+          "path": [
+            "packages",
+            "node_modules/unrs-resolver"
+          ],
+          "value": {
+            "version": "1.12.2",
+            "dev": true,
+            "hasInstallScript": true
+          }
         }
       }
     ]
   },
   "bad-undated-exclude": {
-    "expect": ["[npmrc-exclude] exclude prettier is not inside a dated exclude block"],
+    "expect": [
+      "[npmrc-exclude] exclude prettier is not inside a dated exclude block"
+    ],
     "ops": [
       {
         "replace": {
@@ -955,27 +1514,49 @@
     ],
     "ops": [
       {
-        "json": { "file": "package.json", "path": ["allowScripts"], "value": { "lefthook": true } },
+        "json": {
+          "file": "package.json",
+          "path": [
+            "allowScripts"
+          ],
+          "value": {
+            "lefthook": true
+          }
+        },
         "$comment": "npm approve-scripts --no-allow-scripts-pin writes this name-only key; npm 11.17 then runs the script of every lefthook version."
       }
     ]
   },
   "bad-unpinned-approval-star": {
-    "expect": ["[unpinned-approval] allowScripts approves \"fsevents@*\" for every version", "\"fsevents@2.3.3\": true"],
+    "expect": [
+      "[unpinned-approval] allowScripts approves \"fsevents@*\" for every version",
+      "\"fsevents@2.3.3\": true"
+    ],
     "ops": [
       {
         "json": {
           "file": "package.json",
-          "path": ["allowScripts"],
-          "value": { "lefthook@2.1.14": true, "fsevents@*": true }
+          "path": [
+            "allowScripts"
+          ],
+          "value": {
+            "lefthook@2.1.14": true,
+            "fsevents@*": true
+          }
         },
         "$comment": "name@* is the same name-only allow to npm."
       }
     ]
   },
   "bad-unused-native": {
-    "expect": ["[unused-dependency] expo-haptics is a native module the app installs, but no code file"],
-    "ops": [{ "delete": "src/services/haptics/expo-haptics-adapter.ts" }]
+    "expect": [
+      "[unused-dependency] expo-haptics is a native module the app installs, but no code file"
+    ],
+    "ops": [
+      {
+        "delete": "src/services/haptics/expo-haptics-adapter.ts"
+      }
+    ]
   },
   "bad-workflow-npm-env": {
     "expect": [
@@ -1005,42 +1586,108 @@
     ]
   },
   "bad-wrong-workspace": {
-    "expect": ["[wrong-workspace] zustand belongs in dependencies, not in devDependencies"],
+    "expect": [
+      "[wrong-workspace] zustand belongs in dependencies, not in devDependencies"
+    ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["dependencies", "zustand"], "delete": true } },
-      { "json": { "file": "package.json", "path": ["devDependencies", "zustand"], "value": "5.0.15" } },
-      { "json": { "file": "package-lock.json", "path": ["packages", "", "dependencies", "zustand"], "delete": true } },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "zustand"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "devDependencies",
+            "zustand"
+          ],
+          "value": "5.0.15"
+        }
+      },
       {
         "json": {
           "file": "package-lock.json",
-          "path": ["packages", "", "devDependencies", "zustand"],
+          "path": [
+            "packages",
+            "",
+            "dependencies",
+            "zustand"
+          ],
+          "delete": true
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": [
+            "packages",
+            "",
+            "devDependencies",
+            "zustand"
+          ],
           "value": "5.0.15"
         }
       }
     ]
   },
   "error-no-package-json": {
-    "expect": ["ERROR [bad-input] nothing to check: . has no package.json"],
+    "expect": [
+      "ERROR [bad-input] nothing to check: . has no package.json"
+    ],
     "args": ".",
-    "ops": [{ "delete": "package.json" }]
+    "ops": [
+      {
+        "delete": "package.json"
+      }
+    ]
   },
   "pass-allow-scripts-multi-version": {
-    "expect": ["check-deps-policy: 1 package.json files checked, 0 problems"],
+    "expect": [
+      "check-deps-policy: 1 package.json files checked, 0 problems"
+    ],
     "ops": [
-      { "json": { "file": "package.json", "path": ["allowScripts"], "value": { "lefthook@2.1.13 || 2.1.14": true } } }
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "allowScripts"
+          ],
+          "value": {
+            "lefthook@2.1.13 || 2.1.14": true
+          }
+        }
+      }
     ]
   },
   "pass-denial-every-version": {
-    "expect": ["check-deps-policy: 1 package.json files checked, 0 problems"],
+    "expect": [
+      "check-deps-policy: 1 package.json files checked, 0 problems"
+    ],
     "ops": [
       {
-        "json": { "file": "package.json", "path": ["allowScripts"], "value": { "lefthook": false } },
+        "json": {
+          "file": "package.json",
+          "path": [
+            "allowScripts"
+          ],
+          "value": {
+            "lefthook": false
+          }
+        },
         "$comment": "A name-only false is a reviewed denial of every version: npm installs lefthook without running its script."
       }
     ]
   },
   "pass-eas-env-harmless": {
-    "expect": ["check-deps-policy: 1 package.json files checked, 0 problems"],
+    "expect": [
+      "check-deps-policy: 1 package.json files checked, 0 problems"
+    ],
     "ops": [
       {
         "write": {
@@ -1070,19 +1717,31 @@
     ]
   },
   "pass-knip-ignored": {
-    "expect": ["check-deps-policy: 1 package.json files checked, 0 problems"],
+    "expect": [
+      "check-deps-policy: 1 package.json files checked, 0 problems"
+    ],
     "ops": [
-      { "delete": "src/services/haptics/expo-haptics-adapter.ts" },
+      {
+        "delete": "src/services/haptics/expo-haptics-adapter.ts"
+      },
       {
         "write": {
           "file": "knip.json",
-          "lines": ["{", "  \"ignoreDependencies\": [", "    \"expo-haptics\"", "  ]", "}"]
+          "lines": [
+            "{",
+            "  \"ignoreDependencies\": [",
+            "    \"expo-haptics\"",
+            "  ]",
+            "}"
+          ]
         }
       }
     ]
   },
   "pass-npmrc-ini-values": {
-    "expect": ["check-deps-policy: 1 package.json files checked, 0 problems"],
+    "expect": [
+      "check-deps-policy: 1 package.json files checked, 0 problems"
+    ],
     "ops": [
       {
         "replace": {
@@ -1099,13 +1758,19 @@
         }
       },
       {
-        "replace": { "file": ".npmrc", "find": "engine-strict=true\n", "with": "engine-strict = 'true'\n" },
+        "replace": {
+          "file": ".npmrc",
+          "find": "engine-strict=true\n",
+          "with": "engine-strict = 'true'\n"
+        },
         "$comment": "npm reads 10.5 as a number of days, strips the inline comment and one pair of quotes (verified with npm config get on npm 11.17.0)."
       }
     ]
   },
   "pass-npx-local-tools": {
-    "expect": ["check-deps-policy: 1 package.json files checked, 0 problems"],
+    "expect": [
+      "check-deps-policy: 1 package.json files checked, 0 problems"
+    ],
     "ops": [
       {
         "write": {
@@ -1132,47 +1797,324 @@
       {
         "json": {
           "file": "package.json",
-          "path": ["scripts", "doctor"],
+          "path": [
+            "scripts",
+            "doctor"
+          ],
           "value": "npx expo-doctor && npm exec -- tsc --noEmit"
         }
       },
       {
         "json": {
           "file": "package-lock.json",
-          "path": ["packages", "node_modules/typescript", "bin"],
-          "value": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" }
+          "path": [
+            "packages",
+            "node_modules/typescript",
+            "bin"
+          ],
+          "value": {
+            "tsc": "bin/tsc",
+            "tsserver": "bin/tsserver"
+          }
         }
       }
     ]
   },
   "pass-override-reference": {
-    "expect": ["check-deps-policy: 1 package.json files checked, 0 problems"],
+    "expect": [
+      "check-deps-policy: 1 package.json files checked, 0 problems"
+    ],
     "ops": [
       {
         "op": "json",
         "file": "package.json",
-        "path": ["overrides", "react"],
+        "path": [
+          "overrides",
+          "react"
+        ],
         "value": "$react",
         "$comment": "npm's documented override reference: $react is the root's own react specifier, the same pin."
       }
     ]
   },
   "pass-policy-config-key": {
-    "expect": ["check-deps-policy: 1 package.json files checked, 0 problems"],
+    "expect": [
+      "check-deps-policy: 1 package.json files checked, 0 problems"
+    ],
     "ops": [
-      { "rename": { "from": "contracts/dependency-policy.json", "to": "qa/dependency-policy.json" } },
-      { "write": { "file": "rn-skills.config.json", "json": { "dependencyPolicy": "qa/dependency-policy.json" } } }
+      {
+        "rename": {
+          "from": "contracts/dependency-policy.json",
+          "to": "qa/dependency-policy.json"
+        }
+      },
+      {
+        "write": {
+          "file": "rn-skills.config.json",
+          "json": {
+            "dependencyPolicy": "qa/dependency-policy.json"
+          }
+        }
+      }
     ]
   },
   "pass-release-age-stricter": {
-    "expect": ["check-deps-policy: 1 package.json files checked, 0 problems"],
-    "ops": [{ "replace": { "file": ".npmrc", "find": "min-release-age=7\n", "with": "min-release-age=14\n" } }]
+    "expect": [
+      "check-deps-policy: 1 package.json files checked, 0 problems"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": ".npmrc",
+          "find": "min-release-age=7\n",
+          "with": "min-release-age=14\n"
+        }
+      }
+    ]
   },
   "pass-unused-not-yet-created": {
     "expect": [
       "SKIP src [unused-dependency] not yet created (expo-project-bootstrap creates it)",
       "check-deps-policy: 1 package.json files checked, 0 problems, 1 skipped"
     ],
-    "ops": [{ "delete": "src" }]
+    "ops": [
+      {
+        "delete": "src"
+      }
+    ]
+  },
+  "pass-do-not-add-scoped-dev-row": {
+    "expect": [
+      "check-deps-policy: 1 package.json files checked, 0 problems"
+    ],
+    "ops": [
+      {
+        "$comment": "the JS SDK stays out of the app (a doNotAdd entry scoped to where: app) while a dev row allows it for the rules tests",
+        "json": {
+          "file": "contracts/dependency-policy.json",
+          "path": [
+            "packages",
+            "firebase"
+          ],
+          "value": {
+            "version": "13.0.0",
+            "spec": "13.0.0",
+            "install": "npm",
+            "where": "dev",
+            "why": "the peer of @firebase/rules-unit-testing: only the rules tests under test/rules/ import it (firestore-rules-and-emulator-tests)"
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/dependency-policy.json",
+          "path": [
+            "doNotAdd",
+            "firebase"
+          ],
+          "value": {
+            "reason": "the app talks to Firebase through @react-native-firebase/* (native SDKs, native offline cache); the JS SDK is a second client with its own cache",
+            "where": "app",
+            "allowIn": [
+              "test/rules/**"
+            ]
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "devDependencies",
+            "firebase"
+          ],
+          "value": "13.0.0"
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": [
+            "packages",
+            "",
+            "devDependencies",
+            "firebase"
+          ],
+          "value": "13.0.0"
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": [
+            "packages",
+            "node_modules/firebase"
+          ],
+          "value": {
+            "version": "13.0.0",
+            "dev": true,
+            "license": "Apache-2.0"
+          }
+        }
+      }
+    ]
+  },
+  "bad-do-not-add-scoped-app": {
+    "expect": [
+      "package.json:",
+      "[do-not-add] firebase (kept out of dependencies): the app talks to Firebase through @react-native-firebase/*",
+      "RESULT: FAIL (2 problems)"
+    ],
+    "ops": [
+      {
+        "$comment": "the JS SDK stays out of the app (a doNotAdd entry scoped to where: app) while a dev row allows it for the rules tests",
+        "json": {
+          "file": "contracts/dependency-policy.json",
+          "path": [
+            "packages",
+            "firebase"
+          ],
+          "value": {
+            "version": "13.0.0",
+            "spec": "13.0.0",
+            "install": "npm",
+            "where": "dev",
+            "why": "the peer of @firebase/rules-unit-testing: only the rules tests under test/rules/ import it (firestore-rules-and-emulator-tests)"
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/dependency-policy.json",
+          "path": [
+            "doNotAdd",
+            "firebase"
+          ],
+          "value": {
+            "reason": "the app talks to Firebase through @react-native-firebase/* (native SDKs, native offline cache); the JS SDK is a second client with its own cache",
+            "where": "app",
+            "allowIn": [
+              "test/rules/**"
+            ]
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "package.json",
+          "path": [
+            "dependencies",
+            "firebase"
+          ],
+          "value": "13.0.0"
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": [
+            "packages",
+            "",
+            "dependencies",
+            "firebase"
+          ],
+          "value": "13.0.0"
+        }
+      },
+      {
+        "json": {
+          "file": "package-lock.json",
+          "path": [
+            "packages",
+            "node_modules/firebase"
+          ],
+          "value": {
+            "version": "13.0.0",
+            "license": "Apache-2.0"
+          }
+        }
+      }
+    ]
+  },
+  "bad-do-not-add-scoped-shape": {
+    "expect": [
+      "[policy-contract] doNotAdd.firebase.where is missing: name the places the package is kept out of (\"app\", \"dev\", a workspace folder, or a list)",
+      "[policy-contract] doNotAdd.react-native-restart.allowIn must be a list of repo-relative globs",
+      "[policy-contract] doNotAdd.axios: the row packages.axios allows it in app, where doNotAdd keeps it out",
+      "[policy-contract] doNotAdd.ky.reasn is not a key of the contract"
+    ],
+    "ops": [
+      {
+        "json": {
+          "file": "contracts/dependency-policy.json",
+          "path": [
+            "doNotAdd",
+            "firebase"
+          ],
+          "value": {
+            "reason": "the JS SDK is a second client"
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/dependency-policy.json",
+          "path": [
+            "doNotAdd",
+            "react-native-restart"
+          ],
+          "value": {
+            "reason": "reloadAppAsync",
+            "where": "app",
+            "allowIn": "test/**"
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/dependency-policy.json",
+          "path": [
+            "packages",
+            "axios"
+          ],
+          "value": {
+            "version": "1.13.2",
+            "spec": "1.13.2",
+            "install": "npm",
+            "where": "app",
+            "why": "an HTTP client"
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/dependency-policy.json",
+          "path": [
+            "doNotAdd",
+            "axios"
+          ],
+          "value": {
+            "reason": "use the ApiClient",
+            "where": [
+              "app",
+              "dev"
+            ]
+          }
+        }
+      },
+      {
+        "json": {
+          "file": "contracts/dependency-policy.json",
+          "path": [
+            "doNotAdd",
+            "ky"
+          ],
+          "value": {
+            "reasn": "typo",
+            "where": "app"
+          }
+        }
+      }
+    ]
   }
 }

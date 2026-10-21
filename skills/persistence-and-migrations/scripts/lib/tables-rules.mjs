@@ -798,6 +798,10 @@ export function checkSchemas(ctx, { document }) {
   for (const src of ctx.sources.values()) {
     const { rel } = src;
     if (!rel.startsWith(`${ctx.dataDir}/`) || isTestFile(rel)) continue;
+    // A synced store's documents are written by every app version: their codecs keep v.object, so a newer
+    // version's fields are dropped on read instead of failing it (the synced-store profile).
+    const syncedDir = ctx.contract.syncedStore?.adapterDir;
+    if (syncedDir !== undefined && rel.startsWith(`${syncedDir}/`)) continue;
     const isDocumentSchema = rel.startsWith(`${ctx.dataDir}/document/schema/`);
     const isTableSchema = /-schema\.ts$/.test(rel) && !rel.startsWith(`${ctx.dataDir}/document/`);
     if (!(isTableSchema || (document && isDocumentSchema))) continue;

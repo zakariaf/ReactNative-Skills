@@ -345,4 +345,6 @@ the canvas kit in each workspace's `<srcDir>/canvas` and for surfaces in each wo
 shared by several apps lives in one package: pass `--kit-dir packages/canvas/src` and
 `--gestures-dir packages/canvas/src/gestures` (or set the config keys). Workspace packages consumed as
 TypeScript source need explicit `.ts` extensions in imports (the canonical lint's multi-package mode);
-the templates use the single-app, extensionless style.
+the templates use the single-app, extensionless style, so after copying them into a workspace
+repo run typescript-and-lint-rules' `add-import-extensions.mjs` on the copied files (it writes each
+resolved extension and refuses a platform-only import).

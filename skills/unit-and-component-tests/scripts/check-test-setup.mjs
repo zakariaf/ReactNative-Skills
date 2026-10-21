@@ -9,9 +9,9 @@
 
 import { existsSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { dirname, join } from 'node:path';
+import { basename, dirname, join } from 'node:path';
 
-import { createReporter, fail, globToRegExp, maskComments, matchGlob, parseArgs, parseJsonc, requireDir, resolveLayout, run, toPosix, walkRepo } from './check-lib.mjs';
+import { backendWorkspaces, createReporter, fail, globToRegExp, maskComments, matchGlob, parseArgs, parseJsonc, requireDir, resolveLayout, run, toPosix, walkRepo } from './check-lib.mjs';
 import { jsLocator, jsonLocator } from './lib/config-lines.mjs';
 import { KNOWN_ROOT_MOCKS, appVersion, declares, depsOf, loadContract, readManifests, sourceRoots, testCandidates, testRoots } from './lib/test-contract.mjs';
 
@@ -49,10 +49,12 @@ const SPEC = {
     '  jest-tz                   a Jest config does not set process.env.TZ = \'UTC\'',
     '  jest-projects             projects are not unit (+ android when the app ships Android, + golden when it depends on',
     '                            @shopify/react-native-skia or has *.golden.test.* files; the template always has it),',
-    '                            or another project appears',
+    '                            or another project appears (when multi-package, a Node backend workspace may add one',
+    '                            named after its folder: functions)',
     '  jest-orphan-tests         a file that Jest\'s defaults, jest-expo or Expo\'s guide treat as a test (*.test|spec.[jt]s(x),',
     '                            a test under __tests__/, *-test.[jt]s(x)), anywhere in the repo, is run by no project and',
-    '                            not by jest.sim.config.js (silently never run), or by more than one project (run twice).',
+    '                            not by jest.sim.config.js or jest.emulator.config.js (the security-rules tests) (silently',
+    '                            never run), or by more than one project (run twice).',
     '                            Left out: installed skills, the Maestro folder, a folder that is not a workspace but runs',
     '                            its own tests (its own Jest, Vitest, Playwright or Cypress config, a deno.json, or a',
     '                            package.json test script), the folders a root playwright.config testDir or cypress.config',
@@ -64,6 +66,10 @@ const SPEC = {
     '  jest-unit-project         unit: preset jest-expo/ios, jest.setup.ts, every source and test root, goldens, sims and',
     '                            *.android.test.* left out',
     '  jest-android-project      android: preset jest-expo/android, *.android.test.ts(x) only, jest.setup.ts',
+    '  jest-backend-project      when multi-package, a Node backend\'s project (displayName = its folder, functions):',
+    '                            testEnvironment node, no preset, no jest.setup.ts, and testMatch only its own',
+    '                            <dir>/src tests (unit then leaves that workspace out; jest-orphan-tests catches a',
+    '                            test both run)',
     '  jest-golden-project       golden: preset jest-expo/ios, *.golden.test.ts only; with Skia its CanvasKit jestEnv +',
     '                            jestSetup and not jest.setup.ts (its inert Skia mock would blank every pixel golden);',
     '                            without Skia jest.setup.ts and no Skia environment (Jest could not find it)',
@@ -342,7 +348,7 @@ function checkProjectCommon(root, layout, manifests, rel, project, where, report
 /** True when some glob (with <rootDir>/ stripped) matches the sample path. */
 const anyGlob = (globs, sample) => list(globs).some((glob) => matchGlob(sample, String(glob).replace(/^<rootDir>\//, '')));
 
-function checkUnit(rel, layout, unit, hasAndroid, where, report) {
+function checkUnit(rel, layout, unit, hasAndroid, where, report, ownRunners = []) {
   const problem = (key, message, fix, isOwn = false) => report.problem({ file: rel, line: isOwn ? where.inOwnProject('unit', key) : where.inProject('unit', key), rule: 'jest-unit-project', message, fix });
   if (unit.preset !== 'jest-expo/ios') problem(/\bpreset\s*:/, `unit preset is ${JSON.stringify(unit.preset)}, not "jest-expo/ios"`, 'Use preset jest-expo/ios; Android code is tested by the android project.');
   if (!list(unit.setupFilesAfterEnv).includes(UNIT_SETUP)) problem('setupFilesAfterEnv', 'unit does not load <rootDir>/jest.setup.ts', 'Add setupFilesAfterEnv: [\'<rootDir>/jest.setup.ts\'] to the unit project.', true);
@@ -350,7 +356,8 @@ function checkUnit(rel, layout, unit, hasAndroid, where, report) {
   const kinds = [['x.golden.test.ts', 'golden'], ['x.sim.test.ts', 'sim'], ...(hasAndroid ? [['x.android.test.tsx', 'android']] : [])];
   const leaks = kinds.filter(([file]) => !ignored.some((re) => re.test(join(layout.root, 'src', file)))).map(([, kind]) => `*.${kind}.test.*`);
   if (leaks.length > 0) problem('testPathIgnorePatterns', `unit does not leave out ${leaks.join(', ')}`, 'Add \'\\\\.golden\\\\.test\\\\.\', \'\\\\.sim\\\\.test\\\\.\' and \'\\\\.android\\\\.test\\\\.\' to the unit testPathIgnorePatterns.');
-  const roots = [...sourceRoots(layout), layout.testDir];
+  // A Node backend with a project of its own (multi-package) is that project's to run, not unit's.
+  const roots = [...sourceRoots(layout), layout.testDir].filter((dir) => !ownRunners.some((backend) => dir === `${backend}/src` || dir.startsWith(`${backend}/`)));
   const uncovered = roots.filter((dir) => !anyGlob(unit.testMatch, `${dir}/probe/x.test.tsx`));
   if (uncovered.length > 0) problem('testMatch', `unit testMatch does not cover ${uncovered.join(', ')}`, 'Copy TEST_ROOTS and testMatch from templates/jest.config.js.', true);
 }
@@ -361,6 +368,30 @@ function checkAndroid(rel, layout, android, where, report) {
   const dir = sourceRoots(layout)[0] ?? 'src';
   if (!anyGlob(android.testMatch, `${dir}/probe/x.android.test.tsx`) || anyGlob(android.testMatch, `${dir}/probe/x.test.tsx`)) problem('testMatch', 'android testMatch does not match exactly the *.android.test.ts(x) files', 'Use TEST_ROOTS.map((root) => `${root}*.android.test.{ts,tsx}`).');
   if (!list(android.setupFilesAfterEnv).includes(UNIT_SETUP)) problem('setupFilesAfterEnv', 'android does not load <rootDir>/jest.setup.ts', 'Add setupFilesAfterEnv: [\'<rootDir>/jest.setup.ts\'] to the android project.');
+}
+
+/** The fixed folder a glob starts with ('apps/mobile/src/**\/*.test.ts' -> 'apps/mobile/src'). */
+function globFolder(glob) {
+  const parts = glob.split('/');
+  const wild = parts.findIndex((part) => /[*?{[]/.test(part));
+  return (wild === -1 ? parts.slice(0, -1) : parts.slice(0, wild)).join('/') || glob;
+}
+
+/**
+ * When multi-package, a Node backend workspace (Cloud Functions in functions/) may run its tests in a
+ * project named after its folder: Node's environment, no React Native preset or jest.setup.ts, and
+ * only its own tests. Under the unit project its code runs with React Native's globals (window is
+ * defined) and setup files, so a test can pass there while the deployed function breaks.
+ */
+function checkBackendProject(rel, project, backend, where, report) {
+  const name = String(project.displayName);
+  const problem = (key, message, fix, isOwn = true) => report.problem({ file: rel, line: isOwn ? where.inOwnProject(name, key) : where.inProject(name, key), rule: 'jest-backend-project', message, fix });
+  if (project.preset !== undefined) problem(/\bpreset\s*:/, `${name} preset is ${JSON.stringify(project.preset)}: a React Native preset brings its environment and setup files to Node code`, 'Set preset: undefined in the project (it spreads SHARED, whose preset is jest-expo/ios); Babel still transforms TypeScript through the root babel.config.js.', false);
+  if (project.testEnvironment !== 'node') problem('testEnvironment', `${name} testEnvironment is ${JSON.stringify(project.testEnvironment)}, not "node"`, "Set testEnvironment: 'node': the backend runs in Node, where window and React Native's globals do not exist.", false);
+  if (list(project.setupFilesAfterEnv).includes(UNIT_SETUP)) problem('setupFilesAfterEnv', `${name} loads ${UNIT_SETUP}, the React Native mocks of the app`, 'Leave setupFilesAfterEnv out of the backend project.');
+  if (!anyGlob(project.testMatch, `${backend}/src/probe/x.test.ts`)) problem('testMatch', `${name} testMatch does not reach ${backend}/src`, `Use testMatch: ['<rootDir>/${backend}/src/**/*.test.ts'].`);
+  const outside = list(project.testMatch).map((glob) => String(glob).replace(/^<rootDir>\//, '')).filter((glob) => !glob.startsWith(`${backend}/`));
+  if (outside.length > 0) problem('testMatch', `${name} testMatch reaches tests outside ${backend}/ (${outside.map(globFolder).join(', ')})`, `Match only <rootDir>/${backend}/src/**/*.test.ts: app and package tests belong to unit, android and golden.`);
 }
 
 /**
@@ -479,12 +510,22 @@ function checkJest(root, layout, manifests, contract, goldenTests, report) {
   if (!names.includes('unit')) projectProblem(`projects are [${names.join(', ')}]: the unit project is missing`, 'Use projects from templates/jest.config.js: unit, android and golden.');
   if (wantsAndroid && !names.includes('android')) projectProblem(`projects are [${names.join(', ')}]: the android project is missing`, 'Add androidProject from templates/jest.config.js (preset jest-expo/android, *.android.test.ts(x)); Android-only code is untested without it.');
   if (!names.includes('golden') && (hasSkia || goldenTests.length > 0)) projectProblem(`projects are [${names.join(', ')}]: ${hasSkia ? `the app depends on ${SKIA}` : `${goldenTests[0]} is a golden test`} but the golden project is missing`, 'Add goldenProject from templates/jest.config.js: it belongs in every app (data goldens run with the unit set-up) and switches to Skia\'s CanvasKit environment only while the app depends on Skia.');
-  for (const name of names.filter((entry) => !PROJECT_NAMES.includes(entry))) projectProblem(`project "${name}" is not one of ${PROJECT_NAMES.join(', ')}`, 'Long-running simulations go in jest.sim.config.js; every other test belongs to unit, android or golden.');
+  // When multi-package, a Node backend workspace may have a project of its own, named after its folder.
+  const backends = new Map(layout.mode === 'monorepo' ? backendWorkspaces(root).map((backend) => [basename(backend.dir), backend.dir]) : []);
+  const allowed = [...PROJECT_NAMES, ...backends.keys()];
+  for (const name of names.filter((entry) => !allowed.includes(entry))) projectProblem(`project "${name}" is not one of ${allowed.join(', ')}`, `Long-running simulations go in jest.sim.config.js; every other test belongs to unit, android or golden${backends.size > 0 ? `, and a Node backend's to the project named after its folder (${[...backends.keys()].join(', ')})` : ''}.`);
   for (const project of projects) checkProjectCommon(root, layout, manifests, rel, project, where, report);
   const unit = projects.find((project) => project.displayName === 'unit');
   const android = projects.find((project) => project.displayName === 'android');
   const golden = projects.find((project) => project.displayName === 'golden');
-  if (unit) checkUnit(rel, layout, unit, android !== undefined, where, report);
+  const ownRunners = [];
+  for (const project of projects) {
+    const backend = backends.get(String(project.displayName));
+    if (backend === undefined) continue;
+    ownRunners.push(backend);
+    checkBackendProject(rel, project, backend, where, report);
+  }
+  if (unit) checkUnit(rel, layout, unit, android !== undefined, where, report, ownRunners);
   if (android) checkAndroid(rel, layout, android, where, report);
   if (golden) checkGolden(rel, golden, hasSkia, where, report);
   checkThresholds(rel, text, config, contract, where, report);
@@ -571,14 +612,28 @@ function orphanFix(rel, layout) {
   return 'Put the test where a project matches it: copy TEST_ROOTS and testMatch from templates/jest.config.js (tests sit in src/, scripts/, plugins/ or test/ as <unit>.test.ts(x)).';
 }
 
-/** Every test file runs in exactly one place: one Jest project, or the simulation config. */
+/**
+ * The security-rules config (firestore-rules-and-emulator-tests) when it exists and loads, else null:
+ * its *.rules.test.ts files run inside the Firebase emulators, never in npm test, and the canonical
+ * unit project leaves them out while it exists (HAS_RULES_TESTS). That skill checks its contents.
+ */
+function emulatorRunner(root, report) {
+  const rel = 'jest.emulator.config.js';
+  if (!existsSync(join(root, rel))) return null;
+  const config = loadConfig(root, rel, report);
+  return config ? { ...config, displayName: rel } : null;
+}
+
+/** Every test file runs in exactly one place: one Jest project, the simulation config or the security-rules config. */
 function checkOrphans(root, layout, projects, simConfig, testFiles, report) {
-  const runners = [...projects, ...(simConfig ? [simConfig] : [])].map((config) => ({ name: String(config.displayName ?? '?'), runs: runnerOf(root, config) }));
+  const emulator = emulatorRunner(root, report);
+  const runners = [...projects, ...(simConfig ? [simConfig] : []), ...(emulator ? [emulator] : [])].map((config) => ({ name: String(config.displayName ?? '?'), runs: runnerOf(root, config) }));
   for (const rel of testFiles) {
     if (SIM_TEST.test(rel) && !simConfig && !existsSync(join(root, 'jest.sim.config.js'))) continue; // sim-config reports it
     const names = runners.filter(({ runs }) => runs(rel)).map(({ name }) => name);
     const projectList = projects.map((project) => project.displayName ?? '?').join(', ');
-    if (names.length === 0) report.problem({ file: rel, line: 1, rule: 'jest-orphan-tests', message: simConfig ? `neither a Jest project (${projectList}) nor jest.sim.config.js runs this test, so it never runs` : `no Jest project (${projectList}) runs this test, so it never runs`, fix: orphanFix(rel, layout) });
+    const others = [simConfig ? 'jest.sim.config.js' : null, emulator ? 'jest.emulator.config.js' : null].filter((name) => name !== null);
+    if (names.length === 0) report.problem({ file: rel, line: 1, rule: 'jest-orphan-tests', message: others.length === 0 ? `no Jest project (${projectList}) runs this test, so it never runs` : `neither a Jest project (${projectList}) nor ${others.join(' nor ')} runs this test, so it never runs`, fix: orphanFix(rel, layout) });
     else if (names.length > 1) report.problem({ file: rel, line: 1, rule: 'jest-orphan-tests', message: `runs in ${names.length} places (${names.join(', ')}), so every run executes it twice`, fix: 'Leave it out of all but one: the unit project drops goldens, simulations and *.android.test.* through testPathIgnorePatterns (templates/jest.config.js).' });
   }
 }

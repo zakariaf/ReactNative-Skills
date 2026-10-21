@@ -139,7 +139,7 @@ allowed. The Jest and Testing Library rules still hold (unit-and-component-tests
 | `toEqual` | `undefined` fields and class instances slip through | `jest/prefer-strict-equal` | `toStrictEqual` |
 | `it.only`, `fit`, `it.skip`, `xit` | a focused or skipped test hides failures | `jest/no-focused-tests`, `jest/no-disabled-tests` | run the file with `npx jest <path>`; delete dead tests |
 | a snapshot over 50 lines (inline over 10) | nobody reviews it | `jest/no-large-snapshots` (off only for `*.golden.test.ts`) | assert the fields that matter, or a golden test |
-| a test with no assertion | proves nothing | `jest/expect-expect` (`expect`, `fc.assert`) | assert, or use `fc.assert` for properties |
+| a test with no assertion | proves nothing | `jest/expect-expect` (`expect`, `fc.assert`; an app with security-rules tests may add exactly `assertSucceeds` and `assertFails`, eslint-config-guide) | assert, or use `fc.assert` for properties |
 | `fireEvent`/`userEvent` calls not awaited | Testing Library 14 is async: `render`, `user.press`, `fireEvent` and `act` return promises | `testing-library/await-async-events` | `const user = userEvent.setup();` then `await user.press(...)`; `await render(...)` |
 | `fetch`, `WebSocket` in a test | tests never touch the network | `no-restricted-globals` | a fake port |
 

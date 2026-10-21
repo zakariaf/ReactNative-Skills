@@ -1,0 +1,6 @@
+node_modules/
+/ios
+/android
+# Firebase config files come from EAS file variables (GOOGLE_SERVICES_PLIST, GOOGLE_SERVICES_JSON).
+GoogleService-Info.plist
+google-services.json

@@ -1,0 +1,5 @@
+[
+  { "from": "scripts/check-lib.mjs", "to": "scripts/check-lib.mjs" },
+  { "from": "scripts/lib/source-scan.mjs", "to": "scripts/lib/source-scan.mjs" },
+  { "from": "scripts/lib/object-literal.mjs", "to": "scripts/lib/object-literal.mjs" }
+]

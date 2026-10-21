@@ -331,12 +331,44 @@ export const REPO_SCAN_IGNORES = Object.freeze([
 
 /**
  * REPO_SCAN_IGNORES plus the output folders of every workspace that package.json "workspaces"
- * declares (<workspace>/ios/**, <workspace>/build/**, ...). A single-app repo gets REPO_SCAN_IGNORES.
+ * declares (<workspace>/ios/**, <workspace>/build/**, ...) and each Node backend's build folder
+ * (functions/lib/**, see backendWorkspaces). A single-app repo gets REPO_SCAN_IGNORES.
  */
 export function repoScanIgnores(root = '.') {
   const extra = [];
   for (const workspace of readWorkspaces(root)) for (const name of APP_OUTPUT_FOLDERS) extra.push(`${workspace.dir}/${name}/**`);
+  for (const backend of backendWorkspaces(root)) if (backend.buildDir !== null) extra.push(`${backend.buildDir}/**`);
   return Object.freeze([...REPO_SCAN_IGNORES, ...extra]);
+}
+
+const APP_CONFIG_FILES = Object.freeze(['app.config.ts', 'app.config.js', 'app.config.mjs', 'app.config.cjs', 'app.json']);
+
+/**
+ * The folder a package.json "main" builds into: its first segment when "main" is built JavaScript
+ * (.js, .mjs, .cjs) one folder down or deeper, outside src/ ("lib/index.js" -> "lib"); else null.
+ */
+function buildFolderOf(manifest) {
+  if (typeof manifest?.main !== 'string') return null;
+  const parts = toPosix(manifest.main).replace(/^\.\//, '').split('/');
+  if (parts.length < 2 || !/\.[cm]?js$/.test(parts.at(-1)) || ['', '.', '..', 'src'].includes(parts[0])) return null;
+  return parts[0];
+}
+
+/**
+ * The Node backend workspaces (Cloud Functions in functions/): every workspace outside packages/
+ * that is no Expo app (no app config, no expo dependency), as architecture-and-boundaries reads
+ * them. [{ dir, name, manifest, buildDir }], where buildDir is the repo-relative folder its
+ * package.json "main" builds into ("functions/lib" for "main": "lib/index.js": the deploy bundle,
+ * build output every scan and ignore list leaves out), or null. [] for a single-app repo.
+ */
+export function backendWorkspaces(root = '.') {
+  const absRoot = resolve(root);
+  return readWorkspaces(root)
+    .filter((ws) => !ws.dir.startsWith('packages/') && !APP_CONFIG_FILES.some((name) => existsSync(join(absRoot, ws.dir, name))) && !(ws.manifest?.dependencies?.expo ?? ws.manifest?.devDependencies?.expo))
+    .map((ws) => {
+      const folder = buildFolderOf(ws.manifest);
+      return { ...ws, buildDir: folder === null ? null : `${ws.dir}/${folder}` };
+    });
 }
 
 /**

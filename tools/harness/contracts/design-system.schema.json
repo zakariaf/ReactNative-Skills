@@ -60,6 +60,20 @@
         "minTallLineHeight": { "type": "object", "additionalProperties": { "type": "number" } }
       }
     },
+    "lightOnly": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reason"],
+      "description": "Declares a light-only app (no dark appearance) and why. Absent (the default), light and dark follow the phone. With it, check-design-system requires userInterfaceStyle 'light' and preference=\"light\" on every AppThemeProvider mount instead of 'automatic'.",
+      "properties": {
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S",
+          "description": "Why the app has no dark appearance: a design decision someone can revisit."
+        }
+      }
+    },
     "fonts": {
       "description": "The font decision, always declared. \"system\" (the template default): the platform's own font (San Francisco, Roboto), nothing bundled, and the font-files, font-plugin and no-font-weight rules are off. An object: the bundled font files, pinned by sha256, with their licences; every rule then applies strictly.",
       "oneOf": [

@@ -551,7 +551,8 @@ function checkContract(contractFile, ctx) {
   const { report, contractLabel } = ctx;
   let contract;
   try {
-    contract = JSON.parse(contractText);
+    // JSON with comments, as design-system-structure reads the same file (write-palette, check-design-system).
+    contract = parseJsonc(contractText);
   } catch (error) {
     report.problem({ file: contractLabel, line: 1, rule: 'contrast-contract', message: `${contractLabel} is not valid JSON (${error.message})`, fix: CONTRACT_FIX });
     return null;

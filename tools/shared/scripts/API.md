@@ -94,7 +94,8 @@ exception → `ERROR [crash] <stack>`, exit 2.
 | `walk(root, options)` | sorted relative posix paths. Options: `ignore`, `include`, `defaultIgnores` (false drops DEFAULT_IGNORES), `pruneDirsContaining: ['SKILL.md']` (a folder below the root that holds one of these files is skipped whole) + `onPrune(relDir)`, `followSymlinks`, `onSymlink(rel)`. A missing root → `UsageError` |
 | `AGENT_SKILL_FOLDERS` | `skills`, `.claude`, `.agents`, `.cursor`, `.codex`, `.windsurf`, `.roo`, `.cline`, `.continue`, `.kiro` |
 | `REPO_SCAN_IGNORES` | see §4 |
-| `repoScanIgnores(root)` | REPO_SCAN_IGNORES + each workspace's output folders (from package.json `workspaces`) |
+| `repoScanIgnores(root)` | REPO_SCAN_IGNORES + each workspace's output folders (from package.json `workspaces`) + each Node backend's build folder (`functions/lib/**`) |
+| `backendWorkspaces(root)` | the Node backend workspaces (outside `packages/`, no Expo app): `[{ dir, name, manifest, buildDir }]`, `buildDir` the folder its `main` builds into (`functions/lib` for `"main": "lib/index.js"`) or null |
 | `isRepoScanIgnored(rel, root?)` | for git paths; with `root` also workspace folders and SKILL.md folders |
 | `walkRepo(root, options)` | **the walk for every repo scan**: `repoScanIgnores(root)` + `options.ignore`, SKILL.md pruning on |
 | `requireDir(path, what)` / `requireFile(path, what)` | absolute path, or `UsageError('nothing to check: …')` |
@@ -213,7 +214,8 @@ REPO_SCAN_IGNORES = [
 
 Patterns with `/` are anchored at the root, so `scripts/build/` and `src/ios/` are still scanned.
 Workspace output folders (`apps/mobile/ios/**`, `packages/ui/build/**`, …) come from package.json
-`workspaces` through `repoScanIgnores(root)`, never from `apps/*` literals. `walkRepo(root, opts)`
+`workspaces` through `repoScanIgnores(root)`, never from `apps/*` literals; so does a Node backend's
+build folder (`functions/lib/**`, the folder its `main` names: `backendWorkspaces(root)`). `walkRepo(root, opts)`
 adds both and prunes every folder below the root that holds a `SKILL.md`, wherever it lives:
 
 ```js

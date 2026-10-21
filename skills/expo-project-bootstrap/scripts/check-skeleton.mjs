@@ -14,7 +14,7 @@ import { dirname, join, posix, resolve } from 'node:path';
 import { ASSETS, PRINT_WIDTH, TEMPLATES, holdsTypeScript, leftoversIn, preExistingEntries, reservedIdPartProblem } from './lib/bootstrap-plan.mjs';
 import { EXACT_VERSION, NPMRC_POLICY, lineMatching, npmrcExcludeProblems, npmrcMissingPolicy, npmrcPolicyOverrides, readJsonFile, readTextFile } from './lib/repo-read.mjs';
 import { bundleIdProblem, placeholdersIn } from './lib/ship-placeholders.mjs';
-import { createReporter, fail, maskComments, parseArgs, readWorkspaces, requireDir, resolveLayout, run, walkRepo } from './check-lib.mjs';
+import { backendWorkspaces, createReporter, fail, maskComments, parseArgs, readWorkspaces, requireDir, resolveLayout, run, walkRepo } from './check-lib.mjs';
 
 const SPEC = {
   name: 'check-skeleton',
@@ -32,7 +32,13 @@ const SPEC = {
     '  lefthook quality-gates gate-scope stryker-config claude-settings agents lockfile install-scripts one-react',
     '  template-leftover placeholder',
     'When multi-package (package.json "workspaces"): workspace-layout package-manifest app-lockstep root-runtime,',
-    '  and root-overrides also covers react, react-native and every "*" peer of a shared package.',
+    '  and root-overrides also covers react, react-native and every "*" peer of a shared package. root-scripts',
+    '  then expects the workspace forms of assets/package-scripts.multi-package.json (typecheck; export:audit run',
+    '  inside the Expo app workspace, <app-dir> filled in), and every workspace its own typecheck (workspace-layout).',
+    '  A workspace declaring "engines.node" or a "bin" is Node tooling (a Cloud Functions backend): node types, and',
+    '  no exports map needed. knip-config: a shared package\'s knip workspace sets includeEntryExports: true; a Node',
+    '  backend\'s (outside packages/, no Expo app) does not, and its entry names exact files (src/index.ts) plus tests.',
+    '  Every declared workspace folder counts as app code, never as pre-existing.',
     'Reads rn-skills.config.json (optional): the layout keys (srcDir, routesDir, contractsDir; per workspace under',
     '  "workspaces", relative to the workspace), "dependencyPolicy", "layoutEntries" (extra top-level names that',
     '  belong to the app) and "agentInstructions": "parent-repo" (an app nested in a repository: AGENTS.md must sit',
@@ -66,6 +72,17 @@ const TEMPLATE_TOKEN = /__[A-Z][A-Z0-9_]*__/g;
 const NOT_PLACEHOLDERS = new Set(['__DEV__']);
 
 const template = (rel) => readFileSync(join(TEMPLATES, rel), 'utf8');
+/** The scripts that change when multi-package: { scripts (root; export:audit names the Expo app), workspaceScripts (every workspace) }. */
+/**
+ * A workspace-form command for one Expo app workspace: <app-dir> is its folder, <to-root> the way back up.
+ * With several apps the one the repo's own script names is the canonical one (else the first).
+ */
+function fillAppDir(command, appDirs, actual) {
+  if (!command.includes('<app-dir>') || appDirs.length === 0) return command;
+  const forms = appDirs.map((dir) => command.replaceAll('<app-dir>', dir).replaceAll('<to-root>', dir.split('/').map(() => '..').join('/')));
+  return forms.find((form) => form === actual) ?? forms[0];
+}
+const multiPackageScripts = () => JSON.parse(readFileSync(join(ASSETS, 'package-scripts.multi-package.json'), 'utf8'));
 const templateJson = (rel) => JSON.parse(template(rel));
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const depsOf = (manifest) => ({ ...(manifest?.dependencies ?? {}), ...(manifest?.devDependencies ?? {}) });
@@ -104,6 +121,8 @@ function checkRootManifest(ctx, add) {
   if (!read.ok) return read.error === 'missing' ? undefined : add('package.json', 1, 'root-manifest', read.error, 'Fix the JSON.');
   const pkg = read.value;
   const want = JSON.parse(readFileSync(join(ASSETS, 'skeleton-package.json'), 'utf8'));
+  // When multi-package, typecheck and export:audit take their workspace forms (quality-gates' list).
+  if (ctx.monorepo) want.scripts = { ...want.scripts, ...Object.fromEntries(Object.entries(multiPackageScripts().scripts).map(([name, command]) => [name, fillAppDir(command, ctx.apps.map((app) => app.dir), pkg.scripts?.[name])])) };
   if (pkg.private !== true) add('package.json', 1, 'root-manifest', 'must be "private": true (an app is never published to npm)', 'Set "private": true.');
   if (!same(pkg.engines, want.engines)) add('package.json', 1, 'root-manifest', `engines must be ${JSON.stringify(want.engines)} (Node 22.18 strips types for app.config.ts and the scripts; npm 11.17 reads the dated excludes)`, 'Copy "engines" from the template.');
   if (!ctx.monorepo) {
@@ -205,12 +224,16 @@ function checkMonorepo(ctx, add) {
       if (!declared.has(dir)) add(rel, 1, 'workspace-layout', `${dir} has a package.json but no "workspaces" glob matches it, so npm never links or installs it`, 'Add it to "workspaces" (a new package is an architecture decision: ask first), or remove the folder.');
     }
   }
+  checkWorkspaceScripts(ctx, add);
   const scopes = new Set(ws.map((w) => /^(@[^/]+)\//.exec(w.name ?? '')?.[1]).filter(Boolean));
   for (const w of ws.filter((item) => !ctx.apps.some((app) => app.dir === item.dir))) {
     const rel = `${w.dir}/package.json`;
     const m = w.manifest ?? {};
     if (m.private !== true || !/^@[^/]+\/[a-z0-9-]+$/.test(m.name ?? '') || scopes.size > 1) add(rel, 1, 'package-manifest', `must be private and named @<org>/<package> in the one workspace scope (found ${JSON.stringify(m.name)})`, 'Name every workspace @<org>/<name> with the same scope and set "private": true.');
-    if (!same(m.exports, { './*': './src/*' }) && !(typeof m.exports === 'object' && m.exports?.['./*'] === './src/*')) add(rel, 1, 'package-manifest', 'exports must map "./*" to "./src/*" (TypeScript source, no build step, no barrel)', 'Set "exports": { "./*": "./src/*" }.');
+    // Node tooling nothing imports (a Cloud Functions backend: its deploy bundle is "main") may have no exports map.
+    const nodeTooling = m.engines?.node !== undefined || m.bin !== undefined;
+    const sourceExports = same(m.exports, { './*': './src/*' }) || (typeof m.exports === 'object' && m.exports?.['./*'] === './src/*');
+    if (!sourceExports && !(nodeTooling && m.exports === undefined)) add(rel, 1, 'package-manifest', 'exports must map "./*" to "./src/*" (TypeScript source, no build step, no barrel)', 'Set "exports": { "./*": "./src/*" }.');
     for (const [name, spec] of Object.entries(depsOf(m))) {
       if (ws.some((item) => item.name === name)) continue;
       if (!EXACT_VERSION.test(spec)) add(rel, 1, 'pin-exact', `${name} is "${spec}", not an exact version`, 'Pin it exactly; a native module a shared package imports is a "*" peer instead.');
@@ -236,6 +259,20 @@ function checkMonorepo(ctx, add) {
       if (specs.length === 0) continue;
       const pinned = pkg.overrides?.[name];
       if (typeof pinned !== 'string' || !EXACT_VERSION.test(pinned) || !specs.every((item) => inRange(pinned, item))) add('package.json', 1, 'root-overrides', `overrides.${name} is ${pinned ?? 'missing'}; ${w.dir} peers on it with "*", so it must be pinned at the exact version the apps install for "${specs[0]}"`, `Set "${name}": "<the version npm ls ${name} shows for the apps>" in "overrides", then npm install (a "*" peer otherwise lets npm put its newest release at the root next to the app's: duplicate native modules).`);
+    }
+  }
+}
+
+/** The root runs typecheck in every workspace (npm run -s typecheck --workspaces, no --if-present), so each keeps its own script. */
+function checkWorkspaceScripts(ctx, add) {
+  const { workspaceScripts } = multiPackageScripts();
+  for (const w of ctx.layout.workspaces) {
+    const isApp = ctx.apps.some((app) => app.dir === w.dir);
+    const rel = `${w.dir}/package.json`;
+    for (const [name, command] of Object.entries(workspaceScripts)) {
+      const actual = w.manifest?.scripts?.[name];
+      if (actual === command) continue;
+      add(rel, lineMatching(ctx.text(rel) ?? '', new RegExp(`"${name.replace(/[:]/g, '\\:')}":`)), isApp ? 'app-manifest' : 'workspace-layout', `script "${name}" ${actual === undefined ? 'is missing' : 'differs from the canonical command'} (the root runs it in every workspace with --workspaces and fails on a workspace without it)`, `Set it to: ${command}`);
     }
   }
 }
@@ -437,7 +474,20 @@ function checkGates(ctx, add) {
     const mayIgnore = new Set([...knipWant.ignore, ...ctx.preExisting.map((entry) => (entry.isDir ? `${entry.name}/**` : entry.name))]);
     for (const glob of knipWant.ignore) if (!ignore.includes(glob)) add('knip.json', lineMatching(ctx.text('knip.json'), /"ignore"/), 'knip-config', `"ignore" lacks "${glob}": knip's Jest plugin falls back to Jest's default test globs and analyses installed skills' templates and fixtures (hundreds of "Unlisted dependencies")`, `Add "${glob}" to "ignore".`);
     for (const glob of ignore.filter((entry) => !mayIgnore.has(entry))) add('knip.json', lineMatching(ctx.text('knip.json'), new RegExp(JSON.stringify(glob).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))), 'knip-config', `"ignore" lists ${glob}; only agent folders and pre-existing top-level entries may be ignored (a wider ignore hides dead code)`, 'Remove it; fix the unused file, export or dependency instead (ignoreDependencies with a reason in contracts/knip-ignores.json for a tool knip cannot see).');
-    if (ctx.monorepo) for (const ws of ctx.layout.workspaces.filter((item) => !ctx.apps.some((app) => app.dir === item.dir))) if (knip.value.workspaces?.[ws.dir]?.includeEntryExports !== true) add('knip.json', 1, 'knip-config', `workspaces.${ws.dir}.includeEntryExports must be true (its exports map makes every file an entry, so dead files are never reported otherwise)`, 'Set it.');
+    if (ctx.monorepo) {
+      const backends = new Set(backendWorkspaces(ctx.root).map((ws) => ws.dir));
+      for (const ws of ctx.layout.workspaces.filter((item) => !ctx.apps.some((app) => app.dir === item.dir))) {
+        const own = knip.value.workspaces?.[ws.dir];
+        if (!backends.has(ws.dir)) {
+          if (own?.includeEntryExports !== true) add('knip.json', 1, 'knip-config', `workspaces.${ws.dir}.includeEntryExports must be true (its exports map makes every file an entry, so dead files are never reported otherwise)`, 'Set it.');
+          continue;
+        }
+        // A Node backend (functions/): its entry exports every deployed function and nothing imports them.
+        if (own?.includeEntryExports === true) add('knip.json', 1, 'knip-config', `workspaces.${ws.dir}.includeEntryExports is true, so knip reports every function the deploy entry exports as unused (the deploy runtime, not the repo, imports them)`, `Remove it, and name the file the deploy build bundles as the entry: "${ws.dir}": { "entry": ["src/index.ts", "src/**/*.test.ts"], "project": ["src/**/*.ts"] }.`);
+        const entries = Array.isArray(own?.entry) ? own.entry : typeof own?.entry === 'string' ? [own.entry] : [];
+        for (const glob of entries.filter((entry) => /[*?{[]/.test(entry) && !/\.test\.(?:\{[^}]*\}|[a-z]+)$/.test(entry))) add('knip.json', 1, 'knip-config', `workspaces.${ws.dir} entry adds "${glob}": every export of an entry file counts as used, so knip stops reporting dead exports in the backend`, 'List the exact file the deploy build bundles (src/index.ts) and the test glob (src/**/*.test.ts) only.');
+      }
+    }
   }
   const lefthook = ctx.text('lefthook.yml');
   if (lefthook !== null) {

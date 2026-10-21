@@ -140,6 +140,14 @@ unit-and-component-tests owns `jest.config.js`; this skill guards its numbers:
     `'task-priority\\.test'` fails here before `npm ci`.
   - The guardrail compares the resolved scope with `jest.collectCoverageFrom` and `jest.projects` in
     `quality-gates.json`, and each project's `coveragePathIgnorePatterns` with the device-only list.
+  One entry is the canonical config's own but conditional: once `jest.emulator.config.js` exists
+  (firestore-rules-and-emulator-tests), `HAS_RULES_TESTS` adds `'\\.rules\\.test\\.'` to the unit
+  project's `testPathIgnorePatterns` right after the Android entry, because those security-rules tests
+  run only inside the Firebase emulators. `jest-scope` accepts it as canonical text, and the baseline
+  `gate-weakened` compares with lists it in `jest.projects.unit.testPathIgnorePatterns` exactly while
+  the file exists (`SANCTIONED_JEST_ENTRIES` in `check-gate-wiring.mjs`: entry, project, key, repo
+  fact, owner): add it to `quality-gates.json` in the commit that adds the emulator config, with its
+  trailer. Without the file the same entry fails, since nothing else runs those tests.
   Three changes pass both checks when made with a trailer:
   - **A new test project** (a `web` project with `preset: 'jest-expo/web'` and its own `testMatch`)
     added next to the canonical ones and listed under `jest.projects` in `quality-gates.json`:
@@ -158,7 +166,12 @@ unit-and-component-tests owns `jest.config.js`; this skill guards its numbers:
     `(apps|packages)/[^/]+`), strips them, drops repeats and compares the rest with the canonical
     value, in `jest.config.js` and in `quality-gates.json` alike. Keep the canonical order with the
     workspace entries where `src/` stood. It also fails a workspace holding `src/` that no coverage
-    glob or test root reaches. Per-workspace Jest configs (`projects: ['<rootDir>/apps/*']`) are
+    glob or test root reaches. A Node backend workspace (`functions/`: outside `packages/`, no Expo
+    app) is reached by a project of its own instead of the canonical ones: `displayName: 'functions'`
+    (its folder), `testEnvironment: 'node'`, `testMatch: ['<rootDir>/functions/src/**/*.test.ts']`
+    (unit-and-component-tests, When multi-package), listed under `jest.projects.functions` like any
+    new project, with `TEST_ROOTS` leaving the backend out and `collectCoverageFrom` adding
+    `<rootDir>/functions/src/**/*.{ts,tsx}`. Per-workspace Jest configs (`projects: ['<rootDir>/apps/*']`) are
     outside the static check: it reports them as differing, and the guardrail compares them.
   Any other agreed change of scope (a new ignore pattern, a new generated folder, a test root in the
   single-app layout) is a change to unit-and-component-tests' canonical config, made there and
@@ -189,11 +202,12 @@ copy that lost the agent-folder exclusion.
 
 - this skill's files exist (`gate-file-missing`); another skill's gate file that does not exist yet
   is a `SKIP` naming it, and the rules reading it wait;
-- every canonical script is present byte for byte (`npm-script`; the workspace `typecheck` form when
-  multi-package), and every `node <file>` target of a script, a lefthook job or an extra step exists,
+- every canonical script is present byte for byte (`npm-script`; the workspace `typecheck` and
+  `export:audit` forms when multi-package), and every `node <file>` target of a script, a lefthook job or an extra step exists,
   or is another skill's not-yet-created file (`script-target`);
-- `quality-gates.json` is no weaker than the template (`gate-weakened`) and its extra steps are valid
-  (`verify-step`);
+- `quality-gates.json` is no weaker than the template (`gate-weakened`; when multi-package the
+  template's probes and app program carry each Expo app workspace's prefix, and every workspace
+  `tsconfig.json` has a `typescript.projects` entry) and its extra steps are valid (`verify-step`);
 - `.claude/settings.json` keeps every deny and ask rule, both hooks with their commands byte for
   byte, no bypass allow rule and no `disableAllHooks` (`claude-settings`);
 - `lefthook.yml` keeps every job, run line, `glob:` line and secret glob, switches nothing off and
