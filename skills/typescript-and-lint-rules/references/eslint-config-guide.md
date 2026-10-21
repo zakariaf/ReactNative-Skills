@@ -199,7 +199,8 @@ item it exempts:
 - A package that is banned with its subpaths (`firebase` and `firebase/firestore`, `firebase/app`, ...)
   is a `bannedWithSubpaths(name, message)` entry of `BANNED_PACKAGE_PATHS`: `restrictedImports()` bans
   the name as a path and `<name>/*` as a pattern, and an `allow` that names the entry lifts both. A
-  plain `banned()` entry bans the exact name only (verified with ESLint 9.39.5 on 2026-10-22: with
+  plain `banned()` entry bans the exact name only; the canonical axios ban uses the subpath form, so
+  `axios/unsafe/...` is banned too (verified with ESLint 9.39.5 on 2026-10-22: with
   `bannedWithSubpaths('firebase', ...)` an app file importing `firebase` and `firebase/firestore`
   fails twice, a `test/rules/` file under the lift block passes; re-verify with `npx eslint
   --print-config <file>` and a planted import).

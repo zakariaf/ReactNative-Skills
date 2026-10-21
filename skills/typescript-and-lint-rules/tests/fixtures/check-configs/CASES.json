@@ -456,7 +456,7 @@
       "[eslint-required] missing strict-boolean-expressions with allowString: false and allowNumber: false [strict-booleans]",
       "[eslint-required] missing the asyncHandler selector, verbatim (async on* handlers, handleSubmit(...) on an on* prop, async handleX functions) [async-handler]",
       "[eslint-required] missing the newDate selector, verbatim (no new Date() in app code) [new-date]",
-      "[eslint-required] missing the axios ban in BANNED_PACKAGE_PATHS (network goes through the ApiClient) [banned-axios]",
+      "[eslint-required] missing the axios ban in BANNED_PACKAGE_PATHS, with its subpaths (network goes through the ApiClient) [banned-axios]",
       "[eslint-warn] react-native/no-inline-styles uses severity 1 (warn)",
       "[eslint-weakened] a linterOptions block appears 2 times; the canonical config has 1 [linter-options]"
     ],
@@ -520,7 +520,7 @@
       {
         "replace": {
           "file": "eslint.config.mjs",
-          "find": "  banned('axios', 'Use the ApiClient in src/api/ (fetch, typed and validated).'),\n",
+          "find": "  bannedWithSubpaths('axios', 'Use the ApiClient in src/api/ (fetch, typed and validated).'),\n",
           "with": ""
         }
       },

@@ -317,8 +317,8 @@
       },
       {
         "id": "banned-axios",
-        "pattern": "BANNED_PACKAGE_PATHS = \\[(?:(?!\\n\\];)[\\s\\S])*?banned\\(\\s*'axios',",
-        "what": "the axios ban in BANNED_PACKAGE_PATHS (network goes through the ApiClient)"
+        "pattern": "BANNED_PACKAGE_PATHS = \\[(?:(?!\\n\\];)[\\s\\S])*?banned(?:WithSubpaths)?\\(\\s*'axios',",
+        "what": "the axios ban in BANNED_PACKAGE_PATHS, with its subpaths (network goes through the ApiClient)"
       },
       {
         "id": "banned-async-storage",

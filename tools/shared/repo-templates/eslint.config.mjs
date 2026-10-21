@@ -161,7 +161,7 @@ const ATT_IMPORT = banned(
   'Only src/services/consent/<sdk>-consent-adapter.ts asks for tracking (ConsentPort).',
 );
 const BANNED_PACKAGE_PATHS = [
-  banned('axios', 'Use the ApiClient in src/api/ (fetch, typed and validated).'),
+  bannedWithSubpaths('axios', 'Use the ApiClient in src/api/ (fetch, typed and validated).'),
   banned(
     '@react-native-async-storage/async-storage',
     'Use expo-sqlite/kv-store for preferences and expo-secure-store for secrets.',
