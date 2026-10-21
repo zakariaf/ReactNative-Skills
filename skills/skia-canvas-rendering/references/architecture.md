@@ -281,4 +281,6 @@ root; run `check-canvas-files.mjs` once per app with the app's folder as the rep
 (`node ${CLAUDE_SKILL_DIR}/scripts/check-canvas-files.mjs apps/mobile`), because the Jest config, the
 goldens and `scripts/quality/` belong to the app. Workspace packages consumed as TypeScript
 source need explicit `.ts` extensions in imports (the lint config's `IS_MULTI_PACKAGE`); the
-templates use the single-app, extensionless style.
+templates use the single-app, extensionless style, so after copying them into a workspace repo run
+typescript-and-lint-rules' `add-import-extensions.mjs` on the copied files (it writes each resolved
+extension and refuses a platform-only import).
