@@ -20,6 +20,7 @@ const RULES = [
   ['wildcard-write', 'a write, create, update or delete allowed on a recursive wildcard path (`{document=**}`, `{allPaths=**}`)'],
   ['untested-match', 'a match block with allows that no running describe names, or whose describe never calls assertSucceeds'],
   ['missing-deny-test', 'a match block whose describe never calls assertFails'],
+  ['empty-match', 'a match block with nothing in its body: the rules compiler refuses it ("The \'match\' body must contain at least one declaration")'],
   ['real-project-id', 'an emulator script without `--project demo-...`, or a test projectId that is not a demo- id'],
 ];
 
@@ -38,6 +39,8 @@ const SPEC = {
     '',
     'A test names a match block by a describe title that holds its path as the rules file writes it,',
     'below /databases/{database}/documents or /b/{bucket}/o: describe(\'users/{uid}/tasks/{taskId}\', ...).',
+    'A rules file with no allow at all is deny-all (the starting state): it prints a NOTE and counts as checked',
+    '(its match bodies still need a declaration, such as the isSignedIn() helper).',
     'NOT APPLICABLE when the repo has no firebase.json, no contract and no firebase-tools dependency.',
   ].join('\n'),
 };
@@ -126,6 +129,9 @@ function checkTestProjectIds(files, report) {
 
 function checkBlocks(rulesRel, blocks, describes, report) {
   for (const block of blocks) {
+    if (block.declarations === 0) {
+      report.problem({ file: rulesRel, line: block.line, rule: 'empty-match', message: `match ${block.written} has nothing in its body; the rules compiler refuses the whole file ("The 'match' body must contain at least one declaration"), so the emulator and a deploy reject it`, fix: 'Give the body a declaration: the shared isSignedIn() and isOwner(uid) helpers in the service\'s top match (deny-all needs no allow), or the block\'s allows with their tests; delete a block that grants nothing.' });
+    }
     for (const allow of block.allows) {
       const open = openReason(allow);
       if (open !== null) {
@@ -178,14 +184,22 @@ run(async () => {
   const describes = sources.filter(({ rel }) => TEST_FILE.test(rel)).flatMap(({ masked }) => readDescribes(masked));
 
   let checked = 0;
+  let denyAll = 0;
   for (const [key, service] of [['firestoreRules', 'firestore'], ['storageRules', 'storage']]) {
     if (contract[key] === null) continue;
     const rulesRel = toPosix(contract[key]);
     const blocks = parseRules(readFileSync(join(root, rulesRel), 'utf8'), service);
-    checked += blocks.filter((block) => block.allows.length > 0).length;
+    const granting = blocks.filter((block) => block.allows.length > 0).length;
+    checked += granting;
+    // Deny-all is the starting state (rule 1): nothing granted, so no block needs a test yet.
+    if (granting === 0) {
+      denyAll += 1;
+      report.note(`NOTE ${rulesRel} grants no access (deny-all): every client request is denied, so no block needs a test until its first allow lands with them`);
+    }
     checkBlocks(rulesRel, blocks, describes, report);
   }
   checkScripts(layout, report);
   checkTestProjectIds(sources, report);
+  if (checked === 0) return report.finish({ checked: denyAll, unit: 'deny-all rules files' });
   return report.finish({ checked, unit: 'match blocks' });
 });

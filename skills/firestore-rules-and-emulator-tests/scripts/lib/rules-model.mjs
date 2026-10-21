@@ -57,9 +57,11 @@ export function testPathOf(fullPath, service) {
 const TOKEN = /\bmatch\s+(\/(?:[^\s{}]|\{[^\s{}]*\})*)\s*\{|\bservice\s+[\w.]+\s*\{|\bfunction\s+\w+\s*\([^)]*\)\s*\{|\ballow\s+([a-z]+(?:\s*,\s*[a-z]+)*)\s*(:\s*if\b([\s\S]*?))?;|\{|\}/g;
 
 /**
- * Match blocks of a rules file, outermost first. Each: { path (test path), fullPath, line, allows,
- * recursive (this block or an enclosing one has a `=**` wildcard) }; each allow: { methods, condition
- * (null when the statement has none), line }.
+ * Match blocks of a rules file, outermost first. Each: { path (test path), fullPath, written (the
+ * path as its match statement writes it), line, allows, declarations (the functions, matches and
+ * allows directly in its body: the rules compiler refuses a body with none), recursive (this block or
+ * an enclosing one has a `=**` wildcard) }; each allow: { methods, condition (null when the statement
+ * has none), line }.
  */
 export function parseRules(text, service) {
   const structure = maskRules(text, { blankStrings: true });
@@ -69,14 +71,18 @@ export function parseRules(text, service) {
   TOKEN.lastIndex = 0;
   for (let match = TOKEN.exec(structure); match !== null; match = TOKEN.exec(structure)) {
     const token = match[0];
+    const enclosing = stack.at(-1);
+    if (enclosing?.type === 'match' && /^(?:match|function|allow)\b/.test(token)) enclosing.block.declarations += 1;
     if (token.startsWith('match')) {
       const parent = [...stack].reverse().find((frame) => frame.type === 'match');
       const fullPath = `${parent ? parent.block.fullPath : ''}${match[1]}`;
       const block = {
         path: testPathOf(fullPath, service),
         fullPath,
+        written: match[1],
         line: lineAt(structure, match.index),
         allows: [],
+        declarations: 0,
         recursive: /=\*\*\}/.test(fullPath),
       };
       blocks.push(block);

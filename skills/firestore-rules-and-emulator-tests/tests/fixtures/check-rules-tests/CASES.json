@@ -393,5 +393,99 @@
         }
       }
     ]
+  },
+  "pass-deny-all": {
+    "expect": [
+      "NOTE firestore.rules grants no access (deny-all)",
+      "NOTE storage.rules grants no access (deny-all)",
+      "check-rules-tests: 2 deny-all rules files checked, 0 problems",
+      "RESULT: PASS"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "firestore.rules",
+          "lines": [
+            "// firestore.rules",
+            "// Deny by default: no match block names a collection yet, so every request is denied.",
+            "rules_version = '2';",
+            "",
+            "service cloud.firestore {",
+            "  match /databases/{database}/documents {",
+            "    function isSignedIn() {",
+            "      return request.auth != null;",
+            "    }",
+            "  }",
+            "}"
+          ]
+        }
+      },
+      {
+        "write": {
+          "file": "storage.rules",
+          "lines": [
+            "// storage.rules",
+            "rules_version = '2';",
+            "",
+            "service firebase.storage {",
+            "  match /b/{bucket}/o {",
+            "    function isSignedIn() {",
+            "      return request.auth != null;",
+            "    }",
+            "  }",
+            "}"
+          ]
+        }
+      },
+      {
+        "delete": [
+          "test/rules/firestore.rules.test.ts",
+          "test/rules/storage.rules.test.ts"
+        ]
+      }
+    ]
+  },
+  "bad-empty-match": {
+    "expect": [
+      "[empty-match]",
+      "firestore.rules:4",
+      "must contain at least one declaration"
+    ],
+    "ops": [
+      {
+        "write": {
+          "file": "firestore.rules",
+          "lines": [
+            "rules_version = '2';",
+            "",
+            "service cloud.firestore {",
+            "  match /databases/{database}/documents {",
+            "  }",
+            "}"
+          ]
+        }
+      },
+      {
+        "delete": [
+          "test/rules/firestore.rules.test.ts"
+        ]
+      }
+    ]
+  },
+  "bad-empty-match-nested": {
+    "expect": [
+      "[empty-match]",
+      "storage.rules:24",
+      "match /users/{uid}/attachments/{fileName}"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "storage.rules",
+          "find": "      allow read: if isOwner(uid);\n      allow create, update: if isOwner(uid) && isAcceptedImage();\n      allow delete: if isOwner(uid);\n",
+          "with": "      // allow read: if isOwner(uid);\n"
+        }
+      }
+    ]
   }
 }

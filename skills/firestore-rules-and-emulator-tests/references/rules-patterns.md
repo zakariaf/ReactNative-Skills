@@ -61,6 +61,26 @@ collection is closed until its block and its tests land in the same change. An e
 `allow read, write: if false;` catch-all adds nothing (no allow is already a denial) and invites the
 next person to "temporarily" change `false` to `true`.
 
+**The deny-all starting file** (before the first collection has its block) still holds the helpers:
+
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(uid) { return isSignedIn() && request.auth.uid == uid; }
+  }
+}
+```
+
+A `match` body must hold at least one declaration (a function, a nested match or an allow). An empty
+`match /databases/{database}/documents { }` does not compile: the Firestore emulator rejects the file
+with `Error compiling rules: L4:3 The 'match' body must contain at least one declaration.` (every test
+then fails like a denial) and a deploy is refused. Storage's `match /b/{bucket}/o { }` fails the same
+way, so a deny-all `storage.rules` keeps `isSignedIn()` and `isOwner(uid)` there too. The helpers are
+not filler: the first block calls them. check-rules-tests passes a deny-all file with a NOTE and fails
+an empty body (`empty-match`).
+
 The two rules to never write, even for a day:
 
 - `allow read, write: if true;` (or `allow read, write;` with no condition): open to the internet.
@@ -222,4 +242,5 @@ real project; emulator commands never do (the toolchain-and-ci reference).
 |---|---|---|
 | Version 1 is the default; version 2 makes `=**` match zero or more segments and is required for collection group queries | 2026-10-21, Firebase docs "Structuring security rules" | https://firebase.google.com/docs/firestore/security/rules-structure |
 | The templates' rules (allow-lists, `request.time`, append-only, server-only, Storage type and size) behave as the tests say on Firestore emulator 1.22.0 and the Storage rules runtime 1.1.3 | 2026-10-21, `npm run test:rules` in a scratch app: 20 tests passed; breaking an allow-list, an owner check, a delete rule or the image check each failed a test | `npm run test:rules` |
+| A `match` body with no declaration does not compile (`The 'match' body must contain at least one declaration`); a body holding only helper functions compiles and denies every request | 2026-10-22, Firestore emulator 1.22.0 (loaded through `initializeTestEnvironment`: the empty body was rejected with HTTP 400, the helper-only body loaded and denied a read) and the Storage rules runtime 1.1.3 (the empty body was logged as the same error), firebase-tools 15.33.0, OpenJDK 26.0.1 | `firebase emulators:exec --only firestore,storage --project demo-<app> "<a script that loads both files>"` |
 | The console's test mode starts with a date-limited open rule (about 30 days) | 2026-10-21, secondary sources only (FlutterFlow docs, community posts) | open a new project's Firestore Rules tab in the console |

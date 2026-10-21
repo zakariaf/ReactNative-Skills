@@ -61,7 +61,9 @@ both kinds. Verified on 2026-10-21 with firebase-tools 15.33.0, `@firebase/rules
    [references/rules-patterns.md](references/rules-patterns.md) for the pattern each kind of document
    needs (client-writable, append-only, server-only, Storage folder).
 2. **Copy the templates** (line 1 names the repo path; the JSON files sit at their path under
-   `templates/`), then rename the Tasks example blocks to the app's collections:
+   `templates/`), then rename the Tasks example blocks to the app's collections (an app with no
+   collection yet deletes them and keeps the helpers: a `match` body with no declaration does not
+   compile, so the deny-all file is the helpers alone, rules-patterns reference):
 
    | Template | Goes to |
    |---|---|
@@ -154,7 +156,7 @@ and no `firebase-tools` dependency, so the skill is not applied yet.
 | `templates/test/rules/storage.rules.test.ts` | The Storage folder's owner, type and size tests | Workflow steps 2 and 3 |
 | `templates/contracts/firebase-rules.json` | The contract: rules file paths (or null) and the tests folder | Workflow step 2 |
 | `templates/contracts/firebase-rules.schema.json` | The contract's JSON Schema | When editing the contract |
-| `scripts/check-rules-tests.mjs` | The checker: `open-rule`, `wildcard-write`, `untested-match`, `missing-deny-test`, `real-project-id` | Workflow step 7 and the definition of done |
+| `scripts/check-rules-tests.mjs` | The checker: `open-rule`, `wildcard-write`, `untested-match`, `missing-deny-test`, `empty-match`, `real-project-id`; a deny-all file passes with a NOTE | Workflow step 7 and the definition of done |
 | `scripts/lib/rules-model.mjs` | Reads rules files (blocks, allows, conditions) and test files (describes, assertions) | Read only to change a rule |
 | `scripts/selftest.mjs` | Proves the checker passes the templates and catches every planted bug | After changing the checker, a template or a fixture |
 | `scripts/check-lib.mjs` | Shared script helper, synced from the library (do not edit here) | Never by hand |
