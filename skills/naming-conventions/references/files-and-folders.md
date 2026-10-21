@@ -237,7 +237,9 @@ file the repo owns is a comment holding its repo-relative path:
   (placeholders allowed: `// src/features/__FEATURE__/use-__FEATURE__-model.ts`); the template
   verifier places files by it.
 - **Moving a file** updates its header in the same commit, together with its main export and its
-  imports.
+  imports. Moving the single app into a workspace (`apps/<app>/`) moves every header with it
+  (`// src/ui/app-text.tsx` becomes `// apps/<app>/src/ui/app-text.tsx`); expo-project-bootstrap's
+  "When multi-package" has the one command that rewrites them.
 
 The header is on by default because agents and reviewers read code out of context (a diff hunk, a
 pasted snippet, a log). A repo that does not want it sets `"pathHeader": false` in
