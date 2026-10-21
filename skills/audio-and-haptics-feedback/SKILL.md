@@ -196,6 +196,7 @@ ports, the cue tables, the banks, and the two checkers that prove them.
 | `scripts/lib/synth.mjs` | Synth, sfc32, gate and WAV port with a pinned golden hash | When changing the synth |
 | `scripts/lib/ts-literal.mjs` | Reads TypeScript literal data without a compiler (synced; do not edit here) | Never by hand |
 | `scripts/lib/app-modules.mjs` | Loads the app's pure TypeScript for the synth-drift rule (synced; do not edit here) | Never by hand |
+| `scripts/lib/expo-apps.mjs` | Finds each Expo app workspace of a workspace repo, so the checker runs from the root (synced; do not edit here) | Never by hand |
 | `scripts/check-lib.mjs` | Shared script helper (synced; do not edit here) | Never by hand |
 | `assets/shared.json` | The shared files this skill copies in | When adding a shared file |
 | `assets/template-placeholders.json` | Placeholder values verify-templates and the self-test fill in | When adding a placeholder |
