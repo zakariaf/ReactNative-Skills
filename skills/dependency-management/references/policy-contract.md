@@ -52,9 +52,40 @@ has no equivalent there: move the file with `rn-skills.config.json` rather than 
 | `profiles` | string[] | opt-in ban profiles: `offline-only`, `no-telemetry` |
 | `packages` | object | the rows, keyed by package name (next section) |
 | `heldBack` | `{ package, allowed, trigger }[]` | `allowed` is a regex on the bare version (`"^9\\."`); a version past it fails `held-back` until the written `trigger` happens |
-| `doNotAdd` | `{ "<name>": "<reason>" }` | packages that are wrong rather than dangerous (duplicates of the stack, and `eas-cli`, a global tool expo-doctor refuses in a project); checked as direct dependencies (`do-not-add`) and in committed npx calls, which would install them into the npx cache (`npx-install`) |
+| `doNotAdd` | `{ "<name>": "<reason>" }`, or `{ "<name>": { "reason", "where", "allowIn"? } }` (below) | packages that are wrong rather than dangerous (duplicates of the stack, and `eas-cli`, a global tool expo-doctor refuses in a project); checked as direct dependencies (`do-not-add`) and in committed npx calls, which would install them into the npx cache (`npx-install`) |
 | `banned` | `{ pattern, scope, reason, useInstead?, source? }[]` | `pattern` is a regex on the package name; `scope` `anywhere` (fail at any depth of the lockfile) or `direct` (fail only as a direct dependency) |
 | `licenses` | `{ allowed: string[], exceptions: { "<name>": { license, reason } } }` | SPDX ids shipped code may use, and approved exceptions |
+
+**A scoped `doNotAdd` entry** keeps a package out of some places only, while a row allows it
+elsewhere. The case it exists for: an app on React Native Firebase keeps the Firebase JS SDK
+(`firebase`) out of its code, but firestore-rules-and-emulator-tests needs `firebase` and
+`@firebase/rules-unit-testing` as dev-only packages for the rules tests under `test/rules/`:
+
+```json
+"doNotAdd": {
+  "firebase": {
+    "reason": "the app talks to Firebase through @react-native-firebase/* (native SDKs, native offline cache); the JS SDK is a second client with its own cache",
+    "where": "app",
+    "allowIn": ["test/rules/**"]
+  }
+},
+"packages": {
+  "firebase": { "version": "13.0.0", "spec": "13.0.0", "install": "npm", "where": "dev", "why": "the peer of @firebase/rules-unit-testing; only the rules tests import it" }
+}
+```
+
+- `where` (required): the places the package is kept out of, in the row vocabulary (`app`, `dev`, a
+  workspace folder, or a list). `do-not-add` fails it there only; declared anywhere else it needs a
+  row like any package (`not-in-table`), and a row whose `where` overlaps the entry's fails
+  `policy-contract`.
+- `allowIn` (optional): repo-relative globs of the files that may import it. architecture-and-boundaries'
+  `check-boundaries.mjs` reads this file and reports every other importer as `banned-package`, app code
+  and tests alike; without `allowIn` no file may import it.
+- `plan-dependency.mjs` plans the package only for a row outside the entry's places.
+- A plain string (`"axios": "<reason>"`) keeps meaning "never a direct dependency, never imported".
+- Mirror an import ban in `eslint.config.mjs` `BANNED_PACKAGE_PATHS` as usual, and lift it in one
+  file-exact block for the allowed files (`restrictedImports({ allow: [<the entry>] })`, naming the
+  rules test files exactly; typescript-and-lint-rules).
 
 `check-deps-policy.mjs` reports every shape problem as `policy-contract` with the key that is wrong,
 including **unknown keys** at the top level, in a row, a companion, a `heldBack` or `banned` entry,
@@ -143,6 +174,7 @@ checks the licence of a runtime row only.
 | `check-deps-policy.mjs` (this skill) | everything (and `packages` against Expo's module map: `table-map`; `doNotAdd` and `banned` also against committed npx calls: `npx-install`) |
 | `plan-dependency.mjs` (this skill) | `packages`, `heldBack`, `doNotAdd`, `banned`, `profiles`, `licenses` |
 | `scripts/deps/check-deps.ts` (the app's gate in `npm run verify`) | `banned` |
+| architecture-and-boundaries' `check-boundaries.mjs` | `doNotAdd`: every importer is a `banned-package`, except the files an entry's `allowIn` matches |
 | `scripts/audit/audit-licenses.ts` (`npm run audit:licenses`) | `licenses` |
 
 ## Editing rules

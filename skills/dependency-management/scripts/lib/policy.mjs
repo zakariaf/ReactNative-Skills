@@ -31,6 +31,7 @@ const KNOWN_KEYS = Object.freeze({
   companion: ['$comment', 'package', 'version', 'via', 'why'],
   heldBack: ['$comment', 'package', 'allowed', 'trigger'],
   banned: ['$comment', 'pattern', 'scope', 'reason', 'useInstead', 'source'],
+  doNotAdd: ['$comment', 'reason', 'where', 'allowIn'],
   licenses: ['$comment', 'allowed', 'exceptions'],
   exception: ['$comment', 'license', 'reason'],
 });
@@ -56,6 +57,22 @@ export const placesOf = (row) => (Array.isArray(row?.where) ? row.where : typeof
 export const isAppRow = (row) => placesOf(row).includes('app');
 /** True when every place of a row is the dev tools (nothing of it ships). */
 export const isDevRow = (row) => placesOf(row).length > 0 && placesOf(row).every((place) => place === 'dev');
+
+/**
+ * A doNotAdd entry in one shape: a string keeps the package out of every place and out of every file
+ * ({ reason, where: null, allowIn: [] }); the object form keeps it out of its "where" places only and
+ * lets the files its "allowIn" globs match import it (the JS SDK kept out of the app while a dev row
+ * allows it for the rules tests under test/rules/). null when the policy has no entry.
+ */
+export function doNotAddEntry(policy, name) {
+  const entry = policy?.doNotAdd?.[name];
+  if (entry === undefined || entry === null) return null;
+  if (typeof entry === 'string') return { reason: entry, where: null, allowIn: [] };
+  return { reason: String(entry.reason ?? ''), where: placesOf(entry), allowIn: Array.isArray(entry.allowIn) ? entry.allowIn : [] };
+}
+
+/** True when a doNotAdd entry (doNotAddEntry) keeps its package out of `place` ("app", "dev", a workspace folder). */
+export const doNotAddBlocks = (entry, place) => entry !== null && (entry.where === null || entry.where.includes(place));
 
 /** True when a specifier (exact, ~x.y.z or ^x.y.z) accepts an exact version. */
 export function specAccepts(spec, version) {
@@ -297,6 +314,25 @@ function rowProblems(name, row, errors) {
   for (const key of ['implicitUse', 'deprecated']) if (row[key] !== undefined && !isText(row[key])) errors.push(`${at}.${key} must say why`);
 }
 
+/**
+ * A doNotAdd entry: a reason (the package is kept out of every place and every file), or
+ * { reason, where, allowIn? }: kept out of the "where" places only (a row may allow it elsewhere),
+ * and imported only by the files the "allowIn" globs match.
+ */
+function doNotAddProblems(name, entry, packages, errors) {
+  const at = `doNotAdd.${name}`;
+  if (isText(entry)) return;
+  if (!isObject(entry)) return errors.push(`${at} must be a reason, or { "reason", "where", "allowIn" }`);
+  unknownKeyProblems(entry, 'doNotAdd', at, errors);
+  if (!isText(entry.reason)) errors.push(`${at}.reason is missing: say why the package stays out`);
+  if (entry.where === undefined) errors.push(`${at}.where is missing: name the places the package is kept out of ("app", "dev", a workspace folder, or a list)`);
+  else whereProblems(at, { where: entry.where }, errors);
+  if (entry.allowIn !== undefined && (!Array.isArray(entry.allowIn) || !entry.allowIn.every((glob) => isText(glob) && !glob.startsWith('/') && !glob.includes('..')))) errors.push(`${at}.allowIn must be a list of repo-relative globs (the files that may import it, such as "test/rules/**")`);
+  const row = isObject(packages) ? packages[name] : undefined;
+  const clash = isObject(row) ? placesOf(row).filter((place) => placesOf(entry).includes(place)) : [];
+  if (clash.length > 0) errors.push(`${at}: the row packages.${name} allows it in ${clash.join(', ')}, where doNotAdd keeps it out; scope the entry to the other places or drop the row`);
+}
+
 function bannedProblems(list, errors) {
   if (!Array.isArray(list)) return errors.push('"banned" must be a list');
   for (const [index, entry] of list.entries()) {
@@ -326,7 +362,8 @@ export function validatePolicy(policy) {
     unknownKeyProblems(held, 'heldBack', `heldBack[${index}]`, errors);
     if (!isObject(held) || !isText(held.package) || !isText(held.allowed) || !isText(held.trigger)) errors.push(`heldBack[${index}] needs package, allowed (a regex on the bare version) and trigger`);
   }
-  if (policy.doNotAdd !== undefined && (!isObject(policy.doNotAdd) || !Object.values(policy.doNotAdd).every(isText))) errors.push('"doNotAdd" must map package names to reasons');
+  if (policy.doNotAdd !== undefined && !isObject(policy.doNotAdd)) errors.push('"doNotAdd" must map package names to reasons');
+  else for (const [name, entry] of Object.entries(policy.doNotAdd ?? {})) doNotAddProblems(name, entry, policy.packages, errors);
   bannedProblems(policy.banned, errors);
   if (policy.licenses !== undefined && (!isObject(policy.licenses) || (policy.licenses.allowed !== undefined && !Array.isArray(policy.licenses.allowed)))) errors.push('"licenses" must be { "allowed": [SPDX ids], "exceptions": { ... } }');
   unknownKeyProblems(policy.licenses, 'licenses', 'licenses', errors);

@@ -11,7 +11,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { activeExcludes, bareVersion, parseAllowScriptsKey, banFix, describePlace, effectiveBans, installed, isAllowedLicense, isAppRow, isDevRow, loadBanLists, manifestFile, placesOf, policyPath, readPolicy, readRepo, releaseAgeDays } from './lib/policy.mjs';
+import { activeExcludes, bareVersion, parseAllowScriptsKey, banFix, describePlace, doNotAddBlocks, doNotAddEntry, effectiveBans, installed, isAllowedLicense, isAppRow, isDevRow, loadBanLists, manifestFile, placesOf, policyPath, readPolicy, readRepo, releaseAgeDays } from './lib/policy.mjs';
 import { createReporter, fail, parseArgs, requireDir, resolveLayout, run } from './check-lib.mjs';
 
 const SPEC = {
@@ -242,7 +242,11 @@ function vetRequest(context, request, add) {
   };
   const ban = bans.find((rule) => rule.regex.test(name));
   if (ban) return refuse('banned', `${name} is banned: ${ban.reason}`, `Never install it.${banFix(ban)}`);
-  if (policy.doNotAdd[name]) return refuse('do-not-add', `${name}: ${policy.doNotAdd[name]}`, 'Do not install it.');
+  // A scoped entry ({ where, allowIn }) refuses only a request whose row would put the package where it is kept out.
+  const kept = doNotAddEntry(policy, name);
+  if (kept !== null && (row === undefined || placesOf(row).some((place) => doNotAddBlocks(kept, place)))) {
+    return refuse('do-not-add', `${name}${kept.where === null ? '' : ` (kept out of ${describePlace(context.repo, kept.where)})`}: ${kept.reason}`, kept.where === null ? 'Do not install it.' : `Do not install it there; a row whose "where" lies outside ${describePlace(context.repo, kept.where)} (a dev row for test tooling) may allow it${kept.allowIn.length > 0 ? `, imported only by ${kept.allowIn.join(', ')}` : ''}.`);
+  }
   const held = policy.heldBack.find((entry) => entry.package === name);
   if (held && request.version && !new RegExp(held.allowed).test(bareVersion(request.version))) return refuse('held-back', `${name}@${request.version} crosses a held-back major`, `Stay on the pinned line until: ${held.trigger}.`);
   if (!row) return refuse('not-in-table', `${name} is not in the dependency policy`, 'Stop and ask the developer. If approved: check age, deprecation, licence and install script (--online), add its row to the policy in the same commit, then plan again.');

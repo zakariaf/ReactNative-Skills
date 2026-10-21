@@ -16,7 +16,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { ENGINE_FLOORS, ENGINE_RANGES, EXACT_VERSION, MODULE_MAP_SOURCE, NPMRC_POLICY, RELEASE_AGE_MIN_DAYS, bareVersion, banFix, describePlace, effectiveBans, entriesOf, installed, isAppRow, isDevRow, loadBanLists, lockName, manifestFile, missingBans, moduleMapFor, npmConfigFinding, npmEnvKey, npmrcExcludeProblems, npmrcForbidden, npmrcPolicyMissing, npmrcPolicyOverrides, npxCalls, parseAllowScriptsKey, placeOf, placesOf, policyPath, rangeAdmitsBelow, readPolicy, readRepo, releaseAgeDays, repoSdk, resolveOverride, specAccepts, todayUtc, yamlRunLines } from './lib/policy.mjs';
+import { ENGINE_FLOORS, ENGINE_RANGES, EXACT_VERSION, MODULE_MAP_SOURCE, NPMRC_POLICY, RELEASE_AGE_MIN_DAYS, bareVersion, banFix, describePlace, doNotAddBlocks, doNotAddEntry, effectiveBans, entriesOf, installed, isAppRow, isDevRow, loadBanLists, lockName, manifestFile, missingBans, moduleMapFor, npmConfigFinding, npmEnvKey, npmrcExcludeProblems, npmrcForbidden, npmrcPolicyMissing, npmrcPolicyOverrides, npxCalls, parseAllowScriptsKey, placeOf, placesOf, policyPath, rangeAdmitsBelow, readPolicy, readRepo, releaseAgeDays, repoSdk, resolveOverride, specAccepts, todayUtc, yamlRunLines } from './lib/policy.mjs';
 import { createReporter, fail, notYetCreated, parseArgs, parseJsonc, requireDir, resolveLayout, run, walkRepo } from './check-lib.mjs';
 
 const SPEC = {
@@ -245,7 +245,7 @@ function checkNpxInstalls(ctx) {
           add(file, line, 'npx-install', `"${shown}" makes npx install eas-cli ${where}: EAS CLI's tree holds install scripts (dtrace-provider and protobufjs, verified 2026-10-03), so the call stops with ESTRICTALLOWSCRIPTS on a fresh runner while a warm npx cache hides it, and expo-doctor refuses eas-cli as a dependency`, `Install EAS CLI globally instead: ${EAS_GLOBAL}.`);
           continue;
         }
-        const reason = policy?.doNotAdd?.[spec.name];
+        const reason = doNotAddEntry(policy, spec.name)?.reason;
         const ban = bans.find((entry) => entry.regex.test(spec.name));
         if (reason) add(file, line, 'npx-install', `"${shown}" makes npx install ${spec.name}, a package the policy keeps out of the repo (doNotAdd), ${where}`, `Follow the policy's reason for ${spec.name} instead of npx: ${reason}.`);
         else if (ban) add(file, line, 'npx-install', `"${shown}" makes npx install ${spec.name}, which is banned: ${ban.reason}`, `Remove the call.${banFix(ban)}`);
@@ -313,8 +313,11 @@ function checkDependency(ctx, ws, section, name, spec) {
   const row = policy?.packages[name];
   const mapSpec = map?.[name];
   const runtime = repo.apps.includes(ws) && section !== 'devDependencies';
-  const doNotAdd = policy?.doNotAdd[name];
-  if (doNotAdd) report('do-not-add', `${name}: ${doNotAdd}`, `Remove it: npm uninstall ${name}${npmTarget(repo, ws)}.`);
+  // A scoped entry ({ where, allowIn }) keeps the package out of its places only; a row allows it elsewhere.
+  const kept = doNotAddEntry(policy, name);
+  const place = placeOf(repo, ws, section);
+  const doNotAdd = doNotAddBlocks(kept, place) ? kept.reason : null;
+  if (doNotAdd) report('do-not-add', `${name}${kept.where === null ? '' : ` (kept out of ${describePlace(repo, kept.where)})`}: ${doNotAdd}`, `Remove it: npm uninstall ${name}${npmTarget(repo, ws)}.${kept.where === null ? '' : ` The policy allows it only where its row says (${describePlace(repo, policy.packages[name]?.where ?? 'nowhere yet')})${kept.allowIn.length > 0 ? `, imported only by ${kept.allowIn.join(', ')}` : ''}.`}`);
   const ban = bans.find((entry) => entry.regex.test(name));
   if (ban) report('banned', `${name} is banned: ${ban.reason}`, `Remove it (npm uninstall ${name}${npmTarget(repo, ws)}) with its imports and plugin entries.${banFix(ban)}`);
   // npx expo install <pkg>@<table spec> writes the module map's specifier, and "~x.y.z" for expo itself.
@@ -331,7 +334,6 @@ function checkDependency(ctx, ws, section, name, spec) {
     return;
   }
   if (sameSdk && spec !== row.spec) report('table-version', `${name} is "${spec}" but the policy pins "${row.spec}"`, `${runtime && row.install === 'expo' ? `Run ${expoInstall(repo, ws, name, row.spec)}` : `Use "${row.spec}"`}, or finish the upgrade procedure and change the row in the same commit.`);
-  const place = placeOf(repo, ws, section);
   if (!placesOf(row).includes(place)) report('wrong-workspace', `${name} belongs in ${describePlace(repo, row.where)}, not in ${describePlace(repo, place)}`, `Uninstall it there and install it where the row says (${row.install === 'expo' ? `npx expo install ${name}@${row.spec}` : `npm install ${name}@${row.version}${isDevRow(row) ? ' -D' : ''}`}${repo.mode === 'single' ? '' : ' in the right workspace'})${repo.shared.includes(ws) && !row.native && row.install === 'npm' ? `, or, when the code of ${ws} imports it, add "${ws}" to the row's "where" list` : ''}.`);
 }
 
