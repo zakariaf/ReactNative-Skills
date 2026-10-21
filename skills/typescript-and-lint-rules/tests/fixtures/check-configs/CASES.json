@@ -1978,5 +1978,33 @@
         }
       }
     ]
+  },
+  "pass-eslint-rules-assertions": {
+    "expect": [
+      "check-configs: 5 config areas checked, 0 problems"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "      'jest/expect-expect': ['error', { assertFunctionNames: ['expect', 'fc.assert'] }],\n",
+          "with": "      'jest/expect-expect': [\n        'error',\n        { assertFunctionNames: ['expect', 'fc.assert', 'assertSucceeds', 'assertFails'] },\n      ],\n"
+        }
+      }
+    ]
+  },
+  "bad-eslint-assertion-names": {
+    "expect": [
+      "[eslint-weakened] the block for files: TESTS (rules max-lines, max-lines-per-function, max-nested-callbacks, ...) differs from templates/eslint.config.mjs: it changes the rule 'jest/expect-expect' [canonical-block]"
+    ],
+    "ops": [
+      {
+        "replace": {
+          "file": "eslint.config.mjs",
+          "find": "      'jest/expect-expect': ['error', { assertFunctionNames: ['expect', 'fc.assert'] }],\n",
+          "with": "      'jest/expect-expect': [\n        'error',\n        { assertFunctionNames: ['expect', 'fc.assert', 'assertSucceeds', 'assertFails', 'check'] },\n      ],\n"
+        }
+      }
+    ]
   }
 }

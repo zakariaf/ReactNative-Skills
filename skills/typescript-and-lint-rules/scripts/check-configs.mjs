@@ -551,7 +551,7 @@ function wideUnits(block, canonicalExact) {
 function checkBlocks(canonical, app, spec, report, { multiPackage, scoped }) {
   const groupExact = new Map(groupsOf(canonical).map((group) => [group, canonical.constGlobs(group).globs.every(isExactGlob)]));
   const keyOf = (item) => (item.kind === 'block' ? `block:${scopeKey(item)}` : `other:${item.head}`);
-  const equal = (want, got) => (want.kind === 'block' ? blockDifferences(want, got, { multiPackage }).length === 0 : want.head === 'globalIgnores' || want.text === got.text);
+  const equal = (want, got) => (want.kind === 'block' ? blockDifferences(want, got, { multiPackage, alternatives: spec.structure.ruleAlternatives }).length === 0 : want.head === 'globalIgnores' || want.text === got.text);
   const used = new Set();
   let next = 0;
   const firstLine = app.arrayRange ? app.scan.lineOf(app.arrayRange.start) : 1;
@@ -569,7 +569,7 @@ function checkBlocks(canonical, app, spec, report, { multiPackage, scoped }) {
     if (changed) {
       used.add(changed.index);
       next = changed.index + 1;
-      const differences = blockDifferences(want, changed.item, { multiPackage });
+      const differences = blockDifferences(want, changed.item, { multiPackage, alternatives: spec.structure.ruleAlternatives });
       report.problem({ file: spec.file, line: changed.item.line, rule: 'eslint-weakened', message: `${label} differs from templates/eslint.config.mjs: it ${differences.slice(0, 3).join(', ')} [canonical-block]`, fix: STRUCTURE_FIX });
       continue;
     }

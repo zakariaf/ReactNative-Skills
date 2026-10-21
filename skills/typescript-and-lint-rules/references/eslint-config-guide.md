@@ -372,6 +372,13 @@ name and without counting its `allow` list, when all of this holds; otherwise it
   [NODE_BUILTINS], allow: [...] })` for a file under `src/`. Any other lift drops more than the one
   package.
 
+The rules tests assert with `assertSucceeds` and `assertFails` of `@firebase/rules-unit-testing`, which
+`jest/expect-expect` does not count. Append exactly those two names to the tests block's
+`assertFunctionNames` (`['expect', 'fc.assert', 'assertSucceeds', 'assertFails']`): it is the one
+sanctioned value of that rule besides the canonical one (`ts-lint-baseline.json`
+`structure.ruleAlternatives`), and the quality-gates guardrail accepts the appended names in
+`quality-gates.json` too. Any other name fails `[canonical-block]`.
+
 A new rules test file then needs no config change. architecture-and-boundaries' `check-boundaries.mjs`
 reads the same `allowIn`, so both gates agree on who may import the package.
 
