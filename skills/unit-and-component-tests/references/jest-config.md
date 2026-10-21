@@ -417,9 +417,10 @@ One Jest config, run from the repo root, still covers every workspace:
   projects run); a single app keeps exactly unit, android and golden. quality-gates lists the
   project in `quality-gates.json` `jest.projects` in the same gate change. The build output
   (`functions/lib/`) needs no Jest ignore: tests and coverage read only `src/`.
-- **Skia in a workspace only.** The template's `HAS_SKIA` reads the root `package.json`; when only an
-  app workspace lists Skia, read that workspace's manifest instead (the checker looks at every
-  workspace).
+- **Skia in a workspace only.** The template's `HAS_SKIA` reads the root `package.json` and every
+  workspace's (`MANIFESTS`, from the root `"workspaces"` globs), so Skia listed only in
+  `apps/mobile/package.json` still runs the golden project in CanvasKit, as the checker expects (it
+  reads every workspace too; `pass-skia-in-app-workspace`). Nothing to edit in the config.
 - **Stryker** `disableTypeChecks: "{apps,packages}/*/src/**/*.{ts,tsx}"` (coverage-and-mutation.md).
 - **Ignore lists** add each app's generated folders (`<rootDir>/apps/[^/]+/(ios|android|build|dist)/`).
 - **The contract** names the logic keys and mutate globs of each workspace
